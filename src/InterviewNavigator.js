@@ -86,30 +86,83 @@ class InterviewNavigator {
   }
 
   /**
-   * Check if the supplied skipConditions and conditions return a 'skip' value. AKA should a question_group be skipped.
+   * Check if a condition tag is present in the current context
+   * @param conditionId
+   * @returns {Boolean} - True if the condition tag is present
+   * @private
+   */
+  _hasConditionTag (conditionId) {
+    return this.respondentConditions[conditionId] ||
+      this.formConditions[conditionId] ||
+      (this.sectionConditions[this.state.section] &&
+        this.sectionConditions[this.state.section][this.state.sectionRepetition] &&
+        this.sectionConditions[this.state.section][this.state.sectionRepetition][conditionId]
+      )
+  }
+
+  /**
+   * Check if the supplied skipConditions should return a 'skip' value. This is the only method responsible for
+   * evaluating skip condtions
    * @param skipCondition
    * @param conditions
    * @returns {boolean}
    * @private
    */
   _shouldSkipPage (skipConditions, sectionRepetition) {
+    let shouldSkip = false
 
-    let shouldSkip = false;
     for (let skipCondition of skipConditions) {
-      if (skipCondition.show_hide){
+      // Cast condition booleans as boolean
+      for (let boolKey of ['show_hide', 'any_all']) {
+        if (skipCondition[boolKey] === '0' || skipCondition[boolKey] === 0) {
+          skipCondition[boolKey] = false
+        } else if (skipCondition[boolKey] === '1' || skipCondition[boolKey] === 1) {
+          skipCondition[boolKey] = true
+        }
+      }
+      if (skipCondition.show_hide) {
         if (skipCondition.any_all) {
           // Show if any are true
+          shouldSkip = true
+          for (let condition of skipCondition.conditions) {
+            if (this._hasConditionTag(condition.id)) {
+              shouldSkip = false
+              break
+            }
+          }
         } else {
           // Show if all are true
+          shouldSkip = false
+          for (let condition of skipCondition.conditions) {
+            if (!this._hasConditionTag(condition.id)) {
+              shouldSkip = true
+              break
+            }
+          }
         }
       } else {
         if (skipCondition.any_all) {
           // Hide if any are true
+          shouldSkip = false
+          for (let condition of skipCondition.conditions) {
+            if (this._hasConditionTag(condition.id)) {
+              shouldSkip = true
+              break
+            }
+          }
         } else {
-          // Show if all are true
+          // Hide if all are true
+          shouldSkip = true
+          for (let condition of skipCondition.conditions) {
+            if (!this._hasConditionTag(condition.id)) {
+              shouldSkip = false
+              break
+            }
+          }
         }
       }
     }
+    return shouldSkip
   }
 
   /**
@@ -161,6 +214,24 @@ class InterviewNavigator {
    */
   previous () {
     console.log('previous')
+    let section = this.structure.sections[this.state.section]
+    this.state.page --
+    if (this.state.page < 0) {
+      this.state.page = section.question_groups.length - 1
+      this.state.sectionRepetition --
+    }
+    if (this.state.sectionRepetition < 0) {
+      this.state.sectionRepetition = 0
+      this.state.section --
+    }
+    if (this.state.section < 0) {
+      this.state.page = 0
+      this.state.sectionRepetition = 0
+      this.state.section = 0
+      console.log("We've reached the beginning of the survey")
+    } else if (this._shouldSkipPage(section.question_groups[this.state.page].skips)) {
+      this.previous()
+    }
   }
 
   /**
