@@ -10,7 +10,10 @@
     <v-content>
       <v-container v-if="!isLoading" fluid>
         <!--<router-view></router-view>-->
-        <Page :questions="questions"></Page>
+        <Page :questions="questions"
+              :page="interviewState.state.page"
+              :section="interviewState.state.section"
+              :repetition="interviewState.state.sectionRepetition"></Page>
       </v-container>
       <v-container v-if="isLoading">
         Loading...

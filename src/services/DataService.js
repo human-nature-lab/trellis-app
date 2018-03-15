@@ -50,6 +50,16 @@ class DataService {
         throw err
       })
   }
+  getActionTypes (formId) {
+    return this.instance.get('form/action-types')
+      .then(function (response) {
+        return response.data
+      })
+      .catch(function (err) {
+        console.log('error', err)
+        throw err
+      })
+  }
 }
 
 export default new DataService()

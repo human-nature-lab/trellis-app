@@ -21,19 +21,31 @@
 
 <script>
   import Question from './Question.vue'
-  import interviewState from '../InterviewNavigator'
+  import {sharedState} from '../InterviewNavigator'
+  const interviewState = sharedState()
   export default {
     name: 'page',
     props: {
       questions: {
         type: Array,
         required: true
+      },
+      section: {
+        type: Number
+      },
+      repetition: {
+        type: Number
+      },
+      page: {
+        type: Number
       }
     },
     methods: {
       onNext: (event) => {
         console.log('next')
-        interviewState.next()
+        interviewState.doAction({
+          name: 'next'
+        })
       },
       onPrevious: (event) => {
         console.log('previous')
