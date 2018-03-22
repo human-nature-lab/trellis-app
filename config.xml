@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="1" ios-CFBundleVersion="1" version="0.0.1" id="edu.yale.trellis.survey-view" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget android-versionCode="1" id="edu.yale.trellis.surveyview" ios-CFBundleVersion="1" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>trellis-survey-view</name>
     <description>The form view component of the Trellis platform.</description>
     <author email="dev@cordova.apache.org" href="http://cordova.io">
@@ -22,4 +22,5 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
+    <engine name="android" spec="^7.1.0" />
 </widget>
