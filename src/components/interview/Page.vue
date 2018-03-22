@@ -21,7 +21,7 @@
 
 <script>
   import Question from './Question.vue'
-  import {sharedActionManager} from '../ActionManager'
+  import {sharedActionManager} from './services/ActionManager'
   export default {
     name: 'page',
     data: function () {

@@ -1,4 +1,4 @@
-import Survey from './models/Survey'
+import Survey from '../../../models/Survey'
 export default class SurveyState {
   constructor (formBlueprint) {
     this.survey = new Survey(formBlueprint)
