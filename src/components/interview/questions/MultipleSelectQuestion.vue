@@ -11,7 +11,7 @@
 
 <script>
   import TrellisMultiSelect from '../TrellisMultiSelect'
-  import {sharedActionManager} from '../../ActionManager'
+  import {sharedActionManager} from '../services/ActionManager'
   export default {
     props: ['question'],
     name: 'multiple-select-question',

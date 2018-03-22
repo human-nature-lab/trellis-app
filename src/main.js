@@ -7,7 +7,7 @@ import VueCordova from 'vue-cordova'
 import VueHead from 'vue-head'
 
 import App from './App'
-import router from './router'
+import router from './router/index'
 
 // Flag for debug
 Vue.use(Vuetify)
