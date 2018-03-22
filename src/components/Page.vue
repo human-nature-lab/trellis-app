@@ -21,10 +21,14 @@
 
 <script>
   import Question from './Question.vue'
-  import {sharedState} from '../InterviewNavigator'
-  const interviewState = sharedState()
+  import {sharedActionManager} from '../ActionManager'
   export default {
     name: 'page',
+    data: function () {
+      return {
+        actions: null
+      }
+    },
     props: {
       questions: {
         type: Array,
@@ -40,16 +44,17 @@
         type: Number
       }
     },
+    mounted: function () {
+      this.actions = sharedActionManager()
+    },
     methods: {
-      onNext: (event) => {
+      onNext: function () {
         console.log('next')
-        interviewState.doAction({
-          name: 'next'
-        })
+        this.actions.pushUserAction(null, 'next', null)
       },
-      onPrevious: (event) => {
+      onPrevious: function () {
         console.log('previous')
-        interviewState.previous()
+        this.actions.pushUserAction(null, 'previous', null)
       }
     },
     computed: {
