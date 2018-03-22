@@ -1,12 +1,12 @@
-import InterviewState from './InterviewState'
+import SurveyState from './SurveyState'
 export default class ActionManager {
   constructor (interviewId, actions = []) {
     this.interviewId = interviewId
     this.actions = []
-    this.interviewState = new InterviewState()
+    this.surveyState = new SurveyState()
   }
   /**
-   * Push a user action onto the stack. This will do a diff of the interviewState before actually modifying the data
+   * Push a user action onto the stack. This will do a diff of the surveyState before actually modifying the data
    * @param questionId
    * @param type
    * @param modifications
@@ -29,6 +29,14 @@ export default class ActionManager {
    */
   pushAction (action) {
     this.actions.push(action)
-    this.interviewState.doAction(this.actions.slice(-1))
+    this.surveyState.doAction(this.actions[this.actions.length - 1])
   }
+}
+
+let sharedManager = null
+export function sharedActionManager (interviewId, actions) {
+  if (!sharedManager) {
+    sharedManager = new ActionManager(interviewId, actions)
+  }
+  return sharedManager
 }

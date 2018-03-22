@@ -1,13 +1,20 @@
 <template>
   <v-card class="question">
     <v-card-title class="question-title deep-orange white--text">
-      <div class="name" :question-id="question.id">Question: {{question.var_name}}</div>
+      <v-layout row>
+        <v-flex sm10 class="name" :question-id="question.id">
+          {{question.text}}
+        </v-flex>
+        <v-flex sm2 class="text-xs-right">
+          {{question.var_name}}
+        </v-flex>
+      </v-layout>
     </v-card-title>
     <v-card-text class="question-content">
-      Question here: {{question.var_name}}
-      <IntroQuestion v-if="question.question_type.name === 'intro'" :question="transformedQuestion"></IntroQuestion>
-      <MultipleSelectQuestion v-if="question.question_type.name === 'multiple_select'" :question="transformedQuestion"/>
-      <MultipleChoiceQuestion v-if="question.question_type.name === 'multiple_choice'" :question="transformedQuestion"/>
+
+      <IntroQuestion v-if="question.type.name === 'intro'" :question="question"></IntroQuestion>
+      <MultipleSelectQuestion v-if="question.type.name === 'multiple_select'" :question="question"/>
+      <MultipleChoiceQuestion v-if="question.type.name === 'multiple_choice'" :question="question"/>
     </v-card-text>
     <v-card-actions>
       <DontKnowRefused></DontKnowRefused>
@@ -18,7 +25,7 @@
 <script>
   // This parent component servers the purpose of handling general functionality that is used across all questions.
   // For example, question title and message fills will be applied here. The question header text will be applied here
-  import translationService from '../services/TranslationService'
+  // import translationService from '../services/TranslationService'
   import IntroQuestion from './questions/IntroQuestion.vue'
   import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
   import MultipleChoiceQuestion from './questions/MultipleChoiceQuestion'
@@ -31,23 +38,8 @@
         dk_rf: undefined
       }
     },
-    computed: {
-      transformedQuestion: function () {
-        switch (this.question.question_type.name) {
-          case 'multiple_choice':
-          case 'multiple_select':
-            for (let choice of this.question.choices) {
-              choice.text = translationService.getText(choice.choice_translation)
-            }
-            this.question.choices.sort((a, b) => {
-              return a.pivot.sort_order > b.pivot.sort_order
-            })
-            break
-          default:
-            this.question.text = translationService.getText(this.question.question_translation)
-        }
-        return this.question
-      }
+    methods: {
+
     },
     components: {
       IntroQuestion,
