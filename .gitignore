@@ -8,6 +8,20 @@ test/unit/coverage
 test/e2e/reports
 selenium-debug.log
 
+/platforms
+/plugins
+resources/signing
+
+www/css/app.*.css
+www/css/app.*.css.map
+www/js/app.*.js
+www/js/app.*.js.map
+www/js/manifest.*.js
+www/js/manifest.*.js.map
+www/js/vendor.*.js.map
+www/js/vendor.*.js
+/www
+
 # Editor directories and files
 .idea/
 *.suo

@@ -20,8 +20,9 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "cordova-android": "^7.0.0",
+    "cordova-android": "^7.1.0",
     "cordova-plugin-device": "^2.0.1",
+    "cordova-plugin-whitelist": "^1.3.3",
     "material-design-icons": "^3.0.1",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.6",
@@ -113,8 +114,11 @@
   ],
   "cordova": {
     "plugins": {
-      "cordova-plugin-device": {}
+      "cordova-plugin-device": {},
+      "cordova-plugin-whitelist": {}
     },
-    "platforms": []
+    "platforms": [
+      "android"
+    ]
   }
 }
