@@ -1,7 +1,44 @@
-import Survey from '../../../models/Survey'
+import interviewNavigator from './InterviewNavigator'
+import dataStore from './InterviewDataStore'
+import interpolationService from '@/services/InterpolationService'
+import translationService from '@/services/TranslationService'
 export default class SurveyState {
-  constructor (formBlueprint) {
-    this.survey = new Survey(formBlueprint)
+  constructor () {
+    this.navigator = interviewNavigator
+    this.dataStore = dataStore
+    // TODO: Why does this break Vue's reactivity? Probably because I'm overiding an existing method without inheritance?
+    // this.navigator.hasConditionTag = conditionId => {
+    //   return this.dataStore.hasConditionTag(conditionId, this.navigator.state.section) // TODO: Make this use the correct state variables
+    // }
+  }
+
+  loadBlueprint (blueprint) {
+    this.navigator.loadStructure(blueprint)
+  }
+
+  // Handle merging data from the data store with the question blueprints from the navigator
+  _combineQuestionData (questionBlueprints, questionData) {
+    return questionBlueprints.map(blueprint => {
+      let question = {
+        id: blueprint.id,
+        choices: Object.assign(blueprint.choices, {}),
+        type: blueprint.question_type,
+        data: questionData[blueprint.id] ? questionData[blueprint.id].data : []
+      }
+      if (question.choices) {
+        question.choices.forEach(choice => (choice.text = interpolationService.interpolate(translationService.getTranslated(choice.choice_translation))), {})
+      }
+      question.name = blueprint.var_name
+      question.text = interpolationService.interpolate(question.text, {})
+      return question
+    })
+  }
+
+  getCurrentQuestions () {
+    let questionData = this.dataStore.getPageQuestionData(this.navigator.state.section, this.navigator.state.page)
+    let questionBlueprints = this.navigator.getCurrentQuestionBlueprints()
+    console.log(questionData, questionBlueprints)
+    return this._combineQuestionData(questionBlueprints, questionData)
   }
 
   /**
@@ -24,10 +61,10 @@ export default class SurveyState {
     console.log(action)
     switch (action.action_type) {
       case 'next':
-        this.survey.next()
+        this.navigator.next()
         break
       case 'previous':
-        this.survey.previous()
+        this.navigator.previous()
         break
       case 'select-choice':
         this.survey.getQuestion(action.question_id).select(action.changes_text)

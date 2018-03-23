@@ -1,5 +1,5 @@
 <template>
-  <div class="multiple-choice">
+  <div class="multiple-select">
     <trellis-multi-select
       :selected="selected"
       :choices="question.choices"
@@ -10,7 +10,7 @@
 </template>
 
 <script>
-  import TrellisMultiSelect from '../TrellisMultiSelect'
+  import TrellisMultiSelect from '../../TrellisMultiSelect'
   import {sharedActionManager} from '../services/ActionManager'
   export default {
     props: ['question'],
