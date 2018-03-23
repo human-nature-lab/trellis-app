@@ -1,10 +1,11 @@
 <template>
-  <Page :questions="questions"
-        :page="survey.location.page"
-        :page-repetition="survey.location.pageRepetition"
-        :section="survey.location.section"
-        :section-repetition="survey.location.sectionRepetition"
-  />
+  <v-flex>
+    <v-progress-linear :active="isLoading" indeterminate height="2"></v-progress-linear>
+    <Page :questions="questions"
+          :location="location"
+          v-if="!isLoading"
+    />
+  </v-flex>
 </template>
 
 <script>
@@ -14,6 +15,7 @@
   import {sharedActionManager} from './services/ActionManager'
   import translationService from '../../services/TranslationService'
   import config from '../../config'
+  import SurveyState from './services/SurveyState'
 
   // Custom logging functions that respond to the debug setting in config.js
   Vue.mixin({
@@ -33,6 +35,9 @@
   export default {
     data () {
       return {
+        studyId: this.$route.params.studyId,
+        interviewId: this.$route.params.interviewId,
+        surveyId: null,
         clipped: false,
         survey: null,
         isLoading: true
@@ -40,17 +45,20 @@
     },
     created () {
       dataService.setStudyId('ad9a9086-8f15-4830-941d-416b59639c41')
+      dataService.setStudyId(this.studyId)
       dataService.getLocales()
         .then(locales => {
           console.log('locales', locales)
           translationService.setLocale(locales[0])
-          return dataService.getStructure('be587a4a-38c6-46cb-a787-1fcb4813b274')
+          return dataService.getForm('be587a4a-38c6-46cb-a787-1fcb4813b274')
         })
         .then(resData => {
-          this.actions = sharedActionManager('fake-id-1234567890-0987654321') // TODO: load existing actions here
+          this.actions = sharedActionManager(this.surveyId) // TODO: load and play existing actions here
+          this.surveyState = new SurveyState()
           window.actions = this.actions
-          this.actions.surveyState.survey.loadBlueprint(resData.structure)
-          this.survey = this.actions.surveyState.survey
+          this.surveyState.loadBlueprint(resData.structure)
+          this.actions.on('action', this.surveyState.doAction, this.surveyState)
+          this.actions.on('user-action', this.surveyState.doAction, this.surveyState)
           console.log(resData)
           this.isLoading = false
         })
@@ -60,9 +68,17 @@
     },
     computed: {
       questions: function () {
-        let questions = this.survey.getCurrentQuestions()
+        let questions = this.surveyState.getCurrentQuestions()
         console.log('Computed questions', questions)
         return questions || []
+      },
+      location: function () {
+        return {
+          page: this.surveyState.navigator.state.page || 0,
+          sectionRepetition: this.surveyState.navigator.state.sectionRepetition || 0,
+          section: this.surveyState.navigator.state.section || 0,
+          sectionFollowUpRepetition: this.surveyState.navigator.state.sectionFollowUpRepetition || 0
+        }
       }
     },
     components: {

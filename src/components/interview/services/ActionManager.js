@@ -1,9 +1,9 @@
-import SurveyState from './SurveyState'
-export default class ActionManager {
+import Emitter from '../../../classes/Emitter'
+export default class ActionManager extends Emitter {
   constructor (interviewId, actions = []) {
+    super()
     this.interviewId = interviewId
     this.actions = []
-    this.surveyState = new SurveyState()
   }
   /**
    * Push a user action onto the stack. This will do a diff of the surveyState before actually modifying the data
@@ -17,9 +17,10 @@ export default class ActionManager {
       question_id: questionId,
       action_type: type,
       changes_text: modifications,
-      created_at: new Date()
+      created_at: (new Date()).getTime()
     }
-    this.pushAction(action)
+    this.actions.push(action)
+    this.dispatch('user-action', action)
   }
   /**
    * Push a non-user action onto the action stack
@@ -29,7 +30,7 @@ export default class ActionManager {
    */
   pushAction (action) {
     this.actions.push(action)
-    this.surveyState.doAction(this.actions[this.actions.length - 1])
+    this.dispatch('action', action)
   }
 }
 

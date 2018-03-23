@@ -1,21 +1,15 @@
+import dataStore from './InterviewDataStore'
 class InterviewNavigator {
   constructor () {
     // Structure holds the form data that define how the survey is traversed. This includes sections, pages and questions
     // with repeated sections/pages and skip conditions included
     this.structure = {}
-
-    // Assigned conditions can be assigned to the respondent, form or section
-    this.respondentConditions = {}
-    this.formConditions = {}
-    this.sectionConditions = {}
-
-    this.rosterData = {}
+    this.dataStore = dataStore
     this.state = {
       section: 0,             // index of the current section
       sectionRepetition: 0,   // number of completed sectionRepetitions
       page: 0                 // index of the current page
     }
-    this.questions = []
   }
 
   /**
@@ -38,15 +32,6 @@ class InterviewNavigator {
         })
       })
     })
-  }
-
-  /**
-   * Load a bunch of conditions together
-   * @param conditions
-   */
-  loadConditions (conditions) {
-    // Conditions can be assigned to the respondent, form and/or section and they are all passed into the skip evaluations
-    this.assignedConditions = Object.assign({}, conditions)
   }
 
   /**
@@ -91,13 +76,8 @@ class InterviewNavigator {
    * @returns {Boolean} - True if the condition tag is present
    * @private
    */
-  _hasConditionTag (conditionId) {
-    return this.respondentConditions[conditionId] ||
-      this.formConditions[conditionId] ||
-      (this.sectionConditions[this.state.section] &&
-        this.sectionConditions[this.state.section][this.state.sectionRepetition] &&
-        this.sectionConditions[this.state.section][this.state.sectionRepetition][conditionId]
-      )
+  hasConditionTag (conditionId) {
+    return this.dataStore.hasConditionTag(conditionId, this.state.section)
   }
 
   /**
@@ -108,7 +88,7 @@ class InterviewNavigator {
    * @returns {boolean}
    * @private
    */
-  _shouldSkipPage (skipConditions, sectionRepetition) {
+  _shouldSkipPage (skipConditions) {
     let shouldSkip = false
 
     for (let skipCondition of skipConditions) {
@@ -125,7 +105,7 @@ class InterviewNavigator {
           // Show if any are true
           shouldSkip = true
           for (let condition of skipCondition.conditions) {
-            if (this._hasConditionTag(condition.id)) {
+            if (this.hasConditionTag(condition.id)) {
               shouldSkip = false
               break
             }
@@ -134,7 +114,7 @@ class InterviewNavigator {
           // Show if all are true
           shouldSkip = false
           for (let condition of skipCondition.conditions) {
-            if (!this._hasConditionTag(condition.id)) {
+            if (!this.hasConditionTag(condition.id)) {
               shouldSkip = true
               break
             }
@@ -145,7 +125,7 @@ class InterviewNavigator {
           // Hide if any are true
           shouldSkip = false
           for (let condition of skipCondition.conditions) {
-            if (this._hasConditionTag(condition.id)) {
+            if (this.hasConditionTag(condition.id)) {
               shouldSkip = true
               break
             }
@@ -154,7 +134,7 @@ class InterviewNavigator {
           // Hide if all are true
           shouldSkip = true
           for (let condition of skipCondition.conditions) {
-            if (!this._hasConditionTag(condition.id)) {
+            if (!this.hasConditionTag(condition.id)) {
               shouldSkip = false
               break
             }
@@ -196,15 +176,16 @@ class InterviewNavigator {
     }
     // Check skip conditions and keep moving forward if the section is skipped
     if (this._shouldSkipPage(this.structure.sections[this.state.section].question_groups[this.state.page].skips, this.assignedConditions)) {
-      this.next()
+      return this.next()
     }
+    console.log(this.state)
   }
 
   /**
    * Get all of the questions for the current page. TODO: This should probably be moved to another service.
    * @returns {computed.questions|Array}
    */
-  getCurrentPageQuestions () {
+  getCurrentQuestionBlueprints () {
     this.questions = this.structure.sections ? this.structure.sections[this.state.section].question_groups[this.state.page].questions : []
     return this.questions
   }
