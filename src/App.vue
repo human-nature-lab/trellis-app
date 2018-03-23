@@ -11,24 +11,22 @@
         </v-btn>
         <v-list>
           <v-list-tile>
-            <router-link to="/">Home</router-link>
+            <router-link :to="{name: 'Home'}">Home</router-link>
           </v-list-tile>
           <v-list-tile>
-            <router-link to="interview/1">Form 1</router-link>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '1'}}">Form 1</router-link>
           </v-list-tile>
           <v-list-tile>
-            <router-link to="interview/2">Form 2</router-link>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '2'}}">Form 2</router-link>
           </v-list-tile>
           <v-list-tile>
-            <router-link to="interview/3">Form 3</router-link>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '3'}}">Form 3</router-link>
           </v-list-tile>
         </v-list>
       </v-menu>
     </v-toolbar>
     <v-content>
-      <v-container fluid>
-        <router-view></router-view>
-      </v-container>
+      <router-view></router-view>
     </v-content>
   </v-app>
 </template>
@@ -37,6 +35,10 @@
   import Vue from 'vue'
   import Interview from './components/interview/Interview'
   import config from './config'
+  import dataService from './services/DataService'
+
+  // TODO: This should be set by the app instead of being hardcoded
+  dataService.setStudyId('ad9a9086-8f15-4830-941d-416b59639c41')
 
   // Custom logging functions that respond to the debug setting in config.js
   Vue.mixin({
@@ -66,6 +68,11 @@
       this.cordova.on('deviceready', () => {
         self.onDeviceReady()
       })
+    },
+    computed: {
+      studyId: function () {
+        return dataService.studyId
+      }
     },
     methods: {
       onDeviceReady: function () {

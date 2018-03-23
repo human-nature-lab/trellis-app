@@ -22,7 +22,7 @@ class DataService {
         throw err
       })
   }
-  getStructure (formId) {
+  getForm (formId) {
     return this.instance.get(`form/${formId}/structure`)
       .then(function (response) {
         return response.data
@@ -31,6 +31,9 @@ class DataService {
         console.log('error', err)
         throw err
       })
+  }
+  getForms (respondentId, studyId) {
+    return this.instance.get(``)
   }
   getConditions (respondentId, formId, sectionId) {
     return Promise.all([
