@@ -1,17 +1,16 @@
 <template>
   <div class="multiple-select">
-    <trellis-multi-select
-      :selected="selected"
-      :choices="question.choices"
-      @selected="onSelected"
-      @deselected="onDeselected"
-    ></trellis-multi-select>
+    <v-checkbox
+      v-for="choice in question.choices"
+      :value="choice.val"
+      :label="choice.text"
+      :key="choice.val"
+      @change="onChange(choice)"/>
   </div>
 </template>
 
 <script>
-  import TrellisMultiSelect from '../../TrellisMultiSelect'
-  import {sharedActionManager} from '../services/ActionManager'
+  import { sharedActionManager } from '../services/ActionManager'
   export default {
     props: ['question'],
     name: 'multiple-select-question',
@@ -24,6 +23,9 @@
       }
     },
     methods: {
+      onChange: function (choice) {
+        console.log('change', choice)
+      },
       onSelected: function (choice) {
         this.actions.pushUserAction(this.question.id, 'select-choice', {
           choiceId: choice.id
@@ -34,9 +36,6 @@
           choiceId: choice.id
         })
       }
-    },
-    components: {
-      TrellisMultiSelect
     }
   }
 </script>

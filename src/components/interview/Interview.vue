@@ -13,7 +13,6 @@
   import Page from './Page'
   import dataService from '../../services/DataService'
   import {sharedActionManager} from './services/ActionManager'
-  import translationService from '../../services/TranslationService'
   import config from '../../config'
   import SurveyState from './services/SurveyState'
 
@@ -44,14 +43,7 @@
       }
     },
     created () {
-      dataService.setStudyId('ad9a9086-8f15-4830-941d-416b59639c41')
-      dataService.setStudyId(this.studyId)
-      dataService.getLocales()
-        .then(locales => {
-          console.log('locales', locales)
-          translationService.setLocale(locales[0])
-          return dataService.getForm('be587a4a-38c6-46cb-a787-1fcb4813b274')
-        })
+      dataService.getForm('be587a4a-38c6-46cb-a787-1fcb4813b274')
         .then(resData => {
           this.actions = sharedActionManager(this.surveyId) // TODO: load and play existing actions here
           this.surveyState = new SurveyState()

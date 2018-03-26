@@ -1,19 +1,17 @@
 import axios from 'axios'
 import config from '../config'
+import storage from './StorageService'
 class DataService {
-  constructor (studyId) {
-    this.studyId = studyId
+  constructor () {
     this.instance = axios.create({
       baseURL: config.apiRoot,
       timeout: 20000,
       headers: {'X-Key': config.xKey}
     })
   }
-  setStudyId (studyId) {
-    this.studyId = studyId
-  }
   getLocales () {
-    return this.instance.get(`study/${this.studyId}/locales`)
+    let studyId = storage.get('studyId', 'string')
+    return this.instance.get(`study/${studyId}/locales`)
       .then(response => {
         return response.data.locales
       })
@@ -31,9 +29,6 @@ class DataService {
         console.log('error', err)
         throw err
       })
-  }
-  getForms (respondentId, studyId) {
-    return this.instance.get(``)
   }
   getConditions (respondentId, formId, sectionId) {
     return Promise.all([
