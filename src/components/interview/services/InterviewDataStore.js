@@ -71,10 +71,6 @@ class InterviewDataService {
     }
   }
 
-  getSectionConditionTags (...getSectionArgs) {
-    return this.getSection(...getSectionArgs).sectionConditionTags.concat(this.respondentConditionTags).concat(this.formConditionTags)
-  }
-
   copy () {
     return new InterviewDataService(JSON.parse(JSON.stringify(this.sections)))
   }

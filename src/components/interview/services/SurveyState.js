@@ -2,6 +2,7 @@ import interviewNavigator from './InterviewNavigator'
 import dataStore from './InterviewDataStore'
 import interpolationService from '@/services/InterpolationService'
 import translationService from '@/services/TranslationService'
+// import interviewActions from './InterviewActionDefinitions'
 export default class SurveyState {
   constructor () {
     this.navigator = interviewNavigator
@@ -10,6 +11,7 @@ export default class SurveyState {
     // this.navigator.hasConditionTag = conditionId => {
     //   return this.dataStore.hasConditionTag(conditionId, this.navigator.state.section) // TODO: Make this use the correct state variables
     // }
+    this._currentQuestions = {} // Cached reference to the current questions
   }
 
   loadBlueprint (blueprint) {
@@ -34,11 +36,16 @@ export default class SurveyState {
     })
   }
 
+  getQuestion (questionId) {
+    return this._currentQuestions.find(question => question.id === questionId)
+  }
+
   getCurrentQuestions () {
     let questionData = this.dataStore.getPageQuestionData(this.navigator.state.section, this.navigator.state.page)
     let questionBlueprints = this.navigator.getCurrentQuestionBlueprints()
     console.log(questionData, questionBlueprints)
-    return this._combineQuestionData(questionBlueprints, questionData)
+    this._currentQuestions = this._combineQuestionData(questionBlueprints, questionData)
+    return this._currentQuestions
   }
 
   /**
@@ -67,10 +74,10 @@ export default class SurveyState {
         this.navigator.previous()
         break
       case 'select-choice':
-        this.survey.getQuestion(action.question_id).select(action.changes_text)
+        this.getQuestion(action.question_id).select(action.changes_text)
         break
       case 'deselect-choice':
-        this.survey.getQuestion(action.question_id).deselect(action.changes_text)
+        this.getQuestion(action.question_id).deselect(action.changes_text)
         break
       default:
         console.log('Default')

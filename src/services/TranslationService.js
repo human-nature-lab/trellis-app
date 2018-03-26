@@ -1,15 +1,9 @@
-class TranslationService {
-  constructor (locale = null) {
-    this.locale = locale
-  }
-  setLocale (locale) {
-    this.locale = locale
-  }
-  getTranslated (translation) {
+import storage from './StorageService'
+export default class TranslationService {
+  static getTranslated (translation) {
+    let locale = storage.get('locale', 'object')
     return translation.translation_text.find(tt => {
-      return tt.locale_id === this.locale.id
+      return tt.locale_id === locale.id
     }).translated_text
   }
 }
-
-export default new TranslationService()

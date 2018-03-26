@@ -4,6 +4,7 @@
       <div class="trellis-checkbox-container">
         <input type="checkbox"
                :value="choice.val"
+               :checked="isChecked(choice)"
                @change="onChange"
                :id="choice.val" />
         <div class="trellis-checkbox"></div>
@@ -17,6 +18,9 @@
     // TODO: Handle choice parameters
     export default {
       name: 'trellis-multi-select',
+      mounted: function () {
+        this._selected = []
+      },
       props: {
         choices: {
           validator: function (choices) {
@@ -34,6 +38,9 @@
         }
       },
       methods: {
+        isChecked: function (choice) {
+          return this._selected.find(s => s === choice.val)
+        },
         onChange: function (event) {
           this.$emit('change', {
             selected: this.selected,
