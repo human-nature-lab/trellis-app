@@ -20,6 +20,12 @@
             <router-link :to="{name:'RespondentsSearch'}">Respondents Search</router-link>
           </v-list-tile>
           <v-list-tile>
+            <router-link :to="{name:'QuestionExamples'}">Question Examples</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name:'IconTest'}">Icon Test</router-link>
+          </v-list-tile>
+          <v-list-tile>
             <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '1'}}">Form 1</router-link>
           </v-list-tile>
           <v-list-tile>
