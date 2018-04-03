@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
+import config, {ENV_TYPE} from '@/config'
+
+config.environment = ENV_TYPE.TEST
 
 Vue.use(Vuetify)
 

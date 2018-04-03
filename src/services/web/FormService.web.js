@@ -1,4 +1,4 @@
-import http from './AxiosInstance'
+import http from '../AxiosInstance'
 export default class FormService {
   static getStudyForms (studyId) {
     return http().get(`study/${studyId}/form`)
