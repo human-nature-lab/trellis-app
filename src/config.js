@@ -1,5 +1,8 @@
 export default {
   debug: true,
+  cordova: false,
+  mockCordova: true,
+  mockDeviceId: '3c586040f3f7a483',
   'xKey': '***REMOVED***',
-  'apiRoot': 'https://api.trellislocaldev.net'
+  'apiRoot': 'http://10.0.1.201'
 }

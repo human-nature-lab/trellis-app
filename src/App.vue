@@ -9,7 +9,7 @@
     </v-toolbar>
     <v-content>
       <v-container fluid>
-        <router-view></router-view>
+        <router-view v-if="isDeviceReady"></router-view>
       </v-container>
     </v-content>
   </v-app>
@@ -17,6 +17,7 @@
 
 <script>
   import Vue from 'vue'
+  import DeviceService from './services/DeviceService'
   import Interview from './components/interview/Interview'
   import config from './config'
 
@@ -40,7 +41,8 @@
       return {
         cordova: Vue.cordova,
         clipped: false,
-        title: 'Trellis'
+        title: 'Trellis',
+        deviceReady: !config.cordova
       }
     },
     created () {
@@ -49,12 +51,24 @@
         self.onDeviceReady()
       })
     },
+    computed: {
+      isDeviceReady: function () {
+        return this.deviceReady
+      }
+    },
     methods: {
       onDeviceReady: function () {
+        console.log('device ready')
+        this.deviceReady = true
+        DeviceService.setDeviceReady(true)
+        DeviceService.setUUID(this.cordova.device.uuid)
         // Handle the device ready event.
         this.cordova.on('pause', this.onPause, false)
         this.cordova.on('resume', this.onResume, false)
         if (this.cordova.device.platform === 'Android') {
+          console.log('device.uuid', this.cordova.device.uuid)
+          console.log('device.version', this.cordova.device.version)
+          console.log('device.serial', this.cordova.device.serial)
           document.addEventListener('backbutton', this.onBackKeyDown, false)
         }
       },
