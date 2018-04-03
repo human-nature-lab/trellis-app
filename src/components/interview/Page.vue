@@ -1,5 +1,6 @@
 <template>
   <div class="page">
+    <div class="debug">{{location}}</div>
     <div class="page-content">
       <Question v-for="question in questions" :question="question" :key="question.id"/>
     </div>
@@ -11,6 +12,7 @@
           <v-icon left>chevron_left</v-icon> Previous
         </v-btn>
         <v-btn @click="onNext"
+               :disabled="!allRequiredQuestionsAnswered"
                justify-right>
           Next <v-icon right>chevron_right</v-icon>
         </v-btn>
@@ -34,14 +36,8 @@
         type: Array,
         required: true
       },
-      section: {
-        type: Number
-      },
-      repetition: {
-        type: Number
-      },
-      page: {
-        type: Number
+      location: {
+        type: Object
       }
     },
     mounted: function () {
@@ -58,9 +54,9 @@
       }
     },
     computed: {
-      // Right now questions are responsible for assigning the isAnswered property themselves
-      allQuestionsAnswered: function () {
-        return Array.isArray(this.questions) && this.questions.filter(question => question.isAnswered).length === 0
+      // TODO: // Calculate this and enable/disable next based on it
+      allRequiredQuestionsAnswered: function () {
+        return true
       }
     },
     components: {

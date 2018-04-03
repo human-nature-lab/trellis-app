@@ -5,7 +5,7 @@ class TranslationService {
   setLocale (locale) {
     this.locale = locale
   }
-  getText (translation) {
+  getTranslated (translation) {
     return translation.translation_text.find(tt => {
       return tt.locale_id === this.locale.id
     }).translated_text

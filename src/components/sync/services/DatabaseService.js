@@ -1,4 +1,4 @@
-import DeviceService from '../../../services/DeviceService.js'
+import DeviceService from '../../../services/DeviceServiceDev.js'
 import SyncTable from '../models/SyncTable'
 import SyncMessage from '../models/SyncMessage'
 import Message from '../models/Message'
