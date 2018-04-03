@@ -1,10 +1,8 @@
 import constants from './constants'
 export default {
-  debug: true,
-  appMode: constants.APP_MODE.DEV,
-  cordova: false,
-  mockCordova: true,
-  mockDeviceId: '3c586040f3f7a483',
-  'xKey': 'rXghvr7C1Q8dRmhX2Lyl3wC62TyoAr95',
-  'apiRoot': 'http://10.0.1.201'
+  appEnv: constants.APP_ENV.CORDOVA,
+  appMode: constants.APP_MODE.TEST,
+  xKey: 'rXghvr7C1Q8dRmhX2Lyl3wC62TyoAr95',
+  apiRoot: 'http://10.0.1.201'
 }
+

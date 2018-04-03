@@ -60,4 +60,15 @@ describe('Emitter.js', () => {
     }
     expect(failToRemove).to.throw(Error, 'An event with this name has not been registered yet', 'Incorrectly allowed the emitter to try to remove a function on an event that does not exist yet')
   })
+  it('should pass the correct arguments using dispatch and dispatchApply', () => {
+    const emitter = new Emitter()
+    const arg1 = {a: 'wow'}
+    const arg2 = {b: 'amaze'}
+    emitter.on('test', function (tArg1, tArg2) {
+      expect(tArg1).to.equal(arg1, 'The first argument does not match')
+      expect(tArg2).to.equal(arg2, 'The second argument does not match')
+    })
+    emitter.dispatch('test', arg1, arg2)
+    emitter.dispatchApply('test', [arg1, arg2])
+  })
 })

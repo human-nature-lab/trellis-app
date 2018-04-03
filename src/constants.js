@@ -4,7 +4,7 @@ export default {
     WEB: 2 // No sync, REST
   },
   APP_MODE: {
-    DEV: 1, // Sync, local sqlite storage
+    TEST: 1, // Sync, local sqlite storage
     PROD: 2
   }
 }

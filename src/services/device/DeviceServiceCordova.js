@@ -1,5 +1,5 @@
 import Vue from 'vue'
-class DeviceServiceProd {
+class DeviceServiceCordova {
   constructor () {
     this.isReady = false
     this.uuid = ''
@@ -33,4 +33,4 @@ class DeviceServiceProd {
   }
 }
 
-export default new DeviceServiceProd()
+export default DeviceServiceCordova
