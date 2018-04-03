@@ -1,17 +1,9 @@
-import axios from 'axios'
-import config from '../config'
-import storage from './StorageService'
-class DataService {
-  constructor () {
-    this.instance = axios.create({
-      baseURL: config.apiRoot,
-      timeout: 20000,
-      headers: {'X-Key': config.xKey}
-    })
-  }
-  getLocales () {
+import http from '../AxiosInstance'
+import storage from '../StorageService'
+export default class DataService {
+  static getLocales () {
     let studyId = storage.get('studyId', 'string')
-    return this.instance.get(`study/${studyId}/locales`)
+    return http().get(`study/${studyId}/locales`)
       .then(response => {
         return response.data.locales
       })
@@ -20,8 +12,8 @@ class DataService {
         throw err
       })
   }
-  getForm (formId) {
-    return this.instance.get(`form/${formId}/structure`)
+  static getForm (formId) {
+    return http().get(`form/${formId}/structure`)
       .then(function (response) {
         return response.data
       })
@@ -30,11 +22,11 @@ class DataService {
         throw err
       })
   }
-  getConditions (respondentId, formId, sectionId) {
+  static getConditions (respondentId, formId, sectionId) {
     return Promise.all([
-      this.instance.get(`conditions/respondent/${respondentId}`),
-      this.instance.get(`conditions/form/${formId}`),
-      this.instance.get(`conditions/section/${sectionId}`)
+      http().get(`conditions/respondent/${respondentId}`),
+      http().get(`conditions/form/${formId}`),
+      http().get(`conditions/section/${sectionId}`)
     ])
       .then(function (conditions) {
         let {respondentConditions, formConditions, sectionConditions} = conditions
@@ -48,8 +40,8 @@ class DataService {
         throw err
       })
   }
-  getActionTypes (formId) {
-    return this.instance.get('form/action-types')
+  static getActionTypes (formId) {
+    return http().get('form/action-types')
       .then(function (response) {
         return response.data
       })
@@ -59,5 +51,3 @@ class DataService {
       })
   }
 }
-
-export default new DataService()

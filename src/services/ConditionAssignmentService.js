@@ -4,7 +4,7 @@ export default class ConditionAssignmentService {
   }
 
   /**
-   * Register an eval function with a questionId
+   * Register an eval function with a unique name
    */
   register (name, functionString) {
     // TODO: Do this safely instead. Maybe consider using -> https://github.com/andywer/threads.js/tree/master
@@ -12,9 +12,20 @@ export default class ConditionAssignmentService {
   }
 
   /**
-   * Check if a condition should be assigned
+   * Unregister an eval function with a unique name
+   */
+  unregister (name) {
+    delete this.conditionAssignmentMethods[name]
+  }
+
+  /**
+   * Call a registered method by name with any number of arguments. This returns false if there isn't a function registered
    */
   eval (name, ...args) {
-    return this.conditionAssignmentMethods[name].call(null, ...args)
+    if (this.conditionAssignmentMethods[name]) {
+      return this.conditionAssignmentMethods[name].call(null, ...args)
+    } else {
+      return false
+    }
   }
 }
