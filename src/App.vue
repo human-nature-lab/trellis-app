@@ -23,9 +23,6 @@
             <router-link :to="{name:'QuestionExamples'}">Question Examples</router-link>
           </v-list-tile>
           <v-list-tile>
-            <router-link :to="{name:'IconTest'}">Icon Test</router-link>
-          </v-list-tile>
-          <v-list-tile>
             <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '1'}}">Form 1</router-link>
           </v-list-tile>
           <v-list-tile>
@@ -48,7 +45,7 @@
   import Interview from './components/interview/Interview'
   import config from './config'
   import storage from './services/StorageService'
-  import dataService from './services/DataService'
+  import dataService from './services/web/DataService.web'
   // TODO: This should be set by the app instead of being hardcoded
   storage.set('studyId', 'ad9a9086-8f15-4830-941d-416b59639c41')
   dataService.getLocales()

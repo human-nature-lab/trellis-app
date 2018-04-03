@@ -2,7 +2,7 @@ import interviewNavigator from './InterviewNavigator'
 import dataStore from './InterviewDataStore'
 import interpolationService from '@/services/InterpolationService'
 import translationService from '@/services/TranslationService'
-// import interviewActions from './InterviewActionDefinitions'
+import actionDefinitions from './InterviewActionDefinitions'
 export default class SurveyState {
   constructor () {
     this.navigator = interviewNavigator
@@ -11,11 +11,12 @@ export default class SurveyState {
     // this.navigator.hasConditionTag = conditionId => {
     //   return this.dataStore.hasConditionTag(conditionId, this.navigator.state.section) // TODO: Make this use the correct state variables
     // }
+    this.actionDefinitions = actionDefinitions
     this._currentQuestions = {} // Cached reference to the current questions
   }
 
   loadBlueprint (blueprint) {
-    this.navigator.loadStructure(blueprint)
+    this.navigator.loadBlueprint(blueprint)
   }
 
   // Handle merging data from the data store with the question blueprints from the navigator
@@ -66,6 +67,9 @@ export default class SurveyState {
    */
   doAction (action) {
     console.log(action)
+    if (this.actionDefinitions[action.action_type]) {
+      this.actionDefinitions[action.action_type](this.dataStore, action.payload, this.dataStore.getQ)
+    }
     switch (action.action_type) {
       case 'next':
         this.navigator.next()

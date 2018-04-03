@@ -1,12 +1,14 @@
 <template>
     <v-layout column justify-space-between>
-      <Question :question="question" v-for="question in questions"/>
+      <Question v-for="question in questions"
+                :key="question.id"
+                :question="question"/>
     </v-layout>
 </template>
 
 <script>
   const questionTypes = ['intro', 'decimal', 'integer', 'multiple_select', 'multiple_choice']
-  import mockQuestion from './services/MockQuestionService'
+  import mockQuestion from '../../services/test/MockQuestionService'
   import Question from './Question'
   export default {
     name: 'question-examples',
