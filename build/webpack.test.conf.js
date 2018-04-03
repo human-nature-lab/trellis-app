@@ -27,5 +27,5 @@ var webpackConfig = merge(baseConfig, {
 
 // no need for app entry during tests
 delete webpackConfig.entry
-
+// webpackConfig.entry = ['babel-polyfill', './src/main.js']
 module.exports = webpackConfig

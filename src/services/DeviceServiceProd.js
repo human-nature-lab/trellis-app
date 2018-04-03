@@ -1,13 +1,18 @@
-class DeviceService {
+import Vue from 'vue'
+class DeviceServiceProd {
   constructor () {
     this.isReady = false
     this.uuid = ''
-  }
-  setUUID (uuid) {
-    this.uuid = uuid
+    Vue.cordova.on('deviceready', () => {
+      this.isReady = true
+      this.uuid = this.cordova.device.uuid
+    })
   }
   getUUID () {
     return this.uuid
+  }
+  getPlatform () {
+    return Vue.cordova.device.platform
   }
   setDeviceReady (isReady) {
     this.isReady = isReady
@@ -28,4 +33,4 @@ class DeviceService {
   }
 }
 
-export default new DeviceService()
+export default new DeviceServiceProd()

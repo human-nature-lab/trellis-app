@@ -1,7 +1,7 @@
 import axios from 'axios'
 import xxhash from 'xxhashjs'
 import config from '../../../config'
-import DeviceService from '../../../services/DeviceService'
+import DeviceService from '../../../services/DeviceServiceDev'
 class SyncService {
   constructor () {
     this.deviceId = DeviceService.getUUID()

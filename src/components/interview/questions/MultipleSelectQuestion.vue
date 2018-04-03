@@ -1,5 +1,5 @@
 <template>
-  <div class="multiple-choice">
+  <div class="multiple-select">
     <trellis-multi-select
       :selected="selected"
       :choices="question.choices"

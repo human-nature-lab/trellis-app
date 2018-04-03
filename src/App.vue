@@ -1,11 +1,29 @@
 <template>
   <v-app light>
     <v-toolbar>
-      <v-toolbar-title class="deep-orange--text">Trellis</v-toolbar-title>
+      <v-toolbar-title class="deep-orange--text">
+        Trellis
+      </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>more_vert</v-icon>
-      </v-btn>
+      <v-menu offset-y :nudge-top="-15">
+        <v-btn icon slot="activator">
+          <v-icon>more_vert</v-icon>
+        </v-btn>
+        <v-list>
+          <v-list-tile>
+            <router-link :to="{name: 'Home'}">Home</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '1'}}">Form 1</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '2'}}">Form 2</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '3'}}">Form 3</router-link>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
     </v-toolbar>
     <v-content>
       <v-container fluid>
@@ -17,9 +35,13 @@
 
 <script>
   import Vue from 'vue'
-  import DeviceService from './services/DeviceService'
+  import DeviceService from './services/DeviceServiceDev'
   import Interview from './components/interview/Interview'
   import config from './config'
+  import dataService from './services/DataService'
+
+  // TODO: This should be set by the app instead of being hardcoded
+  dataService.setStudyId('ad9a9086-8f15-4830-941d-416b59639c41')
 
   // Custom logging functions that respond to the debug setting in config.js
   Vue.mixin({
@@ -42,33 +64,28 @@
         cordova: Vue.cordova,
         clipped: false,
         title: 'Trellis',
-        deviceReady: !config.cordova
+        deviceReady: false
       }
     },
     created () {
-      var self = this
-      this.cordova.on('deviceready', () => {
-        self.onDeviceReady()
-      })
+      DeviceService.isDeviceReady().then(this.onDeviceReady())
     },
     computed: {
       isDeviceReady: function () {
         return this.deviceReady
+      },
+      studyId: function () {
+        return dataService.studyId
       }
     },
     methods: {
       onDeviceReady: function () {
         console.log('device ready')
         this.deviceReady = true
-        DeviceService.setDeviceReady(true)
-        DeviceService.setUUID(this.cordova.device.uuid)
         // Handle the device ready event.
         this.cordova.on('pause', this.onPause, false)
         this.cordova.on('resume', this.onResume, false)
-        if (this.cordova.device.platform === 'Android') {
-          console.log('device.uuid', this.cordova.device.uuid)
-          console.log('device.version', this.cordova.device.version)
-          console.log('device.serial', this.cordova.device.serial)
+        if (DeviceService.getPlatform() === 'Android') {
           document.addEventListener('backbutton', this.onBackKeyDown, false)
         }
       },
@@ -96,7 +113,6 @@
 
 <style>
 	body{
-    /*height: 100%;*/
     padding-top: constant(safe-area-inset-top);
     padding-top: env(safe-area-inset-top);
   }
