@@ -15,6 +15,8 @@
       <IntroQuestion v-if="question.type.name === 'intro'" :question="question"></IntroQuestion>
       <MultipleSelectQuestion v-if="question.type.name === 'multiple_select'" :question="question"/>
       <MultipleChoiceQuestion v-if="question.type.name === 'multiple_choice'" :question="question"/>
+      <IntegerQuestion v-if="question.type.name === 'integer'" :question="question"/>
+      <DecimalQuestion v-if="question.type.name === 'decimal'" :question="question"/>
     </v-card-text>
     <v-card-actions>
       <DontKnowRefused></DontKnowRefused>
@@ -29,6 +31,8 @@
   import IntroQuestion from './questions/IntroQuestion.vue'
   import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
   import MultipleChoiceQuestion from './questions/MultipleChoiceQuestion'
+  import DecimalQuestion from './questions/DecimalQuestion'
+  import IntegerQuestion from './questions/IntegerQuestion'
   import DontKnowRefused from './DontKnowRefused.vue'
   export default {
     name: 'question',
@@ -43,6 +47,8 @@
     },
     components: {
       IntroQuestion,
+      DecimalQuestion,
+      IntegerQuestion,
       MultipleSelectQuestion,
       MultipleChoiceQuestion,
       DontKnowRefused

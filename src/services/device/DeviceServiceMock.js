@@ -33,4 +33,4 @@ class DeviceServiceDev {
   }
 }
 
-export default new DeviceServiceDev()
+export default DeviceServiceDev

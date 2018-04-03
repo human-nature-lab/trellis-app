@@ -25,8 +25,15 @@ module.exports = {
       '@': resolve('src')
     }
   },
+  node: {
+    fs: 'empty'
+  },
   module: {
     rules: [
+      {
+        test: /\.txt\.js$/,
+        loader: 'raw-loader'
+      },
       {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
@@ -45,6 +52,10 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
+      },
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

@@ -1,5 +1,5 @@
 // Mock data structure
-class InterviewDataService {
+class InterviewDataStore {
   constructor (sections = {}) {
     this.respondentConditionTags = {}
     this.formConditionTags = {}
@@ -41,6 +41,10 @@ class InterviewDataService {
     }
   }
 
+  makeQuestion (questionId, question, sectionId, pageId, followUpRepetitionId = 0, repetitionId = 0) {
+    this.getPageQuestionData(sectionId, pageId, followUpRepetitionId, repetitionId)[questionId] = question
+  }
+
   getSection (sectionId, followUpRepetitionId = 0, repetitionId = 0) {
     try {
       return this.sections[sectionId].repetitions[repetitionId].followUpRepetitions[followUpRepetitionId]
@@ -71,14 +75,22 @@ class InterviewDataService {
     }
   }
 
-  getSectionConditionTags (...getSectionArgs) {
-    return this.getSection(...getSectionArgs).sectionConditionTags.concat(this.respondentConditionTags).concat(this.formConditionTags)
+  getQuestion (questionId, ...getPageQuestionArgs) {
+    try {
+      return this.getPageQuestionData(...getPageQuestionArgs)[questionId]
+    } catch (err) {
+      throw Error(`Unable to access this question (question: ${questionId}`)
+    }
   }
 
+  /**
+   * Make a copy of the interview datastore
+   * @returns {InterviewDataStore}
+   */
   copy () {
-    return new InterviewDataService(JSON.parse(JSON.stringify(this.sections)))
+    return new InterviewDataStore(JSON.parse(JSON.stringify(this.sections)))
   }
 
 }
 
-export default new InterviewDataService()
+export default new InterviewDataStore()

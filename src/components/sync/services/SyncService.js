@@ -1,7 +1,7 @@
 import axios from 'axios'
-import xxhash from 'xxhashjs'
-import config from '../../../config'
-import DeviceService from '../../../services/DeviceServiceDev'
+import md5 from 'blueimp-md5'
+import config from '@/config'
+import { DeviceService } from '@/services/device/DeviceService'
 class SyncService {
   constructor () {
     this.deviceId = DeviceService.getUUID()
@@ -32,7 +32,7 @@ class SyncService {
       })
   }
   getHash (file) {
-    return xxhash.h64(file, 0xABCD).toString(16)
+    return md5(file)
   }
 }
 
