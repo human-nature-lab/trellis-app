@@ -1,9 +1,9 @@
 import Section from './Section'
 import Question from './Question'
 /**
- * A Survey is a data structure that mimicks the structure of the form including repeated sections and pages. A survey
+ * A Survey is a data blueprint that mimicks the blueprint of the form including repeated sections and pages. A survey
  * is only able to modify the state of the current page move backwards and forwards between pages. The main purpose of
- * this data structure is to capture the repeated nature of a survey.
+ * this data blueprint is to capture the repeated nature of a survey.
  */
 export default class Survey {
   constructor (blueprint) {

@@ -6,5 +6,6 @@ export default {
   xKey: 'rXghvr7C1Q8dRmhX2Lyl3wC62TyoAr95',
   // 'apiRoot': 'http://10.1.0.1',
   apiRoot: 'http://api.trellislocaldev.net',
-  environment: ENV_TYPE.TEST
+  environment: ENV_TYPE.WEB
 }
+

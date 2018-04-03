@@ -11,12 +11,16 @@ export default class ActionManager extends Emitter {
    * @param type
    * @param modifications
    */
-  pushUserAction (questionId, type, modifications) {
+  pushUserAction (sectionId, pageId, followUpReptitionId, repetitionId, questionId, type, payload) {
     let action = {
       interview_id: this.interviewId,
+      section_id: sectionId,
+      page_id: pageId,
+      follow_up_repetition_id: followUpReptitionId,
+      repetition_id: repetitionId,
       question_id: questionId,
       action_type: type,
-      changes_text: modifications,
+      payload: payload,
       created_at: (new Date()).getTime()
     }
     this.actions.push(action)
