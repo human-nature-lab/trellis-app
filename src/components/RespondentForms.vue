@@ -13,7 +13,7 @@
 <script>
   import FormsView from './FormsView'
   import surveyService from '@/services/SurveyService'
-  import formService from '@/services/FormService'
+  import {FormService} from '@/factories/ServiceFactory'
   import respondentService from '@/services/RespondentService'
   export default {
     name: 'respondent-forms',
@@ -53,7 +53,7 @@
         this.loading.forms = true
         return Promise.all([
           surveyService.getRespondentSurveys(this.studyId, this.respondentId),
-          formService.getStudyForms(this.studyId)
+          FormService.getStudyForms(this.studyId)
         ]).then(combined => {
           let [surveys, forms] = combined
           this.loading.forms = false

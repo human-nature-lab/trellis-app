@@ -6,5 +6,6 @@ export default {
   xKey: '***REMOVED***',
   // 'apiRoot': 'http://10.1.0.1',
   apiRoot: 'http://api.trellislocaldev.net',
-  environment: ENV_TYPE.TEST
+  environment: ENV_TYPE.WEB
 }
+
