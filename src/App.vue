@@ -44,7 +44,7 @@
 
 <script>
   import Vue from 'vue'
-  import { DeviceService } from './services/device/DeviceService'
+  import DeviceService from './services/device/DeviceService'
   import Interview from './components/interview/Interview'
   import config from './config'
   import storage from './services/storage/StorageService'
