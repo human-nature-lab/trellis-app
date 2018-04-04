@@ -36,7 +36,7 @@
     </v-toolbar>
     <v-content>
       <v-container fluid>
-        <router-view v-if="isDeviceReady"></router-view>
+        <router-view></router-view>
       </v-container>
     </v-content>
   </v-app>
@@ -86,15 +86,17 @@
         cordova: Vue.cordova,
         clipped: false,
         title: 'Trellis',
-        deviceReady: false
+        _isDeviceReady: false
       }
     },
     created () {
-      DeviceService.isDeviceReady().then(this.onDeviceReady())
+      this.cordova.on('deviceready', () => {
+        this.onDeviceReady()
+      })
     },
     computed: {
       isDeviceReady: function () {
-        return this.deviceReady
+        return this._isDeviceReady
       },
       studyId: function () {
         return storage.get('studyId', 'string')
@@ -103,10 +105,11 @@
     methods: {
       onDeviceReady: function () {
         console.log('device ready')
-        this.deviceReady = true
+        this._isDeviceReady = true
         // Handle the device ready event.
         this.cordova.on('pause', this.onPause, false)
         this.cordova.on('resume', this.onResume, false)
+        // TODO: remove App component dependency on DeviceService completely. No need for it to be loaded in the web version
         if (DeviceService.getPlatform() === 'Android') {
           document.addEventListener('backbutton', this.onBackKeyDown, false)
         }
