@@ -1,4 +1,4 @@
-class DeviceServiceDev {
+class DeviceServiceMock {
   constructor () {
     this.isReady = false
     this.uuid = ''
@@ -33,4 +33,4 @@ class DeviceServiceDev {
   }
 }
 
-export default DeviceServiceDev
+export default DeviceServiceMock
