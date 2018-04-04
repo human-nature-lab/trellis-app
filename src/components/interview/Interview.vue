@@ -11,7 +11,7 @@
 <script>
   import Vue from 'vue'
   import Page from './Page'
-  import { DataService } from '@/services/data/DataService'
+  import DataService from '@/services/data/DataService'
   import {sharedActionManager} from './services/ActionManager'
   import config from '@/config'
   import SurveyState from './services/SurveyState'

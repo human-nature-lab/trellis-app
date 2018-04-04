@@ -48,7 +48,7 @@
   import Interview from './components/interview/Interview'
   import config from './config'
   import storage from './services/storage/StorageService'
-  import { DataService } from './services/data/DataService'
+  import DataService from './services/data/DataService'
   // TODO: This should be set by the app instead of being hardcoded
   storage.set('studyId', 'ad9a9086-8f15-4830-941d-416b59639c41')
   DataService.getLocales()

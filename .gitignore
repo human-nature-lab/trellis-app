@@ -29,3 +29,5 @@ www/js/vendor.*.js
 *.njsproj
 *.sln
 *.swp
+
+config.js

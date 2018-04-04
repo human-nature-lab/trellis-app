@@ -8,7 +8,7 @@
 
 <script>
   const questionTypes = ['intro', 'decimal', 'integer', 'multiple_select', 'multiple_choice']
-  import { MockQuestion } from '@/services/mock/MockQuestionService'
+  import MockQuestion from '@/services/mock/MockQuestionService'
   import Question from './Question'
   export default {
     name: 'question-examples',
