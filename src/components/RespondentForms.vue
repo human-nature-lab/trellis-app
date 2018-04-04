@@ -12,9 +12,9 @@
 
 <script>
   import FormsView from './FormsView'
-  import { SurveyService } from '@/services/survey/SurveyService'
-  import { FormService } from '@/services/form/FormService'
-  import { RespondentService } from '@/services/respondent/RespondentService'
+  import SurveyService from '@/services/survey/SurveyService'
+  import FormService from '@/services/form/FormService'
+  import RespondentService from '@/services/respondent/RespondentService'
   export default {
     name: 'respondent-forms',
     data: function () {

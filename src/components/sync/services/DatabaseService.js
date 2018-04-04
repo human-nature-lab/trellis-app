@@ -3,5 +3,5 @@ import constants from '@/constants'
 import DatabaseServiceMock from './DatabaseServiceMock'
 import DatabaseServiceCordova from './DatabaseServiceCordova'
 
-export const DatabaseService = (config.appMode === constants.APP_MODE.TEST) ? new DatabaseServiceMock() : new DatabaseServiceCordova()
-
+const DatabaseService = (config.appMode === constants.APP_MODE.TEST) ? new DatabaseServiceMock() : new DatabaseServiceCordova()
+export default DatabaseService

@@ -4,7 +4,7 @@ import SyncMessage from '../models/SyncMessage'
 import Message from '../models/Message'
 import Config from '../models/Config'
 
-class DatabaseService {
+export default class DatabaseService {
   constructor () {
     this.database = null
     this.isReady = false
@@ -54,5 +54,3 @@ class DatabaseService {
     )
   }
 }
-
-export default DatabaseService

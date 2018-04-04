@@ -8,7 +8,7 @@
 
 <script>
   import RespondentsView from './RespondentsView'
-  import { RespondentService } from '@/services/respondent/RespondentService'
+  import RespondentService from '@/services/respondent/RespondentService'
   export default {
     name: 'respondents-search',
     data: function () {
