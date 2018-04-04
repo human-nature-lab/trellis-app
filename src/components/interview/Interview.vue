@@ -9,68 +9,81 @@
 </template>
 
 <script>
-  import Vue from 'vue'
   import Page from './Page'
-  import DataService from '@/services/data/DataService'
-  import {sharedActionManager} from './services/ActionManager'
-  import config from '@/config'
-  import SurveyState from './services/SurveyState'
-
-  // Custom logging functions that respond to the debug setting in config.js
-  Vue.mixin({
-    methods: {
-      log: function (...args) {
-        if (config.debug) {
-          console.log(...args)
-        }
-      },
-      debug: function (...args) {
-        if (config.debug) {
-          console.debug(...args)
-        }
-      }
-    }
-  })
+  import Interview from './models/Interview'
+  import InterviewService from './services/interview/InterviewService'
+  import FormService from '@/services/form/FormService'
   export default {
     data () {
       return {
         studyId: this.$route.params.studyId,
         interviewId: this.$route.params.interviewId,
+        formId: null,
         surveyId: null,
         clipped: false,
-        survey: null,
-        isLoading: true
+        isLoading: true,
+        interviewState: null
       }
     },
-    created () {
-      DataService.getForm('be587a4a-38c6-46cb-a787-1fcb4813b274')
-        .then(resData => {
-          this.actions = sharedActionManager(this.surveyId) // TODO: load and play existing actions here
-          this.surveyState = new SurveyState()
-          window.actions = this.actions
-          this.surveyState.loadBlueprint(resData.blueprint)
-          this.actions.on('action', this.surveyState.doAction, this.surveyState)
-          this.actions.on('user-action', this.surveyState.doAction, this.surveyState)
-          console.log(resData)
-          this.isLoading = false
-        })
+    mounted () {
+      let interview = null
+      InterviewService.getInterview(this.interviewId)
         .catch(err => {
+          console.error('No interview exists with this id')
+          this.isLoading = false
           throw err
         })
+        .then(inter => {
+          interview = inter
+          this.formId = interview.survey.form_id
+          this.surveyId = interview.survey.id
+          return Promise.all([
+            InterviewService.getActions(this.interviewId)
+              .catch(err => {
+                console.error('interview actions route does not work', err)
+                return []
+              }),
+            InterviewService.getData(this.interviewId)
+              .catch(err => {
+                console.error('interview data service does not work', err)
+                return []
+              }),
+            FormService.getForm(interview.survey.form_id)
+          ]).then(results => {
+            let [actions, data, formBlueprint] = results
+            this.interviewState = new Interview(interview, formBlueprint, actions, data)
+            this.isLoading = false
+          })
+        })
+     // DataService.getForm('be587a4a-38c6-46cb-a787-1fcb4813b274')
+     //    .then(resData => {
+     //      this.actions = sharedActionManager(this.surveyId) // TODO: load and play existing actions here
+     //      this.surveyState = new SurveyState()
+     //      this.interview = new InterviewService()
+     //      window.actions = this.actions
+     //      this.surveyState.loadBlueprint(resData.blueprint)
+     //      this.actions.on('action', this.surveyState.doAction, this.surveyState)
+     //      this.actions.on('user-action', this.surveyState.doAction, this.surveyState)
+     //      console.log(resData)
+     //      this.isLoading = false
+     //    })
+     //    .catch(err => {
+     //      throw err
+     //    })
     },
     computed: {
       questions: function () {
-        let questions = this.surveyState.getCurrentQuestions()
+        let questions = this.interviewState.getPageQuestions().map(q => {
+          q.type = {
+            name: q.question_type.name
+          }
+          return q
+        })
         console.log('Computed questions', questions)
         return questions || []
       },
       location: function () {
-        return {
-          page: this.surveyState.navigator.state.page || 0,
-          sectionRepetition: this.surveyState.navigator.state.sectionRepetition || 0,
-          section: this.surveyState.navigator.state.section || 0,
-          sectionFollowUpRepetition: this.surveyState.navigator.state.sectionFollowUpRepetition || 0
-        }
+        return this.interviewState.location
       }
     },
     components: {

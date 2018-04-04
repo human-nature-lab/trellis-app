@@ -7,15 +7,16 @@ import GeneratorService from './GeneratorService'
  * from the GeneratorService simply because it is not intended to stand on its own as a useful service.
  * This class also keeps track of fake locales for you
  */
-class MockService extends GeneratorService {
+class MockService {
   constructor () {
-    super()
     this.locales = []
     this.addRandomLocale = this.addRandomLocale.bind(this)
     this.translationGenerator = this.translationGenerator.bind(this)
     this.choiceGenerator = this.choiceGenerator.bind(this)
     this.choicesGenerator = this.choicesGenerator.bind(this)
     this.questionGenerator = this.questionGenerator.bind(this)
+    this.expand = GeneratorService.expand.bind(this)
+    this.expandPromise = GeneratorService.expandPromise.bind(this)
   }
 
   /**

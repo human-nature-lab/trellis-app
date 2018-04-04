@@ -1,6 +1,25 @@
 import MockService from '@/services/mock/GeneratorService'
 import uuidv4 from 'uuid/v4'
+import form1 from './forms/form-1'
+import form2 from './forms/form-2'
+import form3Womens from './forms/form-3-womens'
+let forms = [form1.form, form2.form, form3Womens.form]
 export default class FormService {
+  static getForm (formId) {
+    let form = forms.find(form => form.id === formId)
+    if (form) {
+      return new Promise(resolve => {
+        return resolve(form)
+      })
+    } else {
+      return new Promise(resolve => {
+        return resolve({
+          sections: [],
+          name_translation: {}
+        })
+      })
+    }
+  }
   static getStudyForms (studyId) {
     // TODO: Add valid skip conditions
     return MockService.expandPromise({

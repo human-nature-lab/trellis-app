@@ -1,11 +1,11 @@
 import uuidv4 from 'uuid/v4'
-import SkipService from './SkipService'
-import actionDefinitions from './InterviewActionDefinitions'
-export default class InterviewService {
+import SkipService from '../services/SkipService'
+import actionDefinitions from '../services/InterviewActionDefinitions'
+export default class Interview {
   constructor (interview, blueprint = null, actions = [], data = []) {
     this.interview = interview
-    this.blueprint = blueprint
-    this.data = data
+    this.blueprint = {}
+    this.data = []
     this.location = {
       section: 0,
       sectionRepetition: 0,
@@ -13,6 +13,7 @@ export default class InterviewService {
       page: 0
     }
     this.actions = actions
+    this.load(blueprint, data)
   }
 
   /**
@@ -75,7 +76,7 @@ export default class InterviewService {
    * @private
    */
   _getCurrentPage () {
-    return this._getCurrentSection()[this.location.page]
+    return this._getCurrentSection().pages[this.location.page]
   }
 
   /**
@@ -157,6 +158,6 @@ export default class InterviewService {
     })
   }
   copy () {
-    return new InterviewService(JSON.parse(JSON.stringify(this.interview)), JSON.parse(JSON.stringify(this.blueprint)), JSON.parse(JSON.stringify(this.data)))
+    return new Interview(JSON.parse(JSON.stringify(this.interview)), JSON.parse(JSON.stringify(this.blueprint)), JSON.parse(JSON.stringify(this.data)))
   }
 }
