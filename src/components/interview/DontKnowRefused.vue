@@ -3,18 +3,15 @@
     <v-flex>
       <v-layout row>
         <v-flex sm4 offset-xs8 row>
-          <v-radio-group v-model="selected"
-                         row
-                         justify-right
-                         @change="onChange">
-            <v-radio :label="`Don't Know`"
-                     :value="`DK`"></v-radio>
-            <v-radio :label="`Refuse`"
-                     :value="`RF`"></v-radio>
-          </v-radio-group>
+            <v-checkbox
+              :label="`Don't Know`"
+              v-model="dk" />
+            <v-checkbox
+              :label="`Refuse`"
+              v-model="rf" />
         </v-flex>
       </v-layout>
-      <v-layout v-if="selected !== undefined" row>
+      <v-layout v-if="shouldShowReason" row>
         <v-text-field
           name="Reason"
           label="Reason"
@@ -27,23 +24,69 @@
 </template>
 
 <script>
-  // TODO: This will need to be handled manually if we want to be able to deselect DK/refused type questions
+  import actionBus from './services/ActionBus'
   export default {
-    props: ['dontKnowEnabled', 'refusedEnabled'],
+    props: {
+      question: {
+        type: Object,
+        required: true
+      }
+    },
     name: 'dont-know-refused',
     data: function () {
       return {
-        selected: undefined,
         reason: ''
       }
     },
     methods: {
       // This is where we handle deselecting an already selected option
-      onChange: function (event) {
-        console.log(event)
+      // onChangeDK: function (dk) {
+      //   console.log('dk', dk)
+      //   this.$emit('action', )
+      // },
+      // onChangeRF: function (rf) {
+      //   console.log('rf', rf)
+      // }
+    },
+    computed: {
+      shouldShowReason: function () {
+        return this.question.datum.dk_rf !== null && this.question.datum.dk_rf !== undefined
       },
-      onClick: function (event) {
-        console.log(event.target)
+      dk: {
+        get: function () {
+          if (this.question.datum.dk_rf === null) {
+            return false
+          } else {
+            return this.question.datum.dk_rf
+          }
+        },
+        set: function (val) {
+          actionBus.$emit('action', {
+            action_type: 'dk-rf',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              dk_rf: val ? true : this.rf ? false : null
+            }
+          })
+        }
+      },
+      rf: {
+        get: function () {
+          if (this.question.datum.dk_rf === null) {
+            return false
+          } else {
+            return !this.question.datum.dk_rf
+          }
+        },
+        set: function (val) {
+          actionBus.$emit('action', {
+            action_type: 'dk-rf',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              dk_rf: val === false ? null : false
+            }
+          })
+        }
       }
     }
   }

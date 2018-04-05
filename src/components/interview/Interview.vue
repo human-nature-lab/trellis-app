@@ -3,6 +3,7 @@
     <v-progress-linear :active="isLoading" indeterminate height="2"></v-progress-linear>
     <Page :questions="questions"
           :location="location"
+          :interview="interviewState"
           v-if="!isLoading"
     />
   </v-flex>
@@ -10,8 +11,10 @@
 
 <script>
   import Page from './Page'
-  import Interview from './models/Interview'
+  import {sharedInterview} from './models/Interview'
   import InterviewService from './services/interview/InterviewService'
+  import TranslationService from '@/services/TranslationService'
+  import StringInterpolationService from '@/services/StringInterpolationService'
   import FormService from '@/services/form/FormService'
   export default {
     data () {
@@ -25,7 +28,7 @@
         interviewState: null
       }
     },
-    mounted () {
+    created () {
       let interview = null
       InterviewService.getInterview(this.interviewId)
         .catch(err => {
@@ -51,7 +54,7 @@
             FormService.getForm(interview.survey.form_id)
           ]).then(results => {
             let [actions, data, formBlueprint] = results
-            this.interviewState = new Interview(interview, formBlueprint, actions, data)
+            this.interviewState = sharedInterview(interview, formBlueprint, actions, data)
             this.isLoading = false
           })
         })
@@ -76,6 +79,10 @@
         let questions = this.interviewState.getPageQuestions().map(q => {
           q.type = {
             name: q.question_type.name
+          }
+          q.text = TranslationService.getTranslated(q.question_translation)
+          if (q.follow_up_question_id) {
+            q.text = StringInterpolationService.interpolate(q.text)
           }
           return q
         })

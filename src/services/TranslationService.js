@@ -2,8 +2,12 @@ import storage from '@/services/storage/StorageService'
 export default class TranslationService {
   static getTranslated (translation) {
     let locale = storage.get('locale', 'object')
-    return translation.translation_text.find(tt => {
-      return tt.locale_id === locale.id
-    }).translated_text
+    if (locale) {
+      return translation.translation_text.find(tt => {
+        return tt.locale_id === locale.id
+      }).translated_text
+    } else {
+      return null
+    }
   }
 }

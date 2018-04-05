@@ -36,7 +36,7 @@ export default class GeneratorService {
     if (Array.isArray(generatorExpression)) {
       result = []
       for (let i = 0; i < generatorExpression.length; i++) {
-        result.push(GeneratorService.expand(generatorExpression[i]), _depth + 1)
+        result.push(GeneratorService.expand(generatorExpression[i], _depth + 1))
       }
     } else if (typeof generatorExpression === 'object') {
       result = {}

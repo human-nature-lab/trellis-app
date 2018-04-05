@@ -1,4 +1,4 @@
-import {DataService} from '@/factories/ServiceFactory'
+import DataService from '@/services/data/DataService'
 import describeInEachEnv from '../util'
 
 describeInEachEnv(`DataService.spec`, (env) => {

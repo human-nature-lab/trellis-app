@@ -14,12 +14,16 @@ export class StorageService {
    * @private
    */
   _getLocalStorage (name, type) {
-    switch (type) {
-      case 'object':
-        return JSON.parse(window.localStorage.getItem(name))
-      case 'string':
-      default:
-        return window.localStorage.getItem(name)
+    try {
+      switch (type) {
+        case 'object':
+          return JSON.parse(window.localStorage.getItem(name))
+        case 'string':
+        default:
+          return window.localStorage.getItem(name)
+      }
+    } catch (err) {
+      return undefined
     }
   }
 
@@ -46,10 +50,16 @@ export class StorageService {
    * @returns {*|null}
    */
   get (name, type = 'string') {
-    if (!this.data.has(name)) {
-      this.data.set(name, this._getLocalStorage(name, type))
+    if (this.data.has(name)) {
+      return this.data.get(name)
     }
-    return this.data.get(name) || null
+    let local = this._getLocalStorage(name, type)
+    if (local !== undefined && local !== null) {
+      this.data.set('name', local)
+      return local
+    } else {
+      return null
+    }
   }
 
   set (name, data) {

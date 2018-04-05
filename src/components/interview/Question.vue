@@ -6,20 +6,30 @@
           {{question.text}}
         </v-flex>
         <v-flex sm2 class="text-xs-right">
-          {{question.var_name}}
+          {{question.var_name}} : {{question.type.name}}
         </v-flex>
       </v-layout>
     </v-card-title>
     <v-card-text class="question-content">
-
-      <IntroQuestion v-if="question.type.name === 'intro'" :question="question"></IntroQuestion>
-      <MultipleSelectQuestion v-if="question.type.name === 'multiple_select'" :question="question"/>
-      <MultipleChoiceQuestion v-if="question.type.name === 'multiple_choice'" :question="question"/>
-      <IntegerQuestion v-if="question.type.name === 'integer'" :question="question"/>
-      <DecimalQuestion v-if="question.type.name === 'decimal'" :question="question"/>
+      <IntroQuestion
+        v-if="question.type.name === 'intro'"
+        :question="question"/>
+      <MultipleSelectQuestion
+        v-if="question.type.name === 'multiple_select'"
+        :question="question"/>
+      <MultipleChoiceQuestion
+        v-if="question.type.name === 'multiple_choice'"
+        :question="question"/>
+      <IntegerQuestion
+        v-if="question.type.name === 'integer'"
+        :question="question"/>
+      <DecimalQuestion
+        v-if="question.type.name === 'decimal'"
+        :question="question"/>
     </v-card-text>
     <v-card-actions>
-      <DontKnowRefused></DontKnowRefused>
+      <DontKnowRefused
+        :question="question"></DontKnowRefused>
     </v-card-actions>
   </v-card>
 </template>
@@ -36,7 +46,12 @@
   import DontKnowRefused from './DontKnowRefused.vue'
   export default {
     name: 'question',
-    props: ['question'],
+    props: {
+      question: {
+        type: Object,
+        required: true
+      }
+    },
     data: function () {
       return {
         dk_rf: undefined
