@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import translationService from '@/services/translation/TranslationService'
+  import translationService from '@/services/TranslationService'
   export default {
     name: 'forms-view',
     props: {

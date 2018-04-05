@@ -2,7 +2,11 @@
   <div class="page">
     <div class="debug">{{location}}</div>
     <div class="page-content">
-      <Question v-for="question in questions" :question="question" :key="question.id"/>
+      <Question
+        v-for="question in questions"
+        :question="question"
+        @action="actionHandler"
+        :key="question.id"/>
     </div>
     <div class="page-footer">
       <v-layout row
@@ -23,14 +27,10 @@
 
 <script>
   import Question from './Question.vue'
-  import {sharedActionManager} from './services/ActionManager'
+  import Interview from './models/Interview'
+  import actionBus from './services/ActionBus'
   export default {
     name: 'page',
-    data: function () {
-      return {
-        actions: null
-      }
-    },
     props: {
       questions: {
         type: Array,
@@ -38,19 +38,29 @@
       },
       location: {
         type: Object
+      },
+      interview: {
+        type: Interview,
+        required: true
       }
     },
-    mounted: function () {
-      this.actions = sharedActionManager()
+    created: function () {
+      actionBus.$on('action', this.actionHandler)
     },
     methods: {
       onNext: function () {
-        console.log('next')
-        this.actions.pushUserAction(null, 'next', null)
+        this.interview.pushAction({
+          action_type: 'next'
+        })
       },
       onPrevious: function () {
-        console.log('previous')
-        this.actions.pushUserAction(null, 'previous', null)
+        this.interview.pushAction({
+          action_type: 'previous'
+        })
+      },
+      actionHandler: function (action) {
+        this.interview.pushAction(action)
+        this.$forceUpdate()
       }
     },
     computed: {

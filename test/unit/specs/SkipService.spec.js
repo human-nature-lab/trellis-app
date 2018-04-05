@@ -1,4 +1,3 @@
-'use strict'
 import SkipService from '@/components/interview/services/SkipService'
 describe('SkipService.spec', () => {
   it('should handle show vs hide with no conditions', () => {

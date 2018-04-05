@@ -1,8 +1,10 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import config, {ENV_TYPE} from '@/config'
+import config from '@/config'
+import {APP_MODE, APP_ENV} from '../../src/constants'
 
-config.environment = ENV_TYPE.TEST
+config.appMode = APP_MODE.TEST
+config.appEnv = APP_ENV.WEB
 
 Vue.use(Vuetify)
 

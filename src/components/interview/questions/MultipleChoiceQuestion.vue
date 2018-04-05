@@ -25,7 +25,7 @@
       selected: {
         get: function () {
           this._selected = this.question.choices.filter(choice => {
-            return this.question.data.find(datum => datum.val === choice.val)
+            return this.question.datum.data.find(datum => datum.val === choice.val)
           }).map(choice => choice.val)
           return this._selected
         },

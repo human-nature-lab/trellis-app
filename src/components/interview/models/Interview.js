@@ -31,7 +31,16 @@ export default class Interview {
    */
   performAction (action) {
     if (actionDefinitions[action.action_type]) {
-      actionDefinitions[action.action_type](this.data, this.location, action.payload)
+      console.log(action.action_type)
+      let questionDatum = null
+      let questionData = null
+      if (action.question_datum_id) {
+        questionDatum = this.data.find(q => {
+          return q.id === action.question_datum_id
+        })
+        questionData = questionDatum ? questionDatum.data : undefined
+      }
+      actionDefinitions[action.action_type](this, action.payload, questionDatum, questionData)
     } else {
       console.error('No actionDefinition has been defined for that action yet')
     }
@@ -89,6 +98,17 @@ export default class Interview {
   }
 
   /**
+   * Remove the data associated with this questionDatum.
+   * @param questionDatum
+   */
+  deleteQuestionDatumData (questionDatum) {
+    let qDatum = this.data.find(qDatum => qDatum.id === questionDatum.id)
+    if (qDatum) {
+      qDatum.data = []
+    }
+  }
+
+  /**
    * Get all question data for the current page
    * @returns {Array}
    * @private
@@ -104,15 +124,19 @@ export default class Interview {
     return data
   }
   _makeDatum (questionBlueprint) {
-    this.data.push({
+    let questionDatum = {
       id: uuidv4(),
       section_repetition: this.location.sectionRepetition,
       question_id: questionBlueprint.id,
       survey_id: this.interview.survey_id,
       created_at: (new Date()).getTime(),
       updated_at: (new Date()).getTime(),
+      dk_rf: null,
+      dk_rf_val: null,
       datum: []
-    })
+    }
+    this.data.push(questionDatum)
+    return questionDatum
   }
   load (blueprint, data) {
     this._loadBlueprint(blueprint)
@@ -127,7 +151,7 @@ export default class Interview {
     }
     if (this.location.section >= this.blueprint.sections.length) {
       this.location.section--
-      this.end()
+      return this.atEnd()
     }
     let conditionTags = new Set() // TODO: Actually fill this
     if (SkipService.shouldSkipPage(this._getCurrentPage().skips, conditionTags)) {
@@ -135,24 +159,42 @@ export default class Interview {
       this.next()
     }
   }
+  previous () {
+    this.location.page--
+    if (this.location.page < 0) {
+      this.location.section--
+      if (this.location.section < 0) {
+        this.location.section = 0
+        this.location.page = 0
+        return this.atBeginning()
+      }
+      this.location.page = this._getCurrentSection().pages.length - 1
+    }
+    if (SkipService.shouldSkipPage(this._getCurrentPage().skips, new Set())) {
+      this._markAsSkipped()
+      this.previous()
+    }
+  }
   _markAsSkipped () {
     // TODO: Mark all questions on the current page as skipped
   }
-  end () {
-    console.log(`Reached the ned of the survey`)
+  atBeginning () {
+    console.log(`Reached the beginning of the survey`)
   }
-  previous () {}
+  atEnd () {
+    console.log(`Reached the end of the survey`)
+  }
   getPageQuestions () {
     let questionDefinitions = this._getCurrentPage().questions
     let questionData = this._getCurrentPageData()
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
-      question = JSON.parse(JSON.stringify(question)) // Dereference
-      let qData = questionData.find(q => q.id === question.id)
+      // question = JSON.parse(JSON.stringify(question)) // Dereference
+      let qData = questionData.find(q => q.question_id === question.id)
       if (qData) {
         question.datum = qData
       } else {
-        question.datum = this._makeDatum(question.id)
+        question.datum = this._makeDatum(question)
       }
       return question
     })
@@ -160,4 +202,12 @@ export default class Interview {
   copy () {
     return new Interview(JSON.parse(JSON.stringify(this.interview)), JSON.parse(JSON.stringify(this.blueprint)), JSON.parse(JSON.stringify(this.data)))
   }
+}
+
+let sharedInterviewInstance = null
+export function sharedInterview (...args) {
+  if (!sharedInterviewInstance) {
+    sharedInterviewInstance = new Interview(...args)
+  }
+  return sharedInterviewInstance
 }
