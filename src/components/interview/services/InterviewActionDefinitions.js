@@ -19,8 +19,10 @@ export default {
       interview.deleteQuestionDatumData(questionDatum)
     }
   },
-  'dk-rf-reason': function (interview, payload, questionDatum) {
-
+  'dk-rf-val': function (interview, payload, questionDatum) {
+    if (questionDatum) {
+      questionDatum.dk_rf_val = payload.dk_rf_val
+    }
   },
   'next': function (interview) {
     interview.next()

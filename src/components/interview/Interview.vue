@@ -76,14 +76,17 @@
     },
     computed: {
       questions: function () {
+        let followUpQuestionDatumMap = this.interviewState.getCurrentFollowUpQuestionDatum().reduce((agg, qDatum) => {
+          agg[qDatum.var_name] = qDatum.data.join(', ') + '_INTERPOLATED'
+          return agg
+        }, {})
+        console.log('follow up question datum', followUpQuestionDatumMap)
         let questions = this.interviewState.getPageQuestions().map(q => {
           q.type = {
             name: q.question_type.name
           }
           q.text = TranslationService.getTranslated(q.question_translation)
-          if (q.follow_up_question_id) {
-            q.text = StringInterpolationService.interpolate(q.text)
-          }
+          q.text = StringInterpolationService.interpolate(q.text, followUpQuestionDatumMap)
           return q
         })
         console.log('Computed questions', questions)
