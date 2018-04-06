@@ -124,7 +124,7 @@ export default class Interview {
     }
     return data
   }
-  _makeDatum (questionBlueprint) {
+  _makeQuestionDatum (questionBlueprint) {
     let questionDatum = {
       id: uuidv4(),
       section_repetition: this.location.sectionRepetition,
@@ -221,8 +221,7 @@ export default class Interview {
       if (qData) {
         question.datum = qData
       } else {
-        debugger
-        question.datum = this._makeDatum(question)
+        question.datum = this._makeQuestionDatum(question)
       }
       return question
     })
