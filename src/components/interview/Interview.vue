@@ -87,6 +87,13 @@
           }
           q.text = TranslationService.getTranslated(q.question_translation)
           q.text = StringInterpolationService.interpolate(q.text, followUpQuestionDatumMap)
+          if (q.choices) {
+            q.choices = q.choices.map(choice => {
+              choice.text = TranslationService.getTranslated(choice.choice_translation)
+              choice.text = StringInterpolationService.interpolate(choice.text, followUpQuestionDatumMap)
+              return choice
+            })
+          }
           return q
         })
         console.log('Computed questions', questions)

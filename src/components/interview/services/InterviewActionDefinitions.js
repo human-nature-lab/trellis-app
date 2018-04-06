@@ -1,22 +1,26 @@
 import uuidv4 from 'uuid/v4'
 export default {
   'select-choice': function (interview, payload, questionDatum, questionData) {
-    // questionData.push({
-    //   datum_id: uuid(),
-    //   val: question.choices.find(choice => choice.id === action.choice_id)
-    // })
-    // interview.setQuestionData(questionData, question.id)
+    questionData.push({
+      id: uuidv4(),
+      val: payload.choice_id,
+      choice_id: payload.choice_id
+    })
   },
   'deselect-choice': function (interview, payload, questionDatum, questionData) {
-    // let data = question.data
-    // interview.setQuestionData(question.id)
+    let index = questionData.findIndex(d => d.choice_id === payload.choice_id)
+    if (index > -1) {
+      interview.deleteSingleQuestionDatumDatum(questionDatum, questionData[index])
+    } else {
+      console.error('deselect-choice', 'invalid input without an already selected choice with that id')
+    }
   },
   'dk-rf': function (interview, payload, questionDatum, questionData) {
     if (questionDatum) {
       questionDatum.dk_rf = payload.dk_rf // True or false
     }
     if (questionData && questionData.length) {
-      interview.deleteQuestionDatumData(questionDatum)
+      interview.deleteAllQuestionDatumData(questionDatum)
     }
   },
   'dk-rf-val': function (interview, payload, questionDatum) {

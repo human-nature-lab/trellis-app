@@ -2,46 +2,50 @@
   <div class="multiple-choice">
     <v-checkbox
       v-for="choice in question.choices"
-      :value="choice.val"
       :label="choice.text"
       :key="choice.val"
-      v-model="selected"
-      @change="onChange(choice, selected)"/>
+      v-model="selected[choice.id]"
+      @change="onChange(choice.id, selected[choice.id])"/>
   </div>
 </template>
 
 <script>
-  import {sharedActionManager} from '../services/ActionManager'
+  import actionBus from '../services/ActionBus'
   export default {
     props: ['question'],
     name: 'multiple-choice-question',
     data: function () {
       return {
-        actions: sharedActionManager(),
-        _selected: []
+        _selected: {}
       }
     },
     computed: {
-      selected: {
-        get: function () {
-          this._selected = this.question.choices.filter(choice => {
-            return this.question.datum.data.find(datum => datum.val === choice.val)
-          }).map(choice => choice.val)
-          return this._selected
-        },
-        set: function (newValue) { /* Empty setter. Setting happens in the onChange method */ }
+      selected: function () {
+        let selected = this.question.choices.reduce((agg, choice) => {
+          agg[choice.id] = this.question.datum.data.findIndex(datum => datum.val === choice.id) > -1
+          return agg
+        }, {})
+        console.log('selected multiple choice', selected)
+        return selected
       }
     },
     methods: {
-      onChange: function (choice, selected) {
-        console.log('change', choice, selected)
-        if (selected.indexOf(choice.val) > -1) {
-          this.actions.pushUserAction(this.question.id, 'deselect-choice', {
-            choiceId: choice.id
+      onChange: function (choiceId, val) {
+        if (val) {
+          actionBus.action({
+            action_type: 'select-choice',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              choice_id: choiceId
+            }
           })
         } else {
-          this.actions.pushUserAction(this.question.id, 'select-choice', {
-            choiceId: choice.id
+          actionBus.action({
+            action_type: 'deselect-choice',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              choice_id: choiceId
+            }
           })
         }
       }
