@@ -16,6 +16,7 @@
           name="Reason"
           label="Reason"
           v-model="reason"
+          @blur="onBlur"
         ></v-text-field>
       </v-layout>
     </v-flex>
@@ -35,7 +36,7 @@
     name: 'dont-know-refused',
     data: function () {
       return {
-        reason: ''
+        _reason: this.question.datum.dk_rf_val
       }
     },
     methods: {
@@ -47,10 +48,27 @@
       // onChangeRF: function (rf) {
       //   console.log('rf', rf)
       // }
+      onBlur: function () {
+        actionBus.$emit('action', {
+          action_type: 'dk-rf-val',
+          question_datum_id: this.question.datum.id,
+          payload: {
+            dk_rf_val: this.reason
+          }
+        })
+      }
     },
     computed: {
       shouldShowReason: function () {
         return this.question.datum.dk_rf !== null && this.question.datum.dk_rf !== undefined
+      },
+      reason: {
+        get: function () {
+          return this._reason
+        },
+        set: function (val) {
+          this._reason = val
+        }
       },
       dk: {
         get: function () {

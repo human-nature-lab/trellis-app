@@ -133,8 +133,10 @@ export default class Interview {
       updated_at: (new Date()).getTime(),
       dk_rf: null,
       dk_rf_val: null,
+      var_name: questionBlueprint.var_name,
       datum: []
     }
+    questionDatum.data = questionDatum.datum
     this.data.push(questionDatum)
     return questionDatum
   }
@@ -183,6 +185,26 @@ export default class Interview {
   }
   atEnd () {
     console.log(`Reached the end of the survey`)
+  }
+
+  /**
+   * This method returns the follow up question_datum and data that are associated with the follow up question for that section
+   * TODO: Right now this only gets the first question that matches the follow_up_question_id, but it should probably know
+   * TODO: if a question is in a repeated section and get the correct question_datum(s) in that case
+   * @param sectionId
+   * @param sectionRepetitionId
+   * @param sectionFollowUpQuestionId
+   * @returns {T | undefined}
+   * @private
+   */
+  _getFollowUpQuestionDatum (sectionId, sectionRepetitionId, sectionFollowUpQuestionId) {
+    let section = this.blueprint.sections[sectionId]
+    let followUpQuestionId = section.form_sections[0].follow_up_question_id
+    let followUpDatum = this.data.find(qDatum => qDatum.question_id === followUpQuestionId)
+    return followUpDatum ? [followUpDatum] : []
+  }
+  getCurrentFollowUpQuestionDatum () {
+    return this._getFollowUpQuestionDatum(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpRepetition)
   }
   getPageQuestions () {
     let questionDefinitions = this._getCurrentPage().questions
