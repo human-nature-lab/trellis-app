@@ -177,6 +177,7 @@ export default class Interview {
       this.previous()
     }
   }
+
   _markAsSkipped () {
     // TODO: Mark all questions on the current page as skipped
   }
