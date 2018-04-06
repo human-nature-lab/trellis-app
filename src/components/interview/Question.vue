@@ -26,6 +26,9 @@
       <DecimalQuestion
         v-if="question.type.name === 'decimal'"
         :question="question"/>
+      <RosterQuestion
+        v-if="question.type.name === 'roster'"
+        :question="question"/>
     </v-card-text>
     <v-card-actions>
       <DontKnowRefused
@@ -43,6 +46,7 @@
   import MultipleChoiceQuestion from './questions/MultipleChoiceQuestion'
   import DecimalQuestion from './questions/DecimalQuestion'
   import IntegerQuestion from './questions/IntegerQuestion'
+  import RosterQuestion from './questions/RosterQuestion'
   import DontKnowRefused from './DontKnowRefused.vue'
   export default {
     name: 'question',
@@ -66,6 +70,7 @@
       IntegerQuestion,
       MultipleSelectQuestion,
       MultipleChoiceQuestion,
+      RosterQuestion,
       DontKnowRefused
     }
   }

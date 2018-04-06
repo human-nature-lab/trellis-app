@@ -1,4 +1,4 @@
-// import uuid from 'uuid/v4'
+import uuidv4 from 'uuid/v4'
 export default {
   'select-choice': function (interview, payload, questionDatum, questionData) {
     // questionData.push({
@@ -22,6 +22,8 @@ export default {
   'dk-rf-val': function (interview, payload, questionDatum) {
     if (questionDatum) {
       questionDatum.dk_rf_val = payload.dk_rf_val
+    } else {
+      console.error('invalid input without a questionDatum')
     }
   },
   'next': function (interview) {
@@ -32,5 +34,12 @@ export default {
   },
   'type-text': function (interview, payload, questionDatum, questionData) {
     // interview.getQuestion(payload.question_id, payload.sectionId, payload.pageId, payload.followUpReptitionId, payload.repetitionId)
+  },
+  'add-roster-row': function (interview, payload, questionDatum, questionData) {
+    questionData.push({
+      id: uuidv4(),
+      val: payload.roster_text,
+      sort_order: payload.sort_order
+    })
   }
 }

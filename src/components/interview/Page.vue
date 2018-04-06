@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <div class="debug">{{location}}</div>
+    <debug>Location: {{location}}</debug>
     <div class="page-content">
       <Question
         v-for="question in questions"

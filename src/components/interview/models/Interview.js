@@ -38,7 +38,7 @@ export default class Interview {
         questionDatum = this.data.find(q => {
           return q.id === action.question_datum_id
         })
-        questionData = questionDatum ? questionDatum.data : undefined
+        questionData = questionDatum.data
       }
       actionDefinitions[action.action_type](this, action.payload, questionDatum, questionData)
     } else {
@@ -117,6 +117,7 @@ export default class Interview {
     let data = []
     for (let i = 0; i < this.data.length; i++) {
       let questionDatum = this.data[i]
+      // TODO: take into account survey section and repetition stuff
       if (questionDatum.section === this.location.section && questionDatum.page === this.location.page) {
         data.push(questionDatum)
       }
@@ -127,6 +128,8 @@ export default class Interview {
     let questionDatum = {
       id: uuidv4(),
       section_repetition: this.location.sectionRepetition,
+      page: this.location.page,
+      section: this.location.section,
       question_id: questionBlueprint.id,
       survey_id: this.interview.survey_id,
       created_at: (new Date()).getTime(),
@@ -212,11 +215,13 @@ export default class Interview {
     let questionData = this._getCurrentPageData()
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
-      // question = JSON.parse(JSON.stringify(question)) // Dereference
+      question = JSON.parse(JSON.stringify(question)) // Dereference
+      // TODO: this should take into account section repetition and follow ups as well
       let qData = questionData.find(q => q.question_id === question.id)
       if (qData) {
         question.datum = qData
       } else {
+        debugger
         question.datum = this._makeDatum(question)
       }
       return question
