@@ -23,7 +23,7 @@ export default {
     if (questionDatum) {
       questionDatum.dk_rf_val = payload.dk_rf_val
     } else {
-      console.error('invalid input without a questionDatum')
+      console.error('dk-rf-val', 'invalid input without a questionDatum', payload)
     }
   },
   'next': function (interview) {
@@ -35,11 +35,19 @@ export default {
   'type-text': function (interview, payload, questionDatum, questionData) {
     // interview.getQuestion(payload.question_id, payload.sectionId, payload.pageId, payload.followUpReptitionId, payload.repetitionId)
   },
-  'add-roster-row': function (interview, payload, questionDatum, questionData) {
+  'new-roster-row': function (interview, payload, questionDatum, questionData) {
     questionData.push({
       id: uuidv4(),
-      val: payload.roster_text,
+      val: '',
       sort_order: payload.sort_order
     })
+  },
+  'roster-row-edit': function (interview, payload, questionDatum, questionData) {
+    let datum = questionData.find(d => d.id === payload.datum_id)
+    if (datum) {
+      datum.val = payload.val
+    } else {
+      console.error('roster-row-edit', 'invalid input. No datum has been created with that id')
+    }
   }
 }

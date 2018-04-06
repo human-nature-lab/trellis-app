@@ -16,7 +16,6 @@
           name="Reason"
           label="Reason"
           v-model="reason"
-          @blur="onBlur"
         ></v-text-field>
       </v-layout>
     </v-flex>
@@ -39,24 +38,8 @@
         _reason: this.question.datum.dk_rf_val
       }
     },
-    methods: {
-      // This is where we handle deselecting an already selected option
-      // onChangeDK: function (dk) {
-      //   console.log('dk', dk)
-      //   this.$emit('action', )
-      // },
-      // onChangeRF: function (rf) {
-      //   console.log('rf', rf)
-      // }
-      onBlur: function () {
-        actionBus.$emit('action', {
-          action_type: 'dk-rf-val',
-          question_datum_id: this.question.datum.id,
-          payload: {
-            dk_rf_val: this.reason
-          }
-        })
-      }
+    created: function () {
+      this._reason = this.question.datum.dk_rf_val // We're actually binding to a text model so here we need to initialize that var
     },
     computed: {
       shouldShowReason: function () {
@@ -68,6 +51,13 @@
         },
         set: function (val) {
           this._reason = val
+          actionBus.debounceAction({
+            action_type: 'dk-rf-val',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              dk_rf_val: val
+            }
+          })
         }
       },
       dk: {
@@ -79,7 +69,7 @@
           }
         },
         set: function (val) {
-          actionBus.$emit('action', {
+          actionBus.action({
             action_type: 'dk-rf',
             question_datum_id: this.question.datum.id,
             payload: {

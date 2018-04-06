@@ -2,25 +2,28 @@
   <v-flex xs12 sm12 md6 class="roster-question">
     <v-card>
       <v-list>
-        <v-list-tile v-for="row in roster" :key="row.id">
+        <v-list-tile v-for="(row, rowIndex) in roster" :key="row.id">
           <v-list-tile-content>
-            <span class="roster-val">{{row.val}}</span>
+            <v-text-field
+              placeholder="Roster text here"
+              v-model="newText"
+              v-if="rowIndex === editingIndex"
+              autofocus
+              @blur="onStopEdit(rowIndex)"/>
+            <span class="old-val"
+              v-if="rowIndex === editingIndex">({{oldText}})</span>
+            <span class="roster-val"
+              v-if="rowIndex !== editingIndex">{{row.val}}</span>
           </v-list-tile-content>
           <v-list-tile-action>
-            <v-btn icon ripple>
+            <v-btn icon ripple @click="onStartEdit(rowIndex)">
               <v-icon color="grey">mode_edit</v-icon>
             </v-btn>
           </v-list-tile-action>
         </v-list-tile>
-        <v-list-tile v-if="isAddingNew">
-          <v-text-field
-            placeholder="Roster text here"
-            v-model="newText"
-            @blur="onNewBlur"/>
-        </v-list-tile>
       </v-list>
       <v-btn
-        @click="isAddingNew = true"
+        @click="onNewRow"
         color="deep-orange"
         dark
         absolute
@@ -46,32 +49,64 @@
     data: function () {
       return {
         isAddingNew: false,
-        newText: null,
-        editing: []
+        _newText: null,
+        oldText: null,
+        editingIndex: null
       }
     },
     methods: {
-      onNewBlur: function () {
-        actionBus.$emit('action', {
-          action_type: 'add-roster-row',
+      onNewRow: function () {
+        this.editingIndex = this.question.datum.data.length
+        actionBus.action({
+          action_type: 'new-roster-row',
+          question_datum_id: this.question.datum.id,
           payload: {
-            roster_text: this.newText
+            sort_order: this.question.datum.data.length
           }
         })
-        this.newText = null
-        this.isAddingNew = false
+        this.onStartEdit(this.editingIndex)
       },
-      onRowBlur: function (row) {}
-    },
-    computed: {
-      roster: function () {
-        if (this.question.data) {
-          return this.question.datum.sort(function (a, b) {
+      onStartEdit: function (rowIndex) {
+        let roster = this.getRoster()
+        this.editingIndex = rowIndex
+        this.oldText = roster[rowIndex].val
+        this.newText = roster[rowIndex].val
+        this.$forceUpdate()
+      },
+      onStopEdit: function (rowIndex) {
+        this.editingIndex = ''
+        this.newText = ''
+        this.$forceUpdate()
+      },
+      getRoster: function () {
+        if (this.question.datum.data) {
+          return this.question.datum.data.sort(function (a, b) {
             return a.sort_order > b.sort_order
           })
         } else {
           return []
         }
+      }
+    },
+    computed: {
+      newText: {
+        get: function () {
+          return this._newText
+        },
+        set: function (newText) {
+          actionBus.actionDebounce({
+            action_type: 'roster-row-edit',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              datum_id: this.roster[this.editingIndex].id,
+              val: newText
+            }
+          })
+          this._newText = newText
+        }
+      },
+      roster: function () {
+        return this.getRoster()
       }
     }
   }
