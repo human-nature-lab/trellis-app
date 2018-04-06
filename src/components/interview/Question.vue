@@ -61,9 +61,6 @@
         dk_rf: undefined
       }
     },
-    methods: {
-
-    },
     components: {
       IntroQuestion,
       DecimalQuestion,

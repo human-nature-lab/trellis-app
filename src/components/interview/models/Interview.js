@@ -22,6 +22,8 @@ export default class Interview {
    */
   pushAction (action) {
     this.actions.push(action)
+    action.created_at = (new Date()).getTime()
+    action.updated_at = (new Date()).getTime()
     this.performAction(action)
   }
 
@@ -98,10 +100,19 @@ export default class Interview {
   }
 
   /**
+   * Remove a single datum from the supplied question datum
+   * @param {Object} questionDatum - The question datum reference to remove the datumm from
+   * @param {Number} datumIndex - The index of the datum that should be removed
+   */
+  deleteSingleQuestionDatumDatum (questionDatum, datumIndex) {
+    questionDatum.data.splice(datumIndex, 1)
+  }
+
+  /**
    * Remove the data associated with this questionDatum.
    * @param questionDatum
    */
-  deleteQuestionDatumData (questionDatum) {
+  deleteAllQuestionDatumData (questionDatum) {
     let qDatum = this.data.find(qDatum => qDatum.id === questionDatum.id)
     if (qDatum) {
       qDatum.data = []

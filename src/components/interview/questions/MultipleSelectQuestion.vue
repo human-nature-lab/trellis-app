@@ -10,13 +10,10 @@
 </template>
 
 <script>
-  import { sharedActionManager } from '../services/ActionManager'
+  import actionBus from '../services/ActionBus'
   export default {
     props: ['question'],
     name: 'multiple-select-question',
-    mounted: function () {
-      this.actions = sharedActionManager() // This could be a race condition if the interviewId isn't passed in first from the first caller of this function
-    },
     computed: {
       selected: function () {
         return this.question.data || []
@@ -27,13 +24,21 @@
         console.log('change', choice)
       },
       onSelected: function (choice) {
-        this.actions.pushUserAction(this.question.id, 'select-choice', {
-          choiceId: choice.id
+        actionBus.action({
+          action_type: 'select_choice',
+          question_datum_id: this.question.datum.id,
+          payload: {
+            choice_id: choice.id
+          }
         })
       },
       onDeselected: function (choice) {
-        this.actions.pushUserAction(this.question.id, 'deselect-choice', {
-          choiceId: choice.id
+        actionBus.action({
+          action_type: 'deselect-choice',
+          question_datum_id: this.question.datum.id,
+          payload: {
+            choice_id: choice.id
+          }
         })
       }
     }
