@@ -1,9 +1,10 @@
 <template>
   <div class="page">
-    <debug>
-      Location: {{location}}
-      <br>
-      page sort order: {{pageOrder}}
+    <debug :name="'Location'">
+      {{location}}
+    </debug>
+    <debug :name="'Assigned Conditions: ' + assignedConditions.length">
+      {{assignedConditions}}
     </debug>
     <div class="page-content">
       <Question
@@ -72,9 +73,8 @@
       allRequiredQuestionsAnswered: function () {
         return true
       },
-      pageOrder: function () {
-        let page = this.interview._getCurrentPage()
-        return page.pivot.question_group_order
+      assignedConditions: function () {
+        return this.interview._getCurrentConditionTags()
       }
     },
     components: {
