@@ -13,8 +13,14 @@ export default class Interview {
       sectionFollowUpRepetition: 0,
       page: 0
     }
+    this.conditionTags = {
+      respondent: [],
+      survey: [],
+      section: []
+    }
     this.actions = actions
     this.conditionAssigner = new ConditionAssignmentService()
+    this.allConditions = new Map()
     this.load(blueprint)
   }
 
@@ -59,6 +65,7 @@ export default class Interview {
    */
   _loadBlueprint (blueprint) {
     this.blueprint = Object.assign({}, blueprint)
+    this.allConditions.clear()
     // Sort all levels
     this.blueprint.sections.sort((sectionA, sectionB) => {
       return sectionA.form_sections[0].sort_order - sectionB.form_sections[0].sort_order
@@ -68,6 +75,11 @@ export default class Interview {
         return pageA.pivot.question_group_order - pageB.pivot.question_group_order
       })
       for (let page of section.question_groups) {
+        for (let skip of page.skips) {
+          for (let condition of skip.conditions) {
+            this.allConditions.set(condition.id, condition)
+          }
+        }
         page.questions.sort((questionA, questionB) => {
           return questionA.sort_order - questionB.sort_order
         })
@@ -94,6 +106,7 @@ export default class Interview {
       section.question_groups.forEach(page => {
         page.questions.forEach(question => {
           question.assign_condition_tags.forEach(act => {
+            this.allConditions.set(act.condition.id, act.condition)
             this.conditionAssigner.register(act.id, act.logic)
           })
         })
@@ -209,9 +222,83 @@ export default class Interview {
   }
 
   /**
+   * Assign the specified condition tag
+   * @param assign_condition_tag
+   * @private
+   */
+  _assignConditionTag (act) {
+    // TODO: We could check for existing condition tags before creating it again, but this will
+    // be taken care of by the resetting of the form and replaying existing conditions for pages
+    // that are being modified as opposed to being created for the first time
+    switch (act.scope) {
+      case 'section':
+        this.conditionTags.section.push({
+          id: uuidv4(),
+          survey_id: this.interview.survey_id,
+          condition_id: act.condition.id,
+          repetition: this.location.sectionRepetition,
+          follow_up_question_datum_id: this.location.sectionFollowUpRepetition, // TODO: This is wrong and will need to be changed
+          created_at: (new Date()).getTime(),
+          updated_at: (new Date()).getTime()
+        })
+        break
+      case 'form':
+        this.conditionTags.survey.push({
+          id: uuidv4(),
+          survey_id: this.interview.survey_id,
+          condition_id: act.condition.id,
+          created_at: (new Date()).getTime(),
+          updated_at: (new Date()).getTime()
+        })
+        break
+      case 'respondent':
+      default:
+        this.conditionTags.respondent.push({
+          id: uuidv4(),
+          respondent_id: this.interview.respondent_id,
+          condition_id: act.condition.id,
+          created_at: (new Date()).getTime(),
+          updated_at: (new Date()).getTime()
+        })
+    }
+  }
+
+  /**
+   * Assign the current condition tags
+   */
+  _evaluateConditionAssignment () {
+    let questionsWithData = this.getPageQuestions()
+    let vars = questionsWithData.reduce((vars, question) => {
+      vars[question.var_name] = question.datum.data.map(datum => datum.val)
+      return vars
+    }, {})
+    console.log('vars', vars)
+    for (let question of questionsWithData) {
+      for (let act of question.assign_condition_tags) {
+        if (this.conditionAssigner.run(act.id, vars)) {
+          this._assignConditionTag(act)
+        }
+      }
+    }
+  }
+
+  /**
+   * Get all currently assigned condition tags
+   */
+  _getCurrentConditionTags () {
+    return this.conditionTags.respondent
+      .concat(this.conditionTags.survey)
+      .concat(this.conditionTags.section.filter(tag => {
+        return tag.repetition === this.location.sectionRepetition &&
+          tag.follow_up_question_datum_id === this.location.sectionFollowUpRepetition
+      }))
+  }
+
+  /**
    * Move to the next closest valid page of the survey
    */
   next () {
+    this._evaluateConditionAssignment()
     // TODO: handle section follow up and repetitions here
     this.location.page++
     if (this.location.page >= this._getCurrentSection().pages.length) {
@@ -223,12 +310,14 @@ export default class Interview {
       this.location.page = this._getCurrentSection().pages.length - 1
       return this.atEnd()
     }
-    // let conditionTags = new Set() // TODO: Actually fill this
-    // Don't skip any pages for now
-    // if (SkipService.shouldSkipPage(this._getCurrentPage().skips, conditionTags)) {
-    //   this._markAsSkipped()
-    //   this.next()
-    // }
+    // Get assigned condition tags and convert them into a set of condition ids
+    let conditionTags = this._getCurrentConditionTags().reduce((set, tag) => {
+      set.add(tag.condition_id)
+    }, new Set())
+    if (SkipService.shouldSkipPage(this._getCurrentPage().skips, conditionTags)) {
+      this._markAsSkipped()
+      this.next()
+    }
   }
 
   /**
