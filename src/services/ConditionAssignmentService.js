@@ -28,4 +28,11 @@ export default class ConditionAssignmentService {
       return false
     }
   }
+
+  /**
+   * Remove all registered functions
+   */
+  clear () {
+    this.conditionAssignmentMethods = {}
+  }
 }

@@ -16,6 +16,7 @@
           name="Reason"
           label="Reason"
           v-model="reason"
+          autofocus
         ></v-text-field>
       </v-layout>
     </v-flex>

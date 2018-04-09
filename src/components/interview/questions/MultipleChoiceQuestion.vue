@@ -14,15 +14,10 @@
   export default {
     props: ['question'],
     name: 'multiple-choice-question',
-    data: function () {
-      return {
-        _selected: {}
-      }
-    },
     computed: {
       selected: function () {
         let selected = this.question.choices.reduce((agg, choice) => {
-          agg[choice.id] = this.question.datum.data.findIndex(datum => datum.val === choice.id) > -1
+          agg[choice.id] = this.question.datum.data.findIndex(datum => datum.choice_id === choice.id) > -1
           return agg
         }, {})
         console.log('selected multiple choice', selected)
@@ -54,5 +49,7 @@
 </script>
 
 <style scoped>
-
+  /* TODO: Need to style the checkboxes to look like radio buttons instead. We have to use checkboxes because the state
+   of a radio button in HTML cannot be set to false. This means the radio buttons can't be deselected programmatically
+   without recreating the element.*/
 </style>
