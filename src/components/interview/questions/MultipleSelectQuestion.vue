@@ -2,10 +2,10 @@
   <div class="multiple-select">
     <v-checkbox
       v-for="choice in question.choices"
-      :value="choice.val"
       :label="choice.text"
       :key="choice.val"
-      @change="onChange(choice)"/>
+      v-model="selected[choice.id]"
+      @change="onChange(choice.id, selected[choice.id])"/>
   </div>
 </template>
 
@@ -16,30 +16,33 @@
     name: 'multiple-select-question',
     computed: {
       selected: function () {
-        return this.question.data || []
+        let selected = this.question.choices.reduce((agg, choice) => {
+          agg[choice.id] = this.question.datum.data.findIndex(datum => datum.choice_id === choice.id) > -1
+          return agg
+        }, {})
+        console.log('selected multiple select', selected)
+        return selected
       }
     },
     methods: {
-      onChange: function (choice) {
-        console.log('change', choice)
-      },
-      onSelected: function (choice) {
-        actionBus.action({
-          action_type: 'select_choice',
-          question_datum_id: this.question.datum.id,
-          payload: {
-            choice_id: choice.id
-          }
-        })
-      },
-      onDeselected: function (choice) {
-        actionBus.action({
-          action_type: 'deselect-choice',
-          question_datum_id: this.question.datum.id,
-          payload: {
-            choice_id: choice.id
-          }
-        })
+      onChange: function (choiceId, val) {
+        if (val) {
+          actionBus.action({
+            action_type: 'select-choice',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              choice_id: choiceId
+            }
+          })
+        } else {
+          actionBus.action({
+            action_type: 'deselect-choice',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              choice_id: choiceId
+            }
+          })
+        }
       }
     }
   }

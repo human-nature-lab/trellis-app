@@ -1,6 +1,10 @@
 <template>
   <div class="page">
-    <debug>Location: {{location}}</debug>
+    <debug>
+      Location: {{location}}
+      <br>
+      page sort order: {{pageOrder}}
+    </debug>
     <div class="page-content">
       <Question
         v-for="question in questions"
@@ -67,6 +71,10 @@
       // TODO: // Calculate this and enable/disable next based on it
       allRequiredQuestionsAnswered: function () {
         return true
+      },
+      pageOrder: function () {
+        let page = this.interview._getCurrentPage()
+        return page.pivot.question_group_order
       }
     },
     components: {

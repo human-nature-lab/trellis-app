@@ -1,11 +1,12 @@
 import uuidv4 from 'uuid/v4'
 import SkipService from '../services/SkipService'
 import actionDefinitions from '../services/InterviewActionDefinitions'
+import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 export default class Interview {
   constructor (interview, blueprint = null, actions = [], data = []) {
     this.interview = interview
-    this.blueprint = {}
-    this.data = []
+    this.blueprint = blueprint
+    this.data = data
     this.location = {
       section: 0,
       sectionRepetition: 0,
@@ -13,7 +14,8 @@ export default class Interview {
       page: 0
     }
     this.actions = actions
-    this.load(blueprint, data)
+    this.conditionAssigner = new ConditionAssignmentService()
+    this.load(blueprint)
   }
 
   /**
@@ -35,21 +37,23 @@ export default class Interview {
     if (actionDefinitions[action.action_type]) {
       console.log(action.action_type)
       let questionDatum = null
-      let questionData = null
+      let questionBlueprint = null
       if (action.question_datum_id) {
         questionDatum = this.data.find(q => {
           return q.id === action.question_datum_id
         })
-        questionData = questionDatum.data
+        if (questionDatum) {
+          questionBlueprint = this._findQuestionBlueprint(questionDatum.question_id)
+        }
       }
-      actionDefinitions[action.action_type](this, action.payload, questionDatum, questionData)
+      actionDefinitions[action.action_type](this, action.payload, questionDatum, questionBlueprint)
     } else {
       console.error('No actionDefinition has been defined for that action yet')
     }
   }
 
   /**
-   * Load the form structure
+   * Load and sort the form structure
    * @param {Object} blueprint
    * @private
    */
@@ -57,19 +61,61 @@ export default class Interview {
     this.blueprint = Object.assign({}, blueprint)
     // Sort all levels
     this.blueprint.sections.sort((sectionA, sectionB) => {
-      return sectionA.form_sections[0].sort_order > sectionB.form_sections[0].sort_order
+      return sectionA.form_sections[0].sort_order - sectionB.form_sections[0].sort_order
     })
-    this.blueprint.sections.forEach(section => {
+    for (let section of this.blueprint.sections) {
       section.question_groups.sort((pageA, pageB) => {
-        return pageA.pivot.question_group_order > pageB.pivot.question_group_order
+        return pageA.pivot.question_group_order - pageB.pivot.question_group_order
       })
-      section.question_groups.forEach(page => {
+      for (let page of section.question_groups) {
         page.questions.sort((questionA, questionB) => {
-          return questionA.sort_order > questionB.sort_order
+          return questionA.sort_order - questionB.sort_order
+        })
+        for (let question of page.questions) {
+          if (question.choices) {
+            question.choices.sort((cA, cB) => {
+              return cA.sort_order - cB.sort_order
+            })
+          }
+        }
+      }
+      section.pages = section.question_groups
+    }
+    this._initializeConditionAssignment()
+  }
+
+  /**
+   * Register all condition assignment functions which will be executed when the respondent navigates between pages
+   * @private
+   */
+  _initializeConditionAssignment () {
+    this.conditionAssigner.clear()
+    this.blueprint.sections.forEach(section => {
+      section.question_groups.forEach(page => {
+        page.questions.forEach(question => {
+          question.assign_condition_tags.forEach(act => {
+            this.conditionAssigner.register(act.id, act.logic)
+          })
         })
       })
-      section.pages = section.question_groups
     })
+  }
+
+  /**
+   * Naive search for a single question id. This could be easily converted to a Map if it's a performance bottleneck
+   * @param questionId
+   * @private
+   */
+  _findQuestionBlueprint (questionId) {
+    for (let section of this.blueprint.sections) {
+      for (let page of section.question_groups) {
+        for (let question of page.questions) {
+          if (questionId === question.id) {
+            return question
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -88,15 +134,6 @@ export default class Interview {
    */
   _getCurrentPage () {
     return this._getCurrentSection().pages[this.location.page]
-  }
-
-  /**
-   * Load the data into this service
-   * @param data
-   * @private
-   */
-  _loadData (data) {
-    this.data = data
   }
 
   /**
@@ -135,10 +172,18 @@ export default class Interview {
     }
     return data
   }
+
+  /**
+   * Make a single questionDatum from the provided questionBlueprint
+   * @param questionBlueprint
+   * @returns {{id: *, section_repetition: number, section_follow_up_repetition: number, page: number, section: number, question_id, survey_id: *, created_at: number, updated_at: number, dk_rf: null, dk_rf_val: null, var_name, datum: Array}}
+   * @private
+   */
   _makeQuestionDatum (questionBlueprint) {
     let questionDatum = {
       id: uuidv4(),
       section_repetition: this.location.sectionRepetition,
+      section_follow_up_repetition: this.location.sectionFollowUpRepetition,
       page: this.location.page,
       section: this.location.section,
       question_id: questionBlueprint.id,
@@ -154,10 +199,18 @@ export default class Interview {
     this.data.push(questionDatum)
     return questionDatum
   }
-  load (blueprint, data) {
+
+  /**
+   * Load the survey blueprint and existing data
+   * @param blueprint
+   */
+  load (blueprint) {
     this._loadBlueprint(blueprint)
-    this._loadData(data)
   }
+
+  /**
+   * Move to the next closest valid page of the survey
+   */
   next () {
     // TODO: handle section follow up and repetitions here
     this.location.page++
@@ -167,14 +220,20 @@ export default class Interview {
     }
     if (this.location.section >= this.blueprint.sections.length) {
       this.location.section--
+      this.location.page = this._getCurrentSection().pages.length - 1
       return this.atEnd()
     }
-    let conditionTags = new Set() // TODO: Actually fill this
-    if (SkipService.shouldSkipPage(this._getCurrentPage().skips, conditionTags)) {
-      this._markAsSkipped()
-      this.next()
-    }
+    // let conditionTags = new Set() // TODO: Actually fill this
+    // Don't skip any pages for now
+    // if (SkipService.shouldSkipPage(this._getCurrentPage().skips, conditionTags)) {
+    //   this._markAsSkipped()
+    //   this.next()
+    // }
   }
+
+  /**
+   * Move to closest previously valid page of the survey
+   */
   previous () {
     this.location.page--
     if (this.location.page < 0) {
@@ -192,12 +251,24 @@ export default class Interview {
     }
   }
 
+  /**
+   * Mark all current questions as skipped. This is stored as a property on the questionDatum
+   * @private
+   */
   _markAsSkipped () {
     // TODO: Mark all questions on the current page as skipped
   }
+
+  /**
+   * Handle the 'already at the beginning of survey' event
+   */
   atBeginning () {
     console.log(`Reached the beginning of the survey`)
   }
+
+  /**
+   * Handle 'reached the end of survey' event
+   */
   atEnd () {
     console.log(`Reached the end of the survey`)
   }
@@ -218,9 +289,19 @@ export default class Interview {
     let followUpDatum = this.data.find(qDatum => qDatum.question_id === followUpQuestionId)
     return followUpDatum ? [followUpDatum] : []
   }
+
+  /**
+   * Alias for follow up question datum for the current state of the survey
+   * @returns {T}
+   */
   getCurrentFollowUpQuestionDatum () {
     return this._getFollowUpQuestionDatum(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpRepetition)
   }
+
+  /**
+   * Get an array of the questions for the current page. This function handles merging existing datum with
+   * the question blueprint and dereferences everything
+   */
   getPageQuestions () {
     let questionDefinitions = this._getCurrentPage().questions
     let questionData = this._getCurrentPageData()
@@ -230,13 +311,18 @@ export default class Interview {
       // TODO: this should take into account section repetition and follow ups as well
       let qData = questionData.find(q => q.question_id === question.id)
       if (qData) {
-        question.datum = qData
+        question.datum = JSON.parse(JSON.stringify(qData))
       } else {
-        question.datum = this._makeQuestionDatum(question)
+        question.datum = JSON.parse(JSON.stringify(this._makeQuestionDatum(question)))
       }
       return question
     })
   }
+
+  /**
+   * Make a copy of the current interview
+   * @returns {Interview}
+   */
   copy () {
     return new Interview(JSON.parse(JSON.stringify(this.interview)), JSON.parse(JSON.stringify(this.blueprint)), JSON.parse(JSON.stringify(this.data)))
   }
