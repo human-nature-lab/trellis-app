@@ -2,7 +2,7 @@ import FormService from '@/services/form/FormService'
 
 describe(`FormService`, () => {
   it('service should be defined', () => {
-    expect(FormService).to.not.be.null('This service has not been defined yet')
+    expect(FormService).to.not.equal(null, 'This service has not been defined yet')
   })
   it('should return a correctly structured form', () => {
     return FormService.getStudyForms()

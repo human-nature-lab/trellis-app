@@ -14,7 +14,7 @@ describe('ConditionAssignmentService.js', () => {
     const cass = new ConditionAssignmentService()
     const arg1 = 'test is ok'
     cass.register('question1', 'function (args) { return args }')
-    expect(cass.eval('question1', arg1)).to.deep.equal(arg1, 'The argument returns was not the same as the argument passed in')
+    expect(cass.run('question1', arg1)).to.deep.equal(arg1, 'The argument returns was not the same as the argument passed in')
   })
   it('should handle multiple functions', () => {
     const cass = new ConditionAssignmentService()
@@ -22,8 +22,8 @@ describe('ConditionAssignmentService.js', () => {
     const arg2 = 'test 2'
     cass.register('question1', `function (args) { return '${arg1}' }`)
     cass.register('question2', `function (args) { return '${arg2}' }`)
-    expect(cass.eval('question1', arg1)).to.deep.equal(arg1, 'The argument passed in to question1 did not match the argument returned')
-    expect(cass.eval('question2', arg2)).to.deep.equal(arg2, 'The argument passed in to question2 did not match the argument returned')
+    expect(cass.run('question1', arg1)).to.deep.equal(arg1, 'The argument passed in to question1 did not match the argument returned')
+    expect(cass.run('question2', arg2)).to.deep.equal(arg2, 'The argument passed in to question2 did not match the argument returned')
   })
   it('should handle unregistering', () => {
     const cass = new ConditionAssignmentService()
@@ -34,14 +34,14 @@ describe('ConditionAssignmentService.js', () => {
   })
   it('should return false for an unregistered event', () => {
     const cass = new ConditionAssignmentService()
-    expect(cass.eval('test')).to.be.false
+    expect(cass.run('test')).to.be.false
   })
   it('should be faster than calling eval inline', function () {
     this.timeout(20 * 1000)
     const cass = new ConditionAssignmentService()
     cass.register('test1', `function (val) { return val ++ }`)
     function testCass () {
-      cass.eval('test1', 100)
+      cass.run('test1', 100)
     }
     function testEval () {
       self.eval('(function (val) { return val ++ })(100)')

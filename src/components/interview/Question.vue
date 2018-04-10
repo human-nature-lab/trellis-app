@@ -30,7 +30,7 @@
         v-if="question.type.name === 'roster'"
         :question="question"/>
     </v-card-text>
-    <v-card-actions>
+    <v-card-actions v-if="question.type.name !== 'intro'">
       <DontKnowRefused
         :question="question"></DontKnowRefused>
     </v-card-actions>
