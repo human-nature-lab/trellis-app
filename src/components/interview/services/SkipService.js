@@ -29,11 +29,10 @@ export default class SkipService {
           }
         } else {
           // Show if all are true
-          shouldSkip = false
+          shouldSkip = skipCondition.conditions.length === 0
           for (let condition of skipCondition.conditions) {
             if (!conditionTags.has(condition.id)) {
               shouldSkip = true
-              break
             }
           }
         }
@@ -49,7 +48,7 @@ export default class SkipService {
           }
         } else {
           // Hide if all are true
-          shouldSkip = true
+          shouldSkip = skipCondition.conditions.length !== 0
           for (let condition of skipCondition.conditions) {
             if (!conditionTags.has(condition.id)) {
               shouldSkip = false

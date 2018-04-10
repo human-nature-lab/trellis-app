@@ -70,7 +70,7 @@ class MockService {
    * @returns {Array}
    */
   choicesGenerator (minChoices = 2, maxChoices = 8) {
-    return MockService.arrayGenerate(this.choiceGenerator, minChoices, maxChoices)
+    return GeneratorService.arrayGenerate(this.choiceGenerator, minChoices, maxChoices)
   }
 
   /**
@@ -91,7 +91,7 @@ class MockService {
         choices: this.choiceGenerator(2, 5)
       })
     }
-    const type = MockService.randomSelect(Object.keys(typeMap))
+    const type = GeneratorService.randomSelect(Object.keys(typeMap))
     const baseQuestion = {
       var_name: faker.lorem.word,
       text: faker.lorem.lines,

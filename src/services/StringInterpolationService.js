@@ -7,12 +7,15 @@ export default class StringInterpolationService {
    * @param {object} vals - Key pairs of question names and their values
    */
   static interpolate (msg, vals) {
-    let matches = matchAllBrackets.exec(msg)
-    if (matches) {
-      for (let match of matches) {
-        msg = msg.replace(`[${match}]`, vals[match] ? vals[match] : 'UNDEFINED_VAR_NAME')
+    let match
+    let interpolatedMsg = msg
+    while ((match = matchAllBrackets.exec(msg)) !== null) {
+      // This is necessary to avoid infinite loops with zero-width match
+      if (match.index === matchAllBrackets.lastIndex) {
+        matchAllBrackets.lastIndex++
       }
+      interpolatedMsg = interpolatedMsg.replace(`[${match[1]}]`, vals[match[1]] ? vals[match[1]] : 'UNDEFINED_VAR_NAME')
     }
-    return msg
+    return interpolatedMsg
   }
 }

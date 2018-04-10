@@ -57,7 +57,7 @@ export default class GeneratorService {
    * @param {Number} [min=0]
    * @returns {number}
    */
-  randomInt (max, min = 0) {
+  static randomInt (max, min = 0) {
     return Math.floor(Math.random() * max) + Math.floor(min)
   }
 
@@ -65,7 +65,7 @@ export default class GeneratorService {
    * Select a random item from a collection
    * @param {Array} collection
    */
-  randomSelect (arr) {
+  static randomSelect (arr) {
     return arr[GeneratorService.randomInt(arr.length - 1)]
   }
 
@@ -76,7 +76,7 @@ export default class GeneratorService {
    * @param {Number} max
    * @returns {Array}
    */
-  arrayGenerate (generator, min = 0, max = 10) {
+  static arrayGenerate (generator, min = 0, max = 10) {
     let n = GeneratorService.randomInt(max, min)
     let array = []
     for (let i = 0; i < n; i++) {
