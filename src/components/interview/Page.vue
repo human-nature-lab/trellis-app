@@ -1,33 +1,40 @@
 <template>
-  <div class="page">
-    <debug :name="'Location'">
-      {{location}}
-    </debug>
-    <debug :name="'Assigned Conditions: ' + assignedConditions.length">
-      {{assignedConditions}}
-    </debug>
-    <div class="page-content">
-      <Question
-        v-for="question in questions"
-        :question="question"
-        @action="actionHandler"
-        :key="question.id"/>
-    </div>
-    <div class="page-footer">
-      <v-layout row
-                justify-space-between>
-        <v-btn @click="onPrevious"
-               justify-left>
-          <v-icon left>chevron_left</v-icon> Previous
-        </v-btn>
-        <v-btn @click="onNext"
-               :disabled="!allRequiredQuestionsAnswered"
-               justify-right>
-          Next <v-icon right>chevron_right</v-icon>
-        </v-btn>
-      </v-layout>
-    </div>
-  </div>
+  <v-flex class="page">
+    <v-card>
+      <debug :name="'Location'">
+        {{location}}
+      </debug>
+      <debug :name="'Assigned Conditions: ' + assignedConditions.length">
+        {{assignedConditions}}
+      </debug>
+      <debug :name="'Actions: ' + interview.actions.length">
+        {{interview.actions}}
+      </debug>
+      <v-flex class="page-content">
+        <Question
+          v-for="question in questions"
+          :question="question"
+          :key="question.id"/>
+      </v-flex>
+      <v-bottom-nav
+        absolute
+        :value="true"
+        class="page-footer">
+        <v-layout row
+                  justify-space-between>
+          <v-btn @click="onPrevious"
+                 justify-left>
+            <v-icon left>chevron_left</v-icon> Previous
+          </v-btn>
+          <v-btn @click="onNext"
+                 :disabled="!allRequiredQuestionsAnswered"
+                 justify-right>
+            Next <v-icon right>chevron_right</v-icon>
+          </v-btn>
+        </v-layout>
+      </v-bottom-nav>
+    </v-card>
+  </v-flex>
 </template>
 
 <script>
@@ -62,10 +69,6 @@
         this.interview.pushAction({
           action_type: 'previous'
         })
-      },
-      actionHandler: function (action) {
-        this.interview.pushAction(action)
-        this.$forceUpdate()
       }
     },
     computed: {

@@ -71,9 +71,9 @@ describe('SkipService.spec', () => {
     expect(SkipService.shouldSkipPage([skipCondition], conditionTags)).to.equal(true, `A "hide if all" condition should be hidden if all conditions match`)
   })
   it('should exit on the first show condition', () => {
-    let skipConditions = [{
-      any_all: true,
-      show_hide: false
-    }]
+    // let skipConditions = [{
+    //   any_all: true,
+    //   show_hide: false
+    // }]
   })
 })

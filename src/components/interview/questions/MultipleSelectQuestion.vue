@@ -1,6 +1,7 @@
 <template>
   <div class="multiple-select">
     <v-checkbox
+      :disabled="isQuestionDisabled"
       v-for="choice in question.choices"
       :label="choice.text"
       :key="choice.val"
@@ -10,10 +11,12 @@
 </template>
 
 <script>
+  import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import actionBus from '../services/ActionBus'
   export default {
     props: ['question'],
     name: 'multiple-select-question',
+    mixins: [QuestionDisabledMixin],
     computed: {
       selected: function () {
         let selected = this.question.choices.reduce((agg, choice) => {

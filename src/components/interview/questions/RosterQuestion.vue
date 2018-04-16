@@ -5,6 +5,7 @@
         <v-list-tile v-for="(row, rowIndex) in roster" :key="row.id">
           <v-list-tile-content>
             <v-text-field
+              :disabled="isQuestionDisabled"
               placeholder="Roster text here"
               v-model="newText"
               v-if="rowIndex === editingIndex"
@@ -16,7 +17,10 @@
               v-if="rowIndex !== editingIndex">{{row.val}}</span>
           </v-list-tile-content>
           <v-list-tile-action>
-            <v-btn icon ripple @click="onStartEdit(rowIndex)">
+            <v-btn icon
+                   ripple
+                   :disabled="isQuestionDisabled"
+                   @click="onStartEdit(rowIndex)">
               <v-icon color="grey">mode_edit</v-icon>
             </v-btn>
           </v-list-tile-action>
@@ -24,6 +28,7 @@
       </v-list>
       <v-btn
         @click="onNewRow"
+        :disabled="isQuestionDisabled"
         color="deep-orange"
         dark
         absolute
@@ -37,6 +42,7 @@
 </template>
 
 <script>
+  import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import actionBus from '../services/ActionBus'
   export default {
     name: 'roster-question',
@@ -46,6 +52,7 @@
         required: true
       }
     },
+    mixins: [QuestionDisabledMixin],
     data: function () {
       return {
         isAddingNew: false,

@@ -41,10 +41,10 @@
     </v-toolbar>
     <v-content>
       <v-container fluid>
-        <router-view v-if="locale"></router-view>
         <v-card v-if="!locale" tile>
           <h3>Please select a locale before using the app</h3>
         </v-card>
+        <router-view v-if="locale"></router-view>
       </v-container>
     </v-content>
     <v-dialog v-if="settingsDialog"

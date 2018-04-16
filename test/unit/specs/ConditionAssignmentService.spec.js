@@ -1,6 +1,6 @@
 import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 
-function time (func, n = 30000) {
+function time (func, n = 5000) {
   let i = n
   let start = performance.now()
   while (i--) {
@@ -39,12 +39,22 @@ describe('ConditionAssignmentService.js', () => {
   it('should be faster than calling eval inline', function () {
     this.timeout(20 * 1000)
     const cass = new ConditionAssignmentService()
-    cass.register('test1', `function (val) { return val ++ }`)
+    let func = `function (val) { 
+      var a = val + 2;
+      function res (v) {
+        for (let i = 0; i < v + 1; i++) {
+          v += 1
+          i++
+        }
+        return v
+      }  
+   return res(a)}`
+    cass.register('test1', func)
     function testCass () {
-      cass.run('test1', 100)
+      cass.run('test1', 1000)
     }
     function testEval () {
-      self.eval('(function (val) { return val ++ })(100)')
+      self.eval(`(${func})(1000)`)
     }
     let cassTime = time(testCass)
     let evalTime = time(testEval)
