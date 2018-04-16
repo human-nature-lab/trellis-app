@@ -76,7 +76,7 @@ export default class DiffService {
    * condition tags were removed
    * @param {object} newTags
    * @param {object} oldTags
-   * @returns {{respondent: {added, removed}, section: {added, removed}, form: {added, removed}}}
+   * @returns {{respondent: {added, removed}, section: {added, removed}}
    */
   static conditionTagsDiff (newTags, oldTags) {
     newTags = JSON.parse(JSON.stringify(newTags))

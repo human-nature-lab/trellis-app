@@ -50,7 +50,7 @@
         },
         set: function (val) {
           this._reason = val
-          actionBus.debounceAction({
+          actionBus.actionDebounce({
             action_type: 'dk-rf-val',
             question_datum_id: this.question.datum.id,
             payload: {
