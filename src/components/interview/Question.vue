@@ -74,6 +74,10 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  .question
+    label
+      text-overflow: inherit
+      white-space: normal
+      overflow: auto
 </style>
