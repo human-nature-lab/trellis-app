@@ -14,6 +14,15 @@ class DeviceServiceCordova {
   getPlatform () {
     return Vue.cordova.device.platform
   }
+  getFreeDiskSpace () {
+    Vue.cordova.exec(function (result) {
+      // returns result in Bytes for iOS but in KiloBytes for Android
+      return result
+    },
+    function (error) {
+      throw new Error(error)
+    }, 'File', 'getFreeDiskSpace', [])
+  }
   setDeviceReady (isReady) {
     this.isReady = isReady
   }

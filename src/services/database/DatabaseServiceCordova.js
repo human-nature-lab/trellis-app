@@ -1,8 +1,8 @@
 import { DeviceService } from '@/services/device/DeviceService'
-import SyncTable from '../models/SyncTable'
-import SyncMessage from '../models/SyncMessage'
-import Message from '../models/Message'
-import Config from '../models/Config'
+import SyncTable from './tables/SyncTable'
+import SyncMessage from './tables/SyncMessage'
+import Message from './tables/Message'
+import Config from './tables/Config'
 
 export default class DatabaseService {
   constructor () {
@@ -65,6 +65,18 @@ export default class DatabaseService {
           error => {
             console.log(error)
           })
+    )
+  }
+
+  getUpdatedRecordsCount () {
+    return this.getDatabase().then(db =>
+      db.executeSql('SELECT count(*) AS urcount from updated_records', [],
+        result => {
+          console.log(result.rows.item(0).urcount)
+        },
+        error => {
+          console.log(error)
+        })
     )
   }
 }

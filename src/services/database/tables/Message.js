@@ -1,5 +1,5 @@
-import Model from './Model'
-class Message extends Model {
+import Table from './Table'
+class Message extends Table {
   constructor () {
     const tableName = 'message'
     const schema = [

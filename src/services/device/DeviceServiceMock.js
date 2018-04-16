@@ -17,6 +17,9 @@ class DeviceServiceMock {
   setDeviceReady (isReady) {
     this.isReady = isReady
   }
+  getFreeDiskSpace () {
+    return 39000000 + (Math.random() * 2000000)
+  }
   isDeviceReady () {
     console.log('checking isDevice Ready')
     return new Promise(resolve => {

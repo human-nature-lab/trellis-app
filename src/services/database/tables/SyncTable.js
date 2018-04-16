@@ -1,5 +1,5 @@
-import Model from './Model'
-class SyncTable extends Model {
+import Table from './Table'
+class SyncTable extends Table {
   constructor () {
     const tableName = 'sync'
     const schema = [

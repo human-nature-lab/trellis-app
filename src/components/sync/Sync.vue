@@ -1,20 +1,23 @@
 <template>
   <div class="sync">
     <div class="sync-content">
-      <div>
-        <v-progress-linear
-          v-model="syncProgress"
-          v-if="syncing"
-        ></v-progress-linear>
-      </div>
+      <sync-status v-if="!downloading && !uploading"></sync-status>
+      <download
+        v-if="downloading"
+        v-on:download-cancelled="downloadCancelled">
+      </download>
     </div>
     <div class="sync-footer">
       <v-layout row
                 justify-space-between>
-        <v-btn justify-left>
+        <v-btn justify-left
+               :disabled="!enableUpload()">
           <v-icon>cloud_upload</v-icon>
         </v-btn>
-        <v-btn justify-right>
+        <v-btn justify-right
+               @click="onDownload"
+               :loading="downloading"
+               :disabled="!enableDownload()">
           <v-icon>cloud_download</v-icon>
         </v-btn>
       </v-layout>
@@ -23,30 +26,33 @@
 </template>
 
 <script>
+  import SyncStatus from './SyncStatus'
   import SyncService from './services/SyncService'
-  import DatabaseService from './services/DatabaseService'
+  import DatabaseService from '@/services/database/DatabaseService'
+  import Download from './download/Download'
   export default {
     name: 'sync',
     data () {
       return {
-        syncing: true,
-        syncProgress: 50,
+        uploading: false,
+        downloading: false,
         serverLatestSnapshot: null,
-        localLatestSnapshot: null
+        localLatestSnapshot: null,
+        updatedRecordsCount: null
       }
     },
     created () {
-      // Get info about the latest snapshot on the server
-      SyncService.getLatestSnapshot()
-        .then(snapshot => {
-          this.serverLatestSnapshot = snapshot
-          console.log('serverLatestSnapshot', this.serverLatestSnapshot)
-        })
-      DatabaseService.getLatestSnapshot()
-        .then(snapshot => {
-          this.localLatestSnapshot = snapshot
-          console.log('localLatestSnapshot', this.localLatestSnapshot)
-        })
+      Promise.all([
+        DatabaseService.getLatestDownload(),
+        DatabaseService.getUpdatedRecordsCount()
+      ]).then(results => {
+        this.localLatestSnapshot = results[0]
+        this.updatedRecordsCount = results[1]
+        console.log('localLatestSnapshot', this.localLatestSnapshot)
+        console.log('updatedRecordsCount', this.updatedRecordsCount)
+      }, errors => {
+        console.error(errors)
+      })
     },
     props: {
     },
@@ -56,16 +62,31 @@
       },
       getHash: function () {
         return SyncService.getHash('lnvopnlfj asjvldfnbnero;no;aenionaeongoawernobvnaeronbo;pernho;ghaero;gno;aenmvonaongornjgoaejgo')
+      },
+      onDownload: function () {
+        this.downloading = true
+      },
+      downloadCancelled: function () {
+        this.downloading = false
+      },
+      enableDownload: function () {
+        if (this.localLatestSnapshot === null || this.updatedRecordsCount === null || this.downloading) {
+          return false
+        }
+        return this.updatedRecordsCount === 0
+      },
+      enableUpload: function () {
+        if (this.localLatestSnapshot === null || this.updatedRecordsCount === null) {
+          return false
+        }
+        return this.updatedRecordsCount > 0
       }
     },
     computed: {
-      latestSnapshot: function () {
-        let snapshot = SyncService.getLatestSnapshot()
-        console.log(snapshot)
-        return snapshot
-      }
     },
     components: {
+      Download,
+      SyncStatus
     }
   }
 </script>

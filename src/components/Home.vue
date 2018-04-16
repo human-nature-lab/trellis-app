@@ -1,19 +1,24 @@
 <template>
   <div class="home">
-    <Login></Login>
+    <Login v-if="hasSynced"></Login>
     <Sync v-if="isCordova"></Sync>
   </div>
 </template>
 
 <script>
+  import SyncService from './sync/services/SyncService'
   import Sync from './sync/Sync.vue'
   import Login from './login/Login.vue'
-  import Config from '../config'
+  import config from '../config'
+  import constants from '../constants'
   export default {
     name: 'home',
     computed: {
+      hasSynced: function () {
+        return SyncService.hasSynced()
+      },
       isCordova: function () {
-        return Config.cordova
+        return (config.appEnv === constants.APP_ENV.CORDOVA)
       }
     },
     components: {
