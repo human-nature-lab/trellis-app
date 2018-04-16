@@ -1,7 +1,5 @@
 <template>
-  <p>
-    {{question.text}}
-  </p>
+  <p></p>
 </template>
 
 <script>

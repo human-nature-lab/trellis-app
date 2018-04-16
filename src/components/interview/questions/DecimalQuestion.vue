@@ -1,6 +1,7 @@
 <template>
     <v-flex>
       <v-text-field
+        :disabled="isQuestionDisabled"
         v-model.number="value"
         @change="onChange"
         placeholder="decimal"
@@ -12,6 +13,7 @@
 <script>
   // TODO: It might be required to use https://github.com/text-mask/text-mask/tree/master/core to support decimal type
   // inputs
+  import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   export default {
     name: 'decimal-question',
     props: {
@@ -20,6 +22,7 @@
         required: true
       }
     },
+    mixins: [QuestionDisabledMixin],
     data: function () {
       return {
         value: null

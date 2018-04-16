@@ -1,9 +1,7 @@
 <template>
   <v-flex class="integer-question">
-    <div class="question-text">
-      <h3></h3>
-    </div>
     <v-text-field
+      :disabled="question.dk_rf!==null"
       v-model.number="value"
       @change="onChange"
       :type="number"
@@ -12,6 +10,7 @@
 </template>
 
 <script>
+  import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   export default {
     name: 'decimal-question',
     props: {
@@ -20,6 +19,7 @@
         required: true
       }
     },
+    mixins: [QuestionDisabledMixin],
     data: function () {
       return {
         value: null

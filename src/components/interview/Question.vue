@@ -1,16 +1,17 @@
 <template>
-  <v-card class="question">
+  <v-card class="question" :question-id="question.id">
     <v-card-title class="question-title deep-orange white--text">
       <v-layout row>
-        <v-flex sm10 class="name" :question-id="question.id">
-          {{question.text}}
-        </v-flex>
+        <v-spacer></v-spacer>
         <v-flex sm2 class="text-xs-right">
           {{question.var_name}} : {{question.type.name}}
         </v-flex>
       </v-layout>
     </v-card-title>
     <v-card-text class="question-content">
+      <v-flex class="question-text">
+        <p>{{question.text}}</p>
+      </v-flex>
       <IntroQuestion
         v-if="question.type.name === 'intro'"
         :question="question"/>

@@ -2,13 +2,15 @@
   <v-layout justify-space-between>
     <v-flex>
       <v-layout row>
-        <v-flex sm4 offset-xs8 row>
-            <v-checkbox
-              :label="`Don't Know`"
-              v-model="dk" />
-            <v-checkbox
-              :label="`Refuse`"
-              v-model="rf" />
+        <v-flex sm2 offset-xs8>
+          <v-btn
+            v-bind:class="{'btn-selected': dk}"
+            @click="dk=!dk">DK</v-btn>
+        </v-flex>
+        <v-flex sm2>
+          <v-btn
+            v-bind:class="{'btn-selected': rf}"
+            @click="rf=!rf">RF</v-btn>
         </v-flex>
       </v-layout>
       <v-layout v-if="shouldShowReason" row>
@@ -101,6 +103,9 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+  .theme--light
+    button.btn.btn-selected
+      background: orangered
+      color: white
 </style>
