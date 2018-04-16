@@ -1,10 +1,7 @@
 import moxios from 'moxios'
 import http from '@/services/http/AxiosInstance'
 import uuid from 'uuid/v4'
-import InterviewDataWeb from '@/components/interview/services/interview-data/InterviewDataWeb'
-
-const copy = InterviewDataWeb.copy
-
+import InterviewDataWeb, {copy} from '@/components/interview/services/interview-data/InterviewDataWeb'
 describe('InterviewDataWeb.spec', () => {
   let data
   let conditions
@@ -33,7 +30,11 @@ describe('InterviewDataWeb.spec', () => {
       section: [],
       form: []
     }
-    dataService = new InterviewDataWeb(data, conditions)
+    dataService = new InterviewDataWeb(function () {
+      return data
+    }, function () {
+      return conditions
+    })
   })
   afterEach(() => {
     moxios.uninstall(http())
@@ -85,6 +86,23 @@ describe('InterviewDataWeb.spec', () => {
           }).then(() => {
             expect(dataService._previousData).to.deep.equal(copy(data), 'The cached data should be the same has the dataRef')
           })
+        })
+      })
+    })
+  })
+  it(`shouldn't send anything if no changes were detected`, () => {
+    data.push(copy(qDatum[0]))
+    dataService.send()
+    moxios.wait(() => {
+      let request = moxios.requests.mostRecent()
+      request.respondWith({
+        status: 201,
+        response: {}
+      }).then(() => {
+        dataService.send()
+      }).then(() => {
+        moxios.wait(() => {
+          expect(moxios.requests.length).to.equal(0, 'A request was sent without any changes being present')
         })
       })
     })

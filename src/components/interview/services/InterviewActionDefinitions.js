@@ -1,8 +1,8 @@
-
-import UUIDReuseService from './UUIDReuseService'
+import DatumRecycler from './DatumRecycler'
 /**
  * All action handlers are given access to the interview, the action payload, the questionBlueprint and the questionDatum
- * with the datum associated with the question datum at questionDatum.datum
+ * with the datum associated with the question datum at questionDatum.datum. DatumRecycler should be used whenver new
+ * datum are being created so that the ids are recycled
  */
 export default {
   'select-choice': function (interview, payload, questionDatum, questionBlueprint) {
@@ -35,11 +35,7 @@ export default {
     if (shouldRemoveOthers) {
       questionDatum.data = [] // This could break references... shouldn't be a since we're trying to pass around copies
     }
-    let datum = {
-      val: choiceBlueprint.val,
-      choice_id: payload.choice_id
-    }
-    datum.id = UUIDReuseService.getDatum(questionDatum.id, payload.choice_id)
+    let datum = DatumRecycler.getNoKey(questionDatum, payload)
     if (choiceHasOtherInput) {
       datum.other_input = '' // TODO: Handle the visibility of the other_input textbox for a choice
     }
@@ -81,11 +77,7 @@ export default {
     // interview.getQuestion(payload.question_id, payload.sectionId, payload.pageId, payload.followUpReptitionId, payload.repetitionId)
   },
   'new-roster-row': function (interview, payload, questionDatum, questionBlueprint) {
-    questionDatum.data.push({
-      id: UUIDReuseService(questionDatum.id, payload.sort_order),
-      val: '',
-      sort_order: payload.sort_order
-    })
+    questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
   },
   'roster-row-edit': function (interview, payload, questionDatum, questionBlueprint) {
     let datum = questionDatum.data.find(d => d.id === payload.datum_id)

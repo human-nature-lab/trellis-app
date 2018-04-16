@@ -11,12 +11,13 @@
 
 <script>
   import Page from './Page'
-  import {sharedInterview} from './models/Interview'
+  import Interview from './models/Interview'
   import InterviewService from './services/interview/InterviewService'
   import TranslationService from '@/services/TranslationService'
   import StringInterpolationService from '@/services/StringInterpolationService'
   import FormService from '@/services/form/FormService'
   import actionBus from './services/ActionBus'
+  import InterviewDataService from './services/interview-data/InterviewDataService'
   export default {
     data () {
       return {
@@ -55,7 +56,12 @@
             FormService.getForm(interview.survey.form_id)
           ]).then(results => {
             let [actions, data, formBlueprint] = results
-            this.interviewState = sharedInterview(interview, formBlueprint, actions, data)
+            this.interviewState = new Interview(interview, formBlueprint, actions, data)
+            this.interviewDataService = new InterviewDataService(() => {
+              return this.interviewState.data
+            }, () => {
+              return this.interviewState.conditionTags
+            })
             this.isLoading = false
           })
         })
@@ -82,6 +88,7 @@
           throw Error('Trying to push actions before interview has been initialized')
         }
         this.interviewState.pushAction(action)
+        this.interviewDataService.send()
       }
     },
     computed: {

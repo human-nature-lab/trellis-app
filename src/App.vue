@@ -1,5 +1,5 @@
 <template>
-  <v-app light>
+  <v-app light :class="{web: isWeb, cordova: isCordova}">
     <v-toolbar fixed>
       <v-toolbar-title class="deep-orange--text">
         Trellis <span class="grey--text" v-if="locale">- {{locale.language_tag}}</span>
@@ -88,6 +88,7 @@
   import DeviceService from './services/device/DeviceService'
   import Interview from './components/interview/Interview'
   import config from './config'
+  import {APP_ENV} from './constants'
   import storage from './services/storage/StorageService'
   import DataService from './services/data/DataService'
   // TODO: This should be set by the app instead of being hardcoded
@@ -142,6 +143,12 @@
       },
       studyId: function () {
         return this.storage.get('studyId', 'string')
+      },
+      isWeb: function () {
+        return config.appEnv === APP_ENV.WEB
+      },
+      isCordova: function () {
+        return config.appEnv === APP_ENV.CORDOVA
       }
     },
     methods: {

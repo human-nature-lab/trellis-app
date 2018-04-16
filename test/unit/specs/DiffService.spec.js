@@ -93,7 +93,4 @@ describe('DiffService.spec', () => {
         .and.deep.include(newQDatum[2].datum[2], 'should include deleted properties as modifications')
     })
   })
-  describe('condition diff', () => {
-
-  })
 })

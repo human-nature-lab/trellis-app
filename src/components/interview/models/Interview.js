@@ -2,6 +2,7 @@ import SkipService from '../services/SkipService'
 import actionDefinitions from '../services/InterviewActionDefinitions'
 import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import UUIDReuseService from '../services/UUIDReuseService'
+import QuestionDatumRecycler from '../services/QuestionDatumRecycler'
 export default class Interview {
   constructor (interview, blueprint = null, actions = [], data = []) {
     this.interview = interview
@@ -15,7 +16,7 @@ export default class Interview {
     }
     this.conditionTags = {
       respondent: [],
-      survey: [],
+      form: [],
       section: []
     }
     this.actions = actions
@@ -42,7 +43,7 @@ export default class Interview {
     this.data = []
     this.conditionTags = {
       respondent: [],
-      survey: [],
+      form: [],
       section: []
     }
     this.makePageQuestionDatum()
@@ -244,22 +245,7 @@ export default class Interview {
    * @private
    */
   _makeQuestionDatum (questionBlueprint) {
-    let questionDatum = {
-      id: UUIDReuseService.getQuestionDatum(this.location, questionBlueprint.id),
-      section_repetition: this.location.sectionRepetition,
-      follow_up_datum_id: this.location.sectionFollowUpDatumId,
-      page: this.location.page,
-      section: this.location.section,
-      question_id: questionBlueprint.id,
-      survey_id: this.interview.survey_id,
-      created_at: (new Date()).getTime(),
-      updated_at: (new Date()).getTime(),
-      dk_rf: null,
-      dk_rf_val: null,
-      var_name: questionBlueprint.var_name,
-      datum: []
-    }
-    console.log('question_id:', questionBlueprint.id, 'questionDatumId:', questionDatum.id)
+    let questionDatum = QuestionDatumRecycler.getNoKey(this, questionBlueprint) // OPTIMIZATION: This could be optimized by using 'get' instead
     questionDatum.data = questionDatum.datum
     this.data.push(questionDatum)
     return questionDatum
@@ -296,7 +282,7 @@ export default class Interview {
         break
       case 'form':
         this.conditionTags.survey.push({
-          id: UUIDReuseService.getCondition('survey', act.condition.id),
+          id: UUIDReuseService.getCondition('form', act.condition.id),
           survey_id: this.interview.survey_id,
           condition_id: act.condition.id,
           created_at: (new Date()).getTime(),
@@ -339,7 +325,7 @@ export default class Interview {
    */
   _getCurrentConditionTags () {
     return this.conditionTags.respondent
-      .concat(this.conditionTags.survey)
+      .concat(this.conditionTags.form)
       .concat(this.conditionTags.section.filter(tag => {
         return tag.repetition === this.location.sectionRepetition &&
           tag.follow_up_question_datum_id === this.location.sectionFollowUpDatumId
