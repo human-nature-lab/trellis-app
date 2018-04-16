@@ -195,6 +195,9 @@
 </script>
 
 <style>
+  html {
+    overflow-y: auto;
+  }
 	body{
     padding-top: constant(safe-area-inset-top);
     padding-top: env(safe-area-inset-top);
