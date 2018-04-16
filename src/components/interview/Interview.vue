@@ -16,6 +16,7 @@
   import TranslationService from '@/services/TranslationService'
   import StringInterpolationService from '@/services/StringInterpolationService'
   import FormService from '@/services/form/FormService'
+  import actionBus from './services/ActionBus'
   export default {
     data () {
       return {
@@ -73,6 +74,15 @@
      //    .catch(err => {
      //      throw err
      //    })
+      actionBus.$on('action', this.actionHandler)
+    },
+    methods: {
+      actionHandler: function (action) {
+        if (!this.interviewState) {
+          throw Error('Trying to push actions before interview has been initialized')
+        }
+        this.interviewState.pushAction(action)
+      }
     },
     computed: {
       questions: function () {

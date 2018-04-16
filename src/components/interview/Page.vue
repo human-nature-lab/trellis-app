@@ -17,8 +17,8 @@
           :key="question.id"/>
       </v-flex>
       <v-bottom-nav
-        absolute
         :value="true"
+        fixed
         class="page-footer">
         <v-layout row
                   justify-space-between>
@@ -56,17 +56,14 @@
         required: true
       }
     },
-    created: function () {
-      actionBus.$on('action', this.actionHandler)
-    },
     methods: {
       onNext: function () {
-        this.interview.pushAction({
+        actionBus.action({
           action_type: 'next'
         })
       },
       onPrevious: function () {
-        this.interview.pushAction({
+        actionBus.action({
           action_type: 'previous'
         })
       }
@@ -86,8 +83,17 @@
   }
 </script>
 
-<style lang="sass" scoped>
-  .page-footer
-    flex-shrink: 0
-    padding: 20px
+<style lang="sass">
+  /*.page-footer*/
+    /*flex-shrink: 0*/
+    /*padding: 20px*/
+  .bottom-nav
+    &.page-footer
+      left: 0
+      bottom: 0
+    .btn
+      max-width: none
+      .btn__content
+        flex-direction: row
+        font-size: 16px
 </style>
