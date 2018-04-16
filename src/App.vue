@@ -1,6 +1,6 @@
 <template>
   <v-app light>
-    <v-toolbar>
+    <v-toolbar fixed>
       <v-toolbar-title class="deep-orange--text">
         Trellis <span class="grey--text" v-if="locale">- {{locale.language_tag}}</span>
       </v-toolbar-title>
@@ -40,7 +40,7 @@
       </v-menu>
     </v-toolbar>
     <v-content>
-      <v-container fluid>
+      <v-container fluid class="app-container">
         <v-card v-if="!locale" tile>
           <h3>Please select a locale before using the app</h3>
         </v-card>
@@ -202,5 +202,8 @@
     padding-top: constant(safe-area-inset-top);
     padding-top: env(safe-area-inset-top);
   }
-
+  .app-container {
+    margin-top: 25px;
+    margin-bottom: 50px;
+  }
 </style>

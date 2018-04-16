@@ -1,17 +1,13 @@
 <template>
   <v-layout justify-space-between>
     <v-flex>
-      <v-layout row>
-        <v-flex sm2 offset-xs8>
-          <v-btn
-            v-bind:class="{'btn-selected': dk}"
-            @click="dk=!dk">DK</v-btn>
-        </v-flex>
-        <v-flex sm2>
-          <v-btn
-            v-bind:class="{'btn-selected': rf}"
-            @click="rf=!rf">RF</v-btn>
-        </v-flex>
+      <v-layout row justify-end>
+        <v-btn
+          v-bind:class="{'btn-selected': dk}"
+          @click="dk=!dk">Don't know</v-btn>
+        <v-btn
+          v-bind:class="{'btn-selected': rf}"
+          @click="rf=!rf">Refuse</v-btn>
       </v-layout>
       <v-layout v-if="shouldShowReason" row>
         <v-text-field
@@ -105,7 +101,9 @@
 
 <style lang="sass" scoped>
   .theme--light
-    button.btn.btn-selected
-      background: orangered
-      color: white
+    button
+      font-size: 12px
+      &.btn.btn-selected
+        background: orangered
+        color: white
 </style>

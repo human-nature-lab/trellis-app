@@ -16,10 +16,9 @@
           :question="question"
           :key="question.id"/>
       </v-flex>
-      <v-bottom-nav
-        :value="true"
-        fixed
-        class="page-footer">
+    </v-card>
+    <v-flex
+      class="page-footer">
         <v-layout row
                   justify-space-between>
           <v-btn @click="onPrevious"
@@ -32,8 +31,7 @@
             Next <v-icon right>chevron_right</v-icon>
           </v-btn>
         </v-layout>
-      </v-bottom-nav>
-    </v-card>
+    </v-flex>
   </v-flex>
 </template>
 
@@ -84,16 +82,19 @@
 </script>
 
 <style lang="sass">
-  /*.page-footer*/
-    /*flex-shrink: 0*/
-    /*padding: 20px*/
-  .bottom-nav
-    &.page-footer
-      left: 0
-      bottom: 0
+  $btn-height: 60px
+  .page-footer
+    box-shadow: 0 0px 10px rgba(0, 0, 0, .3)
+    height: $btn-height
+    position: fixed
+    z-index: 100
+    left: 0
+    bottom: 0
+    padding: 0
+    margin: 0
+    width: 100%
     .btn
-      max-width: none
-      .btn__content
-        flex-direction: row
-        font-size: 16px
+      margin: 0
+      width: 50%
+      height: $btn-height
 </style>
