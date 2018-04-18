@@ -8,7 +8,7 @@ describe('InterviewDataWeb.spec', () => {
   let dataService
   let qDatum = [{
     id: uuid(),
-    datum: [{
+    data: [{
       id: uuid(),
       val: 'And stuff'
     }, {
@@ -17,7 +17,7 @@ describe('InterviewDataWeb.spec', () => {
     }]
   }, {
     id: uuid(),
-    datum: [{
+    data: [{
       id: uuid(),
       val: 'More stuff'
     }]

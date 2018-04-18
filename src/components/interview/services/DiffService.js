@@ -46,19 +46,17 @@ export default class DiffService {
     let oldDatum = new Map()
 
     let newQDatumMap = new Map(newData.map(q => {
-      for (let d of q.datum) {
+      for (let d of q.data) {
         newDatum.set(d.id, d)
       }
       delete q.data
-      delete q.datum
       return [q.id, q]
     }))
     let oldQDatumMap = new Map(oldData.map(q => {
-      for (let d of q.datum) {
+      for (let d of q.data) {
         oldDatum.set(d.id, d)
       }
       delete q.data
-      delete q.datum
       return [q.id, q]
     }))
 

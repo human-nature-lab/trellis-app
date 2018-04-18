@@ -1,6 +1,6 @@
 import DiffService from '../DiffService'
 import http from '@/services/http/AxiosInstance'
-import _ from 'lodash'
+// import _ from 'lodash'
 export default class InterviewDataWeb {
   /**
    * The mock service which is in change of sending data changes to the backend for storage
@@ -19,14 +19,14 @@ export default class InterviewDataWeb {
     this.conditionTagExtractor = conditionTagExtractor        // This should be a reference to the conditions object for the interview
     this.maxFailures = 10
     this._failCount = 0
-    this.send = _.throttle(this.send.bind(this), 2000)
+    // this.send = _.throttle(this.send.bind(this), 2000)
   }
 
   /**
    * Send the data :). Basically do a diff of the existing data and then send the differences to the server
    */
   send () {
-    if (this.isAlreadyMakingRequest) return
+    if (this.isAlreadyMakingRequest || this._failCount > this.maxFailures) return
     // We need to make a copy of the state of the data reference at this point in time so we don't lose data that is created
     // while this request is happening
     let dataSnapshot = copy(this.dataExtranctor())
@@ -34,9 +34,7 @@ export default class InterviewDataWeb {
     let dataDiff = DiffService.dataDiff(dataSnapshot, this._previousData)
     let conditionDiff = DiffService.conditionTagsDiff(conditionTagSnapshot, this._previousConditions)
     // No need to send anything if there aren't any changes
-    if (!hasDataChanges(dataDiff) &&
-      !hasConditionChanges(conditionDiff) &&
-      this._failCount > this.maxFailures) return
+    if (!(hasDataChanges(dataDiff) || hasConditionChanges(conditionDiff))) return
     http().post(`data`, {
       data: dataDiff,
       conditionTags: conditionDiff
@@ -70,12 +68,12 @@ export default class InterviewDataWeb {
  * @returns {boolean}
  */
 export function hasDataChanges (diff) {
-  return diff.questionDatum.added.length ||
-    diff.questionDatum.modified.length ||
-    diff.questionDatum.removed.length ||
-    diff.datum.added.length ||
-    diff.datum.removed.length ||
-    diff.datum.modified.length
+  return diff.questionDatum.added.length > 0 ||
+    diff.questionDatum.modified.length > 0 ||
+    diff.questionDatum.removed.length > 0 ||
+    diff.datum.added.length > 0 ||
+    diff.datum.removed.length > 0 ||
+    diff.datum.modified.length > 0
 }
 
 /**
@@ -84,9 +82,9 @@ export function hasDataChanges (diff) {
  * @returns {boolean}
  */
 export function hasConditionChanges (diff) {
-  return diff.section.added.length || diff.section.removed.length ||
-    diff.respondent.added.length || diff.respondent.removed.length ||
-    diff.form.added.length || diff.form.removed.length
+  return diff.section.added.length > 0 || diff.section.removed.length > 0 ||
+    diff.respondent.added.length > 0 || diff.respondent.removed.length > 0 ||
+    diff.form.added.length > 0 || diff.form.removed.length > 0
 }
 
 /**

@@ -46,7 +46,7 @@
       },
       reason: {
         get: function () {
-          return this._reason
+          return this.question.datum.dk_rf_val
         },
         set: function (val) {
           this._reason = val
