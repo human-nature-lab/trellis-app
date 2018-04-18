@@ -8,7 +8,6 @@
     <v-content>
       <v-container fluid class="app-container">
         <router-view></router-view>
-        <p>Below the router</p>
       </v-container>
     </v-content>
   </v-app>
@@ -34,7 +33,7 @@
     padding-top: env(safe-area-inset-top);
   }
   .app-container {
-    margin-top: 25px;
+    margin-top: 35px;
     margin-bottom: 50px;
   }
 </style>
