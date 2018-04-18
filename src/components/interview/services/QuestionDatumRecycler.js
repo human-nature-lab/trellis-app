@@ -7,7 +7,8 @@ class QuestionDatumRecycler extends Recycler {
    * @returns {string}
    */
   keyExtractor (qd) {
-    return `${qd.survey_id}-${qd.section}-${qd.section_repetition}-${qd.follow_up_datum_id}-${qd.page}`
+    // The unique key of a single question datum
+    return `${qd.survey_id}-${qd.section}-${qd.section_repetition}-${qd.follow_up_datum_id}-${qd.page}-${qd.question_id}`
   }
 
   /**
@@ -24,10 +25,11 @@ class QuestionDatumRecycler extends Recycler {
       section: interview.location.section,
       page: interview.location.page,
       survey_id: interview.interview.survey_id,
+      question_id: questionBlueprint.id,
       dk_rf: null,
       dk_rf_val: null,
       var_name: questionBlueprint.var_name,
-      datum: []
+      data: []
     }
   }
 }

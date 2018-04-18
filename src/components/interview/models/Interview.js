@@ -64,7 +64,7 @@ export default class Interview {
         if (this.actions[i].question_datum_id) {
           let questionDatum = this.data.find(qDatum => qDatum.id === this.actions[i].question_datum_id)
           if (!questionDatum) {
-            throw Error('This question should already have a question datum associated with it')
+            throw Error(`This question should already have a question datum associated with it. Location: ${JSON.stringify(this.location, null, 2)}`)
           }
           if (questionDatum.section >= this.location.section) {
             if (questionDatum.section_repetition >= this.location.sectionRepetition) {
@@ -245,8 +245,7 @@ export default class Interview {
    * @private
    */
   _makeQuestionDatum (questionBlueprint) {
-    let questionDatum = QuestionDatumRecycler.getNoKey(this, questionBlueprint) // OPTIMIZATION: This could be optimized by using 'get' instead
-    questionDatum.data = questionDatum.datum
+    let questionDatum = QuestionDatumRecycler.getNoKey(this, questionBlueprint) // OPTIMIZATION: This could be optimized by using 'get' instead of getNoKey
     this.data.push(questionDatum)
     return questionDatum
   }
@@ -437,16 +436,43 @@ export default class Interview {
    */
   seekTo (section, page, sectionRepetition = 0, sectionFollowUpRepetition = 0) {
     let count = 1
+    let DIRS = {FORWARD: 0, BACKWARD: 1}
     // Cast the current location and desired location into a 4 digit number with this structure {section}{sectionRepetition}{sectionFollowUpRepetition}{page}
     let desiredLocNumber = section * 1000 + sectionRepetition * 100 + sectionFollowUpRepetition * 10 + page
     let curLocNumber
+    let previousDirection
+    let currentDirection
     do {
       curLocNumber = this.location.section * 1000 + this.location.sectionRepetition * 100 + this.location.sectionFollowUpDatumId * 10 + this.location.page
       if (curLocNumber < desiredLocNumber) {
-        this.next()
+        currentDirection = DIRS.FORWARD
       } else if (curLocNumber > desiredLocNumber) {
-        this.previous()
+        currentDirection = DIRS.BACKWARD
+      } else {
+        console.log(`The desired survey location has been reached already`)
+        return
       }
+
+      // Detect if we're switching directions. This should never happen, but we should leave the loop if it does
+      if (previousDirection !== undefined && previousDirection !== null && currentDirection !== previousDirection) {
+        console.error(`We are switching directions during the seek. Unreachable seek location detected: 
+          section: ${section}, page: ${page}, sectionRepetition: ${sectionRepetition}, sectionFollowUpRepetition: ${sectionFollowUpRepetition}`)
+        return
+      }
+      previousDirection = currentDirection
+
+      // Actually move in the specified direction
+      switch (currentDirection) {
+        case DIRS.FORWARD:
+          this.next()
+          break
+        case DIRS.BACKWARD:
+          this.previous()
+          break
+        default:
+          return
+      }
+
       if (count > 1000) {
         throw Error('Infinite loop when trying to seek to survey location. Please check exit conditions')
       }
@@ -513,7 +539,7 @@ export default class Interview {
       question = JSON.parse(JSON.stringify(question)) // Dereference
       // TODO: this should take into account section repetition and follow ups as well
       let qData = questionData.find(q => q.question_id === question.id)
-      question.datum = qData ? JSON.parse(JSON.stringify(qData)) : []
+      question.datum = qData ? JSON.parse(JSON.stringify(qData)) : {}
       return question
     })
   }

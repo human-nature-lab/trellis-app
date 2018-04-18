@@ -87,36 +87,10 @@
   import Vue from 'vue'
   import DeviceService from './services/device/DeviceService'
   import Interview from './components/interview/Interview'
-  import config from './config'
-  import {APP_ENV} from './constants'
   import storage from './services/storage/StorageService'
   import DataService from './services/data/DataService'
   // TODO: This should be set by the app instead of being hardcoded
   storage.set('studyId', 'ad9a9086-8f15-4830-941d-416b59639c41')
-
-  // Custom logging functions that respond to the debug setting in config.js
-  Vue.mixin({
-    methods: {
-      log: function (...args) {
-        if (config.debug) {
-          console.log(...args)
-        }
-      },
-      debug: function (...args) {
-        if (config.debug) {
-          console.debug(...args)
-        }
-      },
-      anyValueMatches: function (iterable, value) {
-        for (let key in iterable) {
-          if (iterable[key] === value) {
-            return true
-          }
-        }
-        return false
-      }
-    }
-  })
   export default {
     data () {
       return {
@@ -143,12 +117,6 @@
       },
       studyId: function () {
         return this.storage.get('studyId', 'string')
-      },
-      isWeb: function () {
-        return config.appEnv === APP_ENV.WEB
-      },
-      isCordova: function () {
-        return config.appEnv === APP_ENV.CORDOVA
       }
     },
     methods: {

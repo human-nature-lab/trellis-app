@@ -7,6 +7,13 @@ export default class Recycler {
   }
 
   /**
+   * Remove all previous data by resetting the cache
+   */
+  clear () {
+    this.cache.clear()
+  }
+
+  /**
    * Function that must be overriden by parent class before using the fill or getNoKey methods. Should take an object
    * and return a string that is the unique key for that object
    * @param obj

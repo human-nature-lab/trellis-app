@@ -1,4 +1,8 @@
 import DatumRecycler from './DatumRecycler'
+
+// Options
+const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
+
 /**
  * All action handlers are given access to the interview, the action payload, the questionBlueprint and the questionDatum
  * with the datum associated with the question datum at questionDatum.datum. DatumRecycler should be used whenver new
@@ -52,6 +56,10 @@ export default {
   'dk-rf': function (interview, payload, questionDatum, questionBlueprint) {
     if (questionDatum) {
       questionDatum.dk_rf = payload.dk_rf // True or false
+      // Optionally remove dk_rf responses if they deselect dk_rf
+      if (shouldRemoveDkRfResponsesOnDeselect && questionDatum.dk_rf === null) {
+        questionDatum.dk_rf_val = null
+      }
     }
     // Uncomment this if we want to remove datum associated with this question
     // if (questionDatum.data && questionDatum.data.length) {
