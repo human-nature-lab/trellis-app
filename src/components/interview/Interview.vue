@@ -62,24 +62,10 @@
             }, () => {
               return this.interviewState.conditionTags
             })
+            this.interviewState.bootstrap()
             this.isLoading = false
           })
         })
-     // DataService.getForm('be587a4a-38c6-46cb-a787-1fcb4813b274')
-     //    .then(resData => {
-     //      this.actions = sharedActionManager(this.surveyId) // TODO: load and play existing actions here
-     //      this.surveyState = new SurveyState()
-     //      this.interview = new InterviewService()
-     //      window.actions = this.actions
-     //      this.surveyState.loadBlueprint(resData.blueprint)
-     //      this.actions.on('action', this.surveyState.doAction, this.surveyState)
-     //      this.actions.on('user-action', this.surveyState.doAction, this.surveyState)
-     //      console.log(resData)
-     //      this.isLoading = false
-     //    })
-     //    .catch(err => {
-     //      throw err
-     //    })
       actionBus.$on('action', this.actionHandler)
     },
     methods: {

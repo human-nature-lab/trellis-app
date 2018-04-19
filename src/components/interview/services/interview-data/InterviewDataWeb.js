@@ -1,5 +1,6 @@
 import DiffService from '../DiffService'
 import http from '@/services/http/AxiosInstance'
+import storage from '@/services/storage/StorageService'
 // import _ from 'lodash'
 export default class InterviewDataWeb {
   /**
@@ -12,13 +13,14 @@ export default class InterviewDataWeb {
       data: 'interview/data',
       conditions: 'interview/conditions'
     }
-    this.isAlreadyMakingRequest = false
     this._previousData = copy(dataExtractor())                // Initial state of the data
     this._previousConditions = copy(conditionTagExtractor())  // Intial state of the conditions
     this.dataExtranctor = dataExtractor                       // This should be a reference to the questionDatum array for the interview
     this.conditionTagExtractor = conditionTagExtractor        // This should be a reference to the conditions object for the interview
     this.maxFailures = 10
     this._failCount = 0
+    this.isSending = false
+    this.hasDataToSend = false
     // this.send = _.throttle(this.send.bind(this), 2000)
   }
 
@@ -26,7 +28,12 @@ export default class InterviewDataWeb {
    * Send the data :). Basically do a diff of the existing data and then send the differences to the server
    */
   send () {
-    if (this.isAlreadyMakingRequest || this._failCount > this.maxFailures) return
+    if (this.isSending) {
+      this.hasDataToSend = true
+      console.log('already sending')
+      return
+    }
+    if (this.isSending || this._failCount > this.maxFailures) return
     // We need to make a copy of the state of the data reference at this point in time so we don't lose data that is created
     // while this request is happening
     let dataSnapshot = copy(this.dataExtranctor())
@@ -34,12 +41,17 @@ export default class InterviewDataWeb {
     let dataDiff = DiffService.dataDiff(dataSnapshot, this._previousData)
     let conditionDiff = DiffService.conditionTagsDiff(conditionTagSnapshot, this._previousConditions)
     // No need to send anything if there aren't any changes
-    if (!(hasDataChanges(dataDiff) || hasConditionChanges(conditionDiff))) return
-    http().post(`data`, {
+    if (!(hasDataChanges(dataDiff) || hasConditionChanges(conditionDiff))) {
+      console.log('No changes in data detected')
+      return
+    }
+    let interviewId = storage.get('interview-id', 'string')
+    this.isSending = true
+    console.log('starting send')
+    http().post(`interview/${interviewId}/data`, {
       data: dataDiff,
       conditionTags: conditionDiff
     }).then(res => {
-      this.isAlreadyMakingRequest = false
       if (res.status >= 200 && res.status < 300) {
         this._previousData = dataSnapshot
         this._previousConditions = conditionTagSnapshot
@@ -48,8 +60,14 @@ export default class InterviewDataWeb {
         throw Error('Unable to complete request')
       }
     }).catch(err => {
-      this.isAlreadyMakingRequest = false
       this.onError(err)
+    }).then(() => {
+      this.isSending = false
+      // This is to handle any period of time between data being sent and the throttle waiting to call send
+      if (this.hasDataToSend) {
+        this.send()
+        this.hasDataToSend = false
+      }
     })
   }
   onSuccess () {

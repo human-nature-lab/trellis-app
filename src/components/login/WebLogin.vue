@@ -31,7 +31,8 @@
 </template>
 
 <script>
-  import http from '@/services/http/AxiosInstance'
+  import LoginService from '@/services/login/LoginService'
+  import {router} from '@/router/router'
   export default {
     name: 'web-login',
     data: function () {
@@ -43,21 +44,19 @@
       }
     },
     computed: {
-      formId: 'stuff'
+      studyId: function () {
+        return 'a1344f6d-d1d0-4b4c-9cfb-3893f19439ee' // TODO
+      },
+      formId: function () {
+        return '9b2753e8-9f52-4fc9-aefd-c048a48a5bde' // TODO
+      }
     },
     methods: {
       login: function () {
-        http().post(`survey-view/form/${this.formId}/login`, {
-          username: this.username,
-          password: this.password
-        }).then(res => {
-          if (res.status >= 200 && res.status < 400) {
-
-          } else {
-            throw Error('Unable to log in to this form with the provided credentials')
-          }
-        }).catch(err => {
-          this.error = err
+        LoginService.login(this.username, this.password, this.formId).then(res => {
+          router.push({name: 'Interview', params: {studyId: this.studyId, interviewId: res.data.interviewId}})
+        }).catch(() => {
+          this.error = 'Unable to login with these credentials'
         })
       }
     }

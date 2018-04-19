@@ -26,6 +26,14 @@ export default class Interview {
   }
 
   /**
+   * This needs to be called before doing anything else
+   */
+  bootstrap () {
+    this._initializeConditionAssignment()
+    this.makePageQuestionDatum()
+  }
+
+  /**
    * Make the location zero
    * @private
    */
@@ -144,8 +152,6 @@ export default class Interview {
       }
       section.pages = section.question_groups
     }
-    this._initializeConditionAssignment()
-    this.makePageQuestionDatum()
   }
 
   /**

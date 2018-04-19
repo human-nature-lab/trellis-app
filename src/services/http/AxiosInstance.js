@@ -6,7 +6,7 @@ let axiosInstance = null
 export default function defaultInstance () {
   if (!axiosInstance) {
     axiosInstance = axios.create({
-      baseURL: config.apiRoot,
+      baseURL: config.apiRoot + '/survey-view',
       timeout: 20000,
       headers: {'X-Key': config.xKey}
     })
