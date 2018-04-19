@@ -14,4 +14,15 @@ export default class FormService {
         }
       })
   }
+  static getForm (formId) {
+    return http().get(`form/${formId}`)
+      .then(res => {
+        if (res.data.form) {
+          return res.data.form
+        } else {
+          console.error(res)
+          throw Error('Unable to retrieve form')
+        }
+      })
+  }
 }

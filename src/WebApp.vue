@@ -15,12 +15,7 @@
 
 <script>
   export default {
-    name: 'web-app',
-    computed: {
-      isLoggedIn: function () {
-        return window.localStorage.getItem('interview-id')
-      }
-    }
+    name: 'web-app'
   }
 </script>
 

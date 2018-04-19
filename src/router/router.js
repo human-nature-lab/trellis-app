@@ -16,7 +16,7 @@ if (config.appEnv === APP_ENV.WEB) {
 console.log('routes', routes)
 Vue.use(Router)
 
-const router = new Router({
+export const router = new Router({
   routes: routes
 })
 
