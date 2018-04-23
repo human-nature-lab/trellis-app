@@ -4,13 +4,11 @@ import uuidv4 from 'uuid/v4'
 import form1 from './forms/form-1.json'
 import form2 from './forms/form-2.json'
 // import form3Womens from './forms/form-3-womens'
-let forms = [form1.form, form2.form]
-for (let form of forms) {
-  console.log(form.id)
-}
+import testForm1 from './forms/test-form-1.json'
+let forms = [form1.form, form2.form, null, testForm1.form]
 export default class FormService {
   static getForm (formId) {
-    let form = forms.find(form => form.id === formId)
+    let form = forms.find(form => form && form.id === formId)
     if (form) {
       return new Promise(resolve => {
         return resolve(form)

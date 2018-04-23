@@ -1,17 +1,32 @@
 <template>
-  <v-flex xs12 sm12>
-    <v-form>
-      <v-text-field
-        v-model="query"
-        @change="onQueryChange"></v-text-field>
-      <p>TODO: Filters</p>
-    </v-form>
-    <v-card>
-      <RespondentsView
-        :respondents="respondentResults"
-        @respondentsSelected="onRespondentsSelected"/>
-    </v-card>
-  </v-flex>
+  <v-container>
+    <v-layout>
+      <v-flex xs12 sm12>
+        <v-form>
+          <div class="error">
+            {{error}}
+          </div>
+          <v-text-field
+            placeholder="Search..."
+            v-model="query"
+            @input="onQueryChange"></v-text-field>
+          <p>TODO: Filters</p>
+        </v-form>
+        <RespondentsView
+          :respondents="respondentResults"
+          @selected="onSelected"
+          v-if="respondentResults.length"/>
+        <v-layout v-if="!respondentResults.length">
+          No results present for the query: {{query}}
+        </v-layout>
+      </v-flex>
+    </v-layout>
+    <v-layout>
+      <v-flex>
+        <v-btn @click="onDone">Done</v-btn>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -24,40 +39,39 @@
       return {
         respondentResults: [],
         query: '',
-        error: '',
-        filters: {}
+        error: null,
+        filters: {},
+        selected: []
       }
     },
     components: {
       RespondentsView
     },
     methods: {
-      onRespondentsSelected: function (respondents) {
-        console.log('selected the following respondents', respondents)
-      },
       onQueryChange: _.debounce(function () {
         this.search()
-      }, 800),
+      }, 100),
       search: function () {
-        if (!this._existingRequestPromise) {
-          this._existingRequestPromise = RespondentService.searchRespondents(this.query, this.filters)
-            .then(respondents => {
-              this.respondentResults = respondents
-            }).catch(err => {
-              console.error(err)
-              this.error = err
-            }).then(() => {
-              this._existingRequestPromise = null
-              if (this._shouldMakeAnotherRequestAfterDone) {
-                console.log('making queued request')
-                this.search() // Don't debounce this time
-              }
-              this._shouldMakeAnotherRequestAfterDone = false
-            })
-        } else {
-          this._shouldMakeAnotherRequestAfterDone = true
-          console.log('request in progress. will make next request when the current one finishes')
-        }
+        RespondentService.searchRespondents(this.query, this.filters)
+          .then(respondents => {
+            this.respondentResults = respondents
+            console.log(JSON.stringify(respondents, null, 2))
+          }).catch(err => {
+            console.error(err)
+            this.error = err
+          }).then(() => {
+            if (this._shouldMakeAnotherRequestAfterDone) {
+              console.log('making queued request')
+              this.search() // Don't debounce this time
+            }
+          })
+      },
+      onSelected: function (respondent) {
+        this.selected.push(respondent)
+        this.onDone()
+      },
+      onDone: function () {
+        this.$emit('selected', this.selected)
       }
     }
   }

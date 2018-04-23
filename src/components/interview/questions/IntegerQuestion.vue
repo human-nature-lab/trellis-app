@@ -4,7 +4,7 @@
       :disabled="question.dk_rf!==null"
       v-model.number="value"
       @change="onChange"
-      :type="number"
+      type="number"
       :step="1"></v-text-field>
   </v-flex>
 </template>

@@ -14,6 +14,7 @@
         <Question
           v-for="question in questions"
           :question="question"
+          :interview="interview.interview"
           :key="question.id"/>
       </v-flex>
     </v-card>

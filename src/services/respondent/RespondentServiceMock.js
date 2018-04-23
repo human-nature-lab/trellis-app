@@ -7,6 +7,19 @@ const fakeRespondents = [{
   notes: '',
   geo_notes: '',
   name: 'Fake 1',
+  photos: [{
+    id: uuid(),
+    file_name: 'fake-file-1.jpg',
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    deleted_at: new Date().getTime()
+  }, {
+    id: uuid(),
+    file_name: 'fake-file-11.jpg',
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    deleted_at: new Date().getTime()
+  }],
   created_at: new Date().getTime(),
   updated_at: new Date().getTime(),
   deleted_at: null
@@ -17,6 +30,13 @@ const fakeRespondents = [{
   notes: '',
   geo_notes: '',
   name: 'Fake 2',
+  photos: [{
+    id: uuid(),
+    file_name: 'fake-file-2.jpg',
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    deleted_at: new Date().getTime()
+  }],
   created_at: new Date().getTime(),
   updated_at: new Date().getTime(),
   deleted_at: null
@@ -27,6 +47,13 @@ const fakeRespondents = [{
   notes: '',
   geo_notes: '',
   name: 'Fake 3',
+  photos: [{
+    id: uuid(),
+    file_name: 'fake-file-3.jpg',
+    created_at: new Date().getTime(),
+    updated_at: new Date().getTime(),
+    deleted_at: new Date().getTime()
+  }],
   created_at: new Date().getTime(),
   updated_at: new Date().getTime(),
   deleted_at: null

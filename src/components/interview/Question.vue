@@ -30,6 +30,10 @@
       <RosterQuestion
         v-if="question.type.name === 'roster'"
         :question="question"/>
+      <RelationshipQuestion
+        v-if="question.type.name === 'relationship'"
+        :question="question"
+        :interview="interview"/>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
       <DontKnowRefused
@@ -48,11 +52,18 @@
   import DecimalQuestion from './questions/DecimalQuestion'
   import IntegerQuestion from './questions/IntegerQuestion'
   import RosterQuestion from './questions/RosterQuestion'
+  import RelationshipQuestion from './questions/RelationshipQuestion'
+  import TextQuestion from './questions/TextQuestion'
+  import TimeQuestion from './questions/TimeQuestion'
   import DontKnowRefused from './DontKnowRefused.vue'
   export default {
     name: 'question',
     props: {
       question: {
+        type: Object,
+        required: true
+      },
+      interview: {
         type: Object,
         required: true
       }
@@ -69,7 +80,10 @@
       MultipleSelectQuestion,
       MultipleChoiceQuestion,
       RosterQuestion,
-      DontKnowRefused
+      DontKnowRefused,
+      RelationshipQuestion,
+      TextQuestion,
+      TimeQuestion
     }
   }
 </script>

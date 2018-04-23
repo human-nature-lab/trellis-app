@@ -6,7 +6,7 @@
         @change="onChange"
         placeholder="decimal"
         :mask="'##########.#####'"
-        :type="number"></v-text-field>
+        type="number"></v-text-field>
     </v-flex>
 </template>
 

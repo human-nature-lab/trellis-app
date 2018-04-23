@@ -7,7 +7,7 @@
 </template>
 
 <script>
-  const questionTypes = ['intro', 'decimal', 'integer', 'multiple_select', 'multiple_choice']
+  const questionTypes = ['intro', 'decimal', 'integer', 'multiple_select', 'multiple_choice', 'relationship']
   import MockQuestion from '@/services/mock/MockQuestionService'
   import Question from './Question'
   export default {

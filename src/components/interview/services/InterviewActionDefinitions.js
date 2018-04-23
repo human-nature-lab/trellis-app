@@ -84,6 +84,17 @@ export default {
   'type-text': function (interview, payload, questionDatum, questionBlueprint) {
     // interview.getQuestion(payload.question_id, payload.sectionId, payload.pageId, payload.followUpReptitionId, payload.repetitionId)
   },
+  'add-edge': function (interview, payload, questionDatum) {
+    questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
+  },
+  'remove-edge': function (interview, payload, questionDatum) {
+    let index = questionDatum.data.findIndex(datum => datum.edge_id === payload.edge_id)
+    if (index > -1) {
+      questionDatum.data.splice(index, 1)
+    } else {
+      console.error('No datum exists with this edge_id')
+    }
+  },
   'new-roster-row': function (interview, payload, questionDatum, questionBlueprint) {
     questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
   },
