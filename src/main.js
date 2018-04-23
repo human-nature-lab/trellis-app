@@ -66,8 +66,11 @@ Vue.mixin({
 new Vue({
   el: '#app',
   router,
-  template: config.appEnv === APP_ENV.WEB ? '<WebApp/>' : '<App/>',
-  components: { App, WebApp },
+  template: config.appEnv === APP_ENV.WEB ? '<WebApp />' : '<App />',
+  components: {
+    App,
+    WebApp
+  },
   head: {
     meta: [
       {

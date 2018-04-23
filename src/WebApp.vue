@@ -14,6 +14,10 @@
 </template>
 
 <script>
+  import storage from '@/services/storage/StorageService'
+  if (storage.get('localeId') === null) {
+    storage.set('localeId', '48984fbe-84d4-11e5-ba05-0800279114ca')
+  }
   export default {
     name: 'web-app'
   }
