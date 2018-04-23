@@ -1,48 +1,49 @@
 <template>
-  <v-list>
-    <v-list-tile avatar
-                 v-for="respondent in respondents"
-                 :key="respondent.id"
-                 @click="onClick(respondent)">
-      <v-list-tile-avatar>
-        <Photo :photo="respondent.photo[0]"></Photo>
-      </v-list-tile-avatar>
-      <v-list-tile-content>
-        <v-list-tile-title>{{respondent.name}}</v-list-tile-title>
-      </v-list-tile-content>
-      <v-list-tile-action>
-        <v-btn flat @click="showMore(respondent)">
-          <v-icon color="blue darken-3">info</v-icon>
-        </v-btn>
-      </v-list-tile-action>
-    </v-list-tile>
-  </v-list>
+  <v-flex>
+    <v-container fluid row grid-list-sm>
+      <v-layout row wrap class="respondents">
+        <Respondent
+          :key="respondent.id"
+          v-for="respondent in respondents"
+          @selected="onSelect(respondent)"
+          :respondent="respondent"/>
+      </v-layout>
+    </v-container>
+  </v-flex>
 </template>
 
 <script>
-  import Photo from './Photo'
+  import Respondent from './Respondent'
   export default {
     name: 'respondents-view',
     props: {
       respondents: {
         type: Array,
         required: true
+      },
+      selected: {
+        type: Array,
+        required: false
       }
     },
     methods: {
       showMore: function (respondent) {
         console.log('TODO: Show more information on the respondent. Locations, names, respondent condition tags, etc.')
       },
-      onClick: function (respondent) {
-        this.$emit('respondentsSelected', [respondent])
+      onSelect: function (respondent) {
+        this.$emit('selected', respondent)
+      },
+      isSelected: function (respondent) {
+        return this.selected.indexOf(respondent.id) > -1
       }
     },
     components: {
-      Photo
+      Respondent
     }
   }
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+.selected
+  background: orangered
 </style>

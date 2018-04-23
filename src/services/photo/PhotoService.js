@@ -14,6 +14,6 @@ let Constructor = switchByModeEnv({
   }
 })
 
-export const PhotoService = new Constructor()
+export const PhotoService = Constructor
 
 export default PhotoService

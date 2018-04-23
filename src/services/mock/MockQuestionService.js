@@ -4,7 +4,13 @@ import MockService from './GeneratorService'
 
 const baseGenerator = {
   var_name: faker.hacker.noun,
-  text: faker.lorem.lines
+  text: faker.lorem.lines,
+  datum: {
+    id: 1,
+    dk_rf: null,
+    dk_rf_val: null,
+    data: []
+  }
 }
 
 const choiceTranslationGenerator = {
@@ -17,12 +23,20 @@ const choiceTranslationGenerator = {
 // Types: intro, integer, decimal, multiple_select, multiple_choice
 // JSON Schema faker definitions for specific question types
 const questionGenerator = {
-  integer: {},
   multiple_select: {
     choices: () => MockService.arrayGenerate(i => ({
       value: faker.lorem.word,
       choice_translation: _.cloneDeep(choiceTranslationGenerator)
     }), 2, 20)
+  },
+  relationship: {
+    datum: {
+      data: [{
+        edge_id: 1
+      }, {
+        edge_id: 2
+      }]
+    }
   }
 }
 

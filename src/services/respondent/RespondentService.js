@@ -14,6 +14,6 @@ let Constructor = switchByModeEnv({
   }
 })
 
-export const RespondentService = new Constructor()
+export const RespondentService = Constructor
 
 export default RespondentService

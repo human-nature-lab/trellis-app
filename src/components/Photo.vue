@@ -5,7 +5,7 @@
 <script>
   import PhotoService from '@/services/photo/PhotoService'
   import _ from 'lodash'
-  const URL_PLACEHOLDER = '/static/assets/logo.png'
+  const URL_PLACEHOLDER = 'https://vignette.wikia.nocookie.net/prince-of-stride-alternative/images/1/14/Placeholder_person.jpg/revision/latest?cb=20160220192514'
   export default {
     name: 'photo',
     props: {
@@ -20,16 +20,16 @@
       return {
         src: '',
         id: '',
-        alt: 'No alternative text provided for this photo'
+        alt: 'no alt'
       }
     },
     created: function () {
-      if (!this.photo || !this.photoId) {
-        throw Error('A photo object or photoId must be provided to use this component')
-      }
       this.id = this.photo ? this.photo.id : this.photoId
       if (this.photo && this.photo.alt) {
         this.alt = this.photo.alt
+      }
+      if (!this.id) {
+        return
       }
       if (this.isWithinViewport()) {
         this.loadSrc()
@@ -59,6 +59,6 @@
   }
 </script>
 
-<style scoped>
+<style>
 
 </style>
