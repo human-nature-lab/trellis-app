@@ -21,4 +21,7 @@ export default class RespondentServiceWeb {
         }
       })
   }
+  static searchRespondents (query, filters) {
+
+  }
 }

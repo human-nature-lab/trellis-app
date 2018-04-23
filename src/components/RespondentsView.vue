@@ -1,8 +1,11 @@
 <template>
   <v-list>
-    <v-list-tile avatar v-for="respondent in respondents" :key="respondent.id">
+    <v-list-tile avatar
+                 v-for="respondent in respondents"
+                 :key="respondent.id"
+                 @click="onClick(respondent)">
       <v-list-tile-avatar>
-        <img :src="respondent.photos[0].src" :alt="respondent.name">
+        <Photo :photo="respondent.photo[0]"></Photo>
       </v-list-tile-avatar>
       <v-list-tile-content>
         <v-list-tile-title>{{respondent.name}}</v-list-tile-title>
@@ -17,6 +20,7 @@
 </template>
 
 <script>
+  import Photo from './Photo'
   export default {
     name: 'respondents-view',
     props: {
@@ -27,8 +31,14 @@
     },
     methods: {
       showMore: function (respondent) {
-        console.log(respondent)
+        console.log('TODO: Show more information on the respondent. Locations, names, respondent condition tags, etc.')
+      },
+      onClick: function (respondent) {
+        this.$emit('respondentsSelected', [respondent])
       }
+    },
+    components: {
+      Photo
     }
   }
 </script>

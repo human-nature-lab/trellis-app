@@ -109,6 +109,25 @@ class MockService {
     }
     return rQuestion
   }
+
+  /**
+   * Return a promise which will fail with the provided probability and resolve with the provided delay
+   * @param {function} cb
+   * @param {number} [delay = 2000]
+   * @param {number} [failureProbability = 0.5]
+   * @returns {Promise<any>}
+   */
+  randomlyFail (cb, delay = 2000, failureProbability = 0.5) {
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        if (Math.random() > failureProbability) {
+          return cb(resolve, reject)
+        } else {
+          return reject(new Error('Unable to complete request'))
+        }
+      }, delay)
+    })
+  }
 }
 
 export default new MockService()
