@@ -1,24 +1,29 @@
 <template>
   <v-flex class="relationship">
-    <div class="error">
+    <div class="error" v-if="error">
       {{error}}
     </div>
     <v-chip
-      close
+      :close="!edge.isLoading && !isQuestionDisabled"
       @input="remove(edge)"
-      :key="edge.source_respondent_id+edge.target_respondent_id"
+      dark
+      :id="edge.id"
+      :key="edge.id"
       v-for="edge in edges">
-      <v-avatar>
-        <Photo :photo="edge.target_respondent.photos[0]" />
+      <v-avatar v-if="!edge.isLoading">
+        <Photo :photo="edge.target_respondent.photos[0]" :showAlt="false"/>
       </v-avatar>
-      {{edge.target_respondent.name}}
+      <v-avatar v-if="edge.isLoading">
+        <v-progress-circular indeterminate color="primary" />
+      </v-avatar>
+      {{edge.isLoading ? 'Loading...' : edge.target_respondent.name}}
     </v-chip>
     <v-btn
-      flat
+      :disabled="isQuestionDisabled"
       @click="respondentSearchDialog = true">
       Add Relationship
     </v-btn>
-    <v-dialog v-model="respondentSearchDialog">
+    <v-dialog v-model="respondentSearchDialog" fullscreen>
       <v-card>
         <RespondentsSearch @selected="onSelected" />
       </v-card>
@@ -27,6 +32,7 @@
 </template>
 
 <script>
+  import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import Photo from '@/components/Photo'
   import RespondentsSearch from '@/components/RespondentsSearch'
   import EdgeService from '@/services/edge/EdgeService'
@@ -43,22 +49,41 @@
         required: true
       }
     },
+    mixins: [QuestionDisabledMixin],
     data: function () {
       return {
         respondentSearchDialog: false,
-        edges: []
+        loadedEdges: {},
+        error: null
       }
     },
     computed: {
       edgeIds: function () {
         return this.question.datum.data.map(d => d.edge_id)
+      },
+      edges: {
+        get: function () {
+          let toLoad = []
+          let edges = this.edgeIds.map(id => {
+            if (this.loadedEdges[id]) {
+              return this.loadedEdges[id]
+            } else {
+              toLoad.push(id)
+              return {id: id, isLoading: true}
+            }
+          })
+          this.loadEdges(toLoad)
+          return edges
+        }
       }
     },
     methods: {
-      loadEdges: function () {
-        EdgeService.getEdges(this.edgeIds)
+      loadEdges: function (edgeIds) {
+        EdgeService.getEdges(edgeIds)
           .then(edges => {
-            this.edges = this.edges.concat(edges)
+            for (let edge of edges) {
+              this.$set(this.loadedEdges, edge.id, edge)
+            }
           })
           .catch(err => {
             console.error(err)
@@ -66,24 +91,30 @@
           })
       },
       remove: function (edge) {
-        let index = this.edges.indexOf(edge)
-        this.edges.splice(index, 1)
+        actionBus.action({
+          action_type: 'remove-edge',
+          question_datum_id: this.question.datum.id,
+          payload: {
+            edge_id: edge.id
+          }
+        })
       },
       onSelected: function (selected) {
         EdgeService.createEdges(selected.map(respondent => ({
           source_respondent_id: this.interview.survey.respondent_id,
           target_respondent_id: respondent.id
-        }))).then(res => {
-          for (let edge of res.edges) {
+        }))).then(edges => {
+          for (let edge of edges) {
             actionBus.action({
               action_type: 'add-edge',
               question_datum_id: this.question.datum.id,
               payload: {
+                name: this.question.var_name,
+                val: edge.id,
                 edge_id: edge.id
               }
             })
           }
-          this.loadEdges()
         }).catch(err => {
           console.error(err)
           this.error = err
@@ -93,7 +124,7 @@
       }
     },
     created: function () {
-      this.loadEdges()
+      this.loadEdges(this.edgeIds)
     },
     components: {
       Photo,

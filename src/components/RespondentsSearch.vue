@@ -35,6 +35,11 @@
   import RespondentService from '@/services/respondent/RespondentService'
   export default {
     name: 'respondents-search',
+    props: {
+      selectedRespondents: {
+        type: Array
+      }
+    },
     data: function () {
       return {
         respondentResults: [],
@@ -56,22 +61,18 @@
           .then(respondents => {
             this.respondentResults = respondents
             console.log(JSON.stringify(respondents, null, 2))
+            this.error = null
           }).catch(err => {
             console.error(err)
-            this.error = err
-          }).then(() => {
-            if (this._shouldMakeAnotherRequestAfterDone) {
-              console.log('making queued request')
-              this.search() // Don't debounce this time
-            }
+            this.error = err.toLocaleString()
           })
       },
       onSelected: function (respondent) {
         this.selected.push(respondent)
-        this.onDone()
       },
       onDone: function () {
         this.$emit('selected', this.selected)
+        this.selected = []
       }
     }
   }

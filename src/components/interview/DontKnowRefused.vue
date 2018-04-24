@@ -3,10 +3,10 @@
     <v-flex>
       <v-layout row justify-end>
         <v-btn
-          v-bind:class="{'btn-selected': dk}"
+          v-bind:class="{'primary': dk}"
           @click="dk=!dk">Don't know</v-btn>
         <v-btn
-          v-bind:class="{'btn-selected': rf}"
+          v-bind:class="{'primary': rf}"
           @click="rf=!rf">Refuse</v-btn>
       </v-layout>
       <v-layout v-if="shouldShowReason" row>

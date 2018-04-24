@@ -8,7 +8,8 @@ export default class EdgeServiceMock {
    */
   static getEdges (edgeIds) {
     return MockService.randomlyFail(resolve => {
-      return edgeIds.map(id => (JSON.parse(JSON.stringify({
+      return resolve(edgeIds.map(id => (JSON.parse(JSON.stringify({
+        id: id,
         source_respondent: {
           id: uuid(),
           name: 'me',
@@ -18,20 +19,20 @@ export default class EdgeServiceMock {
         },
         target_respondent: {
           id: uuid(),
-          name: 'Random person for edge: ' + id,
+          name: 'Random person',
           photos: [{
             id: 'wa'
           }]
         }
-      }))))
-    }, 400, 0.05)
+      })))))
+    }, EdgeServiceMock.DELAY, EdgeServiceMock.FAILURE_RATE)
   }
 
   /**
    * Create the provided edges in a transaction. Each edge should have a source_respondent_id and target_respondent_id
    * property
-   * @param edges
-   * @returns {Promise<any>}
+   * @param {array} edges - An array objects with source_respondent_id and target_respondent_id defined
+   * @returns {Promise<array>} - An array of edges
    */
   static createEdges (edges) {
     for (let edge of edges) {
@@ -40,19 +41,21 @@ export default class EdgeServiceMock {
       }
     }
     return MockService.randomlyFail(resolve => {
-      return resolve({
-        edges: edges.map((edge, i) => {
-          edge.id = uuid()
-          edge.target_respondent = {
-            id: uuid(),
-            name: 'Random person: ' + i,
-            photos: [{
-              id: uuid()
-            }]
-          }
-        })
-      })
-    }, 300, 0.05)
+      return resolve(edges.map((edge, i) => {
+        edge.id = uuid()
+        edge.target_respondent = {
+          id: uuid(),
+          name: 'Random person: ' + i,
+          photos: [{
+            id: uuid()
+          }]
+        }
+        return edge
+      }))
+    }, EdgeServiceMock.DELAY, EdgeServiceMock.FAILURE_RATE)
   }
 
 }
+
+EdgeServiceMock.FAILURE_RATE = 0
+EdgeServiceMock.DELAY = 200

@@ -3,17 +3,16 @@
       <v-text-field
         :disabled="isQuestionDisabled"
         v-model.number="value"
-        @change="onChange"
         placeholder="decimal"
-        :mask="'##########.#####'"
-        type="number"></v-text-field>
+        type="number"
+      ></v-text-field>
     </v-flex>
 </template>
 
 <script>
   // TODO: It might be required to use https://github.com/text-mask/text-mask/tree/master/core to support decimal type
-  // inputs
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import actionBus from '../services/ActionBus'
   export default {
     name: 'decimal-question',
     props: {
@@ -25,13 +24,24 @@
     mixins: [QuestionDisabledMixin],
     data: function () {
       return {
-        value: null
+        _value: null
       }
     },
-    methods: {
-      onChange: function (value) {
-        // TODO: send update to the action handler
-        console.log('Decimal value', value)
+    computed: {
+      value: {
+        get: function () {
+          return this.question.datum.data.length ? this.question.datum.data[0].val : this._value
+        },
+        set: function (val) {
+          this._value = val
+          actionBus.actionDebounce({
+            action_type: 'number-change',
+            question_datum_id: this.question.datum.id,
+            payload: {
+              val: val
+            }
+          })
+        }
       }
     }
   }

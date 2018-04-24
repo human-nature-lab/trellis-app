@@ -70,6 +70,32 @@ export default class GeneratorService {
   }
 
   /**
+   * Randomly select N items from an array
+   * @param {array} arr
+   * @param {number} n
+   * @returns {array}
+   */
+  static randomSelectN (arr, n) {
+    let vals = []
+    for (let i = 0; i < n; i++) {
+      vals.push(GeneratorService.randomSelect(arr))
+    }
+    return vals
+  }
+
+  /**
+   * Randomly select N values between min and max from an array
+   * @param {array} arr
+   * @param {number} max
+   * @param {number} min
+   * @returns {array}
+   */
+  static randomSelectMinMax (arr, max, min = 0) {
+    let n = GeneratorService.randomInt(max, min)
+    return GeneratorService.randomSelectN(arr, n)
+  }
+
+  /**
    * Create an array of random length between min and max. Each item is assigned by the result of the generator function
    * @param {Function} generator
    * @param {Number} min

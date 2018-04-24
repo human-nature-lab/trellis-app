@@ -24,7 +24,7 @@ export default class InterviewDataMock {
   send () {
     if (this.isSending) {
       this.hasDataToSend = true
-      console.log('already sending')
+      // console.log('already sending')
       return
     }
     let dataSnapshot = copy(this.dataExtractor())
@@ -33,11 +33,11 @@ export default class InterviewDataMock {
     let conditionDiff = DiffService.conditionTagsDiff(conditionTagSnapshot, this._previousConditions)
     // No need to send anything if there aren't any changes
     if (!(hasDataChanges(dataDiff) || hasConditionChanges(conditionDiff))) {
-      console.log('no changes in data detected')
+      // console.log('no changes in data detected')
       return
     }
     this.isSending = true
-    console.log('starting send')
+    // console.log('starting send')
     new Promise(resolve => {
       setTimeout(function () {
         resolve({
@@ -49,10 +49,10 @@ export default class InterviewDataMock {
       if (res.status >= 200 && res.status < 300) {
         this._previousData = dataSnapshot
         this._previousConditions = conditionTagSnapshot
-        console.log(`sent the following patch: ${JSON.stringify({
-          data: dataDiff,
-          conditionTags: conditionDiff
-        }, null, 2)}`)
+        // console.log(`sent the following patch: ${JSON.stringify({
+        //   data: dataDiff,
+        //   conditionTags: conditionDiff
+        // }, null, 2)}`)
       } else {
         throw Error('Unable to complete request')
       }

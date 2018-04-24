@@ -110,6 +110,9 @@ export default class Interview {
         if (questionDatum) {
           questionBlueprint = this._findQuestionBlueprint(questionDatum.question_id)
         }
+      } else if (action.action_type !== 'next' && action.action_type !== 'previous') {
+        console.error(action)
+        throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
       }
       actionDefinitions[action.action_type](this, action.payload, questionDatum, questionBlueprint)
     } else {
