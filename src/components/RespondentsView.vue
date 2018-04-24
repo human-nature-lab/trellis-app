@@ -1,44 +1,39 @@
 <template>
-  <v-flex>
-    <v-container fluid row grid-list-sm>
-      <v-layout row wrap class="respondents">
-        <Respondent
-          :key="respondent.id"
-          v-for="respondent in respondents"
-          @selected="onSelect(respondent)"
-          :respondent="respondent"/>
-      </v-layout>
-    </v-container>
-  </v-flex>
+  <v-container>
+    <v-layout>
+      <vue-recyclist
+        :list="respondents"
+        :tombstone="false">
+        <template slot="item" slot-scope="respondent">
+          <Respondent
+            :key="respondent.id"
+            @selected="onSelect(respondent)"
+            :respondent="respondent"/>
+        </template>
+      </vue-recyclist>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
   import Respondent from './Respondent'
+  import VueRecyclist from 'vue-recyclist'
+  import RespondentService from '../services/respondent/RespondentService'
   export default {
     name: 'respondents-view',
-    props: {
-      respondents: {
-        type: Array,
-        required: true
-      },
-      selected: {
-        type: Array,
-        required: false
+    data: function () {
+      return {
+        respondents: []
       }
     },
     methods: {
-      showMore: function (respondent) {
-        console.log('TODO: Show more information on the respondent. Locations, names, respondent condition tags, etc.')
-      },
-      onSelect: function (respondent) {
-        this.$emit('selected', respondent)
-      },
-      isSelected: function (respondent) {
-        return this.selected.indexOf(respondent.id) > -1
+      loadMore: function () {
+        RespondentService.search
       }
     },
     components: {
-      Respondent
+      Respondent,
+      VueRecyclist
     }
   }
 </script>
