@@ -13,10 +13,11 @@ import WebApp from './WebApp'
 import router from './router/router'
 
 import config from './config'
+import theme from './theme'
 import {APP_ENV} from './constants'
 
 // Flag for debug
-Vue.use(Vuetify)
+Vue.use(Vuetify, theme)
 Vue.config.productionTip = false
 Vue.use(VueHead)
 if (config.appEnv === APP_ENV.CORDOVA) {
