@@ -1,12 +1,16 @@
 <template>
   <v-card class="question" :question-id="question.id">
-    <v-card-title class="question-title deep-orange white--text">
+    <v-card-title class="primary question-title white--text">
       <v-layout row>
         <v-spacer></v-spacer>
-        <v-flex sm2 class="text-xs-right">
+        <v-flex sm6 class="text-xs-right">
           {{question.var_name}} : {{question.type.name}}
         </v-flex>
       </v-layout>
+      <!--<v-toolbar>-->
+        <!--<v-spacer></v-spacer>-->
+        <!--<v-toolbar-title class="white&#45;&#45;text">{{question.var_name}} : {{question.type.name}}</v-toolbar-title>-->
+      <!--</v-toolbar>-->
     </v-card-title>
     <v-card-text class="question-content">
       <v-flex class="question-text">

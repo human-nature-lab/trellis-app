@@ -84,6 +84,12 @@ export default {
   'type-text': function (interview, payload, questionDatum, questionBlueprint) {
     // interview.getQuestion(payload.question_id, payload.sectionId, payload.pageId, payload.followUpReptitionId, payload.repetitionId)
   },
+  'number-change': function (interview, payload, questionDatum) {
+    if (!questionDatum.data.length) {
+      questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
+    }
+    questionDatum.data[0].val = payload.val
+  },
   'add-edge': function (interview, payload, questionDatum) {
     questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
   },
