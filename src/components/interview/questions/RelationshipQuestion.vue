@@ -23,7 +23,7 @@
       @click="respondentSearchDialog = true">
       Add Relationship
     </v-btn>
-    <v-dialog v-model="respondentSearchDialog" fullscreen>
+    <v-dialog v-model="respondentSearchDialog">
       <v-card>
         <RespondentsSearch @selected="onSelected" />
       </v-card>

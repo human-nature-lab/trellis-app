@@ -1,4 +1,5 @@
 import http from '@/services/http/AxiosInstance'
+import storage from '@/services/storage/StorageService'
 export default class RespondentServiceWeb {
   static getRespondentById (respondentId) {
     return http().get(`respondent/${encodeURIComponent(respondentId)}`)
@@ -11,8 +12,9 @@ export default class RespondentServiceWeb {
         }
       })
   }
-  static getRespondents () {
-    return http().get(`respondent`)
+  static getRespondentsPage (page = 0, size = 50) {
+    let studyId = storage.get('studyId', 'string')
+    return http().get(`study/${studyId}/respondents`)
       .then(res => {
         if (res.data.respondents) {
           return res.data.respondents
@@ -21,7 +23,18 @@ export default class RespondentServiceWeb {
         }
       })
   }
-  static searchRespondents (query, filters) {
-
+  static getSearchPage (query, filter, page = 0, size = 50) {
+    let studyId = storage.get('studyId', 'string')
+    return http().get(`study/${studyId}/respondents/search`, {
+      params: {
+        q: query
+      }
+    }).then(res => {
+      if (res.data && res.data.respondents) {
+        return res.data.respondents
+      } else {
+        throw new Error('Unable to complete query')
+      }
+    })
   }
 }
