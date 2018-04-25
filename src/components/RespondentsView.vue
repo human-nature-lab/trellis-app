@@ -17,7 +17,6 @@
 
 <script>
   import Respondent from './Respondent'
-  import VueRecyclist from 'vue-recyclist'
   import RespondentService from '../services/respondent/RespondentService'
   export default {
     name: 'respondents-view',
@@ -32,8 +31,7 @@
       }
     },
     components: {
-      Respondent,
-      VueRecyclist
+      Respondent
     }
   }
 </script>

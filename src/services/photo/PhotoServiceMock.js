@@ -2,7 +2,7 @@ import MockService from '../mock/MockService'
 import GeneratorService from '../mock/GeneratorService'
 
 const photoProviderUrl = 'https://source.unsplash.com/random'
-const WORDS = ['woman', 'man', 'professional', 'dog', 'cat']
+const WORDS = ['woman', 'man', 'cat']
 const cache = {}
 export default class PhotoServiceMock {
   static getPhotoSrc (photoId) {

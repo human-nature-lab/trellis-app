@@ -79,6 +79,11 @@
   }
 </script>
 
-<style>
-
+<style lang="sass">
+.photo.contained
+  max-height: 100%
+  max-width: 100%
+  img
+   max-height: 100%
+   max-width: 100%
 </style>

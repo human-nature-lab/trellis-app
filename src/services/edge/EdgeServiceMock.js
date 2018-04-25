@@ -1,5 +1,7 @@
 import MockService from '../mock/MockService'
 import uuid from 'uuid/v4'
+import storage from '@/services/storage/StorageService'
+import RespondentService from '../respondent/RespondentService'
 export default class EdgeServiceMock {
   /**
    * Resolves to an edge with both source and target respondents included
@@ -8,23 +10,9 @@ export default class EdgeServiceMock {
    */
   static getEdges (edgeIds) {
     return MockService.randomlyFail(resolve => {
-      return resolve(edgeIds.map(id => (JSON.parse(JSON.stringify({
-        id: id,
-        source_respondent: {
-          id: uuid(),
-          name: 'me',
-          photos: [{
-            id: 'ok'
-          }]
-        },
-        target_respondent: {
-          id: uuid(),
-          name: 'Random person',
-          photos: [{
-            id: 'wa'
-          }]
-        }
-      })))))
+      return resolve(edgeIds.map(id => {
+        return storage.get(`edge-${id}`, 'object')
+      }))
     }, EdgeServiceMock.DELAY, EdgeServiceMock.FAILURE_RATE)
   }
 
@@ -41,16 +29,15 @@ export default class EdgeServiceMock {
       }
     }
     return MockService.randomlyFail(resolve => {
-      return resolve(edges.map((edge, i) => {
-        edge.id = uuid()
-        edge.target_respondent = {
-          id: uuid(),
-          name: 'Random person: ' + i,
-          photos: [{
-            id: uuid()
-          }]
+      return resolve(Promise.all(edges.map(edge => {
+        return RespondentService.getRespondentById(edge.target_respondent_id)
+      })).then(respondents => {
+        for (let i = 0; i < edges.length; i++) {
+          edges[i].id = uuid()
+          edges[i].target_respondent = respondents[i]
+          storage.set(`edge-${edges[i].id}`, edges[i])
         }
-        return edge
+        return edges
       }))
     }, EdgeServiceMock.DELAY, EdgeServiceMock.FAILURE_RATE)
   }

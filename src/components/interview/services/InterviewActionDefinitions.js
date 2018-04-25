@@ -98,18 +98,18 @@ export default {
     if (index > -1) {
       questionDatum.data.splice(index, 1)
     } else {
-      console.error('No datum exists with this edge_id')
+      throw new Error('No datum exists with this edge_id')
     }
   },
-  'new-roster-row': function (interview, payload, questionDatum, questionBlueprint) {
+  'add-roster-row': function (interview, payload, questionDatum) {
     questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
   },
-  'roster-row-edit': function (interview, payload, questionDatum, questionBlueprint) {
-    let datum = questionDatum.data.find(d => d.id === payload.datum_id)
-    if (datum) {
-      datum.val = payload.val
+  'remove-roster-row': function (interview, payload, questionDatum, questionBlueprint) {
+    let index = questionDatum.data.findIndex(datum => datum.roster_id === payload.roster_id)
+    if (index > -1) {
+      questionDatum.data.splice(index, 1)
     } else {
-      console.error('roster-row-edit', 'invalid input. No datum has been created with that id')
+      throw new Error('No datum exists with this roster id')
     }
   }
 }
