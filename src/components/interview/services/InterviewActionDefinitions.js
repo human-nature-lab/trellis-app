@@ -111,5 +111,13 @@ export default {
     } else {
       throw new Error('No datum exists with this roster id')
     }
+  },
+  'change-sort-order': function (interview, payload, questionDatum) {
+    let datum = questionDatum.data.findIndex(datum => datum.id === payload.datum_id)
+    if (datum) {
+      datum.sort_order = payload.sort_order
+    } else {
+      throw new Error('No datum exists with this id: ' + payload.datum_id)
+    }
   }
 }

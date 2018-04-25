@@ -1,18 +1,22 @@
 <template>
   <v-flex xs12 class="roster-question">
-    <v-card>
+    <v-card class="roster">
       <v-list>
         <v-list-tile
           v-for="(row, rowIndex) in roster"
           :key="row.id">
           <v-list-tile-avatar>
-            <v-btn
-              icon
-              v-if="editingIndex === rowIndex"
-              :disabled="isSavingEdit"
-              @click="stopAddingWithoutSaving(row, rowIndex)">
-              <v-icon color="red">clear</v-icon>
-            </v-btn>
+            <v-tooltip top>
+              <v-btn
+                slot="activator"
+                icon
+                v-if="editingIndex === rowIndex"
+                :disabled="isSavingEdit || isQuestionDisabled"
+                @click="stopEditingAndRevert(row, rowIndex)">
+                <v-icon color="red">clear</v-icon>
+              </v-btn>
+              <span>Revert changes</span>
+            </v-tooltip>
           </v-list-tile-avatar>
           <v-list-tile-content>
             <v-text-field
@@ -22,14 +26,14 @@
               v-if="rowIndex === editingIndex"
               autofocus
               @keyup.enter="stopEditingAndSave(row, rowIndex)"
-              @keyup.esc="stopAddingWithoutSaving(row, rowIndex)" />
+              @keyup.esc.stop="stopEditingAndRevert(row, rowIndex)" />
             <span class="roster-val"
               v-if="rowIndex !== editingIndex">{{row.val}}</span>
           </v-list-tile-content>
           <v-list-tile-action>
             <v-menu
               v-if="!isSavingEdit && !row.isLoading && rowIndex !== editingIndex"
-              :disabled="editingIndex > 0"
+              :disabled="editingIndex > 0 || isQuestionDisabled"
               left
               lazy
               :nudge-left="30">
@@ -38,39 +42,50 @@
               </v-btn>
               <v-list>
                 <v-list-tile>
-                  <v-btn icon @click="startEditingRow(row, rowIndex)">
-                    <v-icon>edit</v-icon>
-                  </v-btn>
+                  <v-tooltip left>
+                    <v-btn icon @click="startEditingRow(row, rowIndex)" slot="activator">
+                      <v-icon>edit</v-icon>
+                    </v-btn>
+                    <span>Edit row</span>
+                  </v-tooltip>
                 </v-list-tile>
                 <v-list-tile>
-                  <v-btn icon @click="removeRosterRow(row)">
-                    <v-icon>delete</v-icon>
-                  </v-btn>
+                  <v-tooltip left>
+                    <v-btn
+                      icon
+                      @click="removeRosterRow(row)"
+                      slot="activator">
+                      <v-icon color="red">delete</v-icon>
+                    </v-btn>
+                    <span>Remove row</span>
+                  </v-tooltip>
                 </v-list-tile>
               </v-list>
             </v-menu>
-            <v-btn
-              v-if="editingIndex === rowIndex"
-              icon
-              color="green"
-              @click.stop="stopEditingAndSave(row, rowIndex)">
-              <v-icon>check</v-icon>
-            </v-btn>
-            <v-progress-circular
+            <v-tooltip top>
+              <v-btn
+                v-if="editingIndex === rowIndex"
+                icon
+                :disabled="isQuestionDisabled"
+                slot="activator"
+                @click.stop="stopEditingAndSave(row, rowIndex)">
+                  <v-icon color="green">check</v-icon>
+              </v-btn>
+              <span>Save edits</span>
+            </v-tooltip>
+                <v-progress-circular
               v-if="isSavingEdit || row.isLoading"
               indeterminate
               color="primary" />
           </v-list-tile-action>
         </v-list-tile>
-
         <v-list-tile v-if="isAddingNew">
           <v-list-tile-avatar>
             <v-btn
               :disabled="isSavingNew"
-              color="error"
               icon
               @click="stopAddingWithoutSaving">
-              <v-icon>delete</v-icon>
+              <v-icon color="red">delete</v-icon>
             </v-btn>
           </v-list-tile-avatar>
           <v-list-tile-content>
@@ -85,10 +100,9 @@
           <v-list-tile-action>
             <v-btn
               v-if="!isSavingNew"
-              color="success"
               icon
               @click.stop="stopAddingAndSave">
-              <v-icon>check</v-icon>
+              <v-icon color="green">check</v-icon>
             </v-btn>
             <v-progress-circular
               v-if="isSavingNew"
@@ -96,7 +110,6 @@
               color="primary" />
           </v-list-tile-action>
         </v-list-tile>
-
       </v-list>
       <v-btn
         @click="isAddingNew=true"
@@ -236,6 +249,8 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+  .roster.card
+    padding-bottom: 25px
+    margin-bottom: 25px
 </style>

@@ -6,7 +6,7 @@ import RespondentServiceMock from './RespondentServiceMock'
 let Constructor = switchByModeEnv({
   WEB: {
     PROD: RespondentServiceWeb,
-    TEST: RespondentServiceWeb
+    TEST: RespondentServiceMock
   },
   CORDOVA: {
     PROD: RespondentServiceCordova,

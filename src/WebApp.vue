@@ -8,28 +8,46 @@
       <v-btn icon @click="useDarkTheme=!useDarkTheme">
         <v-icon>wb_sunny</v-icon>
       </v-btn>
-      <!--<v-menu offset-y :nudge-top="-15">-->
-        <!--<v-btn icon slot="activator">-->
-          <!--<v-icon>more_vert</v-icon>-->
-        <!--</v-btn>-->
-        <!--<v-list>-->
-          <!--<v-list-tile>-->
-            <!--<v-select-->
-              <!--:items="['light', 'dark']"-->
-              <!--v-model="themeVariant"></v-select>-->
-          <!--</v-list-tile>-->
-        <!--</v-list>-->
-      <!--</v-menu>-->
+      <v-menu offset-y :nudge-top="-15">
+        <v-btn icon slot="activator">
+          <v-icon>more_vert</v-icon>
+        </v-btn>
+        <v-list>
+          <v-list-tile>
+            <router-link :to="{name: 'RespondentsSearch'}">Respondents</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '0'}}">Form 1</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '1'}}">Form 2</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '2'}}">Form 3</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '3'}}">Form 4</router-link>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
     </v-toolbar>
     <v-content>
       <v-container fluid class="app-container">
-        <router-view></router-view>
+        <router-view v-if="hasValidLocale" />
+        <v-dialog
+          :value="!hasValidLocale"
+          fullscreen
+          lazy>
+          <LocaleChanger />
+        </v-dialog>
       </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script>
+  import LocaleChanger from '@/components/LocaleChanger'
+  import LocaleService from '@/services/locale/LocaleService'
   import storage from '@/services/storage/StorageService'
   if (storage.get('localeId') === null) {
     storage.set('localeId', '48984fbe-84d4-11e5-ba05-0800279114ca')
@@ -40,6 +58,14 @@
       return {
         useDarkTheme: false
       }
+    },
+    methods: {
+      hasValidLocale: function () {
+        return LocaleService.hasValidLocale()
+      }
+    },
+    components: {
+      LocaleChanger
     }
   }
 </script>

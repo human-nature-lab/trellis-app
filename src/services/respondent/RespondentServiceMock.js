@@ -72,10 +72,10 @@ export default class RespondentServiceMock {
       }
     }, SERVICE_DELAY, NETWORK_ERROR_CHANCE)
   }
-  static getRespondents () {
+  static getRespondentsPage (page = 0, size = 50) {
     return MockService.randomlyFail(resolve => resolve(fakeRespondents), SERVICE_DELAY, NETWORK_ERROR_CHANCE)
   }
-  static searchRespondents (query, filter) {
+  static getSearchPage (query, filter, page = 0, size = 50) {
     return MockService.randomlyFail(resolve => {
       let results = []
       for (let r of fakeRespondents) {
