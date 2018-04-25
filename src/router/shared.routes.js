@@ -1,15 +1,17 @@
-import storage from '@/services/storage/StorageService'
+// import storage from '@/services/storage/StorageService'
 import Interview from '@/components/interview/Interview'
 import RespondentForms from '@/components/RespondentForms'
 import RespondentsSearch from '@/components/RespondentsSearch'
+import LocaleChanger from '@/components/LocaleChanger'
 import QuestionExamples from '@/components/interview/QuestionExamples'
 
 function redirectIfNotValidInterview (to, from, next) {
-  if (storage.get('interview-id') === null) {
-    next({name: 'Login'})
-  } else {
-    next()
-  }
+  // if (storage.get('interview-id') === null) {
+  //   next({name: 'Login'})
+  // } else {
+  //   next()
+  // }
+  next()
 }
 
 export default [{
@@ -29,4 +31,8 @@ export default [{
   path: '/question/examples',
   name: 'QuestionExamples',
   component: QuestionExamples
+}, {
+  path: '/locale/change',
+  name: 'LocaleChanger',
+  component: LocaleChanger
 }]

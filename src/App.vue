@@ -36,13 +36,16 @@
           <v-list-tile>
             <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '2'}}">Form 3</router-link>
           </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '3'}}">Form 4</router-link>
+          </v-list-tile>
         </v-list>
       </v-menu>
     </v-toolbar>
     <v-content>
       <v-container fluid class="app-container">
         <v-card v-if="!locale" tile>
-          <h3>Please select a locale before using the app</h3>
+          <h3>Please set a locale before using the app</h3>
         </v-card>
         <router-view v-if="locale"></router-view>
       </v-container>
@@ -86,7 +89,6 @@
 <script>
   import Vue from 'vue'
   import DeviceService from './services/device/DeviceService'
-  import Interview from './components/interview/Interview'
   import storage from './services/storage/StorageService'
   import DataService from './services/data/DataService'
   // TODO: This should be set by the app instead of being hardcoded
@@ -138,6 +140,13 @@
         if (DeviceService.getPlatform() === 'Android') {
           document.addEventListener('backbutton', this.onBackKeyDown, false)
         }
+        // TODO: make sure the element we're current typing in is within view when the keyboard is shown
+        // document.addEventListener('deviceready', function() {
+        //   Keyboard.shrinkView(true)
+        //   window.addEventListener('keyboardDidShow', function () {
+        //     document.activeElement.scrollIntoView()
+        //   })
+        // })
       },
       onPause () {
         // Handle the pause lifecycle event.
@@ -162,9 +171,6 @@
             this.isLoadingLocales = false
           })
       }
-    },
-    components: {
-      Interview
     }
   }
 </script>
