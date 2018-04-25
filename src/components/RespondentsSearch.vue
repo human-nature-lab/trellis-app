@@ -1,6 +1,6 @@
 <template>
-  <v-container class="relative">
-    <v-toolbar class="respondent-search" extended fixed dense inline>
+  <v-container>
+    <v-toolbar class="respondent-search" extended dense inline>
       <v-text-field
         placeholder="Search..."
         v-model="query"
@@ -12,25 +12,17 @@
         </div>
       </v-layout>
     </v-toolbar>
-    <v-layout>
-      <v-flex xs12 sm12>
-        <vue-recyclist
-          class="respondent-list"
-          :list="respondentResults"
-          :loadmore="onLoadMore"
-          :size="scrollPageSize"
-          :tombstone="false">
-          <template slot="item" slot-scope="respondent">
-            <RespondentListItem
-              :key="respondent.data.id"
-              @selected="onSelectRespondent(respondent.data)"
-              :respondent="respondent.data"/>
-          </template>
-        </vue-recyclist>
-        <v-layout v-if="!respondentResults.length">
-          No results present for the query: {{query}}
-        </v-layout>
-      </v-flex>
+    <v-container fluid>
+      <v-layout row wrap>
+        <Respondent
+          v-for="respondent in respondentResults"
+          :key="respondent.id"
+          @selected="onSelectRespondent(respondent)"
+          :respondent="respondent"/>
+      </v-layout>
+    </v-container>
+    <v-layout v-if="!respondentResults.length">
+      No results present for the query: {{query}}
     </v-layout>
     <v-layout>
       <v-flex>
@@ -41,10 +33,10 @@
 </template>
 
 <script>
-  import VueRecyclist from 'vue-recyclist'
   import _ from 'lodash'
   import RespondentService from '@/services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
+  import Respondent from './Respondent'
   export default {
     name: 'respondents-search',
     props: {
@@ -55,44 +47,30 @@
     data: function () {
       return {
         respondentResults: [],
-        shownRespondents: [],
         query: '',
         error: null,
         filters: {},
         selected: [],
-        scrollPageSize: 10,
-        requestPage: 0,
+        currentPage: 0,
         requestPageSize: 50
       }
     },
     methods: {
       onQueryChange: _.debounce(function () {
         this.search()
-      }, 100),
+      }, 400),
       search: function () {
-        this.respondentResults = []
-        this.page = 0
-        this.onLoadMore()
+        this.getCurrentPage()
       },
-      onLoadMore: function () {
-        if (this.shownRespondents.length >= this.respondentResults.length) {
-          RespondentService.getSearchPage(this.query, this.filters, this.page, this.requestPageSize)
-            .then(respondents => {
-              this.respondentResults = this.respondentResults.concat(respondents)
-              console.log(JSON.stringify(respondents, null, 2))
-              this.error = null
-              this.appendToShown()
-            }).catch(err => {
-              this.error = err.toLocaleString()
-            })
-        } else {
-          this.appendToShown()
-        }
-      },
-      appendToShown: function () {
-        for (let respondent of this.respondentResults.slice(this.shownRespondents.length - 1, this.scrollPageSize)) {
-          this.shownRespondents.push(respondent)
-        }
+      getCurrentPage: function () {
+        RespondentService.getSearchPage(this.query, this.filters, this.currentPage, this.requestPageSize)
+          .then(respondents => {
+            this.respondentResults = respondents
+            console.log(JSON.stringify(respondents, null, 2))
+            this.error = null
+          }).catch(err => {
+            this.error = err.toLocaleString()
+          })
       },
       onSelectRespondent: function (respondent) {
         this.selected.push(respondent)
@@ -103,8 +81,8 @@
       }
     },
     components: {
-      VueRecyclist,
-      RespondentListItem
+      RespondentListItem,
+      Respondent
     }
   }
 </script>

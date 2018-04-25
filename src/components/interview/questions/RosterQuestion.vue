@@ -1,33 +1,105 @@
 <template>
-  <v-flex xs12 sm12 md6 class="roster-question">
+  <v-flex xs12 class="roster-question">
     <v-card>
       <v-list>
-        <v-list-tile v-for="(row, rowIndex) in roster" :key="row.id">
+        <v-list-tile
+          v-for="(row, rowIndex) in roster"
+          :key="row.id">
+          <v-list-tile-avatar>
+            <v-btn
+              icon
+              v-if="editingIndex === rowIndex"
+              :disabled="isSavingEdit"
+              @click="stopAddingWithoutSaving(row, rowIndex)">
+              <v-icon color="red">clear</v-icon>
+            </v-btn>
+          </v-list-tile-avatar>
           <v-list-tile-content>
             <v-text-field
               :disabled="isQuestionDisabled"
-              placeholder="Roster text here"
+              :placeholder="oldText"
               v-model="newText"
               v-if="rowIndex === editingIndex"
               autofocus
-              @blur="onStopEdit(rowIndex)"/>
-            <span class="old-val"
-              v-if="rowIndex === editingIndex">({{oldText}})</span>
+              @keyup.enter="stopEditingAndSave(row, rowIndex)"
+              @keyup.esc="stopAddingWithoutSaving(row, rowIndex)" />
             <span class="roster-val"
               v-if="rowIndex !== editingIndex">{{row.val}}</span>
           </v-list-tile-content>
           <v-list-tile-action>
-            <v-btn icon
-                   ripple
-                   :disabled="isQuestionDisabled"
-                   @click="onStartEdit(rowIndex)">
-              <v-icon color="grey">mode_edit</v-icon>
+            <v-menu
+              v-if="!isSavingEdit && !row.isLoading && rowIndex !== editingIndex"
+              :disabled="editingIndex > 0"
+              left
+              lazy
+              :nudge-left="30">
+              <v-btn icon slot="activator">
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+              <v-list>
+                <v-list-tile>
+                  <v-btn icon @click="startEditingRow(row, rowIndex)">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                </v-list-tile>
+                <v-list-tile>
+                  <v-btn icon @click="removeRosterRow(row)">
+                    <v-icon>delete</v-icon>
+                  </v-btn>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+            <v-btn
+              v-if="editingIndex === rowIndex"
+              icon
+              color="green"
+              @click.stop="stopEditingAndSave(row, rowIndex)">
+              <v-icon>check</v-icon>
             </v-btn>
+            <v-progress-circular
+              v-if="isSavingEdit || row.isLoading"
+              indeterminate
+              color="primary" />
           </v-list-tile-action>
         </v-list-tile>
+
+        <v-list-tile v-if="isAddingNew">
+          <v-list-tile-avatar>
+            <v-btn
+              :disabled="isSavingNew"
+              color="error"
+              icon
+              @click="stopAddingWithoutSaving">
+              <v-icon>delete</v-icon>
+            </v-btn>
+          </v-list-tile-avatar>
+          <v-list-tile-content>
+            <v-text-field
+              :disabled="isQuestionDisabled"
+              placeholder="Roster value here..."
+              v-model="newText"
+              autofocus
+              @keyup.esc="stopAddingWithoutSaving"
+              @keyup.enter="stopAddingAndSave" />
+          </v-list-tile-content>
+          <v-list-tile-action>
+            <v-btn
+              v-if="!isSavingNew"
+              color="success"
+              icon
+              @click.stop="stopAddingAndSave">
+              <v-icon>check</v-icon>
+            </v-btn>
+            <v-progress-circular
+              v-if="isSavingNew"
+              indeterminate
+              color="primary" />
+          </v-list-tile-action>
+        </v-list-tile>
+
       </v-list>
       <v-btn
-        @click="onNewRow"
+        @click="isAddingNew=true"
         :disabled="isQuestionDisabled"
         color="deep-orange"
         dark
@@ -43,6 +115,7 @@
 
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import RosterService from '@/services/roster/RosterService'
   import actionBus from '../services/ActionBus'
   export default {
     name: 'roster-question',
@@ -55,65 +128,109 @@
     mixins: [QuestionDisabledMixin],
     data: function () {
       return {
+        rosterCache: {},
         isAddingNew: false,
-        _newText: null,
+        isSavingNew: false,
+        isSavingEdit: false,
+        newText: null,
         oldText: null,
-        editingIndex: null
+        editingIndex: -1
       }
     },
+    created: function () {
+      this.loadRosters(this.rosterIds)
+    },
+    updated: function () {
+      this.loadRosters(this.rosterIds)
+    },
     methods: {
-      onNewRow: function () {
-        this.editingIndex = this.question.datum.data.length
+      startEditingRow: function (row, index) {
+        this.newText = row.val
+        this.oldText = row.val
+        this.editingIndex = index
+      },
+      stopEditingAndSave: function (row, index) {
+        this.isSavingEdit = true
+        row.val = this.newText
+        RosterService.editRosterRow(row).then(newRow => {
+          this.$set(this.rosterCache, newRow.id, newRow)
+        }).catch(err => {
+          this.error = err
+        }).then(() => {
+          this.isSavingEdit = false
+          this.oldText = null
+          this.newText = null
+          this.editingIndex = -1
+        })
+      },
+      stopEditingAndRevert: function (row, index) {
+        row.val = this.oldText
+        this.oldText = null
+        this.newText = null
+        this.editingIndex = -1
+      },
+      stopAddingWithoutSaving: function () {
+        this.isSavingNew = false
+        this.isAddingNew = false
+        this.newText = null
+        this.oldText = null
+      },
+      stopAddingAndSave: function () {
+        this.isSavingNew = true
+        RosterService.createRosterRows([this.newText]).then(rows => {
+          for (let row of rows) {
+            actionBus.action({
+              action_type: 'add-roster-row',
+              question_datum_id: this.question.datum.id,
+              payload: {
+                roster_id: row.id
+              }
+            })
+            this.$set(this.rosterCache, row.id, row)
+          }
+        }).catch(err => {
+          this.error = err
+        }).then(() => {
+          this.isSavingNew = false
+          this.isAddingNew = false
+          this.newText = null
+        })
+      },
+      removeRosterRow: function (row) {
         actionBus.action({
-          action_type: 'new-roster-row',
+          action_type: 'remove-roster-row',
           question_datum_id: this.question.datum.id,
           payload: {
-            sort_order: this.question.datum.data.length
+            roster_id: row.id
           }
         })
-        this.onStartEdit(this.editingIndex)
       },
-      onStartEdit: function (rowIndex) {
-        let roster = this.getRoster()
-        this.editingIndex = rowIndex
-        this.oldText = roster[rowIndex].val
-        this.newText = roster[rowIndex].val
-        this.$forceUpdate()
-      },
-      onStopEdit: function (rowIndex) {
-        this.editingIndex = ''
-        this.newText = ''
-        this.$forceUpdate()
-      },
-      getRoster: function () {
-        if (this.question.datum.data) {
-          return this.question.datum.data.sort(function (a, b) {
-            return a.sort_order > b.sort_order
-          })
-        } else {
-          return []
-        }
+      loadRosters: function (rosterRowIds) {
+        RosterService.getRosterRows(rosterRowIds).then(rosterRows => {
+          for (let row of rosterRows) {
+            this.$set(this.rosterCache, row.id, row)
+          }
+        }).catch(err => {
+          this.error = err
+        })
       }
     },
     computed: {
-      newText: {
-        get: function () {
-          return this._newText
-        },
-        set: function (newText) {
-          actionBus.actionDebounce({
-            action_type: 'roster-row-edit',
-            question_datum_id: this.question.datum.id,
-            payload: {
-              datum_id: this.roster[this.editingIndex].id,
-              val: newText
-            }
-          })
-          this._newText = newText
-        }
+      rosterIds: function () {
+        return this.question.datum.data.map(datum => datum.roster_id)
       },
       roster: function () {
-        return this.getRoster()
+        console.log('recalculating roster values')
+        let toLoad = []
+        let rows = this.rosterIds.map(id => {
+          if (this.rosterCache[id]) {
+            return this.rosterCache[id]
+          } else {
+            return {id: id, val: 'Loading...', isLoading: true}
+          }
+        })
+        this.loadRosters(toLoad)
+        return rows
       }
     }
   }

@@ -6,7 +6,6 @@
     <v-chip
       :close="!edge.isLoading && !isQuestionDisabled"
       @input="remove(edge)"
-      dark
       :id="edge.id"
       :key="edge.id"
       v-for="edge in edges">
@@ -61,20 +60,18 @@
       edgeIds: function () {
         return this.question.datum.data.map(d => d.edge_id)
       },
-      edges: {
-        get: function () {
-          let toLoad = []
-          let edges = this.edgeIds.map(id => {
-            if (this.loadedEdges[id]) {
-              return this.loadedEdges[id]
-            } else {
-              toLoad.push(id)
-              return {id: id, isLoading: true}
-            }
-          })
-          this.loadEdges(toLoad)
-          return edges
-        }
+      edges: function () {
+        let toLoad = []
+        let edges = this.edgeIds.map(id => {
+          if (this.loadedEdges[id]) {
+            return this.loadedEdges[id]
+          } else {
+            toLoad.push(id)
+            return {id: id, isLoading: true}
+          }
+        })
+        this.loadEdges(toLoad)
+        return edges
       }
     },
     methods: {
@@ -114,6 +111,7 @@
                 edge_id: edge.id
               }
             })
+            this.$set(this.loadedEdges, edge.id, edge)
           }
         }).catch(err => {
           console.error(err)

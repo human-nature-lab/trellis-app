@@ -1,5 +1,4 @@
 import DiffService from '../DiffService'
-// import {copy} from './InterviewDataWeb'
 import {copy, hasConditionChanges, hasDataChanges} from './InterviewDataWeb'
 import _ from 'lodash'
 

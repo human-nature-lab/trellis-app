@@ -3,7 +3,8 @@
     <v-flex class="respondent-photo">
       <Photo :photo="respondent.photos[0]"></Photo>
     </v-flex>
-    <v-flex class="respondent-name">
+    <v-spacer></v-spacer>
+    <v-flex class="respondent-name" justify-end align-content-end>
       {{respondent.name}}
       <v-btn @click="onClick">Select</v-btn>
     </v-flex>
@@ -32,6 +33,9 @@
 </script>
 
 <style lang="sass" scoped>
+  $height: 100px
   .respondent-list-item
-    height: 150px
+    height: $height
+  .respondent-photo
+    height: $height
 </style>
