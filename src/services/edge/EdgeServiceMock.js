@@ -4,9 +4,9 @@ import storage from '@/services/storage/StorageService'
 import RespondentService from '../respondent/RespondentService'
 export default class EdgeServiceMock {
   /**
-   * Resolves to an edge with both source and target respondents included
-   * @param edgeIds
-   * @returns {Promise<any>}
+   * Resolves to an array of edges with both source and target respondents included
+   * @param {array} edgeIds - An array of valid edge ids
+   * @returns {Promise<array>} - An array of edges with source and target included
    */
   static getEdges (edgeIds) {
     return MockService.randomlyFail(resolve => {

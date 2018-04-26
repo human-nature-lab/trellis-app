@@ -26,25 +26,25 @@
       }
     },
     created: function () {
+      debugger
       this.load()
     },
-    updated: function () {
-      this.load()
-    },
-    locale: {
-      get: function () {
-        return this.locale_
-      },
-      set: function (locale) {
-        this.isWorking = true
-        LocaleService.setCurrentLocale(locale).then((l) => {
-          this.locale_ = locale
-          this.error = null
-        }).catch(err => {
-          this.error = err
-        }).then(() => {
-          this.isWorking = false
-        })
+    computed: {
+      locale: {
+        get: function () {
+          return this.locale_
+        },
+        set: function (locale) {
+          this.isWorking = true
+          LocaleService.setCurrentLocale(locale).then((l) => {
+            this.locale_ = locale
+            this.error = null
+          }).catch(err => {
+            this.error = err
+          }).then(() => {
+            this.isWorking = false
+          })
+        }
       }
     },
     methods: {

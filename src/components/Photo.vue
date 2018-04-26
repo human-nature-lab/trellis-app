@@ -73,7 +73,7 @@
     },
     computed: {
       shouldLoad: function () {
-        return !this.isLoaded && this.isWithinViewport()
+        return !this.isLoaded && !this.isLoading && this.isWithinViewport()
       }
     }
   }

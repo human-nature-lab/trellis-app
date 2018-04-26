@@ -1,6 +1,6 @@
 import DiffService from '../DiffService'
-import http from '@/services/http/AxiosInstance'
-import storage from '@/services/storage/StorageService'
+// import http from '@/services/http/AxiosInstance'
+// import storage from '@/services/storage/StorageService'
 // import _ from 'lodash'
 export default class InterviewDataWeb {
   /**
@@ -45,30 +45,30 @@ export default class InterviewDataWeb {
       console.log('No changes in data detected')
       return
     }
-    let interviewId = storage.get('interview-id', 'string')
+    // let interviewId = storage.get('interview-id', 'string')
     this.isSending = true
     console.log('starting send')
-    http().post(`interview/${interviewId}/data`, {
-      data: dataDiff,
-      conditionTags: conditionDiff
-    }).then(res => {
-      if (res.status >= 200 && res.status < 300) {
-        this._previousData = dataSnapshot
-        this._previousConditions = conditionTagSnapshot
-        this.onSuccess()
-      } else {
-        throw Error('Unable to complete request')
-      }
-    }).catch(err => {
-      this.onError(err)
-    }).then(() => {
-      this.isSending = false
-      // This is to handle any period of time between data being sent and the throttle waiting to call send
-      if (this.hasDataToSend) {
-        this.send()
-        this.hasDataToSend = false
-      }
-    })
+    // http().post(`interview/${interviewId}/data`, {
+    //   data: dataDiff,
+    //   conditionTags: conditionDiff
+    // }).then(res => {
+    //   if (res.status >= 200 && res.status < 300) {
+    //     this._previousData = dataSnapshot
+    //     this._previousConditions = conditionTagSnapshot
+    //     this.onSuccess()
+    //   } else {
+    //     throw Error('Unable to complete request')
+    //   }
+    // }).catch(err => {
+    //   this.onError(err)
+    // }).then(() => {
+    //   this.isSending = false
+    //   // This is to handle any period of time between data being sent and the throttle waiting to call send
+    //   if (this.hasDataToSend) {
+    //     this.send()
+    //     this.hasDataToSend = false
+    //   }
+    // })
   }
   onSuccess () {
     this._failCount = 0
