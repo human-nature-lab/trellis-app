@@ -28,7 +28,6 @@ class QuestionDatumRecycler extends Recycler {
       question_id: questionBlueprint.id,
       dk_rf: null,
       dk_rf_val: null,
-      var_name: questionBlueprint.var_name,
       data: []
     }
   }

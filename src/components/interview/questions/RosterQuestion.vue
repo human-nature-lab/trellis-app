@@ -219,6 +219,7 @@
         })
       },
       loadRosters: function (rosterRowIds) {
+        if (!rosterRowIds.length) return
         RosterService.getRosterRows(rosterRowIds).then(rosterRows => {
           for (let row of rosterRows) {
             this.$set(this.rosterCache, row.id, row)

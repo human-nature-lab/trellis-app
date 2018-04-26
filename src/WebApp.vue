@@ -17,29 +17,23 @@
             <router-link :to="{name: 'RespondentsSearch'}">Respondents</router-link>
           </v-list-tile>
           <v-list-tile>
-            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '0'}}">Form 1</router-link>
+            <router-link :to="{name: 'Interview', params: {studyId: study.id, interviewId: '0'}}">Form 1</router-link>
           </v-list-tile>
           <v-list-tile>
-            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '1'}}">Form 2</router-link>
+            <router-link :to="{name: 'Interview', params: {studyId: study.id, interviewId: '1'}}">Form 2</router-link>
           </v-list-tile>
           <v-list-tile>
-            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '2'}}">Form 3</router-link>
+            <router-link :to="{name: 'Interview', params: {studyId: study.id, interviewId: '2'}}">Form 3</router-link>
           </v-list-tile>
           <v-list-tile>
-            <router-link :to="{name: 'Interview', params: {studyId: studyId, interviewId: '3'}}">Form 4</router-link>
+            <router-link :to="{name: 'Interview', params: {studyId: study.id, interviewId: '3'}}">Form 4</router-link>
           </v-list-tile>
         </v-list>
       </v-menu>
     </v-toolbar>
     <v-content>
       <v-container fluid class="app-container">
-        <router-view v-if="hasValidLocale" />
-        <v-dialog
-          :value="!hasValidLocale"
-          fullscreen
-          lazy>
-          <LocaleChanger />
-        </v-dialog>
+        <router-view />
       </v-container>
     </v-content>
   </v-app>
@@ -47,7 +41,6 @@
 
 <script>
   import LocaleChanger from '@/components/LocaleChanger'
-  import LocaleService from '@/services/locale/LocaleService'
   import storage from '@/services/storage/StorageService'
   if (storage.get('localeId') === null) {
     storage.set('localeId', '48984fbe-84d4-11e5-ba05-0800279114ca')
@@ -56,12 +49,8 @@
     name: 'web-app',
     data: function () {
       return {
-        useDarkTheme: false
-      }
-    },
-    methods: {
-      hasValidLocale: function () {
-        return LocaleService.hasValidLocale()
+        useDarkTheme: false,
+        study: storage.get('current-study') || {}
       }
     },
     components: {

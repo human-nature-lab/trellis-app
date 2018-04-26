@@ -10,7 +10,7 @@
       :key="edge.id"
       v-for="edge in edges">
       <v-avatar v-if="!edge.isLoading">
-        <Photo :photo="edge.target_respondent.photos[0]" :showAlt="false"/>
+        <Photo :photo="edge.target_respondent.photos.length ? edge.target_respondent.photos[0] : null" :showAlt="false"/>
       </v-avatar>
       <v-avatar v-if="edge.isLoading">
         <v-progress-circular indeterminate color="primary" />
@@ -76,6 +76,7 @@
     },
     methods: {
       loadEdges: function (edgeIds) {
+        if (!edgeIds.length) return
         EdgeService.getEdges(edgeIds)
           .then(edges => {
             for (let edge of edges) {
