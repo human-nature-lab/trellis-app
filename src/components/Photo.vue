@@ -57,13 +57,14 @@
     methods: {
       isWithinViewport: function () {
         if (!this.$refs.container) return false
-        let rect = this.$refs.container.getBoundingClientRect()
-        return (
-          rect.top >= 0 &&
-          rect.left >= 0 &&
-          rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-          rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        )
+        // let rect = this.$refs.container.getBoundingClientRect()
+        return false
+        // return (
+        //   rect.top >= 0 &&
+        //   rect.left >= 0 &&
+        //   rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        //   rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        // )
       },
       loadSrc: function () {
         this.isLoading = true

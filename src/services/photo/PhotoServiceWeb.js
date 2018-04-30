@@ -1,6 +1,6 @@
 import http from '../http/AxiosInstance'
-import InstrumentedCache from '@/classes/InstrumentedCache'
-const cache = new InstrumentedCache(1000)
+import SizeLimitedMap from '@/classes/SizeLimitedMap'
+const cache = new SizeLimitedMap(1000)
 export default class PhotoServiceWeb {
   static getPhotoSrc (photoId) {
     // Get the base64 encoded photo and return the url. This method is cached
