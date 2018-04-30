@@ -1,5 +1,12 @@
 import http from '@/services/http/AxiosInstance'
+let savedInterviewId
 export default class InterviewServiceWeb {
+  static setInterviewId (interviewId) {
+    savedInterviewId = interviewId
+  }
+  static getInterviewId () {
+    return savedInterviewId
+  }
   static getInterview (interviewId) {
     return http().get(`interview/${interviewId}`)
       .then(function (res) {

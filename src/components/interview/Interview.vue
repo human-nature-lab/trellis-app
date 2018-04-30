@@ -18,6 +18,7 @@
   import FormService from '@/services/form/FormService'
   import actionBus from './services/ActionBus'
   import InterviewDataService from './services/interview-data/InterviewDataService'
+  import InterviewActionsService from './services/interview-actions/InterviewActionsService'
   export default {
     data () {
       return {
@@ -32,6 +33,7 @@
     },
     created () {
       let interview = null
+      InterviewService.setInterviewId(this.interviewId)
       InterviewService.getInterview(this.interviewId)
         .catch(err => {
           console.error('No interview exists with this id')
@@ -43,7 +45,7 @@
           this.formId = interview.survey.form_id
           this.surveyId = interview.survey.id
           return Promise.all([
-            InterviewService.getActions(this.interviewId)
+            InterviewActionsService.getActions(this.interviewId)
               .catch(err => {
                 console.error('interview actions route does not work', err)
                 return []

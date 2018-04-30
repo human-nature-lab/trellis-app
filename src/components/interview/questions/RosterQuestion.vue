@@ -153,9 +153,6 @@
     created: function () {
       this.loadRosters(this.rosterIds)
     },
-    updated: function () {
-      this.loadRosters(this.rosterIds)
-    },
     methods: {
       startEditingRow: function (row, index) {
         this.newText = row.val
@@ -218,8 +215,11 @@
           }
         })
       },
-      loadRosters: function (rosterRowIds) {
+      loadRosters: function (rosterRowIds, shouldLoadExisting = false) {
         if (!rosterRowIds.length) return
+        if (!shouldLoadExisting) {
+          rosterRowIds = rosterRowIds.filter(row => !this.rosterCache[row.id]) // Filter out previously loaded roster rows
+        }
         RosterService.getRosterRows(rosterRowIds).then(rosterRows => {
           for (let row of rosterRows) {
             this.$set(this.rosterCache, row.id, row)

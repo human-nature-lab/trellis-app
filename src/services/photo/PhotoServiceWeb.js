@@ -10,7 +10,6 @@ export default class PhotoServiceWeb {
       } else {
         return http().get(`photo/${photoId}`).then(res => {
           let src = `data:${res.headers['content-type']};base64,` + res.data
-          console.log(res, src)
           cache.set(photoId, src)
           return src
         }).catch(err => {
