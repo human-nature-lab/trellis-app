@@ -24,6 +24,7 @@ export default class ActionStore {
    * @param {array} actions
    */
   load (actions) {
+    actions.sort((a, b) => a.created_at > b.created_at)
     this.store = this.store.concat(actions)
     this._lastPersistedLength = this.store.length
   }
@@ -36,6 +37,13 @@ export default class ActionStore {
     this.store.push(action)
     this.hasAddedData = true
     this.persist()
+  }
+
+  /**
+   * Get all actions for a page
+   */
+  getQuestionDatumActions (questionDatumId) {
+    return this.store.filter(action => action.question_datum_id === questionDatumId)
   }
 
   /**

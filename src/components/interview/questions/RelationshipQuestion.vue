@@ -5,7 +5,7 @@
     </div>
     <v-chip
       :close="!edge.isLoading && !isQuestionDisabled"
-      @input="remove(edge)"
+      @input="remove(edge.id)"
       :id="edge.id"
       :key="edge.id"
       v-for="edge in edges">
@@ -24,7 +24,10 @@
     </v-btn>
     <v-dialog v-model="respondentSearchDialog">
       <v-card>
-        <RespondentsSearch @selected="onSelected" />
+        <RespondentsSearch
+          @selected="onSelected"
+          :selectedRespondents="selectedRespondents"
+          :isLoading="isSavingEdges"/>
       </v-card>
     </v-dialog>
   </v-flex>
@@ -53,7 +56,8 @@
       return {
         respondentSearchDialog: false,
         loadedEdges: {},
-        error: null
+        error: null,
+        isSavingEdges: false
       }
     },
     computed: {
@@ -72,6 +76,12 @@
         })
         this.loadEdges(toLoad)
         return edges
+      },
+      selectedRespondents: function () {
+        console.log('recalculating selected respondents')
+        return this.edges.map(edge => {
+          return edge.target_respondent_id
+        })
       }
     },
     methods: {
@@ -88,36 +98,47 @@
             this.error = err
           })
       },
-      remove: function (edge) {
+      add: function (edgeId) {
+        actionBus.action({
+          action_type: 'add-edge',
+          question_datum_id: this.question.datum.id,
+          payload: {
+            name: this.question.var_name,
+            val: edgeId,
+            edge_id: edgeId
+          }
+        })
+      },
+      remove: function (edgeId) {
         actionBus.action({
           action_type: 'remove-edge',
           question_datum_id: this.question.datum.id,
           payload: {
-            edge_id: edge.id
+            edge_id: edgeId
           }
         })
       },
-      onSelected: function (selected) {
-        EdgeService.createEdges(selected.map(respondent => ({
+      onSelected: function (added, removed) {
+        this.isSavingEdges = true
+        EdgeService.createEdges(added.map(id => ({
           source_respondent_id: this.interview.survey.respondent_id,
-          target_respondent_id: respondent.id
+          target_respondent_id: id
         }))).then(edges => {
           for (let edge of edges) {
-            actionBus.action({
-              action_type: 'add-edge',
-              question_datum_id: this.question.datum.id,
-              payload: {
-                name: this.question.var_name,
-                val: edge.id,
-                edge_id: edge.id
-              }
-            })
             this.$set(this.loadedEdges, edge.id, edge)
+          }
+          for (let edge of edges) {
+            this.add(edge.id)
+          }
+          for (let respondentId of removed) {
+            let edge = this.edges.find(edge => edge.target_respondent_id === respondentId)
+            this.remove(edge.id)
           }
         }).catch(err => {
           console.error(err)
           this.error = err
         }).then(() => {
+          this.isSavingEdges = false
           this.respondentSearchDialog = false
         })
       }

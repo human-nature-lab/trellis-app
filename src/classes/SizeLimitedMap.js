@@ -11,15 +11,26 @@ export default class SizeLimitedMap {
     this.length = 0
     this.byteSize = 0
     this.maxByteSize = maxByteSize
-    this.has = this.map.has.bind(this.map)
     this.entries = this.map.has.bind(this.map)
     this.forEach = this.map.forEach.bind(this.map)
     this.keys = this.map.keys.bind(this.map)
   }
 
   get (key) {
-    this.meta[key].touched = Date.now()
-    return this.map.get(key)
+    let val = this.map.get(key)
+    if (val) {
+      this.meta[key].touched = Date.now()
+    }
+    return val
+  }
+
+  has (key) {
+    if (this.map.has(key)) {
+      this.meta[key].touched = Date.now()
+      return true
+    } else {
+      return false
+    }
   }
 
   set (key, val) {
@@ -43,6 +54,7 @@ export default class SizeLimitedMap {
   }
 
   _evict () {
+    console.debug(`evicting members because size has reached: ${this.maxByteSize} with ${this.size} items`)
     let keyOrder = Object.keys(this.meta).map(key => ({
       key: key,
       date: this.meta[key].touched

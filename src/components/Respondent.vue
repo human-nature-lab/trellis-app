@@ -2,14 +2,15 @@
   <v-flex xs12 sm6 md4 lg3 xl2>
     <v-card
       tile
-      class="respondent"
-      @click="onClick">
-      <v-card-media class="respondent-photo">
+      :class="{selected: selected === true, respondent: true}">
+      <v-card-media class="respondent-photo"
+                    @click="onClick()">
         <Photo :photo="respondent.photos[0]"></Photo>
       </v-card-media>
-      <v-card-text class="respondent-name">
+      <v-card-text class="respondent-name"
+                   @click="onClick()">
         {{respondent.name}}
-        <v-btn @click="onClick">Select</v-btn>
+        <!--<v-btn @click="onClick">Select</v-btn>-->
       </v-card-text>
     </v-card>
   </v-flex>
@@ -23,6 +24,9 @@
       respondent: {
         type: Object,
         required: true
+      },
+      selected: {
+        type: Boolean
       }
     },
     methods: {
@@ -37,6 +41,9 @@
 </script>
 
 <style lang="sass" scoped>
+  .selected
+    background-color: orangered
+    color: white
   .respondent-photo
     img
       width: 100%

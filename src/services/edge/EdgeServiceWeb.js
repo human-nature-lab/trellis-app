@@ -18,6 +18,12 @@ export default class EdgeServiceWeb {
    * @returns {Promise<array>} - An array of edges with target_respondent defined
    */
   static createEdges (edges) {
+    // Handle empty edges by returning a promise that resolves to an empty list of edges
+    if (edges.length === 0) {
+      return new Promise(resolve => {
+        return resolve(edges)
+      })
+    }
     for (let edge of edges) {
       if (!edge.source_respondent_id || !edge.target_respondent_id) {
         throw Error('Edges must have both a source_respondent_id and a target_respondent_id defined')

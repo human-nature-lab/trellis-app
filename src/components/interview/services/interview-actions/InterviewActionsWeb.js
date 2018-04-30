@@ -17,7 +17,7 @@ export default class InterviewActionsWeb {
   /**
    * Get the actions that have been recorded for this interview
    */
-  static getInterviewActions () {
+  static getActions () {
     return http().get(`interview/${InterviewService.getInterviewId()}/actions`).then(res => {
       return res.data.actions
     })
