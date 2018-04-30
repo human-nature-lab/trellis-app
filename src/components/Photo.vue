@@ -1,14 +1,15 @@
 <template>
-  <v-flex class="photo">
+  <v-flex class="photo" ref="container">
     <v-progress-circular
       v-if="isLoading"
       indeterminate
       color="primary" />
     <img
+      ref="img"
       :src="src"
       :alt="alt"
-      v-if="!isLoading"
-      v-scroll="loadIfNotLoaded()"/>
+      v-if="isLoaded"
+      v-scroll="loadOrCancelLoading"/>
   </v-flex>
 </template>
 
@@ -35,7 +36,8 @@
         id: '',
         alt: this.showAlt ? 'no alt' : null,
         isLoaded: false,
-        isLoading: false
+        isLoading: false,
+        randId: Math.random().toString(16)
       }
     },
     created: function () {
@@ -46,12 +48,22 @@
       if (!this.id) {
         return
       }
-      this.loadIfNotLoaded()
+    },
+    mounted: function () {
+      this.$nextTick(() => {
+        this.loadOrCancelLoading()
+      })
     },
     methods: {
       isWithinViewport: function () {
-        // TODO: Return true if any part of the photo element is within the viewport
-        return true
+        if (!this.$refs.container) return false
+        let rect = this.$refs.container.getBoundingClientRect()
+        return (
+          rect.top >= 0 &&
+          rect.left >= 0 &&
+          rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+          rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        )
       },
       loadSrc: function () {
         this.isLoading = true
@@ -65,9 +77,15 @@
           this.isLoading = false
         })
       },
-      loadIfNotLoaded: function () {
-        if (this.shouldLoad) {
+      cancelLoad: function () {
+        console.log('TODO: Cancel the currently loading source')
+      },
+      loadOrCancelLoading: function () {
+        let inViewport = this.isWithinViewport()
+        if (inViewport && !this.isLoading && !this.isLoaded) {
           this.loadSrc()
+        } else if (this.isLoading && !inViewport) {
+          this.cancelLoad()
         }
       }
     },

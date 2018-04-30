@@ -1,7 +1,7 @@
 import DiffService from '../DiffService'
 // import http from '@/services/http/AxiosInstance'
-// import storage from '@/services/storage/StorageService'
-// import _ from 'lodash'
+import InterviewService from '../interview/InterviewService'
+import _ from 'lodash'
 export default class InterviewDataWeb {
   /**
    * The mock service which is in change of sending data changes to the backend for storage
@@ -15,13 +15,13 @@ export default class InterviewDataWeb {
     }
     this._previousData = copy(dataExtractor())                // Initial state of the data
     this._previousConditions = copy(conditionTagExtractor())  // Intial state of the conditions
-    this.dataExtranctor = dataExtractor                       // This should be a reference to the questionDatum array for the interview
+    this.dataExtractor = dataExtractor                        // This should be a reference to the questionDatum array for the interview
     this.conditionTagExtractor = conditionTagExtractor        // This should be a reference to the conditions object for the interview
     this.maxFailures = 10
     this._failCount = 0
     this.isSending = false
     this.hasDataToSend = false
-    // this.send = _.throttle(this.send.bind(this), 2000)
+    this.send = _.throttle(this.send.bind(this), 2000)
   }
 
   /**
@@ -36,7 +36,7 @@ export default class InterviewDataWeb {
     if (this.isSending || this._failCount > this.maxFailures) return
     // We need to make a copy of the state of the data reference at this point in time so we don't lose data that is created
     // while this request is happening
-    let dataSnapshot = copy(this.dataExtranctor())
+    let dataSnapshot = copy(this.dataExtractor())
     let conditionTagSnapshot = copy(this.conditionTagExtractor())
     let dataDiff = DiffService.dataDiff(dataSnapshot, this._previousData)
     let conditionDiff = DiffService.conditionTagsDiff(conditionTagSnapshot, this._previousConditions)
@@ -45,9 +45,9 @@ export default class InterviewDataWeb {
       console.log('No changes in data detected')
       return
     }
-    // let interviewId = storage.get('interview-id', 'string')
+    let interviewId = InterviewService.getInterviewId()
     this.isSending = true
-    console.log('starting send')
+    console.log('starting send', interviewId)
     // http().post(`interview/${interviewId}/data`, {
     //   data: dataDiff,
     //   conditionTags: conditionDiff

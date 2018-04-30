@@ -3,6 +3,7 @@ import actionDefinitions from '../services/InterviewActionDefinitions'
 import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import UUIDReuseService from '../services/UUIDReuseService'
 import QuestionDatumRecycler from '../services/QuestionDatumRecycler'
+import ActionStore from '../services/ActionStore'
 export default class Interview {
   constructor (interview, blueprint = null, actions = [], data = []) {
     this.interview = interview
@@ -19,7 +20,8 @@ export default class Interview {
       form: [],
       section: []
     }
-    this.actions = actions
+    this.actions = new ActionStore()
+    this.actions.load(actions)
     this.conditionAssigner = new ConditionAssignmentService()
     this.allConditions = new Map()
     this.load(blueprint)
@@ -63,32 +65,33 @@ export default class Interview {
    */
   pushAction (action) {
     // This should insert the action following the order of the question datum
-    if (this.actions.length === 0) {
-      this.actions.push(action)
-    } else {
-      let i
+    // if (this.actions.length === 0) {
+    this.actions.add(action)
+    // } else {
+    //   let i
       // TODO: This is a naive search and could be a binary search instead if performance is an issue
-      for (i = 0; i < this.actions.length; i++) {
-        if (this.actions[i].question_datum_id) {
-          let questionDatum = this.data.find(qDatum => qDatum.id === this.actions[i].question_datum_id)
-          if (!questionDatum) {
-            throw Error(`This question should already have a question datum associated with it. Location: ${JSON.stringify(this.location, null, 2)}`)
-          }
-          if (questionDatum.section >= this.location.section) {
-            if (questionDatum.section_repetition >= this.location.sectionRepetition) {
-              if (questionDatum.section_follow_up_repetition >= this.location.sectionFollowUpDatumId) {
-                if (questionDatum.page >= this.location.page) {
-                  if ((new Date()).getTime() >= this.actions[i].created_at) {
-                    break
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      this.actions.splice(i, 0, action)
-    }
+      // for (i = 0; i < this.actions.length; i++) {
+      //   if (this.actions[i].question_datum_id) {
+      //     let questionDatum = this.data.find(qDatum => qDatum.id === this.actions[i].question_datum_id)
+      //     if (!questionDatum) {
+      //       throw Error(`This question should already have a question datum associated with it. Location: ${JSON.stringify(this.location, null, 2)}`)
+      //     }
+      //     if (questionDatum.section >= this.location.section) {
+      //       if (questionDatum.section_repetition >= this.location.sectionRepetition) {
+      //         if (questionDatum.section_follow_up_repetition >= this.location.sectionFollowUpDatumId) {
+      //           if (questionDatum.page >= this.location.page) {
+      //             if ((new Date()).getTime() >= this.actions[i].created_at) {
+      //               break
+      //             }
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
+      // this.actions.splice(i, 0, action)
+
+    // }
     action.created_at = (new Date()).getTime()
     action.updated_at = (new Date()).getTime()
     this.performAction(action)
@@ -421,8 +424,9 @@ export default class Interview {
     this._zeroLocation()
     this._resetState()
     // Iterate through all of the actions that have been recorded in the survey so far
-    for (let i = 0; i < this.actions.length; i++) {
-      let action = this.actions[i]
+    let actions = this.actions.actions
+    for (let i = 0; i < actions.length; i++) {
+      let action = actions[i]
       // Don't perform an previous actions or do a next action more than once in a row
       if (action.action_type !== 'previous' && action.action_type !== 'next') {
         this.performAction(action)
