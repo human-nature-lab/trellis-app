@@ -10,7 +10,11 @@
       :key="edge.id"
       v-for="edge in edges">
       <v-avatar v-if="!edge.isLoading">
-        <Photo :photo="edge.target_respondent.photos.length ? edge.target_respondent.photos[0] : null" :showAlt="false"/>
+        <Photo
+          :photo="edge.target_respondent.photos.length ? edge.target_respondent.photos[0] : null"
+          :showAlt="false"
+          :width="20"
+          :height="20"/>
       </v-avatar>
       <v-avatar v-if="edge.isLoading">
         <v-progress-circular indeterminate color="primary" />

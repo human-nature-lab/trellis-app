@@ -203,7 +203,7 @@ export default class Interview {
    * @returns {Object}
    * @private
    */
-  get currentSection () {
+  currentSection () {
     return this.blueprint.sections[this.location.section]
   }
 
@@ -213,7 +213,7 @@ export default class Interview {
    * @private
    */
   get currentPage () {
-    return this.currentSection.pages[this.location.page]
+    return this.currentSection().pages[this.location.page]
   }
 
   /**
@@ -391,26 +391,97 @@ export default class Interview {
   }
 
   /**
+   * Get the data for a particular question datum in order
+   * @param questionDatumId
+   * @param useRandom
+   * @private
+   */
+  _getQuestionDatumDataInOrder (questionDatumId, useRandom = false) {
+    let data = this.data.find(qDatum => qDatum.id === questionDatumId).data
+    if (useRandom) {
+      data.sort(function (a, b) {
+        return a.random_val - b.random_val
+      })
+    } else {
+      data.sort(function (a, b) {
+        return a.sort_val - b.sort_val
+      })
+    }
+    return data
+  }
+
+  /**
+   * Return the next id in the sequence if one exists. Throws an error if the next id doesn't exist
+   * @param {String} questionDatumId - The current questionDatum
+   * @param {String} datumId - The current datum id
+   * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
+   * @private
+   */
+  _getNextDatumId (questionDatumId, datumId, useRandom = false) {
+    let data = this._getQuestionDatumDataInOrder(questionDatumId, useRandom)
+    let curLocation = data.findIndex(datum => datum.id === datumId)
+    return data[curLocation + 1].id
+  }
+
+  /**
+   *
+   * @param questionDatumId
+   * @param datumId
+   * @param useRandom
+   * @private
+   */
+  _getPreviousDatumId (questionDatumId, datumId, useRandom = false) {
+    let data = this._getQuestionDatumDataInOrder(questionDatumId, useRandom)
+    let curLocation = data.findIndex(datum => datum.id === datumId)
+    return data[curLocation - 1].id
+  }
+
+  /**
    * Move to the next closest valid page of the survey
    */
   next () {
     this._evaluateConditionAssignment()
     // TODO: handle section follow up and repetitions here
     this.location.page++
-    if (this.location.page >= this.currentSection.pages.length) {
+    let foundNextRepetitionOrFollowUpOrSection = true
+    if (this.location.page >= this.currentSection().pages.length) {
       this.location.page = 0
+      foundNextRepetitionOrFollowUpOrSection = false
+    }
+
+    // First we check if we can increment the sectionRepetition
+    if (!foundNextRepetitionOrFollowUpOrSection && this.currentSection().isRepeatable) {
       this.location.sectionRepetition++
+      if (this.location.sectionRepetition > this.currentSection().maxRepetitions) {
+        this.location.sectionRepetition = 0
+      } else {
+        foundNextRepetitionOrFollowUpOrSection = true
+      }
     }
-    if (this.currentSection.isRepeatable) {
-      // if (this.location.sectionRepetition >= this.currentSection.maxRepetitions)
-      this.location.page = 0
-      // TODO: Increment the section follow up datum to the next datum
-      this.location.sectionFollowUpDatumId++
+
+    // Then we check if we can increment the sectionFollowUpDatumId
+    if (!foundNextRepetitionOrFollowUpOrSection && this.currentSection().followUpQuestionId) {
+      try {
+        // TODO: Get the correct parameters for this method
+        this.location.sectionFollowUpDatumId = this._getNextDatumId()
+        foundNextRepetitionOrFollowUpOrSection = true
+      } catch (e) {}
     }
+
+    // Finally, if we couldn't increment the sectionRepetition or sectionFollowUpDatumId we increment the section
+    if (!foundNextRepetitionOrFollowUpOrSection) {
+      this.location.section++
+      this.location.sectionRepetition = 0
+      let cSection = this.currentSection()
+      if (cSection && cSection.followUpQuestionId) {
+        // TODO: Zero the followUpQuestionId
+      }
+    }
+
     // TODO: Fix this so that it works with follow up datum ids
     if (this.location.section >= this.blueprint.sections.length) {
       this.location.section--
-      this.location.page = this.currentSection.pages.length - 1
+      this.location.page = this.currentSection().pages.length - 1
       return this.atEnd()
     }
     // Get assigned condition tags and convert them into a set of condition ids
@@ -430,10 +501,36 @@ export default class Interview {
    */
   previous () {
     this.location.page--
+    let foundPreviousRepetitionOrFollowUpOrSection = true
     if (this.location.page < 0) {
+      foundPreviousRepetitionOrFollowUpOrSection = false
+    }
+
+    if (!foundPreviousRepetitionOrFollowUpOrSection && this.currentSection().isRepeatable) {
+      this.location.sectionRepetition--
+      if (this.location.sectionRepetition < 0) {
+        this.location.sectionRepetition = 0
+      } else {
+        foundPreviousRepetitionOrFollowUpOrSection = false
+      }
+    }
+
+    if (!foundPreviousRepetitionOrFollowUpOrSection && this.currentSection().followUpQuestionId) {
+      try {
+        // TODO: Get the correct parameters for this method
+        this.location.sectionFollowUpDatumId = this._getPreviousDatumId()
+        foundPreviousRepetitionOrFollowUpOrSection = true
+      } catch (e) {}
+    }
+
+    if (!foundPreviousRepetitionOrFollowUpOrSection) {
       this.location.section--
-      if (this.location.section >= 0) {
-        this.location.page = this.currentSection.pages.length - 1
+      if (this.currentSection().isRepeatable) {
+        this.location.sectionRepetition = this.currentSection().maxRepetitions - 1
+      }
+      if (this.currentSection().followUpQuestionId) {
+        // TODO: Zero the sectionFollowUpDatumId
+        // this.location.sectionFollowUpDatumId
       }
     }
 

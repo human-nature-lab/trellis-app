@@ -20,7 +20,7 @@
     computed: {
       time: {
         get: function () {
-          return this.question.datum.data[0]
+          return this.question.datum.data.length ? this.question.datum.data[0].val : null
         },
         set: function (val) {
           actionBus.action({
