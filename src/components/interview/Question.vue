@@ -38,6 +38,15 @@
         v-if="question.type.name === 'relationship'"
         :question="question"
         :interview="interview"/>
+      <TextQuestion
+        v-if="question.type.name === 'text'"
+        :question="question"/>
+      <DateQuestion
+        v-if="['date', 'year', 'year_month', 'year_month_day'].indexOf(question.type.name) > -1"
+        :question="question"/>
+      <TimeQuestion
+        v-if="question.type.name === 'time'"
+        :question="question"/>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
       <DontKnowRefused
@@ -59,6 +68,7 @@
   import RelationshipQuestion from './questions/RelationshipQuestion'
   import TextQuestion from './questions/TextQuestion'
   import TimeQuestion from './questions/TimeQuestion'
+  import DateQuestion from './questions/DateQuestion'
   import DontKnowRefused from './DontKnowRefused.vue'
   export default {
     name: 'question',
@@ -87,7 +97,8 @@
       DontKnowRefused,
       RelationshipQuestion,
       TextQuestion,
-      TimeQuestion
+      TimeQuestion,
+      DateQuestion
     }
   }
 </script>

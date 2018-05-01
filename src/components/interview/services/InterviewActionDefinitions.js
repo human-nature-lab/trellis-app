@@ -119,5 +119,12 @@ export default {
     } else {
       throw new Error('No datum exists with this id: ' + payload.datum_id)
     }
+  },
+  'set-date': function (interview, payload, questionDatum) {
+    if (!questionDatum.data.length) {
+      questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
+    } else {
+      questionDatum.data[0].val = payload.val
+    }
   }
 }
