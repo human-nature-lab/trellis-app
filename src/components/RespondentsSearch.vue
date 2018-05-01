@@ -17,14 +17,16 @@
         </div>
       </v-layout>
     </v-toolbar>
-    <v-layout class="respondents" row wrap ma-3>
-      <Respondent
-        v-for="respondent in respondentResults"
-        :key="respondent.id"
-        @selected="onSelectRespondent(respondent)"
-        :selected="isSelected(respondent)"
-        :respondent="respondent"/>
-    </v-layout>
+    <v-container class="respondents" fluid  grid-list-sm>
+      <v-layout row wrap>
+        <Respondent
+          v-for="respondent in respondentResults"
+          :key="respondent.id"
+          @selected="onSelectRespondent(respondent)"
+          :selected="isSelected(respondent)"
+          :respondent="respondent"/>
+      </v-layout>
+    </v-container>
     <v-layout v-if="!respondentResults.length" ma-3>
       No results present for the query: {{query}}
     </v-layout>
@@ -51,17 +53,18 @@
         type: Array
       },
       isLoading: {
-        type: Boolean
+        type: Boolean,
+        default: false
       },
       error: {
-        type: String
+        type: String,
+        default: null
       }
     },
     data: function () {
       return {
         results: [],
         query: '',
-        error: null,
         filters: {},
         added: [],
         removed: [],
