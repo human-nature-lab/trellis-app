@@ -126,5 +126,12 @@ export default {
     } else {
       questionDatum.data[0].val = payload.val
     }
+  },
+  'set-text': function (interview, payload, questionDatum) {
+    if (!questionDatum.data.length) {
+      questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
+    } else {
+      questionDatum.data[0].val = payload.val
+    }
   }
 }
