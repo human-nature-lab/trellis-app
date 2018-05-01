@@ -1,38 +1,39 @@
 <template>
-  <v-time-picker
-    landscape
-    v-model="time"
-    :disable="isQuestionDisabled"/>
+    <v-date-picker
+      v-model="date"
+      reactive
+      landscape
+      :disabled="isQuestionDisabled"/>
 </template>
 
 <script>
   import actionBus from '../services/ActionBus'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   export default {
-    name: 'time-question',
+    name: 'date-question',
     props: {
       question: {
         type: Object,
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin],
     computed: {
-      time: {
+      date: {
         get: function () {
-          return this.question.datum.data[0]
+          return this.question.datum.data[0].val
         },
         set: function (val) {
           actionBus.action({
-            action_type: 'set-time',
-            question_datum_id: this.question.datum.id,
+            action_type: 'set-date',
+            question_datum_id: this.question.id,
             payload: {
               val: val
             }
           })
         }
       }
-    }
+    },
+    mixins: [QuestionDisabledMixin]
   }
 </script>
 
