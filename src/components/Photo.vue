@@ -1,20 +1,20 @@
 <template>
-  <v-flex class="photo" ref="container">
+  <v-flex class="photo" ref="container" :style="{'min-width': width + 'px', 'min-height': height + 'px'}">
     <v-progress-circular
-      v-if="isLoading"
+      v-if="srcLoading || imgLoading"
       indeterminate
       color="primary" />
     <img
       ref="img"
       :src="src"
       :alt="alt"
-      v-if="isLoaded"
-      v-scroll="loadOrCancelLoading"/>
+      v-if="srcLoaded"/>
   </v-flex>
 </template>
 
 <script>
   import PhotoService from '@/services/photo/PhotoService'
+  import ScrollListener from '@/services/ScrollListener'
   const URL_PLACEHOLDER = 'https://vignette.wikia.nocookie.net/prince-of-stride-alternative/images/1/14/Placeholder_person.jpg/revision/latest?cb=20160220192514'
   export default {
     name: 'photo',
@@ -28,6 +28,12 @@
       showAlt: {
         type: Boolean,
         default: true
+      },
+      width: {
+        required: true
+      },
+      height: {
+        required: true
       }
     },
     data: function () {
@@ -35,12 +41,20 @@
         src: '',
         id: '',
         alt: this.showAlt ? 'no alt' : null,
-        isLoaded: false,
-        isLoading: false,
-        randId: Math.random().toString(16)
+        srcLoading: false,
+        srcLoaded: false,
+        imgLoading: false,
+        imgLoaded: false,
+        randId: Math.random().toString(16),
+        onViewportChange: () => {
+          console.log('viewport change')
+          this.loadOrCancelLoading()
+        }
       }
     },
     created: function () {
+      ScrollListener.on('scroll', this.onViewportChange)
+      window.addEventListener('resize', this.onViewportChange)
       this.id = this.photo ? this.photo.id : this.photoId
       if (this.showAlt && this.photo && this.photo.alt) {
         this.alt = this.photo.alt
@@ -48,44 +62,67 @@
       if (!this.id) {
         return
       }
+      this.loadOrCancelLoading()
+    },
+    beforeDestroy: function () {
+      // console.log('removing scroll listener')
+      ScrollListener.off('scroll', this.onViewportChange, true)
+      window.removeEventListener('resize', this.onViewportChange)
+      this.cancelLoad()
     },
     mounted: function () {
-      this.$nextTick(() => {
-        this.loadOrCancelLoading()
-      })
+      this.loadOrCancelLoading()
     },
     methods: {
       isWithinViewport: function () {
         if (!this.$refs.container) return false
-        // let rect = this.$refs.container.getBoundingClientRect()
-        return false
-        // return (
-        //   rect.top >= 0 &&
-        //   rect.left >= 0 &&
-        //   rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-        //   rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        // )
+        let rect = this.$refs.container.getBoundingClientRect()
+        return (rect.top >= 0 ||
+            rect.bottom >= (window.innerHeight || document.documentElement.clientHeight)) &&
+          (rect.left >= 0 ||
+            rect.right >= (window.innerWidth || document.documentElement.clientWidth)
+        )
+      },
+      setSrc: function (src) {
+        this.src = src
+        this.srcLoaded = true
+        this.srcLoading = false
+        this.imgLoading = true
+        this.$nextTick(() => {
+          let _this = this
+          this.$refs.img.addEventListener('load', function () {
+            _this.imgLoading = false
+            _this.imgLoaded = true
+          })
+        })
       },
       loadSrc: function () {
-        this.isLoading = true
-        PhotoService.getPhotoSrc(this.id).then(src => {
-          this.src = src
-          this.isLoaded = true
+        this.srcLoading = true
+        this.loadingPromise = PhotoService.getPhotoSrc(this.id).then(src => {
+          this.setSrc(src)
         }).catch(err => {
-          console.error(err)
-          this.src = URL_PLACEHOLDER
-        }).then(() => {
-          this.isLoading = false
+          if (err && err.response && err.response.status === 404) {
+            this.setSrc(URL_PLACEHOLDER)
+          }
         })
       },
       cancelLoad: function () {
-        console.log('TODO: Cancel the currently loading source')
+        if (this.loadingPromise && this.loadingPromise.cancel) {
+          this.srcLoading = false
+          this.srcLoaded = false
+          this.loadingPromise.cancel()
+        }
+        if (this.src && this.$refs && this.$refs.img) {
+          this.src = null
+          this.imgLoaded = false
+          this.imgLoading = false
+        }
       },
       loadOrCancelLoading: function () {
         let inViewport = this.isWithinViewport()
-        if (inViewport && !this.isLoading && !this.isLoaded) {
+        if (inViewport && !this.srcLoaded && !this.srcLoading) {
           this.loadSrc()
-        } else if (this.isLoading && !inViewport) {
+        } else if (!this.isLoaded && this.isLoading && !inViewport) {
           this.cancelLoad()
         }
       }
@@ -93,6 +130,12 @@
     computed: {
       shouldLoad: function () {
         return !this.isLoaded && !this.isLoading && this.isWithinViewport()
+      },
+      isLoaded: function () {
+        return this.srcLoaded && this.imgLoaded
+      },
+      isLoading: function () {
+        return this.srcLoading || this.imgLoading
       }
     }
   }

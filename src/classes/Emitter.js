@@ -36,8 +36,9 @@ export default class Emitter {
    * @param eventName
    * @param callback
    */
-  off (eventName, callback) {
+  off (eventName, callback, force = false) {
     if (!this.eventCallbacks[eventName]) {
+      if (force) return
       throw Error('An event with this name has not been registered yet', eventName)
     }
     let cbInd = this.eventCallbacks[eventName].findIndex(cb => cb.callback === callback)
@@ -79,5 +80,18 @@ export default class Emitter {
    */
   emit (eventName, ...args) {
     this.dispatch(eventName, ...args)
+  }
+
+  /**
+   * Getter to check if any listeners are present on this emitter
+   * @returns {boolean}
+   */
+  get hasListeners () {
+    for (let key in this.eventCallbacks) {
+      if (this.eventCallbacks[key].length) {
+        return true
+      }
+    }
+    return false
   }
 }

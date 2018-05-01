@@ -136,6 +136,9 @@ export default class Interview {
       return sectionA.form_sections[0].sort_order - sectionB.form_sections[0].sort_order
     })
     for (let section of this.blueprint.sections) {
+      section.maxRepetitions = section.form_sections[0].max_repetitions
+      section.isRepeatable = parseInt(section.form_sections[0].is_repeatable, 10) === 1
+      section.followUpQuestionId = section.form_sections[0].follow_up_question_id
       section.question_groups.sort((pageA, pageB) => {
         return pageA.pivot.question_group_order - pageB.pivot.question_group_order
       })
@@ -200,17 +203,17 @@ export default class Interview {
    * @returns {Object}
    * @private
    */
-  _getCurrentSection () {
+  get currentSection () {
     return this.blueprint.sections[this.location.section]
   }
 
   /**
-   * REturn the current page blueprint
+   * Return the current page blueprint
    * @returns {Object}
    * @private
    */
-  _getCurrentPage () {
-    return this._getCurrentSection().pages[this.location.page]
+  get currentPage () {
+    return this.currentSection.pages[this.location.page]
   }
 
   /**
@@ -347,10 +350,43 @@ export default class Interview {
    * Make all non-existant question datum for the current page
    */
   makePageQuestionDatum () {
-    for (let questionBlueprint of this._getCurrentPage().questions) {
+    for (let questionBlueprint of this.currentPage.questions) {
       if (this.data.findIndex(qD => qD.question_id === questionBlueprint.id) === -1) {
         this._makeQuestionDatum(questionBlueprint)
       }
+    }
+  }
+
+  // TODO: This should be easier
+  _getCurrentMaxFollowUpPosition (questionId) {
+    let qDatum = this.data.find(qDatum => {
+      return qDatum.section === this.location.section &&
+        qDatum.sectionRepetition === this.location.sectionRepetition &&
+        qDatum.sectionFollowUpDatumId === this.location.sectionFollowUpDatumId &&
+        qDatum.page === this.location.page &&
+        qDatum.question_id === questionId
+    })
+    if (qDatum) {
+      return qDatum.data.length
+    } else {
+      throw new Error('Unable to find question datum matching this')
+    }
+  }
+
+  // TODO: This should be easier
+  _getCurrentFollowUpPosition (questionId) {
+    let qDatum = this.data.find(qDatum => {
+      return qDatum.section === this.location.section &&
+        qDatum.sectionRepetition === this.location.sectionRepetition &&
+        qDatum.sectionFollowUpDatumId === this.location.sectionFollowUpDatumId &&
+        qDatum.page === this.location.page &&
+        qDatum.question_id === questionId
+    })
+    if (qDatum) {
+      let index = qDatum.data.findIndex(d => d.id === this.location.sectionFollowUpDatumId)
+      return index
+    } else {
+      throw new Error('Unable to find question datum matching current follow up position')
     }
   }
 
@@ -361,13 +397,20 @@ export default class Interview {
     this._evaluateConditionAssignment()
     // TODO: handle section follow up and repetitions here
     this.location.page++
-    if (this.location.page >= this._getCurrentSection().pages.length) {
+    if (this.location.page >= this.currentSection.pages.length) {
       this.location.page = 0
-      this.location.section++
+      this.location.sectionRepetition++
     }
+    if (this.currentSection.isRepeatable) {
+      // if (this.location.sectionRepetition >= this.currentSection.maxRepetitions)
+      this.location.page = 0
+      // TODO: Increment the section follow up datum to the next datum
+      this.location.sectionFollowUpDatumId++
+    }
+    // TODO: Fix this so that it works with follow up datum ids
     if (this.location.section >= this.blueprint.sections.length) {
       this.location.section--
-      this.location.page = this._getCurrentSection().pages.length - 1
+      this.location.page = this.currentSection.pages.length - 1
       return this.atEnd()
     }
     // Get assigned condition tags and convert them into a set of condition ids
@@ -376,7 +419,7 @@ export default class Interview {
     }, new Set())
 
     this.makePageQuestionDatum()
-    if (SkipService.shouldSkipPage(this._getCurrentPage().skips, conditionTags)) {
+    if (SkipService.shouldSkipPage(this.currentPage.skips, conditionTags)) {
       this._markAsSkipped()
       return this.next()
     }
@@ -390,7 +433,7 @@ export default class Interview {
     if (this.location.page < 0) {
       this.location.section--
       if (this.location.section >= 0) {
-        this.location.page = this._getCurrentSection().pages.length - 1
+        this.location.page = this.currentSection.pages.length - 1
       }
     }
 
@@ -405,7 +448,7 @@ export default class Interview {
       set.add(tag.condition_id)
     }, new Set())
     this.makePageQuestionDatum()
-    if (SkipService.shouldSkipPage(this._getCurrentPage().skips, conditionTags)) {
+    if (SkipService.shouldSkipPage(this.currentPage.skips, conditionTags)) {
       this._markAsSkipped()
       this.previous()
     }
@@ -545,7 +588,7 @@ export default class Interview {
    * the question blueprint and dereferences everything
    */
   getPageQuestions () {
-    let questionDefinitions = this._getCurrentPage().questions
+    let questionDefinitions = this.currentPage.questions
     let questionData = this._getCurrentPageData()
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
