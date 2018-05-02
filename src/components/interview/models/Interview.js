@@ -4,15 +4,18 @@ import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import UUIDReuseService from '../services/UUIDReuseService'
 import QuestionDatumRecycler from '../services/QuestionDatumRecycler'
 import ActionStore from '../services/ActionStore'
-export default class Interview {
+import Emitter from '@/classes/Emitter'
+import Clock from '@/classes/Clock'
+export default class Interview extends Emitter {
   constructor (interview, blueprint = null, actions = [], data = []) {
+    super()
     this.interview = interview
     this.blueprint = blueprint
     this.data = data
     this.location = {
       section: 0,
       sectionRepetition: 0,
-      sectionFollowUpDatumId: 0,
+      sectionFollowUpDatumId: null,
       page: 0
     }
     this.conditionTags = {
@@ -42,8 +45,8 @@ export default class Interview {
   _zeroLocation () {
     this.location.section = 0
     this.location.sectionRepetition = 0
-    this.location.sectionFollowUpDatumId = 0
     this.location.page = 0
+    this.location.sectionFollowUpDatumId = 0
   }
 
   /**
@@ -212,7 +215,7 @@ export default class Interview {
    * @returns {Object}
    * @private
    */
-  get currentPage () {
+  currentPage () {
     return this.currentSection().pages[this.location.page]
   }
 
@@ -350,7 +353,7 @@ export default class Interview {
    * Make all non-existant question datum for the current page
    */
   makePageQuestionDatum () {
-    for (let questionBlueprint of this.currentPage.questions) {
+    for (let questionBlueprint of this.currentPage().questions) {
       if (this.data.findIndex(qD => qD.question_id === questionBlueprint.id) === -1) {
         this._makeQuestionDatum(questionBlueprint)
       }
@@ -412,7 +415,7 @@ export default class Interview {
 
   /**
    * Return the next id in the sequence if one exists. Throws an error if the next id doesn't exist
-   * @param {String} questionDatumId - The current questionDatum
+   * @param {String} questionDatumId - The current question datum id
    * @param {String} datumId - The current datum id
    * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
    * @private
@@ -424,10 +427,10 @@ export default class Interview {
   }
 
   /**
-   *
-   * @param questionDatumId
-   * @param datumId
-   * @param useRandom
+   * Get the datum id of the datum adjacent to this datum
+   * @param {String} questionDatumId - The current question datum id
+   * @param {String} datumId - The current datum id
+   * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
    * @private
    */
   _getPreviousDatumId (questionDatumId, datumId, useRandom = false) {
@@ -437,11 +440,119 @@ export default class Interview {
   }
 
   /**
-   * Move to the next closest valid page of the survey
+   * Get the first datum for this questionDatum
+   * @param {String} questionDatumId - The current question datum id
+   * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
+   * @private
+   */
+  _getFirstDatumId (questionDatumId, useRandom = false) {
+    let data = this._getQuestionDatumDataInOrder(questionDatumId, useRandom)
+    return data[0]
+  }
+
+  /**
+   * Get the last datum for this questionDatum
+   * @param {String} questionDatumId - The current question datum id
+   * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
+   * @private
+   */
+  _getLastDatumId (questionDatumId, useRandom = false) {
+    let data = this._getQuestionDatumDataInOrder(questionDatumId, useRandom)
+    return data[data.length - 1]
+  }
+
+  /**
+   * Get the corresponding questionDatum for this place in the survey
+   */
+  _getQuestionDatumByLocation (location, questionId) {
+    for (let qDatum of this.data) {
+      if (qDatum.question_id === questionId) {
+        if (qDatum.section === location.section &&
+            qDatum.sectionRepetition === location.sectionRepetition &&
+            qDatum.sectionFollowUpDatumId === location.sectionFollowUpDatumId &&
+            qDatum.page === location.page) {
+          return qDatum
+        }
+      }
+    }
+  }
+
+  /**
+   * Get the current location lock :)
+   * @private
+   */
+  _getClockFromLocation () {
+    let sectionFollowUpLocation = 0
+    let sectionFollowUpLocationMax = 0
+    let currentSection = this.currentSection()
+    if (currentSection.followUpQuestionId) {
+      let data = this._getQuestionDatumByLocation(currentSection.followUpQuestionId).data
+      sectionFollowUpLocation = data.findIndex(datum => datum.id === this.location.sectionFollowUpDatumId)
+      sectionFollowUpLocationMax = data.length - 1
+      if (sectionFollowUpLocation < 0) {
+        throw Error('This appears to be an invalid followUpDatumId')
+      }
+    }
+    let currentLocation = [this.location.section, sectionFollowUpLocation, this.location.sectionRepetition, this.location.page]
+    let maxLocation = [this.blueprint.sections.length - 1, sectionFollowUpLocationMax, currentSection.maxRepetitions || 0, currentSection.pages.length - 1]
+    return new Clock(currentLocation, maxLocation)
+  }
+
+  /**
+   * Convert the location clock back into a valid location
+   * @param {Clock} clock - The location clock
+   * @private
+   */
+  _setLocationFromClock (clock) {
+    this.location.section = clock.time[0]
+    this.location.sectionFollowUpDatumId = null
+    this.location.sectionRepetition = clock.time[2]
+    this.location.page = clock.time[3]
+    if (this.currentSection().followUpQuestionId) {
+      let data = this._getQuestionDatumByLocation(this.currentSection().followUpQuestionId).data
+      this.location.sectionFollowUpDatumId = data[clock.time[1]]
+    }
+  }
+
+  /**
+   * Move to the next valid page in the survey. The bulk of the form navigation is handled by the clock class which is
+   * an abstraction on this type of incremental movement that is similar to a clock
+   * @returns undefined
    */
   next () {
     this._evaluateConditionAssignment()
+    let locationClock = this._getClockFromLocation()
+    locationClock.increment()
+    this._setLocationFromClock(locationClock)
+
+    if (locationClock.isAtMin) {
+      this.atBeginning()
+    } else if (locationClock.isAtMax) {
+      this.atEnd()
+    }
+
+    // TODO: Instead of rebuilding the clock we should just increment it again. Or probably we should cache the location
+    // clock permanently and use a getter to expose the actual location values
+
+    // Get assigned condition tags and convert them into a set of condition ids
+    let conditionTags = this._getCurrentConditionTags().reduce((set, tag) => {
+      set.add(tag.condition_id)
+    }, new Set())
+
+    this.makePageQuestionDatum()
+    if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
+      this._markAsSkipped()
+      return this.next()
+    }
+  }
+
+  /**
+   * Move to the next closest valid page of the survey
+   */
+  nextOld () {
+    this._evaluateConditionAssignment()
     // TODO: handle section follow up and repetitions here
+    // let curLocationIntegerList = [this.location.page, this.location.sectionRepetition]
     this.location.page++
     let foundNextRepetitionOrFollowUpOrSection = true
     if (this.location.page >= this.currentSection().pages.length) {
@@ -463,7 +574,8 @@ export default class Interview {
     if (!foundNextRepetitionOrFollowUpOrSection && this.currentSection().followUpQuestionId) {
       try {
         // TODO: Get the correct parameters for this method
-        this.location.sectionFollowUpDatumId = this._getNextDatumId()
+        let qDatum = this._getQuestionDatumByLocation(this.location, this.currentSection().followUpQuestionId)
+        this.location.sectionFollowUpDatumId = this._getNextDatumId(qDatum.id, this.location.sectionFollowUpDatumId)
         foundNextRepetitionOrFollowUpOrSection = true
       } catch (e) {}
     }
@@ -474,7 +586,8 @@ export default class Interview {
       this.location.sectionRepetition = 0
       let cSection = this.currentSection()
       if (cSection && cSection.followUpQuestionId) {
-        // TODO: Zero the followUpQuestionId
+        let qDatum = this._getQuestionDatumByLocation(this.location, cSection.followUpQuestionId)
+        this.location.sectionFollowUpDatumId = this._getFirstDatumId(qDatum.id)
       }
     }
 
@@ -483,16 +596,6 @@ export default class Interview {
       this.location.section--
       this.location.page = this.currentSection().pages.length - 1
       return this.atEnd()
-    }
-    // Get assigned condition tags and convert them into a set of condition ids
-    let conditionTags = this._getCurrentConditionTags().reduce((set, tag) => {
-      set.add(tag.condition_id)
-    }, new Set())
-
-    this.makePageQuestionDatum()
-    if (SkipService.shouldSkipPage(this.currentPage.skips, conditionTags)) {
-      this._markAsSkipped()
-      return this.next()
     }
   }
 
@@ -508,6 +611,7 @@ export default class Interview {
 
     if (!foundPreviousRepetitionOrFollowUpOrSection && this.currentSection().isRepeatable) {
       this.location.sectionRepetition--
+      foundPreviousRepetitionOrFollowUpOrSection = true
       if (this.location.sectionRepetition < 0) {
         this.location.sectionRepetition = 0
       } else {
@@ -518,7 +622,8 @@ export default class Interview {
     if (!foundPreviousRepetitionOrFollowUpOrSection && this.currentSection().followUpQuestionId) {
       try {
         // TODO: Get the correct parameters for this method
-        this.location.sectionFollowUpDatumId = this._getPreviousDatumId()
+        let qDatum = this._getQuestionDatumByLocation(this.location, this.currentSection().followUpQuestionId)
+        this.location.sectionFollowUpDatumId = this._getPreviousDatumId(qDatum.id, this.location.sectionFollowUpDatumId)
         foundPreviousRepetitionOrFollowUpOrSection = true
       } catch (e) {}
     }
@@ -545,7 +650,7 @@ export default class Interview {
       set.add(tag.condition_id)
     }, new Set())
     this.makePageQuestionDatum()
-    if (SkipService.shouldSkipPage(this.currentPage.skips, conditionTags)) {
+    if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
       this._markAsSkipped()
       this.previous()
     }
@@ -561,6 +666,7 @@ export default class Interview {
    * @param sectionFollowUpRepetition
    */
   replayTo (section, page, sectionRepetition = 0, sectionFollowUpRepetition = 0) {
+    this._isReplaying = true
     this._zeroLocation()
     this._resetState()
     // Iterate through all of the actions that have been recorded in the survey so far
@@ -578,6 +684,7 @@ export default class Interview {
     // All valid question datum should have been created so we don't really need to use the next or previous buttons. We
     // would have to make sure we aren't visiting an invalid part of the form though. idk...
     this.seekTo(section, page, sectionRepetition, sectionFollowUpRepetition)
+    this._isReplaying = false
   }
 
   /**
@@ -645,6 +752,9 @@ export default class Interview {
    * Handle the 'already at the beginning of survey' event
    */
   atBeginning () {
+    if (!this._isReplaying) {
+      this.emit('atBeginning', JSON.parse(JSON.stringify(this.location)))
+    }
     console.log(`Reached the beginning of the survey`)
   }
 
@@ -652,6 +762,9 @@ export default class Interview {
    * Handle 'reached the end of survey' event
    */
   atEnd () {
+    if (!this._isReplaying) {
+      this.emit('atEnd', JSON.parse(JSON.stringify(this.location)))
+    }
     console.log(`Reached the end of the survey`)
   }
 
@@ -685,7 +798,7 @@ export default class Interview {
    * the question blueprint and dereferences everything
    */
   getPageQuestions () {
-    let questionDefinitions = this.currentPage.questions
+    let questionDefinitions = this.currentPage().questions
     let questionData = this._getCurrentPageData()
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
