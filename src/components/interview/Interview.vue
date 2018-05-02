@@ -6,6 +6,50 @@
           :interview="interviewState"
           v-if="!isLoading"
     />
+    <v-dialog
+      v-model="beginningDialog">
+      <v-card>
+        <v-card-title class="headline">
+          You've reached the beginning of the survey
+        </v-card-title>
+        <v-card-text>
+          All changes have been saved. Would you like to exit the interview?
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            flat
+            color="error"
+            @click="beginningDialog = false">Cancel</v-btn>
+          <v-spacer />
+          <v-btn
+            flat
+            color="success"
+            @click="saveAndExit">Confirm</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="endDialog">
+      <v-card>
+        <v-card-title class="headline">
+          You've reached the end of the survey
+        </v-card-title>
+        <v-card-text>
+          Would you like to exit and permanently lock the survey?
+        </v-card-text>
+        <v-card-actions>
+          <v-btn
+            flat
+            color="error"
+            @click="endDialog = false">Cancel</v-btn>
+          <v-spacer />
+          <v-btn
+            flat
+            color="success"
+            @click="lockAndExit">Confirm</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-flex>
 </template>
 
@@ -28,7 +72,9 @@
         surveyId: null,
         clipped: false,
         isLoading: true,
-        interviewState: null
+        interviewState: null,
+        beginningDialog: false,
+        endDialog: false
       }
     },
     created () {
@@ -65,6 +111,8 @@
               return this.interviewState.conditionTags
             })
             this.interviewState.bootstrap()
+            this.interviewState.on('atEnd', this.showEndDialog, this)
+            this.interviewState.on('atBeginning', this.showBeginningDialog, this)
             this.isLoading = false
           })
         })
@@ -77,6 +125,18 @@
         }
         this.interviewState.pushAction(action)
         this.interviewDataService.send()
+      },
+      showBeginningDialog: function () {
+        this.beginningDialog = true
+      },
+      showEndDialog: function () {
+        this.endDialog = true
+      },
+      lockAndExit: function () {
+        console.log('TODO: Lock and exit the survey')
+      },
+      saveAndExit: function () {
+        console.log('TODO: Save and exit the survey')
       }
     },
     computed: {

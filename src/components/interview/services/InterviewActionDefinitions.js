@@ -8,7 +8,7 @@ const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val sho
  * with the datum associated with the question datum at questionDatum.datum. DatumRecycler should be used whenver new
  * datum are being created so that the ids are recycled
  */
-export default {
+const definitions = {
   'select-choice': function (interview, payload, questionDatum, questionBlueprint) {
     let choiceBlueprint = questionBlueprint.choices.find(choice => choice.id === payload.choice_id)
     let shouldRemoveOthers = questionBlueprint.question_type.name === 'multiple_choice'
@@ -120,14 +120,7 @@ export default {
       throw new Error('No datum exists with this id: ' + payload.datum_id)
     }
   },
-  'set-date': function (interview, payload, questionDatum) {
-    if (!questionDatum.data.length) {
-      questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
-    } else {
-      questionDatum.data[0].val = payload.val
-    }
-  },
-  'set-text': function (interview, payload, questionDatum) {
+  'set-val': function (interview, payload, questionDatum) {
     if (!questionDatum.data.length) {
       questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
     } else {
@@ -135,3 +128,10 @@ export default {
     }
   }
 }
+
+// Action aliases
+definitions['set-date'] = definitions['set-val']
+definitions['set-text'] = definitions['set-val']
+definitions['set-time'] = definitions['set-val']
+
+export default definitions
