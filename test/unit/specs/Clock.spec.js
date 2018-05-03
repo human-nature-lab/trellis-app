@@ -49,6 +49,25 @@ describe('Clock.spec', () => {
     }, {
       decrement: [11, 1, 1, 58]
     }])
+    let arr = [{
+      increment: [0, 0, 0, 1]
+    }, {
+      increment: [0, 0, 1, 0]
+    }, {
+      increment: [0, 0, 1, 1]
+    }, {
+      increment: [1, 0, 0, 0]
+    }, {
+      increment: [1, 0, 0, 1]
+    }, {
+      increment: [1, 0, 1, 0]
+    }, {
+      increment: [1, 0, 1, 1]
+    }]
+    arr = arr.concat(arr.map(o => ({increment: o.increment})).reverse().slice(1).map(o => ({
+      decrement: o.increment
+    })))
+    testSequence(new Clock([0, 0, 0, 0], [1, 0, 1, 1]), arr)
   })
   it('should validate the initial time', () => {
     expect(() => {

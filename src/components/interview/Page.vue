@@ -2,13 +2,13 @@
   <v-flex class="page">
     <v-card>
       <debug :name="'Location'">
-        {{location}}
+        {{interview.location}}
       </debug>
       <debug :name="'Assigned Conditions: ' + assignedConditions.length">
         {{assignedConditions}}
       </debug>
-      <debug :name="'Actions: ' + interview.actions.length">
-        {{interview.actions}}
+      <debug :name="'Actions: ' + interview.actions.store.length">
+        {{JSON.stringify(interview.actions.store, null, 2)}}
       </debug>
       <v-flex class="page-content">
         <Question

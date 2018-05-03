@@ -81,7 +81,7 @@ export default class DiffService {
     oldTags = JSON.parse(JSON.stringify(oldTags))
 
     let res = {}
-    for (let type of ['respondent', 'section', 'form']) {
+    for (let type of ['respondent', 'section', 'survey']) {
       let newConditionIds = new Map(newTags[type].map(tag => [tag.condition_id, tag]))
       let oldConditionIds = new Map(oldTags[type].map(tag => [tag.condition_id, tag]))
 

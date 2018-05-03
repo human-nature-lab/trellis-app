@@ -47,7 +47,6 @@
         imgLoaded: false,
         randId: Math.random().toString(16),
         onViewportChange: () => {
-          console.log('viewport change')
           this.loadOrCancelLoading()
         }
       }

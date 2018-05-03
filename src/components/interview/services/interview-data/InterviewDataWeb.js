@@ -102,7 +102,7 @@ export function hasDataChanges (diff) {
 export function hasConditionChanges (diff) {
   return diff.section.added.length > 0 || diff.section.removed.length > 0 ||
     diff.respondent.added.length > 0 || diff.respondent.removed.length > 0 ||
-    diff.form.added.length > 0 || diff.form.removed.length > 0
+    diff.survey.added.length > 0 || diff.survey.removed.length > 0
 }
 
 /**

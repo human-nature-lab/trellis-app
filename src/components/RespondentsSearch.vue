@@ -83,7 +83,6 @@
         RespondentService.getSearchPage(this.query, this.filters, this.currentPage, this.requestPageSize)
           .then(respondents => {
             this.results = respondents
-            console.log(JSON.stringify(respondents, null, 2))
             this.error = null
           }).catch(err => {
             this.error = err.toLocaleString()

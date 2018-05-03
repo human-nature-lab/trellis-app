@@ -1,26 +1,24 @@
 import SkipService from '../services/SkipService'
 import actionDefinitions from '../services/InterviewActionDefinitions'
 import ConditionAssignmentService from '@/services/ConditionAssignmentService'
-import UUIDReuseService from '../services/UUIDReuseService'
-import QuestionDatumRecycler from '../services/QuestionDatumRecycler'
 import ActionStore from '../services/ActionStore'
 import Emitter from '@/classes/Emitter'
 import Clock from '@/classes/Clock'
+
+import InterviewNavigator from '../services/InterviewNavigator'
+import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
+import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
+import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
+import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 export default class Interview extends Emitter {
   constructor (interview, blueprint = null, actions = [], data = []) {
     super()
     this.interview = interview
     this.blueprint = blueprint
     this.data = data
-    this.location = {
-      section: 0,
-      sectionRepetition: 0,
-      sectionFollowUpDatumId: null,
-      page: 0
-    }
     this.conditionTags = {
       respondent: [],
-      form: [],
+      survey: [],
       section: []
     }
     this.actions = new ActionStore()
@@ -28,6 +26,7 @@ export default class Interview extends Emitter {
     this.conditionAssigner = new ConditionAssignmentService()
     this.allConditions = new Map()
     this.load(blueprint)
+    this.navigator = new InterviewNavigator(this)
   }
 
   /**
@@ -43,10 +42,7 @@ export default class Interview extends Emitter {
    * @private
    */
   _zeroLocation () {
-    this.location.section = 0
-    this.location.sectionRepetition = 0
-    this.location.page = 0
-    this.location.sectionFollowUpDatumId = 0
+    this.navigator.zero()
   }
 
   /**
@@ -56,10 +52,18 @@ export default class Interview extends Emitter {
     this.data = []
     this.conditionTags = {
       respondent: [],
-      form: [],
+      survey: [],
       section: []
     }
     this.makePageQuestionDatum()
+  }
+
+  /**
+   * Getter for the current location in the survey
+   * @returns {{section: *, sectionRepetition: *, sectionFollowUpDatumId: null, page: *}}
+   */
+  get location () {
+    return this.navigator.getLocation()
   }
 
   /**
@@ -202,12 +206,21 @@ export default class Interview extends Emitter {
   }
 
   /**
+   * Get a section by index
+   * @param {Number} index
+   * @private
+   */
+  _getSection (index) {
+    return this.blueprint.sections[index]
+  }
+
+  /**
    * Return the current section blueprint
    * @returns {Object}
    * @private
    */
   currentSection () {
-    return this.blueprint.sections[this.location.section]
+    return this._getSection(this.location.section)
   }
 
   /**
@@ -248,12 +261,25 @@ export default class Interview extends Emitter {
     let data = []
     for (let i = 0; i < this.data.length; i++) {
       let questionDatum = this.data[i]
-      // TODO: take into account survey section and repetition stuff
-      if (questionDatum.section === this.location.section && questionDatum.page === this.location.page) {
+      if (this._locationMatchesQuestionDatum(this.location, questionDatum)) {
         data.push(questionDatum)
       }
     }
     return data
+  }
+
+  /**
+   * Question data is valid for this location
+   * @param location
+   * @param questionDatum
+   * @returns {boolean}
+   * @private
+   */
+  _locationMatchesQuestionDatum (location, questionDatum) {
+    return questionDatum.section === this.location.section &&
+    questionDatum.page === this.location.page &&
+    questionDatum.section_repetition === this.location.sectionRepetition &&
+    questionDatum.follow_up_datum_id === this.location.sectionFollowUpDatumId
   }
 
   /**
@@ -287,34 +313,14 @@ export default class Interview extends Emitter {
     // that are being modified as opposed to being created for the first time
     switch (act.scope) {
       case 'section':
-        this.conditionTags.section.push({
-          id: UUIDReuseService.getCondition('section', act.condition.id, this.location.sectionRepetition, this.location.sectionFollowUpDatumId),
-          survey_id: this.interview.survey_id,
-          condition_id: act.condition.id,
-          repetition: this.location.sectionRepetition,
-          follow_up_datum_id: this.location.sectionFollowUpDatumId, // TODO: This is wrong and will need to be changed
-          created_at: (new Date()).getTime(),
-          updated_at: (new Date()).getTime()
-        })
+        this.conditionTags.section.push(SectionConditionTagRecycler.getNoKey(this, act))
         break
       case 'form':
-        this.conditionTags.survey.push({
-          id: UUIDReuseService.getCondition('form', act.condition.id),
-          survey_id: this.interview.survey_id,
-          condition_id: act.condition.id,
-          created_at: (new Date()).getTime(),
-          updated_at: (new Date()).getTime()
-        })
+        this.conditionTags.survey.push(FormConditionTagRecycler.getNoKey(this, act))
         break
       case 'respondent':
       default:
-        this.conditionTags.respondent.push({
-          id: UUIDReuseService.getCondition('respondent', act.condition.id),
-          respondent_id: this.interview.respondent_id,
-          condition_id: act.condition.id,
-          created_at: (new Date()).getTime(),
-          updated_at: (new Date()).getTime()
-        })
+        this.conditionTags.respondent.push(RespondentConditionTagRecycler.getNoKey(this.interview, act))
     }
   }
 
@@ -324,14 +330,22 @@ export default class Interview extends Emitter {
   _evaluateConditionAssignment () {
     let questionsWithData = this.getPageQuestions()
     let vars = questionsWithData.reduce((vars, question) => {
+      if (!question.datum || !question.datum.data) {
+        debugger
+      }
       vars[question.var_name] = question.datum.data.map(datum => datum.val)
       return vars
     }, {})
     console.log('vars', vars)
     for (let question of questionsWithData) {
       for (let act of question.assign_condition_tags) {
-        if (this.conditionAssigner.run(act.id, vars)) {
-          this._assignConditionTag(act)
+        try {
+          if (this.conditionAssigner.run(act.id, vars)) {
+            this._assignConditionTag(act)
+          }
+        } catch (err) {
+          console.error('Unable to assign condition tag correctly')
+          throw err
         }
       }
     }
@@ -341,20 +355,29 @@ export default class Interview extends Emitter {
    * Get all currently assigned condition tags
    */
   _getCurrentConditionTags () {
-    return this.conditionTags.respondent
-      .concat(this.conditionTags.form)
-      .concat(this.conditionTags.section.filter(tag => {
-        return tag.repetition === this.location.sectionRepetition &&
-          tag.follow_up_question_datum_id === this.location.sectionFollowUpDatumId
-      }))
+    let tags = []
+    this.conditionTags.respondent.forEach(tag => {
+      tags.push(tag)
+    })
+    this.conditionTags.survey.forEach(tag => {
+      tags.push(tag)
+    })
+    this.conditionTags.section.filter(tag => {
+      return tag.repetition === this.location.sectionRepetition &&
+        tag.follow_up_datum_id === this.location.sectionFollowUpDatumId
+    }).forEach(tag => {
+      tags.push(tag)
+    })
+    return tags
   }
 
   /**
    * Make all non-existant question datum for the current page
    */
   makePageQuestionDatum () {
-    for (let questionBlueprint of this.currentPage().questions) {
-      if (this.data.findIndex(qD => qD.question_id === questionBlueprint.id) === -1) {
+    let currentPage = this.currentPage()
+    for (let questionBlueprint of currentPage.questions) {
+      if (this.data.findIndex(qD => this._locationMatchesQuestionDatum(this.location, qD) && qD.question_id === questionBlueprint.id) === -1) {
         this._makeQuestionDatum(questionBlueprint)
       }
     }
@@ -479,22 +502,24 @@ export default class Interview extends Emitter {
 
   /**
    * Get the current location lock :)
+   * @param {Object} location
    * @private
    */
-  _getClockFromLocation () {
+  _getClockFromLocation (location) {
     let sectionFollowUpLocation = 0
     let sectionFollowUpLocationMax = 0
-    let currentSection = this.currentSection()
-    if (currentSection.followUpQuestionId) {
-      let data = this._getQuestionDatumByLocation(currentSection.followUpQuestionId).data
-      sectionFollowUpLocation = data.findIndex(datum => datum.id === this.location.sectionFollowUpDatumId)
+    let section = this._getSection(location.section)
+    if (section.followUpQuestionId) {
+      let data = this._getQuestionDatumByLocation(section.followUpQuestionId).data
+      sectionFollowUpLocation = data.findIndex(datum => datum.id === location.sectionFollowUpDatumId)
       sectionFollowUpLocationMax = data.length - 1
       if (sectionFollowUpLocation < 0) {
         throw Error('This appears to be an invalid followUpDatumId')
       }
     }
-    let currentLocation = [this.location.section, sectionFollowUpLocation, this.location.sectionRepetition, this.location.page]
-    let maxLocation = [this.blueprint.sections.length - 1, sectionFollowUpLocationMax, currentSection.maxRepetitions || 0, currentSection.pages.length - 1]
+    let currentLocation = [location.section, sectionFollowUpLocation, location.sectionRepetition, location.page]
+    let maxLocation = [this.blueprint.sections.length - 1, sectionFollowUpLocationMax, section.maxRepetitions || 0, section.pages.length - 1]
+    console.log('get clock', JSON.stringify(currentLocation), JSON.stringify(maxLocation))
     return new Clock(currentLocation, maxLocation)
   }
 
@@ -512,6 +537,7 @@ export default class Interview extends Emitter {
       let data = this._getQuestionDatumByLocation(this.currentSection().followUpQuestionId).data
       this.location.sectionFollowUpDatumId = data[clock.time[1]]
     }
+    console.log('set clock', JSON.stringify(clock.time), JSON.stringify(clock.clockMax))
   }
 
   /**
@@ -520,29 +546,40 @@ export default class Interview extends Emitter {
    * @returns undefined
    */
   next () {
-    this._evaluateConditionAssignment()
-    let locationClock = this._getClockFromLocation()
-    locationClock.increment()
-    this._setLocationFromClock(locationClock)
-
-    if (locationClock.isAtMin) {
-      this.atBeginning()
-    } else if (locationClock.isAtMax) {
-      this.atEnd()
+    // Don't increment if we're already at the end
+    if (this.navigator.isAtEnd) {
+      return this.atEnd()
     }
-
-    // TODO: Instead of rebuilding the clock we should just increment it again. Or probably we should cache the location
-    // clock permanently and use a getter to expose the actual location values
+    this._evaluateConditionAssignment()
+    this.navigator.next()
 
     // Get assigned condition tags and convert them into a set of condition ids
-    let conditionTags = this._getCurrentConditionTags().reduce((set, tag) => {
-      set.add(tag.condition_id)
-    }, new Set())
+    let cConditionTags = this._getCurrentConditionTags()
+    let conditionTags = new Set(cConditionTags.map(tag => tag.condition_id))
 
     this.makePageQuestionDatum()
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
       this._markAsSkipped()
       return this.next()
+    }
+  }
+
+  previous () {
+    // Don't decrement if we're already at the beginning
+    if (this.navigator.isAtStart) {
+      return this.atBeginning()
+    }
+    this._evaluateConditionAssignment()
+    this.navigator.previous()
+
+    // Get assigned condition tags and convert them into a set of condition ids
+    let cConditionTags = this._getCurrentConditionTags()
+    let conditionTags = new Set(cConditionTags.map(tag => tag.condition_id))
+
+    this.makePageQuestionDatum()
+    if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
+      this._markAsSkipped()
+      return this.previous()
     }
   }
 
@@ -602,7 +639,7 @@ export default class Interview extends Emitter {
   /**
    * Move to closest previously valid page of the survey
    */
-  previous () {
+  previousOld () {
     this.location.page--
     let foundPreviousRepetitionOrFollowUpOrSection = true
     if (this.location.page < 0) {
@@ -665,7 +702,7 @@ export default class Interview extends Emitter {
    * @param sectionRepetition
    * @param sectionFollowUpRepetition
    */
-  replayTo (section, page, sectionRepetition = 0, sectionFollowUpRepetition = 0) {
+  replayTo (section, page, sectionRepetition, sectionFollowUpDatumId) {
     this._isReplaying = true
     this._zeroLocation()
     this._resetState()
@@ -680,10 +717,17 @@ export default class Interview extends Emitter {
         this.next()
       }
     }
+    // let clock = this._getClockFromLocation({
+    //   section: section,
+    //   page: page,
+    //   sectionRepetition: sectionRepetition,
+    //   sectionFollowUpDatumId: sectionFollowUpDatumId
+    // })
     // TODO: Is there a better way to achieve this? In theory we could just specify the desired location directly, right?
     // All valid question datum should have been created so we don't really need to use the next or previous buttons. We
     // would have to make sure we aren't visiting an invalid part of the form though. idk...
-    this.seekTo(section, page, sectionRepetition, sectionFollowUpRepetition)
+    // this._setLocationFromClock(clock)
+    // this.seekTo(...clock.time)
     this._isReplaying = false
   }
 
@@ -694,7 +738,8 @@ export default class Interview extends Emitter {
    * @param sectionRepetition
    * @param sectionFollowUpRepetition
    */
-  seekTo (section, page, sectionRepetition = 0, sectionFollowUpRepetition = 0) {
+  seekTo (section, sectionRepetition, sectionFollowUpRepetition, page) {
+    // TODO: Should change to a clock based comparison instead.
     let count = 1
     let DIRS = {FORWARD: 0, BACKWARD: 1}
     // Cast the current location and desired location into a 4 digit number with this structure {section}{sectionRepetition}{sectionFollowUpRepetition}{page}
@@ -703,7 +748,7 @@ export default class Interview extends Emitter {
     let previousDirection
     let currentDirection
     do {
-      curLocNumber = this.location.section * 1000 + this.location.sectionRepetition * 100 + this.location.sectionFollowUpDatumId * 10 + this.location.page
+      curLocNumber = parseInt(this._getClockFromLocation(this.location).time.join(''), 10)
       if (curLocNumber < desiredLocNumber) {
         currentDirection = DIRS.FORWARD
       } else if (curLocNumber > desiredLocNumber) {
