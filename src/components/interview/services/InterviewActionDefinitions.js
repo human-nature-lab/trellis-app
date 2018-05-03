@@ -1,4 +1,4 @@
-import DatumRecycler from './DatumRecycler'
+import DatumRecycler from './recyclers/DatumRecycler'
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
@@ -75,11 +75,11 @@ const definitions = {
   },
   'next': function (interview) {
     interview.next()
-    interview.replayTo(interview.location.section, interview.location.page)
+    interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
   },
   'previous': function (interview) {
     interview.previous()
-    interview.replayTo(interview.location.section, interview.location.page)
+    interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
   },
   'type-text': function (interview, payload, questionDatum, questionBlueprint) {
     // interview.getQuestion(payload.question_id, payload.sectionId, payload.pageId, payload.followUpReptitionId, payload.repetitionId)

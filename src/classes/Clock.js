@@ -1,4 +1,5 @@
-export default class Clock {
+import Emitter from './Emitter'
+export default class Clock extends Emitter {
   /**
    * An abstraction for a group of integers that are dependent on each other, but don't follow the conventions of a
    * normal integers like time.
@@ -13,6 +14,7 @@ export default class Clock {
    * @param {Array} [clockMin = null] - The minimum time as an array. Ex: [0, 0]
    */
   constructor (time, clockMax = null, clockMin = null) {
+    super()
     this.time = time
     this.clockMax = clockMax // Inclusive max boundary array
     this.clockMin = clockMin // Inclusive min boundary array
@@ -42,6 +44,48 @@ export default class Clock {
         throw new Error(`Time value at ${i} is less than the minimum allowed value`)
       }
     }
+  }
+
+  /**
+   * Change one of the maximum values
+   * @param {Number} val - The new value
+   * @param {Number} index - The index that should be replaced
+   */
+  setSingleMax (val, index) {
+    this.clockMax[index] = val
+    this._isAtMax = null
+    this.validateTime()
+  }
+
+  /**
+   * Set all the max values
+   * @param {Array} maximums - The max values array
+   */
+  setMaximums (maximums) {
+    this.clockMax = maximums
+    this._isAtMax = null
+    this.validateTime()
+  }
+
+  /**
+   * Change one of the minimum values
+   * @param {Number} val - The new value
+   * @param {Number} index - The index that should be replaced
+   */
+  setSingleMin (val, index) {
+    this.clockMin[index] = val
+    this._isAtMin = null
+    this.validateTime()
+  }
+
+  /**
+   * Set all the min values
+   * @param {Array} minimums - The min values array
+   */
+  setMinimums (minimums) {
+    this.clockMax = minimums
+    this._isAtMin = null
+    this.validateTime()
   }
 
   /**
@@ -98,6 +142,7 @@ export default class Clock {
     this._isAtMax = null
     let done
     let index = this.time.length - 1
+    let prevTime = JSON.parse(JSON.stringify(this.time))
     do {
       done = true
       this.time[index]++
@@ -109,9 +154,10 @@ export default class Clock {
       }
       // We are already at the max state so we need to exit without exceeding the max state
       if (index < 0) {
-        return
+        done = true
       }
     } while (!done)
+    this.emit('increment', this.time, prevTime)
   }
 
   /**
@@ -124,6 +170,7 @@ export default class Clock {
     this._isAtMin = null
     let done
     let index = this.time.length - 1
+    let prevTime = JSON.parse(JSON.stringify(this.time))
     do {
       done = true
       this.time[index]--
@@ -135,8 +182,9 @@ export default class Clock {
       }
       // We are at the minimum state so we need to exit without passing it
       if (index >= this.time.length) {
-        return
+        done = true
       }
     } while (!done)
+    this.emit('decrement', this.time, prevTime)
   }
 }
