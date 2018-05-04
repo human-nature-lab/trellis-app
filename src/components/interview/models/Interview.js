@@ -3,7 +3,6 @@ import actionDefinitions from '../services/InterviewActionDefinitions'
 import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import ActionStore from '../services/ActionStore'
 import Emitter from '@/classes/Emitter'
-import Clock from '@/classes/Clock'
 
 import InterviewNavigator from '../services/InterviewNavigator'
 import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
@@ -63,7 +62,7 @@ export default class Interview extends Emitter {
    * @returns {{section: *, sectionRepetition: *, sectionFollowUpDatumId: null, page: *}}
    */
   get location () {
-    return this.navigator.getLocation()
+    return this.navigator.location
   }
 
   /**
@@ -501,46 +500,6 @@ export default class Interview extends Emitter {
   }
 
   /**
-   * Get the current location lock :)
-   * @param {Object} location
-   * @private
-   */
-  _getClockFromLocation (location) {
-    let sectionFollowUpLocation = 0
-    let sectionFollowUpLocationMax = 0
-    let section = this._getSection(location.section)
-    if (section.followUpQuestionId) {
-      let data = this._getQuestionDatumByLocation(section.followUpQuestionId).data
-      sectionFollowUpLocation = data.findIndex(datum => datum.id === location.sectionFollowUpDatumId)
-      sectionFollowUpLocationMax = data.length - 1
-      if (sectionFollowUpLocation < 0) {
-        throw Error('This appears to be an invalid followUpDatumId')
-      }
-    }
-    let currentLocation = [location.section, sectionFollowUpLocation, location.sectionRepetition, location.page]
-    let maxLocation = [this.blueprint.sections.length - 1, sectionFollowUpLocationMax, section.maxRepetitions || 0, section.pages.length - 1]
-    console.log('get clock', JSON.stringify(currentLocation), JSON.stringify(maxLocation))
-    return new Clock(currentLocation, maxLocation)
-  }
-
-  /**
-   * Convert the location clock back into a valid location
-   * @param {Clock} clock - The location clock
-   * @private
-   */
-  _setLocationFromClock (clock) {
-    this.location.section = clock.time[0]
-    this.location.sectionFollowUpDatumId = null
-    this.location.sectionRepetition = clock.time[2]
-    this.location.page = clock.time[3]
-    if (this.currentSection().followUpQuestionId) {
-      let data = this._getQuestionDatumByLocation(this.currentSection().followUpQuestionId).data
-      this.location.sectionFollowUpDatumId = data[clock.time[1]]
-    }
-    console.log('set clock', JSON.stringify(clock.time), JSON.stringify(clock.clockMax))
-  }
-
-  /**
    * Move to the next valid page in the survey. The bulk of the form navigation is handled by the clock class which is
    * an abstraction on this type of incremental movement that is similar to a clock
    * @returns undefined
@@ -553,11 +512,11 @@ export default class Interview extends Emitter {
     this._evaluateConditionAssignment()
     this.navigator.next()
 
+    this.makePageQuestionDatum()
+
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTags = new Set(cConditionTags.map(tag => tag.condition_id))
-
-    this.makePageQuestionDatum()
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
       this._markAsSkipped()
       return this.next()
@@ -572,124 +531,13 @@ export default class Interview extends Emitter {
     this._evaluateConditionAssignment()
     this.navigator.previous()
 
+    this.makePageQuestionDatum()
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTags = new Set(cConditionTags.map(tag => tag.condition_id))
-
-    this.makePageQuestionDatum()
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
       this._markAsSkipped()
       return this.previous()
-    }
-  }
-
-  /**
-   * Move to the next closest valid page of the survey
-   */
-  nextOld () {
-    this._evaluateConditionAssignment()
-    // TODO: handle section follow up and repetitions here
-    // let curLocationIntegerList = [this.location.page, this.location.sectionRepetition]
-    this.location.page++
-    let foundNextRepetitionOrFollowUpOrSection = true
-    if (this.location.page >= this.currentSection().pages.length) {
-      this.location.page = 0
-      foundNextRepetitionOrFollowUpOrSection = false
-    }
-
-    // First we check if we can increment the sectionRepetition
-    if (!foundNextRepetitionOrFollowUpOrSection && this.currentSection().isRepeatable) {
-      this.location.sectionRepetition++
-      if (this.location.sectionRepetition > this.currentSection().maxRepetitions) {
-        this.location.sectionRepetition = 0
-      } else {
-        foundNextRepetitionOrFollowUpOrSection = true
-      }
-    }
-
-    // Then we check if we can increment the sectionFollowUpDatumId
-    if (!foundNextRepetitionOrFollowUpOrSection && this.currentSection().followUpQuestionId) {
-      try {
-        // TODO: Get the correct parameters for this method
-        let qDatum = this._getQuestionDatumByLocation(this.location, this.currentSection().followUpQuestionId)
-        this.location.sectionFollowUpDatumId = this._getNextDatumId(qDatum.id, this.location.sectionFollowUpDatumId)
-        foundNextRepetitionOrFollowUpOrSection = true
-      } catch (e) {}
-    }
-
-    // Finally, if we couldn't increment the sectionRepetition or sectionFollowUpDatumId we increment the section
-    if (!foundNextRepetitionOrFollowUpOrSection) {
-      this.location.section++
-      this.location.sectionRepetition = 0
-      let cSection = this.currentSection()
-      if (cSection && cSection.followUpQuestionId) {
-        let qDatum = this._getQuestionDatumByLocation(this.location, cSection.followUpQuestionId)
-        this.location.sectionFollowUpDatumId = this._getFirstDatumId(qDatum.id)
-      }
-    }
-
-    // TODO: Fix this so that it works with follow up datum ids
-    if (this.location.section >= this.blueprint.sections.length) {
-      this.location.section--
-      this.location.page = this.currentSection().pages.length - 1
-      return this.atEnd()
-    }
-  }
-
-  /**
-   * Move to closest previously valid page of the survey
-   */
-  previousOld () {
-    this.location.page--
-    let foundPreviousRepetitionOrFollowUpOrSection = true
-    if (this.location.page < 0) {
-      foundPreviousRepetitionOrFollowUpOrSection = false
-    }
-
-    if (!foundPreviousRepetitionOrFollowUpOrSection && this.currentSection().isRepeatable) {
-      this.location.sectionRepetition--
-      foundPreviousRepetitionOrFollowUpOrSection = true
-      if (this.location.sectionRepetition < 0) {
-        this.location.sectionRepetition = 0
-      } else {
-        foundPreviousRepetitionOrFollowUpOrSection = false
-      }
-    }
-
-    if (!foundPreviousRepetitionOrFollowUpOrSection && this.currentSection().followUpQuestionId) {
-      try {
-        // TODO: Get the correct parameters for this method
-        let qDatum = this._getQuestionDatumByLocation(this.location, this.currentSection().followUpQuestionId)
-        this.location.sectionFollowUpDatumId = this._getPreviousDatumId(qDatum.id, this.location.sectionFollowUpDatumId)
-        foundPreviousRepetitionOrFollowUpOrSection = true
-      } catch (e) {}
-    }
-
-    if (!foundPreviousRepetitionOrFollowUpOrSection) {
-      this.location.section--
-      if (this.currentSection().isRepeatable) {
-        this.location.sectionRepetition = this.currentSection().maxRepetitions - 1
-      }
-      if (this.currentSection().followUpQuestionId) {
-        // TODO: Zero the sectionFollowUpDatumId
-        // this.location.sectionFollowUpDatumId
-      }
-    }
-
-    if (this.location.section < 0) {
-      this.location.section = 0
-      this.location.page = 0
-      return this.atBeginning()
-    }
-
-    // Get assigned condition tags and convert them into a set of condition ids
-    let conditionTags = this._getCurrentConditionTags().reduce((set, tag) => {
-      set.add(tag.condition_id)
-    }, new Set())
-    this.makePageQuestionDatum()
-    if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
-      this._markAsSkipped()
-      this.previous()
     }
   }
 
@@ -728,6 +576,8 @@ export default class Interview extends Emitter {
     // would have to make sure we aren't visiting an invalid part of the form though. idk...
     // this._setLocationFromClock(clock)
     // this.seekTo(...clock.time)
+    // this.navigator.section = section
+    this.navigator.setLocation(section, page, sectionRepetition, sectionFollowUpDatumId)
     this._isReplaying = false
   }
 
@@ -743,12 +593,12 @@ export default class Interview extends Emitter {
     let count = 1
     let DIRS = {FORWARD: 0, BACKWARD: 1}
     // Cast the current location and desired location into a 4 digit number with this structure {section}{sectionRepetition}{sectionFollowUpRepetition}{page}
-    let desiredLocNumber = section * 1000 + sectionRepetition * 100 + sectionFollowUpRepetition * 10 + page
+    let desiredLocNumber = section * 1000000 + sectionRepetition * 10000 + sectionFollowUpRepetition * 100 + page
     let curLocNumber
     let previousDirection
     let currentDirection
     do {
-      curLocNumber = parseInt(this._getClockFromLocation(this.location).time.join(''), 10)
+      curLocNumber = this.location.section * 1000000 + this.location.sectionRepetition * 10000 + this.navigator.sectionFollowUpRepetition * 100 + this.location.page
       if (curLocNumber < desiredLocNumber) {
         currentDirection = DIRS.FORWARD
       } else if (curLocNumber > desiredLocNumber) {
@@ -791,6 +641,7 @@ export default class Interview extends Emitter {
    */
   _markAsSkipped () {
     // TODO: Mark all questions on the current page as skipped
+    console.log('Skipped ', this.location)
   }
 
   /**

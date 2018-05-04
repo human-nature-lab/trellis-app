@@ -46,8 +46,8 @@
   export default {
     name: 'relationship-question',
     props: {
-      interview: {
-        type: Object,
+      respondentId: {
+        type: String,
         required: true
       },
       question: {
@@ -125,7 +125,7 @@
       onSelected: function (added, removed) {
         this.isSavingEdges = true
         EdgeService.createEdges(added.map(id => ({
-          source_respondent_id: this.interview.survey.respondent_id,
+          source_respondent_id: this.respondentId,
           target_respondent_id: id
         }))).then(edges => {
           for (let edge of edges) {

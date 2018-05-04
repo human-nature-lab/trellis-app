@@ -93,9 +93,9 @@ export default class Clock extends Emitter {
    * @returns {boolean}
    */
   get isAtMin () {
-    if (this._isAtMin !== null) {
-      return this._isAtMin
-    }
+    // if (this._isAtMin !== null) {
+    //   return this._isAtMin
+    // }
     let i = this.time.length
     while (i--) {
       if (this.clockMin) {
@@ -113,9 +113,9 @@ export default class Clock extends Emitter {
   }
 
   get isAtMax () {
-    if (this._isAtMax !== null) {
-      return this._isAtMax
-    }
+    // if (this._isAtMax !== null) {
+    //   return this._isAtMax
+    // }
     let i = this.time.length
     while (i--) {
       if (this.clockMax) {
@@ -152,6 +152,7 @@ export default class Clock extends Emitter {
         index--
         done = false
       }
+      this.emit('incrementIndex', index)
       // We are already at the max state so we need to exit without exceeding the max state
       if (index < 0) {
         done = true
@@ -180,11 +181,20 @@ export default class Clock extends Emitter {
         index--
         done = false
       }
+      this.emit('decrementIndex', index)
       // We are at the minimum state so we need to exit without passing it
       if (index >= this.time.length) {
         done = true
       }
     } while (!done)
     this.emit('decrement', this.time, prevTime)
+  }
+
+  /**
+   * Set a single time index to the max value
+   * @param index
+   */
+  setIndexToMax (index) {
+    this.time[index] = this.clockMax ? this.clockMax[index] : 9
   }
 }
