@@ -1,20 +1,18 @@
 <template>
   <v-flex class="page">
     <v-card>
-      <debug :name="'Location'">
-        {{interview.location}}
+      <debug name="Location">{{location}}</debug>
+      <debug :name="'Assigned Conditions: ' + conditionTags.length">
+        {{conditionTags}}
       </debug>
-      <debug :name="'Assigned Conditions: ' + assignedConditions.length">
-        {{assignedConditions}}
-      </debug>
-      <debug :name="'Actions: ' + interview.actions.store.length">
-        {{JSON.stringify(interview.actions.store, null, 2)}}
+      <debug :name="'Actions: ' + actions.length">
+        {{JSON.stringify(actions, null, 2)}}
       </debug>
       <v-flex class="page-content">
         <Question
           v-for="question in questions"
           :question="question"
-          :interview="interview.interview"
+          :interview="interview"
           :key="question.id"/>
       </v-flex>
     </v-card>
@@ -38,7 +36,6 @@
 
 <script>
   import Question from './Question.vue'
-  import Interview from './models/Interview'
   import actionBus from './services/ActionBus'
   export default {
     name: 'page',
@@ -47,11 +44,24 @@
         type: Array,
         required: true
       },
-      location: {
-        type: Object
+      data: {
+        type: Array,
+        required: true
+      },
+      actions: {
+        type: Array,
+        required: true
+      },
+      conditionTags: {
+        type: Object,
+        required: true
       },
       interview: {
-        type: Interview,
+        type: Object,
+        required: true
+      },
+      location: {
+        type: Object,
         required: true
       }
     },
@@ -71,9 +81,6 @@
       // TODO: // Calculate this and enable/disable next based on it
       allRequiredQuestionsAnswered: function () {
         return true
-      },
-      assignedConditions: function () {
-        return this.interview._getCurrentConditionTags()
       }
     },
     components: {

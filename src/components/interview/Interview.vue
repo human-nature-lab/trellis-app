@@ -1,11 +1,20 @@
 <template>
   <v-flex>
-    <v-progress-linear :active="isLoading" indeterminate height="2"></v-progress-linear>
+    <v-container v-if="isLoading">
+      <v-layout>
+        <LoadingPage
+          :step="loadingStep"
+          :message="loadingMessage"
+          :max-steps="4" />
+      </v-layout>
+    </v-container>
     <Page :questions="questions"
           :location="location"
-          :interview="interviewState"
-          v-if="!isLoading"
-    />
+          :actions="interviewActions"
+          :data="interviewData"
+          :conditionTags="interviewConditionTags"
+          :interview="interview"
+          v-if="!isLoading" />
     <v-dialog
       v-model="beginningDialog">
       <v-card>
@@ -55,14 +64,19 @@
 
 <script>
   import Page from './Page'
+  import LoadingPage from './LoadingPage'
+
   import Interview from './models/Interview'
   import InterviewService from './services/interview/InterviewService'
-  import TranslationService from '@/services/TranslationService'
-  import StringInterpolationService from '@/services/StringInterpolationService'
-  import FormService from '@/services/form/FormService'
+  import TranslationService from '../../services/TranslationService'
+  import StringInterpolationService from '../../services/StringInterpolationService'
+  import FormService from '../../services/form/FormService'
   import actionBus from './services/ActionBus'
   import InterviewDataService from './services/interview-data/InterviewDataService'
   import InterviewActionsService from './services/interview-actions/InterviewActionsService'
+
+  let interviewState
+  let interviewDataService
   export default {
     data () {
       return {
@@ -72,9 +86,19 @@
         surveyId: null,
         clipped: false,
         isLoading: true,
-        interviewState: null,
+        interviewData: {},
+        interviewActions: {},
+        interviewConditionTags: {},
+        interview: {},
+        location: {
+          section: 0,
+          page: 0,
+          sectionRepetition: 0,
+          sectionFollowUpDatumId: null
+        },
         beginningDialog: false,
-        endDialog: false
+        endDialog: false,
+        loadingStep: 0
       }
     },
     created () {
@@ -90,41 +114,69 @@
           interview = inter
           this.formId = interview.survey.form_id
           this.surveyId = interview.survey.id
+          this.loadingStep++
           return Promise.all([
-            InterviewActionsService.getActions(this.interviewId)
-              .catch(err => {
-                console.error('interview actions route does not work', err)
-                return []
-              }),
-            InterviewService.getData(this.interviewId)
-              .catch(err => {
-                console.error('interview data service does not work', err)
-                return []
-              }),
-            FormService.getForm(interview.survey.form_id)
+            InterviewActionsService.getActions(this.interviewId).catch(err => {
+              console.error('interview actions route does not work', err)
+              return []
+            }).then(res => {
+              return new Promise(resolve => {
+                setTimeout(() => {
+                  this.loadingStep++
+                  resolve(res)
+                }, 500)
+              })
+            }),
+            InterviewService.getData(this.interviewId).catch(err => {
+              console.error('interview data service does not work', err)
+              return []
+            }).then(res => {
+              return new Promise(resolve => {
+                setTimeout(() => {
+                  this.loadingStep++
+                  resolve(res || [])
+                }, 1200)
+              })
+            }),
+            FormService.getForm(interview.survey.form_id).then(res => {
+              return new Promise(resolve => {
+                setTimeout(() => {
+                  this.loadingStep++
+                  resolve(res)
+                }, 1800)
+              })
+            })
           ]).then(results => {
             let [actions, data, formBlueprint] = results
-            this.interviewState = new Interview(interview, formBlueprint, actions, data)
-            this.interviewDataService = new InterviewDataService(() => {
-              return this.interviewState.data
+            interviewState = new Interview(interview, formBlueprint, actions, data)
+            interviewDataService = new InterviewDataService(() => {
+              return interviewState.data
             }, () => {
-              return this.interviewState.conditionTags
+              return interviewState.conditionTags
             })
-            this.interviewState.bootstrap()
-            this.interviewState.on('atEnd', this.showEndDialog, this)
-            this.interviewState.on('atBeginning', this.showBeginningDialog, this)
-            this.isLoading = false
+            interviewState.bootstrap()
+            // Bind the relevant parts to the view
+            this.interviewData = interviewState.data
+            this.interviewConditionTags = interviewState.conditionTags
+            this.interviewActions = interviewState.actions.store
+            this.location = interviewState.navigator.location
+            this.interview = interview
+            interviewState.on('atEnd', this.showEndDialog, this)
+            interviewState.on('atBeginning', this.showBeginningDialog, this)
+            setTimeout(() => {
+              this.isLoading = false
+            }, 2000)
           })
         })
       actionBus.$on('action', this.actionHandler)
     },
     methods: {
       actionHandler: function (action) {
-        if (!this.interviewState) {
+        if (!interviewState) {
           throw Error('Trying to push actions before interview has been initialized')
         }
-        this.interviewState.pushAction(action)
-        this.interviewDataService.send()
+        interviewState.pushAction(action)
+        interviewDataService.send()
       },
       showBeginningDialog: function () {
         this.beginningDialog = true
@@ -141,12 +193,13 @@
     },
     computed: {
       questions: function () {
-        let followUpQuestionDatumMap = this.interviewState.getCurrentFollowUpQuestionDatum().reduce((agg, qDatum) => {
+        let followUpQuestionDatum = interviewState._getFollowUpQuestionDatum(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+        let followUpQuestionDatumMap = followUpQuestionDatum.reduce((agg, qDatum) => {
           agg[qDatum.var_name] = qDatum.data.join(', ') + '_INTERPOLATED'
           return agg
         }, {})
         console.log('follow up question datum', followUpQuestionDatumMap)
-        let questions = this.interviewState.getPageQuestions().map(q => {
+        let questions = interviewState.getPageQuestions().map(q => {
           q.type = {
             name: q.question_type.name
           }
@@ -164,12 +217,24 @@
         console.log('Computed questions', questions)
         return questions || []
       },
-      location: function () {
-        return this.interviewState.location
+      loadingMessage: function () {
+        switch (this.loadingStep) {
+          case 1:
+            return 'Loading existing actions, data and form definition'
+          case 2:
+            return 'Loading existing actions and data'
+          case 3:
+            return 'Loading existing actions'
+          case 4:
+            return 'Building survey'
+          default:
+            return 'Loading interview'
+        }
       }
     },
     components: {
-      Page
+      Page,
+      LoadingPage
     }
   }
 </script>

@@ -37,7 +37,7 @@
       <RelationshipQuestion
         v-if="question.type.name === 'relationship'"
         :question="question"
-        :interview="interview"/>
+        :respondent-id="interview.survey.respondent_id"/>
       <TextQuestion
         v-if="question.type.name === 'text'"
         :question="question"/>
