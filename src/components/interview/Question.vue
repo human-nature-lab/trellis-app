@@ -14,7 +14,7 @@
     </v-card-title>
     <v-card-text class="question-content">
       <v-flex class="question-text">
-        <InterpolatedText :text="question.text" />
+        <InterpolatedText :text="question.text" :section-follow-up-datum-id="location.sectionFollowUpDatumId"/>
       </v-flex>
       <IntroQuestion
         v-if="question.type.name === 'intro'"
@@ -81,6 +81,10 @@
         required: true
       },
       interview: {
+        type: Object,
+        required: true
+      },
+      location: {
         type: Object,
         required: true
       }
