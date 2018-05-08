@@ -14,7 +14,7 @@
     </v-card-title>
     <v-card-text class="question-content">
       <v-flex class="question-text">
-        <p>{{question.text}}</p>
+        <InterpolatedText :text="question.text" />
       </v-flex>
       <IntroQuestion
         v-if="question.type.name === 'intro'"
@@ -70,6 +70,9 @@
   import TimeQuestion from './questions/TimeQuestion'
   import DateQuestion from './questions/DateQuestion'
   import DontKnowRefused from './DontKnowRefused.vue'
+
+  import InterpolatedText from './InterpolatedText'
+
   export default {
     name: 'question',
     props: {
@@ -88,6 +91,7 @@
       }
     },
     components: {
+      InterpolatedText,
       IntroQuestion,
       DecimalQuestion,
       IntegerQuestion,

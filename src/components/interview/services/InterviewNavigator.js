@@ -1,71 +1,104 @@
-import Clock from '@/classes/Clock'
 export default class InterviewNavigator {
   constructor (interview) {
     // Section, sectionFollowUpRepetition, sectionRepetition, page
     this.location = {}
-    this.clock = new Clock([0, 0, 0, 0], [0, 0, 0, 0])
-    this.clock.on('incrementIndex', this._incrementIndex, this)
-    this.clock.on('decrementIndex', this._decrementIndex, this)
+    this._location = {
+      section: 0,
+      sectionRepetition: 0,
+      sectionFollowUpDatumId: null,
+      sectionFollowUpRepetition: 0,
+      page: 0
+    }
+    this.max = {}
     this.interview = interview
     this.blueprint = interview.blueprint
     this.updateLocation()
     this.updateMax()
   }
   get section () {
-    return this.clock.time[0]
+    return this._location.section
   }
   set section (val) {
-    this.clock.time[0] = val
+    this._location.section = val
   }
   get sectionRepetition () {
-    return this.clock.time[1]
+    return this._location.sectionRepetition
   }
   set sectionRepetition (val) {
-    this.clock.time[1] = val
+    this._location.sectionRepetition = val
   }
   get page () {
-    return this.clock.time[3]
+    return this._location.page
   }
   set page (val) {
-    this.clock.time[3] = val
+    this._location.page = val
   }
   get sectionFollowUpDatumId () {
-    if (this.blueprint.sections[this.section].pages[this.page]) {
-      // TODO: Look up the follow up datum id from the clock val
-      return null
-    } else {
-      return null
+    if (!this._location.sectionFollowUpDatumId) {
+      let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
+      if (followUpQuestionId) {
+        // TODO: Handle follow up questions from repeatedSections and follow up sections
+        let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
+        if (data && data.length) {
+          this._location.sectionFollowUpDatumId = data[this.sectionFollowUpDatumRepetition].id
+        }
+      }
+    }
+    return this._location.sectionFollowUpDatumId
+  }
+  set sectionFollowUpDatumId (newId) {
+    this._location.sectionFollowUpDatumId = null
+    let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
+    if (newId && followUpQuestionId) {
+      // TODO: Handle follow up questions from repeatedSections and follow up sections
+      let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
+      if (data && data.length) {
+        let index = data.find(datum => datum.id === newId)
+        this._location.sectionFollowUpDatumId = newId
+        this._location.sectionFollowUpRepetition = index
+      }
     }
   }
-  set sectionFollowUpDatumId (val) {
-    if (this.blueprint.sections[this.section].pages[this.page].followUpQuestionId) {
-      // TODO: Look up and set the clock val
-    } else {
-      this.clock.time[2] = 0
-    }
+  get sectionFollowUpDatumRepetition () {
+    return this._location.sectionFollowUpRepetition
+  }
+  set sectionFollowUpDatumRepetition (val) {
+    this._location.sectionFollowUpRepetition = val
+    this._location.sectionFollowUpDatumId = null
+  }
+  updateMax () {
+    let max = this.getMax()
+    this.max.section = max[0]
+    this.max.sectionRepetition = max[1]
+    this.max.sectionFollowUpDatumRepetition = max[2]
+    this.max.page = max[3]
+  }
+  setToMax () {
+    this.sectionRepetition = this.max.sectionRepetition
+    this.sectionFollowUpDatumRepetition = this.max.sectionFollowUpDatumRepetition
+    this.page = this.max.page
   }
   updateLocation () {
     this.location.section = this.section
     this.location.sectionRepetition = this.sectionRepetition
     this.location.sectionFollowUpDatumId = this.sectionFollowUpDatumId
+    this.location.sectionFollowUpDatumRepetition = this.sectionFollowUpDatumRepetition
     this.location.page = this.page
   }
   zero () {
-    this.clock.time = [0, 0, 0, 0]
-    this.updateMax()
+    this.section = 0
+    this.page = 0
+    this.sectionRepetition = 0
+    this.sectionFollowUpDatumRepetition = 0
   }
 
   get isAtEnd () {
-    return this.clock.isAtMax
+    let max = this.getMax()
+    return this.section === max[0] && this.sectionRepetition === max[1] && this.sectionFollowUpDatumRepetition === max[2] && this.page === max[3]
   }
 
   get isAtStart () {
-    return this.clock.isAtMin
-  }
-
-  updateMax () {
-    let max = this.getMax()
-    this.clock.setMaximums(max)
+    return this.section === 0 && this.sectionRepetition === 0 && this.sectionFollowUpDatumRepetition === 0 && this.page === 0
   }
 
   getMax () {
@@ -73,53 +106,72 @@ export default class InterviewNavigator {
     max[0] = this.blueprint.sections.length - 1
     max[1] = this.blueprint.sections[this.section].maxRepetitions
     max[2] = 0
-    if (this.blueprint.sections[this.section].followUpQuestionId) {
-      // TODO: Fill this out. Requires a search and sort at the moment
+    let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
+    if (followUpQuestionId) {
+      // TODO: Handle follow up questions from repeatedSections and follow up sections
+      let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
+      max[2] = data.length - 1
     }
     max[3] = this.blueprint.sections[this.section].pages.length - 1
     return max
   }
+
   setLocation (section, page, sectionRepetition, sectionFollowUpDatumId) {
     this.section = section
     this.page = page
     this.sectionRepetition = sectionRepetition
     this.sectionFollowUpDatumId = sectionFollowUpDatumId
-    this.updateMax()
     this.updateLocation()
-  }
-
-  // In charge of keeping the max values in sync with the state of the form
-  _incrementIndex (index) {
-    if (index === 0) {
-      this.updateMax()
-    }
-  }
-
-  _decrementIndex (index) {
-    if (index === 0) {
-      let max = this.getMax()
-      this.clock.time[1] = max[1]
-      this.clock.time[2] = max[2]
-      this.clock.time[3] = max[3]
-      this.clock.setMaximums(max)
-    }
   }
 
   /**
    * Move forward a step
    */
   next () {
-    this.clock.increment()
+    this.page++
+    if (this.page > this.max.page) {
+      this.page = 0
+      this.sectionRepetition++
+    }
+    if (this.sectionRepetition > this.max.sectionRepetition) {
+      this.sectionRepetition = 0
+      this.sectionFollowUpDatumRepetition++
+    }
+    if (this.sectionFollowUpDatumRepetition > this.max.sectionFollowUpDatumRepetition) {
+      this.sectionFollowUpDatumRepetition = 0
+      this.section++
+      this.updateMax()
+    }
+    if (this.section > this.max.section) {
+      this.section = this.max.section
+      this.setToMax()
+    }
     this.updateLocation()
-    console.log('loc', JSON.stringify(this.clock.time))
   }
 
   /**
    * Move back a step
    */
   previous () {
-    this.clock.decrement()
+    this.page--
+    if (this.page < 0) {
+      this.page = this.max.page
+      this.sectionRepetition--
+    }
+    if (this.sectionRepetition < 0) {
+      this.sectionRepetition = this.max.sectionRepetition
+      this.sectionFollowUpDatumRepetition--
+    }
+    if (this.sectionFollowUpDatumRepetition < 0) {
+      this.sectionFollowUpDatumRepetition = this.max.sectionFollowUpDatumRepetition
+      this.section--
+      this.updateMax()
+      this.setToMax()
+    }
+    if (this.section < 0) {
+      this.section = 0
+      this.zero()
+    }
     this.updateLocation()
-    console.log('loc', JSON.stringify(this.clock.time))
   }
 }
