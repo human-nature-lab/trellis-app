@@ -66,7 +66,7 @@
   import Page from './Page'
   import LoadingPage from './LoadingPage'
 
-  import Interview from './models/Interview'
+  import {sharedInterview} from './models/Interview'
   import InterviewService from './services/interview/InterviewService'
   import TranslationService from '../../services/TranslationService'
   import StringInterpolationService from '../../services/StringInterpolationService'
@@ -80,6 +80,7 @@
   export default {
     data () {
       return {
+        artificiallyExtendLoadTime: false,
         studyId: this.$route.params.studyId,
         interviewId: this.$route.params.interviewId,
         formId: null,
@@ -94,6 +95,7 @@
           section: 0,
           page: 0,
           sectionRepetition: 0,
+          sectionFollowUpDatumRepetition: null,
           sectionFollowUpDatumId: null
         },
         beginningDialog: false,
@@ -124,7 +126,7 @@
                 setTimeout(() => {
                   this.loadingStep++
                   resolve(res)
-                }, 500)
+                }, this.artificiallyExtendLoadTime ? 500 : 0)
               })
             }),
             InterviewService.getData(this.interviewId).catch(err => {
@@ -135,7 +137,7 @@
                 setTimeout(() => {
                   this.loadingStep++
                   resolve(res || [])
-                }, 1200)
+                }, this.artificiallyExtendLoadTime ? 1200 : 0)
               })
             }),
             FormService.getForm(interview.survey.form_id).then(res => {
@@ -143,12 +145,12 @@
                 setTimeout(() => {
                   this.loadingStep++
                   resolve(res)
-                }, 1800)
+                }, this.artificiallyExtendLoadTime ? 1800 : 0)
               })
             })
           ]).then(results => {
             let [actions, data, formBlueprint] = results
-            interviewState = new Interview(interview, formBlueprint, actions, data)
+            interviewState = sharedInterview(interview, formBlueprint, actions, data)
             interviewDataService = new InterviewDataService(() => {
               return interviewState.data
             }, () => {
@@ -165,10 +167,14 @@
             interviewState.on('atBeginning', this.showBeginningDialog, this)
             setTimeout(() => {
               this.isLoading = false
-            }, 2000)
+            }, this.artificiallyExtendLoadTime ? 2000 : 0)
           })
         })
       actionBus.$on('action', this.actionHandler)
+      window.onbeforeunload = this.prematureExit
+    },
+    beforeDestroy: function () {
+      window.onbeforeunload = null
     },
     methods: {
       actionHandler: function (action) {
@@ -189,13 +195,20 @@
       },
       saveAndExit: function () {
         console.log('TODO: Save and exit the survey')
+      },
+      prematureExit: function (e) {
+        const dialogText = 'You have unsaved changes. Are you sure you want to leave?'
+        e.returnValue = dialogText
+        return dialogText
       }
     },
     computed: {
       questions: function () {
-        let followUpQuestionDatum = interviewState._getFollowUpQuestionDatum(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-        let followUpQuestionDatumMap = followUpQuestionDatum.reduce((agg, qDatum) => {
-          agg[qDatum.var_name] = qDatum.data.join(', ') + '_INTERPOLATED'
+        // This needs to be here so that we have a dependency on this.location
+        let followUpQuestionDatum = interviewState.getFollowUpQuestionDatum(this.location.sectionFollowUpDatumId)
+        let followUpData = interviewState.getFollowUpQuestionDatumData(this.location.sectionFollowUpDatumId)
+        let followUpQuestionDatumMap = followUpData.reduce((agg, datum) => {
+          agg[followUpQuestionDatum.var_name] = datum.join(', ') + '_INTERPOLATED'
           return agg
         }, {})
         console.log('follow up question datum', followUpQuestionDatumMap)
@@ -204,7 +217,6 @@
             name: q.question_type.name
           }
           q.text = TranslationService.getTranslated(q.question_translation)
-          q.text = StringInterpolationService.interpolate(q.text, followUpQuestionDatumMap)
           if (q.choices) {
             q.choices = q.choices.map(choice => {
               choice.text = TranslationService.getTranslated(choice.choice_translation)
@@ -214,7 +226,6 @@
           }
           return q
         })
-        console.log('Computed questions', questions)
         return questions || []
       },
       loadingMessage: function () {

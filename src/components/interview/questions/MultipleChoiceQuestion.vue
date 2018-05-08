@@ -6,7 +6,7 @@
       :label="choice.text"
       :key="choice.val"
       v-model="selected[choice.id]"
-      @change="onChange(choice.id, selected[choice.id])"/>
+      @change="onChange(choice, selected[choice.id])"/>
   </div>
 </template>
 
@@ -28,13 +28,14 @@
       }
     },
     methods: {
-      onChange: function (choiceId, val) {
+      onChange: function (choice, val) {
         if (val) {
           actionBus.action({
             action_type: 'select-choice',
             question_datum_id: this.question.datum.id,
             payload: {
-              choice_id: choiceId
+              choice_id: choice.id,
+              val: choice.val
             }
           })
         } else {
@@ -42,7 +43,8 @@
             action_type: 'deselect-choice',
             question_datum_id: this.question.datum.id,
             payload: {
-              choice_id: choiceId
+              choice_id: choice.id,
+              val: choice.val
             }
           })
         }

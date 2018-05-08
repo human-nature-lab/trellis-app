@@ -24,6 +24,8 @@ export default class Interview extends Emitter {
     this.actions.load(actions)
     this.conditionAssigner = new ConditionAssignmentService()
     this.allConditions = new Map()
+    this.varNameMap = new Map()
+    this.questionMap = new Map()
     this.load(blueprint)
     this.navigator = new InterviewNavigator(this)
   }
@@ -137,11 +139,15 @@ export default class Interview extends Emitter {
   _loadBlueprint (blueprint) {
     this.blueprint = Object.assign({}, blueprint)
     this.allConditions.clear()
+    this.varNameMap.clear()
+    this.questionMap.clear()
     // Sort all levels
     this.blueprint.sections.sort((sectionA, sectionB) => {
       return sectionA.form_sections[0].sort_order - sectionB.form_sections[0].sort_order
     })
-    for (let section of this.blueprint.sections) {
+
+    for (let s = 0; s < this.blueprint.sections.length; s++) {
+      let section = this.blueprint.sections[s]
       section.maxRepetitions = section.form_sections[0].max_repetitions
       section.isRepeatable = parseInt(section.form_sections[0].is_repeatable, 10) === 1
       section.followUpQuestionId = section.form_sections[0].follow_up_question_id
@@ -158,6 +164,9 @@ export default class Interview extends Emitter {
           return questionA.sort_order - questionB.sort_order
         })
         for (let question of page.questions) {
+          this.varNameMap.set(question.var_name, question.id)
+          this.questionMap.set(question.id, question)
+          question.section = s
           if (question.choices) {
             question.choices.sort((cA, cB) => {
               return cA.sort_order - cB.sort_order
@@ -327,12 +336,22 @@ export default class Interview extends Emitter {
    * Assign the current condition tags
    */
   _evaluateConditionAssignment () {
+    // TODO: This should probably be every question in the survey so far
     let questionsWithData = this.getPageQuestions()
     let vars = questionsWithData.reduce((vars, question) => {
       if (!question.datum || !question.datum.data) {
         debugger
       }
-      vars[question.var_name] = question.datum.data.map(datum => datum.val)
+      switch (question.question_type.name) {
+        case 'multiple_select':
+        case 'relationship':
+        case 'geo':
+        case 'photo':
+          vars[question.var_name] = question.datum.data.map(datum => datum.val)
+          break
+        default:
+          vars[question.var_name] = question.datum.data.length ? question.datum.data[0].val : undefined
+      }
       return vars
     }, {})
     console.log('vars', vars)
@@ -382,39 +401,6 @@ export default class Interview extends Emitter {
     }
   }
 
-  // TODO: This should be easier
-  _getCurrentMaxFollowUpPosition (questionId) {
-    let qDatum = this.data.find(qDatum => {
-      return qDatum.section === this.location.section &&
-        qDatum.sectionRepetition === this.location.sectionRepetition &&
-        qDatum.sectionFollowUpDatumId === this.location.sectionFollowUpDatumId &&
-        qDatum.page === this.location.page &&
-        qDatum.question_id === questionId
-    })
-    if (qDatum) {
-      return qDatum.data.length
-    } else {
-      throw new Error('Unable to find question datum matching this')
-    }
-  }
-
-  // TODO: This should be easier
-  _getCurrentFollowUpPosition (questionId) {
-    let qDatum = this.data.find(qDatum => {
-      return qDatum.section === this.location.section &&
-        qDatum.sectionRepetition === this.location.sectionRepetition &&
-        qDatum.sectionFollowUpDatumId === this.location.sectionFollowUpDatumId &&
-        qDatum.page === this.location.page &&
-        qDatum.question_id === questionId
-    })
-    if (qDatum) {
-      let index = qDatum.data.findIndex(d => d.id === this.location.sectionFollowUpDatumId)
-      return index
-    } else {
-      throw new Error('Unable to find question datum matching current follow up position')
-    }
-  }
-
   /**
    * Get the data for a particular question datum in order
    * @param questionDatumId
@@ -433,54 +419,6 @@ export default class Interview extends Emitter {
       })
     }
     return data
-  }
-
-  /**
-   * Return the next id in the sequence if one exists. Throws an error if the next id doesn't exist
-   * @param {String} questionDatumId - The current question datum id
-   * @param {String} datumId - The current datum id
-   * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
-   * @private
-   */
-  _getNextDatumId (questionDatumId, datumId, useRandom = false) {
-    let data = this._getQuestionDatumDataInOrder(questionDatumId, useRandom)
-    let curLocation = data.findIndex(datum => datum.id === datumId)
-    return data[curLocation + 1].id
-  }
-
-  /**
-   * Get the datum id of the datum adjacent to this datum
-   * @param {String} questionDatumId - The current question datum id
-   * @param {String} datumId - The current datum id
-   * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
-   * @private
-   */
-  _getPreviousDatumId (questionDatumId, datumId, useRandom = false) {
-    let data = this._getQuestionDatumDataInOrder(questionDatumId, useRandom)
-    let curLocation = data.findIndex(datum => datum.id === datumId)
-    return data[curLocation - 1].id
-  }
-
-  /**
-   * Get the first datum for this questionDatum
-   * @param {String} questionDatumId - The current question datum id
-   * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
-   * @private
-   */
-  _getFirstDatumId (questionDatumId, useRandom = false) {
-    let data = this._getQuestionDatumDataInOrder(questionDatumId, useRandom)
-    return data[0]
-  }
-
-  /**
-   * Get the last datum for this questionDatum
-   * @param {String} questionDatumId - The current question datum id
-   * @param {Boolean} [useRandom = false] - indicates if the random_val should be used instead of the sort_val
-   * @private
-   */
-  _getLastDatumId (questionDatumId, useRandom = false) {
-    let data = this._getQuestionDatumDataInOrder(questionDatumId, useRandom)
-    return data[data.length - 1]
   }
 
   /**
@@ -665,20 +603,61 @@ export default class Interview extends Emitter {
   }
 
   /**
+   * Get the questionDatum corresponding with this follow up section
+   * @param sectionFollowUpQuestionId
+   * @returns {T}
+   */
+  getFollowUpQuestionDatum (sectionFollowUpQuestionId) {
+    let qDatum = this.data.find(qDatum => {
+      return qDatum.question_id === sectionFollowUpQuestionId
+    })
+    return qDatum
+  }
+
+  getSingleDatumByQuestionVarName (varName, followUpDatumId) {
+    let questionId = this.varNameMap.get(varName)
+    if (!questionId) {
+      throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
+    }
+    let question = this.questionMap.get(questionId)
+    let section = this._getSection(question.section)
+    let qDatum = this.data.find(qDatum => {
+      if (section.followUpQuestionId) {
+        return qDatum.sectionFollowUpDatumId === followUpDatumId && qDatum.question_id === questionId
+      } else {
+        return qDatum.question_id === questionId
+      }
+    })
+    if (qDatum) {
+      return qDatum
+    } else {
+      throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
+    }
+  }
+
+  /**
    * This method returns the follow up question_datum and data that are associated with the follow up question for that section
    * TODO: Right now this only gets the first question that matches the follow_up_question_id, but it should probably know
    * TODO: if a question is in a repeated section and get the correct question_datum(s) in that case
-   * @param sectionId
-   * @param sectionRepetitionId
-   * @param sectionFollowUpQuestionId
+   * @param {String} sectionFollowUpQuestionId
+   * @param {Number} currentRepetition - Will be used for handling follow up questions from repeated sections
+   * @param {Number} currentFollowUpSection - Will be used for handling follow up questions from follow up sections
    * @returns {T | undefined}
    * @private
    */
-  _getFollowUpQuestionDatum (sectionId, sectionRepetitionId, sectionFollowUpQuestionId) {
-    let section = this.blueprint.sections[sectionId]
-    let followUpQuestionId = section.form_sections[0].follow_up_question_id
-    let followUpDatum = this.data.find(qDatum => qDatum.question_id === followUpQuestionId)
-    return followUpDatum ? [followUpDatum] : []
+  getFollowUpQuestionDatumData (sectionFollowUpQuestionId, currentRepetition = 0, currentFollowUpSection = 0) {
+    let qDatum = this.getFollowUpQuestionDatum(sectionFollowUpQuestionId)
+    // TODO: This should change if we're using randomization for follow up sections
+    if (!qDatum || !qDatum.data) return []
+
+    // Guard against repeated sections for now
+    if (this._getSection(qDatum.section).maxRepetitions || this._getSection(qDatum.section).followUpQuestionId) {
+      throw Error(`Can't handle follow up questions from repeated sections currently`)
+    }
+    qDatum.data.sort(function (a, b) {
+      return a.sort_val - b.sort_val
+    })
+    return qDatum.data
   }
 
   /**
@@ -686,7 +665,7 @@ export default class Interview extends Emitter {
    * @returns {T}
    */
   getCurrentFollowUpQuestionDatum () {
-    return this._getFollowUpQuestionDatum(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    return this.getFollowUpQuestionDatumData(this.location.sectionFollowUpDatumId)
   }
 
   /**
