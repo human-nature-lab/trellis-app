@@ -13,6 +13,7 @@
           v-for="question in questions"
           :question="question"
           :interview="interview"
+          :location="location"
           :key="question.id"/>
       </v-flex>
     </v-card>

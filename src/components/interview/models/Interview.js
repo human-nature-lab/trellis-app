@@ -619,20 +619,18 @@ export default class Interview extends Emitter {
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
-    let question = this.questionMap.get(questionId)
-    let section = this._getSection(question.section)
+    console.log('Getting question by varname', varName, followUpDatumId)
     let qDatum = this.data.find(qDatum => {
-      if (section.followUpQuestionId) {
-        return qDatum.sectionFollowUpDatumId === followUpDatumId && qDatum.question_id === questionId
+      if (followUpDatumId) {
+        return qDatum.question_id === questionId && qDatum.data.findIndex(d => d.id === followUpDatumId) > -1
       } else {
         return qDatum.question_id === questionId
       }
     })
-    if (qDatum) {
-      return qDatum
-    } else {
+    if (!qDatum) {
       throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
     }
+    return qDatum
   }
 
   /**
