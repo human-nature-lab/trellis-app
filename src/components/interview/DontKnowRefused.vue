@@ -51,7 +51,7 @@
           this._reason = val
           actionBus.actionDebounce({
             action_type: 'dk-rf-val',
-            question_datum_id: this.question.datum.id,
+            question_id: this.question.id,
             payload: {
               dk_rf_val: val
             }
@@ -69,7 +69,7 @@
         set: function (val) {
           actionBus.action({
             action_type: 'dk-rf',
-            question_datum_id: this.question.datum.id,
+            question_id: this.question.id,
             payload: {
               dk_rf: val ? true : this.rf ? false : null
             }
@@ -87,7 +87,7 @@
         set: function (val) {
           actionBus.$emit('action', {
             action_type: 'dk-rf',
-            question_datum_id: this.question.datum.id,
+            question_id: this.question.id,
             payload: {
               dk_rf: val === false ? null : false
             }

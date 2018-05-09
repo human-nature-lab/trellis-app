@@ -48,10 +48,10 @@ export default class InterviewDataMock {
       if (res.status >= 200 && res.status < 300) {
         this._previousData = dataSnapshot
         this._previousConditions = conditionTagSnapshot
-        console.log(`sent the following patch: ${JSON.stringify({
-          data: dataDiff,
-          conditionTags: conditionDiff
-        }, null, 2)}`)
+        // console.log(`sent the following patch: ${JSON.stringify({
+        //   data: dataDiff,
+        //   conditionTags: conditionDiff
+        // }, null, 2)}`)
       } else {
         throw Error('Unable to complete request')
       }

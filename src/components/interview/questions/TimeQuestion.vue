@@ -25,7 +25,7 @@
         set: function (val) {
           actionBus.action({
             action_type: 'set-time',
-            question_datum_id: this.question.datum.id,
+            question_id: this.question.id,
             payload: {
               val: val
             }

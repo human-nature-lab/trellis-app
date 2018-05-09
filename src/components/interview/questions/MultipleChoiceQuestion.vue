@@ -34,7 +34,7 @@
         if (val) {
           actionBus.action({
             action_type: 'select-choice',
-            question_datum_id: this.question.datum.id,
+            question_id: this.question.id,
             payload: {
               choice_id: choice.id,
               val: choice.val
@@ -43,7 +43,7 @@
         } else {
           actionBus.action({
             action_type: 'deselect-choice',
-            question_datum_id: this.question.datum.id,
+            question_id: this.question.id,
             payload: {
               choice_id: choice.id,
               val: choice.val

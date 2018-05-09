@@ -36,7 +36,7 @@
           this._value = val
           actionBus.actionDebounce({
             action_type: 'number-change',
-            question_datum_id: this.question.datum.id,
+            question_id: this.question.id,
             payload: {
               val: val
             }

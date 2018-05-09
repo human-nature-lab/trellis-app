@@ -1,10 +1,10 @@
 <template>
-  <v-flex>
+  <span>
     <v-alert type="error" v-if="error">
       {{error}}
     </v-alert>
-    <p>{{interpolatedText}}</p>
-  </v-flex>
+    <span>{{interpolatedText}}</span>
+  </span>
 </template>
 
 <script>
@@ -92,7 +92,7 @@
         this.isLoading = true
         Promise.all(this.getInterpolationPromises(varNames)).then(fills => {
           let fillMap = fills.reduce((fillMap, fill) => {
-            fillMap[fill.key] = fill.name + '_INTERPOLATED'
+            fillMap[fill.key] = fill.name/* + '_INTERPOLATED' */
             return fillMap
           }, {})
           this.interpolatedText_ = StringInterpolationService.interpolate(this.text, fillMap)

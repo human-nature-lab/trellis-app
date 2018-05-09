@@ -191,7 +191,7 @@
           for (let row of rows) {
             actionBus.action({
               action_type: 'add-roster-row',
-              question_datum_id: this.question.datum.id,
+              question_id: this.question.id,
               payload: {
                 roster_id: row.id
               }
@@ -209,7 +209,7 @@
       removeRosterRow: function (row) {
         actionBus.action({
           action_type: 'remove-roster-row',
-          question_datum_id: this.question.datum.id,
+          question_id: this.question.id,
           payload: {
             roster_id: row.id
           }
