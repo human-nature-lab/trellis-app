@@ -42,7 +42,4 @@ export default [{
   path: '/locale',
   name: 'locale',
   component: LocaleSelectorPage
-}, {
-  path: '*',
-  redirect: '/'
 }]

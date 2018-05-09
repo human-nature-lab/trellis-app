@@ -105,7 +105,7 @@
       add: function (edgeId) {
         actionBus.action({
           action_type: 'add-edge',
-          question_datum_id: this.question.datum.id,
+          question_id: this.question.id,
           payload: {
             name: this.question.var_name,
             val: edgeId,
@@ -116,7 +116,7 @@
       remove: function (edgeId) {
         actionBus.action({
           action_type: 'remove-edge',
-          question_datum_id: this.question.datum.id,
+          question_id: this.question.id,
           payload: {
             edge_id: edgeId
           }

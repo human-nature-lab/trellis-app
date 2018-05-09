@@ -35,7 +35,7 @@
         set: function (val) {
           actionBus.actionDebounce({
             action_type: 'set-text',
-            question_datum_id: this.question.datum.id,
+            question_id: this.question.id,
             payload: {
               val: val
             }

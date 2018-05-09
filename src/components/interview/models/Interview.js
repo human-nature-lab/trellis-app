@@ -51,11 +51,9 @@ export default class Interview extends Emitter {
    */
   _resetState () {
     this.data = []
-    this.conditionTags = {
-      respondent: [],
-      survey: [],
-      section: []
-    }
+    this.conditionTags.respondent = []
+    this.conditionTags.survey = []
+    this.conditionTags.section = []
     this.makePageQuestionDatum()
   }
 
@@ -68,13 +66,35 @@ export default class Interview extends Emitter {
   }
 
   /**
+   * Play an array of actions
+   * @param {Array} actions - The array of actions to play
+   * @param {Boolean} [includeNext = false] - Don't filter out next actions
+   * @param {Boolean} [includePrevious = false] - Don't filter out previous actions
+   */
+  playActions (actions, includeNext = false, includePrevious = false) {
+    actions = actions.filter(action => {
+      if (includeNext && action.action_type === 'next') {
+        return true
+      } else if (includePrevious && action.action_type === 'previous') {
+        return true
+      } else {
+        return action.action_type !== 'next' && action.action_type !== 'previous'
+      }
+    })
+    for (let action of actions) {
+      this.performAction(action)
+    }
+  }
+
+  /**
    * All user created actions should go through this method so that the actions are stored
    * @param action
    */
   pushAction (action) {
     // This should insert the action following the order of the question datum
     // if (this.actions.length === 0) {
-    this.actions.add(action)
+    action.survey_id = this.interview.survey_id
+    this.actions.add(action, this.location)
     // } else {
     //   let i
       // TODO: This is a naive search and could be a binary search instead if performance is an issue
@@ -100,8 +120,6 @@ export default class Interview extends Emitter {
       // this.actions.splice(i, 0, action)
 
     // }
-    action.created_at = (new Date()).getTime()
-    action.updated_at = (new Date()).getTime()
     this.performAction(action)
   }
 
@@ -114,13 +132,11 @@ export default class Interview extends Emitter {
       console.log(action.action_type)
       let questionDatum = null
       let questionBlueprint = null
-      if (action.question_datum_id) {
+      if (action.question_id) {
         questionDatum = this.data.find(q => {
-          return q.id === action.question_datum_id
+          return q.question_id === action.question_id && q.section === action.section && q.page === action.page
         })
-        if (questionDatum) {
-          questionBlueprint = this._findQuestionBlueprint(questionDatum.question_id)
-        }
+        questionBlueprint = this._findQuestionBlueprint(action.question_id)
       } else if (action.action_type !== 'next' && action.action_type !== 'previous') {
         console.error(action)
         throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
@@ -438,6 +454,23 @@ export default class Interview extends Emitter {
   }
 
   /**
+   * Called when the leaving any page. Includes skipped pages
+   * @private
+   */
+  _onPageExit () {
+    this._evaluateConditionAssignment()
+  }
+
+  /**
+   * Called when entering any page. Includes skipped pages
+   * @private
+   */
+  _onPageEnter () {
+    // let actions = this.actions.getLocationActions(this.location)
+    this.makePageQuestionDatum()
+  }
+
+  /**
    * Move to the next valid page in the survey. The bulk of the form navigation is handled by the clock class which is
    * an abstraction on this type of incremental movement that is similar to a clock
    * @returns undefined
@@ -447,10 +480,9 @@ export default class Interview extends Emitter {
     if (this.navigator.isAtEnd) {
       return this.atEnd()
     }
-    this._evaluateConditionAssignment()
+    this._onPageExit()
     this.navigator.next()
-
-    this.makePageQuestionDatum()
+    this._onPageEnter()
 
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
@@ -466,10 +498,9 @@ export default class Interview extends Emitter {
     if (this.navigator.isAtStart) {
       return this.atBeginning()
     }
-    this._evaluateConditionAssignment()
+    this._onPageExit()
     this.navigator.previous()
-
-    this.makePageQuestionDatum()
+    this._onPageEnter()
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTags = new Set(cConditionTags.map(tag => tag.condition_id))
