@@ -14,7 +14,9 @@
     </v-card-title>
     <v-card-text class="question-content">
       <v-flex class="question-text">
-        <InterpolatedText :text="question.text" :section-follow-up-datum-id="location.sectionFollowUpDatumId"/>
+        <InterpolatedText
+          :text="translated"
+          :section-follow-up-datum-id="location.sectionFollowUpDatumId" />
       </v-flex>
       <IntroQuestion
         v-if="question.type.name === 'intro'"
@@ -47,6 +49,9 @@
       <TimeQuestion
         v-if="question.type.name === 'time'"
         :question="question"/>
+      <GeoQuestion
+        v-if="question.type.name === 'geo'"
+        :question="question"/>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
       <DontKnowRefused
@@ -59,22 +64,25 @@
   // This parent component servers the purpose of handling general functionality that is used across all questions.
   // For example, question title and message fills will be applied here. The question header text will be applied here
   // import translationService from '../services/TranslationService'
-  import IntroQuestion from './questions/IntroQuestion.vue'
-  import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
-  import MultipleChoiceQuestion from './questions/MultipleChoiceQuestion'
+  import DateQuestion from './questions/DateQuestion'
   import DecimalQuestion from './questions/DecimalQuestion'
+  import DontKnowRefused from './DontKnowRefused.vue'
+  import GeoQuestion from './questions/GeoQuestion'
   import IntegerQuestion from './questions/IntegerQuestion'
-  import RosterQuestion from './questions/RosterQuestion'
+  import InterpolatedText from './InterpolatedText'
+  import IntroQuestion from './questions/IntroQuestion.vue'
+  import MultipleChoiceQuestion from './questions/MultipleChoiceQuestion'
+  import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
   import RelationshipQuestion from './questions/RelationshipQuestion'
+  import RosterQuestion from './questions/RosterQuestion'
   import TextQuestion from './questions/TextQuestion'
   import TimeQuestion from './questions/TimeQuestion'
-  import DateQuestion from './questions/DateQuestion'
-  import DontKnowRefused from './DontKnowRefused.vue'
 
-  import InterpolatedText from './InterpolatedText'
+  import TranslationMixin from '../../mixins/TranslationMixin'
 
   export default {
     name: 'question',
+    mixins: [TranslationMixin],
     props: {
       question: {
         type: Object,
@@ -91,28 +99,32 @@
     },
     data: function () {
       return {
-        dk_rf: undefined
+        translation: this.question.question_translation
       }
     },
     components: {
-      InterpolatedText,
-      IntroQuestion,
+      DateQuestion,
       DecimalQuestion,
-      IntegerQuestion,
-      MultipleSelectQuestion,
-      MultipleChoiceQuestion,
-      RosterQuestion,
       DontKnowRefused,
+      GeoQuestion,
+      InterpolatedText,
+      IntegerQuestion,
+      IntroQuestion,
+      MultipleChoiceQuestion,
+      MultipleSelectQuestion,
       RelationshipQuestion,
+      RosterQuestion,
       TextQuestion,
-      TimeQuestion,
-      DateQuestion
+      TimeQuestion
     }
   }
 </script>
 
 <style lang="sass">
+  $question-margin: 15px
   .question
+    margin-top: $question-margin
+    margin-bottom: $question-margin
     label
       text-overflow: inherit
       white-space: normal

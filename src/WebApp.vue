@@ -1,11 +1,14 @@
 <template>
-  <v-app :dark="useDarkTheme">
+  <v-app light dense class="web" :dark="global.darkTheme">
     <v-toolbar fixed>
       <v-toolbar-title class="deep-orange--text">
         Trellis
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="useDarkTheme=!useDarkTheme">
+      <v-btn class="subheading" flat :to="{name: 'locale', query: {to: this.$route.path}}">
+        {{global.locale.language_tag}}
+      </v-btn>
+      <v-btn icon @click="global.darkTheme=!global.darkTheme">
         <v-icon>wb_sunny</v-icon>
       </v-btn>
       <v-menu offset-y :nudge-top="-15">
@@ -40,8 +43,7 @@
 </template>
 
 <script>
-  import LocaleChanger from '@/components/LocaleChanger'
-  import storage from '@/services/storage/StorageService'
+  import storage from './services/storage/StorageService'
   if (storage.get('localeId') === null) {
     storage.set('localeId', '48984fbe-84d4-11e5-ba05-0800279114ca')
   }
@@ -49,12 +51,8 @@
     name: 'web-app',
     data: function () {
       return {
-        useDarkTheme: false,
         study: storage.get('current-study') || {}
       }
-    },
-    components: {
-      LocaleChanger
     }
   }
 </script>
@@ -68,7 +66,7 @@
     padding-top: env(safe-area-inset-top);
   }
   .app-container {
-    margin-top: 35px;
+    margin-top: 50px;
     margin-bottom: 50px;
   }
 </style>

@@ -2,23 +2,30 @@
 import Interview from '@/components/interview/Interview'
 import RespondentForms from '@/components/RespondentForms'
 import RespondentsSearch from '@/components/RespondentsSearch'
-import LocaleChanger from '@/components/LocaleChanger'
+import LocaleSelectorPage from '../components/LocaleSelectorPage'
 import QuestionExamples from '@/components/interview/QuestionExamples'
+import LocaleService from '../services/locale/LocaleService'
+import StudyService from '../services/study/StudyService'
 
-function redirectIfNotValidInterview (to, from, next) {
-  // if (storage.get('interview-id') === null) {
-  //   next({name: 'Login'})
-  // } else {
-  //   next()
-  // }
-  next()
+function beforeInterview (to, from, next) {
+  StudyService.getStudy(to.params.studyId).then(study => {
+    if (study) {
+      StudyService.setCurrentStudy(study)
+    } else {
+      return next({path: '/'})
+    }
+    if (!LocaleService.hasValidLocale()) {
+      return next({path: '/locale', query: {to: to.path}})
+    }
+    return next()
+  })
 }
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
   name: 'Interview',
   component: Interview,
-  beforeEnter: redirectIfNotValidInterview
+  beforeEnter: beforeInterview
 }, {
   path: '/study/:studyId/respondent/:respondentId/forms',
   name: 'RespondentForms',
@@ -32,7 +39,10 @@ export default [{
   name: 'QuestionExamples',
   component: QuestionExamples
 }, {
-  path: '/locale/change',
-  name: 'LocaleChanger',
-  component: LocaleChanger
+  path: '/locale',
+  name: 'locale',
+  component: LocaleSelectorPage
+}, {
+  path: '*',
+  redirect: '/'
 }]

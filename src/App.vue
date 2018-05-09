@@ -1,11 +1,11 @@
 <template>
-  <v-app light :class="{web: isWeb, cordova: isCordova}">
+  <v-app light dense class="cordova">
     <v-toolbar fixed>
       <v-toolbar-title class="deep-orange--text">
         Trellis <span class="grey--text" v-if="locale">- {{locale.language_tag}}</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-menu offset-y :nudge-top="-15">
+      <v-menu offset-y :nudge-top="-14">
         <v-btn icon slot="activator">
           <v-icon>more_vert</v-icon>
         </v-btn>
@@ -184,7 +184,7 @@
     padding-top: env(safe-area-inset-top);
   }
   .app-container {
-    margin-top: 25px;
+    margin-top: 35px;
     margin-bottom: 50px;
   }
 </style>
