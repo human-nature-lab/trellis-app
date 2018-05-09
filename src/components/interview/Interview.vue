@@ -68,8 +68,8 @@
 
   import {sharedInterview} from './models/Interview'
   import InterviewService from './services/interview/InterviewService'
-  import TranslationService from '../../services/TranslationService'
-  import StringInterpolationService from '../../services/StringInterpolationService'
+  // import TranslationService from '../../services/TranslationService'
+  // import StringInterpolationService from '../../services/StringInterpolationService'
   import FormService from '../../services/form/FormService'
   import actionBus from './services/ActionBus'
   import InterviewDataService from './services/interview-data/InterviewDataService'
@@ -216,14 +216,14 @@
           q.type = {
             name: q.question_type.name
           }
-          q.text = TranslationService.getTranslated(q.question_translation)
-          if (q.choices) {
-            q.choices = q.choices.map(choice => {
-              choice.text = TranslationService.getTranslated(choice.choice_translation)
-              choice.text = StringInterpolationService.interpolate(choice.text, followUpQuestionDatumMap)
-              return choice
-            })
-          }
+          // q.text = TranslationService.getTranslated(q.question_translation)
+          // if (q.choices) {
+          //   q.choices = q.choices.map(choice => {
+          //     choice.text = TranslationService.getTranslated(choice.choice_translation)
+          //     choice.text = StringInterpolationService.interpolate(choice.text, followUpQuestionDatumMap)
+          //     return choice
+          //   })
+          // }
           return q
         })
         return questions || []

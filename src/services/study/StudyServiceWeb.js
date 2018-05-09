@@ -1,5 +1,6 @@
 import storage from '../storage/StorageService'
 import http from '../http/AxiosInstance'
+import singleton from '@/singleton'
 export default class StudyServiceWeb {
   static getCurrentStudy () {
     return new Promise((resolve, reject) => {
@@ -32,5 +33,6 @@ export default class StudyServiceWeb {
    */
   static setCurrentStudy (study) {
     storage.set('current-study', study)
+    singleton.study = study
   }
 }

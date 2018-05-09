@@ -3,15 +3,17 @@
     <v-checkbox
       :disabled="isQuestionDisabled"
       v-for="choice in question.choices"
-      :label="choice.text"
       :key="choice.val"
       v-model="selected[choice.id]"
-      @change="onChange(choice.id, selected[choice.id])"/>
+      @change="onChange(choice.id, selected[choice.id])">
+      <ChoiceText :translation="choice.choice_translation" slot="label"/>
+    </v-checkbox>
   </div>
 </template>
 
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import ChoiceText from './ChoiceText'
   import actionBus from '../services/ActionBus'
   export default {
     props: ['question'],
@@ -47,6 +49,9 @@
           })
         }
       }
+    },
+    components: {
+      ChoiceText
     }
   }
 </script>

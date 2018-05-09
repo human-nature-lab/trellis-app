@@ -1,7 +1,7 @@
 <template>
   <v-layout justify-space-between>
     <v-flex>
-      <v-layout row justify-end>
+      <v-layout row>
         <v-btn
           v-bind:class="{'primary': dk}"
           @click="dk=!dk">Don't know</v-btn>
@@ -19,7 +19,6 @@
       </v-layout>
     </v-flex>
   </v-layout>
-
 </template>
 
 <script>

@@ -1,22 +1,20 @@
 <template>
   <v-flex class="page">
-    <v-card>
-      <debug name="Location">{{location}}</debug>
-      <debug :name="'Assigned Conditions: ' + conditionTags.length">
-        {{conditionTags}}
-      </debug>
-      <debug :name="'Actions: ' + actions.length">
-        {{JSON.stringify(actions, null, 2)}}
-      </debug>
-      <v-flex class="page-content">
-        <Question
-          v-for="question in questions"
-          :question="question"
-          :interview="interview"
-          :location="location"
-          :key="question.id"/>
-      </v-flex>
-    </v-card>
+    <debug name="Location">{{location}}</debug>
+    <debug :name="'Assigned Conditions: ' + conditionTags.length">
+      {{conditionTags}}
+    </debug>
+    <debug :name="'Actions: ' + actions.length">
+      {{JSON.stringify(actions, null, 2)}}
+    </debug>
+    <v-flex class="page-content">
+      <Question
+        v-for="question in questions"
+        :question="question"
+        :interview="interview"
+        :location="location"
+        :key="question.id"/>
+    </v-flex>
     <v-flex
       class="page-footer">
         <v-layout row

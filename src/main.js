@@ -6,6 +6,7 @@ import 'vuetify/dist/vuetify.css'
 import VueCordova from 'vue-cordova'
 import VueHead from 'vue-head'
 import Debug from '@/components/Debug'
+import singleton from './singleton'
 // import 'material-design-icons-iconfont'
 
 import App from './App'
@@ -27,7 +28,7 @@ Vue.component('debug', Debug)
 
 // add cordova.js only if serving the app through file://
 if (window.location.protocol === 'file:' || window.location.port === '3000') {
-  var cordovaScript = document.createElement('script')
+  let cordovaScript = document.createElement('script')
   cordovaScript.setAttribute('type', 'text/javascript')
   cordovaScript.setAttribute('src', 'cordova.js')
   document.body.appendChild(cordovaScript)
@@ -35,6 +36,11 @@ if (window.location.protocol === 'file:' || window.location.port === '3000') {
 
 // Global component mixins
 Vue.mixin({
+  data: function () {
+    return {
+      global: singleton
+    }
+  },
   methods: {
     log: function (...args) {
       if (config.debug) {
