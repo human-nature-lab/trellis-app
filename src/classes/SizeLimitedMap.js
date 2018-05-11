@@ -18,7 +18,7 @@ export default class SizeLimitedMap {
 
   get (key) {
     let val = this.map.get(key)
-    if (val) {
+    if (val && this.meta[key]) {
       this.meta[key].touched = Date.now()
     }
     return val
@@ -26,7 +26,9 @@ export default class SizeLimitedMap {
 
   has (key) {
     if (this.map.has(key)) {
-      this.meta[key].touched = Date.now()
+      if (this.meta[key]) {
+        this.meta[key].touched = Date.now()
+      }
       return true
     } else {
       return false

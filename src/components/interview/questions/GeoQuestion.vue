@@ -30,20 +30,16 @@
         </v-list-tile>
       </v-list>
       <v-dialog
+        lazy
         v-model="geoSearchDialog">
-        <v-container fluid>
-          <v-layout>
-            <v-card>
-              <h3>Search here</h3>
-            </v-card>
-          </v-layout>
-        </v-container>
+        <GeoSearch />
       </v-dialog>
     </v-flex>
 </template>
 
 <script>
   import GeoService from '@/services/geo/GeoService'
+  import GeoSearch from '@/components/GeoSearch'
   export default {
     name: 'geo-question',
     props: {
@@ -93,6 +89,9 @@
         this.loadGeos(toLoad)
         return rows
       }
+    },
+    components: {
+      GeoSearch
     }
   }
 </script>
