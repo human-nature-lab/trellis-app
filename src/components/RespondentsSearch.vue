@@ -17,7 +17,7 @@
         </div>
       </v-layout>
     </v-toolbar>
-    <v-container class="respondents" fluid  grid-list-sm>
+    <v-container class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
         <Respondent
           v-for="respondent in respondentResults"
