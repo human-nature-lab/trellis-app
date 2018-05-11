@@ -1,115 +1,16 @@
-import DiffService from '../DiffService'
-// import http from '@/services/http/AxiosInstance'
 import InterviewService from '../interview/InterviewService'
-import _ from 'lodash'
+import http from '@/services/http/AxiosInstance'
 export default class InterviewDataWeb {
   /**
-   * The mock service which is in change of sending data changes to the backend for storage
-   * @param dataExtractor
-   * @param conditionTagExtractor
+   * Send a data patch to the server
+   * @param interviewId
+   * @param diff
+   * @returns {Promise<T>}
    */
-  constructor (dataExtractor, conditionTagExtractor) {
-    this.routes = {
-      data: 'interview/data',
-      conditions: 'interview/conditions'
-    }
-    this._previousData = copy(dataExtractor())                // Initial state of the data
-    this._previousConditions = copy(conditionTagExtractor())  // Intial state of the conditions
-    this.dataExtractor = dataExtractor                        // This should be a reference to the questionDatum array for the interview
-    this.conditionTagExtractor = conditionTagExtractor        // This should be a reference to the conditions object for the interview
-    this.maxFailures = 10
-    this._failCount = 0
-    this.isSending = false
-    this.hasDataToSend = false
-    this.send = _.throttle(this.send.bind(this), 2000)
-  }
-
-  /**
-   * Send the data :). Basically do a diff of the existing data and then send the differences to the server
-   */
-  send () {
-    if (this.isSending) {
-      this.hasDataToSend = true
-      console.log('already sending')
-      return
-    }
-    if (this.isSending || this._failCount > this.maxFailures) return
-    // We need to make a copy of the state of the data reference at this point in time so we don't lose data that is created
-    // while this request is happening
-    let dataSnapshot = copy(this.dataExtractor())
-    let conditionTagSnapshot = copy(this.conditionTagExtractor())
-    let dataDiff = DiffService.dataDiff(dataSnapshot, this._previousData)
-    let conditionDiff = DiffService.conditionTagsDiff(conditionTagSnapshot, this._previousConditions)
-    // No need to send anything if there aren't any changes
-    if (!(hasDataChanges(dataDiff) || hasConditionChanges(conditionDiff))) {
-      console.log('No changes in data detected')
-      return
-    }
-    let interviewId = InterviewService.getInterviewId()
-    this.isSending = true
-    console.log('starting send', interviewId)
-    // http().post(`interview/${interviewId}/data`, {
-    //   data: dataDiff,
-    //   conditionTags: conditionDiff
-    // }).then(res => {
-    //   if (res.status >= 200 && res.status < 300) {
-    //     this._previousData = dataSnapshot
-    //     this._previousConditions = conditionTagSnapshot
-    //     this.onSuccess()
-    //   } else {
-    //     throw Error('Unable to complete request')
-    //   }
-    // }).catch(err => {
-    //   this.onError(err)
-    // }).then(() => {
-    //   this.isSending = false
-    //   // This is to handle any period of time between data being sent and the throttle waiting to call send
-    //   if (this.hasDataToSend) {
-    //     this.send()
-    //     this.hasDataToSend = false
-    //   }
-    // })
-  }
-  onSuccess () {
-    this._failCount = 0
-    console.log('Successfully stored data')
-  }
-  onError (err) {
-    this._failCount++
-    console.error(err)
+  static sendDiff (diff) {
+    return http().post(`interview/${InterviewService.getInterviewId()}/data`, diff).then(res => {
+      return res.data
+    })
   }
 }
 
-/**
- * Check if the data diff has any data
- * @param diff - Result of [DiffService#dataDiff]{@link DiffService#dataDiff}
- * @returns {boolean}
- */
-export function hasDataChanges (diff) {
-  return diff.questionDatum.added.length > 0 ||
-    diff.questionDatum.modified.length > 0 ||
-    diff.questionDatum.removed.length > 0 ||
-    diff.datum.added.length > 0 ||
-    diff.datum.removed.length > 0 ||
-    diff.datum.modified.length > 0
-}
-
-/**
- * Check if the condition diff has any data
- * @param diff - Result of [DiffService#conditionTagsDiff]{@link DiffService#conditionTagsDiff}
- * @returns {boolean}
- */
-export function hasConditionChanges (diff) {
-  return diff.section.added.length > 0 || diff.section.removed.length > 0 ||
-    diff.respondent.added.length > 0 || diff.respondent.removed.length > 0 ||
-    diff.survey.added.length > 0 || diff.survey.removed.length > 0
-}
-
-/**
- * Make a deep copy of an object
- * @param json
- * @returns {object|array}
- */
-export function copy (json) {
-  return JSON.parse(JSON.stringify(json))
-}

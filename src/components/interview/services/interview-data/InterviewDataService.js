@@ -1,12 +1,12 @@
 import switchByModeEnv from '@/services/util'
-// import InterviewDataWeb from './InterviewDataWeb'
+import InterviewDataWeb from './InterviewDataWeb'
 import InterviewDataMock from './InterviewdataMock'
 import InterviewDataCordova from './InterviewDataCordova'
 
 let Constructor = switchByModeEnv({
   WEB: {
     TEST: InterviewDataMock,
-    PROD: InterviewDataMock
+    PROD: InterviewDataWeb
   },
   CORDOVA: {
     TEST: InterviewDataMock,

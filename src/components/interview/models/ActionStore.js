@@ -1,4 +1,4 @@
-import InterviewActionsService from './interview-actions/InterviewActionsService'
+import InterviewActionsService from '../services/interview-actions/InterviewActionsService'
 import _ from 'lodash'
 import uuidv4 from 'uuid/v4'
 export default class ActionStore {
@@ -6,7 +6,7 @@ export default class ActionStore {
     this.store = []
     this._lastPersistedLength = 0
     this._existingRequest = null
-    this.persist = _.debounce(this.persist.bind(this), throttleRate, {
+    this.persist = _.debounce(this.save.bind(this), throttleRate, {
       leading: false,
       maxWait: throttleRate
     })
@@ -37,7 +37,6 @@ export default class ActionStore {
   add (action, location) {
     action.id = uuidv4()
     action.section = location.section
-    delete action.question_datum_id
     // action.section_repetition = location.sectionRepetition
     // action.section_follow_up_repetition = location.sectionFollowUpDatumRepetition
     action.page = location.page
@@ -59,7 +58,7 @@ export default class ActionStore {
    * Actually save the data via the InterviewActionsService.saveActions method, whatever that may be. This method will
    * call itself again if data has been added to the store since it last ran
    */
-  persist () {
+  save () {
     if (this._existingRequest) {
       console.log('action saving request in progress')
       return
