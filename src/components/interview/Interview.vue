@@ -72,11 +72,9 @@
   // import StringInterpolationService from '../../services/StringInterpolationService'
   import FormService from '../../services/form/FormService'
   import actionBus from './services/ActionBus'
-  import InterviewDataService from './services/interview-data/InterviewDataService'
   import InterviewActionsService from './services/interview-actions/InterviewActionsService'
 
   let interviewState
-  let interviewDataService
   export default {
     data () {
       return {
@@ -151,15 +149,10 @@
           ]).then(results => {
             let [actions, data, formBlueprint] = results
             interviewState = sharedInterview(interview, formBlueprint, actions, data)
-            interviewDataService = new InterviewDataService(() => {
-              return interviewState.data
-            }, () => {
-              return interviewState.conditionTags
-            })
             interviewState.bootstrap()
             // Bind the relevant parts to the view
-            this.interviewData = interviewState.data
-            this.interviewConditionTags = interviewState.conditionTags
+            this.interviewData = interviewState.data.data
+            this.interviewConditionTags = interviewState.data.conditionTags
             this.interviewActions = interviewState.actions.store
             this.location = interviewState.navigator.location
             this.interview = interview
@@ -182,7 +175,6 @@
           throw Error('Trying to push actions before interview has been initialized')
         }
         interviewState.pushAction(action)
-        interviewDataService.send()
       },
       showBeginningDialog: function () {
         this.beginningDialog = true
@@ -216,14 +208,6 @@
           q.type = {
             name: q.question_type.name
           }
-          // q.text = TranslationService.getTranslated(q.question_translation)
-          // if (q.choices) {
-          //   q.choices = q.choices.map(choice => {
-          //     choice.text = TranslationService.getTranslated(choice.choice_translation)
-          //     choice.text = StringInterpolationService.interpolate(choice.text, followUpQuestionDatumMap)
-          //     return choice
-          //   })
-          // }
           return q
         })
         return questions || []

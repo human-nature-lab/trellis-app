@@ -1,7 +1,8 @@
 import SkipService from '../services/SkipService'
 import actionDefinitions from '../services/InterviewActionDefinitions'
 import ConditionAssignmentService from '@/services/ConditionAssignmentService'
-import ActionStore from '../services/ActionStore'
+import ActionStore from './ActionStore'
+import DataStore from './DataStore'
 import Emitter from '@/classes/Emitter'
 
 import InterviewNavigator from '../services/InterviewNavigator'
@@ -10,23 +11,21 @@ import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecy
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 export default class Interview extends Emitter {
-  constructor (interview, blueprint = null, actions = [], data = []) {
+  constructor (interview, blueprint = null, actions = [], data = [], conditionTags = {}) {
     super()
     this.interview = interview
     this.blueprint = blueprint
-    this.data = data
-    this.conditionTags = {
-      respondent: [],
-      survey: [],
-      section: []
-    }
+    this.data = new DataStore()
     this.actions = new ActionStore()
-    this.actions.load(actions)
+
     this.conditionAssigner = new ConditionAssignmentService()
     this.allConditions = new Map()
     this.varNameMap = new Map()
     this.questionMap = new Map()
     this.load(blueprint)
+    this.actions.load(actions)
+    this.data.loadData(data)
+    this.data.loadConditionTags(conditionTags)
     this.navigator = new InterviewNavigator(this)
   }
 
@@ -50,7 +49,7 @@ export default class Interview extends Emitter {
    * Empty the state
    */
   _resetState () {
-    this.data = []
+    this.data.reset()
     this.conditionTags.respondent = []
     this.conditionTags.survey = []
     this.conditionTags.section = []
@@ -91,35 +90,8 @@ export default class Interview extends Emitter {
    * @param action
    */
   pushAction (action) {
-    // This should insert the action following the order of the question datum
-    // if (this.actions.length === 0) {
     action.survey_id = this.interview.survey_id
     this.actions.add(action, this.location)
-    // } else {
-    //   let i
-      // TODO: This is a naive search and could be a binary search instead if performance is an issue
-      // for (i = 0; i < this.actions.length; i++) {
-      //   if (this.actions[i].question_datum_id) {
-      //     let questionDatum = this.data.find(qDatum => qDatum.id === this.actions[i].question_datum_id)
-      //     if (!questionDatum) {
-      //       throw Error(`This question should already have a question datum associated with it. Location: ${JSON.stringify(this.location, null, 2)}`)
-      //     }
-      //     if (questionDatum.section >= this.location.section) {
-      //       if (questionDatum.section_repetition >= this.location.sectionRepetition) {
-      //         if (questionDatum.section_follow_up_repetition >= this.location.sectionFollowUpDatumId) {
-      //           if (questionDatum.page >= this.location.page) {
-      //             if ((new Date()).getTime() >= this.actions[i].created_at) {
-      //               break
-      //             }
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
-      // this.actions.splice(i, 0, action)
-
-    // }
     this.performAction(action)
   }
 
@@ -129,13 +101,10 @@ export default class Interview extends Emitter {
    */
   performAction (action) {
     if (actionDefinitions[action.action_type]) {
-      console.log(action.action_type)
       let questionDatum = null
       let questionBlueprint = null
       if (action.question_id) {
-        questionDatum = this.data.find(q => {
-          return q.question_id === action.question_id && q.section === action.section && q.page === action.page
-        })
+        questionDatum = this.data.getSingleQuestionDatumByLocation(action.question_id, action.section, action.page, action.sectionRepetition, action.sectionFollowUpDatumRepetition)
         questionBlueprint = this._findQuestionBlueprint(action.question_id)
       } else if (action.action_type !== 'next' && action.action_type !== 'previous') {
         console.error(action)
@@ -282,14 +251,7 @@ export default class Interview extends Emitter {
    * @private
    */
   _getCurrentPageData () {
-    let data = []
-    for (let i = 0; i < this.data.length; i++) {
-      let questionDatum = this.data[i]
-      if (this._locationMatchesQuestionDatum(this.location, questionDatum)) {
-        data.push(questionDatum)
-      }
-    }
-    return data
+    return this.data.getAllQuestionDatumByLocation(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
   }
 
   /**
@@ -314,7 +276,7 @@ export default class Interview extends Emitter {
    */
   _makeQuestionDatum (questionBlueprint) {
     let questionDatum = QuestionDatumRecycler.getNoKey(this, questionBlueprint) // OPTIMIZATION: This could be optimized by using 'get' instead of getNoKey
-    this.data.push(questionDatum)
+    this.data.add(questionDatum)
     return questionDatum
   }
 
@@ -337,14 +299,14 @@ export default class Interview extends Emitter {
     // that are being modified as opposed to being created for the first time
     switch (act.scope) {
       case 'section':
-        this.conditionTags.section.push(SectionConditionTagRecycler.getNoKey(this, act))
+        this.data.addTag('section', SectionConditionTagRecycler.getNoKey(this, act))
         break
       case 'form':
-        this.conditionTags.survey.push(FormConditionTagRecycler.getNoKey(this, act))
+        this.data.addTag('survey', FormConditionTagRecycler.getNoKey(this, act))
         break
       case 'respondent':
       default:
-        this.conditionTags.respondent.push(RespondentConditionTagRecycler.getNoKey(this.interview, act))
+        this.data.addTag('respondent', RespondentConditionTagRecycler.getNoKey(this.interview, act))
     }
   }
 
@@ -389,20 +351,7 @@ export default class Interview extends Emitter {
    * Get all currently assigned condition tags
    */
   _getCurrentConditionTags () {
-    let tags = []
-    this.conditionTags.respondent.forEach(tag => {
-      tags.push(tag)
-    })
-    this.conditionTags.survey.forEach(tag => {
-      tags.push(tag)
-    })
-    this.conditionTags.section.filter(tag => {
-      return tag.repetition === this.location.sectionRepetition &&
-        tag.follow_up_datum_id === this.location.sectionFollowUpDatumId
-    }).forEach(tag => {
-      tags.push(tag)
-    })
-    return tags
+    return this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
   }
 
   /**
@@ -411,7 +360,7 @@ export default class Interview extends Emitter {
   makePageQuestionDatum () {
     let currentPage = this.currentPage()
     for (let questionBlueprint of currentPage.questions) {
-      if (this.data.findIndex(qD => this._locationMatchesQuestionDatum(this.location, qD) && qD.question_id === questionBlueprint.id) === -1) {
+      if (this.data.locationHasQuestionDatum(questionBlueprint.id, this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)) {
         this._makeQuestionDatum(questionBlueprint)
       }
     }
@@ -424,7 +373,7 @@ export default class Interview extends Emitter {
    * @private
    */
   _getQuestionDatumDataInOrder (questionDatumId, useRandom = false) {
-    let data = this.data.find(qDatum => qDatum.id === questionDatumId).data
+    let data = this.data.getQuestionDatumById(questionDatumId).data
     if (useRandom) {
       data.sort(function (a, b) {
         return a.random_val - b.random_val
@@ -441,16 +390,7 @@ export default class Interview extends Emitter {
    * Get the corresponding questionDatum for this place in the survey
    */
   _getQuestionDatumByLocation (location, questionId) {
-    for (let qDatum of this.data) {
-      if (qDatum.question_id === questionId) {
-        if (qDatum.section === location.section &&
-            qDatum.sectionRepetition === location.sectionRepetition &&
-            qDatum.sectionFollowUpDatumId === location.sectionFollowUpDatumId &&
-            qDatum.page === location.page) {
-          return qDatum
-        }
-      }
-    }
+    return this.data.getSingleQuestionDatumByLocation(questionId, location.section, location.page, location.sectionRepetition, location.sectionFollowUpDatumId)
   }
 
   /**
@@ -639,10 +579,11 @@ export default class Interview extends Emitter {
    * @returns {T}
    */
   getFollowUpQuestionDatum (sectionFollowUpQuestionId) {
-    let qDatum = this.data.find(qDatum => {
-      return qDatum.question_id === sectionFollowUpQuestionId
-    })
-    return qDatum
+    let qDatum = this.data.getQuestionDataByQuestionId(sectionFollowUpQuestionId)
+    if (qDatum && qDatum.length > 1) {
+      throw Error('We need to handle follow up questions. Too many question datum for this followUpQuestionId')
+    }
+    return qDatum ? qDatum[0] : null
   }
 
   getSingleDatumByQuestionVarName (varName, followUpDatumId) {
@@ -651,17 +592,12 @@ export default class Interview extends Emitter {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
     console.log('Getting question by varname', varName, followUpDatumId)
-    let qDatum = this.data.find(qDatum => {
-      if (followUpDatumId) {
-        return qDatum.question_id === questionId && qDatum.data.findIndex(d => d.id === followUpDatumId) > -1
-      } else {
-        return qDatum.question_id === questionId
+    for (let qD of this.data.getQuestionDataByQuestionId(questionId)) {
+      if (qD.data.findIndex(d => d.id === followUpDatumId) > -1) {
+        return qD
       }
-    })
-    if (!qDatum) {
-      throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
     }
-    return qDatum
+    throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
   }
 
   /**
