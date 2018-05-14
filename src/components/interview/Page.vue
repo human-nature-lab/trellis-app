@@ -4,6 +4,9 @@
     <debug :name="'Assigned Conditions: ' + conditionTags.length">
       {{conditionTags}}
     </debug>
+    <debug :name="`Data: ${data.length}`">
+      {{JSON.stringify(data, null, 2)}}
+    </debug>
     <debug :name="'Actions: ' + actions.length">
       {{JSON.stringify(actions, null, 2)}}
     </debug>

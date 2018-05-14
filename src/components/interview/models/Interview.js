@@ -592,7 +592,8 @@ export default class Interview extends Emitter {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
     console.log('Getting question by varname', varName, followUpDatumId)
-    for (let qD of this.data.getQuestionDataByQuestionId(questionId)) {
+    let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
+    for (let qD of questionDatum) {
       if (qD.data.findIndex(d => d.id === followUpDatumId) > -1) {
         return qD
       }

@@ -158,6 +158,7 @@
             this.interview = interview
             interviewState.on('atEnd', this.showEndDialog, this)
             interviewState.on('atBeginning', this.showBeginningDialog, this)
+
             setTimeout(() => {
               this.isLoading = false
             }, this.artificiallyExtendLoadTime ? 2000 : 0)
