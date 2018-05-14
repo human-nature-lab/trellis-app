@@ -7,7 +7,12 @@
         {{this.translated}}
       </v-list-tile-content>
       <v-list-tile-action>
-        <v-btn @click="$emit('geo-select')">Select</v-btn>
+        <v-btn
+          :color="selected && 'primary' || ''"
+          @click.stop="$emit('geo-select')">
+          <v-icon v-if="selected">check</v-icon>
+          <span v-else>Select</span>
+        </v-btn>
       </v-list-tile-action>
     </v-list-tile>
 </template>
@@ -21,6 +26,10 @@
       geo: {
         type: Object,
         required: true
+      },
+      selected: {
+        type: Boolean,
+        default: false
       }
     },
     data: function () {

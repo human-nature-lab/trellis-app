@@ -2,6 +2,12 @@ import InterviewData from '../services/interview-data/InterviewDataService'
 import _ from 'lodash'
 import DiffService from '../services/DiffService'
 
+import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
+import DatumRecycler from '../services/recyclers/DatumRecycler'
+import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
+import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
+import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
+
 export default class DataStore {
   constructor (throttleRate = 10000) {
     this.reset()
@@ -45,11 +51,25 @@ export default class DataStore {
    * @param data
    */
   loadData (data) {
+    data = JSON.parse(JSON.stringify(data))
+    let datum = []
+    let questionDatum = []
     for (let d of data) {
+      d.section = parseInt(d.section, 10)
+      d.page = parseInt(d.page, 10)
+      d.section_repetition = parseInt(d.section_repetition, 10)
       this.data.push(d)
+      for (let dat of d.data) {
+        datum.push(dat)
+      }
+      let qD = JSON.parse(JSON.stringify(d))
+      qD.data = []
+      questionDatum.push(qD)
       this.questionDatumIdMap.set(d.id, d)
     }
     this._lastPersistedState.data = _.cloneDeep(this.data)
+    QuestionDatumRecycler.fill(questionDatum)
+    DatumRecycler.fill(datum)
   }
 
   /**
@@ -63,6 +83,9 @@ export default class DataStore {
       }
     }
     this._lastPersistedState.conditionTags = _.cloneDeep(this.conditionTags)
+    RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
+    SectionConditionTagRecycler.fill(this.conditionTags.section)
+    FormConditionTagRecycler.fill(this.conditionTags.survey)
   }
 
   /**

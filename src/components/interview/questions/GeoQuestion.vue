@@ -32,7 +32,10 @@
       <v-dialog
         lazy
         v-model="geoSearchDialog">
-        <GeoSearch />
+        <GeoSearch
+          :selectedIds="geoIds"
+          @geoSelected="onGeoSelected"
+          @doneSelecting="onDoneSelecting"/>
       </v-dialog>
     </v-flex>
 </template>
@@ -70,6 +73,12 @@
         }).catch(err => {
           this.error = err
         })
+      },
+      onGeoSelected: function (geo) {
+
+      },
+      onDoneSelecting: function (added, removed) {
+
       }
     },
     computed: {

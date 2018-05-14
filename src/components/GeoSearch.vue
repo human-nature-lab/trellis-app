@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-card>
-      <v-container fluid>
+      <v-container fluid class="geo-search" :class="{'cart-spacing': selected.length}">
         <v-alert v-if="error">
           {{this.error}}
         </v-alert>
@@ -31,10 +31,19 @@
           </v-list-tile>
           <GeoListTile
             v-for="geo in results"
+            :selected="selected.indexOf(geo.id) > -1"
             @click="onGeoClick(geo)"
+            @geo-select="onGeoSelect(geo)"
             :key="geo.id"
             :geo="geo" />
         </v-list>
+        <Cart
+          v-if="selected.length"
+          :items="selected">
+          <v-flex slot name="item">
+            Item
+          </v-flex>
+        </Cart>
       </v-container>
     </v-card>
   </v-container>
@@ -44,10 +53,14 @@
   import _ from 'lodash'
   import GeoService from '@/services/geo/GeoService'
   import GeoListTile from './GeoListTile'
+  import Cart from './Cart'
   import singleton from '@/singleton'
   export default {
     name: 'geo-search',
     props: {
+      selectedIds: {
+        type: Array
+      },
       baseFilters: {
         type: Object,
         default: function () {
@@ -72,6 +85,8 @@
         },
         query: '',
         results: [],
+        added: [],
+        removed: [],
         error: null,
         isSearching_: false,
         lastParentIds: [],
@@ -84,6 +99,16 @@
     computed: {
       filters: function () {
         return Object.assign({}, this.baseFilters, this.userFilters)
+      },
+      selected: function () {
+        let selected = this.selectedIds.concat(this.added)
+        for (let removed of this.removed) {
+          let index = selected.indexOf(removed)
+          if (index > -1) {
+            selected.splice(index, 1)
+          }
+        }
+        return selected
       }
     },
     methods: {
@@ -104,7 +129,22 @@
         })
       },
       onGeoSelect: function (geo) {
-        this.$emit('geoSelect', geo)
+        let sIndex = this.selected.indexOf(geo.id)
+        let aIndex = this.added.indexOf(geo.id)
+        let rIndex = this.removed.indexOf(geo.id)
+        if (aIndex > -1) {
+          this.added.splice(aIndex, 1)
+        } else if (rIndex > -1) {
+          this.removed.splice(rIndex, 1)
+        } else if (sIndex > -1) {
+          this.removed.push(geo.id)
+        } else {
+          this.added.push(geo.id)
+        }
+        this.$emit('geoSelected', geo)
+      },
+      onDone: function () {
+        this.$emit('doneSelecting', this.added, this.removed)
       },
       search: function () {
         this.isSearching_ = true
@@ -127,11 +167,18 @@
       }
     },
     components: {
-      GeoListTile
+      GeoListTile,
+      Cart
     }
   }
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+.cart-spacing
+  padding-bottom: 150px
+.cart
+  border-top: 1px solid grey
+  position: absolute
+  bottom: 0
+  left: 0
 </style>
