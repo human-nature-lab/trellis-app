@@ -6,7 +6,7 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn class="subheading" flat :to="{name: 'locale', query: {to: this.$route.path}}">
-        {{global.locale.language_tag}}
+        {{global.locale ? global.locale.language_tag : ''}}
       </v-btn>
       <v-btn icon @click="global.darkTheme=!global.darkTheme">
         <v-icon>wb_sunny</v-icon>
@@ -19,17 +19,8 @@
           <v-list-tile>
             <router-link :to="{name: 'RespondentsSearch'}">Respondents</router-link>
           </v-list-tile>
-          <v-list-tile>
-            <router-link :to="{name: 'Interview', params: {studyId: study.id, interviewId: '0'}}">Form 1</router-link>
-          </v-list-tile>
-          <v-list-tile>
-            <router-link :to="{name: 'Interview', params: {studyId: study.id, interviewId: '1'}}">Form 2</router-link>
-          </v-list-tile>
-          <v-list-tile>
-            <router-link :to="{name: 'Interview', params: {studyId: study.id, interviewId: '2'}}">Form 3</router-link>
-          </v-list-tile>
-          <v-list-tile>
-            <router-link :to="{name: 'Interview', params: {studyId: study.id, interviewId: '3'}}">Form 4</router-link>
+          <v-list-tile v-if="global.study" v-for="(id, index) in interviewIds" :key="id">
+            <router-link :to="{name: 'Interview', params: {studyId: global.study.id, interviewId: id}}">Interview {{id}}</router-link>
           </v-list-tile>
         </v-list>
       </v-menu>
@@ -43,16 +34,19 @@
 </template>
 
 <script>
-  import storage from './services/storage/StorageService'
-  if (storage.get('localeId') === null) {
-    storage.set('localeId', '48984fbe-84d4-11e5-ba05-0800279114ca')
-  }
+  import StudyService from './services/study/StudyService'
   export default {
     name: 'web-app',
     data: function () {
       return {
-        study: storage.get('current-study') || {}
+        error: null,
+        interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796']
       }
+    },
+    created: function () {
+      StudyService.getStudy('ad9a9086-8f15-4830-941d-416b59639c41').then(study => {
+        StudyService.setCurrentStudy(study)
+      })
     }
   }
 </script>

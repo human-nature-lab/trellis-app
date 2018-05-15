@@ -33,6 +33,7 @@
     "material-design-icons-iconfont": "^3.0.3",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.6",
+    "typeface-roboto": "0.0.54",
     "uuid": "^3.2.1",
     "vue": "^2.3.3",
     "vue-cordova": "^0.1.2",
