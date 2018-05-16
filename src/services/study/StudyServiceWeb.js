@@ -35,4 +35,14 @@ export default class StudyServiceWeb {
     storage.set('current-study', study)
     singleton.study = study
   }
+
+  /**
+   * Get list of avaliable studies
+   * @returns {Promise<Array>}
+   */
+  static getStudies () {
+    return http().get('/studies').then(res => {
+      return res.data.studies
+    })
+  }
 }

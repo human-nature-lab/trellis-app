@@ -12,7 +12,7 @@
           </v-layout>
         </v-flex>
         <v-flex xs3>
-          <v-btn @click="$emit('onDone')">Done</v-btn>
+          <v-btn @click="$emit('done')">Done</v-btn>
         </v-flex>
       </v-layout>
     </v-container>
@@ -35,7 +35,11 @@
   background: white
   max-height: 150px
 .cart-item
-  width: 200px
+  height: 100px
+  width: 100px
+  flex-shrink: 0
+  box-sizing: border-box
+  border: 1px solid grey
 .items
   overflow-y: auto
 </style>

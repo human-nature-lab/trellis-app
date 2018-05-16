@@ -45,12 +45,20 @@ const definitions = {
     }
     questionDatum.data.push(datum)
   },
-  'deselect-choice': function (interview, payload, questionDatum, questionBlueprint) {
+  'deselect-choice': function (interview, payload, questionDatum) {
     let index = questionDatum.data.findIndex(d => d.choice_id === payload.choice_id)
     if (index > -1) {
       interview.deleteSingleQuestionDatumDatum(questionDatum, index)
     } else {
       console.error('deselect-choice', 'invalid input without an already selected choice with that id')
+    }
+  },
+  'other-choice-text': function (interview, payload, questionDatum) {
+    let datum = questionDatum.data.find(d => d.choice_id === payload.choice_id)
+    if (datum) {
+      datum.val = payload.val
+    } else {
+      console.error('other-choice-text', 'invalid input without an already selected choice with that id')
     }
   },
   'dk-rf': function (interview, payload, questionDatum, questionBlueprint) {
@@ -125,6 +133,17 @@ const definitions = {
       questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
     } else {
       questionDatum.data[0].val = payload.val
+    }
+  },
+  'add-geo': function (interview, payload, questionDatum) {
+    questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
+  },
+  'remove-geo': function (interview, payload, questionDatum) {
+    let index = questionDatum.data.findIndex(datum => datum.geo_id === payload.geo_id)
+    if (index > -1) {
+      questionDatum.data.splice(index, 1)
+    } else {
+      throw new Error('No datum exists with this geo id')
     }
   }
 }

@@ -33,7 +33,9 @@ export default class GeneratorService {
     if (_depth > 1000) {
       throw Error('Max depth of generator has been exceeded')
     }
-    if (Array.isArray(generatorExpression)) {
+    if (!generatorExpression) {
+      return generatorExpression
+    } else if (Array.isArray(generatorExpression)) {
       result = []
       for (let i = 0; i < generatorExpression.length; i++) {
         result.push(GeneratorService.expand(generatorExpression[i], _depth + 1))

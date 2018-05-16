@@ -1,39 +1,41 @@
 <template>
-  <v-flex class="page">
-    <debug name="Location">{{location}}</debug>
-    <debug :name="'Assigned Conditions: ' + conditionTags.length">
-      {{conditionTags}}
-    </debug>
-    <debug :name="`Data: ${data.length}`">
-      {{JSON.stringify(data, null, 2)}}
-    </debug>
-    <debug :name="'Actions: ' + actions.length">
-      {{JSON.stringify(actions, null, 2)}}
-    </debug>
-    <v-flex class="page-content">
-      <Question
-        v-for="question in questions"
-        :question="question"
-        :interview="interview"
-        :location="location"
-        :key="question.id"/>
-    </v-flex>
-    <v-flex
-      class="page-footer">
-        <v-layout row
-                  justify-space-between>
-          <v-btn @click="onPrevious"
-                 justify-left>
-            <v-icon left>chevron_left</v-icon> Previous
-          </v-btn>
-          <v-btn @click="onNext"
-                 :disabled="!allRequiredQuestionsAnswered"
-                 justify-right>
-            Next <v-icon right>chevron_right</v-icon>
-          </v-btn>
-        </v-layout>
-    </v-flex>
-  </v-flex>
+  <v-container fluid class="page">
+    <v-layout column>
+      <debug name="Location">{{location}}</debug>
+      <debug :name="'Assigned Conditions: ' + conditionTags.length">
+        {{conditionTags}}
+      </debug>
+      <debug :name="`Data: ${data.length}`">
+        {{JSON.stringify(data, null, 2)}}
+      </debug>
+      <debug :name="'Actions: ' + actions.length">
+        {{JSON.stringify(actions, null, 2)}}
+      </debug>
+      <v-flex class="page-content">
+        <Question
+          v-for="question in questions"
+          :question="question"
+          :interview="interview"
+          :location="location"
+          :key="question.id"/>
+      </v-flex>
+      <v-flex
+        class="page-footer">
+          <v-layout row
+                    justify-space-between>
+            <v-btn @click="onPrevious"
+                   justify-left>
+              <v-icon left>chevron_left</v-icon> Previous
+            </v-btn>
+            <v-btn @click="onNext"
+                   :disabled="!allRequiredQuestionsAnswered"
+                   justify-right>
+              Next <v-icon right>chevron_right</v-icon>
+            </v-btn>
+          </v-layout>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>

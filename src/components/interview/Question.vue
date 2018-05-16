@@ -13,7 +13,7 @@
       <!--</v-toolbar>-->
     </v-card-title>
     <v-card-text class="question-content">
-      <v-flex class="question-text">
+      <v-flex class="question-text title">
         <InterpolatedText
           :text="translated"
           :section-follow-up-datum-id="location.sectionFollowUpDatumId" />
@@ -22,35 +22,32 @@
         v-if="question.type.name === 'intro'"
         :question="question"/>
       <MultipleSelectQuestion
-        v-if="question.type.name === 'multiple_select'"
-        :question="question"/>
-      <MultipleChoiceQuestion
-        v-if="question.type.name === 'multiple_choice'"
+        v-else-if="question.type.name === 'multiple_select' || question.type.name === 'multiple_choice'"
         :question="question"/>
       <IntegerQuestion
-        v-if="question.type.name === 'integer'"
+        v-else-if="question.type.name === 'integer'"
         :question="question"/>
       <DecimalQuestion
-        v-if="question.type.name === 'decimal'"
+        v-else-if="question.type.name === 'decimal'"
         :question="question"/>
       <RosterQuestion
-        v-if="question.type.name === 'roster'"
+        v-else-if="question.type.name === 'roster'"
         :question="question"/>
       <RelationshipQuestion
-        v-if="question.type.name === 'relationship'"
+        v-else-if="question.type.name === 'relationship'"
         :question="question"
         :respondent-id="interview.survey.respondent_id"/>
       <TextQuestion
-        v-if="question.type.name === 'text'"
+        v-else-if="question.type.name === 'text'"
         :question="question"/>
       <DateQuestion
-        v-if="['date', 'year', 'year_month', 'year_month_day'].indexOf(question.type.name) > -1"
+        v-else-if="['date', 'year', 'year_month', 'year_month_day'].indexOf(question.type.name) > -1"
         :question="question"/>
       <TimeQuestion
-        v-if="question.type.name === 'time'"
+        v-else-if="question.type.name === 'time'"
         :question="question"/>
       <GeoQuestion
-        v-if="question.type.name === 'geo'"
+        v-else-if="question.type.name === 'geo'"
         :question="question"/>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
@@ -71,7 +68,6 @@
   import IntegerQuestion from './questions/IntegerQuestion'
   import InterpolatedText from './InterpolatedText'
   import IntroQuestion from './questions/IntroQuestion.vue'
-  import MultipleChoiceQuestion from './questions/MultipleChoiceQuestion'
   import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
   import RelationshipQuestion from './questions/RelationshipQuestion'
   import RosterQuestion from './questions/RosterQuestion'
@@ -110,7 +106,6 @@
       InterpolatedText,
       IntegerQuestion,
       IntroQuestion,
-      MultipleChoiceQuestion,
       MultipleSelectQuestion,
       RelationshipQuestion,
       RosterQuestion,
@@ -125,8 +120,14 @@
   .question
     margin-top: $question-margin
     margin-bottom: $question-margin
-    label
-      text-overflow: inherit
-      white-space: normal
-      overflow: auto
+    .question-text
+      padding-bottom: 15px
+  .input-group
+    &.input-group--selection-controls
+      label
+        /*text-overflow: inherit*/
+        /*white-space: normal*/
+        /*overflow: auto*/
+        max-width: 95%
+        /*height: auto*/
 </style>
