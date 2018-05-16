@@ -37,4 +37,11 @@ export default class InterviewServiceWeb {
         }
       })
   }
+
+  static getPreload (interviewId) {
+    return http().get(`interview/${interviewId}/preload`)
+      .then(res => {
+        return res.data.preload
+      })
+  }
 }

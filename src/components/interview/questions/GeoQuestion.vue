@@ -1,27 +1,12 @@
 <template>
     <v-flex>
       <v-list>
-        <v-list-tile
-          v-for="(geo, geoIndex) in geos"
+        <GeoListTile
+          v-for="geo in geos"
+          :geo="geo"
+          hide-select
           :key="geo.id">
-          <v-list-tile-avatar>
-            <v-tooltip top>
-              <v-btn
-                slot="activator"
-                icon
-                v-if="editingIndex === geoIndex"
-                :disabled="isSavingEdit || isQuestionDisabled"
-                @click="stopEditingAndRevert(geo, geoIndex)">
-                <v-icon color="red">clear</v-icon>
-              </v-btn>
-              <span>Revert changes</span>
-            </v-tooltip>
-          </v-list-tile-avatar>
-          <v-list-tile-content>
-            <span class="roster-val"
-                  v-if="geoIndex !== editingIndex">{{geo.val}}</span>
-          </v-list-tile-content>
-        </v-list-tile>
+        </GeoListTile>
         <v-list-tile>
           <v-spacer />
           <v-list-tile-action>
@@ -34,15 +19,16 @@
         v-model="geoSearchDialog">
         <GeoSearch
           :selectedIds="geoIds"
-          @geoSelected="onGeoSelected"
-          @doneSelecting="onDoneSelecting"/>
+          @doneSelecting="onDoneSelecting" />
       </v-dialog>
     </v-flex>
 </template>
 
 <script>
-  import GeoService from '@/services/geo/GeoService'
-  import GeoSearch from '@/components/GeoSearch'
+  import GeoService from '../../../services/geo/GeoService'
+  import GeoSearch from '../../../components/GeoSearch'
+  import GeoListTile from '../../../components/GeoListTile'
+  import actionBus from '../services/ActionBus'
   export default {
     name: 'geo-question',
     props: {
@@ -62,23 +48,58 @@
     },
     methods: {
       loadGeos: function (geoIds, shouldLoadExisting = false) {
+        geoIds = Array.from(new Set(geoIds))
         if (!geoIds.length) return
+        let needLoaded = []
+        let needRefreshed = []
         if (!shouldLoadExisting) {
-          geoIds = geoIds.filter(geo => !this.geoCache[geo.id]) // Filter out previously loaded roster rows
+          for (let id of geoIds) {
+            if (this.geoCache[id]) {
+              needRefreshed.push(id)
+            } else {
+              needLoaded.push(id)
+            }
+          }
         }
-        GeoService.getGeosById(geoIds).then(rosterRows => {
-          for (let row of rosterRows) {
-            this.$set(this.geoCache, row.id, row)
+        GeoService.getGeosById(needLoaded).then(geos => {
+          for (let geo of geos) {
+            this.$set(this.geoCache, geo.id, geo)
           }
         }).catch(err => {
           this.error = err
         })
+        for (let id of needRefreshed) {
+          console.log('refreshing', id)
+          this.$set(this.geoCache, id, this.geoCache[id])
+        }
       },
-      onGeoSelected: function (geo) {
-
+      add: function (geoId) {
+        actionBus.action({
+          question_id: this.question.id,
+          action_type: 'add-geo',
+          payload: {
+            geo_id: geoId
+          }
+        })
+      },
+      remove: function (geoId) {
+        actionBus.action({
+          question_id: this.question.id,
+          action_type: 'remove-geo',
+          payload: {
+            geo_id: geoId
+          }
+        })
       },
       onDoneSelecting: function (added, removed) {
-
+        for (let id of added) {
+          this.add(id)
+        }
+        for (let id of removed) {
+          this.remove(id)
+        }
+        this.geoSearchDialog = false
+        this.loadGeos(this.geoIds)
       }
     },
     computed: {
@@ -86,7 +107,7 @@
         return this.question.datum.data.map(d => d.geo_id)
       },
       geos: function () {
-        console.log('recalculating roster values')
+        console.log('recalculating any new geos to load')
         let toLoad = []
         let rows = this.geoIds.map(id => {
           if (this.geoCache[id]) {
@@ -100,7 +121,8 @@
       }
     },
     components: {
-      GeoSearch
+      GeoSearch,
+      GeoListTile
     }
   }
 </script>

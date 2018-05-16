@@ -8,6 +8,7 @@
         <v-layout row wrap>
           <v-text-field
             v-model="query"
+            placeholder="Search..."
             :loading="isSearching_"
             @input="queryChange"/>
         </v-layout>
@@ -39,6 +40,7 @@
         </v-list>
         <Cart
           v-if="selected.length"
+          @done="onDone"
           :items="selected">
           <v-flex slot name="item">
             Item
@@ -101,14 +103,11 @@
         return Object.assign({}, this.baseFilters, this.userFilters)
       },
       selected: function () {
-        let selected = this.selectedIds.concat(this.added)
-        for (let removed of this.removed) {
-          let index = selected.indexOf(removed)
-          if (index > -1) {
-            selected.splice(index, 1)
-          }
+        let selected = this.selectedIds
+        for (let id of this.added) {
+          selected.push(id)
         }
-        return selected
+        return selected.filter(id => this.removed.indexOf(id) === -1)
       }
     },
     methods: {
@@ -145,6 +144,8 @@
       },
       onDone: function () {
         this.$emit('doneSelecting', this.added, this.removed)
+        this.added = []
+        this.removed = []
       },
       search: function () {
         this.isSearching_ = true

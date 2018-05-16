@@ -6,7 +6,7 @@
       <v-list-tile-content>
         {{this.translated}}
       </v-list-tile-content>
-      <v-list-tile-action>
+      <v-list-tile-action v-if="!hideSelect">
         <v-btn
           :color="selected && 'primary' || ''"
           @click.stop="$emit('geo-select')">
@@ -30,16 +30,18 @@
       selected: {
         type: Boolean,
         default: false
-      }
-    },
-    data: function () {
-      return {
-        translation: this.geo.name_translation
+      },
+      hideSelect: {
+        type: Boolean,
+        default: false
       }
     },
     computed: {
       primaryPhoto: function () {
         return this.geo.photos.length ? this.geo.photos[0] : {}
+      },
+      translation: function () {
+        return this.geo.name_translation || null
       }
     },
     mixins: [TranslationMixin],

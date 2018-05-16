@@ -46,7 +46,6 @@
           this.locales = locales
           this.error = null
         }).catch(err => {
-          debugger
           this.error = err
         }).then(() => {
           this.isWorking = false

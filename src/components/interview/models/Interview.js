@@ -157,9 +157,31 @@ export default class Interview extends Emitter {
               return cA.sort_order - cB.sort_order
             })
           }
+          this._assignParameters(question)
         }
       }
       section.pages = section.question_groups
+    }
+  }
+
+  _assignParameters (question) {
+    question.parameters = {}
+    for (let p of question.question_parameters) {
+      switch (p.parameter.name) {
+        case 'other':
+        case 'other_exclusive':
+          for (let choice of question.choices) {
+            if (choice.val === p.val) {
+              if (!choice.parameters) {
+                choice.parameters = {}
+              }
+              choice.parameters[p.parameter.name] = p.val
+            }
+          }
+          break
+        default:
+          question.parameters[p.parameter.name] = p.val
+      }
     }
   }
 
@@ -318,7 +340,7 @@ export default class Interview extends Emitter {
     let questionsWithData = this.getPageQuestions()
     let vars = questionsWithData.reduce((vars, question) => {
       if (!question.datum || !question.datum.data) {
-        debugger
+        throw Error('question datum and data should already exist!')
       }
       switch (question.question_type.name) {
         case 'multiple_select':

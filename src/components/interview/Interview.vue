@@ -102,68 +102,8 @@
       }
     },
     created () {
-      let interview = null
       InterviewService.setInterviewId(this.interviewId)
-      InterviewService.getInterview(this.interviewId)
-        .catch(err => {
-          console.error('No interview exists with this id')
-          this.isLoading = false
-          throw err
-        })
-        .then(inter => {
-          interview = inter
-          this.formId = interview.survey.form_id
-          this.surveyId = interview.survey.id
-          this.loadingStep++
-          return Promise.all([
-            InterviewActionsService.getActions(this.interviewId).catch(err => {
-              console.error('interview actions route does not work', err)
-              return []
-            }).then(res => {
-              return new Promise(resolve => {
-                setTimeout(() => {
-                  this.loadingStep++
-                  resolve(res)
-                }, this.artificiallyExtendLoadTime ? 500 : 0)
-              })
-            }),
-            InterviewService.getData(this.interviewId).catch(err => {
-              console.error('interview data service does not work', err)
-              return []
-            }).then(res => {
-              return new Promise(resolve => {
-                setTimeout(() => {
-                  this.loadingStep++
-                  resolve(res || [])
-                }, this.artificiallyExtendLoadTime ? 1200 : 0)
-              })
-            }),
-            FormService.getForm(interview.survey.form_id).then(res => {
-              return new Promise(resolve => {
-                setTimeout(() => {
-                  this.loadingStep++
-                  resolve(res)
-                }, this.artificiallyExtendLoadTime ? 1800 : 0)
-              })
-            })
-          ]).then(results => {
-            let [actions, data, formBlueprint] = results
-            interviewState = sharedInterview(interview, formBlueprint, actions, data)
-            interviewState.bootstrap()
-            // Bind the relevant parts to the view
-            this.interviewData = interviewState.data.data
-            this.interviewConditionTags = interviewState.data.conditionTags
-            this.interviewActions = interviewState.actions.store
-            this.location = interviewState.navigator.location
-            this.interview = interview
-            interviewState.on('atEnd', this.showEndDialog, this)
-            interviewState.on('atBeginning', this.showBeginningDialog, this)
-
-            setTimeout(() => {
-              this.isLoading = false
-            }, this.artificiallyExtendLoadTime ? 2000 : 0)
-          })
-        })
+      this.loadInterview()
       actionBus.$on('action', this.actionHandler)
       window.onbeforeunload = this.prematureExit
     },
@@ -171,6 +111,77 @@
       window.onbeforeunload = null
     },
     methods: {
+      loadInterview: function () {
+        let interview = null
+        InterviewService.getInterview(this.interviewId)
+          .catch(err => {
+            console.error('No interview exists with this id')
+            this.isLoading = false
+            throw err
+          })
+          .then(inter => {
+            interview = inter
+            this.formId = interview.survey.form_id
+            this.surveyId = interview.survey.id
+            this.loadingStep++
+            return Promise.all([
+              InterviewActionsService.getActions(this.interviewId).catch(err => {
+                console.error('interview actions route does not work', err)
+                return []
+              }).then(res => {
+                return new Promise(resolve => {
+                  setTimeout(() => {
+                    this.loadingStep++
+                    resolve(res)
+                  }, this.artificiallyExtendLoadTime ? 500 : 0)
+                })
+              }),
+              InterviewService.getData(this.interviewId).catch(err => {
+                console.error('interview data service does not work', err)
+                return []
+              }).then(res => {
+                return new Promise(resolve => {
+                  setTimeout(() => {
+                    this.loadingStep++
+                    resolve(res || [])
+                  }, this.artificiallyExtendLoadTime ? 1200 : 0)
+                })
+              }),
+              FormService.getForm(interview.survey.form_id).then(res => {
+                return new Promise(resolve => {
+                  setTimeout(() => {
+                    this.loadingStep++
+                    resolve(res)
+                  }, this.artificiallyExtendLoadTime ? 1800 : 0)
+                })
+              }),
+              InterviewService.getPreload(this.interviewId).catch(err => {
+                console.error('preload data was not loaded', err)
+                return []
+              })
+            ]).then(results => {
+              let [actions, data, formBlueprint, preload] = results
+              this.initializeInterview(interview, actions, data, formBlueprint, preload)
+            })
+          })
+      },
+      initializeInterview: function (interview, actions, data, formBlueprint, preload) {
+        console.log('preload data', preload)
+        interviewState = sharedInterview(interview, formBlueprint, actions, data)
+        interviewState.bootstrap()
+        // Bind the relevant parts to the view
+        this.interviewData = interviewState.data.data
+        this.interviewConditionTags = interviewState.data.conditionTags
+        this.interviewActions = interviewState.actions.store
+        this.location = interviewState.navigator.location
+        this.interview = interview
+        interviewState.on('atEnd', this.showEndDialog, this)
+        interviewState.on('atBeginning', this.showBeginningDialog, this)
+
+        setTimeout(() => {
+          this.isLoading = false
+        }, this.artificiallyExtendLoadTime ? 2000 : 0)
+      },
       actionHandler: function (action) {
         if (!interviewState) {
           throw Error('Trying to push actions before interview has been initialized')
@@ -198,13 +209,6 @@
     computed: {
       questions: function () {
         // This needs to be here so that we have a dependency on this.location
-        let followUpQuestionDatum = interviewState.getFollowUpQuestionDatum(this.location.sectionFollowUpDatumId)
-        let followUpData = interviewState.getFollowUpQuestionDatumData(this.location.sectionFollowUpDatumId)
-        let followUpQuestionDatumMap = followUpData.reduce((agg, datum) => {
-          agg[followUpQuestionDatum.var_name] = datum.join(', ') + '_INTERPOLATED'
-          return agg
-        }, {})
-        console.log('follow up question datum', followUpQuestionDatumMap)
         let questions = interviewState.getPageQuestions().map(q => {
           q.type = {
             name: q.question_type.name
