@@ -12,8 +12,12 @@ export default class DataStore {
   constructor (throttleRate = 10000) {
     this.reset()
     this._lastPersistedState = {
-      data: {},
-      conditionTags: {}
+      data: [],
+      conditionTags: {
+        section: [],
+        respondent: [],
+        survey: []
+      }
     }
     this._interval = setInterval(this.persistIfChanges.bind(this), throttleRate / 2)
     this.persist = _.debounce(this.save.bind(this), throttleRate, {

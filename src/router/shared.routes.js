@@ -1,31 +1,19 @@
-// import storage from '@/services/storage/StorageService'
-import Interview from '@/components/interview/Interview'
-import RespondentForms from '@/components/RespondentForms'
-import RespondentsSearch from '@/components/RespondentsSearch'
+import Interview from '../components/interview/Interview'
+import RespondentForms from '../components/RespondentForms'
+import RespondentsSearch from '../components/RespondentsSearch'
+import CameraTest from '../components/CameraTest'
 import LocaleSelectorPage from '../components/LocaleSelectorPage'
-import QuestionExamples from '@/components/interview/QuestionExamples'
-import LocaleService from '../services/locale/LocaleService'
-import StudyService from '../services/study/StudyService'
-
-function beforeInterview (to, from, next) {
-  StudyService.getStudy(to.params.studyId).then(study => {
-    if (study) {
-      StudyService.setCurrentStudy(study)
-    } else {
-      return next({path: '/'})
-    }
-    if (!LocaleService.hasValidLocale()) {
-      return next({path: '/locale', query: {to: to.path}})
-    }
-    return next()
-  })
-}
+import QuestionExamples from '../components/interview/QuestionExamples'
+import validateLocale from './guards/ValidateLocale'
+import validateStudy from './guards/ValidateStudy'
+import loadInterview from './guards/LoadInterview'
+import chainableGuards from './guards/ChainableGuards'
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
   name: 'Interview',
   component: Interview,
-  beforeEnter: beforeInterview
+  beforeEnter: chainableGuards(validateLocale, validateStudy, loadInterview)
 }, {
   path: '/study/:studyId/respondent/:respondentId/forms',
   name: 'RespondentForms',
@@ -42,4 +30,8 @@ export default [{
   path: '/locale',
   name: 'locale',
   component: LocaleSelectorPage
+}, {
+  path: '/camera',
+  name: 'camera',
+  component: CameraTest
 }]

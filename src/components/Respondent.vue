@@ -43,6 +43,12 @@
                 :width="100"
                 :key="photo.id"
                 :photo="photo"/>
+              <v-btn @click="photoFromCamera">
+                <v-icon size="100">photo_camera</v-icon>
+              </v-btn>
+              <v-btn @click="photoFromFile">
+                <v-icon size="100">cloud_upload</v-icon>
+              </v-btn>
             </v-layout>
           </v-container>
           <h3>Condition Tags</h3>
@@ -92,6 +98,12 @@
     methods: {
       onClick: function () {
         this.$emit('selected')
+      },
+      photoFromFile: function () {
+
+      },
+      photoFromCamera: function () {
+
       }
     },
     components: {

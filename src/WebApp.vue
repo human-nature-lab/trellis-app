@@ -19,6 +19,9 @@
           <v-list-tile>
             <router-link :to="{name: 'RespondentsSearch'}">Respondents</router-link>
           </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'camera'}">Camera</router-link>
+          </v-list-tile>
           <v-list-tile v-if="global.study" v-for="(id, index) in interviewIds" :key="id">
             <router-link :to="{name: 'Interview', params: {studyId: global.study.id, interviewId: id}}">Interview {{id}}</router-link>
           </v-list-tile>
@@ -35,6 +38,7 @@
 
 <script>
   import StudyService from './services/study/StudyService'
+
   export default {
     name: 'web-app',
     data: function () {
