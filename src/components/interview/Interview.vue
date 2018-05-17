@@ -70,9 +70,9 @@
   import InterviewService from './services/interview/InterviewService'
   // import TranslationService from '../../services/TranslationService'
   // import StringInterpolationService from '../../services/StringInterpolationService'
-  import FormService from '../../services/form/FormService'
+  // import FormService from '../../services/form/FormService'
   import actionBus from './services/ActionBus'
-  import InterviewActionsService from './services/interview-actions/InterviewActionsService'
+  // import InterviewActionsService from './services/interview-actions/InterviewActionsService'
 
   let interviewState
   export default {
@@ -112,62 +112,25 @@
     },
     methods: {
       loadInterview: function () {
-        let interview = null
-        InterviewService.getInterview(this.interviewId)
-          .catch(err => {
-            console.error('No interview exists with this id')
-            this.isLoading = false
-            throw err
-          })
-          .then(inter => {
-            interview = inter
-            this.formId = interview.survey.form_id
-            this.surveyId = interview.survey.id
-            this.loadingStep++
-            return Promise.all([
-              InterviewActionsService.getActions(this.interviewId).catch(err => {
-                console.error('interview actions route does not work', err)
-                return []
-              }).then(res => {
-                return new Promise(resolve => {
-                  setTimeout(() => {
-                    this.loadingStep++
-                    resolve(res)
-                  }, this.artificiallyExtendLoadTime ? 500 : 0)
-                })
-              }),
-              InterviewService.getData(this.interviewId).catch(err => {
-                console.error('interview data service does not work', err)
-                return []
-              }).then(res => {
-                return new Promise(resolve => {
-                  setTimeout(() => {
-                    this.loadingStep++
-                    resolve(res || [])
-                  }, this.artificiallyExtendLoadTime ? 1200 : 0)
-                })
-              }),
-              FormService.getForm(interview.survey.form_id).then(res => {
-                return new Promise(resolve => {
-                  setTimeout(() => {
-                    this.loadingStep++
-                    resolve(res)
-                  }, this.artificiallyExtendLoadTime ? 1800 : 0)
-                })
-              }),
-              InterviewService.getPreload(this.interviewId).catch(err => {
-                console.error('preload data was not loaded', err)
-                return []
-              })
-            ]).then(results => {
-              let [actions, data, formBlueprint, preload] = results
-              this.initializeInterview(interview, actions, data, formBlueprint, preload)
-            })
-          })
+        let data = this.global.interview.data
+        let conditionTags = this.global.interview.conditionTags
+        let interview = this.global.interview.interview
+        let actions = this.global.interview.actions
+        let form = this.global.interview.form
+        let preload = []
+        if (!interview) {
+          interview = {
+            id: 'fake id',
+            survey: {
+              respondent_id: 'ok'
+            }
+          }
+        }
+        this.initializeInterview(interview, actions, data, conditionTags, form, preload)
       },
-      initializeInterview: function (interview, actions, data, formBlueprint, preload) {
+      initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, preload) {
         console.log('preload data', preload)
-        interviewState = sharedInterview(interview, formBlueprint, actions, data)
+        interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags)
         interviewState.bootstrap()
         // Bind the relevant parts to the view
         this.interviewData = interviewState.data.data

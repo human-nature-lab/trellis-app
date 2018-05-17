@@ -50,7 +50,8 @@
     name: 'respondents-search',
     props: {
       selectedRespondents: {
-        type: Array
+        type: Array,
+        default: []
       },
       isLoading: {
         type: Boolean,
@@ -133,7 +134,7 @@
 <style lang="sass" scoped>
 .respondent-search
   position: fixed
-  z-index: 1000
+  z-index: 10
 .respondents
   padding-top: 130px
 </style>

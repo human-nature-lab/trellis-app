@@ -11,7 +11,7 @@ import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecy
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 export default class Interview extends Emitter {
-  constructor (interview, blueprint = null, actions = [], data = [], conditionTags = {}) {
+  constructor (interview, blueprint, actions, data, conditionTags) {
     super()
     this.interview = interview
     this.blueprint = blueprint
@@ -23,9 +23,9 @@ export default class Interview extends Emitter {
     this.varNameMap = new Map()
     this.questionMap = new Map()
     this.load(blueprint)
-    this.actions.load(actions)
-    this.data.loadData(data)
-    this.data.loadConditionTags(conditionTags)
+    if (actions) this.actions.load(actions)
+    if (data) this.data.loadData(data)
+    if (conditionTags) this.data.loadConditionTags(conditionTags)
     this.navigator = new InterviewNavigator(this)
   }
 
