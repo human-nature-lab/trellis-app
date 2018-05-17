@@ -4,19 +4,22 @@
       <li>
         Checking for available storage space...
         <strong v-if="success" class="green--text">OK.</strong>
-        <strong v-if="warning" class="yellow--text">WARNING.</strong>
+        <strong v-if="warning" class="amber--text">WARNING.</strong>
         <strong v-if="error" class="red--text">ERROR.</strong>
       </li>
     </ul>
     <span v-if="error" class="red--text">
       <p>{{ errorMessage }}</p>
     </span>
+    <span v-if="warning">
+      <p>{{ warningMessage }}</p>
+    </span>
     <v-progress-linear
       v-if="checking"
       height="2"
       :indeterminate="true"></v-progress-linear>
     <v-btn
-      v-if="error"
+      v-if="error || warning"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
@@ -41,7 +44,8 @@
           checking: false,
           apiRoot: config.apiRoot,
           source: null,
-          errorMessage: ''
+          errorMessage: '',
+          warningMessage: ''
         }
       },
       created () {
@@ -60,12 +64,12 @@
           this.checking = true
           SyncService.getSnapshotFileSize(this.source, this.snapshotId).then((snapshotFileSize) => {
             const freeDiskSpace = DeviceService.getFreeDiskSpace()
-            console.log('snapshotFileSize', snapshotFileSize)
-            console.log('deviceFreeDiskSpace', freeDiskSpace)
             if (snapshotFileSize > freeDiskSpace) {
               this.warning = true
+              this.warningMessage = `The snapshot is ${snapshotFileSize}B and you only have ${freeDiskSpace}B free.`
             } else {
               this.success = true
+              this.$emit('check-download-size-done', snapshotFileSize)
             }
             this.checking = false
           }).catch((error) => {
@@ -82,6 +86,7 @@
         },
         retry: function () {
           this.error = false
+          this.warning = false
           this.checkDownloadSize()
         }
       },

@@ -31,10 +31,10 @@ class SyncService {
       })
   }
   getLatestSnapshot (source) {
-    // TODO: pass in or get device ID from device
+    const deviceId = DeviceService.getUUID()
     let options = {}
     if (source) { options.cancelToken = source.token }
-    return http().get('device/3c586040f3f7a483/syncv2/snapshot', options)
+    return http().get(`device/${deviceId}/syncv2/snapshot`, options)
       .then(response => {
         return response.data
       })
@@ -44,12 +44,28 @@ class SyncService {
       })
   }
   getSnapshotFileSize (source, snapshotId) {
-    console.log('getSnapshotFileSize.snapshotId', snapshotId)
     let options = {}
     if (source) { options.cancelToken = source.token }
     return http().get(`snapshot/${snapshotId}/file_size`, options)
       .then(response => {
+        console.log('response', response)
         return response.data
+      })
+      .catch(err => {
+        console.error(err)
+        throw err
+      })
+  }
+  downloadSnapshot (source, onDownloadProgress, snapshotId) {
+    let options = {
+      timeout: 0
+    }
+    if (source) { options.cancelToken = source.token }
+    if (onDownloadProgress) { options.onDownloadProgress = onDownloadProgress }
+    return http().get(`snapshot/${snapshotId}/download`, options)
+      .then(response => {
+        console.log('response', response)
+        return response
       })
       .catch(err => {
         console.error(err)
