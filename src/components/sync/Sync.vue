@@ -7,7 +7,7 @@
         v-on:download-cancelled="downloadCancelled">
       </download>
     </div>
-    <div class="sync-footer">
+    <v-flex class="sync-footer v-flex xs12 sm12 md6 offset-md3">
       <v-layout row
                 justify-space-between>
         <v-btn justify-left
@@ -21,7 +21,7 @@
           <v-icon>cloud_download</v-icon>
         </v-btn>
       </v-layout>
-    </div>
+    </v-flex>
   </div>
 </template>
 

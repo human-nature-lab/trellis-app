@@ -13,6 +13,7 @@
             <v-stepper-content step="1">
               <download-step
                 title="Connecting"
+                v-if="downloadStep === 1"
                 v-bind:continue-status="continueStatusArray[0]"
                 v-on:continue-clicked="onContinue"
                 v-on:cancel-clicked="onCancel">
@@ -34,13 +35,21 @@
             <v-stepper-content step="2">
               <download-step
                 title="Downloading"
+                v-if="downloadStep === 2"
                 v-bind:continue-status="continueStatusArray[1]"
                 v-on:continue-clicked="onContinue"
                 v-on:cancel-clicked="onCancel">
                 <check-download-size
                   v-if="downloadStep > 1"
-                  v-bind:snapshotId="serverSnapshotId">
+                  v-bind:snapshotId="serverSnapshotId"
+                  v-on:check-download-size-done="checkDownloadSizeDone">
                 </check-download-size>
+                <download-snapshot
+                  v-if="downloadStep > 1 && downloadSubStep > 1"
+                  v-bind:snapshotId="serverSnapshotId"
+                  v-bind:snapshotFileSize="snapshotFileSize"
+                  v-on:download-snapshot-done="downloadSnapshotDone">
+                </download-snapshot>
               </download-step>
             </v-stepper-content>
             <v-stepper-content step="3">
@@ -59,6 +68,7 @@
   import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'
   import CompareSnapshots from './substeps/CompareSnapshots'
   import CheckDownloadSize from './substeps/CheckDownloadSize'
+  import DownloadSnapshot from './substeps/DownloadSnapshot.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
@@ -74,6 +84,7 @@
         downloading: false,
         downloadProgress: 0,
         progressMessages: [],
+        snapshotFileSize: null,
         serverSnapshot: null,
         localDownload: null,
         localUpload: null,
@@ -116,6 +127,13 @@
         } else {
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
+      },
+      checkDownloadSizeDone: function (snapshotFileSize) {
+        this.snapshotFileSize = snapshotFileSize
+        this.downloadSubStep = 2
+      },
+      downloadSnapshotDone: function () {
+        console.log('downloadSnapshotDone')
       }
     },
     computed: {
@@ -128,7 +146,6 @@
         }
       },
       serverSnapshotId: function () {
-        console.log('serverSnapshotId', this.serverSnapshot)
         if (this.serverSnapshot === null || (!this.serverSnapshot.hasOwnProperty('id'))) return ''
         return this.serverSnapshot['id']
       }
@@ -139,7 +156,8 @@
       CheckConnection,
       AuthenticateDevice,
       DownloadStep,
-      CheckDownloadSize
+      CheckDownloadSize,
+      DownloadSnapshot
     }
   }
 </script>
