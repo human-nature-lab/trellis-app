@@ -91,7 +91,8 @@
         compareSnapshotsResults: COMPARE_SNAPSHOTS_RESULTS.NONE,
         COMPARE_SNAPSHOTS_RESULTS: COMPARE_SNAPSHOTS_RESULTS,
         autoContinueLabel: '',
-        continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED]
+        continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
+        downloadedSnapshotFileEntry: null
       }
     },
     created () {
@@ -132,8 +133,10 @@
         this.snapshotFileSize = snapshotFileSize
         this.downloadSubStep = 2
       },
-      downloadSnapshotDone: function () {
-        console.log('downloadSnapshotDone')
+      downloadSnapshotDone: function (fileEntry) {
+        console.log('downloadSnapshotDone', fileEntry)
+        this.downloadedSnapshotFileEntry = fileEntry
+        this.downloadSubStep = 3
       }
     },
     computed: {
