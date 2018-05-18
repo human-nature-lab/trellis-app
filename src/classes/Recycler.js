@@ -25,7 +25,7 @@ export default class Recycler {
 
   /**
    * Function that must be defined by parent class to use this class effectively
-   * @param {any} ...params - Any parameters
+   * @param {...any} params - Any parameters
    * @returns {any}
    */
   objectCreator (...params) {
@@ -46,8 +46,8 @@ export default class Recycler {
   /**
    * Get a single object by key. If the object for that key doesn't already exist it will be created using the
    * objectCreator method. All arguments after the key parameter will be included with the objectCreator method
-   * @param key
-   * @param params
+   * @param {any} key
+   * @param {..any} params
    */
   get (key, ...params) {
     let obj = this.cache.get(key)
@@ -62,7 +62,7 @@ export default class Recycler {
    * Get without a key. The key will be created by calling the keyExtractor method with the results of the objectCreator
    * method. This method is much more expensive than just calling the get method since it needs to create a new instance
    * of the object and key regardless of if another one already exists
-   * @param params
+   * @param {...any} params
    */
   getNoKey (...params) {
     let key = this.keyExtractor(this.objectCreator(...params))

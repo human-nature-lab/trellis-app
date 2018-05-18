@@ -3,13 +3,25 @@
     <v-layout column>
       <debug name="Location">{{location}}</debug>
       <debug :name="'Assigned Conditions: ' + conditionTags.length">
-        {{conditionTags}}
+        <pre>
+          <code>
+            {{JSON.stringify(conditionTags, null, 2)}}
+          </code>
+        </pre>
       </debug>
-      <debug :name="`Data: ${data.length}`">
-        {{JSON.stringify(data, null, 2)}}
+      <debug :name="`Question Datum: ${data.length}, Datum: ${datumLength}, Cached Datum: ${datumRecyclerSize()}, Cache Question Datum: ${questionDatumRecyclerSize()}`">
+        <pre>
+          <code>
+            {{JSON.stringify(data, null, 2)}}
+          </code>
+        </pre>
       </debug>
       <debug :name="'Actions: ' + actions.length">
-        {{JSON.stringify(actions, null, 2)}}
+        <pre>
+          <code>
+            {{JSON.stringify(actions, null, 2)}}
+          </code>
+        </pre>
       </debug>
       <v-flex class="page-content">
         <Question
@@ -40,6 +52,8 @@
 
 <script>
   import Question from './Question.vue'
+  import questionDatumRecycler from './services/recyclers/QuestionDatumRecycler'
+  import datumRecycler from './services/recyclers/DatumRecycler'
   import actionBus from './services/ActionBus'
   export default {
     name: 'page',
@@ -79,12 +93,25 @@
         actionBus.action({
           action_type: 'previous'
         })
+      },
+      datumRecyclerSize: function () {
+        return datumRecycler.cache.size
+      },
+      questionDatumRecyclerSize: function () {
+        return questionDatumRecycler.cache.size
       }
     },
     computed: {
       // TODO: // Calculate this and enable/disable next based on it
       allRequiredQuestionsAnswered: function () {
         return true
+      },
+      datumLength: function () {
+        let l = 0
+        for (let datum of this.data) {
+          l += datum.data.length
+        }
+        return l
       }
     },
     components: {

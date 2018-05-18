@@ -1,14 +1,14 @@
 import Recycler from '@/classes/Recycler'
 import uuidv4 from 'uuid/v4'
+const keyNames = ['scope', 'survey_id', 'condition_id', 'repetition', 'follow_up_datum_id']
 class SectionConditionTagRecycler extends Recycler {
   /**
    * Takes the same object that objectCreator returns
-   * @param qd
+   * @param tag
    * @returns {string}
    */
   keyExtractor (tag) {
-    // The unique key of a single question datum
-    return `${tag.scope}-${tag.survey_id}-${tag.condition_id}-${tag.repetition}-${tag.follow_up_datum_id}`
+    return keyNames.map(key => tag[key]).join('-')
   }
 
   /**
