@@ -1,5 +1,6 @@
 import Recycler from '@/classes/Recycler'
 import uuidv4 from 'uuid/v4'
+const keyNames = ['survey_id', 'section', 'section_repetition', 'follow_up_datum_id', 'page', 'question_id']
 class QuestionDatumRecycler extends Recycler {
   /**
    * Takes the same object that objectCreator returns
@@ -8,7 +9,7 @@ class QuestionDatumRecycler extends Recycler {
    */
   keyExtractor (qd) {
     // The unique key of a single question datum
-    return `${qd.survey_id}-${qd.section}-${qd.section_repetition}-${qd.follow_up_datum_id}-${qd.page}-${qd.question_id}`
+    return keyNames.map(key => qd[key]).join('-')
   }
 
   /**
