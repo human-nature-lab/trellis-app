@@ -28,6 +28,16 @@ export default function loadInterview (to, from, next) {
         })
       ]).then(results => {
         let [actions, data, formBlueprint, preload] = results
+        for (let d of data) {
+          for (let datum of d.data) {
+            for (let key in datum) {
+              if (datum[key] === null || datum[key] === undefined) {
+                delete datum[key]
+              }
+            }
+          }
+        }
+        singleton.interview.interview = interview
         singleton.interview.actions = actions
         singleton.interview.data = data
         singleton.interview.form = formBlueprint

@@ -4,9 +4,29 @@
  * @param {...Function} guards
  * @returns {guardChain}
  */
+
+export function parallel (...guards) {
+  let next
+  let nDone = 0
+  function incrementAndFailOrFinish (...args) {
+    nDone++
+    if (args.length) {
+      return next(...args)
+    } else if (nDone === guards.length) {
+      return next()
+    }
+  }
+  return function parallelCB (to, from, n) {
+    next = n
+    guards.forEach(f => {
+      f(to, from, incrementAndFailOrFinish)
+    })
+  }
+}
+
 export default function chainableGuards (...guards) {
   let to, from, next
-  function callNextGuardOrFinish (to, from) {
+  function callNextGuardOrFinish () {
     let guard = guards.shift()
     if (!guard) {
       return next()
@@ -16,7 +36,7 @@ export default function chainableGuards (...guards) {
         if (args.length) {
           return next(...args)
         } else {
-          return callNextGuardOrFinish(to, from)
+          return callNextGuardOrFinish()
         }
       })
     }
@@ -24,6 +44,6 @@ export default function chainableGuards (...guards) {
 
   return function guardChain (...args) {
     [to, from, next] = args
-    return callNextGuardOrFinish(to, from)
+    return callNextGuardOrFinish()
   }
 }
