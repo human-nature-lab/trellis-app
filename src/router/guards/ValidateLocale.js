@@ -4,6 +4,7 @@ export default function (to, from, next) {
   if (!LocaleService.hasValidLocale()) {
     return next({path: '/locale', query: {to: to.path}})
   } else {
+    console.log('valid locale')
     return next()
   }
 }
