@@ -40,7 +40,11 @@ export default class InterviewNavigator {
         // TODO: Handle follow up questions from repeatedSections and follow up sections
         let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
         if (data && data.length) {
-          this._location.sectionFollowUpDatumId = data[this.sectionFollowUpDatumRepetition].id
+          let datum = data.find(d => d.event_order === this.sectionFollowUpDatumRepetition)
+          if (!datum) {
+            throw Error('No datum present with that event order')
+          }
+          this._location.sectionFollowUpDatumId = datum.id
         }
       }
     }

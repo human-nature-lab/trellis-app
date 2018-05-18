@@ -10,6 +10,7 @@ import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
+
 export default class Interview extends Emitter {
   constructor (interview, blueprint, actions, data, conditionTags) {
     super()
@@ -27,12 +28,6 @@ export default class Interview extends Emitter {
     if (data) this.data.loadData(data)
     if (conditionTags) this.data.loadConditionTags(conditionTags)
     this.navigator = new InterviewNavigator(this)
-  }
-
-  /**
-   * This needs to be called before doing anything else
-   */
-  bootstrap () {
     this._initializeConditionAssignment()
     this.makePageQuestionDatum()
   }
@@ -154,7 +149,7 @@ export default class Interview extends Emitter {
           question.section = s
           if (question.choices) {
             question.choices.sort((cA, cB) => {
-              return cA.sort_order - cB.sort_order
+              return cA.pivot.sort_order - cB.pivot.sort_order
             })
           }
           this._assignParameters(question)
