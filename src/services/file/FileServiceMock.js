@@ -52,53 +52,41 @@ class FileServiceMock {
   }
 
   writeFile (file, fileName, fileSize, storageType = 'PERSISTENT', create = true, exclusive = false) {
-    return new Promise((resolve, reject) => {
-      let requestFileSystemOptions = {
-        'storageType': (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
-        'requestedBytes': fileSize
-      }
-      let getFileEntryOptions = {
-        'create': create,
-        'exclusive': exclusive
-      }
-      // Round up to the nearest 100MB
-      let roundUpToNearest = (1024 * 1024 * 100)
-      let quota = Math.ceil(fileSize / roundUpToNearest) * roundUpToNearest
-      this.requestQuota(quota)
-        .then((grantedBytes) => {
-          if (grantedBytes < fileSize) {
-            reject('File size exceeds quota.')
-          }
-          this.requestFileSystem(requestFileSystemOptions)
-            .then((fileSystem) => {
-              this.getFileEntry(fileSystem, fileName, getFileEntryOptions)
-                .then((fileEntry) => {
-                  fileEntry.createWriter(
-                    function (fileWriter) {
-                      fileWriter.onwriteend = function () {
-                        resolve('Success')
-                      }
-                      fileWriter.onerror = function (error) {
-                        reject(error)
-                      }
-                      fileWriter.write(file)
-                    },
-                    function (error) {
-                      reject(error)
-                    })
-                },
-                function (error) {
-                  reject(error)
-                })
-            },
-            function (error) {
+    let requestFileSystemOptions = {
+      'storageType': (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
+      'requestedBytes': fileSize
+    }
+    let getFileEntryOptions = {
+      'create': create,
+      'exclusive': exclusive
+    }
+    // Round up to the nearest 100MB
+    let roundUpToNearest = (1024 * 1024 * 100)
+    let quota = Math.ceil(fileSize / roundUpToNearest) * roundUpToNearest
+    return this.requestQuota(quota)
+      .then((grantedBytes) => {
+        if (grantedBytes < fileSize) {
+          throw new Error('File size exceeds quota.')
+        }
+        return this.requestFileSystem(requestFileSystemOptions)
+      })
+      .then((fileSystem) => this.getFileEntry(fileSystem, fileName, getFileEntryOptions))
+      .then((fileEntry) => new Promise((resolve, reject) => {
+        fileEntry.createWriter(
+          function (fileWriter) {
+            fileWriter.onwriteend = function () {
+              resolve(fileEntry)
+            }
+            fileWriter.onerror = function (error) {
               reject(error)
-            })
-        },
-        (error) => {
-          reject(error)
-        })
-    })
+            }
+            fileWriter.write(file)
+          },
+          function (error) {
+            reject(error)
+          })
+      })
+      )
   }
 
   static getDefaultRequestFileSystemOptions () {

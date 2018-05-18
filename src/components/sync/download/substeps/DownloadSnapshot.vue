@@ -78,9 +78,9 @@
             let fileSize = Number(response.headers['content-length'])
             FileService.writeFile(snapshot, fileName, fileSize)
               .then(
-                () => {
+                (fileEntry) => {
                   this.success = true
-                  this.$emit('download-snapshot-done')
+                  this.$emit('download-snapshot-done', fileEntry)
                   this.downloading = false
                 },
                 (error) => {
