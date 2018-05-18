@@ -131,8 +131,7 @@
       initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, preload) {
         console.log('preload data', preload)
         interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags)
-        interviewState.bootstrap()
-        // Bind the relevant parts to the view
+        // Share the relevant parts of the interview with the view
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
         this.interviewActions = interviewState.actions.store
