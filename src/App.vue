@@ -53,7 +53,7 @@
   storage.set('studyId', 'ad9a9086-8f15-4830-941d-416b59639c41')
   DataService.getLocales()
     .then(locales => {
-      console.log('locales', locales)
+      // console.log('locales', locales)
       storage.set('locale', locales[0])
     })
 
@@ -102,7 +102,7 @@
     },
     methods: {
       onDeviceReady: function () {
-        console.log('device ready')
+        // console.log('device ready')
         this.deviceReady = true
         // Handle the device ready event.
         this.cordova.on('pause', this.onPause, false)

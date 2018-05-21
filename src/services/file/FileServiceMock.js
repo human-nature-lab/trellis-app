@@ -34,31 +34,36 @@ class FileServiceMock {
     })
   }
 
-  getFileEntry (fileSystem, fileName, _options) {
+  getDirectoryEntry (fileSystem, directory, _options) {
+    return new Promise((resolve, reject) => {
+      let options = _options
+      if (!options) {
+        options = this.getDefaultGetDirectoryEntryOptions()
+      }
+      fileSystem.root.getDirectory(directory, options,
+        (directoryEntry) => resolve(directoryEntry),
+        (error) => reject(error)
+      )
+    })
+  }
+
+  getFileEntry (directoryEntry, fileName, _options) {
     return new Promise((resolve, reject) => {
       let options = _options
       if (!options) {
         options = this.getDefaultGetFileEntryOptions()
       }
-      fileSystem.root.getFile(fileName, options,
-        function (fileEntry) {
-          resolve(fileEntry)
-        },
-        function (error) {
-          reject(error)
-        }
+      directoryEntry.getFile(fileName, options,
+        (fileEntry) => resolve(fileEntry),
+        (error) => reject(error)
       )
     })
   }
 
-  writeFile (file, fileName, fileSize, storageType = 'PERSISTENT', create = true, exclusive = false) {
+  writeFile (directory, file, fileName, fileSize, storageType = 'PERSISTENT', create = true, exclusive = false) {
     let requestFileSystemOptions = {
       'storageType': (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
       'requestedBytes': fileSize
-    }
-    let getFileEntryOptions = {
-      'create': create,
-      'exclusive': exclusive
     }
     // Round up to the nearest 100MB
     let roundUpToNearest = (1024 * 1024 * 100)
@@ -70,7 +75,8 @@ class FileServiceMock {
         }
         return this.requestFileSystem(requestFileSystemOptions)
       })
-      .then((fileSystem) => this.getFileEntry(fileSystem, fileName, getFileEntryOptions))
+      .then((fileSystem) => this.getDirectoryEntry(fileSystem, directory))
+      .then((directoryEntry) => this.getFileEntry(directoryEntry, fileName))
       .then((fileEntry) => new Promise((resolve, reject) => {
         fileEntry.createWriter(
           function (fileWriter) {
@@ -89,14 +95,33 @@ class FileServiceMock {
       )
   }
 
-  static getDefaultRequestFileSystemOptions () {
+  listFiles () {
+    this.requestFileSystem()
+      .then((fs) => {
+        fs.root.getDirectory('/')
+          .readEntries((entries) => {
+            entries.forEach((entry) => {
+              console.log('entry', entry)
+            })
+          })
+      })
+  }
+
+  getDefaultRequestFileSystemOptions () {
     return {
       storageType: window.PERSISTENT,
       requestedBytes: (1024 * 1024 * 10)
     }
   }
 
-  static getDefaultGetFileEntryOptions () {
+  getDefaultGetFileEntryOptions () {
+    return {
+      create: true,
+      exclusive: false
+    }
+  }
+
+  getDefaultGetDirectoryEntryOptions () {
     return {
       create: true,
       exclusive: false
