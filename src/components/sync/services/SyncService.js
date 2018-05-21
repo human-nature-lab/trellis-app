@@ -1,4 +1,3 @@
-import md5 from 'blueimp-md5'
 import { DeviceService } from '@/services/device/DeviceService'
 import http from '@/services/http/AxiosInstance'
 class SyncService {
@@ -72,9 +71,6 @@ class SyncService {
         console.error(err)
         throw err
       })
-  }
-  getHash (file) {
-    return md5(file)
   }
   hasSynced () {
     return this.synced
