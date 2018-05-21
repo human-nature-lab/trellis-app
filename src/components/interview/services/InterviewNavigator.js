@@ -144,42 +144,43 @@ export default class InterviewNavigator extends Emitter {
 
   getNext (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
     let m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
-    let max
-    let count = 0
-    do {
-      console.log(count, 'next', page, sectionRepetition, sectionFollowUpDatumRepetition, section)
+    let max = {
+      section: m[0],
+      sectionRepetition: m[1],
+      sectionFollowUpDatumRepetition: m[2],
+      page: m[3]
+    }
+    console.log('next', page, sectionRepetition, sectionFollowUpDatumRepetition, section)
+    page++
+    if (page > max.page) {
+      page = 0
+      sectionRepetition++
+    }
+    if (sectionRepetition > max.sectionRepetition) {
+      sectionRepetition = 0
+      sectionFollowUpDatumRepetition++
+    }
+    if (sectionFollowUpDatumRepetition > max.sectionFollowUpDatumRepetition) {
+      sectionFollowUpDatumRepetition = 0
+      section++
+      m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
       max = {
-        page: m[0],
+        section: m[0],
         sectionRepetition: m[1],
         sectionFollowUpDatumRepetition: m[2],
-        section: m[3]
+        page: m[3]
       }
-      count++
-      page++
-      if (page > max.page) {
-        page = 0
-        sectionRepetition++
+      if (section > max.section) {
+        throw Error('Reached the end of the survey')
       }
-      if (sectionRepetition > max.sectionRepetition) {
-        sectionRepetition = 0
-        sectionFollowUpDatumRepetition++
-      }
-      if (sectionFollowUpDatumRepetition > max.sectionFollowUpDatumRepetition) {
-        sectionFollowUpDatumRepetition = 0
+      // Handle follow up sections
+      if (max.sectionFollowUpDatumRepetition < 0) {
         section++
         if (section > max.section) {
           throw Error('Reached the end of the survey')
         }
-        m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
-        max = {
-          page: m[0],
-          sectionRepetition: m[1],
-          sectionFollowUpDatumRepetition: m[2],
-          section: m[3]
-        }
       }
-    } while (!this.isValidLocation(max, page, section, sectionRepetition, sectionFollowUpDatumRepetition) && count < 10000)
-    debugger
+    }
     return {page, section, sectionRepetition, sectionFollowUpDatumRepetition}
   }
 
