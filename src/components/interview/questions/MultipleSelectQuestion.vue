@@ -8,14 +8,14 @@
         :disabled="isQuestionDisabled"
         v-model="selected[choice.id]"
         @change="onChange(choice, selected[choice.id])">
-        <ChoiceText :translation="choice.choice_translation" slot="label"/>
+        <ChoiceText :translation="choice.choice_translation" :location="location" slot="label"/>
       </v-checkbox>
       <radio-checkbox
         v-else
         :disabled="isQuestionDisabled"
         v-model="selected[choice.id]"
         @change="onChange(choice, selected[choice.id])">
-        <ChoiceText :translation="choice.choice_translation" slot="label"/>
+        <ChoiceText :translation="choice.choice_translation" :location="location" slot="label"/>
       </radio-checkbox>
       <v-text-field
         v-if="showOtherText(choice)"
@@ -31,7 +31,7 @@
   import RadioCheckbox from './RadioCheckbox'
   import actionBus from '../services/ActionBus'
   export default {
-    props: ['question'],
+    props: ['question', 'location'],
     name: 'multiple-select-question',
     mixins: [QuestionDisabledMixin],
     computed: {

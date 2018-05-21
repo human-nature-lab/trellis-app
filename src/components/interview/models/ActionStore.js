@@ -37,8 +37,8 @@ export default class ActionStore {
   add (action, location) {
     action.id = uuidv4()
     action.section = location.section
-    // action.section_repetition = location.sectionRepetition
-    // action.section_follow_up_repetition = location.sectionFollowUpDatumRepetition
+    action.section_repetition = location.sectionRepetition
+    action.section_follow_up_repetition = location.sectionFollowUpDatumRepetition
     action.page = location.page
     action.created_at = (new Date()).getTime()
     this.store.push(action)

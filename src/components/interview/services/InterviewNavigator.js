@@ -1,5 +1,7 @@
-export default class InterviewNavigator {
+import Emitter from '../../../classes/Emitter'
+export default class InterviewNavigator extends Emitter {
   constructor (interview) {
+    super()
     // Section, sectionFollowUpRepetition, sectionRepetition, page
     this.location = {}
     this._location = {
@@ -71,7 +73,10 @@ export default class InterviewNavigator {
     this._location.sectionFollowUpDatumId = null
   }
   updateMax () {
-    let max = this.getMax()
+    let max = this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+    this.setMax(max)
+  }
+  setMax (max) {
     this.max.section = max[0]
     this.max.sectionRepetition = max[1]
     this.max.sectionFollowUpDatumRepetition = max[2]
@@ -97,26 +102,28 @@ export default class InterviewNavigator {
   }
 
   get isAtEnd () {
-    let max = this.getMax()
+    let max = this.getCurrentMax()
     return this.section === max[0] && this.sectionRepetition === max[1] && this.sectionFollowUpDatumRepetition === max[2] && this.page === max[3]
   }
 
   get isAtStart () {
     return this.section === 0 && this.sectionRepetition === 0 && this.sectionFollowUpDatumRepetition === 0 && this.page === 0
   }
-
-  getMax () {
+  getCurrentMax () {
+    return this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+  }
+  getMax (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
     let max = []
     max[0] = this.blueprint.sections.length - 1
-    max[1] = this.blueprint.sections[this.section].maxRepetitions
+    max[1] = this.blueprint.sections[section].maxRepetitions
     max[2] = 0
-    let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
+    let followUpQuestionId = this.blueprint.sections[section].followUpQuestionId
     if (followUpQuestionId) {
       // TODO: Handle follow up questions from repeatedSections and follow up sections
       let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
       max[2] = data.length - 1
     }
-    max[3] = this.blueprint.sections[this.section].pages.length - 1
+    max[3] = this.blueprint.sections[section].pages.length - 1
     return max
   }
 
@@ -128,27 +135,67 @@ export default class InterviewNavigator {
     this.updateLocation()
   }
 
+  isValidLocation (max, page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+    return page <= max.page &&
+      section <= max.section &&
+      sectionRepetition <= max.sectionRepetition &&
+      sectionFollowUpDatumRepetition <= max.sectionFollowUpDatumRepetition
+  }
+
+  getNext (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+    let m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
+    let max
+    let count = 0
+    do {
+      console.log(count, 'next', page, sectionRepetition, sectionFollowUpDatumRepetition, section)
+      max = {
+        page: m[0],
+        sectionRepetition: m[1],
+        sectionFollowUpDatumRepetition: m[2],
+        section: m[3]
+      }
+      count++
+      page++
+      if (page > max.page) {
+        page = 0
+        sectionRepetition++
+      }
+      if (sectionRepetition > max.sectionRepetition) {
+        sectionRepetition = 0
+        sectionFollowUpDatumRepetition++
+      }
+      if (sectionFollowUpDatumRepetition > max.sectionFollowUpDatumRepetition) {
+        sectionFollowUpDatumRepetition = 0
+        section++
+        if (section > max.section) {
+          throw Error('Reached the end of the survey')
+        }
+        m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
+        max = {
+          page: m[0],
+          sectionRepetition: m[1],
+          sectionFollowUpDatumRepetition: m[2],
+          section: m[3]
+        }
+      }
+    } while (!this.isValidLocation(max, page, section, sectionRepetition, sectionFollowUpDatumRepetition) && count < 10000)
+    debugger
+    return {page, section, sectionRepetition, sectionFollowUpDatumRepetition}
+  }
+
   /**
    * Move forward a step
    */
   next () {
-    this.page++
-    if (this.page > this.max.page) {
-      this.page = 0
-      this.sectionRepetition++
-    }
-    if (this.sectionRepetition > this.max.sectionRepetition) {
-      this.sectionRepetition = 0
-      this.sectionFollowUpDatumRepetition++
-    }
-    if (this.sectionFollowUpDatumRepetition > this.max.sectionFollowUpDatumRepetition) {
-      this.sectionFollowUpDatumRepetition = 0
-      this.section++
-      this.updateMax()
-    }
-    if (this.section > this.max.section) {
-      this.section = this.max.section
-      this.setToMax()
+    try {
+      let next = this.getNext(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+      this.page = next.page
+      this.section = next.section
+      this.sectionRepetition = next.sectionRepetition
+      this.sectionFollowUpDatumRepetition = next.sectionFollowUpDatumRepetition
+    } catch (err) {
+      console.log(err)
+      this.emit('end')
     }
     this.updateLocation()
   }

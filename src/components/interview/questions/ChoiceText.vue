@@ -1,5 +1,7 @@
 <template>
-    <InterpolatedText :text="translated" />
+    <InterpolatedText
+      :text="translated"
+      :location="location" />
 </template>
 
 <script>
@@ -9,6 +11,10 @@
     name: 'choice-text',
     props: {
       translation: {
+        type: Object,
+        required: true
+      },
+      location: {
         type: Object,
         required: true
       }

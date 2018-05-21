@@ -62,14 +62,13 @@ export default class DataStore {
       d.section = parseInt(d.section, 10)
       d.page = parseInt(d.page, 10)
       d.section_repetition = parseInt(d.section_repetition, 10)
-      this.data.push(d)
       for (let dat of d.data) {
         datum.push(dat)
       }
-      let qD = JSON.parse(JSON.stringify(d))
-      qD.data = []
-      questionDatum.push(qD)
-      this.questionDatumIdMap.set(d.id, d)
+      this.add(d, false)
+      d = JSON.parse(JSON.stringify(d))
+      d.data = []
+      questionDatum.push(d)
     }
     this._lastPersistedState.data = _.cloneDeep(this.data)
     QuestionDatumRecycler.fill(questionDatum)
@@ -95,8 +94,9 @@ export default class DataStore {
   /**
    * Add a questionDatum to the dataStore
    * @param {Object} questionDatum - A single questionDatum
+   * @param {Boolean} [shouldPersist = false] - Whether the persist method should be called after adding the data
    */
-  add (questionDatum) {
+  add (questionDatum, shouldPersist = false) {
     this.data.push(questionDatum)
     this.questionDatumIdMap.set(questionDatum.id, questionDatum)
     let questionIdIndex = this.questionDatumQuestionIdMap.get(questionDatum.question_id)
@@ -107,7 +107,9 @@ export default class DataStore {
       questionIdIndex.push(questionDatum)
     }
     this.hasAddedData = true
-    this.persist()
+    if (shouldPersist) {
+      this.persist()
+    }
   }
 
   /**
@@ -149,7 +151,10 @@ export default class DataStore {
    * @private
    */
   _locationMatchesQuestionDatum (questionDatum, section, page, sectionRepetition, sectionFollowUpRepetition) {
-    return questionDatum.section === section && questionDatum.page === page
+    return questionDatum.section === section &&
+      questionDatum.page === page &&
+      questionDatum.section_repetition === sectionRepetition &&
+      questionDatum.section_follow_up_repetition === sectionFollowUpRepetition
   }
 
   /**
@@ -193,8 +198,8 @@ export default class DataStore {
     return tags
   }
 
-  locationHasQuestionDatum (questionId, section, page, sectionRepetition, sectionFollowUpDatumId) {
-    return this.data.findIndex(qD => this._locationMatchesQuestionDatum(qD, section, page, sectionRepetition, sectionFollowUpDatumId) && qD.question_id === questionId) === -1
+  locationHasQuestionDatum (questionId, section, page, sectionRepetition, sectionFollowUpDatumRepetition) {
+    return this.data.findIndex(qD => this._locationMatchesQuestionDatum(qD, section, page, sectionRepetition, sectionFollowUpDatumRepetition) && qD.question_id === questionId) !== -1
   }
 
   /**

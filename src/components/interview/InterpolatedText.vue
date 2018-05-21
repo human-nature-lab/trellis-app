@@ -13,6 +13,7 @@
   import EdgeService from '@/services/edge/EdgeService'
   import RosterService from '@/services/roster/RosterService'
 
+  let oldText = ''
   export default {
     name: 'interpolated-text',
     props: {
@@ -20,8 +21,9 @@
         type: String,
         required: true
       },
-      sectionFollowUpDatumId: {
-        type: String
+      location: {
+        type: Object,
+        required: true
       }
     },
     data: function () {
@@ -32,13 +34,20 @@
         interpolatedText_: null
       }
     },
+    updated: function () {
+      if (this.text !== oldText) {
+        this.loadInterpolatedValues()
+      }
+    },
+    created: function () {
+      this.loadInterpolatedValues()
+    },
     computed: {
       interpolatedText: function () {
-        this.loadInterpolatedValues(this.sectionFollowUpDatumId)
         if (this.interpolatedText_) {
           return this.interpolatedText_
         } else {
-          let varNames = StringInterpolationService.getInterpolationKeys(this.text, this.sectionFollowUpDatumId)
+          let varNames = StringInterpolationService.getInterpolationKeys(this.text)
           let fillMap = varNames.reduce(function (fillMap, name) {
             fillMap[name] = 'LOADING'
             return fillMap
@@ -52,9 +61,12 @@
         let interview = sharedInterview() // TODO: This is a stupid way to do this. Why isn't this just a singleton?
         let promises = []
         varNames.forEach(varName => {
-          let questionDatum = interview.getSingleDatumByQuestionVarName(varName, this.sectionFollowUpDatumId)
+          // debugger
+          let questionDatum = interview.getSingleDatumByQuestionVarName(varName, this.location.sectionFollowUpDatumRepetition)
           let question = interview.questionMap.get(questionDatum.question_id)
-          let datum = this.sectionFollowUpDatumId ? questionDatum.data.find(d => d.id === this.sectionFollowUpDatumId) : questionDatum.data[0]
+          // let datum = this.sectionFollowUpRepetition ? questionDatum.data.find(d => d.id === this.location) : questionDatum.data[0]
+          let datum = questionDatum.data.find(d => d.event_order === this.location.sectionFollowUpDatumRepetition)
+          console.log('datumId:', datum.id)
           switch (question.question_type.name) {
             case 'relationship':
               return promises.push(EdgeService.getEdges([datum.edge_id]).then(edges => {
@@ -65,24 +77,27 @@
               }))
             case 'roster':
               return promises.push(RosterService.getRosterRows(questionDatum.data.map(d => d.roster_id)).then(rosters => {
+                let roster = rosters.find(r => r.id === datum.roster_id)
                 return {
                   key: varName,
-                  name: rosters[0].val
+                  name: roster.val
                 }
               }))
             default:
               return promises.push(new Promise(resolve => {
-                return {
+                return resolve({
                   key: varName,
                   name: datum.val
-                }
+                })
               }))
           }
         })
         return promises
       },
-      loadInterpolatedValues: function (sectionFollowUpDatumId) {
-        let varNames = StringInterpolationService.getInterpolationKeys(this.text, sectionFollowUpDatumId)
+      loadInterpolatedValues: function () {
+        oldText = this.text
+        this.interpolatedText_ = null
+        let varNames = StringInterpolationService.getInterpolationKeys(this.text)
         if (!varNames.length) {
           this.isLoaded = true
           this.isLoading = false

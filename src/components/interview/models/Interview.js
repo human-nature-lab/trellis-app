@@ -28,6 +28,8 @@ export default class Interview extends Emitter {
     if (data) this.data.loadData(data)
     if (conditionTags) this.data.loadConditionTags(conditionTags)
     this.navigator = new InterviewNavigator(this)
+    this.navigator.on('end', this.atEnd, this)
+    this.navigator.on('beginning', this.atBeginning, this)
     this._initializeConditionAssignment()
     this.makePageQuestionDatum()
   }
@@ -99,7 +101,7 @@ export default class Interview extends Emitter {
       let questionDatum = null
       let questionBlueprint = null
       if (action.question_id) {
-        questionDatum = this.data.getSingleQuestionDatumByLocation(action.question_id, action.section, action.page, action.sectionRepetition, action.sectionFollowUpDatumRepetition)
+        questionDatum = this.data.getSingleQuestionDatumByLocation(action.question_id, action.section, action.page, action.section_repetition, action.section_follow_up_repetition)
         questionBlueprint = this._findQuestionBlueprint(action.question_id)
       } else if (action.action_type !== 'next' && action.action_type !== 'previous') {
         console.error(action)
@@ -268,7 +270,7 @@ export default class Interview extends Emitter {
    * @private
    */
   _getCurrentPageData () {
-    return this.data.getAllQuestionDatumByLocation(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    return this.data.getAllQuestionDatumByLocation(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumRepetition)
   }
 
   /**
@@ -376,8 +378,11 @@ export default class Interview extends Emitter {
    */
   makePageQuestionDatum () {
     let currentPage = this.currentPage()
+    if (this.location.sectionFollowUpDatumRepetition > 0) {
+      // debugger
+    }
     for (let questionBlueprint of currentPage.questions) {
-      if (this.data.locationHasQuestionDatum(questionBlueprint.id, this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)) {
+      if (!this.data.locationHasQuestionDatum(questionBlueprint.id, this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumRepetition)) {
         this._makeQuestionDatum(questionBlueprint)
       }
     }
@@ -603,15 +608,15 @@ export default class Interview extends Emitter {
     return qDatum ? qDatum[0] : null
   }
 
-  getSingleDatumByQuestionVarName (varName, followUpDatumId) {
+  getSingleDatumByQuestionVarName (varName, sectionFollowUpRepetition) {
     let questionId = this.varNameMap.get(varName)
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
-    console.log('Getting question by varname', varName, followUpDatumId)
+    console.log('Getting question by varname', varName, sectionFollowUpRepetition)
     let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
     for (let qD of questionDatum) {
-      if (qD.data.findIndex(d => d.id === followUpDatumId) > -1) {
+      if (qD.data.findIndex(d => d.event_order === sectionFollowUpRepetition) > -1) {
         return qD
       }
     }
