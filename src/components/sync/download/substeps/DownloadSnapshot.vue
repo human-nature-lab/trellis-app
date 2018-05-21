@@ -73,10 +73,12 @@
           this.source = CancelToken.source()
           this.downloading = true
           SyncService.downloadSnapshot(this.source, this.onDownloadProgress, this.snapshotId).then((response) => {
+            console.log('downloadSnapshot, response', response)
             let fileName = this.snapshotId + '.sql.zip'
-            let snapshot = new Blob([response.data])
+            let snapshot = response.data
             let fileSize = Number(response.headers['content-length'])
-            FileService.writeFile(snapshot, fileName, fileSize)
+            console.log('fileSize', fileSize)
+            FileService.writeFile('snapshots', snapshot, fileName, fileSize)
               .then(
                 (fileEntry) => {
                   this.success = true

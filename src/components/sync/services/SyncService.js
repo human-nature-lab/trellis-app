@@ -58,7 +58,8 @@ class SyncService {
   }
   downloadSnapshot (source, onDownloadProgress, snapshotId) {
     let options = {
-      timeout: 0
+      timeout: 0,
+      responseType: 'blob'
     }
     if (source) { options.cancelToken = source.token }
     if (onDownloadProgress) { options.onDownloadProgress = onDownloadProgress }

@@ -50,6 +50,11 @@
                   v-bind:snapshotFileSize="snapshotFileSize"
                   v-on:download-snapshot-done="downloadSnapshotDone">
                 </download-snapshot>
+                <extract-snapshot
+                  v-if="downloadStep > 1 && downloadSubStep > 2"
+                  v-bind:fileEntry="downloadedSnapshotFileEntry"
+                  v-on:extract-snapshot-done="extractSnapshotDone">
+                </extract-snapshot>
               </download-step>
             </v-stepper-content>
             <v-stepper-content step="3">
@@ -69,6 +74,7 @@
   import CompareSnapshots from './substeps/CompareSnapshots'
   import CheckDownloadSize from './substeps/CheckDownloadSize'
   import DownloadSnapshot from './substeps/DownloadSnapshot.vue'
+  import ExtractSnapshot from './substeps/ExtractSnapshot.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
@@ -137,6 +143,9 @@
         console.log('downloadSnapshotDone', fileEntry)
         this.downloadedSnapshotFileEntry = fileEntry
         this.downloadSubStep = 3
+      },
+      extractSnapshotDone: function (unzippedFile) {
+        console.log('extractSnapshotDone', unzippedFile)
       }
     },
     computed: {
@@ -160,7 +169,8 @@
       AuthenticateDevice,
       DownloadStep,
       CheckDownloadSize,
-      DownloadSnapshot
+      DownloadSnapshot,
+      ExtractSnapshot
     }
   }
 </script>

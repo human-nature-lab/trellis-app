@@ -9,10 +9,10 @@ export default class DatabaseService {
   constructor () {
     this.database = null
     this.isReady = false
-    console.log('database waiting for device to be ready')
+    // console.log('database waiting for device to be ready')
     DeviceService.isDeviceReady().then(
       () => {
-        console.log('device is ready initializing database')
+        // console.log('device is ready initializing database')
         this.initDatabase()
       }
     )
@@ -42,10 +42,10 @@ export default class DatabaseService {
     }, function (error) {
       console.error('initDatabase error: ', error)
     }, function () {
-      console.log('initialized database successfully')
+      // console.log('initialized database successfully')
     })
     this.isReady = true
-    console.log('connection to db opened', this.database)
+    // console.log('connection to db opened', this.database)
   }
 
   getLatestDownload () {

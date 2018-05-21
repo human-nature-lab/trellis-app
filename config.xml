@@ -27,4 +27,5 @@
     <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
     <engine name="android" spec="^7.1.0" />
     <engine name="osx" spec="^4.0.1" />
+    <plugin name="cordova-plugin-zip" spec="^3.1.0" />
 </widget>
