@@ -14,12 +14,10 @@ export default function loadInterview (to, from, next) {
       interview = inter
       return Promise.all([
         InterviewActionsService.getActions(to.params.interviewId).catch(err => {
-          console.error('interview actions route does not work', err)
-          return []
+          throw new Error('Could not contact interview actions service', err)
         }),
         InterviewService.getData(to.params.interviewId).catch(err => {
-          console.error('interview data service does not work', err)
-          return []
+          throw new Error('Could not contac interview data service', err)
         }),
         FormService.getForm(interview.survey.form_id),
         InterviewService.getPreload(to.params.interviewId).catch(err => {
@@ -38,8 +36,8 @@ export default function loadInterview (to, from, next) {
           }
         }
         singleton.interview.interview = interview
-        singleton.interview.actions = actions
-        singleton.interview.data = data
+        singleton.interview.actions = [] || actions
+        singleton.interview.data = [] || data
         singleton.interview.form = formBlueprint
         singleton.interview.preload = preload
         next()

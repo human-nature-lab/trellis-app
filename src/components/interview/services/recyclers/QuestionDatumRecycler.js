@@ -1,6 +1,6 @@
 import Recycler from '@/classes/Recycler'
 import uuidv4 from 'uuid/v4'
-const keyNames = ['survey_id', 'section', 'section_repetition', 'follow_up_datum_id', 'page', 'question_id']
+const keyNames = ['survey_id', 'section', 'section_repetition', 'section_follow_up_repetition', 'page', 'question_id']
 class QuestionDatumRecycler extends Recycler {
   /**
    * Takes the same object that objectCreator returns
@@ -22,7 +22,7 @@ class QuestionDatumRecycler extends Recycler {
     return {
       id: uuidv4(),
       section_repetition: interview.location.sectionRepetition,
-      follow_up_datum_id: interview.location.sectionFollowUpDatumId,
+      section_follow_up_repetition: interview.location.sectionFollowUpDatumRepetition,
       section: interview.location.section,
       page: interview.location.page,
       survey_id: interview.interview.survey_id,

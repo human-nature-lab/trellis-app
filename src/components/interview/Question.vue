@@ -16,13 +16,14 @@
       <v-flex class="question-text title">
         <InterpolatedText
           :text="translated"
-          :section-follow-up-datum-id="location.sectionFollowUpDatumId" />
+          :location="location" />
       </v-flex>
       <IntroQuestion
         v-if="question.type.name === 'intro'"
         :question="question"/>
       <MultipleSelectQuestion
         v-else-if="question.type.name === 'multiple_select' || question.type.name === 'multiple_choice'"
+        :location="location"
         :question="question"/>
       <IntegerQuestion
         v-else-if="question.type.name === 'integer'"

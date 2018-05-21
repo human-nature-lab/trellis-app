@@ -79,8 +79,6 @@
     data () {
       return {
         artificiallyExtendLoadTime: false,
-        studyId: this.$route.params.studyId,
-        interviewId: this.$route.params.interviewId,
         formId: null,
         surveyId: null,
         clipped: false,
@@ -102,7 +100,6 @@
       }
     },
     created () {
-      InterviewService.setInterviewId(this.interviewId)
       this.loadInterview()
       actionBus.$on('action', this.actionHandler)
       window.onbeforeunload = this.prematureExit
@@ -125,6 +122,8 @@
               respondent_id: 'ok'
             }
           }
+        } else {
+          InterviewService.setInterviewId(interview.id)
         }
         this.initializeInterview(interview, actions, data, conditionTags, form, preload)
       },
@@ -170,8 +169,8 @@
     },
     computed: {
       questions: function () {
-        // This needs to be here so that we have a dependency on this.location
-        let questions = interviewState.getPageQuestions().map(q => {
+        // The reference to this.location needs to be here so that we have a dependency on this.location
+        let questions = interviewState.getPageQuestions(this.location.sectionFollowUpDatumId).map(q => {
           q.type = {
             name: q.question_type.name
           }
