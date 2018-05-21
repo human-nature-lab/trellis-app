@@ -184,6 +184,48 @@ export default class InterviewNavigator extends Emitter {
     return {page, section, sectionRepetition, sectionFollowUpDatumRepetition}
   }
 
+  getPrevious (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+    let m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
+    let max = {
+      section: m[0],
+      sectionRepetition: m[1],
+      sectionFollowUpDatumRepetition: m[2],
+      page: m[3]
+    }
+    page--
+    if (page < 0) {
+      page = max.page
+      sectionRepetition--
+    }
+    if (sectionRepetition < 0) {
+      sectionRepetition = max.sectionRepetition
+      sectionFollowUpDatumRepetition--
+    }
+    if (sectionFollowUpDatumRepetition < 0) {
+      sectionFollowUpDatumRepetition = max.sectionFollowUpDatumRepetition
+      section--
+      m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
+      max = {
+        section: m[0],
+        sectionRepetition: m[1],
+        sectionFollowUpDatumRepetition: m[2],
+        page: m[3]
+      }
+      sectionRepetition = max.sectionRepetition
+      sectionFollowUpDatumRepetition = max.sectionFollowUpDatumRepetition
+      page = max.page
+    }
+    console.log('previous', page, sectionRepetition, sectionFollowUpDatumRepetition, section)
+    if (section < 0) {
+      section = 0
+      page = 0
+      sectionRepetition = 0
+      sectionFollowUpDatumRepetition = 0
+      throw Error('Reached beginning of survey')
+    }
+    return {page, section, sectionRepetition, sectionFollowUpDatumRepetition}
+  }
+
   /**
    * Move forward a step
    */
@@ -205,24 +247,15 @@ export default class InterviewNavigator extends Emitter {
    * Move back a step
    */
   previous () {
-    this.page--
-    if (this.page < 0) {
-      this.page = this.max.page
-      this.sectionRepetition--
-    }
-    if (this.sectionRepetition < 0) {
-      this.sectionRepetition = this.max.sectionRepetition
-      this.sectionFollowUpDatumRepetition--
-    }
-    if (this.sectionFollowUpDatumRepetition < 0) {
-      this.sectionFollowUpDatumRepetition = this.max.sectionFollowUpDatumRepetition
-      this.section--
-      this.updateMax()
-      this.setToMax()
-    }
-    if (this.section < 0) {
-      this.section = 0
-      this.zero()
+    try {
+      let prev = this.getPrevious(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+      this.page = prev.page
+      this.section = prev.section
+      this.sectionRepetition = prev.sectionRepetition
+      this.sectionFollowUpDatumRepetition = prev.sectionFollowUpDatumRepetition
+    } catch (err) {
+      console.log(err)
+      this.emit('beginning')
     }
     this.updateLocation()
   }
