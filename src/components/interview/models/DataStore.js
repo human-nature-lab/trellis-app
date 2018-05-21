@@ -19,6 +19,11 @@ export default class DataStore {
         survey: []
       }
     }
+    DatumRecycler.clear()
+    QuestionDatumRecycler.clear()
+    RespondentConditionTagRecycler.clear()
+    SectionConditionTagRecycler.clear()
+    FormConditionTagRecycler.clear()
     this._interval = setInterval(this.persistIfChanges.bind(this), throttleRate / 2)
     this.persist = _.debounce(this.save.bind(this), throttleRate, {
       leading: false,

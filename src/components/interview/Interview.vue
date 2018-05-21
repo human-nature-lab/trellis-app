@@ -66,13 +66,86 @@
   import Page from './Page'
   import LoadingPage from './LoadingPage'
 
-  import {sharedInterview} from './models/Interview'
+  import {sharedInterview, clearSharedInterview} from './models/Interview'
   import InterviewService from './services/interview/InterviewService'
   // import TranslationService from '../../services/TranslationService'
   // import StringInterpolationService from '../../services/StringInterpolationService'
   // import FormService from '../../services/form/FormService'
   import actionBus from './services/ActionBus'
   // import InterviewActionsService from './services/interview-actions/InterviewActionsService'
+
+  import InterviewActionsService from './services/interview-actions/InterviewActionsService'
+  import FormService from '../../services/form/FormService'
+  import LocaleService from '../../services/locale/LocaleService'
+  let interviewData = {}
+
+  function loadInterview (interviewId) {
+    let interview
+    return InterviewService.getInterview(interviewId)
+      .catch(err => {
+        console.error('No interview exists with this id')
+        throw err
+      })
+      .then(inter => {
+        interview = inter
+        return Promise.all([
+          InterviewActionsService.getActions(interviewId).catch(() => {
+            // throw new Error('Could not contact interview actions service: ' + err)
+          }),
+          InterviewService.getData(interviewId).catch(() => {
+            // throw new Error('Could not contact interview data service: ' + err)
+          }),
+          FormService.getForm(interview.survey.form_id),
+          InterviewService.getPreload(interviewId).catch(() => {
+            // throw new Error('Could not contact preload data service: ' + err)
+          })
+        ]).then(results => {
+          let [actions, data, formBlueprint, preload] = results
+          for (let d of data) {
+            for (let datum of d.data) {
+              for (let key in datum) {
+                if (datum[key] === null || datum[key] === undefined) {
+                  delete datum[key]
+                }
+              }
+            }
+          }
+          interviewData.interview = interview
+          interviewData.actions = [] || actions
+          interviewData.data = [] || data
+          interviewData.form = formBlueprint
+          interviewData.preload = preload
+        }).catch(() => {
+          // debugger
+          // throw err
+        })
+      })
+  }
+
+  function loadPreview (formId) {
+    let promises = [
+      FormService.getForm(formId).then(form => {
+        interviewData.form = form
+      })
+    ]
+    return Promise.all(promises)
+  }
+
+  function interviewGuards (to, from, next) {
+    LocaleService.setExistingLocale()
+    let p
+    if (to.name === 'Interview') {
+      p = loadInterview(to.params.interviewId)
+    } else {
+      p = loadPreview(to.params.formId)
+    }
+    if (to.query.locale) {
+      // TODO: set the locale here
+    }
+    return p.then(() => {
+      next()
+    })
+  }
 
   let interviewState
   export default {
@@ -104,16 +177,47 @@
       actionBus.$on('action', this.actionHandler)
       window.onbeforeunload = this.prematureExit
     },
+    beforeRouteEnter (to, from, next) {
+      console.log('before route enter', to)
+      interviewGuards(to, from, next)
+    },
+    beforeRouteUpdate (to, from, next) {
+      console.log('before route update', to)
+      this.isLoading = true
+      interviewData.intervew = null
+      interviewData.actions = null
+      interviewData.data = null
+      interviewData.form = null
+      interviewData.preload = null
+      interviewGuards(to, from, next).then(() => {
+        this.loadInterview()
+      })
+    },
+    beforeRouteLeave  (to, from, next) {
+      console.log('before route leave', to)
+      if (to.name === 'Interview' || to.name === 'InterviewPreview') {
+        this.isLoading = true
+        interviewData.intervew = null
+        interviewData.actions = null
+        interviewData.data = null
+        interviewData.form = null
+        interviewData.preload = null
+        interviewGuards(to, from, next).then(() => {
+          this.loadInterview()
+        })
+      }
+    },
     beforeDestroy: function () {
       window.onbeforeunload = null
     },
     methods: {
       loadInterview: function () {
-        let data = this.global.interview.data
-        let conditionTags = this.global.interview.conditionTags
-        let interview = this.global.interview.interview
-        let actions = this.global.interview.actions
-        let form = this.global.interview.form
+        this.isLoading = false
+        let conditionTags = interviewData.conditionTags
+        let interview = interviewData.interview
+        let actions = interviewData.actions
+        let form = interviewData.form
+        let data = interviewData.data
         let preload = []
         if (!interview) {
           interview = {
@@ -128,7 +232,7 @@
         this.initializeInterview(interview, actions, data, conditionTags, form, preload)
       },
       initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, preload) {
-        console.log('preload data', preload)
+        clearSharedInterview()
         interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags)
         // Share the relevant parts of the interview with the view
         this.interviewData = interviewState.data.data

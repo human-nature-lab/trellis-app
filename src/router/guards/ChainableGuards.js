@@ -44,6 +44,6 @@ export default function chainableGuards (...guards) {
 
   return function guardChain (...args) {
     [to, from, next] = args
-    return callNextGuardOrFinish()
+    callNextGuardOrFinish()
   }
 }

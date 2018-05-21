@@ -4,16 +4,11 @@ import RespondentsSearch from '../components/RespondentsSearch'
 import CameraTest from '../components/CameraTest'
 import LocaleSelectorPage from '../components/LocaleSelectorPage'
 import QuestionExamples from '../components/interview/QuestionExamples'
-import validateLocale from './guards/ValidateLocale'
-import validateStudy from './guards/ValidateStudy'
-import loadInterview from './guards/LoadInterview'
-import chainableGuards, {parallel} from './guards/ChainableGuards'
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
   name: 'Interview',
-  component: Interview,
-  beforeEnter: chainableGuards(parallel(validateLocale, validateStudy), loadInterview)
+  component: Interview
 }, {
   path: '/study/:studyId/respondent/:respondentId/forms',
   name: 'RespondentForms',

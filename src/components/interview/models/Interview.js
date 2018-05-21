@@ -689,3 +689,7 @@ export function sharedInterview (...args) {
   }
   return sharedInterviewInstance
 }
+
+export function clearSharedInterview () {
+  sharedInterviewInstance = null
+}
