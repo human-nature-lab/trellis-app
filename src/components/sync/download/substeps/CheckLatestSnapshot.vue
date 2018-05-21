@@ -58,6 +58,7 @@
           this.source = CancelToken.source()
           this.checking = true
           SyncService.getLatestSnapshot(this.source).then((serverLatestSnapshot) => {
+            console.log('serverLatestSnapshot', serverLatestSnapshot)
             this.checking = false
             if (Object.keys(serverLatestSnapshot).length === 0) {
               this.warning = true

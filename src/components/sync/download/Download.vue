@@ -50,8 +50,14 @@
                   v-bind:snapshotFileSize="snapshotFileSize"
                   v-on:download-snapshot-done="downloadSnapshotDone">
                 </download-snapshot>
-                <extract-snapshot
+                <verify-download
                   v-if="downloadStep > 1 && downloadSubStep > 2"
+                  v-bind:fileEntry="downloadedSnapshotFileEntry"
+                  v-bind:fileHash="serverSnapshot.hash"
+                  v-on:verify-download-done="verifyDownloadDone">
+                </verify-download>
+                <extract-snapshot
+                  v-if="downloadStep > 1 && downloadSubStep > 3"
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-on:extract-snapshot-done="extractSnapshotDone">
                 </extract-snapshot>
@@ -74,6 +80,7 @@
   import CompareSnapshots from './substeps/CompareSnapshots'
   import CheckDownloadSize from './substeps/CheckDownloadSize'
   import DownloadSnapshot from './substeps/DownloadSnapshot.vue'
+  import VerifyDownload from './substeps/VerifyDownload.vue'
   import ExtractSnapshot from './substeps/ExtractSnapshot.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
   const DOWNLOAD_STATUS = {
@@ -144,6 +151,10 @@
         this.downloadedSnapshotFileEntry = fileEntry
         this.downloadSubStep = 3
       },
+      verifyDownloadDone: function () {
+        console.log('verifyDownloadDone')
+        this.downloadSubStep = 4
+      },
       extractSnapshotDone: function (unzippedFile) {
         console.log('extractSnapshotDone', unzippedFile)
       }
@@ -170,7 +181,8 @@
       DownloadStep,
       CheckDownloadSize,
       DownloadSnapshot,
-      ExtractSnapshot
+      ExtractSnapshot,
+      VerifyDownload
     }
   }
 </script>
