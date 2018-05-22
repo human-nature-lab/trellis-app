@@ -14,7 +14,7 @@ export default [{
     }
   }
 }, {
-  path: '/form/preview/:formId',
+  path: '/form/:formId/preview',
   name: 'InterviewPreview',
   component: Interview
 }]
