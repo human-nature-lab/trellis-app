@@ -3,6 +3,7 @@ import actionDefinitions from '../services/InterviewActionDefinitions'
 import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
+import ConditionTagStore from './ConditionTagStore'
 import Emitter from '@/classes/Emitter'
 
 import InterviewNavigator from '../services/InterviewNavigator'
@@ -20,7 +21,6 @@ export default class Interview extends Emitter {
     this.actions = new ActionStore()
 
     this.conditionAssigner = new ConditionAssignmentService()
-    this.allConditions = new Map()
     this.varNameMap = new Map()
     this.questionMap = new Map()
     this.load(blueprint)
@@ -120,7 +120,7 @@ export default class Interview extends Emitter {
    */
   _loadBlueprint (blueprint) {
     this.blueprint = Object.assign({}, blueprint)
-    this.allConditions.clear()
+    ConditionTagStore.clear()
     this.varNameMap.clear()
     this.questionMap.clear()
     // Sort all levels
@@ -137,11 +137,12 @@ export default class Interview extends Emitter {
         return pageA.pivot.question_group_order - pageB.pivot.question_group_order
       })
       for (let page of section.question_groups) {
-        for (let skip of page.skips) {
-          for (let condition of skip.conditions) {
-            this.allConditions.set(condition.id, condition)
-          }
-        }
+        // for (let skip of page.skips) {
+        //   for (let condition of skip.conditions) {
+        //     console.log('condition', JSON.stringify(condition, null, 2))
+        //     ConditionTagStore.add(condition)
+        //   }
+        // }
         page.questions.sort((questionA, questionB) => {
           return questionA.sort_order - questionB.sort_order
         })
@@ -192,7 +193,7 @@ export default class Interview extends Emitter {
       section.question_groups.forEach(page => {
         page.questions.forEach(question => {
           question.assign_condition_tags.forEach(act => {
-            this.allConditions.set(act.condition.id, act.condition)
+            ConditionTagStore.add(act.condition)
             this.conditionAssigner.register(act.id, act.logic)
           })
         })
@@ -356,6 +357,7 @@ export default class Interview extends Emitter {
       for (let act of question.assign_condition_tags) {
         try {
           if (this.conditionAssigner.run(act.id, vars)) {
+            console.log('assigning', act)
             this._assignConditionTag(act)
           }
         } catch (err) {
@@ -448,8 +450,8 @@ export default class Interview extends Emitter {
 
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
-    let conditionTags = new Set(cConditionTags.map(tag => tag.condition_id))
-    if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
+    let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
+    if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
       this._markAsSkipped()
       return this.next()
     }
@@ -465,8 +467,8 @@ export default class Interview extends Emitter {
     this._onPageEnter()
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
-    let conditionTags = new Set(cConditionTags.map(tag => tag.condition_id))
-    if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTags)) {
+    let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
+    if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
       this._markAsSkipped()
       return this.previous()
     }

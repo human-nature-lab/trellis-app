@@ -8,6 +8,8 @@ import RespondentConditionTagRecycler from '../services/recyclers/RespondentCond
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
 
+import ConditionTagStore from '../models/ConditionTagStore'
+
 export default class DataStore {
   constructor (throttleRate = 10000) {
     this.reset()
@@ -200,7 +202,10 @@ export default class DataStore {
     }).forEach(tag => {
       tags.push(tag)
     })
-    return tags
+    return tags.map(tag => {
+      tag.name = ConditionTagStore.getNameFromId(tag.condition_id)
+      return tag
+    })
   }
 
   locationHasQuestionDatum (questionId, section, page, sectionRepetition, sectionFollowUpDatumRepetition) {
