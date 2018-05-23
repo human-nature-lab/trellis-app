@@ -68,11 +68,7 @@
 
   import {sharedInterview, clearSharedInterview} from './models/Interview'
   import InterviewService from './services/interview/InterviewService'
-  // import TranslationService from '../../services/TranslationService'
-  // import StringInterpolationService from '../../services/StringInterpolationService'
-  // import FormService from '../../services/form/FormService'
   import actionBus from './services/ActionBus'
-  // import InterviewActionsService from './services/interview-actions/InterviewActionsService'
 
   import InterviewActionsService from './services/interview-actions/InterviewActionsService'
   import FormService from '../../services/form/FormService'
@@ -135,16 +131,25 @@
     LocaleService.setExistingLocale()
     let p
     if (to.name === 'Interview') {
+      interviewData.interviewType = 'interview'
       p = loadInterview(to.params.interviewId)
     } else {
+      interviewData.interviewType = 'preview'
       p = loadPreview(to.params.formId)
     }
     if (to.query.locale) {
-      // TODO: set the locale here
+      p.then(() => {
+        return LocaleService.getLocaleById(to.query.locale)
+          .then(locale => {
+            LocaleService.setCurrentLocale(locale)
+          })
+          .catch(err => {
+            console.error('no locale matching', to.query.locale, 'in the database')
+            console.error(err)
+          })
+      })
     }
-    return p.then(() => {
-      next()
-    })
+    return p.then(next)
   }
 
   let interviewState
@@ -205,10 +210,13 @@
         interviewGuards(to, from, next).then(() => {
           this.loadInterview()
         })
+      } else {
+        next()
       }
     },
     beforeDestroy: function () {
       window.onbeforeunload = null
+      interviewState.destroy()
     },
     methods: {
       loadInterview: function () {
@@ -234,6 +242,10 @@
       initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, preload) {
         clearSharedInterview()
         interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags)
+        if (interviewData.interviewType === 'interview') {
+          interviewState.attachDataPersistSlave()
+          interviewState.attachActionsPersistSlave()
+        }
         // Share the relevant parts of the interview with the view
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
@@ -242,7 +254,6 @@
         this.interview = interview
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
-
         setTimeout(() => {
           this.isLoading = false
         }, this.artificiallyExtendLoadTime ? 2000 : 0)

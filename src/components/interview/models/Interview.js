@@ -4,6 +4,8 @@ import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
 import ConditionTagStore from './ConditionTagStore'
+import dataPersistSlave from '../services/DataPersistSlave'
+import actionsPersistSlave from '../services/ActionsPersistSlave'
 import Emitter from '@/classes/Emitter'
 
 import InterviewNavigator from '../services/InterviewNavigator'
@@ -34,6 +36,31 @@ export default class Interview extends Emitter {
     this.makePageQuestionDatum()
   }
 
+  attachDataPersistSlave () {
+    this._dataPersistSlave = dataPersistSlave(this.data)
+  }
+
+  attachActionsPersistSlave () {
+    this._actionsPersistSlave = actionsPersistSlave(this.actions)
+  }
+
+  /**
+   * Should be called when you want to cleanup the interview
+   */
+  destroy () {
+    this._resetState()
+    this.navigator.off('end', this.atEnd, true)
+    this.navigator.off('beginning', this.atBeginning, true)
+    if (this._dataPersistSlave) {
+      this._dataPersistSlave.destroy()
+      this._dataPersistSlave = null
+    }
+    if (this._actionsPersistSlave) {
+      this._actionsPersistSlave.destroy()
+      this._actionsPersistSlave = null
+    }
+  }
+
   /**
    * Make the location zero
    * @private
@@ -47,9 +74,6 @@ export default class Interview extends Emitter {
    */
   _resetState () {
     this.data.reset()
-    this.conditionTags.respondent = []
-    this.conditionTags.survey = []
-    this.conditionTags.section = []
     this.makePageQuestionDatum()
   }
 

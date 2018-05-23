@@ -3,6 +3,7 @@
     <v-alert color="error" :value="error">
       {{error}}
     </v-alert>
+    <debug name="Locales">{{locales}}</debug>
     <v-select
       :loading="isWorking"
       v-model="locale"
