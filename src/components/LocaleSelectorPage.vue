@@ -14,7 +14,8 @@
     methods: {
       done: function () {
         if (this.$route.query.to) {
-          router.push({path: this.$route.query.to})
+          let path = this.$route.query.to.replace(/locale=[^&?]*/g, '')
+          router.push({path: path})
         } else {
           router.push({name: 'home'})
         }

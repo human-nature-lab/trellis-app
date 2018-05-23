@@ -5,7 +5,7 @@
         Trellis
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn class="subheading" flat :to="{name: 'locale', query: {to: this.$route.path}}">
+      <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.path}}">
         {{global.locale ? global.locale.language_tag : ''}}
       </v-btn>
       <v-btn icon @click="global.darkTheme=!global.darkTheme">

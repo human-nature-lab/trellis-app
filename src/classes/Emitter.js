@@ -1,6 +1,6 @@
 export default class Emitter {
   constructor () {
-    this.eventCallbacks = {}
+    this._eventCallbacks = {}
   }
 
   /**
@@ -9,10 +9,10 @@ export default class Emitter {
    * @param eventName
    */
   register (eventName) {
-    if (this.eventCallbacks[eventName]) {
+    if (this._eventCallbacks[eventName]) {
       throw Error('An event with this name has already been registered', eventName)
     }
-    this.eventCallbacks[eventName] = []
+    this._eventCallbacks[eventName] = []
   }
 
   /**
@@ -22,10 +22,10 @@ export default class Emitter {
    * @param context
    */
   on (eventName, callback, context = null) {
-    if (!this.eventCallbacks[eventName]) {
+    if (!this._eventCallbacks[eventName]) {
       this.register(eventName)
     }
-    this.eventCallbacks[eventName].unshift({
+    this._eventCallbacks[eventName].unshift({
       callback: callback,
       context: context
     })
@@ -37,12 +37,12 @@ export default class Emitter {
    * @param callback
    */
   off (eventName, callback, force = false) {
-    if (!this.eventCallbacks[eventName]) {
+    if (!this._eventCallbacks[eventName]) {
       if (force) return
       throw Error('An event with this name has not been registered yet', eventName)
     }
-    let cbInd = this.eventCallbacks[eventName].findIndex(cb => cb.callback === callback)
-    this.eventCallbacks[eventName].splice(cbInd, 1)
+    let cbInd = this._eventCallbacks[eventName].findIndex(cb => cb.callback === callback)
+    this._eventCallbacks[eventName].splice(cbInd, 1)
   }
 
   /**
@@ -51,10 +51,10 @@ export default class Emitter {
    * @param {any|repeated} [args=null]
    */
   dispatch (eventName, ...args) {
-    if (this.eventCallbacks[eventName]) {
-      let i = this.eventCallbacks[eventName].length
+    if (this._eventCallbacks[eventName]) {
+      let i = this._eventCallbacks[eventName].length
       while (i--) {
-        this.eventCallbacks[eventName][i].callback.call(this.eventCallbacks[eventName][i].context, ...args)
+        this._eventCallbacks[eventName][i].callback.call(this._eventCallbacks[eventName][i].context, ...args)
       }
     }
   }
@@ -65,10 +65,10 @@ export default class Emitter {
    * @param {array} [args=[]]
    */
   dispatchApply (eventName, args = []) {
-    if (this.eventCallbacks[eventName]) {
-      let i = this.eventCallbacks[eventName].length
+    if (this._eventCallbacks[eventName]) {
+      let i = this._eventCallbacks[eventName].length
       while (i--) {
-        this.eventCallbacks[eventName][i].callback.apply(this.eventCallbacks[eventName][i].context, args)
+        this._eventCallbacks[eventName][i].callback.apply(this._eventCallbacks[eventName][i].context, args)
       }
     }
   }
@@ -87,8 +87,8 @@ export default class Emitter {
    * @returns {boolean}
    */
   get hasListeners () {
-    for (let key in this.eventCallbacks) {
-      if (this.eventCallbacks[key].length) {
+    for (let key in this._eventCallbacks) {
+      if (this._eventCallbacks[key].length) {
         return true
       }
     }

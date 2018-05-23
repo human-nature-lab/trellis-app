@@ -2,16 +2,17 @@ import InterviewData from '../services/interview-data/InterviewDataService'
 import _ from 'lodash'
 import DiffService from '../services/DiffService'
 
+import Emitter from '../../../classes/Emitter'
 import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
 import DatumRecycler from '../services/recyclers/DatumRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
-
 import ConditionTagStore from '../models/ConditionTagStore'
 
-export default class DataStore {
+export default class DataStore extends Emitter {
   constructor (throttleRate = 10000) {
+    super()
     this.reset()
     this._lastPersistedState = {
       data: [],
@@ -26,11 +27,6 @@ export default class DataStore {
     RespondentConditionTagRecycler.clear()
     SectionConditionTagRecycler.clear()
     FormConditionTagRecycler.clear()
-    this._interval = setInterval(this.persistIfChanges.bind(this), throttleRate / 2)
-    this.persist = _.debounce(this.save.bind(this), throttleRate, {
-      leading: false,
-      maxWait: throttleRate
-    })
   }
 
   persistIfChanges () {
@@ -80,6 +76,7 @@ export default class DataStore {
     this._lastPersistedState.data = _.cloneDeep(this.data)
     QuestionDatumRecycler.fill(questionDatum)
     DatumRecycler.fill(datum)
+    this.emit('initialState', this.data)
   }
 
   /**
@@ -96,6 +93,7 @@ export default class DataStore {
     RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
     SectionConditionTagRecycler.fill(this.conditionTags.section)
     FormConditionTagRecycler.fill(this.conditionTags.survey)
+    this.emit('initialState', this.data)
   }
 
   /**
@@ -113,10 +111,10 @@ export default class DataStore {
     } else {
       questionIdIndex.push(questionDatum)
     }
-    this.hasAddedData = true
-    if (shouldPersist) {
-      this.persist()
-    }
+    this.emit('change', {
+      data: this.data,
+      conditionTags: this.conditionTags
+    })
   }
 
   /**
@@ -126,8 +124,10 @@ export default class DataStore {
    */
   addTag (type, tag) {
     this.conditionTags[type].push(tag)
-    this.hasAddedData = true
-    this.persist()
+    this.emit('change', {
+      data: this.data,
+      conditionTags: this.conditionTags
+    })
   }
 
   /**
@@ -230,15 +230,15 @@ export default class DataStore {
       return
     }
     this.hasAddedData = false
-    this._existingRequestState = _.cloneDeep({
+    let existingRequestState = _.cloneDeep({
       data: this.data,
       conditionTags: this.conditionTags
     })
-    let diff = getDiff(this._existingRequestState, this._lastPersistedState)
-    console.log('saving data', JSON.stringify(this._existingRequestState, null, 2))
+    let diff = getDiff(existingRequestState, this._lastPersistedState)
+    // console.log('saving data', JSON.stringify(existingRequestState, null, 2))
     this._existingRequest = InterviewData.sendDiff(diff).then(body => {
       this._existingRequest = null
-      this._lastPersistedState = this._existingRequestState
+      this._lastPersistedState = existingRequestState
       // Make another throttled request if new data has been stored since the last save
       if (this.hasAddedData) {
         this.persist()
