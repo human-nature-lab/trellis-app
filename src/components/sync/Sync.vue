@@ -4,6 +4,7 @@
       <sync-status v-if="!downloading && !uploading"></sync-status>
       <download
         v-if="downloading"
+        v-on:download-done="downloadDone"
         v-on:download-cancelled="downloadCancelled">
       </download>
     </div>
@@ -60,13 +61,14 @@
       heartbeat: function () {
         return SyncService.getHeartbeat()
       },
-      getHash: function () {
-        return SyncService.getHash('lnvopnlfj asjvldfnbnero;no;aenionaeongoawernobvnaeronbo;pernho;ghaero;gno;aenmvonaongornjgoaejgo')
-      },
       onDownload: function () {
         this.downloading = true
       },
       downloadCancelled: function () {
+        this.downloading = false
+      },
+      downloadDone: function () {
+        console.log('downloadDone')
         this.downloading = false
       },
       enableDownload: function () {
