@@ -116,9 +116,7 @@ class FileServiceMock {
             let reader = new FileReader()
             reader.onloadend = function () {
               let file = this.result
-              console.log('file', file)
               let md5Hash = md5(file)
-              console.log('md5Hash', md5Hash)
               resolve(md5Hash)
             }
             reader.onerror = function (error) {

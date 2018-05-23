@@ -7,12 +7,13 @@ import Config from './tables/Config'
 
 export default class DatabaseService {
   constructor () {
+    this.configDatabase = null
+    this.configIsReady = false
     this.database = null
     this.isReady = false
-    // console.log('database waiting for device to be ready')
     DeviceService.isDeviceReady().then(
       () => {
-        // console.log('device is ready initializing database')
+        this.initConfigDatabase()
         this.initDatabase()
       }
     )
@@ -31,9 +32,66 @@ export default class DatabaseService {
     })
   }
 
-  initDatabase () {
-    this.database = window.openDatabase('trellis.db', '1.0', 'Trellis Database', 1024 * 1024 * 5)
-    this.database.transaction((tx) => {
+  getConfigDatabase () {
+    return new Promise(resolve => {
+      const checkReady = () => {
+        if (this.configIsReady) {
+          resolve(this.configDatabase)
+        } else {
+          setTimeout(checkReady)
+        }
+      }
+      checkReady()
+    })
+  }
+
+  removeDatabase () {
+    // In Cordova we'll delete the sqlite file and create a new database
+    // in WebSQL we can't delete the database so let's remove all tables instead
+    return new Promise((resolve, reject) => {
+      DeviceService.isDeviceReady()
+        .then(() => {
+          this.getDatabase()
+            .then((db) => {
+              let promises = []
+              db.transaction((tx) => {
+                tx.executeSql('select name from sqlite_master where type = "table"', [], (tx, res) => {
+                  for (let i = 0; i < res.rows.length; i++) {
+                    let tableName = res.rows.item(i).name
+                    if (tableName !== '__WebKitDatabaseInfoTable__') {
+                      promises.push(this.removeTable(tableName, tx))
+                    }
+                  }
+                  Promise.all(promises)
+                    .then(() => {
+                      resolve()
+                    },
+                    (error) => {
+                      reject(error)
+                    })
+                })
+              })
+            })
+        })
+    })
+  }
+
+  removeTable (tableName, tx) {
+    return new Promise((resolve, reject) => {
+      console.log(`Dropping table ${tableName}`)
+      tx.executeSql(`drop table ${tableName}`, [], () => {
+        console.log(`Table ${tableName} dropped`)
+        resolve()
+      },
+      (error) => {
+        reject(error)
+      })
+    })
+  }
+
+  initConfigDatabase () {
+    this.configDatabase = window.openDatabase('trellis-config.db', '1.0', 'Trellis Config Database', 1024 * 1024 * 5)
+    this.configDatabase.transaction((tx) => {
       tx.executeSql(SyncTable.getCreateTableStatement(), [])
       tx.executeSql(SyncMessage.getCreateTableStatement(), [])
       tx.executeSql(Message.getCreateTableStatement(), [])
@@ -44,13 +102,17 @@ export default class DatabaseService {
     }, function () {
       // console.log('initialized database successfully')
     })
+    this.configIsReady = true
+  }
+
+  initDatabase () {
+    this.database = window.openDatabase('trellis.db', '1.0', 'Trellis Database', 1024 * 1024 * 5)
     this.isReady = true
-    // console.log('connection to db opened', this.database)
   }
 
   getLatestDownload () {
     return new Promise((resolve, reject) => {
-      this.getDatabase().then(db =>
+      this.getConfigDatabase().then(db =>
         db.transaction((tx) =>
           tx.executeSql('SELECT * from sync where type = "download" and status = "success" order by created_at desc limit 1', [],
             function (t, data) {
@@ -66,7 +128,7 @@ export default class DatabaseService {
 
   getLatestUpload () {
     return new Promise((resolve, reject) => {
-      this.getDatabase().then(db =>
+      this.getConfigDatabase().then(db =>
         db.transaction((tx) =>
           tx.executeSql('SELECT * from sync where type = "upload" and status = "success" order by created_at desc limit 1', [],
             function (t, data) {
@@ -82,7 +144,7 @@ export default class DatabaseService {
 
   getUpdatedRecordsCount () {
     return new Promise((resolve, reject) => {
-      this.getDatabase().then((db) => {
+      this.getConfigDatabase().then((db) => {
         db.transaction((tx) => {
           tx.executeSql('SELECT count(*) AS urcount FROM updated_records', [],
             function (t, data) {

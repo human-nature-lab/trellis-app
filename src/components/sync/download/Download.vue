@@ -64,7 +64,17 @@
               </download-step>
             </v-stepper-content>
             <v-stepper-content step="3">
-              <v-card color="grey lighten-3" class="mb-5" height="200px"></v-card>
+              <download-step
+                title="Inserting"
+                v-if="downloadStep === 3"
+                v-bind:continue-status="continueStatusArray[2]"
+                v-on:continue-clicked="onContinue"
+                v-on:cancel-clicked="onCancel">
+                <remove-database
+                  v-if="downloadStep > 2"
+                  v-on:remove-database-done="removeDatabaseDone">
+                </remove-database>
+              </download-step>
             </v-stepper-content>
           </v-stepper-items>
         </v-stepper>
@@ -82,6 +92,7 @@
   import DownloadSnapshot from './substeps/DownloadSnapshot.vue'
   import VerifyDownload from './substeps/VerifyDownload.vue'
   import ExtractSnapshot from './substeps/ExtractSnapshot.vue'
+  import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
@@ -117,8 +128,12 @@
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
-        this.downloadStep++
-        this.downloadSubStep = 1
+        if (this.downloadStep < 3) {
+          this.downloadStep++
+          this.downloadSubStep = 1
+        } else {
+          this.$emit('download-done')
+        }
       },
       onCancel: function () {
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
@@ -147,16 +162,18 @@
         this.downloadSubStep = 2
       },
       downloadSnapshotDone: function (fileEntry) {
-        console.log('downloadSnapshotDone', fileEntry)
         this.downloadedSnapshotFileEntry = fileEntry
         this.downloadSubStep = 3
       },
       verifyDownloadDone: function () {
-        console.log('verifyDownloadDone')
         this.downloadSubStep = 4
       },
       extractSnapshotDone: function (unzippedFile) {
+        this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
         console.log('extractSnapshotDone', unzippedFile)
+      },
+      removeDatabaseDone: function () {
+        console.log('removeDatabaseDone')
       }
     },
     computed: {
@@ -182,7 +199,8 @@
       CheckDownloadSize,
       DownloadSnapshot,
       ExtractSnapshot,
-      VerifyDownload
+      VerifyDownload,
+      RemoveDatabase
     }
   }
 </script>
