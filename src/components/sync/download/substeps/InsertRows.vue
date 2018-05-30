@@ -2,7 +2,7 @@
   <div>
     <ul>
       <li>
-        Removing previous database...
+        Importing database...
         <strong v-if="success" class="green--text">DONE.</strong>
         <strong v-if="error" class="red--text">ERROR.</strong>
       </li>
@@ -11,9 +11,10 @@
       <p>{{ errorMessage }}</p>
     </span>
     <v-progress-linear
-      v-if="removing"
+      v-if="working"
       height="2"
-      :indeterminate="true">
+      :indeterminate="progressIndeterminate"
+      v-model="insertProgress">
     </v-progress-linear>
     <v-btn
       v-if="error"
@@ -26,39 +27,49 @@
     import config from '@/config'
     import DatabaseService from '@/services/database/DatabaseService'
     export default {
-      name: 'remove-database',
+      name: 'insert-rows',
       data () {
         return {
           success: false,
           error: false,
-          removing: false,
+          working: false,
           apiRoot: config.apiRoot,
-          errorMessage: ''
+          errorMessage: '',
+          progressIndeterminate: true,
+          insertProgress: 0
         }
       },
       created () {
-        this.removeDatabase()
+        this.startWork()
       },
-      props: [],
+      props: ['extractedSnapshot'],
       methods: {
-        removeDatabase: function () {
-          this.removing = true
-          DatabaseService.removeDatabase()
+        startWork: function () {
+          this.working = true
+          DatabaseService.importDatabase(this.extractedSnapshot, this.trackProgress)
             .then(() => {
-              this.removing = false
+              this.working = false
               this.success = true
-              this.$emit('remove-database-done')
+              this.$emit('insert-rows-done')
             },
             (error) => {
               console.error(error)
-              this.removing = false
+              this.working = false
               this.error = true
               this.errorMessage = error
             })
         },
         retry: function () {
           this.error = false
-          this.removeDatabase()
+          this.startWork()
+        },
+        trackProgress: function (progress) {
+          if (progress && progress.inserted && progress.total) {
+            this.progressIndeterminate = false
+            this.insertProgress = (progress.inserted / progress.total) * 100
+          } else {
+            this.progressIndeterminate = true
+          }
         }
       },
       computed: {

@@ -11,6 +11,7 @@ export default class DatabaseService {
     this.configIsReady = false
     this.database = null
     this.isReady = false
+    this.insertBufferSize = 5242880
     DeviceService.isDeviceReady().then(
       () => {
         this.initConfigDatabase()
@@ -73,6 +74,52 @@ export default class DatabaseService {
               })
             })
         })
+    })
+  }
+
+  importDatabase (extractedSnapshot, trackProgress) {
+    return new Promise((resolve, reject) => {
+      if (!extractedSnapshot) {
+        reject('No extracted snapshot provided')
+      }
+      this.getDatabase()
+        .then((db) => {
+          console.log('importDatabase', db)
+          extractedSnapshot.file((file) => {
+            let reader = new FileReader()
+            reader.onloadend = function () {
+              const loadedFile = this.result
+              const allStatements = loadedFile.split(/;\n/)
+              db.transaction((tx) => {
+                allStatements.map((statement, i) => {
+                  trackProgress({inserted: i, total: allStatements.length})
+                  if (statement.trim() !== '') {
+                    // console.log(statement, i)
+                    tx.executeSql(statement, [],
+                      (tx, resultSet) => {
+                        // console.log('resultSet', resultSet)
+                      },
+                      (tx, error) => {
+                        console.error(statement, error)
+                      })
+                  }
+                })
+              },
+              (error) => {
+                reject(error)
+              },
+              () => {
+                resolve()
+              })
+            }
+            reader.onerror = function (error) {
+              reject(error)
+            }
+            reader.readAsText(file)
+          })
+        })
+      console.log('extractedSnapshot', extractedSnapshot)
+      resolve()
     })
   }
 

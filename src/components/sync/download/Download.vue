@@ -74,6 +74,11 @@
                   v-if="downloadStep > 2"
                   v-on:remove-database-done="removeDatabaseDone">
                 </remove-database>
+                <insert-rows
+                  v-if="downloadStep > 2 && downloadSubStep > 1"
+                  v-on:insert-rows-done="insertRowsDone"
+                  v-bind:extracted-snapshot="extractedSnapshot">
+                </insert-rows>
               </download-step>
             </v-stepper-content>
           </v-stepper-items>
@@ -93,6 +98,7 @@
   import VerifyDownload from './substeps/VerifyDownload.vue'
   import ExtractSnapshot from './substeps/ExtractSnapshot.vue'
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
+  import InsertRows from './substeps/InsertRows.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
@@ -116,7 +122,8 @@
         COMPARE_SNAPSHOTS_RESULTS: COMPARE_SNAPSHOTS_RESULTS,
         autoContinueLabel: '',
         continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
-        downloadedSnapshotFileEntry: null
+        downloadedSnapshotFileEntry: null,
+        extractedSnapshot: null
       }
     },
     created () {
@@ -168,12 +175,15 @@
       verifyDownloadDone: function () {
         this.downloadSubStep = 4
       },
-      extractSnapshotDone: function (unzippedFile) {
+      extractSnapshotDone: function (extractedSnapshot) {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
-        console.log('extractSnapshotDone', unzippedFile)
+        this.extractedSnapshot = extractedSnapshot
       },
       removeDatabaseDone: function () {
-        console.log('removeDatabaseDone')
+        this.downloadSubStep = 2
+      },
+      insertRowsDone: function () {
+        console.log('insertRowsDone')
       }
     },
     computed: {
@@ -200,7 +210,8 @@
       DownloadSnapshot,
       ExtractSnapshot,
       VerifyDownload,
-      RemoveDatabase
+      RemoveDatabase,
+      InsertRows
     }
   }
 </script>
