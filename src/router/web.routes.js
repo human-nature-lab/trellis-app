@@ -17,4 +17,7 @@ export default [{
   path: '/form/:formId/preview',
   name: 'InterviewPreview',
   component: Interview
+}, {
+  path: '*',
+  redirect: '/login'
 }]

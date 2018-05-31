@@ -22,11 +22,14 @@
             label="Username"
             :rules="rules.username"
             required
+            autofocus
+            @keyup.enter="login()"
             v-model="username" />
           <v-text-field
             label="Password"
             required
             :rules="rules.password"
+            @keyup.enter="login()"
             :append-icon="e1 ? 'visibility' : 'visibility_off'"
             :append-icon-cb="() => (e1 = !e1)"
             :type="e1 ? 'password' : 'text'"

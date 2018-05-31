@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container :class="['loading-container', {'hidden': !showLoading}]">
       <v-layout>
         <h2>
           {{currentMessage}}
@@ -13,6 +13,7 @@
 </template>
 
 <script>
+  const preloadTime = 750 // Used to prevent unwanted flashing of the screen on fast/local internet connections
   export default {
     name: 'loading-bar',
     props: {
@@ -26,6 +27,20 @@
       maxSteps: {
         type: Number
       }
+    },
+    data: function () {
+      return {
+        showLoading: false,
+        timeout_: null
+      }
+    },
+    created: function () {
+      this.timeout_ = setTimeout(() => {
+        this.showLoading = true
+      }, preloadTime)
+    },
+    beforeDestroy: function () {
+      clearTimeout(this.timeout_)
     },
     computed: {
       currentMessage: function () {
@@ -41,6 +56,10 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+.loading-container
+  transition: opacity .3s
+  opacity: 1
+.hidden
+  opacity: 0
 </style>

@@ -30,7 +30,15 @@
     </v-toolbar>
     <v-content>
       <v-container fluid class="app-container">
-        <router-view />
+        <LoadingPage
+          v-if="global.loading.active"
+          :indeterminate="global.loading.indeterminate"
+          :step="global.loading.step"
+          :message="global.loading.message"
+          :max-steps="global.loading.steps" />
+        <router-view
+          class="route-container fade-in"
+          v-show="!global.loading.active"/>
       </v-container>
     </v-content>
   </v-app>
@@ -38,7 +46,7 @@
 
 <script>
   import StudyService from './services/study/StudyService'
-
+  import LoadingPage from './components/LoadingPage'
   export default {
     name: 'web-app',
     data: function () {
@@ -51,20 +59,31 @@
       StudyService.getStudy('ad9a9086-8f15-4830-941d-416b59639c41').then(study => {
         StudyService.setCurrentStudy(study)
       })
+    },
+    components: {
+      LoadingPage
     }
   }
 </script>
 
-<style scoped>
-  html {
-    overflow-y: auto;
-  }
-  body{
-    padding-top: constant(safe-area-inset-top);
-    padding-top: env(safe-area-inset-top);
-  }
-  .app-container {
-    margin-top: 50px;
-    margin-bottom: 50px;
-  }
+<style lang="sass">
+  html
+    overflow-y: auto
+
+  body
+    /*padding-top: constant(safe-area-inset-top)*/
+    /*padding-top: env(safe-area-inset-top)*/
+
+  .app-container
+    margin-top: 50px
+    margin-bottom: 50px
+
+  .fade-in
+    animation: fade-in .3s ease-in-out 0s 1
+
+  @keyframes fade-in
+    0%
+      opacity: 0
+    100%
+      opacity: 1
 </style>
