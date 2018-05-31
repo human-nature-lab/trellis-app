@@ -44,4 +44,13 @@ export default class InterviewServiceWeb {
         return res.data.preload
       })
   }
+
+  /**
+   * Mark the survey/interview as complete
+   * @param {String} interviewId
+   * @returns {*|AxiosPromise<any>}
+   */
+  static complete (interviewId) {
+    return http().post(`interview/${interviewId}/complete`)
+  }
 }

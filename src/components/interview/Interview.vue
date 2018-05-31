@@ -1,20 +1,11 @@
 <template>
   <v-flex>
-    <v-container v-if="isLoading">
-      <v-layout>
-        <LoadingPage
-          :step="loadingStep"
-          :message="loadingMessage"
-          :max-steps="4" />
-      </v-layout>
-    </v-container>
     <Page :questions="questions"
           :location="location"
           :actions="interviewActions"
           :data="interviewData"
           :conditionTags="interviewConditionTags"
-          :interview="interview"
-          v-if="!isLoading" />
+          :interview="interview"/>
     <v-dialog
       v-model="beginningDialog">
       <v-card>
@@ -55,7 +46,7 @@
           <v-btn
             flat
             color="success"
-            @click="lockAndExit">Confirm</v-btn>
+            @click="lockAndExit()">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -64,7 +55,6 @@
 
 <script>
   import Page from './Page'
-  import LoadingPage from './LoadingPage'
 
   import {sharedInterview, clearSharedInterview} from './models/Interview'
   import InterviewService from './services/interview/InterviewService'
@@ -73,10 +63,15 @@
   import InterviewActionsService from './services/interview-actions/InterviewActionsService'
   import FormService from '../../services/form/FormService'
   import LocaleService from '../../services/locale/LocaleService'
+  import router from '../../router/router'
+
+  import singleton from '../../singleton'
+
   let interviewData = {}
 
   function loadInterview (interviewId) {
     let interview
+    singleton.loading.message = 'Loading interview and survey'
     return InterviewService.getInterview(interviewId)
       .catch(err => {
         console.error('No interview exists with this id')
@@ -84,15 +79,29 @@
       })
       .then(inter => {
         interview = inter
+        singleton.loading.step++
+        singleton.loading.message = 'Loading existing data and stuff'
         return Promise.all([
-          InterviewActionsService.getActions(interviewId).catch(() => {
+          InterviewActionsService.getActions(interviewId).then(r => {
+            singleton.loading.step++
+            return r
+          }).catch(() => {
             // throw new Error('Could not contact interview actions service: ' + err)
           }),
-          InterviewService.getData(interviewId).catch(() => {
+          InterviewService.getData(interviewId).then(r => {
+            singleton.loading.step++
+            return r
+          }).catch(() => {
             // throw new Error('Could not contact interview data service: ' + err)
           }),
-          FormService.getForm(interview.survey.form_id),
-          InterviewService.getPreload(interviewId).catch(() => {
+          FormService.getForm(interview.survey.form_id).then(r => {
+            singleton.loading.step++
+            return r
+          }),
+          InterviewService.getPreload(interviewId).then(r => {
+            singleton.loading.step++
+            return r
+          }).catch(() => {
             // throw new Error('Could not contact preload data service: ' + err)
           })
         ]).then(results => {
@@ -122,25 +131,35 @@
     let promises = [
       FormService.getForm(formId).then(form => {
         interviewData.form = form
+        singleton.loading.step++
       })
     ]
     return Promise.all(promises)
   }
 
   function interviewGuards (to, from, next) {
+    singleton.loading.active = true
+    singleton.loading.step = 0
+    singleton.loading.steps = 0
+    singleton.loading.indeterminate = false
     LocaleService.setExistingLocale()
     let p
     if (to.name === 'Interview') {
       interviewData.interviewType = 'interview'
       p = loadInterview(to.params.interviewId)
+      singleton.loading.steps += 4
     } else {
       interviewData.interviewType = 'preview'
       p = loadPreview(to.params.formId)
+      singleton.loading.steps++
     }
     if (to.query.locale) {
+      singleton.loading.steps++
       p.then(() => {
+        singleton.loading.message = 'Loading current locale'
         return LocaleService.getLocaleById(to.query.locale)
           .then(locale => {
+            singleton.loading.step++
             LocaleService.setCurrentLocale(locale)
           })
           .catch(err => {
@@ -149,7 +168,10 @@
           })
       })
     }
-    return p.then(next)
+    return p.then(() => {
+      singleton.loading.step++
+      singleton.loading.active = false
+    }).then(next)
   }
 
   let interviewState
@@ -271,10 +293,17 @@
         this.endDialog = true
       },
       lockAndExit: function () {
+        console.log('TODO: Make sure everything is saved before marking the survey complete and exiting')
         console.log('TODO: Lock and exit the survey')
+        InterviewService.complete(this.interview.id).then(res => {
+          this.endDialog = false
+          router.push({name: 'home'})
+        })
       },
       saveAndExit: function () {
-        console.log('TODO: Save and exit the survey')
+        console.log('TODO: Make sure everything is saved before exiting')
+        this.endDialog = false
+        router.push({name: 'home'})
       },
       prematureExit: function (e) {
         const dialogText = 'You have unsaved changes. Are you sure you want to leave?'
@@ -309,8 +338,7 @@
       }
     },
     components: {
-      Page,
-      LoadingPage
+      Page
     }
   }
 </script>

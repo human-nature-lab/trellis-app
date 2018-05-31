@@ -9,4 +9,7 @@ export default [{
   path: '/respondents',
   name: 'Respondents',
   component: RespondentsView
+}, {
+  path: '*',
+  redirect: '/'
 }]
