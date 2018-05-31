@@ -11,7 +11,7 @@
       <v-btn icon @click="global.darkTheme=!global.darkTheme">
         <v-icon>wb_sunny</v-icon>
       </v-btn>
-      <v-menu offset-y :nudge-top="-15">
+      <v-menu offset-y :nudge-top="-15" z-index="1000">
         <v-btn icon slot="activator">
           <v-icon>more_vert</v-icon>
         </v-btn>

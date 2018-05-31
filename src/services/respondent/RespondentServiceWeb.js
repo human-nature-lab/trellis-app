@@ -27,7 +27,8 @@ export default class RespondentServiceWeb {
     let studyId = storage.get('studyId', 'string')
     return http().get(`study/${studyId}/respondents/search`, {
       params: {
-        q: query
+        q: query,
+        c: filter.conditionTags.join(',')
       }
     }).then(res => {
       if (res.data && res.data.respondents) {

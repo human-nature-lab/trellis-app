@@ -11,11 +11,27 @@
         autofocus
         @input="onQueryChange"></v-text-field>
       <v-layout slot="extension">
-        <p>TODO: Filters</p>
-        <div class="error">
-          {{error}}
-        </div>
+        <v-flex>
+          <v-select
+            :items="conditionTags"
+            v-model="filters.conditionTags"
+            label="Condition Tags"
+            chips
+            tags
+            @input="onQueryChange"
+            :loading="conditionTagsLoading"
+            autocomplete/>
+        </v-flex>
+        <v-flex sm1>
+          <v-btn
+            @click="clearFilters">
+            <v-icon>clear</v-icon>
+          </v-btn>
+        </v-flex>
       </v-layout>
+      <v-alert v-if="error">
+        {{error}}
+      </v-alert>
     </v-toolbar>
     <v-container class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
@@ -43,7 +59,8 @@
 
 <script>
   import _ from 'lodash'
-  import RespondentService from '@/services/respondent/RespondentService'
+  import ConditionTagService from '../services/condition-tag/ConditionTagService'
+  import RespondentService from '../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
   import Respondent from './Respondent'
   export default {
@@ -65,13 +82,21 @@
     data: function () {
       return {
         results: [],
+        conditionTags: [],
         query: '',
-        filters: {},
+        filters: {
+          conditionTags: []
+        },
         added: [],
         removed: [],
         currentPage: 0,
-        requestPageSize: 50
+        requestPageSize: 50,
+        conditionTagsLoaded: false,
+        conditionTagsLoading: false
       }
+    },
+    created: function () {
+      this.loadConditionTags()
     },
     methods: {
       onQueryChange: _.debounce(function () {
@@ -79,6 +104,21 @@
       }, 400),
       search: function () {
         this.getCurrentPage()
+      },
+      loadConditionTags: function () {
+        if (this.conditionTagsLoaded) return
+        this.conditionTagsLoading = true
+        ConditionTagService.respondent().then(tags => {
+          this.conditionTags = Array.from(new Set(tags))
+          this.conditionTagsLoaded = true
+        }).catch(err => {
+          this.error = err
+        }).then(() => {
+          this.conditionTagsLoading = false
+        })
+      },
+      clearFilters: function () {
+        this.filters.conditionTags = []
       },
       getCurrentPage: function () {
         RespondentService.getSearchPage(this.query, this.filters, this.currentPage, this.requestPageSize)
