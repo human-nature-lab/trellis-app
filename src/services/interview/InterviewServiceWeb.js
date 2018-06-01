@@ -53,4 +53,15 @@ export default class InterviewServiceWeb {
   static complete (interviewId) {
     return http().post(`interview/${interviewId}/complete`)
   }
+
+  /**
+   * Create a new interview for the specified survey
+   * @param {String} surveyId
+   * @returns {*|AxiosPromise<any>}
+   */
+  static create (surveyId) {
+    return http().post(`survey/${surveyId}/interview`).then(res => {
+      return res.data.interview
+    })
+  }
 }

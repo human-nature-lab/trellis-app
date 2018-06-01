@@ -57,7 +57,7 @@
   import Page from './Page'
 
   import {sharedInterview, clearSharedInterview} from './models/Interview'
-  import InterviewService from './services/interview/InterviewService'
+  import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/ActionBus'
 
   import InterviewActionsService from './services/interview-actions/InterviewActionsService'

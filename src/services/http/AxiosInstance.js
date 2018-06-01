@@ -2,6 +2,7 @@ import axios from 'axios'
 import config from '@/config'
 import storage from '../../services/storage/StorageService'
 import router from '../../router/router'
+import singleton from '../../singleton'
 
 let axiosInstance
 
@@ -35,6 +36,7 @@ export default function defaultInstance () {
     }, function (err) {
       if (err.response && err.response.status === 401) {
         let current = router.currentRoute.fullPath
+        singleton.loading.active = false
         if (router.currentRoute.name === 'login') {
           return err.response
         } else {

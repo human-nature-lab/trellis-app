@@ -6,11 +6,11 @@ export default class FormService {
    * @returns {Promise<Array>}
    */
   static getStudyForms (studyId) {
-    return http().get(`study/${studyId}/form`)
+    return http().get(`study/${studyId}/forms/published`)
       .then(res => {
         if (res.data.forms) {
           return res.data.forms.map(form => {
-            form.sort_order = form.pivot.sort_order
+            form.sort_order = form.study_form[0].sort_order
             return form
           })
         } else {

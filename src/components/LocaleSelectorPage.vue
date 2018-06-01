@@ -1,9 +1,9 @@
 <template>
     <v-card>
-      <h2>Choose a locale</h2>
-      <LocaleSelector @change="onChange"/>
-      <v-btn @click="done">Done</v-btn>
-    </v-card>
+  <h2>Choose a locale</h2>
+  <LocaleSelector @change="onChange"/>
+  <v-btn @click="done">Done</v-btn>
+</v-card>
 </template>
 
 <script>

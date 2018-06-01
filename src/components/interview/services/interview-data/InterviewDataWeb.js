@@ -1,4 +1,4 @@
-import InterviewService from '../interview/InterviewService'
+import InterviewService from '../../../../services/interview/InterviewService'
 import http from '@/services/http/AxiosInstance'
 export default class InterviewDataWeb {
   /**

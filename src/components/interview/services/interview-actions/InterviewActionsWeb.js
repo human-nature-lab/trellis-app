@@ -1,5 +1,5 @@
 import http from '@/services/http/AxiosInstance'
-import InterviewService from '../interview/InterviewService'
+import InterviewService from '../../../../services/interview/InterviewService'
 export default class InterviewActionsWeb {
   /**
    * Save the actions that have been passed into this method

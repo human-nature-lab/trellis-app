@@ -1,8 +1,8 @@
 import http from '@/services/http/AxiosInstance'
-import storage from '@/services/storage/StorageService'
 export default class RespondentServiceWeb {
   static getRespondentById (respondentId) {
-    return http().get(`respondent/${encodeURIComponent(respondentId)}`)
+    respondentId = encodeURIComponent(respondentId)
+    return http().get(`respondent/${respondentId}`)
       .then(res => {
         if (res.data.respondent) {
           return res.data.respondent
@@ -12,8 +12,8 @@ export default class RespondentServiceWeb {
         }
       })
   }
-  static getRespondentsPage (page = 0, size = 50) {
-    let studyId = storage.get('studyId', 'string')
+  static getRespondentsPage (studyId, page = 0, size = 50) {
+    studyId = encodeURIComponent(studyId)
     return http().get(`study/${studyId}/respondents`)
       .then(res => {
         if (res.data.respondents) {
@@ -23,13 +23,16 @@ export default class RespondentServiceWeb {
         }
       })
   }
-  static getSearchPage (query, filter, page = 0, size = 50) {
-    let studyId = storage.get('studyId', 'string')
+  static getSearchPage (studyId, query, filter, page = 0, size = 50) {
+    let params = {
+      q: query
+    }
+    if (filter.conditionTags) {
+      params.c = filter.conditionTags.join(',')
+    }
+    studyId = encodeURIComponent(studyId)
     return http().get(`study/${studyId}/respondents/search`, {
-      params: {
-        q: query,
-        c: filter.conditionTags.join(',')
-      }
+      params: params
     }).then(res => {
       if (res.data && res.data.respondents) {
         return res.data.respondents

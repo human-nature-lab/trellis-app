@@ -1,5 +1,6 @@
 import WebLogin from '../components/login/WebLogin'
 import Interview from '../components/interview/Interview'
+import StudySelectorPage from '../components/StudySelectorPage'
 import storage from '../services/storage/StorageService'
 
 export default [{
@@ -13,6 +14,10 @@ export default [{
       next()
     }
   }
+}, {
+  path: '/',
+  name: 'Home',
+  component: StudySelectorPage
 }, {
   path: '/form/:formId/preview',
   name: 'InterviewPreview',
