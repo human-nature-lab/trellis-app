@@ -68,19 +68,16 @@
     props: {
       selectedRespondents: {
         type: Array,
-        default: []
+        default: () => []
       },
       isLoading: {
         type: Boolean,
         default: false
-      },
-      error: {
-        type: String,
-        default: null
       }
     },
     data: function () {
       return {
+        error: null,
         results: [],
         conditionTags: [],
         query: '',
@@ -121,7 +118,8 @@
         this.filters.conditionTags = []
       },
       getCurrentPage: function () {
-        RespondentService.getSearchPage(this.query, this.filters, this.currentPage, this.requestPageSize)
+        let study = this.global.study
+        RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize)
           .then(respondents => {
             this.results = respondents
             this.error = null

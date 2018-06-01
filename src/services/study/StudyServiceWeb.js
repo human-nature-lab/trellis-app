@@ -37,11 +37,11 @@ export default class StudyServiceWeb {
   }
 
   /**
-   * Get list of avaliable studies
+   * Get all of the studies assigned to me
    * @returns {Promise<Array>}
    */
-  static getStudies () {
-    return http().get('/studies').then(res => {
+  static getMyStudies () {
+    return http().get(`me/studies`).then(res => {
       return res.data.studies
     })
   }

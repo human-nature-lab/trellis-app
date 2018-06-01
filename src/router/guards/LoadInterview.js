@@ -1,4 +1,4 @@
-import InterviewService from '../../components/interview/services/interview/InterviewService'
+import InterviewService from '../../services/interview/InterviewService'
 import InterviewActionsService from '../../components/interview/services/interview-actions/InterviewActionsService'
 import FormService from '../../services/form/FormService'
 import singleton from '../../singleton'

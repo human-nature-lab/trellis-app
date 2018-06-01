@@ -1,4 +1,4 @@
-import InterviewService from '../interview/InterviewService'
+import InterviewService from '../../../../services/interview/InterviewService'
 import MockService from '../../../../services/mock/MockService'
 import Emitter from '@/classes/Emitter'
 // Mock datastore for the actions. In memory of course

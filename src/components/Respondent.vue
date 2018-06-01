@@ -14,11 +14,15 @@
         <!--<v-btn @click="onClick">Select</v-btn>-->
       </v-card-text>
       <v-card-actions>
+        <v-btn icon
+          :to="{name: 'respondent-forms', params: {studyId: global.study.id, respondentId: respondent.id}}">
+          <v-icon>view_agenda</v-icon>
+        </v-btn>
         <v-spacer></v-spacer>
-        <button icon
+        <v-btn icon
                 @click="showInfo = true">
           <v-icon>info</v-icon>
-        </button>
+        </v-btn>
       </v-card-actions>
     </v-card>
     <v-dialog
@@ -39,8 +43,8 @@
             <v-layout row wrap>
               <Photo
                 v-for="photo in respondent.photos"
-                :height="100"
-                :width="100"
+                :height="200"
+                :width="200"
                 :key="photo.id"
                 :photo="photo"/>
               <v-btn @click="photoFromCamera">

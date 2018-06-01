@@ -9,7 +9,7 @@ export default class LocaleService {
     return singleton.locale !== null && singleton.locale !== undefined
   }
   static getCurrentLocale () {
-    return storage.get('current-locale', 'object')
+    return storage.get('current-locale')
   }
   static setExistingLocale () {
     singleton.locale = LocaleService.getCurrentLocale()

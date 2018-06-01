@@ -2,10 +2,11 @@
   <v-app light dense class="web" :dark="global.darkTheme">
     <v-toolbar fixed>
       <v-toolbar-title class="deep-orange--text">
-        Trellis
+        <span>Trellis</span>
+
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.path}}">
+      <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.fullPath}}">
         {{global.locale ? global.locale.language_tag : ''}}
       </v-btn>
       <v-btn icon @click="global.darkTheme=!global.darkTheme">
@@ -21,6 +22,9 @@
           </v-list-tile>
           <v-list-tile>
             <router-link :to="{name: 'camera'}">Camera</router-link>
+          </v-list-tile>
+          <v-list-tile>
+            <router-link :to="{name: 'Home', query: {to: $route.fullPath}}">Study</router-link>
           </v-list-tile>
           <v-list-tile v-if="global.study" v-for="(id, index) in interviewIds" :key="id">
             <router-link :to="{name: 'Interview', params: {studyId: global.study.id, interviewId: id}}">Interview {{id}}</router-link>
@@ -47,6 +51,7 @@
 <script>
   import StudyService from './services/study/StudyService'
   import LoadingPage from './components/LoadingPage'
+  import LocaleService from './services/locale/LocaleService'
   export default {
     name: 'web-app',
     data: function () {
@@ -59,6 +64,7 @@
       StudyService.getStudy('ad9a9086-8f15-4830-941d-416b59639c41').then(study => {
         StudyService.setCurrentStudy(study)
       })
+      LocaleService.setExistingLocale()
     },
     components: {
       LoadingPage
