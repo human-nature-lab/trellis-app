@@ -1,6 +1,27 @@
-import MockService from '@/services/mock/GeneratorService'
+import MockService from '@/services/mock/MockService'
+import GeneratorService from '@/services/mock/GeneratorService'
 import uuidv4 from 'uuid/v4'
+import form1 from './forms/form-1.json'
+import form2 from './forms/form-2.json'
+// import form3Womens from './forms/form-3-womens'
+import testForm1 from './forms/test-form-1.json'
+let forms = [form1.form, form2.form, null, testForm1.form]
 export default class FormService {
+  static getForm (formId) {
+    let form = forms.find(form => form && form.id === formId)
+    if (form) {
+      return new Promise(resolve => {
+        return resolve(form)
+      })
+    } else {
+      return new Promise(resolve => {
+        return resolve({
+          sections: [],
+          name_translation: {}
+        })
+      })
+    }
+  }
   static getStudyForms (studyId) {
     // TODO: Add valid skip conditions
     return MockService.expandPromise({
@@ -8,7 +29,7 @@ export default class FormService {
       form_master_id: uuidv4,
       version: 1,
       is_published: true,
-      sections: MockService.arrayGenerate((i, sections) => ({
+      sections: GeneratorService.arrayGenerate((i, sections) => ({
         id: uuidv4,
         pivot: {
           sort_order: i,
@@ -21,15 +42,15 @@ export default class FormService {
           is_repeatable: false,
           max_repetitions: 0,
           repeat_prompt_translation: MockService.translationGenerator,
-          follow_up_question_id: MockService.expand(sections.length && Math.random() < 0.333 ? MockService.randomSelect(MockService.randomSelect(MockService.randomSelect(sections).question_groups).questions).id : null)
+          follow_up_question_id: MockService.expand(sections.length && Math.random() < 0.333 ? GeneratorService.randomSelect(GeneratorService.randomSelect(GeneratorService.randomSelect(sections).question_groups).questions).id : null)
         }],
         name_translation: MockService.translationGenerator,
-        question_groups: MockService.arrayGenerate(i => ({
+        question_groups: GeneratorService.arrayGenerate(i => ({
           id: uuidv4,
           pivot: {
             question_group_order: i
           },
-          questions: MockService.arrayGenerate(i => MockService.questionGenerator, 1, 3)
+          questions: GeneratorService.arrayGenerate(i => MockService.questionGenerator, 1, 3)
         }), 1, 4),
         skips: []
       }), 1, 4)

@@ -1,6 +1,10 @@
-# trellis-survey-view
+# Trellis Interview
 
-> The form view component of the Trellis platform.
+> The trellis SPA for conducting interviews
+
+## Configuration
+- Add **config.js** file in **src/**. Look at **src/config.default.js** for template.
+- Add **config.xml.js** file in **config/**. The template is **config/config.xml.default.js**.
 
 ## Build Setup
 
@@ -10,6 +14,9 @@ npm install
 
 # serve with hot reload at localhost:8080
 npm run dev
+
+# Build android app with hot reload serving based on config.xml.js
+npm run dev-android
 
 # build for production with minification
 npm run build

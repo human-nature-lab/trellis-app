@@ -1,34 +1,45 @@
 <template>
   <v-flex class="integer-question">
-    <div class="question-text">
-      <h3></h3>
-    </div>
     <v-text-field
+      :disabled="isQuestionDisabled"
       v-model.number="value"
-      @change="onChange"
-      :type="number"
+      type="number"
       :step="1"></v-text-field>
   </v-flex>
 </template>
 
 <script>
+  import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import actionBus from '../services/ActionBus'
   export default {
-    name: 'decimal-question',
+    name: 'integer-question',
     props: {
       question: {
         type: Object,
         required: true
       }
     },
+    mixins: [QuestionDisabledMixin],
     data: function () {
       return {
-        value: null
+        _value: null
       }
     },
-    methods: {
-      onChange: function (value) {
-        // TODO: send update to the action handler
-        console.log('Integer value', value)
+    computed: {
+      value: {
+        get: function () {
+          return this.question.datum.data.length ? this.question.datum.data[0].val : this._value
+        },
+        set: function (val) {
+          this._value = val
+          actionBus.actionDebounce({
+            action_type: 'number-change',
+            question_id: this.question.id,
+            payload: {
+              val: val
+            }
+          })
+        }
       }
     }
   }

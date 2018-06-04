@@ -7,15 +7,16 @@ import GeneratorService from './GeneratorService'
  * from the GeneratorService simply because it is not intended to stand on its own as a useful service.
  * This class also keeps track of fake locales for you
  */
-class MockService extends GeneratorService {
+class MockService {
   constructor () {
-    super()
     this.locales = []
     this.addRandomLocale = this.addRandomLocale.bind(this)
     this.translationGenerator = this.translationGenerator.bind(this)
     this.choiceGenerator = this.choiceGenerator.bind(this)
     this.choicesGenerator = this.choicesGenerator.bind(this)
     this.questionGenerator = this.questionGenerator.bind(this)
+    this.expand = GeneratorService.expand.bind(this)
+    this.expandPromise = GeneratorService.expandPromise.bind(this)
   }
 
   /**
@@ -69,7 +70,7 @@ class MockService extends GeneratorService {
    * @returns {Array}
    */
   choicesGenerator (minChoices = 2, maxChoices = 8) {
-    return MockService.arrayGenerate(this.choiceGenerator, minChoices, maxChoices)
+    return GeneratorService.arrayGenerate(this.choiceGenerator, minChoices, maxChoices)
   }
 
   /**
@@ -90,7 +91,7 @@ class MockService extends GeneratorService {
         choices: this.choiceGenerator(2, 5)
       })
     }
-    const type = MockService.randomSelect(Object.keys(typeMap))
+    const type = GeneratorService.randomSelect(Object.keys(typeMap))
     const baseQuestion = {
       var_name: faker.lorem.word,
       text: faker.lorem.lines,
@@ -107,6 +108,25 @@ class MockService extends GeneratorService {
       rQuestion.var_name = `question type not mocked: ${type}`
     }
     return rQuestion
+  }
+
+  /**
+   * Return a promise which will fail with the provided probability and resolve with the provided delay
+   * @param {function} cb
+   * @param {number} [delay = 2000]
+   * @param {number} [failureProbability = 0.5]
+   * @returns {Promise<any>}
+   */
+  randomlyFail (cb, delay = 2000, failureProbability = 0.5) {
+    return new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        if (Math.random() > failureProbability) {
+          return cb(resolve, reject)
+        } else {
+          return reject(new Error('Unable to complete request'))
+        }
+      }, delay)
+    })
   }
 }
 

@@ -6,23 +6,15 @@
  * of the data structure is distinct and doesn't reference another version of the structure.
  */
 export default class GeneratorService {
-  constructor () {
-    this.expand = this.expand.bind(this)
-    this.expandPromise = this.expandPromise.bind(this)
-    this.randomInt = this.randomInt.bind(this)
-    this.arrayGenerate = this.arrayGenerate.bind(this)
-    this.randomSelect = this.randomSelect.bind(this)
-  }
-
   /**
    * Expand with a promise
    * @param generatorExpression
    * @returns {Promise<any>}
    */
-  expandPromise (generatorExpression) {
+  static expandPromise (generatorExpression) {
     return new Promise((resolve, reject) => {
       try {
-        return resolve(this.expand(generatorExpression))
+        return resolve(GeneratorService.expand(generatorExpression))
       } catch (err) {
         return reject(err)
       }
@@ -36,23 +28,25 @@ export default class GeneratorService {
    * @param {Function} generatorExpression
    * @returns {any}
    */
-  expand (generatorExpression, _depth = 0) {
+  static expand (generatorExpression, _depth = 0) {
     let result = null
     if (_depth > 1000) {
       throw Error('Max depth of generator has been exceeded')
     }
-    if (Array.isArray(generatorExpression)) {
+    if (!generatorExpression) {
+      return generatorExpression
+    } else if (Array.isArray(generatorExpression)) {
       result = []
       for (let i = 0; i < generatorExpression.length; i++) {
-        result.push(this.expand(generatorExpression[i]), _depth + 1)
+        result.push(GeneratorService.expand(generatorExpression[i], _depth + 1))
       }
     } else if (typeof generatorExpression === 'object') {
       result = {}
       for (let key in generatorExpression) {
-        result[key] = this.expand(generatorExpression[key], _depth + 1)
+        result[key] = GeneratorService.expand(generatorExpression[key], _depth + 1)
       }
     } else if (typeof generatorExpression === 'function') {
-      result = this.expand(generatorExpression(), _depth + 1)
+      result = GeneratorService.expand(generatorExpression(), _depth + 1)
     } else {
       result = generatorExpression
     }
@@ -65,7 +59,7 @@ export default class GeneratorService {
    * @param {Number} [min=0]
    * @returns {number}
    */
-  randomInt (max, min = 0) {
+  static randomInt (max, min = 0) {
     return Math.floor(Math.random() * max) + Math.floor(min)
   }
 
@@ -73,8 +67,34 @@ export default class GeneratorService {
    * Select a random item from a collection
    * @param {Array} collection
    */
-  randomSelect (arr) {
-    return arr[this.randomInt(arr.length - 1)]
+  static randomSelect (arr) {
+    return arr[GeneratorService.randomInt(arr.length - 1)]
+  }
+
+  /**
+   * Randomly select N items from an array
+   * @param {array} arr
+   * @param {number} n
+   * @returns {array}
+   */
+  static randomSelectN (arr, n) {
+    let vals = []
+    for (let i = 0; i < n; i++) {
+      vals.push(GeneratorService.randomSelect(arr))
+    }
+    return vals
+  }
+
+  /**
+   * Randomly select N values between min and max from an array
+   * @param {array} arr
+   * @param {number} max
+   * @param {number} min
+   * @returns {array}
+   */
+  static randomSelectMinMax (arr, max, min = 0) {
+    let n = GeneratorService.randomInt(max, min)
+    return GeneratorService.randomSelectN(arr, n)
   }
 
   /**
@@ -84,8 +104,8 @@ export default class GeneratorService {
    * @param {Number} max
    * @returns {Array}
    */
-  arrayGenerate (generator, min = 0, max = 10) {
-    let n = this.randomInt(max, min)
+  static arrayGenerate (generator, min = 0, max = 10) {
+    let n = GeneratorService.randomInt(max, min)
     let array = []
     for (let i = 0; i < n; i++) {
       array.push(generator(i, array))

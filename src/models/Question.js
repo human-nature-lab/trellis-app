@@ -1,5 +1,5 @@
 import translationService from '../services/TranslationService'
-import interpolationService from '../services/InterpolationService'
+import interpolationService from '../services/StringInterpolationService'
 export default class Question {
   constructor (blueprint, data = [], conditionTags = [], respondentConditionTags = []) {
     this.blueprint = blueprint

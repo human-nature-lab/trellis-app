@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget android-versionCode="1" id="edu.yale.trellis.surveyview" ios-CFBundleVersion="1" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>trellis-survey-view</name>
+    <description>The form view component of the Trellis platform.</description>
+    <author email="dev@cordova.apache.org" href="http://cordova.io">
+        Apache Cordova Team
+    </author>
+    <content src="CORDOVA_CONTENT_SOURCE" />
+    <preference name="DisallowOverscroll" value="true" />
+    <allow-navigation href="CORDOVA_CONTENT_SOURCE/*" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <platform name="android">
+        <allow-intent href="market:*" />
+    </platform>
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
+    <plugin name="cordova-plugin-device" spec="^2.0.1" />
+    <plugin name="cordova-plugin-whitelist" spec="^1.3.3" />
+    <plugin name="cordova-sqlite-storage" spec="^2.2.1" />
+    <plugin name="cordova-plugin-file" spec="^6.0.1" />
+    <plugin name="cordova-plugin-splashscreen" spec="^5.0.2" />
+    <engine name="android" spec="^7.1.0" />
+    <engine name="osx" spec="^4.0.1" />
+    <plugin name="cordova-plugin-zip" spec="^3.1.0" />
+</widget>
