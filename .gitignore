@@ -31,3 +31,4 @@ www/js/vendor.*.js
 *.swp
 
 config.js
+config.xml.js

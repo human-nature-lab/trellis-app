@@ -3,7 +3,6 @@
     <v-toolbar fixed>
       <v-toolbar-title class="deep-orange--text">
         <span>Trellis</span>
-
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.fullPath}}">
