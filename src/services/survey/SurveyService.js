@@ -21,13 +21,15 @@ export default class SurveyService {
   /**
    * Create a new survey
    * @param {String} studyId
+   * @param {String} respondentId
    * @param {String} formId
    * @returns {*|AxiosPromise<any>}
    */
-  static create (studyId, formId) {
+  static create (studyId, respondentId, formId) {
     studyId = encodeURIComponent(studyId)
     formId = encodeURIComponent(formId)
-    return http().post(`study/${studyId}/form/${formId}/survey`).then(res => {
+    respondentId = encodeURIComponent(respondentId)
+    return http().post(`study/${studyId}/respondent/${respondentId}/form/${formId}/survey`).then(res => {
       return res.data.survey
     })
   }

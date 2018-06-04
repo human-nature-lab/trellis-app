@@ -1,10 +1,13 @@
 <template>
   <v-flex class="respondent-forms">
-    <v-container>
+    <v-container fluid>
+      <v-alert v-if="error">{{this.error}}</v-alert>
       <v-flex>
         <h3>Forms for: {{respondent.name}}</h3>
       </v-flex>
-      <FormsView v-if="forms" :forms="forms"  />
+      <v-layout>
+        <FormsView v-if="forms" :forms="forms" @click="startInterview"/>
+      </v-layout>
     </v-container>
   </v-flex>
 </template>
@@ -15,6 +18,8 @@
   import FormService from '@/services/form/FormService'
   import RespondentService from '@/services/respondent/RespondentService'
   import singleton from '../singleton'
+  import InterviewService from '../services/interview/InterviewService'
+  import router from '../router/router'
 
   let data = {}
   function load (respondentId, studyId) {
@@ -40,9 +45,9 @@
         forms = forms.filter(form => {
           return form.is_published === '1' || form.is_published === 1 || form.is_published === true // TODO: Filter out any forms that the respondent does not qualify for
         }).map(form => {
-          let survey = surveys.find(survey => survey.form_id === form.id)
-          if (survey) {
-            form.survey = survey
+          let formSurveys = surveys.filter(survey => survey.form_id === form.id)
+          if (formSurveys) {
+            form.surveys = formSurveys
           }
           return form
         })
@@ -53,6 +58,8 @@
       })
     ]).then(() => {
       singleton.loading.active = false
+    }).catch(err => {
+      this.error = err
     })
   }
 
@@ -63,6 +70,13 @@
         forms: {},
         respondent: {},
         error: null
+      }
+    },
+    head: {
+      title: function () {
+        return {
+          inner: `${this.respondent.name} Forms`
+        }
       }
     },
     beforeRouteEnter (to, from, next) {
@@ -78,6 +92,22 @@
       FormsView
     },
     methods: {
+      startInterview: function (form) {
+        if (form.isComplete) return
+        let p
+        if (form.isStarted) {
+          p = InterviewService.create(form.surveys[0].id)
+        } else {
+          p = SurveyService.create(this.global.study.id, this.respondent.id, form.id).then(survey => {
+            return InterviewService.create(survey.id)
+          })
+        }
+        return p.then(interview => {
+          router.push({name: 'Interview', params: {studyId: this.global.study.id, interviewId: interview.id}})
+        }).catch(err => {
+          this.error = err
+        })
+      },
       hydrate: function () {
         this.respondent = data.respondent
         this.respondentId = data.respondent.id

@@ -30,7 +30,9 @@ module.exports = merge(baseWebpackConfig, {
       'process.env': config.dev.env
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
-    new webpack.HotModuleReplacementPlugin(),
+    new webpack.HotModuleReplacementPlugin({
+      multistep: true
+    }),
     new webpack.NoEmitOnErrorsPlugin(),
     // https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
@@ -48,7 +50,6 @@ module.exports = merge(baseWebpackConfig, {
         var replacements = require('../config/config.xml')
         content = content.toString()
         for (var key in replacements) {
-          console.log(content)
           content = content.replace(key, replacements[key])
         }
         return content
