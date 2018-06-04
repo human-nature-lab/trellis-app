@@ -32,14 +32,15 @@ var webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
-      'process.env': env
+      'process.env': env,
+      CORDOVA_CONTENT_SOURCE: 'index.html'
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      },
-      sourceMap: true
-    }),
+    // new webpack.optimize.UglifyJsPlugin({
+    //   compress: {
+    //     warnings: false
+    //   },
+    //   sourceMap: true
+    // }),
     // extract css into its own file
     new ExtractTextPlugin({
       filename: utils.assetsPath('css/[name].[contenthash].css')
@@ -62,7 +63,7 @@ var webpackConfig = merge(baseWebpackConfig, {
       inject: true,
       minify: {
         removeComments: true,
-        collapseWhitespace: true,
+        // collapseWhitespace: true,
         removeAttributeQuotes: true
         // more options:
         // https://github.com/kangax/html-minifier#options-quick-reference
@@ -98,6 +99,21 @@ var webpackConfig = merge(baseWebpackConfig, {
         from: path.resolve(__dirname, '../static'),
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
+      },
+      {
+        from: path.resolve(__dirname, '../static/config.xml'),
+        to: path.resolve(config.build.assetsRoot, 'config.xml'),
+        transform: function (content) {
+          var replacements = {
+            CORDOVA_CONTENT_SOURCE: 'index.html'
+          }
+          content = content.toString()
+          for (var key in replacements) {
+            console.log(content)
+            content = content.replace(key, replacements[key])
+          }
+          return content
+        }
       }
     ]),
     // service worker caching

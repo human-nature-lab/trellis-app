@@ -1,195 +1,262 @@
-import dataStore from './InterviewDataStore'
-class InterviewNavigator {
-  constructor () {
-    // Structure holds the form data that define how the survey is traversed. This includes sections, pages and questions
-    // with repeated sections/pages and skip conditions included
-    this.blueprint = {}
-    this.dataStore = dataStore
-    this.state = {
-      section: 0,                   // index of the current section
-      sectionRepetition: 0,         // number of completed sectionRepetitions
-      sectionFollowUpReptition: 0,  // index of the follow up repetition
-      page: 0                       // index of the current page
+import Emitter from '../../../classes/Emitter'
+export default class InterviewNavigator extends Emitter {
+  constructor (interview) {
+    super()
+    // Section, sectionFollowUpRepetition, sectionRepetition, page
+    this.location = {}
+    this._location = {
+      section: 0,
+      sectionRepetition: 0,
+      sectionFollowUpDatumId: null,
+      sectionFollowUpRepetition: 0,
+      page: 0
     }
+    this.max = {}
+    this.interview = interview
+    this.blueprint = interview.blueprint
+    this.updateLocation()
+    this.updateMax()
   }
-
-  /**
-   * Make a copy of the passed in blueprint. This can be a 'bare bones' version of the form
-   * @param blueprint
-   */
-  loadBlueprint (blueprint) {
-    this.blueprint = Object.assign({}, blueprint)
-    // Sort all levels
-    this.blueprint.sections.sort((sectionA, sectionB) => {
-      return sectionA.form_sections[0].sort_order > sectionB.form_sections[0].sort_order
-    })
-    this.blueprint.sections.forEach(section => {
-      section.question_groups.sort((pageA, pageB) => {
-        return pageA.pivot.question_group_order > pageB.pivot.question_group_order
-      })
-      section.question_groups.forEach(page => {
-        page.questions.sort((questionA, questionB) => {
-          return questionA.sort_order > questionB.sort_order
-        })
-      })
-    })
+  get section () {
+    return this._location.section
   }
-
-  /**
-   * Assign a single condition for this respondent
-   * @param condition
-   */
-  assignRespondentCondition (condition) {
-    this.respondentConditions[condition.id] = condition
-    return this
+  set section (val) {
+    this._location.section = val
   }
-
-  /**
-   * Assign a form condition
-   * @param condition
-   */
-  assignFormCondition (condition) {
-    this.formConditions[condition.id] = condition
-    return this
+  get sectionRepetition () {
+    return this._location.sectionRepetition
   }
-
-  /**
-   * Assign a section condition
-   * @param conditions
-   */
-  assignSectionConditions (condition, repetition) {
-    if (!repetition) {
-      repetition = this.state.sectionRepetition
-    }
-    if (!this.sectionConditions[this.state.section]) {
-      this.sectionConditions[this.state.section] = []
-    }
-    if (!this.sectionConditions[this.state.section][repetition]) {
-      this.sectionConditions[this.state.section][repetition] = {}
-    }
-    this.sectionConditions[this.state.section][repetition] = condition
-    return this
+  set sectionRepetition (val) {
+    this._location.sectionRepetition = val
   }
-
-  /**
-   * Check if a condition tag is present in the current context
-   * @param conditionId
-   * @returns {Boolean} - True if the condition tag is present
-   * @private
-   */
-  hasConditionTag (conditionId) {
-    return this.dataStore.hasConditionTag(conditionId, this.state.section)
+  get page () {
+    return this._location.page
   }
-
-  /**
-   * Move to the next part of the survey if it exists. This works by just incrementing the page and section until it finds
-   * a page that shouldn't be skipped or the form ends.
-   */
-  next () {
-    // Increment the page first
-    this.state.page ++
-    if (this.state.page >= this.blueprint.sections[this.state.section].question_groups.length) {
-      // Current page is outside the section so we increment sectionRepetition and then check if it is invalid
-      this.state.sectionRepetition ++
-      this.state.page = 0
-      let section = this.blueprint.sections[this.state.section]
-      let formSection = section.form_sections[0]
-      let isRepeatable = parseInt(formSection.is_repeatable, 10) !== 0
-      let isFollowUp = formSection.follow_up_question_id !== null
-      let numFollowUpQuestions = 0 // TODO: modify this so that it is the correct number of responses to that question
-      // Conditions to move to the next section for:
-      //  - section is not repeatable or a follow question.
-      //  - section is repeatable and has exceeded the max number of repetitions.
-      //  - TODO: section is a follow up question and has exceeded number responses in referenced question.
-      if (!(isRepeatable || isFollowUp) || (isRepeatable && this.state.sectionRepetition >= formSection.max_repetitions) || (isFollowUp && this.state.sectionRepetition >= numFollowUpQuestions)) {
-        this.state.section ++
-        this.state.sectionRepetition = 0
+  set page (val) {
+    this._location.page = val
+  }
+  get sectionFollowUpDatumId () {
+    if (!this._location.sectionFollowUpDatumId) {
+      let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
+      if (followUpQuestionId) {
+        // TODO: Handle follow up questions from repeatedSections and follow up sections
+        let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
+        if (data && data.length) {
+          let datum = data.find(d => d.event_order === this.sectionFollowUpDatumRepetition)
+          if (!datum) {
+            throw Error('No datum present with that event order')
+          }
+          this._location.sectionFollowUpDatumId = datum.id
+        }
       }
     }
-    // The form has ended
-    if (this.state.section >= this.blueprint.sections.length) {
-      this.end()
+    return this._location.sectionFollowUpDatumId
+  }
+  set sectionFollowUpDatumId (newId) {
+    this._location.sectionFollowUpDatumId = null
+    let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
+    if (newId && followUpQuestionId) {
+      // TODO: Handle follow up questions from repeatedSections and follow up sections
+      let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
+      if (data && data.length) {
+        let index = data.find(datum => datum.id === newId)
+        this._location.sectionFollowUpDatumId = newId
+        this._location.sectionFollowUpRepetition = index
+      }
     }
-    // Check skip conditions and keep moving forward if the section is skipped
-    if (this._shouldSkipPage(this.blueprint.sections[this.state.section].question_groups[this.state.page].skips, this.assignedConditions)) {
-      return this.next()
+  }
+  get sectionFollowUpDatumRepetition () {
+    return this._location.sectionFollowUpRepetition
+  }
+  set sectionFollowUpDatumRepetition (val) {
+    this._location.sectionFollowUpRepetition = val
+    this._location.sectionFollowUpDatumId = null
+  }
+  updateMax () {
+    let max = this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+    this.setMax(max)
+  }
+  setMax (max) {
+    this.max.section = max[0]
+    this.max.sectionRepetition = max[1]
+    this.max.sectionFollowUpDatumRepetition = max[2]
+    this.max.page = max[3]
+  }
+  setToMax () {
+    this.sectionRepetition = this.max.sectionRepetition
+    this.sectionFollowUpDatumRepetition = this.max.sectionFollowUpDatumRepetition
+    this.page = this.max.page
+  }
+  updateLocation () {
+    this.location.section = this.section
+    this.location.sectionRepetition = this.sectionRepetition
+    this.location.sectionFollowUpDatumId = this.sectionFollowUpDatumId
+    this.location.sectionFollowUpDatumRepetition = this.sectionFollowUpDatumRepetition
+    this.location.page = this.page
+  }
+  zero () {
+    this.section = 0
+    this.page = 0
+    this.sectionRepetition = 0
+    this.sectionFollowUpDatumRepetition = 0
+  }
+
+  get isAtEnd () {
+    let max = this.getCurrentMax()
+    return this.section === max[0] && this.sectionRepetition === max[1] && this.sectionFollowUpDatumRepetition === max[2] && this.page === max[3]
+  }
+
+  get isAtStart () {
+    return this.section === 0 && this.sectionRepetition === 0 && this.sectionFollowUpDatumRepetition === 0 && this.page === 0
+  }
+  getCurrentMax () {
+    return this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+  }
+  getMax (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+    let max = []
+    max[0] = this.blueprint.sections.length - 1
+    max[1] = this.blueprint.sections[section].maxRepetitions
+    max[2] = 0
+    let followUpQuestionId = this.blueprint.sections[section].followUpQuestionId
+    if (followUpQuestionId) {
+      // TODO: Handle follow up questions from repeatedSections and follow up sections
+      let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
+      max[2] = data.length - 1
     }
-    console.log(this.state)
+    max[3] = this.blueprint.sections[section].pages.length - 1
+    return max
+  }
+
+  setLocation (section, page, sectionRepetition, sectionFollowUpDatumId) {
+    this.section = section
+    this.page = page
+    this.sectionRepetition = sectionRepetition
+    this.sectionFollowUpDatumId = sectionFollowUpDatumId
+    this.updateLocation()
+  }
+
+  isValidLocation (max, page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+    return page <= max.page &&
+      section <= max.section &&
+      sectionRepetition <= max.sectionRepetition &&
+      sectionFollowUpDatumRepetition <= max.sectionFollowUpDatumRepetition
+  }
+
+  getNext (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+    let m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
+    let max = {
+      section: m[0],
+      sectionRepetition: m[1],
+      sectionFollowUpDatumRepetition: m[2],
+      page: m[3]
+    }
+    console.log('next', page, sectionRepetition, sectionFollowUpDatumRepetition, section)
+    page++
+    if (page > max.page) {
+      page = 0
+      sectionRepetition++
+    }
+    if (sectionRepetition > max.sectionRepetition) {
+      sectionRepetition = 0
+      sectionFollowUpDatumRepetition++
+    }
+    if (sectionFollowUpDatumRepetition > max.sectionFollowUpDatumRepetition) {
+      sectionFollowUpDatumRepetition = 0
+      section++
+      m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
+      max = {
+        section: m[0],
+        sectionRepetition: m[1],
+        sectionFollowUpDatumRepetition: m[2],
+        page: m[3]
+      }
+      if (section > max.section) {
+        throw Error('Reached the end of the survey')
+      }
+      // Handle follow up sections
+      if (max.sectionFollowUpDatumRepetition < 0) {
+        section++
+        if (section > max.section) {
+          throw Error('Reached the end of the survey')
+        }
+      }
+    }
+    return {page, section, sectionRepetition, sectionFollowUpDatumRepetition}
+  }
+
+  getPrevious (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+    let m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
+    let max = {
+      section: m[0],
+      sectionRepetition: m[1],
+      sectionFollowUpDatumRepetition: m[2],
+      page: m[3]
+    }
+    page--
+    if (page < 0) {
+      page = max.page
+      sectionRepetition--
+    }
+    if (sectionRepetition < 0) {
+      sectionRepetition = max.sectionRepetition
+      sectionFollowUpDatumRepetition--
+    }
+    if (sectionFollowUpDatumRepetition < 0) {
+      sectionFollowUpDatumRepetition = max.sectionFollowUpDatumRepetition
+      section--
+      m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
+      max = {
+        section: m[0],
+        sectionRepetition: m[1],
+        sectionFollowUpDatumRepetition: m[2],
+        page: m[3]
+      }
+      sectionRepetition = max.sectionRepetition
+      sectionFollowUpDatumRepetition = max.sectionFollowUpDatumRepetition
+      page = max.page
+    }
+    console.log('previous', page, sectionRepetition, sectionFollowUpDatumRepetition, section)
+    if (section < 0) {
+      section = 0
+      page = 0
+      sectionRepetition = 0
+      sectionFollowUpDatumRepetition = 0
+      throw Error('Reached beginning of survey')
+    }
+    return {page, section, sectionRepetition, sectionFollowUpDatumRepetition}
   }
 
   /**
-   * Get all of the questions for the current page. TODO: This should probably be moved to another service.
-   * @returns {computed.questions|Array}
+   * Move forward a step
    */
-  getCurrentQuestionBlueprints () {
-    this.questions = this.blueprint.sections ? this.blueprint.sections[this.state.section].question_groups[this.state.page].questions : []
-    return this.questions
+  next () {
+    try {
+      let next = this.getNext(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+      this.page = next.page
+      this.section = next.section
+      this.sectionRepetition = next.sectionRepetition
+      this.sectionFollowUpDatumRepetition = next.sectionFollowUpDatumRepetition
+    } catch (err) {
+      console.log(err)
+      this.emit('end')
+    }
+    this.updateLocation()
   }
 
   /**
-   * Move to the previous part of the survey if it exists
+   * Move back a step
    */
   previous () {
-    console.log('previous')
-    this.isAtEnd = false
-    let section = this.blueprint.sections[this.state.section]
-    this.state.page --
-    if (this.state.page < 0) {
-      this.state.page = section.question_groups.length - 1
-      this.state.sectionRepetition --
+    try {
+      let prev = this.getPrevious(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+      this.page = prev.page
+      this.section = prev.section
+      this.sectionRepetition = prev.sectionRepetition
+      this.sectionFollowUpDatumRepetition = prev.sectionFollowUpDatumRepetition
+    } catch (err) {
+      console.log(err)
+      this.emit('beginning')
     }
-    if (this.state.sectionRepetition < 0) {
-      this.state.sectionRepetition = 0
-      this.state.section --
-    }
-    if (this.state.section < 0) {
-      this.state.page = 0
-      this.state.sectionRepetition = 0
-      this.state.section = 0
-      console.log("We've reached the beginning of the survey")
-    } else if (this._shouldSkipPage(section.question_groups[this.state.page].skips)) {
-      this.previous()
-    }
+    this.updateLocation()
   }
-
-  /**
-   * End the survey and interview
-   */
-  end () {
-    console.log('Survey ended')
-    this.isAtEnd = true
-  }
-
-  /**
-   * Set the state to the beginning of the survey
-   * @private
-   */
-  _zeroState () {
-    this.state.page = 0
-    this.state.sectionRepetition = 0
-    this.state.section = 0
-    this.state.sectionFollowUpReptition = 0
-    this.isAtEnd = false
-  }
-
-  /**
-   * Seek to a specific point in the survey from the beginning of the survey
-   * @param sectionId
-   * @param pageId
-   * @param sectionRepetitionId
-   * @param sectionFollowUpId
-   */
-  seek (sectionId, pageId, sectionRepetitionId, sectionFollowUpId) {
-    this._zeroState()
-    while ((this.state.section < sectionId &&
-      this.state.page < pageId &&
-      this.state.sectionRepetition < sectionRepetitionId &&
-      this.state.sectionFollowUpReptition < sectionFollowUpId) ||
-      !this.isAtEnd) {
-      this.next()
-    }
-  }
-
 }
-
-export default new InterviewNavigator()

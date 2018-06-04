@@ -2,53 +2,107 @@
   <v-layout justify-space-between>
     <v-flex>
       <v-layout row>
-        <v-flex sm4 offset-xs8 row>
-          <v-radio-group v-model="selected"
-                         row
-                         justify-right
-                         @change="onChange">
-            <v-radio :label="`Don't Know`"
-                     :value="`DK`"></v-radio>
-            <v-radio :label="`Refuse`"
-                     :value="`RF`"></v-radio>
-          </v-radio-group>
-        </v-flex>
+        <v-btn
+          v-bind:class="{'primary': dk}"
+          @click="dk=!dk">Don't know</v-btn>
+        <v-btn
+          v-bind:class="{'primary': rf}"
+          @click="rf=!rf">Refuse</v-btn>
       </v-layout>
-      <v-layout v-if="selected !== undefined" row>
+      <v-layout v-if="shouldShowReason" row>
         <v-text-field
           name="Reason"
           label="Reason"
           v-model="reason"
+          autofocus
         ></v-text-field>
       </v-layout>
     </v-flex>
   </v-layout>
-
 </template>
 
 <script>
-  // TODO: This will need to be handled manually if we want to be able to deselect DK/refused type questions
+  import actionBus from './services/ActionBus'
   export default {
-    props: ['dontKnowEnabled', 'refusedEnabled'],
+    props: {
+      question: {
+        type: Object,
+        required: true
+      }
+    },
     name: 'dont-know-refused',
     data: function () {
       return {
-        selected: undefined,
-        reason: ''
+        _reason: this.question.datum.dk_rf_val
       }
     },
-    methods: {
-      // This is where we handle deselecting an already selected option
-      onChange: function (event) {
-        console.log(event)
+    created: function () {
+      this._reason = this.question.datum.dk_rf_val // We're actually binding to a text model so here we need to initialize that var
+    },
+    computed: {
+      shouldShowReason: function () {
+        return this.question.datum.dk_rf !== null && this.question.datum.dk_rf !== undefined
       },
-      onClick: function (event) {
-        console.log(event.target)
+      reason: {
+        get: function () {
+          return this.question.datum.dk_rf_val
+        },
+        set: function (val) {
+          this._reason = val
+          actionBus.actionDebounce({
+            action_type: 'dk-rf-val',
+            question_id: this.question.id,
+            payload: {
+              dk_rf_val: val
+            }
+          })
+        }
+      },
+      dk: {
+        get: function () {
+          if (this.question.datum.dk_rf === null) {
+            return false
+          } else {
+            return this.question.datum.dk_rf
+          }
+        },
+        set: function (val) {
+          actionBus.action({
+            action_type: 'dk-rf',
+            question_id: this.question.id,
+            payload: {
+              dk_rf: val ? true : this.rf ? false : null
+            }
+          })
+        }
+      },
+      rf: {
+        get: function () {
+          if (this.question.datum.dk_rf === null) {
+            return false
+          } else {
+            return !this.question.datum.dk_rf
+          }
+        },
+        set: function (val) {
+          actionBus.$emit('action', {
+            action_type: 'dk-rf',
+            question_id: this.question.id,
+            payload: {
+              dk_rf: val === false ? null : false
+            }
+          })
+        }
       }
     }
   }
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+  .theme--light
+    button
+      font-size: 12px
+      &.btn.btn-selected
+        background: orangered
+        color: white
 </style>

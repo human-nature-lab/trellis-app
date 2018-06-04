@@ -1,38 +1,42 @@
 <template>
-  <v-list>
-    <v-list-tile avatar v-for="respondent in respondents" :key="respondent.id">
-      <v-list-tile-avatar>
-        <img :src="respondent.photos[0].src" :alt="respondent.name">
-      </v-list-tile-avatar>
-      <v-list-tile-content>
-        <v-list-tile-title>{{respondent.name}}</v-list-tile-title>
-      </v-list-tile-content>
-      <v-list-tile-action>
-        <v-btn flat @click="showMore(respondent)">
-          <v-icon color="blue darken-3">info</v-icon>
-        </v-btn>
-      </v-list-tile-action>
-    </v-list-tile>
-  </v-list>
+  <v-container>
+    <v-layout>
+      <vue-recyclist
+        :list="respondents"
+        :tombstone="false">
+        <template slot="item" slot-scope="respondent">
+          <Respondent
+            :key="respondent.id"
+            @selected="onSelect(respondent)"
+            :respondent="respondent"/>
+        </template>
+      </vue-recyclist>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
+  import Respondent from './Respondent'
+  import RespondentService from '../services/respondent/RespondentService'
   export default {
     name: 'respondents-view',
-    props: {
-      respondents: {
-        type: Array,
-        required: true
+    data: function () {
+      return {
+        respondents: []
       }
     },
     methods: {
-      showMore: function (respondent) {
-        console.log(respondent)
+      loadMore: function () {
+        RespondentService.search
       }
+    },
+    components: {
+      Respondent
     }
   }
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+.selected
+  background: orangered
 </style>
