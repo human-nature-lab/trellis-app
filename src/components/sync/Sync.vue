@@ -1,29 +1,36 @@
 <template>
-  <div class="sync">
-    <div class="sync-content">
-      <sync-status v-if="!downloading && !uploading"></sync-status>
-      <download
-        v-if="downloading"
-        v-on:download-done="downloadDone"
-        v-on:download-cancelled="downloadCancelled">
-      </download>
-    </div>
-    <v-flex class="sync-footer v-flex xs12 sm12 md6 offset-md3">
-      <v-layout row
-                justify-space-between>
-        <v-btn justify-left
-               :disabled="!enableUpload()">
-          <v-icon>cloud_upload</v-icon>
-        </v-btn>
-        <v-btn justify-right
-               @click="onDownload"
-               :loading="downloading"
-               :disabled="!enableDownload()">
-          <v-icon>cloud_download</v-icon>
-        </v-btn>
-      </v-layout>
-    </v-flex>
-  </div>
+  <v-container fill-height>
+    <v-layout>
+      <v-flex>
+        <v-container>
+          <v-layout row class="sync-content">
+            <v-flex class="xs12 sm12 md6 offset-md3">
+              <sync-status v-if="!downloading && !uploading"></sync-status>
+              <download
+                v-if="downloading"
+                v-on:download-done="downloadDone"
+                v-on:download-cancelled="downloadCancelled">
+              </download>
+            </v-flex>
+          </v-layout>
+          <v-layout row class="mt-2 sync-footer" justify-space-between>
+            <v-flex class="xs3 text-xs-center">
+              <v-btn :disabled="!enableUpload()">
+                <v-icon>cloud_upload</v-icon>
+              </v-btn>
+            </v-flex>
+            <v-flex class="xs3 text-xs-center">
+              <v-btn @click="onDownload"
+                     :loading="downloading"
+                     :disabled="!enableDownload()">
+                <v-icon>cloud_download</v-icon>
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -31,6 +38,7 @@
   import SyncService from './services/SyncService'
   import DatabaseService from '@/services/database/DatabaseService'
   import Download from './download/Download'
+
   export default {
     name: 'sync',
     data () {
@@ -55,8 +63,7 @@
         console.error(errors)
       })
     },
-    props: {
-    },
+    props: {},
     methods: {
       heartbeat: function () {
         return SyncService.getHeartbeat()
@@ -84,8 +91,7 @@
         return this.updatedRecordsCount > 0
       }
     },
-    computed: {
-    },
+    computed: {},
     components: {
       Download,
       SyncStatus
@@ -94,7 +100,4 @@
 </script>
 
 <style lang="sass" scoped>
-  .sync-footer
-    flex-shrink: 0
-    padding: 20px
 </style>

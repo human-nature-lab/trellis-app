@@ -1,8 +1,8 @@
 <template>
-  <div class="home">
+  <v-container fill-height class="home">
     <Login v-if="hasSynced"></Login>
     <Sync v-if="isCordova"></Sync>
-  </div>
+  </v-container>
 </template>
 
 <script>
