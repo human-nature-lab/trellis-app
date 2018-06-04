@@ -1,7 +1,8 @@
-var path = require('path')
-var utils = require('./utils')
-var config = require('../config')
-var vueLoaderConfig = require('./vue-loader.conf')
+const path = require('path')
+const utils = require('./utils')
+const config = require('../config')
+const vueLoaderConfig = require('./vue-loader.conf')
+const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -19,7 +20,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.js', '.vue', '.json', '.ts', '.tsx'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src')
@@ -33,6 +34,10 @@ module.exports = {
       {
         test: /\.txt\.js$/,
         loader: 'raw-loader'
+      },
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader"
       },
       {
         test: /\.(js|vue)$/,
@@ -84,5 +89,10 @@ module.exports = {
         }
       }
     ]
-  }
+  },
+  plugins: [
+    new FilterWarningsPlugin({
+      exclude: [/Critical dependency/, /mongodb/, /mssql/, /mysql/, /mysql2/, /oracledb/, /pg/, /pg-native/, /pg-query-stream/, /redis/, /react-native-sqlite-storage/, /sqlite3/]
+    })
+  ]
 }

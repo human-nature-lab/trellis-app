@@ -4,6 +4,8 @@ import SyncMessage from './tables/SyncMessage'
 import Message from './tables/Message'
 import UpdatedRecords from './tables/UpdatedRecords'
 import Config from './tables/ConfigTable'
+import 'reflect-metadata'
+import {createConnection} from 'typeorm'
 
 export default class DatabaseService {
   constructor () {
@@ -16,8 +18,23 @@ export default class DatabaseService {
       () => {
         this.initConfigDatabase()
         this.initDatabase()
+        this.testTypeorm()
       }
     )
+  }
+
+  testTypeorm () {
+    createConnection({
+      type: 'cordova',
+      database: 'test',
+      location: 'default',
+      entities: [
+      ],
+      logging: true,
+      synchronize: true
+    }).then(async connection => {
+      console.log(connection)
+    })
   }
 
   getDatabase () {
