@@ -5,6 +5,9 @@
         Trellis <span class="grey--text" v-if="locale">- {{locale.language_tag}}</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn icon @click="refresh()">
+        <v-icon>refresh</v-icon>
+      </v-btn>
       <v-menu offset-y :nudge-top="-14">
         <v-btn icon slot="activator">
           <v-icon>more_vert</v-icon>
@@ -122,6 +125,9 @@
       }
     },
     methods: {
+      refresh: function () {
+        window.location.reload(true)
+      },
       setLocale: function (newLocale) {
         // Called to keep the locale in sync with local storage
         console.log('setting locale')

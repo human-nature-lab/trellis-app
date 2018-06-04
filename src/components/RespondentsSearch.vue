@@ -9,6 +9,7 @@
         placeholder="Search..."
         v-model="query"
         autofocus
+        :loading="isLoading"
         @input="onQueryChange"></v-text-field>
       <v-layout slot="extension">
         <v-flex>
@@ -63,16 +64,50 @@
   import RespondentService from '../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
   import Respondent from './Respondent'
+  import router from '../router/router'
+
+  /**
+   * Keeps the vue router link in sync with the current query. This means that navigating away from this page and then
+   * returning to it will bring you to the same place you were before.
+   * @param {VueComponent} vm - The vue instance to derive the route from
+   */
+  function updateRoute (vm) {
+    let query = {}
+    if (vm.query) {
+      query.query = vm.query
+    }
+    if (vm.filters.conditionTags.length) {
+      query.filters = JSON.stringify(vm.filters)
+    }
+    router.replace({
+      name: vm.$route.name,
+      params: vm.$route.params,
+      query: query
+    })
+  }
+
+  /**
+   * Mutates the vm to conform to the updates made by the updateRoute method
+   * @param {VueComponent} vm - The vue instance we're modifying
+   */
+  function loadRoute (vm) {
+    vm.query = vm.$route.query.query || ''
+    vm.filters = vm.$route.query.filters ? JSON.parse(vm.$route.query.filters) : {
+      conditionTags: []
+    }
+  }
+
   export default {
     name: 'respondents-search',
     props: {
       selectedRespondents: {
         type: Array,
         default: () => []
-      },
-      isLoading: {
-        type: Boolean,
-        default: false
+      }
+    },
+    head: {
+      title: {
+        inner: 'Respondent search'
       }
     },
     data: function () {
@@ -89,23 +124,27 @@
         currentPage: 0,
         requestPageSize: 50,
         conditionTagsLoaded: false,
-        conditionTagsLoading: false
+        conditionTagsLoading: false,
+        isLoading: false
       }
     },
     created: function () {
-      this.loadConditionTags()
+      loadRoute(this)
+      this.loadConditionTags().then(this.getCurrentPage)
     },
     methods: {
       onQueryChange: _.debounce(function () {
+        this.isLoading = true
         this.search()
       }, 400),
       search: function () {
+        updateRoute(this)
         this.getCurrentPage()
       },
       loadConditionTags: function () {
         if (this.conditionTagsLoaded) return
         this.conditionTagsLoading = true
-        ConditionTagService.respondent().then(tags => {
+        return ConditionTagService.respondent().then(tags => {
           this.conditionTags = Array.from(new Set(tags))
           this.conditionTagsLoaded = true
         }).catch(err => {
@@ -119,12 +158,15 @@
       },
       getCurrentPage: function () {
         let study = this.global.study
+        this.isLoading = true
         RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize)
           .then(respondents => {
             this.results = respondents
             this.error = null
           }).catch(err => {
             this.error = err.toLocaleString()
+          }).then(() => {
+            this.isLoading = false
           })
       },
       onSelectRespondent: function (respondent) {

@@ -41,6 +41,9 @@
           StudyService.getMyStudies()
         ]).then(results => {
           let [study, studies] = results
+          studies.sort(function (a, b) {
+            return b.updated_at.localeCompare(a.updated_at)
+          })
           this.study = study
           this.studies = studies
         }).catch(err => {

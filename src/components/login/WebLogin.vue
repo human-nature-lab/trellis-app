@@ -20,6 +20,8 @@
           <v-text-field
             name="username"
             label="Username"
+            autocapitalize="off"
+            autocorrect="off"
             :rules="rules.username"
             required
             autofocus
@@ -27,6 +29,8 @@
             v-model="username" />
           <v-text-field
             label="Password"
+            autocapitalize="off"
+            autocorrect="off"
             required
             :rules="rules.password"
             @keyup.enter="login()"
