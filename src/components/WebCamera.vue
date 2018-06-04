@@ -61,10 +61,8 @@
           }
           video.error = (err) => {
             console.error(err)
-            debugger
           }
         }).catch(err => {
-          debugger
           this.error = err
         })
       },

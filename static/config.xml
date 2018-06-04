@@ -5,9 +5,9 @@
     <author email="dev@cordova.apache.org" href="http://cordova.io">
         Apache Cordova Team
     </author>
-    <content src="index.html" />
+    <content src="CORDOVA_CONTENT_SOURCE" />
     <preference name="DisallowOverscroll" value="true" />
-    <allow-navigation href="*://10.0.1.6:8081/*" />
+    <allow-navigation href="CORDOVA_CONTENT_SOURCE/*" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
