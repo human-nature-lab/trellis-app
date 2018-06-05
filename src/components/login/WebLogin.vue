@@ -54,6 +54,11 @@
   import router from '../../router/router'
   export default {
     name: 'web-login',
+    head: {
+      title: {
+        inner: 'Login'
+      }
+    },
     data: function () {
       return {
         username: null,
