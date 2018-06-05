@@ -1,8 +1,10 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme">
     <v-toolbar fixed>
-      <v-toolbar-title class="deep-orange--text">
-        <span>Trellis</span>
+      <v-toolbar-title class="deep-orange--text logo">
+        <router-link :to="{name: 'home'}">
+          <img src="../static/img/trellis-logo.png" alt="trellis">
+        </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.fullPath}}">
@@ -82,18 +84,21 @@
 <style lang="sass">
   html
     overflow-y: auto
-
   body
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
-
   .app-container
     margin-top: 50px
     margin-bottom: 50px
-
+  .logo
+    height: 60%
+    width: 100%
+    font-size: 28px
+    img
+      max-width: 100%
+      max-height: 100%
   .fade-in
     animation: fade-in .3s ease-in-out 0s 1
-
   @keyframes fade-in
     0%
       opacity: 0
