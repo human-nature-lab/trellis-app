@@ -130,7 +130,8 @@
     },
     created: function () {
       loadRoute(this)
-      this.loadConditionTags().then(this.getCurrentPage)
+      this.loadConditionTags()
+      this.getCurrentPage()
     },
     methods: {
       onQueryChange: _.debounce(function () {

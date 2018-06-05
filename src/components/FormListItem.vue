@@ -1,12 +1,12 @@
 <template>
-  <v-card class="ma-2">
+  <v-card class="ma-1">
     <v-layout
       column
       :class="{open: isOpen}"
       :data-id="form.id">
       <v-layout
         row>
-        <v-flex class="pa-3 icon-container clickable"
+        <v-flex class="centered icon-container clickable"
                 @click="$emit('click')">
           <v-tooltip
             right
@@ -34,7 +34,7 @@
           </v-tooltip>
         </v-flex>
         <v-flex
-          class="pa-3 clickable"
+          class="centered clickable"
           @click="$emit('click')">
           <TranslatedText
             :translation="form.name_translation"
@@ -58,29 +58,46 @@
         <v-flex
           v-for="survey in form.surveys"
           :key="survey.id">
-          <v-layout row wrap>
-            <v-flex>
-              Survey completed at: {{survey.completed_at}}
-            </v-flex>
-          </v-layout>
-          <v-layout
-            class="ml-5"
-            column>
-            <v-flex>Interviews</v-flex>
-            <v-layout
-              v-for="interview in survey.interviews"
-              :key="interview.id">
-              <v-flex>
-                {{interview.start_time}}
-              </v-flex>
-              <v-flex>
-                {{interview.end_time}}
-              </v-flex>
-              <v-flex>
-                {{interview.user.name}} <span class="light">({{interview.user.username}})</span>
-              </v-flex>
-            </v-layout>
-          </v-layout>
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th class="a-left">Interviews</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="survey in form.surveys" :key="survey.id">
+                <td>
+                  <span
+                    v-if="survey.completed_at"
+                    class="complete">
+                    Completed at: {{survey.completed_at}}
+                  </span>
+                  <span
+                    v-else
+                    class="incomplete">
+                    Incomplete
+                  </span>
+                </td>
+                <td>
+                  <table>
+                    <tr>
+                      <th>Surveyor</th>
+                      <th>Start time</th>
+                      <th>End time</th>
+                    </tr>
+                    <tr
+                      v-for="interview in survey.interviews"
+                      :key="interview.id">
+                      <td>{{interview.user.name}} <span class="light">({{interview.user.username}})</span></td>
+                      <td>{{interview.start_time}}</td>
+                      <td>{{interview.end_time}}</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </v-flex>
       </v-layout>
     </v-layout>
@@ -113,8 +130,20 @@
 </script>
 
 <style lang="sass" scoped>
+  table
+    thead
+      th
+        border-bottom: 1px solid grey
+    width: 100%
+    td, th
+      text-align: right
+      &:first-child
+        text-align: left
+    .a-left
+      text-align: left
   .icon-container
-    width: 40px
+    width: 50px
+    padding: 5px
     flex-grow: 0
     flex-shrink: 0
   /*.open*/
@@ -124,4 +153,12 @@
     color: grey
   .clickable
     cursor: pointer
+  .complete
+    color: green
+  .incomplete
+    color: orangered
+  .centered
+    display: inline-flex
+    align-items: center
+
 </style>
