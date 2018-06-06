@@ -3,7 +3,7 @@
     <v-layout
       column
       :class="{open: isOpen}"
-      :data-id="form.id">
+      :data-form-id="form.id">
       <v-layout
         row>
         <v-flex class="centered icon-container clickable"
@@ -57,6 +57,7 @@
         v-show="isOpen">
         <v-flex
           v-for="survey in form.surveys"
+          :data-survey-id="survey.id"
           :key="survey.id">
           <table>
             <thead>
@@ -66,12 +67,15 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="survey in form.surveys" :key="survey.id">
+              <tr
+                v-for="survey in form.surveys"
+                :data-survey-id="survey.id"
+                :key="survey.id">
                 <td>
                   <span
                     v-if="survey.completed_at"
                     class="complete">
-                    Completed at: {{survey.completed_at}}
+                    Complete
                   </span>
                   <span
                     v-else
@@ -88,6 +92,7 @@
                     </tr>
                     <tr
                       v-for="interview in survey.interviews"
+                      :data-interview-id="interview.id"
                       :key="interview.id">
                       <td>{{interview.user.name}} <span class="light">({{interview.user.username}})</span></td>
                       <td>{{interview.start_time}}</td>

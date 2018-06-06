@@ -13,7 +13,9 @@
         <v-text-field
           name="Reason"
           label="Reason"
+          :rules="rules"
           v-model="reason"
+          required
           autofocus
         ></v-text-field>
       </v-layout>
@@ -33,7 +35,8 @@
     name: 'dont-know-refused',
     data: function () {
       return {
-        _reason: this.question.datum.dk_rf_val
+        _reason: this.question.datum.dk_rf_val,
+        rules: [value => !!value || 'Reason is required.']
       }
     },
     created: function () {

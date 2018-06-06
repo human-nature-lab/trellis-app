@@ -66,6 +66,7 @@
   import router from '../../router/router'
 
   import singleton from '../../singleton'
+  import {validateParametersWithError} from './services/ValidatorService'
 
   let interviewData = {}
 
@@ -176,6 +177,18 @@
 
   let interviewState
   export default {
+    name: 'interview',
+    head: {
+      title: function () {
+        let d = {}
+        if (this.type === 'preview') {
+          d.inner = 'Form preview: ' + interviewState.blueprint.id
+        } else if (this.interview.survey) {
+          d.inner = `Interview with ${this.interview.survey.respondent.name}`
+        }
+        return d
+      }
+    },
     data () {
       return {
         artificiallyExtendLoadTime: false,
@@ -183,6 +196,7 @@
         surveyId: null,
         clipped: false,
         isLoading: true,
+        type: 'interview',
         interviewData: {},
         interviewActions: {},
         interviewConditionTags: {},
@@ -259,6 +273,7 @@
         } else {
           InterviewService.setInterviewId(interview.id)
         }
+        this.type = interviewData.interviewType
         this.initializeInterview(interview, actions, data, conditionTags, form, preload)
       },
       initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, preload) {
@@ -318,6 +333,10 @@
           q.type = {
             name: q.question_type.name
           }
+          let validation = validateParametersWithError(q, q.question_parameters, q.datum)
+          q.allParametersSatisfied = validation === true // Makes none boolean types falsey
+          q.validationError = typeof validation === 'string' ? validation : null
+          q.isAnswered = false
           return q
         })
         return questions || []

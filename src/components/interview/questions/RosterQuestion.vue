@@ -3,6 +3,7 @@
     <v-card class="roster">
       <v-list>
         <v-list-tile
+          :data-id="row.id"
           v-for="(row, rowIndex) in roster"
           :key="row.id">
           <v-list-tile-avatar>
@@ -111,17 +112,19 @@
           </v-list-tile-action>
         </v-list-tile>
       </v-list>
-      <v-btn
-        @click="isAddingNew=true"
-        :disabled="isQuestionDisabled"
-        color="deep-orange"
-        dark
-        absolute
-        bottom
-        right
-        fab>
-        <v-icon>add</v-icon>
-      </v-btn>
+      <v-fab-transition>
+        <v-btn
+          class="deep-orange"
+          @click="isAddingNew=true"
+          v-show="!isQuestionDisabled"
+          fab
+          dark
+          absolute
+          bottom
+          right>
+          <v-icon>add</v-icon>
+        </v-btn>
+      </v-fab-transition>
     </v-card>
   </v-flex>
 </template>
@@ -188,6 +191,7 @@
       stopAddingAndSave: function () {
         this.isSavingNew = true
         RosterService.createRosterRows([this.newText]).then(rows => {
+          debugger
           for (let row of rows) {
             actionBus.action({
               action_type: 'add-roster-row',
