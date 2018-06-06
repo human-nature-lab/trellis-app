@@ -8,7 +8,6 @@
       <v-text-field
         placeholder="Search..."
         v-model="query"
-        autofocus
         :loading="isLoading"
         @input="onQueryChange"></v-text-field>
       <v-layout slot="extension">
@@ -122,7 +121,7 @@
         added: [],
         removed: [],
         currentPage: 0,
-        requestPageSize: 50,
+        requestPageSize: 20,
         conditionTagsLoaded: false,
         conditionTagsLoading: false,
         isLoading: false

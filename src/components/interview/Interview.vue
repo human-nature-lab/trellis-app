@@ -7,7 +7,7 @@
           :conditionTags="interviewConditionTags"
           :interview="interview"/>
     <v-dialog
-      v-model="beginningDialog">
+      v-model="dialog.beginning">
       <v-card>
         <v-card-title class="headline">
           You've reached the beginning of the survey
@@ -19,7 +19,7 @@
           <v-btn
             flat
             color="error"
-            @click="beginningDialog = false">Cancel</v-btn>
+            @click="dialog.beginning = false">Cancel</v-btn>
           <v-spacer />
           <v-btn
             flat
@@ -29,7 +29,7 @@
       </v-card>
     </v-dialog>
     <v-dialog
-      v-model="endDialog">
+      v-model="dialog.end">
       <v-card>
         <v-card-title class="headline">
           You've reached the end of the survey
@@ -41,7 +41,7 @@
           <v-btn
             flat
             color="error"
-            @click="endDialog = false">Cancel</v-btn>
+            @click="dialog.end = false">Cancel</v-btn>
           <v-spacer />
           <v-btn
             flat
@@ -50,23 +50,48 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-touch="{down: () => dialog.conditionTag = false}"
+      content-class="condition-tag-dialog"
+      transition="dialog-bottom-transition"
+      scrollable
+      full-width
+      lazy
+      v-model="dialog.conditionTag">
+      <v-card tile>
+        <v-toolbar
+          card
+          dark
+          color="primary">
+          <v-btn icon dark @click.native="dialog.conditionTag = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Conditions</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
+          <ConditionTagList :conditions="interviewConditionTags" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-flex>
 </template>
 
 <script>
   import Page from './Page'
+  import ConditionTagList from './ConditionTagList'
+  import menuBus from '../main-menu/MenuBus'
 
   import {sharedInterview, clearSharedInterview} from './models/Interview'
+
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/ActionBus'
-
   import InterviewActionsService from './services/interview-actions/InterviewActionsService'
   import FormService from '../../services/form/FormService'
   import LocaleService from '../../services/locale/LocaleService'
-  import router from '../../router/router'
-
-  import singleton from '../../singleton'
   import {validateParametersWithError} from './services/ValidatorService'
+
+  import router from '../../router/router'
+  import singleton from '../../singleton'
 
   let interviewData = {}
 
@@ -208,15 +233,25 @@
           sectionFollowUpDatumRepetition: null,
           sectionFollowUpDatumId: null
         },
-        beginningDialog: false,
-        endDialog: false,
+        dialog: {
+          beginning: false,
+          end: false,
+          conditionTag: false
+        },
         loadingStep: 0
       }
     },
     created () {
       this.loadInterview()
       actionBus.$on('action', this.actionHandler)
+      menuBus.$on('showConditionTags', this.showConditionTags)
       window.onbeforeunload = this.prematureExit
+    },
+    beforeDestroy: function () {
+      window.onbeforeunload = null
+      menuBus.$off('showConditionTags', this.showConditionTags)
+      actionBus.$off('action', this.actionHandler)
+      interviewState.destroy()
     },
     beforeRouteEnter (to, from, next) {
       console.log('before route enter', to)
@@ -249,10 +284,6 @@
       } else {
         next()
       }
-    },
-    beforeDestroy: function () {
-      window.onbeforeunload = null
-      interviewState.destroy()
     },
     methods: {
       loadInterview: function () {
@@ -302,22 +333,25 @@
         interviewState.pushAction(action)
       },
       showBeginningDialog: function () {
-        this.beginningDialog = true
+        this.dialog.beginning = true
       },
       showEndDialog: function () {
-        this.endDialog = true
+        this.dialog.end = true
+      },
+      showConditionTags: function () {
+        this.dialog.conditionTag = true
       },
       lockAndExit: function () {
         console.log('TODO: Make sure everything is saved before marking the survey complete and exiting')
         console.log('TODO: Lock and exit the survey')
         InterviewService.complete(this.interview.id).then(res => {
-          this.endDialog = false
+          this.dialog.end = false
           router.push({name: 'home'})
         })
       },
       saveAndExit: function () {
         console.log('TODO: Make sure everything is saved before exiting')
-        this.endDialog = false
+        this.dialog.end = false
         router.push({name: 'home'})
       },
       prematureExit: function (e) {
@@ -357,11 +391,20 @@
       }
     },
     components: {
-      Page
+      Page,
+      ConditionTagList
     }
   }
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  .condition-tag-dialog
+    max-height: 80%
+    min-height: 50%
+    position: absolute
+    bottom: 0
+    left: 0
+    padding: 0
+    margin: 0
+    background-color: white
 </style>

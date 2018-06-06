@@ -9,7 +9,6 @@ export class ConditionTagStore {
    * @param {Object} tag - Object repesentation of tag
    */
   add (tag) {
-    console.log('tag', JSON.stringify(tag, null, 2))
     this.idToNameMap.set(tag.id, tag.name)
     this.data.push(tag)
   }
@@ -33,5 +32,5 @@ export class ConditionTagStore {
 }
 
 let c = new ConditionTagStore()
-window.ConditionTagStore = c
+
 export default c
