@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid ma-0 pa-0>
+  <v-card fluid ma-0 pa-0>
     <v-toolbar
       class="respondent-search pa-2"
       extended
@@ -38,6 +38,8 @@
         <Respondent
           v-for="respondent in respondentResults"
           :key="respondent.id"
+          :formsButtonVisible="formsButtonVisible"
+          :infoButtonVisible="infoButtonVisible"
           @selected="onSelectRespondent(respondent)"
           :selected="isSelected(respondent)"
           :respondent="respondent"/>
@@ -54,7 +56,7 @@
         </v-btn>
       </v-flex>
     </v-layout>
-  </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -99,6 +101,22 @@
   export default {
     name: 'respondents-search',
     props: {
+      formsButtonVisible: {
+        type: Boolean,
+        default: true
+      },
+      infoButtonVisible: {
+        type: Boolean,
+        default: true
+      },
+      shouldUpdateRoute: {
+        type: Boolean,
+        default: true
+      },
+      baseFilters: {
+        type: Object,
+        default: () => ({})
+      },
       selectedRespondents: {
         type: Array,
         default: () => []
@@ -115,9 +133,10 @@
         results: [],
         conditionTags: [],
         query: '',
-        filters: {
-          conditionTags: []
-        },
+        filters: Object.assign({
+          conditionTags: [],
+          locations: []
+        }, this.baseFilters),
         added: [],
         removed: [],
         currentPage: 0,
@@ -128,7 +147,9 @@
       }
     },
     created: function () {
-      loadRoute(this)
+      if (this.shouldUpdateRoute) {
+        loadRoute(this)
+      }
       this.loadConditionTags()
       this.getCurrentPage()
     },
@@ -138,7 +159,9 @@
         this.search()
       }, 400),
       search: function () {
-        updateRoute(this)
+        if (this.shouldUpdateRoute) {
+          updateRoute(this)
+        }
         this.getCurrentPage()
       },
       loadConditionTags: function () {
