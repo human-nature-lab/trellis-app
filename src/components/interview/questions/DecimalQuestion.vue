@@ -1,6 +1,7 @@
 <template>
-    <v-flex>
+    <v-flex class="decimal-question">
       <v-text-field
+        :rules="rules"
         :disabled="isQuestionDisabled"
         v-model.number="value"
         placeholder="decimal"
@@ -12,7 +13,9 @@
 <script>
   // TODO: It might be required to use https://github.com/text-mask/text-mask/tree/master/core to support decimal type
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
   import actionBus from '../services/ActionBus'
+
   export default {
     name: 'decimal-question',
     props: {
@@ -21,7 +24,7 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin],
+    mixins: [QuestionDisabledMixin, VuetifyValidationRules],
     data: function () {
       return {
         _value: null
@@ -34,6 +37,7 @@
         },
         set: function (val) {
           this._value = val
+          this.question.isAnswered = this.value !== null && this.value !== undefined
           actionBus.actionDebounce({
             action_type: 'number-change',
             question_id: this.question.id,

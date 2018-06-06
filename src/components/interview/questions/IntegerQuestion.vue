@@ -1,6 +1,7 @@
 <template>
   <v-flex class="integer-question">
     <v-text-field
+      :rules="rules"
       :disabled="isQuestionDisabled"
       v-model.number="value"
       type="number"
@@ -10,6 +11,7 @@
 
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
   import actionBus from '../services/ActionBus'
   export default {
     name: 'integer-question',
@@ -19,7 +21,7 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin],
+    mixins: [QuestionDisabledMixin, VuetifyValidationRules],
     data: function () {
       return {
         _value: null

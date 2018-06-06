@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget android-versionCode="1" id="edu.yale.trellis.surveyview" ios-CFBundleVersion="1" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>trellis-survey-view</name>
+    <name>Trellis 2</name>
     <description>The form view component of the Trellis platform.</description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="trellis@yale.edu" href="http://trellis.yale.edu">
+        Mark McKnight, Wyatt Israel
     </author>
     <content src="CORDOVA_CONTENT_SOURCE" />
     <preference name="DisallowOverscroll" value="true" />
