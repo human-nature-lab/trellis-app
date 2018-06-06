@@ -40,7 +40,7 @@
       <RelationshipQuestion
         v-else-if="question.type.name === 'relationship'"
         :question="question"
-        :respondent-id="interview.survey.respondent_id"/>
+        :respondent="interview.survey.respondent"/>
       <TextQuestion
         v-else-if="question.type.name === 'text' || question.type.name === 'text_area'"
         :question="question"/>
