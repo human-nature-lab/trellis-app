@@ -1,47 +1,29 @@
-import { DeviceService } from '@/services/device/DeviceService'
+import { DeviceService } from '../device/DeviceService'
 import SyncTable from './tables/SyncTable'
 import SyncMessage from './tables/SyncMessage'
 import Message from './tables/Message'
 import UpdatedRecords from './tables/UpdatedRecords'
 import Config from './tables/ConfigTable'
-import 'reflect-metadata'
-import {createConnection} from 'typeorm'
 
-export default class DatabaseService {
+export default class DatabaseServiceMock {
   constructor () {
     this.configDatabase = null
     this.configIsReady = false
-    this.database = null
+    this.databaseConnection = null
     this.isReady = false
-    this.insertBufferSize = 5242880
     DeviceService.isDeviceReady().then(
       () => {
         this.initConfigDatabase()
         this.initDatabase()
-        this.testTypeorm()
       }
     )
-  }
-
-  testTypeorm () {
-    createConnection({
-      type: 'cordova',
-      database: 'test',
-      location: 'default',
-      entities: [
-      ],
-      logging: true,
-      synchronize: true
-    }).then(async connection => {
-      console.log(connection)
-    })
   }
 
   getDatabase () {
     return new Promise(resolve => {
       const checkReady = () => {
         if (this.isReady) {
-          resolve(this.database)
+          resolve(this.databaseConnection)
         } else {
           setTimeout(checkReady)
         }
@@ -122,12 +104,12 @@ export default class DatabaseService {
                   }
                 })
               },
-              (error) => {
-                reject(error)
-              },
-              () => {
-                resolve()
-              })
+                (error) => {
+                  reject(error)
+                },
+                () => {
+                  resolve()
+                })
             }
             reader.onerror = function (error) {
               reject(error)
@@ -170,7 +152,7 @@ export default class DatabaseService {
   }
 
   initDatabase () {
-    this.database = window.openDatabase('trellis.db', '1.0', 'Trellis Database', 1024 * 1024 * 5)
+    this.databaseConnection = window.openDatabase('trellis.db', '1.0', 'Trellis Database', 1024 * 1024 * 5)
     this.isReady = true
   }
 
