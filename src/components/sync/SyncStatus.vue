@@ -57,10 +57,11 @@
     },
     computed: {
       wasSnapshotDownloaded: function () {
-        return (this.localLatestSnapshot !== null && this.localLatestSnapshot.length === 1)
+        return (this.localLatestSnapshot)
       },
       snapshotDownloadedAt: function () {
-        if (this.wasSnapshotDownloaded && this.localLatestSnapshot[0].hasOwnProperty('created_at')) {
+        console.log(this.localLatestSnapshot)
+        if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('created_at')) {
           return this.localLatestSnapshot['created_at']
         } else {
           return ''
