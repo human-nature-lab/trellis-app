@@ -13,7 +13,7 @@ if (config.appEnv === APP_ENV.WEB) {
 } else {
   routes = routes.concat(appRoutes)
 }
-console.log('routes', routes)
+
 Vue.use(Router)
 
 export const router = new Router({

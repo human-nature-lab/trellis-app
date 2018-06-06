@@ -476,9 +476,11 @@ export default class Interview extends Emitter {
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
+      console.log('skipping location', JSON.stringify(this.location))
       this._markAsSkipped()
       return this.next()
     }
+    console.log('next done location', JSON.stringify(this.location))
   }
 
   previous () {
@@ -493,9 +495,11 @@ export default class Interview extends Emitter {
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
+      console.log('skipping location', JSON.stringify(this.location))
       this._markAsSkipped()
       return this.previous()
     }
+    console.log('previous done location', JSON.stringify(this.location))
   }
 
   /**
@@ -507,7 +511,7 @@ export default class Interview extends Emitter {
    * @param sectionRepetition
    * @param sectionFollowUpRepetition
    */
-  replayTo (section, page, sectionRepetition, sectionFollowUpDatumId) {
+  replayTo (section, page, sectionRepetition, sectionFollowUpRepetition) {
     this._isReplaying = true
     this._zeroLocation()
     this._resetState()
@@ -534,7 +538,7 @@ export default class Interview extends Emitter {
     // this._setLocationFromClock(clock)
     // this.seekTo(...clock.time)
     // this.navigator.section = section
-    this.navigator.setLocation(section, page, sectionRepetition, sectionFollowUpDatumId)
+    this.navigator.setLocation(section, page, sectionRepetition, sectionFollowUpRepetition)
     this._isReplaying = false
   }
 

@@ -16,25 +16,7 @@
       <v-btn icon @click="refresh()">
         <v-icon>refresh</v-icon>
       </v-btn>
-      <v-menu offset-y :nudge-top="-15" z-index="1000">
-        <v-btn icon slot="activator">
-          <v-icon>more_vert</v-icon>
-        </v-btn>
-        <v-list>
-          <v-list-tile>
-            <router-link :to="{name: 'RespondentsSearch'}">Respondents</router-link>
-          </v-list-tile>
-          <v-list-tile>
-            <router-link :to="{name: 'camera'}">Camera</router-link>
-          </v-list-tile>
-          <v-list-tile>
-            <router-link :to="{name: 'Home', query: {to: $route.fullPath}}">Study</router-link>
-          </v-list-tile>
-          <v-list-tile v-if="global.study" v-for="(id, index) in interviewIds" :key="id">
-            <router-link :to="{name: 'Interview', params: {studyId: global.study.id, interviewId: id}}">Interview {{id}}</router-link>
-          </v-list-tile>
-        </v-list>
-      </v-menu>
+      <MainMenu />
     </v-toolbar>
     <v-content>
       <v-container fluid class="app-container">
@@ -56,6 +38,7 @@
   import StudyService from './services/study/StudyService'
   import LoadingPage from './components/LoadingPage'
   import LocaleService from './services/locale/LocaleService'
+  import MainMenu from './components/main-menu/MainMenu'
   export default {
     name: 'web-app',
     data: function () {
@@ -76,7 +59,8 @@
       LocaleService.setExistingLocale()
     },
     components: {
-      LoadingPage
+      LoadingPage,
+      MainMenu
     }
   }
 </script>

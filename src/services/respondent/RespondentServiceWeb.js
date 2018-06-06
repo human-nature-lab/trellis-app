@@ -32,10 +32,14 @@ export default class RespondentServiceWeb {
     }
     studyId = encodeURIComponent(studyId)
     return http().get(`study/${studyId}/respondents/search`, {
-      params: params
+      params: params,
+      query: {
+        offset: page * size,
+        limit: size
+      }
     }).then(res => {
       if (res.data && res.data.respondents) {
-        return res.data.respondents
+        return res.data.respondents.slice(0, size)
       } else {
         throw new Error('Unable to complete query')
       }
