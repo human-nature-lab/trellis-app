@@ -13,7 +13,6 @@
     <v-progress-linear
       v-if="working"
       height="2"
-      :indeterminate="progressIndeterminate"
       v-model="insertProgress">
     </v-progress-linear>
     <v-btn
@@ -35,7 +34,7 @@
           working: false,
           apiRoot: config.apiRoot,
           errorMessage: '',
-          progressIndeterminate: true,
+          progressIndeterminate: false,
           insertProgress: 0
         }
       },
@@ -64,12 +63,8 @@
           this.startWork()
         },
         trackProgress: function (progress) {
-          if (progress && progress.inserted && progress.total) {
-            this.progressIndeterminate = false
-            this.insertProgress = (progress.inserted / progress.total) * 100
-          } else {
-            this.progressIndeterminate = true
-          }
+          this.insertProgress = (progress.inserted / progress.total) * 100
+          // console.log('this.insertProgress', this.insertProgress, progress)
         }
       },
       computed: {
