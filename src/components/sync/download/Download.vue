@@ -184,6 +184,7 @@
       },
       insertRowsDone: function () {
         console.log('insertRowsDone')
+        this.continueStatus = BUTTON_STATUS.ENABLED
       }
     },
     computed: {

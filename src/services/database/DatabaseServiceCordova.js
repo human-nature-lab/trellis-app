@@ -5,7 +5,6 @@ import ConfigEntity from './entities/trellis-config/ConfigTable'
 import MessageEntity from './entities/trellis-config/Message'
 import SyncEntity from './entities/trellis-config/SyncTable'
 import UpdatedRecordsEntity from './entities/trellis-config/UpdatedRecords'
-import Papa from 'papaparse'
 
 export default class DatabaseServiceCordova {
   constructor () {
@@ -67,29 +66,57 @@ export default class DatabaseServiceCordova {
       }
       this.getDatabase()
         .then((connection) => {
-          console.log('importDatabase', connection)
           extractedSnapshot.file((file) => {
-            console.log('file', file)
-            let bytesParsed = 0
-            Papa.parse(file, {
-              delimiter: ';',
-              escapeChar: '#',
-              worker: true,
-              skipEmptyLines: true,
-              step: function (results) {
-                console.log('results', results)
-                bytesParsed += results.length
-                trackProgress({inserted: bytesParsed, total: file.size})
-              },
-              complete: function () {
-                console.log('complete')
-                resolve()
-              },
-              error: function (error) {
-                console.error(error)
-                reject(error)
+            let offset = 0
+            let chunkSize = 1024
+            let fileSize = file.size
+            let end = Math.min(fileSize, (offset + chunkSize))
+            let fileReader = new FileReader(file)
+            let buffer = ''
+            let query = ''
+            let curChar = 0
+            let inQuotes = false
+            let escaped = false
+            let everything = ''
+            fileReader.onloadend = (event) => {
+              trackProgress({inserted: offset, total: fileSize})
+              buffer += event.target.result
+              for (; curChar < buffer.length; curChar++) {
+                let char = buffer.charAt(curChar)
+                if (!escaped && char === '\'') {
+                  inQuotes = !inQuotes
+                }
+                if (escaped) {
+                  escaped = false
+                } else {
+                  if (char === '\\') {
+                    escaped = true
+                  }
+                }
+                if (!inQuotes) {
+                  if (char === ';') {
+                    query += buffer.substring(0, (curChar + 1))
+                    // console.log('complete query', query)
+                    everything += query
+                    query = ''
+                    buffer = buffer.substring(curChar + 1, buffer.length)
+                    curChar = 0
+                  }
+                }
               }
-            })
+              if (end < fileSize) {
+                offset = end
+                end = Math.min(fileSize, (offset + chunkSize))
+                let slice = file.slice(offset, end)
+                fileReader.readAsText(slice)
+              } else {
+                console.log('everything', everything)
+                resolve()
+              }
+            }
+            fileReader.onerror = (error) => reject(error)
+            let slice = file.slice(offset, end)
+            fileReader.readAsText(slice)
           })
         })
     })
