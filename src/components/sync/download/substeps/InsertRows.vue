@@ -11,7 +11,7 @@
       <p>{{ errorMessage }}</p>
     </span>
     <v-progress-linear
-      v-if="working"
+      v-show="working"
       height="2"
       v-model="insertProgress">
     </v-progress-linear>
@@ -64,7 +64,6 @@
         },
         trackProgress: function (progress) {
           this.insertProgress = (progress.inserted / progress.total) * 100
-          console.log('this.insertProgress', this.insertProgress, progress)
         }
       },
       computed: {

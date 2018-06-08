@@ -51,10 +51,8 @@ export default class DatabaseServiceCordova {
     return new Promise((resolve, reject) => {
       this.getDatabase()
         .then((connection) => {
-          console.log('removeDatabase', connection)
-          connection.createQueryRunner()
-            .dropDatabase('trellis', true)
-          resolve()
+          connection.dropDatabase()
+            .then(() => resolve())
         })
     })
   }
@@ -66,57 +64,61 @@ export default class DatabaseServiceCordova {
       }
       this.getDatabase()
         .then((connection) => {
-          extractedSnapshot.file((file) => {
-            let decoder = new TextDecoder()
-            let start = 0
-            const CHUNK_SIZE = 1024
-            let fileSize = file.size
-            let end = Math.min(fileSize, (start + CHUNK_SIZE))
-            let fileReader = new FileReader(file)
-            let inQuotes = false
-            let escaped = false
-            let buffer = ''
-            let everything = ''
-            fileReader.onload = (event) => {
-              trackProgress({inserted: start, total: fileSize})
-              buffer += decoder.decode(event.target.result, {stream: true})
-              for (let curChar = 0; curChar < buffer.length; curChar++) {
-                let char = buffer.charAt(curChar)
-                if (!escaped && char === '\'') {
-                  inQuotes = !inQuotes
+          connection.query('PRAGMA foreign_keys = OFF;')
+          connection.transaction((manager) => {
+            extractedSnapshot.file((file) => {
+              let decoder = new TextDecoder()
+              let start = 0
+              const CHUNK_SIZE = 1024
+              let fileSize = file.size
+              let end = Math.min(fileSize, (start + CHUNK_SIZE))
+              let fileReader = new FileReader(file)
+              let inQuotes = false
+              let escaped = false
+              let buffer = ''
+              let everything = ''
+              fileReader.onload = (event) => {
+                trackProgress({inserted: start, total: fileSize})
+                buffer += decoder.decode(event.target.result, {stream: true})
+                for (let curChar = 0; curChar < buffer.length; curChar++) {
+                  let char = buffer.charAt(curChar)
+                  if (!escaped && char === '\'') {
+                    inQuotes = !inQuotes
+                  }
+                  if (escaped) {
+                    escaped = false
+                  } else {
+                    if (char === '\\') {
+                      escaped = true
+                    }
+                  }
+                  if (!inQuotes) {
+                    if (char === ';') {
+                      let query = buffer.substring(0, (curChar + 1))
+                      everything += query
+                      manager.query(query)
+                      buffer = buffer.substring(curChar + 1, buffer.length)
+                      curChar = 0
+                    }
+                  }
                 }
-                if (escaped) {
+                if (end < fileSize) {
+                  start += CHUNK_SIZE
+                  end = Math.min(fileSize, (end + CHUNK_SIZE))
+                  let slice = file.slice(start, end)
+                  inQuotes = false
                   escaped = false
+                  setTimeout(() => fileReader.readAsArrayBuffer(slice))
                 } else {
-                  if (char === '\\') {
-                    escaped = true
-                  }
-                }
-                if (!inQuotes) {
-                  if (char === ';') {
-                    let query = buffer.substring(0, (curChar + 1))
-                    everything += query
-                    // console.log(query)
-                    buffer = buffer.substring(curChar + 1, buffer.length)
-                    curChar = 0
-                  }
+                  console.log(everything)
+                  connection.query('PRAGMA foreign_keys = ON;')
+                  resolve()
                 }
               }
-              if (end < fileSize) {
-                start += CHUNK_SIZE
-                end = Math.min(fileSize, (end + CHUNK_SIZE))
-                let slice = file.slice(start, end)
-                inQuotes = false
-                escaped = false
-                fileReader.readAsArrayBuffer(slice)
-              } else {
-                console.log(everything)
-                resolve()
-              }
-            }
-            fileReader.onerror = (error) => reject(error)
-            let slice = file.slice(start, end)
-            fileReader.readAsArrayBuffer(slice)
+              fileReader.onerror = (error) => reject(error)
+              let slice = file.slice(start, end)
+              fileReader.readAsArrayBuffer(slice)
+            })
           })
         })
     })
