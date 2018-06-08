@@ -64,7 +64,7 @@
         },
         trackProgress: function (progress) {
           this.insertProgress = (progress.inserted / progress.total) * 100
-          // console.log('this.insertProgress', this.insertProgress, progress)
+          console.log('this.insertProgress', this.insertProgress, progress)
         }
       },
       computed: {

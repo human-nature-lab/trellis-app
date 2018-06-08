@@ -67,21 +67,20 @@ export default class DatabaseServiceCordova {
       this.getDatabase()
         .then((connection) => {
           extractedSnapshot.file((file) => {
-            let offset = 0
-            let chunkSize = 1024
+            let decoder = new TextDecoder()
+            let start = 0
+            const CHUNK_SIZE = 1024
             let fileSize = file.size
-            let end = Math.min(fileSize, (offset + chunkSize))
+            let end = Math.min(fileSize, (start + CHUNK_SIZE))
             let fileReader = new FileReader(file)
-            let buffer = ''
-            let query = ''
-            let curChar = 0
             let inQuotes = false
             let escaped = false
+            let buffer = ''
             let everything = ''
-            fileReader.onloadend = (event) => {
-              trackProgress({inserted: offset, total: fileSize})
-              buffer += event.target.result
-              for (; curChar < buffer.length; curChar++) {
+            fileReader.onload = (event) => {
+              trackProgress({inserted: start, total: fileSize})
+              buffer += decoder.decode(event.target.result, {stream: true})
+              for (let curChar = 0; curChar < buffer.length; curChar++) {
                 let char = buffer.charAt(curChar)
                 if (!escaped && char === '\'') {
                   inQuotes = !inQuotes
@@ -95,28 +94,29 @@ export default class DatabaseServiceCordova {
                 }
                 if (!inQuotes) {
                   if (char === ';') {
-                    query += buffer.substring(0, (curChar + 1))
-                    // console.log('complete query', query)
+                    let query = buffer.substring(0, (curChar + 1))
                     everything += query
-                    query = ''
+                    // console.log(query)
                     buffer = buffer.substring(curChar + 1, buffer.length)
                     curChar = 0
                   }
                 }
               }
               if (end < fileSize) {
-                offset = end
-                end = Math.min(fileSize, (offset + chunkSize))
-                let slice = file.slice(offset, end)
-                fileReader.readAsText(slice)
+                start += CHUNK_SIZE
+                end = Math.min(fileSize, (end + CHUNK_SIZE))
+                let slice = file.slice(start, end)
+                inQuotes = false
+                escaped = false
+                fileReader.readAsArrayBuffer(slice)
               } else {
-                console.log('everything', everything)
+                console.log(everything)
                 resolve()
               }
             }
             fileReader.onerror = (error) => reject(error)
-            let slice = file.slice(offset, end)
-            fileReader.readAsText(slice)
+            let slice = file.slice(start, end)
+            fileReader.readAsArrayBuffer(slice)
           })
         })
     })
