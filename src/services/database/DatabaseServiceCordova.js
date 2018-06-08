@@ -124,6 +124,18 @@ export default class DatabaseServiceCordova {
     })
   }
 
+  checkForeignKeys () {
+    return new Promise((resolve, reject) => {
+      this.getDatabase()
+        .then((connection) => {
+          connection.query('PRAGMA foreign_key_check;')
+            .then(
+              () => resolve(),
+              (error) => reject(error.message))
+        })
+    })
+  }
+
   removeTable (tableName, tx) {
     return new Promise((resolve, reject) => {
       console.log(`Dropping table ${tableName}`)
