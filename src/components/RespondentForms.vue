@@ -1,6 +1,6 @@
 <template>
   <v-flex class="respondent-forms">
-    <v-container fluid>
+    <v-container fluid class="px-0">
       <v-alert v-if="error">{{this.error}}</v-alert>
       <v-flex>
         <h3>Forms for: {{respondent.name}}</h3>

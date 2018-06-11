@@ -10,24 +10,29 @@
         v-model="query"
         :loading="isLoading"
         @input="onQueryChange"></v-text-field>
-      <v-layout slot="extension">
-        <v-flex>
-          <v-select
-            :items="conditionTags"
-            v-model="filters.conditionTags"
-            label="Condition Tags"
-            chips
-            tags
-            @input="onQueryChange"
-            :loading="conditionTagsLoading"
-            autocomplete/>
-        </v-flex>
-        <v-flex sm1>
-          <v-btn
-            @click="clearFilters">
-            <v-icon>clear</v-icon>
-          </v-btn>
-        </v-flex>
+      <v-btn
+        @click="onDone"
+        :disabled="isLoading">
+        <span v-if="!isLoading">Done</span>
+        <v-progress-circular v-if="isLoading" indeterminate color="primary" />
+      </v-btn>
+      <v-layout class="pa-3" slot="extension">
+        <v-select
+          :items="conditionTags"
+          v-model="filters.conditionTags"
+          label="Condition Tags"
+          single-line
+          dense
+          chips
+          tags
+          @input="onQueryChange"
+          :loading="conditionTagsLoading"
+          autocomplete/>
+        <v-btn
+          icon
+          @click="clearFilters">
+          <v-icon>clear</v-icon>
+        </v-btn>
       </v-layout>
       <v-alert v-if="error">
         {{error}}
@@ -50,10 +55,7 @@
     </v-layout>
     <v-layout ma-3>
       <v-flex>
-        <v-btn @click="onDone" :disabled="isLoading">
-          <span v-if="!isLoading">Done</span>
-          <v-progress-circular v-if="isLoading" indeterminate color="primary" />
-        </v-btn>
+
       </v-flex>
     </v-layout>
   </v-card>
@@ -101,6 +103,14 @@
   export default {
     name: 'respondents-search',
     props: {
+      canSelect: {
+        type: Boolean,
+        default: false
+      },
+      limit: {
+        type: Number,
+        default: 0
+      },
       formsButtonVisible: {
         type: Boolean,
         default: true
@@ -193,6 +203,10 @@
           })
       },
       onSelectRespondent: function (respondent) {
+        this.$emit('selectRespondent', respondent)
+        if (!this.canSelect) return
+        if (this.limit && this.selected.length > this.limit) return
+
         let sIndex = this.selected.indexOf(respondent.id)
         let aIndex = this.added.indexOf(respondent.id)
         let rIndex = this.removed.indexOf(respondent.id)
@@ -217,10 +231,7 @@
     },
     computed: {
       selected: function () {
-        let selected = this.selectedRespondents
-        for (let id of this.added) {
-          selected.push(id)
-        }
+        let selected = this.selectedRespondents.concat(this.added)
         return selected.filter(id => this.removed.indexOf(id) === -1)
       },
       respondentResults: function () {
@@ -236,8 +247,8 @@
 
 <style lang="sass" scoped>
 .respondent-search
-  position: fixed
+  /*position: fixed*/
   z-index: 10
 .respondents
-  padding-top: 130px
+  /*padding-top: 130px*/
 </style>
