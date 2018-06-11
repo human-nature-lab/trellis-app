@@ -92,7 +92,7 @@ function castParameter (questionType, parameterType, value) {
   }
 }
 
-function parametersToMap (parameters, question) {
+export function parametersToMap (parameters, question) {
   let pMap = parameters.reduce((map, p) => {
     map[p.parameter.name] = castParameter(question.type.name, p.parameter.name, p.val)
     return map

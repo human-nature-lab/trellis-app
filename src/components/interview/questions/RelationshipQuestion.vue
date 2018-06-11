@@ -29,6 +29,8 @@
     <v-dialog v-model="respondentSearchDialog">
       <v-card>
         <RespondentsSearch
+          :canSelect="true"
+          :limit="selectLimit"
           :shouldUpdateRoute="false"
           @selected="onSelected"
           :formsButtonVisible="false"
@@ -89,6 +91,14 @@
         return this.edges.map(edge => {
           return edge.target_respondent_id
         })
+      },
+      selectLimit: function () {
+        for (let p of this.question.question_parameters) {
+          if (p.parameter.name === 'max_relationships') {
+            return parseInt(p.val, 10)
+          }
+        }
+        return 0
       }
     },
     methods: {

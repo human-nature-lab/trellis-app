@@ -2,8 +2,8 @@
   <v-card class="ma-1">
     <v-layout
       column
-      :class="{open: isOpen}"
-      :data-form-id="form.id">
+      :id="'form-' + form.id"
+      :class="{'open': isOpen}">
       <v-layout
         row>
         <v-flex class="centered icon-container clickable"

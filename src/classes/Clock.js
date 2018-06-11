@@ -64,7 +64,7 @@ export default class Clock extends Emitter {
   setMaximums (maximums) {
     this.clockMax = maximums
     this._isAtMax = null
-    this.validateTime()
+    // this.validateTime()
   }
 
   /**
@@ -143,6 +143,7 @@ export default class Clock extends Emitter {
     let done
     let index = this.time.length - 1
     let prevTime = JSON.parse(JSON.stringify(this.time))
+    let c = 0
     do {
       done = true
       this.time[index]++
@@ -154,10 +155,14 @@ export default class Clock extends Emitter {
         this.emit('beforeIndexChange', index, 'increment')
         done = false
       }
-      this.emit('afterIncrement', index)
+      this.emit('afterIndexChange', index)
       // We are already at the max state so we need to exit without exceeding the max state
       if (index < 0) {
         done = true
+      }
+      c++
+      if (c > 1000) {
+        debugger
       }
     } while (!done)
     this.emit('increment', this.time, prevTime)
@@ -191,7 +196,7 @@ export default class Clock extends Emitter {
         done = false
       }
 
-      this.emit('afterDecrement', index)
+      this.emit('afterIndexChange', index)
       // We are at the minimum state so we need to exit without passing it
       if (index >= this.time.length) {
         done = true

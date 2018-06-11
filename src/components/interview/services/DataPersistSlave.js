@@ -16,6 +16,13 @@ export default function dataPersistSlave (dataStore, throttleRate = 10000) {
     }
   }
   function saveData (newState, prevState) {
+    function transformRespondentTag (tag) {
+      tag.condition_tag_id = tag.condition_id
+      delete tag.condition_id
+      return tag
+    }
+    newState.conditionTags.respondent = newState.conditionTags.respondent.map(transformRespondentTag)
+    prevState.conditionTags.respondent = prevState.conditionTags.respondent.map(transformRespondentTag)
     let diff = {
       data: DiffService.dataDiff(newState.data, prevState.data),
       conditionTags: DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
