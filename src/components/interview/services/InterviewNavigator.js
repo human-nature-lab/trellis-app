@@ -1,4 +1,5 @@
 import Emitter from '../../../classes/Emitter'
+import Clock from '../../../classes/Clock'
 export default class InterviewNavigator extends Emitter {
   constructor (interview) {
     super()
@@ -14,8 +15,24 @@ export default class InterviewNavigator extends Emitter {
     this.max = {}
     this.interview = interview
     this.blueprint = interview.blueprint
+    this.clock = new Clock([0, 0, 0, 0])
+    this.clock.on('beforeIndexChange', (index, direction) => {
+      if (index === 0) {
+        console.log('updating max', direction, this.clock.time, this.clock.clockMax)
+        let max = this.getMax(this.clock.time[3], this.clock.time[0] + (direction === 'increment' ? 1 : 0), this.clock.time[1], this.clock.time[2])
+        this.setMax(max)
+      }
+    })
     this.updateLocation()
     this.updateMax()
+  }
+
+  /**
+   * Destroy all listeners on this instance
+   */
+  destroy () {
+    this.destroyListeners()
+    this.clock.destroyListeners()
   }
   get section () {
     return this._location.section
@@ -73,10 +90,11 @@ export default class InterviewNavigator extends Emitter {
     this._location.sectionFollowUpDatumId = null
   }
   updateMax () {
-    let max = this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+    let max = this.getMax(this.clock.time[3], this.clock.time[0], this.clock.time[1], this.clock.time[2])
     this.setMax(max)
   }
   setMax (max) {
+    this.clock.setMaximums(max)
     this.max.section = max[0]
     this.max.sectionRepetition = max[1]
     this.max.sectionFollowUpDatumRepetition = max[2]
@@ -88,6 +106,10 @@ export default class InterviewNavigator extends Emitter {
     this.page = this.max.page
   }
   updateLocation () {
+    this.section = this.clock.time[0]
+    this.sectionRepetition = this.clock.time[1]
+    this.sectionFollowUpDatumRepetition = this.clock.time[2]
+    this.page = this.clock.time[3]
     this.location.section = this.section
     this.location.sectionRepetition = this.sectionRepetition
     this.location.sectionFollowUpDatumId = this.sectionFollowUpDatumId
@@ -102,12 +124,11 @@ export default class InterviewNavigator extends Emitter {
   }
 
   get isAtEnd () {
-    let max = this.getCurrentMax()
-    return this.section === max[0] && this.sectionRepetition === max[1] && this.sectionFollowUpDatumRepetition === max[2] && this.page === max[3]
+    return this.clock.isAtMax
   }
 
   get isAtStart () {
-    return this.section === 0 && this.sectionRepetition === 0 && this.sectionFollowUpDatumRepetition === 0 && this.page === 0
+    return this.clock.isAtMin
   }
   getCurrentMax () {
     return this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
@@ -206,7 +227,6 @@ export default class InterviewNavigator extends Emitter {
       section--
       m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
       max = {
-        section: m[0],
         sectionRepetition: m[1],
         sectionFollowUpDatumRepetition: m[2],
         page: m[3]
@@ -229,7 +249,7 @@ export default class InterviewNavigator extends Emitter {
   /**
    * Move forward a step
    */
-  next () {
+  nextOld () {
     try {
       let next = this.getNext(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
       this.page = next.page
@@ -246,7 +266,7 @@ export default class InterviewNavigator extends Emitter {
   /**
    * Move back a step
    */
-  previous () {
+  previousOld () {
     try {
       let prev = this.getPrevious(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
       this.page = prev.page
@@ -258,5 +278,25 @@ export default class InterviewNavigator extends Emitter {
       this.emit('beginning')
     }
     this.updateLocation()
+  }
+
+  next () {
+    this.clock.increment()
+    if (this.clock.isAtMax) {
+      this.emit('end')
+      return
+    }
+    this.updateLocation()
+    // console.log('navigator next location', JSON.stringify(this.location), 'max', JSON.stringify(this.clock.clockMax))
+  }
+
+  previous () {
+    this.clock.decrement()
+    if (this.clock.isAtMin) {
+      this.emit('beginning')
+      return
+    }
+    this.updateLocation()
+    // console.log('navigator prev location', JSON.stringify(this.location), 'max', JSON.stringify(this.clock.clockMax))
   }
 }

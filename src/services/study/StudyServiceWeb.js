@@ -28,6 +28,15 @@ export default class StudyServiceWeb {
   }
 
   /**
+   * Apply the existing version of the study to the global Vue data store
+   */
+  static setExistingStudy () {
+    if (storage.get('current-study')) {
+      singleton.study = storage.get('current-study')
+    }
+  }
+
+  /**
    * Set the current study
    * @param study
    */

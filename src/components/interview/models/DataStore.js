@@ -86,9 +86,20 @@ export default class DataStore extends Emitter {
   loadConditionTags (tags) {
     for (let type of ['respondent', 'survey', 'section']) {
       if (this.conditionTags[type] && tags[type]) {
-        this.conditionTags[type] = this.conditionTags.concat(tags[type])
+        this.conditionTags[type] = this.conditionTags[type].concat(tags[type])
       }
     }
+    this.conditionTags.respondent = this.conditionTags.respondent.map(tag => {
+      if (tag.condition_tag_id) {
+        tag.condition_id = tag.condition_tag_id
+        delete tag.condition_tag_id
+      }
+      if (tag.condition_tag) {
+        ConditionTagStore.add(tag.condition_tag)
+        delete tag.condition_tag
+      }
+      return tag
+    })
     this._lastPersistedState.conditionTags = _.cloneDeep(this.conditionTags)
     RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
     SectionConditionTagRecycler.fill(this.conditionTags.section)

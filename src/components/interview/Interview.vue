@@ -132,7 +132,7 @@
           })
         ]).then(results => {
           let [actions, data, formBlueprint, preload] = results
-          for (let d of data) {
+          for (let d of data.data) {
             for (let datum of d.data) {
               for (let key in datum) {
                 if (datum[key] === null || datum[key] === undefined) {
@@ -141,14 +141,14 @@
               }
             }
           }
+          interviewData.conditionTags = data.conditionTags || {}
           interviewData.interview = interview
-          interviewData.actions = [] || actions
-          interviewData.data = [] || data
+          interviewData.actions = actions || []
+          interviewData.data = data.data || []
           interviewData.form = formBlueprint
           interviewData.preload = preload
-        }).catch(() => {
-          // debugger
-          // throw err
+        }).catch((err) => {
+          console.error(err)
         })
       })
   }
@@ -346,13 +346,15 @@
         console.log('TODO: Lock and exit the survey')
         InterviewService.complete(this.interview.id).then(res => {
           this.dialog.end = false
-          router.push({name: 'home'})
+          router.go(-1)
+          // router.push({name: 'home'})
         })
       },
       saveAndExit: function () {
         console.log('TODO: Make sure everything is saved before exiting')
         this.dialog.end = false
-        router.push({name: 'home'})
+        router.go(-1)
+        // router.push({name: 'home'})
       },
       prematureExit: function (e) {
         const dialogText = 'You have unsaved changes. Are you sure you want to leave?'
@@ -374,20 +376,6 @@
           return q
         })
         return questions || []
-      },
-      loadingMessage: function () {
-        switch (this.loadingStep) {
-          case 1:
-            return 'Loading existing actions, data and form definition'
-          case 2:
-            return 'Loading existing actions and data'
-          case 3:
-            return 'Loading existing actions'
-          case 4:
-            return 'Building survey'
-          default:
-            return 'Loading interview'
-        }
       }
     },
     components: {

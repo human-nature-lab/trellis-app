@@ -30,8 +30,8 @@ export default class Interview extends Emitter {
     if (data) this.data.loadData(data)
     if (conditionTags) this.data.loadConditionTags(conditionTags)
     this.navigator = new InterviewNavigator(this)
-    this.navigator.on('end', this.atEnd, this)
-    this.navigator.on('beginning', this.atBeginning, this)
+    // this.navigator.on('end', this.atEnd, this)
+    // this.navigator.on('beginning', this.atBeginning, this)
     this._initializeConditionAssignment()
     this.makePageQuestionDatum()
   }
@@ -49,8 +49,7 @@ export default class Interview extends Emitter {
    */
   destroy () {
     this._resetState()
-    this.navigator.off('end', this.atEnd, true)
-    this.navigator.off('beginning', this.atBeginning, true)
+    this.navigator.destroy()
     if (this._dataPersistSlave) {
       this._dataPersistSlave.destroy()
       this._dataPersistSlave = null
@@ -472,9 +471,16 @@ export default class Interview extends Emitter {
     this.navigator.next()
     this._onPageEnter()
 
+    // Skip any question that's in a follow up section with no data to follow up on
+    if (this.currentSection().followUpQuestionId && this.navigator.clock.clockMax[2] <= 0) {
+      console.log('skipping question in empty follow up section', JSON.stringify(this.location))
+      return this.next()
+    }
+
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
+    console.log('next location:', JSON.stringify(this.location), 'conditionTags:', JSON.stringify(Array.from(conditionTagNames)))
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
       console.log('skipping location', JSON.stringify(this.location))
       this._markAsSkipped()
@@ -491,9 +497,17 @@ export default class Interview extends Emitter {
     this._onPageExit()
     this.navigator.previous()
     this._onPageEnter()
+
+    // Skip any question that's in a follow up section with no data to follow up on
+    if (this.currentSection().followUpQuestionId && this.navigator.clock.clockMax[2] <= 0) {
+      console.log('skipping question in empty follow up section', JSON.stringify(this.location))
+      return this.previous()
+    }
+
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
+    console.log('previous location:', JSON.stringify(this.location), 'conditionTags:', JSON.stringify(Array.from(conditionTagNames)))
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
       console.log('skipping location', JSON.stringify(this.location))
       this._markAsSkipped()
@@ -721,5 +735,8 @@ export function sharedInterview (...args) {
 }
 
 export function clearSharedInterview () {
+  if (sharedInterviewInstance) {
+    sharedInterviewInstance.destroy()
+  }
   sharedInterviewInstance = null
 }

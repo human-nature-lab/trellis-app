@@ -12,7 +12,7 @@
         <!--<v-toolbar-title class="white&#45;&#45;text">{{question.var_name}} : {{question.type.name}}</v-toolbar-title>-->
       <!--</v-toolbar>-->
     </v-card-title>
-    <v-alert v-show="validationError">
+    <v-alert v-show="validationError" transition="slide-y-transition">
       {{validationError}}
     </v-alert>
     <v-card-text class="question-content">

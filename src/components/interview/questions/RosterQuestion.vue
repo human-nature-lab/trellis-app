@@ -191,7 +191,6 @@
       stopAddingAndSave: function () {
         this.isSavingNew = true
         RosterService.createRosterRows([this.newText]).then(rows => {
-          debugger
           for (let row of rows) {
             actionBus.action({
               action_type: 'add-roster-row',
