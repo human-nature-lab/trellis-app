@@ -146,13 +146,15 @@ export default class Clock extends Emitter {
     do {
       done = true
       this.time[index]++
+      this.emit('beforeIncrement', index)
       if ((this.clockMax && this.time[index] > this.clockMax[index]) ||
         (!this.clockMax && this.time[index] > 9)) {
         this.time[index] = this.clockMin ? this.clockMin[index] : 0
         index--
+        this.emit('beforeIndexChange', index, 'increment')
         done = false
       }
-      this.emit('incrementIndex', index)
+      this.emit('afterIncrement', index)
       // We are already at the max state so we need to exit without exceeding the max state
       if (index < 0) {
         done = true
@@ -175,13 +177,21 @@ export default class Clock extends Emitter {
     do {
       done = true
       this.time[index]--
+      this.emit('beforeIndexChange', index, 'decrement')
+      for (let i = index + 1; i < this.time.length; i++) {
+        this.time[i] = this.clockMax ? this.clockMax[i] : 9
+      }
       if ((this.clockMin && this.time[index] < this.clockMin[index]) ||
         (!this.clockMin && this.time[index] < 0)) {
-        this.time[index] = this.clockMax ? this.clockMax[index] : 9
+        // this.time[index] = this.clockMax ? this.clockMax[index] : 9
+        // if (index < this.time.length - 1) {
+        //   this.time[index + 1] = this.clockMax ? this.clockMax[index + 1] : 9
+        // }
         index--
         done = false
       }
-      this.emit('decrementIndex', index)
+
+      this.emit('afterDecrement', index)
       // We are at the minimum state so we need to exit without passing it
       if (index >= this.time.length) {
         done = true

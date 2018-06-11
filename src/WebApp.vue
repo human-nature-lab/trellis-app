@@ -1,10 +1,13 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme">
     <v-toolbar fixed>
-      <v-toolbar-title class="deep-orange--text logo">
-        <router-link :to="{name: 'home'}">
+      <v-toolbar-title class="logo">
+        <router-link :to="{name: 'home'}" class="deep-orange--text">
           <img src="../static/img/trellis-logo.png" alt="trellis">
         </router-link>
+        <span class="study" v-if="global.study">
+          ({{global.study.name}})
+        </span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.fullPath}}">
@@ -19,7 +22,7 @@
       <MainMenu />
     </v-toolbar>
     <v-content>
-      <v-container fluid class="app-container">
+      <v-container fluid class="app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
         <LoadingPage
           v-if="global.loading.active"
           :indeterminate="global.loading.indeterminate"
@@ -53,9 +56,7 @@
       }
     },
     created: function () {
-      StudyService.getStudy('ad9a9086-8f15-4830-941d-416b59639c41').then(study => {
-        StudyService.setCurrentStudy(study)
-      })
+      StudyService.setExistingStudy()
       LocaleService.setExistingLocale()
     },
     components: {
@@ -81,6 +82,13 @@
     img
       max-width: 100%
       max-height: 100%
+    .study
+      color: #9d9d9d
+      font-size: 20px
+      display: inline-flex
+      height: 145%
+      padding-left: 10px
+      vertical-align: middle
   .fade-in
     animation: fade-in .3s ease-in-out 0s 1
   @keyframes fade-in
