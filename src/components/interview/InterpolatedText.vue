@@ -61,7 +61,15 @@
         let interview = sharedInterview() // TODO: This is a stupid way to do this. Why isn't this just a singleton?
         let promises = []
         varNames.forEach(varName => {
-          // debugger
+          if (varName === 'CHILD ROSTER X') {
+            promises.push(new Promise(resolve => {
+              return resolve({
+                key: varName,
+                val: varName
+              })
+            }))
+            return
+          }
           let questionDatum = interview.getSingleDatumByQuestionVarName(varName, this.location.sectionFollowUpDatumRepetition)
           let question = interview.questionMap.get(questionDatum.question_id)
           // let datum = this.sectionFollowUpRepetition ? questionDatum.data.find(d => d.id === this.location) : questionDatum.data[0]

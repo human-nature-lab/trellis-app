@@ -41,7 +41,7 @@ export default class Interview extends Emitter {
   }
 
   attachActionsPersistSlave () {
-    this._actionsPersistSlave = actionsPersistSlave(this.actions)
+    this._actionsPersistSlave = actionsPersistSlave(this.interview.id, this.actions)
   }
 
   /**

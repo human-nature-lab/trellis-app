@@ -6,13 +6,13 @@ import InterviewActionsService from './interview-actions/InterviewActionsService
  * @param {ActionStore} actionStore
  * @returns {PersistSlave}
  */
-export default function actionsPersistSlave (actionStore) {
+export default function actionsPersistSlave (interviewId, actionStore) {
   function actionsExtractor () {
     return actionStore.actions
   }
   function saveCallback (newState, prevState) {
     let lastPersistedLength = newState.length - prevState.length
-    return InterviewActionsService.saveActions(newState.slice(lastPersistedLength))
+    return InterviewActionsService.saveActions(interviewId, newState.slice(lastPersistedLength))
   }
   return new PersistSlave(actionStore, actionsExtractor, saveCallback)
 }
