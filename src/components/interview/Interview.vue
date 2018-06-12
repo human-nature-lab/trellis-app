@@ -85,117 +85,27 @@
 
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/ActionBus'
-  import InterviewActionsService from './services/interview-actions/InterviewActionsService'
-  import FormService from '../../services/form/FormService'
-  import LocaleService from '../../services/locale/LocaleService'
   import {validateParametersWithError} from './services/ValidatorService'
 
   import router from '../../router/router'
   import singleton from '../../singleton'
+  import InterviewLoader from './services/InterviewLoader'
 
   let interviewData = {}
 
-  function loadInterview (interviewId) {
-    let interview
-    singleton.loading.message = 'Loading interview and survey'
-    return InterviewService.getInterview(interviewId)
-      .catch(err => {
-        console.error('No interview exists with this id')
-        throw err
-      })
-      .then(inter => {
-        interview = inter
-        singleton.loading.step++
-        singleton.loading.message = 'Loading existing data and stuff'
-        return Promise.all([
-          InterviewActionsService.getActions(interviewId).then(r => {
-            singleton.loading.step++
-            return r
-          }).catch(() => {
-            // throw new Error('Could not contact interview actions service: ' + err)
-          }),
-          InterviewService.getData(interviewId).then(r => {
-            singleton.loading.step++
-            return r
-          }).catch(() => {
-            // throw new Error('Could not contact interview data service: ' + err)
-          }),
-          FormService.getForm(interview.survey.form_id).then(r => {
-            singleton.loading.step++
-            return r
-          }),
-          InterviewService.getPreload(interviewId).then(r => {
-            singleton.loading.step++
-            return r
-          }).catch(() => {
-            // throw new Error('Could not contact preload data service: ' + err)
-          })
-        ]).then(results => {
-          let [actions, data, formBlueprint, preload] = results
-          for (let d of data.data) {
-            for (let datum of d.data) {
-              for (let key in datum) {
-                if (datum[key] === null || datum[key] === undefined) {
-                  delete datum[key]
-                }
-              }
-            }
-          }
-          interviewData.conditionTags = data.conditionTags || {}
-          interviewData.interview = interview
-          interviewData.actions = actions || []
-          interviewData.data = data.data || []
-          interviewData.form = formBlueprint
-          interviewData.preload = preload
-        }).catch((err) => {
-          console.error(err)
-        })
-      })
-  }
-
-  function loadPreview (formId) {
-    let promises = [
-      FormService.getForm(formId).then(form => {
-        interviewData.form = form
-        singleton.loading.step++
-      })
-    ]
-    return Promise.all(promises)
-  }
-
   function interviewGuards (to, from, next) {
+    let messages = ['Loading form structure', 'Loading all interview data']
     singleton.loading.active = true
+    singleton.loading.message = messages[0]
     singleton.loading.step = 0
-    singleton.loading.steps = 0
-    singleton.loading.indeterminate = false
-    LocaleService.setExistingLocale()
-    let p
-    if (to.name === 'Interview') {
-      interviewData.interviewType = 'interview'
-      p = loadInterview(to.params.interviewId)
-      singleton.loading.steps += 4
-    } else {
-      interviewData.interviewType = 'preview'
-      p = loadPreview(to.params.formId)
-      singleton.loading.steps++
-    }
-    if (to.query.locale) {
-      singleton.loading.steps++
-      p.then(() => {
-        singleton.loading.message = 'Loading current locale'
-        return LocaleService.getLocaleById(to.query.locale)
-          .then(locale => {
-            singleton.loading.step++
-            LocaleService.setCurrentLocale(locale)
-          })
-          .catch(err => {
-            console.error('no locale matching', to.query.locale, 'in the database')
-            console.error(err)
-          })
-      })
-    }
-    return p.then(() => {
+    singleton.loading.steps = 6
+    InterviewLoader.load(to, function (progress) {
+      singleton.loading.message = messages[1]
       singleton.loading.step++
+    }).catch(err => {
+      console.error(err)
+    }).then(results => {
+      interviewData = results
       singleton.loading.active = false
     }).then(next)
   }
@@ -288,29 +198,14 @@
     methods: {
       loadInterview: function () {
         this.isLoading = false
-        let conditionTags = interviewData.conditionTags
-        let interview = interviewData.interview
-        let actions = interviewData.actions
-        let form = interviewData.form
-        let data = interviewData.data
-        let preload = []
-        if (!interview) {
-          interview = {
-            id: 'fake id',
-            survey: {
-              respondent_id: 'ok'
-            }
-          }
-        } else {
-          InterviewService.setInterviewId(interview.id)
-        }
         this.type = interviewData.interviewType
-        this.initializeInterview(interview, actions, data, conditionTags, form, preload)
+        let d = interviewData
+        this.initializeInterview(d.interview, d.actions, d.data, d.conditionTags, d.form)
       },
-      initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, preload) {
+      initializeInterview: function (interview, actions, data, conditionTags, formBlueprint) {
         clearSharedInterview()
         interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags)
-        if (interviewData.interviewType === 'interview') {
+        if (this.type === 'interview') {
           interviewState.attachDataPersistSlave()
           interviewState.attachActionsPersistSlave()
         }
