@@ -1,42 +1,20 @@
-import InterviewData from '../services/interview-data/InterviewDataService'
-import _ from 'lodash'
-import DiffService from '../services/DiffService'
-
 import Emitter from '../../../classes/Emitter'
 import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
 import DatumRecycler from '../services/recyclers/DatumRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
-import ConditionTagStore from '../models/ConditionTagStore'
+import ConditionTagStore from './/ConditionTagStore'
 
 export default class DataStore extends Emitter {
   constructor (throttleRate = 10000) {
     super()
     this.reset()
-    this._lastPersistedState = {
-      data: [],
-      conditionTags: {
-        section: [],
-        respondent: [],
-        survey: []
-      }
-    }
     DatumRecycler.clear()
     QuestionDatumRecycler.clear()
     RespondentConditionTagRecycler.clear()
     SectionConditionTagRecycler.clear()
     FormConditionTagRecycler.clear()
-  }
-
-  persistIfChanges () {
-    let diff = getDiff({
-      data: this.data,
-      conditionTags: this.conditionTags
-    }, this._lastPersistedState)
-    if (hasDataChanges(diff.data) || hasConditionChanges(diff.conditionTags)) {
-      this.persist()
-    }
   }
 
   /**
@@ -73,7 +51,7 @@ export default class DataStore extends Emitter {
       d.data = []
       questionDatum.push(d)
     }
-    this._lastPersistedState.data = _.cloneDeep(this.data)
+    debugger
     QuestionDatumRecycler.fill(questionDatum)
     DatumRecycler.fill(datum)
     this.emit('initialState', this.data)
@@ -100,7 +78,6 @@ export default class DataStore extends Emitter {
       }
       return tag
     })
-    this._lastPersistedState.conditionTags = _.cloneDeep(this.conditionTags)
     RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
     SectionConditionTagRecycler.fill(this.conditionTags.section)
     FormConditionTagRecycler.fill(this.conditionTags.survey)
@@ -180,13 +157,13 @@ export default class DataStore extends Emitter {
    * @param section
    * @param page
    * @param sectionRepetition
-   * @param sectionFollowUpRepetition
+   * @param sectionFollowUpDatumId
    * @returns {Array}
    */
-  getAllQuestionDatumByLocation (section, page, sectionRepetition, sectionFollowUpRepetition) {
+  getAllQuestionDatumByLocation (section, page, sectionRepetition, sectionFollowUpDatumId) {
     let data = []
     for (let qD of this.data) {
-      if (this._locationMatchesQuestionDatum(qD, section, page, sectionRepetition, sectionFollowUpRepetition)) {
+      if (qD.section === section && qD.page === page && qD.section_repetition === sectionRepetition && qD.follow_up_datum_id === sectionFollowUpDatumId) {
         data.push(qD)
       }
     }
@@ -231,65 +208,6 @@ export default class DataStore extends Emitter {
   getQuestionDatumById (id) {
     return this.questionDatumIdMap.get(id)
   }
-
-  /**
-   * Actually store the new data on disk
-   */
-  save () {
-    if (this._existingRequest) {
-      console.log('data saving request is in progress')
-      return
-    }
-    this.hasAddedData = false
-    let existingRequestState = _.cloneDeep({
-      data: this.data,
-      conditionTags: this.conditionTags
-    })
-    let diff = getDiff(existingRequestState, this._lastPersistedState)
-    // console.log('saving data', JSON.stringify(existingRequestState, null, 2))
-    this._existingRequest = InterviewData.sendDiff(diff).then(body => {
-      this._existingRequest = null
-      this._lastPersistedState = existingRequestState
-      // Make another throttled request if new data has been stored since the last save
-      if (this.hasAddedData) {
-        this.persist()
-      }
-    }).catch(() => {
-      this._existingRequest = null
-    })
-  }
-}
-
-export function getDiff (newState, prevState) {
-  return {
-    data: DiffService.dataDiff(newState.data, prevState.data),
-    conditionTags: DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
-  }
-}
-
-/**
- * Check if the data diff has any data
- * @param diff - Result of [DiffService#dataDiff]{@link DiffService#dataDiff}
- * @returns {boolean}
- */
-export function hasDataChanges (diff) {
-  return diff.questionDatum.added.length > 0 ||
-    diff.questionDatum.modified.length > 0 ||
-    diff.questionDatum.removed.length > 0 ||
-    diff.datum.added.length > 0 ||
-    diff.datum.removed.length > 0 ||
-    diff.datum.modified.length > 0
-}
-
-/**
- * Check if the condition diff has any data
- * @param diff - Result of [DiffService#conditionTagsDiff]{@link DiffService#conditionTagsDiff}
- * @returns {boolean}
- */
-export function hasConditionChanges (diff) {
-  return diff.section.added.length > 0 || diff.section.removed.length > 0 ||
-    diff.respondent.added.length > 0 || diff.respondent.removed.length > 0 ||
-    diff.survey.added.length > 0 || diff.survey.removed.length > 0
 }
 
 /**

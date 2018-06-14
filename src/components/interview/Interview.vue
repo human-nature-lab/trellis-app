@@ -51,7 +51,6 @@
       </v-card>
     </v-dialog>
     <v-dialog
-      v-touch="{down: () => dialog.conditionTag = false}"
       content-class="condition-tag-dialog"
       transition="dialog-bottom-transition"
       scrollable
@@ -81,7 +80,7 @@
   import ConditionTagList from './ConditionTagList'
   import menuBus from '../main-menu/MenuBus'
 
-  import {sharedInterview, clearSharedInterview} from './models/Interview'
+  import {sharedInterview, clearSharedInterview} from './classes/Interview'
 
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/ActionBus'
@@ -129,7 +128,6 @@
         artificiallyExtendLoadTime: false,
         formId: null,
         surveyId: null,
-        clipped: false,
         isLoading: true,
         type: 'interview',
         interviewData: {},
@@ -200,7 +198,7 @@
         this.isLoading = false
         this.type = interviewData.interviewType
         let d = interviewData
-        this.initializeInterview(d.interview, d.actions, d.data, d.conditionTags, d.form)
+        this.initializeInterview(d.interview, d.actions, d.data, d.conditionTags, d.form, d.respondentFills)
       },
       initializeInterview: function (interview, actions, data, conditionTags, formBlueprint) {
         clearSharedInterview()
@@ -209,6 +207,7 @@
           interviewState.attachDataPersistSlave()
           interviewState.attachActionsPersistSlave()
         }
+        interviewState.initalize()
         // Share the relevant parts of the interview with the view
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
@@ -260,16 +259,21 @@
     computed: {
       questions: function () {
         // The reference to this.location needs to be here so that we have a dependency on this.location
-        let questions = interviewState.getPageQuestions(this.location.sectionFollowUpDatumId).map(q => {
-          q.type = {
-            name: q.question_type.name
-          }
-          let validation = validateParametersWithError(q, q.question_parameters, q.datum)
-          q.allParametersSatisfied = validation === true // Makes none boolean types falsey
-          q.validationError = typeof validation === 'string' ? validation : null
-          q.isAnswered = false
-          return q
-        })
+        let questions = interviewState.getPageQuestions(
+            this.location.section,
+            this.location.sectionRepetition,
+            this.location.sectionFollowUpDatumRepetition,
+            this.location.page
+          ).map(q => {
+            q.type = {
+              name: q.question_type.name
+            }
+            let validation = validateParametersWithError(q, q.question_parameters, q.datum)
+            q.allParametersSatisfied = validation === true // Makes non-boolean types falsey
+            q.validationError = typeof validation === 'string' ? validation : null
+            q.isAnswered = false
+            return q
+          })
         return questions || []
       }
     },

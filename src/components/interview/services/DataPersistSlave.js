@@ -8,7 +8,7 @@ import DiffService from './DiffService'
  * @param {Number} [throttleRate = 10000] - How often should we make requests to store the data (milliseconds)
  * @returns {PersistSlave}
  */
-export default function dataPersistSlave (dataStore, throttleRate = 10000) {
+export default function dataPersistSlave (interviewId, dataStore, throttleRate = 10000) {
   function dataExtractor () {
     return {
       data: dataStore.data,
@@ -16,19 +16,20 @@ export default function dataPersistSlave (dataStore, throttleRate = 10000) {
     }
   }
   function saveData (newState, prevState) {
-    function transformRespondentTag (tag) {
-      tag.condition_tag_id = tag.condition_id
-      delete tag.condition_id
-      return tag
-    }
-    newState.conditionTags.respondent = newState.conditionTags.respondent.map(transformRespondentTag)
-    prevState.conditionTags.respondent = prevState.conditionTags.respondent.map(transformRespondentTag)
     let diff = {
       data: DiffService.dataDiff(newState.data, prevState.data),
       conditionTags: DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
     }
+    function transformRespondentTag (tag) {
+      tag.condition_tag_id = tag.condition_id
+      delete tag.condition_id
+      delete tag.name
+      return tag
+    }
+    diff.conditionTags.respondent.added = diff.conditionTags.respondent.added.map(transformRespondentTag)
+    diff.conditionTags.respondent.removed = diff.conditionTags.respondent.removed.map(transformRespondentTag)
     console.log('saving data', JSON.stringify(newState, null, 2))
-    return InterviewData.sendDiff(diff)
+    return InterviewData.sendDiff(interviewId, diff)
   }
   function shouldSave (newState, prevState) {
     return true

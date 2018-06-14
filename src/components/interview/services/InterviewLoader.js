@@ -2,6 +2,7 @@ import FormService from '../../../services/form/FormService'
 import InterviewService from '../../../services/interview/InterviewService'
 import InterviewActionsService from './interview-actions/InterviewActionsService'
 import LocaleService from '../../../services/locale/LocaleService'
+import RespondentService from '../../../services/respondent/RespondentService'
 export default class InterviewLoader {
 
   /**
@@ -34,8 +35,9 @@ export default class InterviewLoader {
           }
         }
       }
-      res.data = res.data.data || []
+      res.respondentFills = res.respondentFills || []
       res.conditionTags = res.data.conditionTags || {}
+      res.data = res.data.data || []
       res.interview = res.interview || {
         id: 'Preview ID',
         survey: {
@@ -87,21 +89,22 @@ export default class InterviewLoader {
           results.actions = actions
           currentStep++
           progressCb(currentStep / steps)
-        }).catch(() => {
-          // throw new Error('Could not contact interview actions service: ' + err)
-        }),
+        }).catch(() => {}),
         InterviewService.getData(interviewId).then(data => {
           results.data = data
           currentStep++
           progressCb(currentStep / steps)
-        }).catch(() => {
-          // throw new Error('Could not contact interview data service: ' + err)
-        }),
+        }).catch(() => {}),
         FormService.getForm(interview.survey.form_id).then(form => {
           results.form = form
           currentStep++
           progressCb(currentStep / steps)
-        })
+        }),
+        RespondentService.getRespondentFillsById(interview.survey.respondent_id).then(fills => {
+          results.respondentFills = fills
+          currentStep++
+          progressCb(currentStep / steps)
+        }).catch(() => {})
       ]).then(() => {
         return results
       })

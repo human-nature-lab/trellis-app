@@ -11,8 +11,11 @@ export default function actionsPersistSlave (interviewId, actionStore) {
     return actionStore.actions
   }
   function saveCallback (newState, prevState) {
-    let lastPersistedLength = newState.length - prevState.length
-    return InterviewActionsService.saveActions(interviewId, newState.slice(lastPersistedLength))
+    if (newState.length > prevState.length) {
+      return InterviewActionsService.saveActions(interviewId, newState.slice(prevState.length))
+    } else {
+      return new Promise(resolve => resolve())
+    }
   }
   return new PersistSlave(actionStore, actionsExtractor, saveCallback)
 }
