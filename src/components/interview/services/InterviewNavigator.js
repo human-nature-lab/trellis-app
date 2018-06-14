@@ -18,8 +18,8 @@ export default class InterviewNavigator extends Emitter {
     this.clock = new Clock([0, 0, 0, 0])
     this.clock.on('beforeIndexChange', (index, direction) => {
       if (index === 0) {
-        console.log('updating max', direction, this.clock.time, this.clock.clockMax)
         let max = this.getMax(this.clock.time[3], this.clock.time[0] + (direction === 'increment' ? 1 : 0), this.clock.time[1], this.clock.time[2])
+        console.log('updating max', direction, this.clock.time, 'from', this.clock.clockMax, 'to', max)
         this.setMax(max)
       }
     })
@@ -56,15 +56,7 @@ export default class InterviewNavigator extends Emitter {
     if (!this._location.sectionFollowUpDatumId) {
       let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
       if (followUpQuestionId) {
-        // TODO: Handle follow up questions from repeatedSections and follow up sections
-        let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
-        if (data && data.length) {
-          let datum = data.find(d => d.event_order === this.sectionFollowUpDatumRepetition)
-          if (!datum) {
-            throw Error('No datum present with that event order')
-          }
-          this._location.sectionFollowUpDatumId = datum.id
-        }
+        this._location.sectionFollowUpDatumId = this.getFollowUpQuestionDatumIdByFollowUpRepetition(followUpQuestionId, this.sectionFollowUpDatumRepetition)
       }
     }
     return this._location.sectionFollowUpDatumId
@@ -88,6 +80,26 @@ export default class InterviewNavigator extends Emitter {
   set sectionFollowUpDatumRepetition (val) {
     this._location.sectionFollowUpRepetition = val
     this._location.sectionFollowUpDatumId = null
+  }
+
+  /**
+   * Look up a datum id using the questionId and the sectionFollowUpRepetition. This is designed to break since we
+   * shouldn't be trying to access datum outside of valid repetitions
+   * @param {String} questionId - The question id we're looking at
+   * @param {Number} followUpRepetition - The repetition we want to find data for
+   * @returns {String} - The datum id for this repetition
+   * @throws An error if there is no datum present that matches the followUpRepetition
+   */
+  getFollowUpQuestionDatumIdByFollowUpRepetition (questionId, followUpRepetition) {
+    let data = this.interview.getFollowUpQuestionDatumData(questionId)
+    if (data && data.length) {
+      let datum = data.find(d => d.event_order === followUpRepetition)
+      if (!datum) {
+        throw Error('No datum present with that event order')
+      }
+      return datum.id
+    }
+    return null
   }
   updateMax () {
     let max = this.getMax(this.clock.time[3], this.clock.time[0], this.clock.time[1], this.clock.time[2])
@@ -282,20 +294,20 @@ export default class InterviewNavigator extends Emitter {
 
   next () {
     this.clock.increment()
-    if (this.clock.isAtMax) {
-      this.emit('end')
-      return
-    }
+    // if (this.clock.isAtMax) {
+    //   this.emit('end')
+    //   return
+    // }
     this.updateLocation()
     // console.log('navigator next location', JSON.stringify(this.location), 'max', JSON.stringify(this.clock.clockMax))
   }
 
   previous () {
     this.clock.decrement()
-    if (this.clock.isAtMin) {
-      this.emit('beginning')
-      return
-    }
+    // if (this.clock.isAtMin) {
+    //   this.emit('beginning')
+    //   return
+    // }
     this.updateLocation()
     // console.log('navigator prev location', JSON.stringify(this.location), 'max', JSON.stringify(this.clock.clockMax))
   }

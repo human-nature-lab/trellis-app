@@ -51,7 +51,6 @@ export default class DataStore extends Emitter {
       d.data = []
       questionDatum.push(d)
     }
-    debugger
     QuestionDatumRecycler.fill(questionDatum)
     DatumRecycler.fill(datum)
     this.emit('initialState', this.data)
@@ -120,15 +119,19 @@ export default class DataStore extends Emitter {
 
   /**
    * Get a single questionDatum by its location within the survey
-   * @param questionId
-   * @param section
-   * @param page
-   * @param sectionRepetition
-   * @param sectionFollowUpRepetition
+   * @param {String} questionId
+   * @param {Number} section
+   * @param {Number} page
+   * @param {Number} sectionRepetition
+   * @param {String} sectionFollowUpDatumId
    * @returns {Object | undefined}
    */
-  getSingleQuestionDatumByLocation (questionId, section, page, sectionRepetition, sectionFollowUpRepetition) {
-    return this.data.find(qD => qD.question_id === questionId && this._locationMatchesQuestionDatum(qD, section, page, sectionRepetition, sectionFollowUpRepetition))
+  getSingleQuestionDatumByLocation (questionId, section, page, sectionRepetition, sectionFollowUpDatumId) {
+    return this.data.find(qD => qD.question_id === questionId &&
+      qD.section === section &&
+      qD.page === page &&
+      qD.section_repetition === sectionRepetition &&
+      qD.follow_up_datum_id === sectionFollowUpDatumId)
   }
 
   getQuestionDataByQuestionId (questionId) {
@@ -141,15 +144,15 @@ export default class DataStore extends Emitter {
    * @param section
    * @param page
    * @param sectionRepetition
-   * @param sectionFollowUpRepetition
+   * @param sectionFollowUpDatumId
    * @returns {boolean}
    * @private
    */
-  _locationMatchesQuestionDatum (questionDatum, section, page, sectionRepetition, sectionFollowUpRepetition) {
+  _locationMatchesQuestionDatum (questionDatum, section, page, sectionRepetition, sectionFollowUpDatumId) {
     return questionDatum.section === section &&
       questionDatum.page === page &&
       questionDatum.section_repetition === sectionRepetition &&
-      questionDatum.section_follow_up_repetition === sectionFollowUpRepetition
+      questionDatum.follow_up_datum_id === sectionFollowUpDatumId
   }
 
   /**
@@ -196,8 +199,8 @@ export default class DataStore extends Emitter {
     })
   }
 
-  locationHasQuestionDatum (questionId, section, page, sectionRepetition, sectionFollowUpDatumRepetition) {
-    return this.data.findIndex(qD => this._locationMatchesQuestionDatum(qD, section, page, sectionRepetition, sectionFollowUpDatumRepetition) && qD.question_id === questionId) !== -1
+  locationHasQuestionDatum (questionId, section, page, sectionRepetition, sectionFollowUpDatumId) {
+    return this.data.findIndex(qD => this._locationMatchesQuestionDatum(qD, section, page, sectionRepetition, sectionFollowUpDatumId) && qD.question_id === questionId) !== -1
   }
 
   /**

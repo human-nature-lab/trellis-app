@@ -4,6 +4,7 @@
           :location="location"
           :actions="interviewActions"
           :data="interviewData"
+          :isAtEnd="isAtEnd"
           :conditionTags="interviewConditionTags"
           :interview="interview"/>
     <v-dialog
@@ -257,6 +258,13 @@
       }
     },
     computed: {
+      isAtEnd: function () {
+        // We do this just to have the dependency on this.location
+        if (this.location.section > 0) {
+          return interviewState.navigator.isAtEnd
+        }
+        return false
+      },
       questions: function () {
         // The reference to this.location needs to be here so that we have a dependency on this.location
         let questions = interviewState.getPageQuestions(

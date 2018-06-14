@@ -134,7 +134,9 @@ export default class Interview extends Emitter {
       let questionDatum = null
       let questionBlueprint = null
       if (action.question_id) {
-        questionDatum = this.data.getSingleQuestionDatumByLocation(action.question_id, action.section, action.page, action.section_repetition, action.section_follow_up_repetition)
+        let followUpQuestionId = this._getSection(action.section).followUpQuestionId
+        let actionFollowUpDatumId = this.navigator.getFollowUpQuestionDatumIdByFollowUpRepetition(followUpQuestionId, action.section_follow_up_repetition)
+        questionDatum = this.data.getSingleQuestionDatumByLocation(action.question_id, action.section, action.page, action.section_repetition, actionFollowUpDatumId)
         questionBlueprint = this._findQuestionBlueprint(action.question_id)
       } else if (action.action_type !== 'next' && action.action_type !== 'previous') {
         console.error(action)
@@ -413,11 +415,8 @@ export default class Interview extends Emitter {
    */
   makePageQuestionDatum () {
     let currentPage = this.currentPage()
-    if (this.location.sectionFollowUpDatumRepetition > 0) {
-      // debugger
-    }
     for (let questionBlueprint of currentPage.questions) {
-      if (!this.data.locationHasQuestionDatum(questionBlueprint.id, this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumRepetition)) {
+      if (!this.data.locationHasQuestionDatum(questionBlueprint.id, this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)) {
         this._makeQuestionDatum(questionBlueprint)
       }
     }
@@ -482,7 +481,7 @@ export default class Interview extends Emitter {
     this._onPageEnter()
 
     // Skip any question that's in a follow up section with no data to follow up on
-    if (this.currentSection().followUpQuestionId && this.navigator.clock.clockMax[2] <= 0) {
+    if (this.currentSection().followUpQuestionId && this.navigator.clock.clockMax[2] < 0) {
       console.log('skipping question in empty follow up section', JSON.stringify(this.location))
       return this.next()
     }
@@ -509,7 +508,7 @@ export default class Interview extends Emitter {
     this._onPageEnter()
 
     // Skip any question that's in a follow up section with no data to follow up on
-    if (this.currentSection().followUpQuestionId && this.navigator.clock.clockMax[2] <= 0) {
+    if (this.currentSection().followUpQuestionId && this.navigator.clock.clockMax[2] < 0) {
       console.log('skipping question in empty follow up section', JSON.stringify(this.location))
       return this.previous()
     }

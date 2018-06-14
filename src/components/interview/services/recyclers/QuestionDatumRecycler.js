@@ -9,7 +9,7 @@ class QuestionDatumRecycler extends Recycler {
    */
   keyExtractor (qd) {
     // The unique key of a single question datum
-    return keyNames.map(key => qd[key]).join('-')
+    return keyNames.map(key => qd[key] === null ? 'null' : qd[key]).join('-')
   }
 
   /**
@@ -34,4 +34,6 @@ class QuestionDatumRecycler extends Recycler {
   }
 }
 
-export default new QuestionDatumRecycler()
+let qdr = new QuestionDatumRecycler()
+window.qdr = qdr
+export default qdr
