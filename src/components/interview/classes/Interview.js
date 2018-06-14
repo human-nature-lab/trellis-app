@@ -4,6 +4,7 @@ import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
 import ConditionTagStore from './ConditionTagStore'
+import RespondentFillStore from './RespondentFillStore'
 import dataPersistSlave from '../services/DataPersistSlave'
 import actionsPersistSlave from '../services/ActionsPersistSlave'
 import Emitter from '@/classes/Emitter'
@@ -15,33 +16,42 @@ import SectionConditionTagRecycler from '../services/recyclers/SectionConditionT
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 
 export default class Interview extends Emitter {
-  constructor (interview, blueprint, actions, data, conditionTags) {
+  constructor (interview, blueprint, actions, data, conditionTags, respondentFills) {
     super()
     this.interview = interview
     this.blueprint = blueprint
     this.data = new DataStore()
     this.actions = new ActionStore()
 
+    this.respondentFills = new RespondentFillStore()
     this.conditionAssigner = new ConditionAssignmentService()
     this.varNameMap = new Map()
     this.questionMap = new Map()
+
+    // Initializing all the custom data types
     this.load(blueprint)
     if (actions) this.actions.load(actions)
     if (data) this.data.loadData(data)
     if (conditionTags) this.data.loadConditionTags(conditionTags)
+    if (respondentFills) this.respondentFills.fill(respondentFills)
+
     this.navigator = new InterviewNavigator(this)
-    // this.navigator.on('end', this.atEnd, this)
-    // this.navigator.on('beginning', this.atBeginning, this)
     this._initializeConditionAssignment()
-    this.makePageQuestionDatum()
   }
 
   attachDataPersistSlave () {
-    this._dataPersistSlave = dataPersistSlave(this.data)
+    this._dataPersistSlave = dataPersistSlave(this.interview.id, this.data)
   }
 
   attachActionsPersistSlave () {
     this._actionsPersistSlave = actionsPersistSlave(this.interview.id, this.actions)
+  }
+
+  /**
+   * Run anything that needs to wait until other stuff is initialized before being run
+   */
+  initalize () {
+    this.makePageQuestionDatum()
   }
 
   /**
@@ -294,7 +304,7 @@ export default class Interview extends Emitter {
    * @private
    */
   _getCurrentPageData () {
-    return this.data.getAllQuestionDatumByLocation(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumRepetition)
+    return this.data.getAllQuestionDatumByLocation(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
   }
 
   /**
@@ -652,6 +662,21 @@ export default class Interview extends Emitter {
     return qDatum ? qDatum[0] : null
   }
 
+  /**
+   * Returns the value for a respondent fill with the specified varName
+   * @param {String} varName
+   * @returns {String|null}
+   */
+  getRespondentFillByVarName (varName) {
+    return this.respondentFills.get(varName)
+  }
+
+  /**
+   * Get a question datum by the question var name. There should only be one per question per repetition
+   * @param {String} varName
+   * @param {Number} sectionFollowUpRepetition
+   * @returns {Object}
+   */
   getSingleDatumByQuestionVarName (varName, sectionFollowUpRepetition) {
     let questionId = this.varNameMap.get(varName)
     if (!questionId) {
@@ -704,7 +729,7 @@ export default class Interview extends Emitter {
    * Get an array of the questions for the current page. This function handles merging existing datum with
    * the question blueprint and dereferences everything
    */
-  getPageQuestions () {
+  getPageQuestions (section, sectionRepetition, sectionFollowUpRepetition, page) {
     let questionDefinitions = this.currentPage().questions
     let questionData = this._getCurrentPageData()
     // Copy and assign existing datum to each question

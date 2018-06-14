@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  // import conditionTagStore from './models/ConditionTagStore'
+  import conditionTagStore from './classes/ConditionTagStore'
   const conditionKeys = ['respondent', 'survey', 'section']
   export default {
     name: 'condition-tag-list',
@@ -43,10 +43,11 @@
         let conditions = []
         for (let type of ['survey', 'respondent', 'section']) {
           for (let condition of this.conditions[type]) {
-            // debugger
-            // condition.name = conditionTagStore.getNameFromId(condition.id)
-            condition.type = type
-            conditions.push(condition)
+            debugger
+            let c = JSON.parse(JSON.stringify(condition))
+            c.name = conditionTagStore.getNameFromId(c.id)
+            c.type = type
+            conditions.push(c)
           }
         }
         return conditions

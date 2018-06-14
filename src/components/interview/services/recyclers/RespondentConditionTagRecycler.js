@@ -20,7 +20,7 @@ class RespondentConditionTagRecycler extends Recycler {
   objectCreator (interview, act) {
     return {
       id: uuidv4(),
-      respondent_id: interview.respondent_id,
+      respondent_id: interview.survey.respondent_id,
       condition_id: act.condition.id,
       created_at: (new Date()).getTime(),
       updated_at: (new Date()).getTime()
