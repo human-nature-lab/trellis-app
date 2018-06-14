@@ -43,7 +43,7 @@
             <v-btn @click="onNext"
                    :disabled="!isNavigationEnabled"
                    justify-right>
-              Next <v-icon right>chevron_right</v-icon>
+              {{isAtEnd ? 'Finish' : 'Next'}} <v-icon right>chevron_right</v-icon>
             </v-btn>
           </v-layout>
       </v-flex>
@@ -82,6 +82,10 @@
       location: {
         type: Object,
         required: true
+      },
+      isAtEnd: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
