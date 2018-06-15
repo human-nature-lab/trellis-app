@@ -32,17 +32,20 @@ class SyncService {
       })
   }
   getLatestSnapshot (source) {
-    const deviceId = DeviceService.getUUID()
-    let options = {}
-    if (source) { options.cancelToken = source.token }
-    return http.get(`device/${deviceId}/syncv2/snapshot`, options)
-      .then(response => {
-        return response.data
-      })
-      .catch(err => {
-        console.error(err)
-        throw err
-      })
+    return new Promise((resolve, reject) => {
+      DeviceService.getUUID()
+        .then((deviceId) => {
+          let options = {}
+          if (source) { options.cancelToken = source.token }
+          http.get(`device/${deviceId}/syncv2/snapshot`, options)
+            .then(response => {
+              resolve(response.data)
+            })
+            .catch((error) => {
+              reject(error)
+            })
+        })
+    })
   }
   getSnapshotFileSize (source, snapshotId) {
     let options = {}
