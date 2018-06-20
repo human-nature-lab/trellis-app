@@ -161,8 +161,9 @@ export default class Clock extends Emitter {
         done = true
       }
       c++
-      if (c > 1000) {
-        debugger
+      if (c > 5000) {
+        console.error('exiting infinite loop in clock')
+        break
       }
     } while (!done)
     this.emit('increment', this.time, prevTime)
