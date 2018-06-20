@@ -43,7 +43,6 @@
         let conditions = []
         for (let type of ['survey', 'respondent', 'section']) {
           for (let condition of this.conditions[type]) {
-            debugger
             let c = JSON.parse(JSON.stringify(condition))
             c.name = conditionTagStore.getNameFromId(c.id)
             c.type = type
