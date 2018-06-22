@@ -34,7 +34,7 @@ export const typeHandlers = {
   },
   'is_required': function (qd, pVal, pMap) {
     if (pVal) {
-      if (qd.data.length) {
+      if (qd.data && qd.data.length) {
         return true
       } else if (pMap.show_dk || pMap.show_rf) {
         return qd.dk_rf !== undefined && qd.dk_rf !== null && qd.dk_rf_val && qd.dk_rf_val.length

@@ -13,7 +13,6 @@
   import EdgeService from '@/services/edge/EdgeService'
   import RosterService from '@/services/roster/RosterService'
 
-  let oldText = ''
   export default {
     name: 'interpolated-text',
     props: {
@@ -34,13 +33,11 @@
         interpolatedText_: null
       }
     },
-    updated: function () {
-      if (this.text !== oldText) {
-        this.loadInterpolatedValues()
-      }
-    },
     created: function () {
       this.loadInterpolatedValues()
+      this.$watch('location', this.locationUpdated, {
+        deep: true
+      })
     },
     computed: {
       interpolatedText: function () {
@@ -57,6 +54,10 @@
       }
     },
     methods: {
+      locationUpdated: function () {
+        console.log('location updated')
+        this.loadInterpolatedValues()
+      },
       getInterpolationPromises: function (varNames) {
         let interview = sharedInterview() // TODO: This is a stupid way to do this. Why isn't this just a singleton?
         let promises = []
@@ -65,14 +66,14 @@
             promises.push(new Promise(resolve => {
               return resolve({
                 key: varName,
-                name: varName
+                name: '[PLEASE CHANGE FILL TEXT TO VAR_NAME OF FOLLOW UP QUESTION]'
               })
             }))
             return
           }
           try {
             let questionDatum = interview.getSingleDatumByQuestionVarName(varName, this.location.sectionFollowUpDatumRepetition)
-            let question = interview.questionMap.get(questionDatum.question_id)
+            let question = interview.questionIndex.get(questionDatum.question_id)
             // let datum = this.sectionFollowUpRepetition ? questionDatum.data.find(d => d.id === this.location) : questionDatum.data[0]
             let datum = questionDatum.data.find(d => d.event_order === this.location.sectionFollowUpDatumRepetition)
             console.log('datumId:', datum.id)
@@ -120,7 +121,6 @@
         return promises
       },
       loadInterpolatedValues: function () {
-        oldText = this.text
         this.interpolatedText_ = null
         let varNames = StringInterpolationService.getInterpolationKeys(this.text)
         if (!varNames.length) {
