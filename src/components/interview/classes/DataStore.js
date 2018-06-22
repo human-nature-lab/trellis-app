@@ -9,6 +9,7 @@ import ConditionTagStore from './/ConditionTagStore'
 export default class DataStore extends Emitter {
   constructor (throttleRate = 10000) {
     super()
+    this.baseRespondentConditionTags = []
     this.reset()
     DatumRecycler.clear()
     QuestionDatumRecycler.clear()
@@ -24,11 +25,11 @@ export default class DataStore extends Emitter {
     this.data = []
     this.conditionTags = {
       section: [],
-      respondent: [],
+      respondent: this.baseRespondentConditionTags, // Used to prevent removal of existing respondent condition tags
       survey: []
     }
     this.questionDatumIdMap = new Map()
-    this.questionDatumQuestionIdMap = new Map()
+    this.questionDatumQuestionIdIndex = new Map()
   }
 
   /**
@@ -40,8 +41,6 @@ export default class DataStore extends Emitter {
     let datum = []
     let questionDatum = []
     for (let d of data) {
-      d.section = parseInt(d.section, 10)
-      d.page = parseInt(d.page, 10)
       d.section_repetition = parseInt(d.section_repetition, 10)
       for (let dat of d.data) {
         datum.push(dat)
@@ -61,6 +60,7 @@ export default class DataStore extends Emitter {
    * @param {Object} tags - has respondent, survey and section arrays
    */
   loadConditionTags (tags) {
+    this.baseRespondentConditionTags = tags.respondent
     for (let type of ['respondent', 'survey', 'section']) {
       if (this.conditionTags[type] && tags[type]) {
         this.conditionTags[type] = this.conditionTags[type].concat(tags[type])
@@ -91,10 +91,10 @@ export default class DataStore extends Emitter {
   add (questionDatum, shouldPersist = false) {
     this.data.push(questionDatum)
     this.questionDatumIdMap.set(questionDatum.id, questionDatum)
-    let questionIdIndex = this.questionDatumQuestionIdMap.get(questionDatum.question_id)
+    let questionIdIndex = this.questionDatumQuestionIdIndex.get(questionDatum.question_id)
     if (!questionIdIndex) {
       questionIdIndex = [questionDatum]
-      this.questionDatumQuestionIdMap.set(questionDatum.question_id, questionIdIndex)
+      this.questionDatumQuestionIdIndex.set(questionDatum.question_id, questionIdIndex)
     } else {
       questionIdIndex.push(questionDatum)
     }
@@ -120,38 +120,30 @@ export default class DataStore extends Emitter {
   /**
    * Get a single questionDatum by its location within the survey
    * @param {String} questionId
-   * @param {Number} section
-   * @param {Number} page
    * @param {Number} sectionRepetition
    * @param {String} sectionFollowUpDatumId
    * @returns {Object | undefined}
    */
-  getSingleQuestionDatumByLocation (questionId, section, page, sectionRepetition, sectionFollowUpDatumId) {
-    return this.data.find(qD => qD.question_id === questionId &&
-      qD.section === section &&
-      qD.page === page &&
+  getSingleQuestionDatumByLocation (questionId, sectionRepetition, sectionFollowUpDatumId) {
+    return this.questionDatumQuestionIdIndex.get(questionId).find(qD =>
       qD.section_repetition === sectionRepetition &&
       qD.follow_up_datum_id === sectionFollowUpDatumId)
   }
 
   getQuestionDataByQuestionId (questionId) {
-    return this.questionDatumQuestionIdMap.get(questionId)
+    return this.questionDatumQuestionIdIndex.get(questionId)
   }
 
   /**
    * Comparison function for code reuse
    * @param questionDatum
-   * @param section
-   * @param page
    * @param sectionRepetition
    * @param sectionFollowUpDatumId
    * @returns {boolean}
    * @private
    */
-  _locationMatchesQuestionDatum (questionDatum, section, page, sectionRepetition, sectionFollowUpDatumId) {
-    return questionDatum.section === section &&
-      questionDatum.page === page &&
-      questionDatum.section_repetition === sectionRepetition &&
+  _locationMatchesQuestionDatum (questionDatum, sectionRepetition, sectionFollowUpDatumId) {
+    return questionDatum.section_repetition === sectionRepetition &&
       questionDatum.follow_up_datum_id === sectionFollowUpDatumId
   }
 
@@ -199,8 +191,30 @@ export default class DataStore extends Emitter {
     })
   }
 
-  locationHasQuestionDatum (questionId, section, page, sectionRepetition, sectionFollowUpDatumId) {
-    return this.data.findIndex(qD => this._locationMatchesQuestionDatum(qD, section, page, sectionRepetition, sectionFollowUpDatumId) && qD.question_id === questionId) !== -1
+  /**
+   * Get all of the data for thse
+   * @param {Array} questionIds
+   * @param {Number} sectionRepetition
+   * @param {String} sectionFollowUpDatumId
+   * @returns {Array}
+   */
+  getQuestionDataByIds (questionIds, sectionRepetition, sectionFollowUpDatumId) {
+    let data = []
+    for (let id of questionIds) {
+      if (this.questionDatumQuestionIdIndex.has(id)) {
+        let qd = this.questionDatumQuestionIdIndex.get(id).find(qd => {
+          return qd.section_repetition === sectionRepetition && qd.follow_up_datum_id === sectionFollowUpDatumId
+        })
+        if (qd) {
+          data.push(qd)
+        }
+      }
+    }
+    return data
+  }
+
+  locationHasQuestionDatum (questionId, sectionRepetition, sectionFollowUpDatumId) {
+    return this.data.findIndex(qD => this._locationMatchesQuestionDatum(qD, sectionRepetition, sectionFollowUpDatumId) && qD.question_id === questionId) !== -1
   }
 
   /**

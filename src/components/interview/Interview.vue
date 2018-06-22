@@ -270,7 +270,7 @@
         let questions = interviewState.getPageQuestions(
             this.location.section,
             this.location.sectionRepetition,
-            this.location.sectionFollowUpDatumRepetition,
+            this.location.sectionFollowUpDatumId,
             this.location.page
           ).map(q => {
             q.type = {
