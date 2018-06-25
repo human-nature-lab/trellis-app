@@ -36,8 +36,8 @@ export default class InterviewLoader {
         }
       }
       res.respondentFills = res.respondentFills || []
-      res.conditionTags = res.data.conditionTags || {}
-      res.data = res.data.data || []
+      res.conditionTags = res.data && res.data.conditionTags || {}
+      res.data = res.data && res.data.data || []
       res.interview = res.interview || {
         id: 'Preview ID',
         survey: {
@@ -57,16 +57,11 @@ export default class InterviewLoader {
    * @returns {Promise<Object>}
    */
   static loadPreview (formId, progressCb) {
-    let promises = []
-    let results = {}
-    promises.push(FormService.getForm(formId).then(form => {
+    return FormService.getForm(formId).then(form => {
       progressCb(1)
-      results.form = form
-      return form
-    }))
-
-    return Promise.all(promises).then(all => {
-      return results
+      return {
+        form
+      }
     })
   }
 
