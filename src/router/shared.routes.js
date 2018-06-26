@@ -3,7 +3,6 @@ import RespondentForms from '../components/RespondentForms'
 import RespondentsSearch from '../components/RespondentsSearch'
 import CameraTest from '../components/CameraTest'
 import LocaleSelectorPage from '../components/LocaleSelectorPage'
-import QuestionExamples from '../components/interview/QuestionExamples'
 import chainableGuards from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
 import ValidateLocale from './guards/ValidateLocale'
@@ -23,10 +22,6 @@ export default [{
   name: 'RespondentsSearch',
   component: RespondentsSearch,
   beforeEnter: chainableGuards(ValidateStudy, ValidateLocale)
-}, {
-  path: '/question/examples',
-  name: 'QuestionExamples',
-  component: QuestionExamples
 }, {
   path: '/locale',
   name: 'locale',

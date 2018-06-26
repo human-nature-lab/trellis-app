@@ -4,10 +4,11 @@
           :location="location"
           :actions="interviewActions"
           :data="interviewData"
+          :isAtEnd="isAtEnd"
           :conditionTags="interviewConditionTags"
           :interview="interview"/>
     <v-dialog
-      v-model="beginningDialog">
+      v-model="dialog.beginning">
       <v-card>
         <v-card-title class="headline">
           You've reached the beginning of the survey
@@ -19,7 +20,7 @@
           <v-btn
             flat
             color="error"
-            @click="beginningDialog = false">Cancel</v-btn>
+            @click="dialog.beginning = false">Cancel</v-btn>
           <v-spacer />
           <v-btn
             flat
@@ -29,7 +30,7 @@
       </v-card>
     </v-dialog>
     <v-dialog
-      v-model="endDialog">
+      v-model="dialog.end">
       <v-card>
         <v-card-title class="headline">
           You've reached the end of the survey
@@ -41,7 +42,7 @@
           <v-btn
             flat
             color="error"
-            @click="endDialog = false">Cancel</v-btn>
+            @click="dialog.end = false">Cancel</v-btn>
           <v-spacer />
           <v-btn
             flat
@@ -50,139 +51,86 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+      content-class="condition-tag-dialog"
+      transition="dialog-bottom-transition"
+      scrollable
+      full-width
+      lazy
+      v-model="dialog.conditionTag">
+      <v-card tile>
+        <v-toolbar
+          card
+          dark
+          color="primary">
+          <v-btn icon dark @click.native="dialog.conditionTag = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Conditions</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
+          <ConditionTagList :conditions="interviewConditionTags" />
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-flex>
 </template>
 
 <script>
   import Page from './Page'
+  import ConditionTagList from './ConditionTagList'
+  import menuBus from '../main-menu/MenuBus'
 
-  import {sharedInterview, clearSharedInterview} from './models/Interview'
+  import {sharedInterview, clearSharedInterview} from './classes/Interview'
+
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/ActionBus'
+  import {validateParametersWithError} from './services/ValidatorService'
 
-  import InterviewActionsService from './services/interview-actions/InterviewActionsService'
-  import FormService from '../../services/form/FormService'
-  import LocaleService from '../../services/locale/LocaleService'
   import router from '../../router/router'
-
   import singleton from '../../singleton'
+  import InterviewLoader from './services/InterviewLoader'
 
   let interviewData = {}
 
-  function loadInterview (interviewId) {
-    let interview
-    singleton.loading.message = 'Loading interview and survey'
-    return InterviewService.getInterview(interviewId)
-      .catch(err => {
-        console.error('No interview exists with this id')
-        throw err
-      })
-      .then(inter => {
-        interview = inter
-        singleton.loading.step++
-        singleton.loading.message = 'Loading existing data and stuff'
-        return Promise.all([
-          InterviewActionsService.getActions(interviewId).then(r => {
-            singleton.loading.step++
-            return r
-          }).catch(() => {
-            // throw new Error('Could not contact interview actions service: ' + err)
-          }),
-          InterviewService.getData(interviewId).then(r => {
-            singleton.loading.step++
-            return r
-          }).catch(() => {
-            // throw new Error('Could not contact interview data service: ' + err)
-          }),
-          FormService.getForm(interview.survey.form_id).then(r => {
-            singleton.loading.step++
-            return r
-          }),
-          InterviewService.getPreload(interviewId).then(r => {
-            singleton.loading.step++
-            return r
-          }).catch(() => {
-            // throw new Error('Could not contact preload data service: ' + err)
-          })
-        ]).then(results => {
-          let [actions, data, formBlueprint, preload] = results
-          for (let d of data) {
-            for (let datum of d.data) {
-              for (let key in datum) {
-                if (datum[key] === null || datum[key] === undefined) {
-                  delete datum[key]
-                }
-              }
-            }
-          }
-          interviewData.interview = interview
-          interviewData.actions = [] || actions
-          interviewData.data = [] || data
-          interviewData.form = formBlueprint
-          interviewData.preload = preload
-        }).catch(() => {
-          // debugger
-          // throw err
-        })
-      })
-  }
-
-  function loadPreview (formId) {
-    let promises = [
-      FormService.getForm(formId).then(form => {
-        interviewData.form = form
-        singleton.loading.step++
-      })
-    ]
-    return Promise.all(promises)
-  }
-
   function interviewGuards (to, from, next) {
+    let messages = ['Loading form structure', 'Loading all interview data']
     singleton.loading.active = true
+    singleton.loading.message = messages[0]
     singleton.loading.step = 0
-    singleton.loading.steps = 0
-    singleton.loading.indeterminate = false
-    LocaleService.setExistingLocale()
-    let p
-    if (to.name === 'Interview') {
-      interviewData.interviewType = 'interview'
-      p = loadInterview(to.params.interviewId)
-      singleton.loading.steps += 4
-    } else {
-      interviewData.interviewType = 'preview'
-      p = loadPreview(to.params.formId)
-      singleton.loading.steps++
-    }
-    if (to.query.locale) {
-      singleton.loading.steps++
-      p.then(() => {
-        singleton.loading.message = 'Loading current locale'
-        return LocaleService.getLocaleById(to.query.locale)
-          .then(locale => {
-            singleton.loading.step++
-            LocaleService.setCurrentLocale(locale)
-          })
-          .catch(err => {
-            console.error('no locale matching', to.query.locale, 'in the database')
-            console.error(err)
-          })
-      })
-    }
-    return p.then(() => {
+    singleton.loading.steps = 6
+    InterviewLoader.load(to, function (progress) {
+      singleton.loading.message = messages[1]
       singleton.loading.step++
+    }).catch(err => {
+      console.error(err)
+    }).then(results => {
+      interviewData = results
       singleton.loading.active = false
     }).then(next)
   }
 
   let interviewState
   export default {
+    name: 'interview',
+    head: {
+      title: function () {
+        let d = {}
+        if (this.type === 'preview') {
+          d.inner = 'Form preview: ' + interviewState.blueprint.id
+        } else if (this.interview.survey) {
+          d.inner = `Interview with ${this.interview.survey.respondent.name}`
+        }
+        return d
+      }
+    },
     data () {
       return {
         artificiallyExtendLoadTime: false,
         formId: null,
         surveyId: null,
-        clipped: false,
         isLoading: true,
+        type: 'interview',
         interviewData: {},
         interviewActions: {},
         interviewConditionTags: {},
@@ -194,15 +142,25 @@
           sectionFollowUpDatumRepetition: null,
           sectionFollowUpDatumId: null
         },
-        beginningDialog: false,
-        endDialog: false,
+        dialog: {
+          beginning: false,
+          end: false,
+          conditionTag: false
+        },
         loadingStep: 0
       }
     },
     created () {
       this.loadInterview()
       actionBus.$on('action', this.actionHandler)
+      menuBus.$on('showConditionTags', this.showConditionTags)
       window.onbeforeunload = this.prematureExit
+    },
+    beforeDestroy: function () {
+      window.onbeforeunload = null
+      menuBus.$off('showConditionTags', this.showConditionTags)
+      actionBus.$off('action', this.actionHandler)
+      interviewState.destroy()
     },
     beforeRouteEnter (to, from, next) {
       console.log('before route enter', to)
@@ -236,38 +194,21 @@
         next()
       }
     },
-    beforeDestroy: function () {
-      window.onbeforeunload = null
-      interviewState.destroy()
-    },
     methods: {
       loadInterview: function () {
         this.isLoading = false
-        let conditionTags = interviewData.conditionTags
-        let interview = interviewData.interview
-        let actions = interviewData.actions
-        let form = interviewData.form
-        let data = interviewData.data
-        let preload = []
-        if (!interview) {
-          interview = {
-            id: 'fake id',
-            survey: {
-              respondent_id: 'ok'
-            }
-          }
-        } else {
-          InterviewService.setInterviewId(interview.id)
-        }
-        this.initializeInterview(interview, actions, data, conditionTags, form, preload)
+        this.type = interviewData.interviewType
+        let d = interviewData
+        this.initializeInterview(d.interview, d.actions, d.data, d.conditionTags, d.form, d.respondentFills)
       },
-      initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, preload) {
+      initializeInterview: function (interview, actions, data, conditionTags, formBlueprint) {
         clearSharedInterview()
         interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags)
-        if (interviewData.interviewType === 'interview') {
+        if (this.type === 'interview') {
           interviewState.attachDataPersistSlave()
           interviewState.attachActionsPersistSlave()
         }
+        interviewState.initalize()
         // Share the relevant parts of the interview with the view
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
@@ -287,23 +228,28 @@
         interviewState.pushAction(action)
       },
       showBeginningDialog: function () {
-        this.beginningDialog = true
+        this.dialog.beginning = true
       },
       showEndDialog: function () {
-        this.endDialog = true
+        this.dialog.end = true
+      },
+      showConditionTags: function () {
+        this.dialog.conditionTag = true
       },
       lockAndExit: function () {
         console.log('TODO: Make sure everything is saved before marking the survey complete and exiting')
         console.log('TODO: Lock and exit the survey')
         InterviewService.complete(this.interview.id).then(res => {
-          this.endDialog = false
-          router.push({name: 'home'})
+          this.dialog.end = false
+          router.go(-1)
+          // router.push({name: 'home'})
         })
       },
       saveAndExit: function () {
         console.log('TODO: Make sure everything is saved before exiting')
-        this.endDialog = false
-        router.push({name: 'home'})
+        this.dialog.end = false
+        router.go(-1)
+        // router.push({name: 'home'})
       },
       prematureExit: function (e) {
         const dialogText = 'You have unsaved changes. Are you sure you want to leave?'
@@ -312,37 +258,48 @@
       }
     },
     computed: {
+      isAtEnd: function () {
+        // We do this just to have the dependency on this.location
+        if (this.location.section > 0) {
+          return interviewState.navigator.isAtEnd
+        }
+        return false
+      },
       questions: function () {
         // The reference to this.location needs to be here so that we have a dependency on this.location
-        let questions = interviewState.getPageQuestions(this.location.sectionFollowUpDatumId).map(q => {
-          q.type = {
-            name: q.question_type.name
-          }
-          return q
-        })
+        let questions = interviewState.getPageQuestions(
+            this.location.section,
+            this.location.sectionRepetition,
+            this.location.sectionFollowUpDatumId,
+            this.location.page
+          ).map(q => {
+            q.type = {
+              name: q.question_type.name
+            }
+            let validation = validateParametersWithError(q, q.question_parameters, q.datum)
+            q.allParametersSatisfied = validation === true // Makes non-boolean types falsey
+            q.validationError = typeof validation === 'string' ? validation : null
+            q.isAnswered = false
+            return q
+          })
         return questions || []
-      },
-      loadingMessage: function () {
-        switch (this.loadingStep) {
-          case 1:
-            return 'Loading existing actions, data and form definition'
-          case 2:
-            return 'Loading existing actions and data'
-          case 3:
-            return 'Loading existing actions'
-          case 4:
-            return 'Building survey'
-          default:
-            return 'Loading interview'
-        }
       }
     },
     components: {
-      Page
+      Page,
+      ConditionTagList
     }
   }
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  .condition-tag-dialog
+    max-height: 80%
+    min-height: 50%
+    position: absolute
+    bottom: 0
+    left: 0
+    padding: 0
+    margin: 0
+    background-color: white
 </style>

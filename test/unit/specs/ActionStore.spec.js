@@ -1,4 +1,4 @@
-import ActionStore from '../../../src/components/interview/models/ActionStore'
+import ActionStore from '../../../src/components/interview/classes/ActionStore'
 import InterviewActionsService from '../../../src/components/interview/services/interview-actions/InterviewActionsMock'
 describe('ActionStore.spec', () => {
   beforeEach(() => {

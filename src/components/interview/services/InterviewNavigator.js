@@ -1,4 +1,5 @@
 import Emitter from '../../../classes/Emitter'
+import Clock from '../../../classes/Clock'
 export default class InterviewNavigator extends Emitter {
   constructor (interview) {
     super()
@@ -14,8 +15,24 @@ export default class InterviewNavigator extends Emitter {
     this.max = {}
     this.interview = interview
     this.blueprint = interview.blueprint
+    this.clock = new Clock([0, 0, 0, 0])
+    this.clock.on('beforeIndexChange', (index, direction) => {
+      if (index === 0) {
+        let max = this.getMax(this.clock.time[3], this.clock.time[0] + (direction === 'increment' ? 1 : 0), this.clock.time[1], this.clock.time[2])
+        console.log('updating max', direction, this.clock.time, 'from', this.clock.clockMax, 'to', max)
+        this.setMax(max)
+      }
+    })
     this.updateLocation()
     this.updateMax()
+  }
+
+  /**
+   * Destroy all listeners on this instance
+   */
+  destroy () {
+    this.destroyListeners()
+    this.clock.destroyListeners()
   }
   get section () {
     return this._location.section
@@ -39,15 +56,7 @@ export default class InterviewNavigator extends Emitter {
     if (!this._location.sectionFollowUpDatumId) {
       let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
       if (followUpQuestionId) {
-        // TODO: Handle follow up questions from repeatedSections and follow up sections
-        let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
-        if (data && data.length) {
-          let datum = data.find(d => d.event_order === this.sectionFollowUpDatumRepetition)
-          if (!datum) {
-            throw Error('No datum present with that event order')
-          }
-          this._location.sectionFollowUpDatumId = datum.id
-        }
+        this._location.sectionFollowUpDatumId = this.getFollowUpQuestionDatumIdByFollowUpRepetition(followUpQuestionId, this.sectionFollowUpDatumRepetition)
       }
     }
     return this._location.sectionFollowUpDatumId
@@ -72,11 +81,32 @@ export default class InterviewNavigator extends Emitter {
     this._location.sectionFollowUpRepetition = val
     this._location.sectionFollowUpDatumId = null
   }
+
+  /**
+   * Look up a datum id using the questionId and the sectionFollowUpRepetition. This is designed to break since we
+   * shouldn't be trying to access datum outside of valid repetitions
+   * @param {String} questionId - The question id we're looking at
+   * @param {Number} followUpRepetition - The repetition we want to find data for
+   * @returns {String} - The datum id for this repetition
+   * @throws An error if there is no datum present that matches the followUpRepetition
+   */
+  getFollowUpQuestionDatumIdByFollowUpRepetition (questionId, followUpRepetition) {
+    let data = this.interview.getFollowUpQuestionDatumData(questionId)
+    if (data && data.length) {
+      let datum = data.find(d => d.event_order === followUpRepetition)
+      if (!datum) {
+        throw Error('No datum present with that event order')
+      }
+      return datum.id
+    }
+    return null
+  }
   updateMax () {
-    let max = this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
+    let max = this.getMax(this.clock.time[3], this.clock.time[0], this.clock.time[1], this.clock.time[2])
     this.setMax(max)
   }
   setMax (max) {
+    this.clock.setMaximums(max)
     this.max.section = max[0]
     this.max.sectionRepetition = max[1]
     this.max.sectionFollowUpDatumRepetition = max[2]
@@ -88,6 +118,10 @@ export default class InterviewNavigator extends Emitter {
     this.page = this.max.page
   }
   updateLocation () {
+    this.section = this.clock.time[0]
+    this.sectionRepetition = this.clock.time[1]
+    this.sectionFollowUpDatumRepetition = this.clock.time[2]
+    this.page = this.clock.time[3]
     this.location.section = this.section
     this.location.sectionRepetition = this.sectionRepetition
     this.location.sectionFollowUpDatumId = this.sectionFollowUpDatumId
@@ -102,12 +136,11 @@ export default class InterviewNavigator extends Emitter {
   }
 
   get isAtEnd () {
-    let max = this.getCurrentMax()
-    return this.section === max[0] && this.sectionRepetition === max[1] && this.sectionFollowUpDatumRepetition === max[2] && this.page === max[3]
+    return this.clock.isAtMax
   }
 
   get isAtStart () {
-    return this.section === 0 && this.sectionRepetition === 0 && this.sectionFollowUpDatumRepetition === 0 && this.page === 0
+    return this.clock.isAtMin
   }
   getCurrentMax () {
     return this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
@@ -206,7 +239,6 @@ export default class InterviewNavigator extends Emitter {
       section--
       m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
       max = {
-        section: m[0],
         sectionRepetition: m[1],
         sectionFollowUpDatumRepetition: m[2],
         page: m[3]
@@ -229,7 +261,7 @@ export default class InterviewNavigator extends Emitter {
   /**
    * Move forward a step
    */
-  next () {
+  nextOld () {
     try {
       let next = this.getNext(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
       this.page = next.page
@@ -246,7 +278,7 @@ export default class InterviewNavigator extends Emitter {
   /**
    * Move back a step
    */
-  previous () {
+  previousOld () {
     try {
       let prev = this.getPrevious(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
       this.page = prev.page
@@ -258,5 +290,25 @@ export default class InterviewNavigator extends Emitter {
       this.emit('beginning')
     }
     this.updateLocation()
+  }
+
+  next () {
+    this.clock.increment()
+    // if (this.clock.isAtMax) {
+    //   this.emit('end')
+    //   return
+    // }
+    this.updateLocation()
+    // console.log('navigator next location', JSON.stringify(this.location), 'max', JSON.stringify(this.clock.clockMax))
+  }
+
+  previous () {
+    this.clock.decrement()
+    // if (this.clock.isAtMin) {
+    //   this.emit('beginning')
+    //   return
+    // }
+    this.updateLocation()
+    // console.log('navigator prev location', JSON.stringify(this.location), 'max', JSON.stringify(this.clock.clockMax))
   }
 }

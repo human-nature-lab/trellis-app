@@ -39,7 +39,7 @@ export default class Recycler {
   fill (items) {
     for (let item of items) {
       let key = this.keyExtractor(item)
-      this.cache.set(key, item)
+      this.set(key, item)
     }
   }
 
@@ -53,7 +53,7 @@ export default class Recycler {
     let obj = this.cache.get(key)
     if (!obj) {
       obj = this.objectCreator(...params)
-      this.cache.set(key, obj)
+      this.set(key, obj)
     }
     return JSON.parse(JSON.stringify(obj))
   }

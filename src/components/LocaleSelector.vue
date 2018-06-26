@@ -39,8 +39,11 @@
         this.isWorking = true
         StudyService.getCurrentStudy().then(study => {
           StudyService.setCurrentStudy(study)
-          return LocaleService.getCurrentStudyLocales()
-        }).then(locales => {
+          return study
+        })
+        .catch(() => {})
+        .then(study => LocaleService.getStudyLocales(study.id))
+        .then(locales => {
           if (!this.locale) {
             this.locale = locales.find(locale => locale.id === this.global.study.default_locale_id)
           }

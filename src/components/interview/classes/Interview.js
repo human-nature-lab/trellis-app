@@ -4,6 +4,7 @@ import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
 import ConditionTagStore from './ConditionTagStore'
+import RespondentFillStore from './RespondentFillStore'
 import dataPersistSlave from '../services/DataPersistSlave'
 import actionsPersistSlave from '../services/ActionsPersistSlave'
 import Emitter from '@/classes/Emitter'
@@ -15,33 +16,45 @@ import SectionConditionTagRecycler from '../services/recyclers/SectionConditionT
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 
 export default class Interview extends Emitter {
-  constructor (interview, blueprint, actions, data, conditionTags) {
+  constructor (interview, blueprint, actions, data, conditionTags, respondentFills) {
     super()
     this.interview = interview
     this.blueprint = blueprint
     this.data = new DataStore()
     this.actions = new ActionStore()
 
+    // Indexes and data stores
+    this.respondentFills = new RespondentFillStore()
     this.conditionAssigner = new ConditionAssignmentService()
-    this.varNameMap = new Map()
-    this.questionMap = new Map()
+    this.varNameIndex = new Map()
+    this.questionIndex = new Map()
+    this.questionIdToSectionIndex = new Map()
+    this.questionIdToPageIndex = new Map()
+
+    // Initializing all the custom data types
     this.load(blueprint)
     if (actions) this.actions.load(actions)
     if (data) this.data.loadData(data)
     if (conditionTags) this.data.loadConditionTags(conditionTags)
+    if (respondentFills) this.respondentFills.fill(respondentFills)
+
     this.navigator = new InterviewNavigator(this)
-    this.navigator.on('end', this.atEnd, this)
-    this.navigator.on('beginning', this.atBeginning, this)
     this._initializeConditionAssignment()
-    this.makePageQuestionDatum()
   }
 
   attachDataPersistSlave () {
-    this._dataPersistSlave = dataPersistSlave(this.data)
+    this._dataPersistSlave = dataPersistSlave(this.interview.id, this.data)
   }
 
   attachActionsPersistSlave () {
-    this._actionsPersistSlave = actionsPersistSlave(this.actions)
+    this._actionsPersistSlave = actionsPersistSlave(this.interview.id, this.actions)
+  }
+
+  /**
+   * Run anything that needs to wait until other stuff is initialized before being run
+   */
+  initalize () {
+    this.makePageQuestionDatum()
   }
 
   /**
@@ -49,8 +62,7 @@ export default class Interview extends Emitter {
    */
   destroy () {
     this._resetState()
-    this.navigator.off('end', this.atEnd, true)
-    this.navigator.off('beginning', this.atBeginning, true)
+    this.navigator.destroy()
     if (this._dataPersistSlave) {
       this._dataPersistSlave.destroy()
       this._dataPersistSlave = null
@@ -111,7 +123,7 @@ export default class Interview extends Emitter {
    * @param action
    */
   pushAction (action) {
-    action.survey_id = this.interview.survey_id
+    action.interview_id = this.interview.id
     this.actions.add(action, this.location)
     this.performAction(action)
   }
@@ -125,7 +137,9 @@ export default class Interview extends Emitter {
       let questionDatum = null
       let questionBlueprint = null
       if (action.question_id) {
-        questionDatum = this.data.getSingleQuestionDatumByLocation(action.question_id, action.section, action.page, action.section_repetition, action.section_follow_up_repetition)
+        let followUpQuestionId = this.questionIdToSectionIndex.get(action.question_id).followUpQuestionId
+        let actionFollowUpDatumId = this.navigator.getFollowUpQuestionDatumIdByFollowUpRepetition(followUpQuestionId, action.section_follow_up_repetition)
+        questionDatum = this.data.getSingleQuestionDatumByLocation(action.question_id, action.section_repetition, actionFollowUpDatumId)
         questionBlueprint = this._findQuestionBlueprint(action.question_id)
       } else if (action.action_type !== 'next' && action.action_type !== 'previous') {
         console.error(action)
@@ -145,8 +159,8 @@ export default class Interview extends Emitter {
   _loadBlueprint (blueprint) {
     this.blueprint = Object.assign({}, blueprint)
     ConditionTagStore.clear()
-    this.varNameMap.clear()
-    this.questionMap.clear()
+    this.varNameIndex.clear()
+    this.questionIndex.clear()
     // Sort all levels
     this.blueprint.sections.sort((sectionA, sectionB) => {
       return sectionA.form_sections[0].sort_order - sectionB.form_sections[0].sort_order
@@ -171,14 +185,16 @@ export default class Interview extends Emitter {
           return questionA.sort_order - questionB.sort_order
         })
         for (let question of page.questions) {
-          this.varNameMap.set(question.var_name, question.id)
-          this.questionMap.set(question.id, question)
+          this.varNameIndex.set(question.var_name, question.id)
+          this.questionIndex.set(question.id, question)
           question.section = s
           if (question.choices) {
             question.choices.sort((cA, cB) => {
               return cA.pivot.sort_order - cB.pivot.sort_order
             })
           }
+          this.questionIdToSectionIndex.set(question.id, section)
+          this.questionIdToPageIndex.set(question.id, page)
           this._assignParameters(question)
         }
       }
@@ -295,7 +311,7 @@ export default class Interview extends Emitter {
    * @private
    */
   _getCurrentPageData () {
-    return this.data.getAllQuestionDatumByLocation(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumRepetition)
+    return this.data.get(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
   }
 
   /**
@@ -359,7 +375,7 @@ export default class Interview extends Emitter {
    */
   _evaluateConditionAssignment () {
     // TODO: This should probably be every question in the survey so far
-    let questionsWithData = this.getPageQuestions()
+    let questionsWithData = this.getPageQuestions(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)
     let vars = questionsWithData.reduce((vars, question) => {
       if (!question.datum || !question.datum.data) {
         throw Error('question datum and data should already exist!')
@@ -404,11 +420,8 @@ export default class Interview extends Emitter {
    */
   makePageQuestionDatum () {
     let currentPage = this.currentPage()
-    if (this.location.sectionFollowUpDatumRepetition > 0) {
-      // debugger
-    }
     for (let questionBlueprint of currentPage.questions) {
-      if (!this.data.locationHasQuestionDatum(questionBlueprint.id, this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumRepetition)) {
+      if (!this.data.locationHasQuestionDatum(questionBlueprint.id, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)) {
         this._makeQuestionDatum(questionBlueprint)
       }
     }
@@ -472,13 +485,22 @@ export default class Interview extends Emitter {
     this.navigator.next()
     this._onPageEnter()
 
+    // Skip any question that's in a follow up section with no data to follow up on
+    if (this.currentSection().followUpQuestionId && this.navigator.clock.clockMax[2] < 0) {
+      console.log('skipping question in empty follow up section', JSON.stringify(this.location))
+      return this.next()
+    }
+
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
+    console.log('next location:', JSON.stringify(this.location), 'conditionTags:', JSON.stringify(Array.from(conditionTagNames)))
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
+      console.log('skipping location', JSON.stringify(this.location))
       this._markAsSkipped()
       return this.next()
     }
+    console.log('next done location', JSON.stringify(this.location))
   }
 
   previous () {
@@ -489,13 +511,23 @@ export default class Interview extends Emitter {
     this._onPageExit()
     this.navigator.previous()
     this._onPageEnter()
+
+    // Skip any question that's in a follow up section with no data to follow up on
+    if (this.currentSection().followUpQuestionId && this.navigator.clock.clockMax[2] < 0) {
+      console.log('skipping question in empty follow up section', JSON.stringify(this.location))
+      return this.previous()
+    }
+
     // Get assigned condition tags and convert them into a set of condition ids
     let cConditionTags = this._getCurrentConditionTags()
     let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
+    console.log('previous location:', JSON.stringify(this.location), 'conditionTags:', JSON.stringify(Array.from(conditionTagNames)))
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
+      console.log('skipping location', JSON.stringify(this.location))
       this._markAsSkipped()
       return this.previous()
     }
+    console.log('previous done location', JSON.stringify(this.location))
   }
 
   /**
@@ -507,7 +539,7 @@ export default class Interview extends Emitter {
    * @param sectionRepetition
    * @param sectionFollowUpRepetition
    */
-  replayTo (section, page, sectionRepetition, sectionFollowUpDatumId) {
+  replayTo (section, page, sectionRepetition, sectionFollowUpRepetition) {
     this._isReplaying = true
     this._zeroLocation()
     this._resetState()
@@ -534,7 +566,7 @@ export default class Interview extends Emitter {
     // this._setLocationFromClock(clock)
     // this.seekTo(...clock.time)
     // this.navigator.section = section
-    this.navigator.setLocation(section, page, sectionRepetition, sectionFollowUpDatumId)
+    this.navigator.setLocation(section, page, sectionRepetition, sectionFollowUpRepetition)
     this._isReplaying = false
   }
 
@@ -634,8 +666,23 @@ export default class Interview extends Emitter {
     return qDatum ? qDatum[0] : null
   }
 
+  /**
+   * Returns the value for a respondent fill with the specified varName
+   * @param {String} varName
+   * @returns {String|null}
+   */
+  getRespondentFillByVarName (varName) {
+    return this.respondentFills.get(varName)
+  }
+
+  /**
+   * Get a question datum by the question var name. There should only be one per question per repetition
+   * @param {String} varName
+   * @param {Number} sectionFollowUpRepetition
+   * @returns {Object}
+   */
   getSingleDatumByQuestionVarName (varName, sectionFollowUpRepetition) {
-    let questionId = this.varNameMap.get(varName)
+    let questionId = this.varNameIndex.get(varName)
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
@@ -665,7 +712,7 @@ export default class Interview extends Emitter {
     if (!qDatum || !qDatum.data) return []
 
     // Guard against repeated sections for now
-    if (this._getSection(qDatum.section).maxRepetitions || this._getSection(qDatum.section).followUpQuestionId) {
+    if (this.questionIdToSectionIndex.get(sectionFollowUpQuestionId).maxRepetitions || this.questionIdToSectionIndex.get(sectionFollowUpQuestionId).followUpQuestionId) {
       throw Error(`Can't handle follow up questions from repeated sections currently`)
     }
     qDatum.data.sort(function (a, b) {
@@ -686,9 +733,9 @@ export default class Interview extends Emitter {
    * Get an array of the questions for the current page. This function handles merging existing datum with
    * the question blueprint and dereferences everything
    */
-  getPageQuestions () {
+  getPageQuestions (section, sectionRepetition, sectionFollowUpDatumId, page) {
     let questionDefinitions = this.currentPage().questions
-    let questionData = this._getCurrentPageData()
+    let questionData = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), sectionRepetition, sectionFollowUpDatumId)
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
       question = JSON.parse(JSON.stringify(question)) // Dereference
@@ -717,5 +764,8 @@ export function sharedInterview (...args) {
 }
 
 export function clearSharedInterview () {
+  if (sharedInterviewInstance) {
+    sharedInterviewInstance.destroy()
+  }
   sharedInterviewInstance = null
 }

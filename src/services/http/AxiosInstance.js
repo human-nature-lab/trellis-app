@@ -40,7 +40,7 @@ export default function defaultInstance () {
         if (router.currentRoute.name === 'login') {
           return err.response
         } else {
-          router.push({name: 'login', query: {to: current}})
+          router.push({name: 'Login', query: {to: current}})
           return Promise.reject(err)
         }
       }

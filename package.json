@@ -1,5 +1,5 @@
 {
-  "name": "trellis-survey-view",
+  "name": "trellis",
   "version": "1.0.0",
   "description": "The form view component of the Trellis platform.",
   "author": "wyattis <wyattisrael@gmail.com>",
@@ -36,6 +36,7 @@
     "jszip": "^3.1.5",
     "material-design-icons": "^3.0.1",
     "material-design-icons-iconfont": "^3.0.3",
+    "moment": "^2.22.2",
     "node-sass": "^4.7.2",
     "reflect-metadata": "^0.1.12",
     "sass-loader": "^6.0.6",
@@ -116,7 +117,8 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "sw-precache-webpack-plugin": "^0.11.4",
-    "ts-loader": "^4.3.1",
+    "ts-loader": "^4.4.1",
+    "typescript": "^2.9.2",
     "uglify-es": "^3.0.25",
     "url-loader": "^0.5.8",
     "vue-loader": "^12.1.0",
@@ -151,6 +153,5 @@
       "android",
       "osx"
     ]
-  },
-  "eslintConfig": {}
+  }
 }
