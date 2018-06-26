@@ -186,7 +186,6 @@ export default class DataStore extends Emitter {
       tags.push(tag)
     })
     return tags.map(tag => {
-      tag.name = ConditionTagStore.getNameFromId(tag.condition_id)
       return tag
     })
   }
