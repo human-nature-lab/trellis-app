@@ -52,15 +52,9 @@ Vue.mixin({
       if (config.debug) {
         console.debug(...args)
       }
-    },
-    anyValueMatches: function (iterable, value) {
-      for (let key in iterable) {
-        if (iterable[key] === value) {
-          return true
-        }
-      }
-      return false
-    },
+    }
+  },
+  computed: {
     isWeb: function () {
       return config.appEnv === APP_ENV.WEB
     },

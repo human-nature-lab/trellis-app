@@ -1,37 +1,54 @@
-import Vue from 'vue'
 class DeviceServiceCordova {
   constructor () {
     this.isReady = false
-    this.uuid = ''
-    Vue.cordova.on('deviceready', () => {
-      this.isReady = true
-      this.uuid = this.cordova.device.uuid
-    })
+    this.uuid = undefined
+    this.platform = undefined
+    document.addEventListener('deviceready', () => { this.isReady = true }, false)
   }
   getUUID () {
-    return this.uuid
+    return new Promise((resolve) => {
+      if (this.uuid !== undefined) {
+        resolve(this.uuid)
+      } else {
+        this.isDeviceReady()
+          .then(() => {
+            this.uuid = device.uuid
+            resolve(this.uuid)
+          })
+      }
+    })
   }
   getPlatform () {
-    return Vue.cordova.device.platform
+    return new Promise((resolve) => {
+      if (this.platform !== undefined) {
+        resolve(this.platform)
+      } else {
+        this.isDeviceReady()
+          .then(() => {
+            this.platform = device.platform
+            resolve(this.platform)
+          })
+      }
+    })
   }
   getFreeDiskSpace () {
-    Vue.cordova.exec(function (result) {
-      // returns result in Bytes for iOS but in KiloBytes for Android
-      return result
-    },
-    function (error) {
-      throw new Error(error)
-    }, 'File', 'getFreeDiskSpace', [])
+    return new Promise((resolve, reject) => {
+      this.isDeviceReady()
+        .then(() => {
+          cordova.exec((result) => {
+            resolve(result)
+          },
+          (error) => reject(error))
+        })
+    })
   }
   setDeviceReady (isReady) {
     this.isReady = isReady
   }
   isDeviceReady () {
-    console.log('checking isDevice Ready')
     return new Promise(resolve => {
       const checkReady = () => {
         if (this.isReady) {
-          console.log('device is ready')
           resolve(true)
         } else {
           setTimeout(checkReady)

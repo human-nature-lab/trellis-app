@@ -48,8 +48,8 @@
       },
       methods: {
         authenticate: function () {
-          DeviceService.isDeviceReady().then(() => {
-            const deviceId = DeviceService.getUUID()
+          DeviceService.getUUID().then((deviceId) => {
+            console.log('deviceId', deviceId)
             const CancelToken = axios.CancelToken
             this.source = CancelToken.source()
             this.checking = true

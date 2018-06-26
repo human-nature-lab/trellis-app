@@ -49,3 +49,8 @@ export default function defaultInstance () {
   }
   return axiosInstance
 }
+
+export const syncInstance = axios.create({
+  baseURL: config.apiRoot + '/sync',
+  timeout: 0
+})

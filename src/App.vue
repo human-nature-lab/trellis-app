@@ -48,7 +48,7 @@
       </v-menu>
     </v-toolbar>
     <v-content>
-      <v-container fluid class="app-container">
+      <v-container fluid fill-height class="app-container">
         <v-card v-if="!locale" tile>
           <h3>Please set a locale before using the app</h3>
         </v-card>

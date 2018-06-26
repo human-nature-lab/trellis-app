@@ -1,11 +1,11 @@
 import config from '@/config'
-import { APP_MODE, APP_ENV } from '@/constants'
+import { APP_ENV } from '@/constants'
 import DeviceServiceMock from './DeviceServiceMock'
 import DeviceServiceCordova from './DeviceServiceCordova'
 
 let DeviceServiceConstructor = null
 if (config.appEnv === APP_ENV.CORDOVA) {
-  DeviceServiceConstructor = (config.appMode === APP_MODE.TEST) ? DeviceServiceMock : DeviceServiceCordova
+  DeviceServiceConstructor = DeviceServiceCordova
 } else {
   DeviceServiceConstructor = DeviceServiceMock
 }
