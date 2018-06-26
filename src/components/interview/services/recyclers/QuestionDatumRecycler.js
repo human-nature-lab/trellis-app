@@ -1,5 +1,7 @@
 import Recycler from '@/classes/Recycler'
 import uuidv4 from 'uuid/v4'
+import moment from 'moment'
+
 const keyNames = ['survey_id', 'section_repetition', 'follow_up_datum_id', 'question_id']
 class QuestionDatumRecycler extends Recycler {
   /**
@@ -27,7 +29,9 @@ class QuestionDatumRecycler extends Recycler {
       question_id: questionBlueprint.id,
       dk_rf: null,
       dk_rf_val: null,
-      data: []
+      data: [],
+      created_at: moment().format(),
+      updated_at: moment().format()
     }
   }
 }

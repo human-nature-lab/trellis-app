@@ -1,5 +1,7 @@
 import Recycler from '@/classes/Recycler'
 import uuidv4 from 'uuid/v4'
+import moment from 'moment'
+
 const keyNames = ['name', 'question_datum_id', 'survey_id', 'choice_id', 'edge_id', 'geo_id', 'photo_id', 'roster_id']
 class DatumRecycler extends Recycler {
   keyExtractor (datum) {
@@ -20,7 +22,9 @@ class DatumRecycler extends Recycler {
       name: questionDatum.var_name,
       question_datum_id: questionDatum.id,
       event_order: maxEventOrder + 1,
-      datum_type_id: '0'
+      datum_type_id: '0',
+      updated_at: moment().format(),
+      created_at: moment().format()
     }
     for (let key in payload) {
       datum[key] = payload[key]
