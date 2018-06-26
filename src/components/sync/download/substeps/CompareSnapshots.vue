@@ -104,11 +104,11 @@
         compareDownload: function () {
           this.checking = true
           DatabaseService.getLatestDownload().then((localDownload) => {
-            if (localDownload.length === 0) {
+            if (!localDownload) {
               this.emitResults(RESULTS.NO_DOWNLOAD)
               return
             }
-            this.localDownload = localDownload[0]
+            this.localDownload = localDownload
             this.localDownloadedAt = new Date(this.localDownload['created_at']).now()
             this.serverCreatedAt = new Date(this.serverSnapshot['created_at']).now()
             if (this.localDownloadedAt > this.serverCreatedAt) {

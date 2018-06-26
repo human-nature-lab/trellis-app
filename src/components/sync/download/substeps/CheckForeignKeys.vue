@@ -2,8 +2,8 @@
   <div>
     <ul>
       <li>
-        Importing database...
-        <strong v-if="success" class="green--text">DONE.</strong>
+        Checking foreign key constraints...
+        <strong v-if="success" class="green--text">OK.</strong>
         <strong v-if="error" class="red--text">ERROR.</strong>
       </li>
     </ul>
@@ -11,14 +11,18 @@
       <p>{{ errorMessage }}</p>
     </span>
     <v-progress-linear
-      v-show="working"
+      v-if="working"
       height="2"
-      v-model="insertProgress">
+      :indeterminate="true">
     </v-progress-linear>
     <v-btn
       v-if="error"
       color="primary"
       @click.native="retry">Retry</v-btn>
+    <v-btn
+      v-if="error"
+      color="warning"
+      @click.native="ignore">Ignore</v-btn>
   </div>
 </template>
 
@@ -26,30 +30,28 @@
     import config from '@/config'
     import DatabaseService from '@/services/database/DatabaseService'
     export default {
-      name: 'insert-rows',
+      name: 'check-foreign-keys',
       data () {
         return {
           success: false,
           error: false,
           working: false,
           apiRoot: config.apiRoot,
-          errorMessage: '',
-          progressIndeterminate: false,
-          insertProgress: 0
+          errorMessage: ''
         }
       },
       created () {
-        this.startWork()
+        this.checkForeignKeys()
       },
-      props: ['extractedSnapshot'],
+      props: [],
       methods: {
-        startWork: function () {
+        checkForeignKeys: function () {
           this.working = true
-          DatabaseService.importDatabase(this.extractedSnapshot, this.trackProgress)
+          DatabaseService.checkForeignKeys()
             .then(() => {
               this.working = false
               this.success = true
-              this.$emit('insert-rows-done')
+              this.$emit('check-foreign-keys-done')
             },
             (error) => {
               console.error(error)
@@ -60,10 +62,12 @@
         },
         retry: function () {
           this.error = false
-          this.startWork()
+          this.checkForeignKeys()
         },
-        trackProgress: function (progress) {
-          this.insertProgress = (progress.inserted / progress.total) * 100
+        ignore: function () {
+          this.error = false
+          this.success = true
+          this.$emit('check-foreign-keys-done')
         }
       },
       computed: {

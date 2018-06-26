@@ -1,5 +1,7 @@
 import { DeviceService } from '@/services/device/DeviceService'
-import http from '@/services/http/AxiosInstance'
+import { syncInstance as http } from '../../../services/http/AxiosInstance'
+
+'@/services/http/AxiosInstance'
 class SyncService {
   constructor () {
     this.synced = false
@@ -8,7 +10,7 @@ class SyncService {
   getHeartbeat (source) {
     let options = {}
     if (source) { options.cancelToken = source.token }
-    return http().get(`heartbeat`, options)
+    return http.get(`heartbeat`, options)
       .then(response => {
         return response.data
       })
@@ -20,7 +22,7 @@ class SyncService {
   authenticate (source, deviceId) {
     let options = {}
     if (source) { options.cancelToken = source.token }
-    return http().get(`device/${deviceId}/syncv2/authenticate`, options)
+    return http.get(`device/${deviceId}/syncv2/authenticate`, options)
       .then(response => {
         return response.data
       })
@@ -30,22 +32,25 @@ class SyncService {
       })
   }
   getLatestSnapshot (source) {
-    const deviceId = DeviceService.getUUID()
-    let options = {}
-    if (source) { options.cancelToken = source.token }
-    return http().get(`device/${deviceId}/syncv2/snapshot`, options)
-      .then(response => {
-        return response.data
-      })
-      .catch(err => {
-        console.error(err)
-        throw err
-      })
+    return new Promise((resolve, reject) => {
+      DeviceService.getUUID()
+        .then((deviceId) => {
+          let options = {}
+          if (source) { options.cancelToken = source.token }
+          http.get(`device/${deviceId}/syncv2/snapshot`, options)
+            .then(response => {
+              resolve(response.data)
+            })
+            .catch((error) => {
+              reject(error)
+            })
+        })
+    })
   }
   getSnapshotFileSize (source, snapshotId) {
     let options = {}
     if (source) { options.cancelToken = source.token }
-    return http().get(`snapshot/${snapshotId}/file_size`, options)
+    return http.get(`snapshot/${snapshotId}/file_size`, options)
       .then(response => {
         console.log('response', response)
         return response.data
@@ -62,7 +67,7 @@ class SyncService {
     }
     if (source) { options.cancelToken = source.token }
     if (onDownloadProgress) { options.onDownloadProgress = onDownloadProgress }
-    return http().get(`snapshot/${snapshotId}/download`, options)
+    return http.get(`snapshot/${snapshotId}/download`, options)
       .then(response => {
         console.log('response', response)
         return response

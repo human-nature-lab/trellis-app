@@ -79,6 +79,10 @@
                   v-on:insert-rows-done="insertRowsDone"
                   v-bind:extracted-snapshot="extractedSnapshot">
                 </insert-rows>
+                <check-foreign-keys
+                  v-if="downloadStep > 2 && downloadSubStep > 2"
+                  v-on:check-foreign-keys-done="checkForeignKeysDone">
+                </check-foreign-keys>
               </download-step>
             </v-stepper-content>
           </v-stepper-items>
@@ -99,6 +103,7 @@
   import ExtractSnapshot from './substeps/ExtractSnapshot.vue'
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import InsertRows from './substeps/InsertRows.vue'
+  import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
@@ -183,7 +188,10 @@
         this.downloadSubStep = 2
       },
       insertRowsDone: function () {
-        console.log('insertRowsDone')
+        this.downloadSubStep = 3
+      },
+      checkForeignKeysDone: function () {
+        this.continueStatus = BUTTON_STATUS.ENABLED
       }
     },
     computed: {
@@ -211,7 +219,8 @@
       ExtractSnapshot,
       VerifyDownload,
       RemoveDatabase,
-      InsertRows
+      InsertRows,
+      CheckForeignKeys
     }
   }
 </script>
