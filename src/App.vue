@@ -1,10 +1,15 @@
 <template>
   <v-app light dense class="cordova">
     <v-toolbar fixed>
-      <v-toolbar-title class="deep-orange--text">
-        Trellis <span class="grey--text" v-if="locale">- {{locale.language_tag}}</span>
+      <v-toolbar-title class="deep-orange--text logo">
+        <router-link :to="{name: 'home'}">
+          <img src="../static/img/trellis-logo.png" alt="trellis">
+        </router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn icon @click="refresh()">
+        <v-icon>refresh</v-icon>
+      </v-btn>
       <v-menu offset-y :nudge-top="-14">
         <v-btn icon slot="activator">
           <v-icon>more_vert</v-icon>
@@ -122,6 +127,9 @@
       }
     },
     methods: {
+      refresh: function () {
+        window.location.reload(true)
+      },
       setLocale: function (newLocale) {
         // Called to keep the locale in sync with local storage
         console.log('setting locale')
@@ -175,16 +183,27 @@
   }
 </script>
 
-<style>
-  html {
-    overflow-y: auto;
-  }
-	body{
-    padding-top: constant(safe-area-inset-top);
-    padding-top: env(safe-area-inset-top);
-  }
-  .app-container {
-    margin-top: 35px;
-    margin-bottom: 50px;
-  }
+<style lang="sass">
+  html
+    overflow-y: auto
+  body
+  /*padding-top: constant(safe-area-inset-top)*/
+  /*padding-top: env(safe-area-inset-top)*/
+  .app-container
+    margin-top: 50px
+    margin-bottom: 50px
+  .logo
+    height: 60%
+    width: 100%
+    font-size: 28px
+    img
+      max-width: 100%
+      max-height: 100%
+  .fade-in
+    animation: fade-in .3s ease-in-out 0s 1
+  @keyframes fade-in
+    0%
+      opacity: 0
+    100%
+      opacity: 1
 </style>

@@ -1,4 +1,3 @@
-import InterviewService from '../../../../services/interview/InterviewService'
 import http from '@/services/http/AxiosInstance'
 export default class InterviewDataWeb {
   /**
@@ -7,8 +6,9 @@ export default class InterviewDataWeb {
    * @param diff
    * @returns {Promise<T>}
    */
-  static sendDiff (diff) {
-    return http().post(`interview/${InterviewService.getInterviewId()}/data`, diff).then(res => {
+  static sendDiff (interviewId, diff) {
+    interviewId = encodeURIComponent(interviewId)
+    return http().post(`interview/${interviewId}/data`, diff).then(res => {
       return res.data
     })
   }

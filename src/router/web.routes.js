@@ -5,7 +5,7 @@ import storage from '../services/storage/StorageService'
 
 export default [{
   path: '/login',
-  name: 'login',
+  name: 'Login',
   component: WebLogin,
   beforeEnter: function (to, from, next) {
     if (storage.get('interview-id') !== null) {

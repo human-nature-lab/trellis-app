@@ -4,6 +4,7 @@ export default class ActionStore extends Emitter {
   constructor () {
     super()
     this.store = []
+    this.questionIndex = new Map()
   }
 
   /**
@@ -12,6 +13,27 @@ export default class ActionStore extends Emitter {
    */
   get actions () {
     return this.store
+  }
+
+  /**
+   * Get the actions for any number of question ids for a specific sectionRepetition and followUpRepetition
+   * @param questionIds
+   * @param sectionRepetition
+   * @param sectionFollowUpRepetition
+   * @returns {Array}
+   */
+  getQuestionActions (questionIds, sectionRepetition, sectionFollowUpRepetition) {
+    let actions = []
+    for (let id of questionIds) {
+      if (this.questionIndex.has(id)) {
+        for (let action of this.questionIndex.get(id)) {
+          if (action.section_repetition === sectionRepetition && action.section_follow_up_repetition === sectionFollowUpRepetition) {
+            actions.push(action)
+          }
+        }
+      }
+    }
+    return actions
   }
 
   /**
@@ -30,13 +52,27 @@ export default class ActionStore extends Emitter {
    */
   add (action, location) {
     action.id = uuidv4()
-    action.section = location.section
     action.section_repetition = location.sectionRepetition
     action.section_follow_up_repetition = location.sectionFollowUpDatumRepetition
-    action.page = location.page
     action.created_at = (new Date()).getTime()
-    this.store.push(action)
+    this.save(action)
     this.emit('change', this.store)
+  }
+
+  /**
+   * Save the action in the store and update any indexes
+   * @param action
+   */
+  save (action) {
+    this.store.push(action)
+    if (action.question_id) {
+      let questionActions = this.questionIndex.get(action.question_id)
+      if (!questionActions) {
+        questionActions = []
+        this.questionIndex.set(action.question_id, questionActions)
+      }
+      questionActions.push(action)
+    }
   }
 
   /**

@@ -10,8 +10,9 @@
 </template>
 
 <script>
-  import actionBus from '../services/ActionBus'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
+  import actionBus from '../services/ActionBus'
   export default {
     name: 'text-question',
     props: {
@@ -20,7 +21,7 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin],
+    mixins: [QuestionDisabledMixin, VuetifyValidationRules],
     data: function () {
       return {
         newText: null,

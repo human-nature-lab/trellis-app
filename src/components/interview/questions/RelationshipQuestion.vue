@@ -29,7 +29,12 @@
     <v-dialog v-model="respondentSearchDialog">
       <v-card>
         <RespondentsSearch
+          :canSelect="true"
+          :limit="selectLimit"
+          :shouldUpdateRoute="false"
           @selected="onSelected"
+          :formsButtonVisible="false"
+          :baseFilters="{locations: [respondent.geo_id]}"
           :selectedRespondents="selectedRespondents"
           :isLoading="isSavingEdges"/>
       </v-card>
@@ -46,8 +51,8 @@
   export default {
     name: 'relationship-question',
     props: {
-      respondentId: {
-        type: String,
+      respondent: {
+        type: Object,
         required: true
       },
       question: {
@@ -86,6 +91,14 @@
         return this.edges.map(edge => {
           return edge.target_respondent_id
         })
+      },
+      selectLimit: function () {
+        for (let p of this.question.question_parameters) {
+          if (p.parameter.name === 'max_relationships') {
+            return parseInt(p.val, 10)
+          }
+        }
+        return 0
       }
     },
     methods: {
@@ -125,7 +138,7 @@
       onSelected: function (added, removed) {
         this.isSavingEdges = true
         EdgeService.createEdges(added.map(id => ({
-          source_respondent_id: this.respondentId,
+          source_respondent_id: this.respondent.id,
           target_respondent_id: id
         }))).then(edges => {
           for (let edge of edges) {
@@ -157,6 +170,7 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+.avatar
+  overflow: hidden
 </style>

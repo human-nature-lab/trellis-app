@@ -14,8 +14,8 @@ export default class LocaleService {
   static setExistingLocale () {
     singleton.locale = LocaleService.getCurrentLocale()
   }
-  static getCurrentStudyLocales () {
-    return StudyService.getCurrentStudy().then(study => study.locales)
+  static getStudyLocales (studyId) {
+    return StudyService.getStudy(studyId).then(study => study.locales)
   }
   static setCurrentLocale (locale) {
     storage.set('current-locale', locale)

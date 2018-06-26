@@ -83,6 +83,13 @@ export default class Emitter {
   }
 
   /**
+   * Remove all listeners from this instance
+   */
+  destroyListeners () {
+    this._eventCalbacks = {}
+  }
+
+  /**
    * Getter to check if any listeners are present on this emitter
    * @returns {boolean}
    */

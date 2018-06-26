@@ -7,8 +7,8 @@
 </template>
 
 <script>
-  import actionBus from '../services/ActionBus'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import actionBus from '../services/ActionBus'
   export default {
     name: 'date-question',
     props: {
