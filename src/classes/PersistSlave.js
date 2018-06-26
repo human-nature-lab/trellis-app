@@ -75,7 +75,7 @@ export default class PersistSlave {
       })
       this.persist()
     }).then(() => {
-      this._existingRequest = null
+      this.existingRequest = null
     })
   }
 }
@@ -85,7 +85,7 @@ export default class PersistSlave {
  * @callback PersistSlave~saveCallback
  * @param {any} currentState - The current state of the data
  * @param {any} previousState - The state of the data the last time we persisted
- * @returns {Promise<any>} - Should resolve if the save was completed successfully. Should fail if it doesn't
+ * @returns {Promise<any>} - Should resolve if the save was completed successfully. Should reject if it doesn't
  */
 
 /**

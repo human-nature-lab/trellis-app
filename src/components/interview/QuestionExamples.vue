@@ -13,7 +13,7 @@
   import MockService from '../../services/mock/MockService'
   import MockQuestion from '../../services/mock/MockQuestionService'
   import LocaleService from '../../services/locale/LocaleService'
-  import Question from './Question'
+  import Question from './classes/Question'
   export default {
     name: 'question-examples',
     data: function () {

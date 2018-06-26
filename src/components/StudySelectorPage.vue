@@ -20,6 +20,11 @@
         }
       }
     },
+    head: {
+      title: {
+        inner: 'Study Selector'
+      }
+    },
     components: {
       StudySelector
     }

@@ -41,6 +41,7 @@ const definitions = {
     }
     let datum = DatumRecycler.getNoKey(questionDatum, payload)
     if (choiceHasOtherInput) {
+      datum.val = ''
       datum.other_input = '' // TODO: Handle the visibility of the other_input textbox for a choice
     }
     questionDatum.data.push(datum)

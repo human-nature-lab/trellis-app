@@ -36,13 +36,14 @@
           <v-layout row
                     justify-space-between>
             <v-btn @click="onPrevious"
+                   :disabled="isFirstPage"
                    justify-left>
               <v-icon left>chevron_left</v-icon> Previous
             </v-btn>
             <v-btn @click="onNext"
-                   :disabled="!allRequiredQuestionsAnswered"
+                   :disabled="!isNavigationEnabled"
                    justify-right>
-              Next <v-icon right>chevron_right</v-icon>
+              {{isAtEnd ? 'Finish' : 'Next'}} <v-icon right>chevron_right</v-icon>
             </v-btn>
           </v-layout>
       </v-flex>
@@ -81,6 +82,10 @@
       location: {
         type: Object,
         required: true
+      },
+      isAtEnd: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
@@ -102,9 +107,19 @@
       }
     },
     computed: {
-      // TODO: // Calculate this and enable/disable next based on it
-      allRequiredQuestionsAnswered: function () {
+      isNavigationEnabled: function () {
+        for (let question of this.questions) {
+          if (!question.allParametersSatisfied) {
+            return false
+          }
+        }
         return true
+      },
+      isFirstPage: function () {
+        return this.location.page === 0 &&
+          this.location.section === 0 &&
+          this.location.sectionRepetition === 0 &&
+          this.location.sectionFollowUpDatumRepetition === 0
       },
       datumLength: function () {
         let l = 0
@@ -123,6 +138,7 @@
 <style lang="sass">
   $btn-height: 60px
   .page-footer
+    background-color: white
     box-shadow: 0 0px 10px rgba(0, 0, 0, .3)
     height: $btn-height
     position: fixed

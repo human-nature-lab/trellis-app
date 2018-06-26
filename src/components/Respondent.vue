@@ -14,13 +14,17 @@
         <!--<v-btn @click="onClick">Select</v-btn>-->
       </v-card-text>
       <v-card-actions>
-        <v-btn icon
+        <v-btn
+          icon
+          v-if="formsButtonVisible"
           :to="{name: 'respondent-forms', params: {studyId: global.study.id, respondentId: respondent.id}}">
           <v-icon>view_agenda</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
-        <v-btn icon
-                @click="showInfo = true">
+        <v-btn
+          icon
+          v-if="infoButtonVisible"
+          @click="showInfo = true">
           <v-icon>info</v-icon>
         </v-btn>
       </v-card-actions>
@@ -32,7 +36,10 @@
       scrollable>
       <v-card tile>
         <v-toolbar card color="primary">
-          <v-btn icon @click.native="showInfo = false" dark>
+          <v-btn
+            icon
+            dark
+            @click.native="showInfo = false">
             <v-icon>close</v-icon>
           </v-btn>
           <v-toolbar-title>{{respondent.name}}</v-toolbar-title>
@@ -86,6 +93,14 @@
   export default {
     name: 'respondent',
     props: {
+      formsButtonVisible: {
+        type: Boolean,
+        default: true
+      },
+      infoButtonVisible: {
+        type: Boolean,
+        default: true
+      },
       respondent: {
         type: Object,
         required: true

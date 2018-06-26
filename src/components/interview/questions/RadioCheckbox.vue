@@ -11,7 +11,7 @@
     </label>
     <div class="input-group__input" :class="{'input-group--disabled': disabled}">
       <v-icon class="icon--selection-control icon--checkbox" v-if="value">radio_button_checked</v-icon>
-      <v-icon class="icon--selection-control" v-else>radio_button_unchecked</v-icon>
+      <v-icon class="icon--selection-control icon--checkbox" v-else>radio_button_unchecked</v-icon>
       <div class="input-group--selection-controls__ripple" />
     </div>
     <div class="input-group__details">

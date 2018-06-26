@@ -22,6 +22,11 @@
       },
       onChange: function () {}
     },
+    head: {
+      title: {
+        inner: 'Locale Selector'
+      }
+    },
     components: {
       LocaleSelector
     }

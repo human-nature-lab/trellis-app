@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid ma-0 pa-0>
+  <v-card fluid ma-0 pa-0>
     <v-toolbar
       class="respondent-search pa-2"
       extended
@@ -8,26 +8,31 @@
       <v-text-field
         placeholder="Search..."
         v-model="query"
-        autofocus
+        :loading="isLoading"
         @input="onQueryChange"></v-text-field>
-      <v-layout slot="extension">
-        <v-flex>
-          <v-select
-            :items="conditionTags"
-            v-model="filters.conditionTags"
-            label="Condition Tags"
-            chips
-            tags
-            @input="onQueryChange"
-            :loading="conditionTagsLoading"
-            autocomplete/>
-        </v-flex>
-        <v-flex sm1>
-          <v-btn
-            @click="clearFilters">
-            <v-icon>clear</v-icon>
-          </v-btn>
-        </v-flex>
+      <v-btn
+        @click="onDone"
+        :disabled="isLoading">
+        <span v-if="!isLoading">Done</span>
+        <v-progress-circular v-if="isLoading" indeterminate color="primary" />
+      </v-btn>
+      <v-layout class="pa-3" slot="extension">
+        <v-select
+          :items="conditionTags"
+          v-model="filters.conditionTags"
+          label="Condition Tags"
+          single-line
+          dense
+          chips
+          tags
+          @input="onQueryChange"
+          :loading="conditionTagsLoading"
+          autocomplete/>
+        <v-btn
+          icon
+          @click="clearFilters">
+          <v-icon>clear</v-icon>
+        </v-btn>
       </v-layout>
       <v-alert v-if="error">
         {{error}}
@@ -38,6 +43,8 @@
         <Respondent
           v-for="respondent in respondentResults"
           :key="respondent.id"
+          :formsButtonVisible="formsButtonVisible"
+          :infoButtonVisible="infoButtonVisible"
           @selected="onSelectRespondent(respondent)"
           :selected="isSelected(respondent)"
           :respondent="respondent"/>
@@ -48,13 +55,10 @@
     </v-layout>
     <v-layout ma-3>
       <v-flex>
-        <v-btn @click="onDone" :disabled="isLoading">
-          <span v-if="!isLoading">Done</span>
-          <v-progress-circular v-if="isLoading" indeterminate color="primary" />
-        </v-btn>
+
       </v-flex>
     </v-layout>
-  </v-container>
+  </v-card>
 </template>
 
 <script>
@@ -63,16 +67,74 @@
   import RespondentService from '../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
   import Respondent from './Respondent'
+  import router from '../router/router'
+
+  /**
+   * Keeps the vue router link in sync with the current query. This means that navigating away from this page and then
+   * returning to it will bring you to the same place you were before.
+   * @param {VueComponent} vm - The vue instance to derive the route from
+   */
+  function updateRoute (vm) {
+    let query = {}
+    if (vm.query) {
+      query.query = vm.query
+    }
+    if (vm.filters.conditionTags.length) {
+      query.filters = JSON.stringify(vm.filters)
+    }
+    router.replace({
+      name: vm.$route.name,
+      params: vm.$route.params,
+      query: query
+    })
+  }
+
+  /**
+   * Mutates the vm to conform to the updates made by the updateRoute method
+   * @param {VueComponent} vm - The vue instance we're modifying
+   */
+  function loadRoute (vm) {
+    vm.query = vm.$route.query.query || ''
+    vm.filters = vm.$route.query.filters ? JSON.parse(vm.$route.query.filters) : {
+      conditionTags: []
+    }
+  }
+
   export default {
     name: 'respondents-search',
     props: {
+      canSelect: {
+        type: Boolean,
+        default: false
+      },
+      limit: {
+        type: Number,
+        default: 0
+      },
+      formsButtonVisible: {
+        type: Boolean,
+        default: true
+      },
+      infoButtonVisible: {
+        type: Boolean,
+        default: true
+      },
+      shouldUpdateRoute: {
+        type: Boolean,
+        default: true
+      },
+      baseFilters: {
+        type: Object,
+        default: () => ({})
+      },
       selectedRespondents: {
         type: Array,
         default: () => []
-      },
-      isLoading: {
-        type: Boolean,
-        default: false
+      }
+    },
+    head: {
+      title: {
+        inner: 'Respondent search'
       }
     },
     data: function () {
@@ -81,31 +143,41 @@
         results: [],
         conditionTags: [],
         query: '',
-        filters: {
-          conditionTags: []
-        },
+        filters: Object.assign({
+          conditionTags: [],
+          locations: []
+        }, this.baseFilters),
         added: [],
         removed: [],
         currentPage: 0,
-        requestPageSize: 50,
+        requestPageSize: 20,
         conditionTagsLoaded: false,
-        conditionTagsLoading: false
+        conditionTagsLoading: false,
+        isLoading: false
       }
     },
     created: function () {
+      if (this.shouldUpdateRoute) {
+        loadRoute(this)
+      }
       this.loadConditionTags()
+      this.getCurrentPage()
     },
     methods: {
       onQueryChange: _.debounce(function () {
+        this.isLoading = true
         this.search()
       }, 400),
       search: function () {
+        if (this.shouldUpdateRoute) {
+          updateRoute(this)
+        }
         this.getCurrentPage()
       },
       loadConditionTags: function () {
         if (this.conditionTagsLoaded) return
         this.conditionTagsLoading = true
-        ConditionTagService.respondent().then(tags => {
+        return ConditionTagService.respondent().then(tags => {
           this.conditionTags = Array.from(new Set(tags))
           this.conditionTagsLoaded = true
         }).catch(err => {
@@ -119,15 +191,22 @@
       },
       getCurrentPage: function () {
         let study = this.global.study
+        this.isLoading = true
         RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize)
           .then(respondents => {
             this.results = respondents
             this.error = null
           }).catch(err => {
             this.error = err.toLocaleString()
+          }).then(() => {
+            this.isLoading = false
           })
       },
       onSelectRespondent: function (respondent) {
+        this.$emit('selectRespondent', respondent)
+        if (!this.canSelect) return
+        if (this.limit && this.selected.length > this.limit) return
+
         let sIndex = this.selected.indexOf(respondent.id)
         let aIndex = this.added.indexOf(respondent.id)
         let rIndex = this.removed.indexOf(respondent.id)
@@ -152,10 +231,7 @@
     },
     computed: {
       selected: function () {
-        let selected = this.selectedRespondents
-        for (let id of this.added) {
-          selected.push(id)
-        }
+        let selected = this.selectedRespondents.concat(this.added)
         return selected.filter(id => this.removed.indexOf(id) === -1)
       },
       respondentResults: function () {
@@ -171,8 +247,8 @@
 
 <style lang="sass" scoped>
 .respondent-search
-  position: fixed
+  /*position: fixed*/
   z-index: 10
 .respondents
-  padding-top: 130px
+  /*padding-top: 130px*/
 </style>
