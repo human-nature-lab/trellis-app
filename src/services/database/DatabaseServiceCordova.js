@@ -2,7 +2,7 @@ import { DeviceService } from '@/services/device/DeviceService'
 import SyncTable from './tables/SyncTable'
 import SyncMessage from './tables/SyncMessage'
 import Message from './tables/Message'
-import Config from './tables/Config'
+import Config from './tables/ConfigTable'
 
 export default class DatabaseService {
   constructor () {

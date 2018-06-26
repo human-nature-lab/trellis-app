@@ -18,9 +18,8 @@ export default class SkipService {
           skipCondition[boolKey] = true
         }
       }
-      skipCondition.any_all = !skipCondition.any_all
       if (skipCondition.show_hide) {
-        if (skipCondition.any_all) {
+        if (!skipCondition.any_all) {
           // Show if any are true
           shouldSkip = true
           for (let condition of skipCondition.conditions) {
@@ -39,7 +38,7 @@ export default class SkipService {
           }
         }
       } else {
-        if (skipCondition.any_all) {
+        if (!skipCondition.any_all) {
           // Hide if any are true
           shouldSkip = false
           for (let condition of skipCondition.conditions) {

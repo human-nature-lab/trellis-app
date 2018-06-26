@@ -1,6 +1,6 @@
 <template>
   <v-flex>
-    <v-alert color="error" :value="error">
+    <v-alert color="error" v-if="error">
       {{error}}
     </v-alert>
     <debug name="Studies">{{studies}}</debug>
@@ -36,12 +36,15 @@
       },
       load: function () {
         this.isWorking = true
-        return Promise.all([
-          StudyService.getCurrentStudy(),
-          StudyService.getMyStudies()
-        ]).then(results => {
-          let [study, studies] = results
-          this.study = study
+        return StudyService.getCurrentStudy().then(current => {
+          this.study = current
+        })
+        .catch(() => {}) // This is a useless error that should be ignored
+        .then(() => StudyService.getMyStudies())
+        .then(studies => {
+          studies.sort(function (a, b) {
+            return b.updated_at.localeCompare(a.updated_at)
+          })
           this.studies = studies
         }).catch(err => {
           this.error = err

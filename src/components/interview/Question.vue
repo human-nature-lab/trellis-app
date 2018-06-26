@@ -12,6 +12,9 @@
         <!--<v-toolbar-title class="white&#45;&#45;text">{{question.var_name}} : {{question.type.name}}</v-toolbar-title>-->
       <!--</v-toolbar>-->
     </v-card-title>
+    <v-alert v-show="validationError" transition="slide-y-transition">
+      {{validationError}}
+    </v-alert>
     <v-card-text class="question-content">
       <v-flex class="question-text title">
         <InterpolatedText
@@ -37,9 +40,9 @@
       <RelationshipQuestion
         v-else-if="question.type.name === 'relationship'"
         :question="question"
-        :respondent-id="interview.survey.respondent_id"/>
+        :respondent="interview.survey.respondent"/>
       <TextQuestion
-        v-else-if="question.type.name === 'text'"
+        v-else-if="question.type.name === 'text' || question.type.name === 'text_area'"
         :question="question"/>
       <DateQuestion
         v-else-if="['date', 'year', 'year_month', 'year_month_day'].indexOf(question.type.name) > -1"
@@ -96,7 +99,21 @@
     },
     data: function () {
       return {
-        translation: this.question.question_translation
+        translation: this.question.question_translation,
+        hasChanged: false
+      }
+    },
+    updated: function () {
+      if (!this.hasChanged) {
+        this.hasChanged = true
+      }
+    },
+    computed: {
+      validationError: function () {
+        if (!this.hasChanged || (this.question.dk_rf !== null && this.question.dk_rf !== undefined)) {
+          return null
+        }
+        return this.question.validationError
       }
     },
     components: {

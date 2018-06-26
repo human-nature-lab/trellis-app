@@ -3,7 +3,7 @@ import SyncTable from './tables/SyncTable'
 import SyncMessage from './tables/SyncMessage'
 import Message from './tables/Message'
 import UpdatedRecords from './tables/UpdatedRecords'
-import Config from './tables/Config'
+import Config from './tables/ConfigTable'
 
 export default class DatabaseService {
   constructor () {

@@ -30,8 +30,8 @@ export default class InterviewServiceWeb {
   static getData (interviewId) {
     return http().get(`interview/${interviewId}/data`)
       .then(function (res) {
-        if (res.data.interview) {
-          return res.data.interview.survey_data.data
+        if (res.data) {
+          return res.data
         } else {
           throw Error(`Unable to fetch data for interview with id: ${interviewId}`)
         }

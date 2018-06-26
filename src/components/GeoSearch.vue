@@ -79,6 +79,11 @@
         }
       }
     },
+    head: {
+      title: {
+        inner: 'Geo Search'
+      }
+    },
     data: function () {
       return {
         userFilters: {
