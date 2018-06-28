@@ -36,10 +36,6 @@ module.exports = {
         loader: 'raw-loader'
       },
       {
-        test: /\.tsx?$/,
-        loader: "ts-loader"
-      },
-      {
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
         enforce: 'pre',
@@ -47,6 +43,11 @@ module.exports = {
         options: {
           formatter: require('eslint-friendly-formatter')
         }
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/
       },
       {
         test: /\.vue$/,

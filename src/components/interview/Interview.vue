@@ -1,5 +1,11 @@
 <template>
   <v-flex>
+    <v-progress-linear
+      v-if="isSaving"
+      :indeterminate="true" />
+    <v-alert v-if="showSafeToExitMessage">
+      <p>It is now safe to exit the survey</p>
+    </v-alert>
     <Page :questions="questions"
           :location="location"
           :actions="interviewActions"
@@ -130,6 +136,8 @@
         formId: null,
         surveyId: null,
         isLoading: true,
+        isSaving: false,
+        showSafeToExitMessage: false,
         type: 'interview',
         interviewData: {},
         interviewActions: {},
@@ -168,31 +176,50 @@
     },
     beforeRouteUpdate (to, from, next) {
       console.log('before route update', to)
-      this.isLoading = true
-      interviewData.intervew = null
-      interviewData.actions = null
-      interviewData.data = null
-      interviewData.form = null
-      interviewData.preload = null
-      interviewGuards(to, from, next).then(() => {
-        this.loadInterview()
-      })
-    },
-    beforeRouteLeave  (to, from, next) {
-      console.log('before route leave', to)
-      if (to.name === 'Interview' || to.name === 'InterviewPreview') {
+      this.saveData().then(() => {
         this.isLoading = true
         interviewData.intervew = null
         interviewData.actions = null
         interviewData.data = null
         interviewData.form = null
         interviewData.preload = null
-        interviewGuards(to, from, next).then(() => {
-          this.loadInterview()
-        })
-      } else {
-        next()
-      }
+        interviewData.destroy()
+      })
+      .then(() => interviewGuards(to, from, next))
+      .then(() => {
+        this.loadInterview()
+      })
+    },
+    beforeRouteLeave  (to, from, next) {
+      console.log('before route leave', to)
+      // if (to.name === 'Interview' || to.name === 'InterviewPreview') {
+      //   this.isLoading = true
+      //   interviewData.intervew = null
+      //   interviewData.actions = null
+      //   interviewData.data = null
+      //   interviewData.form = null
+      //   interviewData.preload = null
+      //   interviewGuards(to, from, next).then(() => {
+      //     this.loadInterview()
+      //   })
+      // } else {
+      //   next()
+      // }
+      this.saveData().then(() => {
+        if (to.name === 'Interview' || to.name === 'InterviewPreview') {
+          this.isLoading = true
+          interviewData.intervew = null
+          interviewData.actions = null
+          interviewData.data = null
+          interviewData.form = null
+          interviewData.preload = null
+          interviewGuards(to, from, next).then(() => {
+            this.loadInterview()
+          })
+        } else {
+          next()
+        }
+      })
     },
     methods: {
       loadInterview: function () {
@@ -239,19 +266,33 @@
       lockAndExit: function () {
         console.log('TODO: Make sure everything is saved before marking the survey complete and exiting')
         console.log('TODO: Lock and exit the survey')
-        InterviewService.complete(this.interview.id).then(res => {
-          this.dialog.end = false
-          router.go(-1)
-          // router.push({name: 'home'})
+        this.saveData()
+          .then(() => InterviewService.complete(this.interview.id))
+          .then(() => {
+            this.dialog.end = false
+            router.go(-1)
+            // router.push({name: 'home'})
+          })
+          .catch(err => {
+            this.error = err
+          })
+      },
+      saveData: function () {
+        this.isSaving = true
+        return interviewState.save().then(() => {
+          this.isSaving = false
         })
       },
       saveAndExit: function () {
-        console.log('TODO: Make sure everything is saved before exiting')
-        this.dialog.end = false
-        router.go(-1)
-        // router.push({name: 'home'})
+        this.saveData().then(() => {
+          this.dialog.end = false
+          router.go(-1)
+        })
       },
       prematureExit: function (e) {
+        this.saveData().then(() => {
+          this.showSafeToExitMessage = true
+        })
         const dialogText = 'You have unsaved changes. Are you sure you want to leave?'
         e.returnValue = dialogText
         return dialogText

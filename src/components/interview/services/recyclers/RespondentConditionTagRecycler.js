@@ -24,8 +24,8 @@ class RespondentConditionTagRecycler extends Recycler {
       id: uuidv4(),
       respondent_id: interview.survey.respondent_id,
       condition_id: act.condition.id,
-      created_at: moment().format(),
-      updated_at: moment().format()
+      created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+      updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
     }
   }
 }

@@ -24,8 +24,8 @@ class FormConditionTagRecycler extends Recycler {
       id: uuidv4(),
       survey_id: interview.survey_id,
       condition_id: act.condition.id,
-      created_at: moment().format(),
-      updated_at: moment().format()
+      created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+      updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
     }
   }
 }

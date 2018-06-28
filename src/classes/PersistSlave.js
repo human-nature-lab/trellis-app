@@ -18,6 +18,7 @@ export default class PersistSlave {
     this.shouldSaveCb = shouldSaveCb || (() => true)
     this.errors = []
     this.maxFailures = maxFailures
+    this.cancelAllRequests = false
     this.persist = _.throttle(() => {
       this.save()
     }, throttleRate)
@@ -31,8 +32,13 @@ export default class PersistSlave {
    */
   destroy () {
     this.store.off('change', this.onChange)
+    this.persist.cancel()
+    this.cancelAllRequests = true
   }
 
+  /**
+   * Fires when some data has changed
+   */
   onChange () {
     console.log('some data changed')
     this.persist()
@@ -40,12 +46,14 @@ export default class PersistSlave {
 
   /**
    * Actually persist the data.
+   * @returns {Promise<any>} - A promise resolving to the results of the saveCallback
    */
   save () {
+    if (this.cancelAllRequests) return
     console.log('saving something')
     if (this.existingRequest) {
       this.hasNewData = true
-      return
+      return this.existingRequest
     }
     if (this.errors.length > this.maxFailures) {
       console.log('exceeded max attempts at storing data', this.errors)
@@ -77,6 +85,8 @@ export default class PersistSlave {
     }).then(() => {
       this.existingRequest = null
     })
+
+    return this.existingRequest
   }
 }
 
