@@ -30,8 +30,8 @@ class QuestionDatumRecycler extends Recycler {
       dk_rf: null,
       dk_rf_val: null,
       data: [],
-      created_at: moment().format(),
-      updated_at: moment().format()
+      created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+      updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
     }
   }
 }

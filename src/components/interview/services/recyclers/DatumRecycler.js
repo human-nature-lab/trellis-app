@@ -19,12 +19,11 @@ class DatumRecycler extends Recycler {
     }
     let datum = {
       id: uuidv4(),
-      name: questionDatum.var_name,
       question_datum_id: questionDatum.id,
       event_order: maxEventOrder + 1,
       datum_type_id: '0',
-      updated_at: moment().format(),
-      created_at: moment().format()
+      updated_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+      created_at: moment().format('YYYY-MM-DD HH:mm:ss')
     }
     for (let key in payload) {
       datum[key] = payload[key]

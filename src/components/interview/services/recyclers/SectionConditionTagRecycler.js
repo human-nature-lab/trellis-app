@@ -26,8 +26,8 @@ class SectionConditionTagRecycler extends Recycler {
       condition_id: act.condition.id,
       repetition: interview.location.sectionRepetition,
       follow_up_datum_id: interview.location.sectionFollowUpDatumId,
-      created_at: moment().format(),
-      updated_at: moment().format()
+      created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+      updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
     }
   }
 }

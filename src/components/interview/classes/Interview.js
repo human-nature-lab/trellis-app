@@ -58,11 +58,24 @@ export default class Interview extends Emitter {
   }
 
   /**
+   * Make sure all data is stored (if any)
+   * @returns {Promise<[any]>}
+   */
+  save () {
+    let p = []
+    if (this._dataPersistSlave) {
+      p.push(this._dataPersistSlave.save())
+    }
+    if (this._actionsPersistSlave) {
+      p.push(this._actionsPersistSlave.save())
+    }
+    return Promise.all(p)
+  }
+
+  /**
    * Should be called when you want to cleanup the interview
    */
   destroy () {
-    this._resetState()
-    this.navigator.destroy()
     if (this._dataPersistSlave) {
       this._dataPersistSlave.destroy()
       this._dataPersistSlave = null
@@ -71,6 +84,8 @@ export default class Interview extends Emitter {
       this._actionsPersistSlave.destroy()
       this._actionsPersistSlave = null
     }
+    this.navigator.destroy()
+    this._resetState()
   }
 
   /**
