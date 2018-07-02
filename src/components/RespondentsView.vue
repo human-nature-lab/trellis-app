@@ -5,10 +5,10 @@
         :list="respondents"
         :tombstone="false">
         <template slot="item" slot-scope="respondent">
-          <Respondent
+          <RespondentItem
             :key="respondent.id"
             @selected="onSelect(respondent)"
-            :respondent="respondent"/>
+            :respondent="respondent" />
         </template>
       </vue-recyclist>
     </v-layout>
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import Respondent from './Respondent'
+  import RespondentItem from './respondent/RespondentItem'
   import RespondentService from '../services/respondent/RespondentService'
   export default {
     name: 'respondents-view',
@@ -31,7 +31,7 @@
       }
     },
     components: {
-      Respondent
+      RespondentItem
     }
   }
 </script>

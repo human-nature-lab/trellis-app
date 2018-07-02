@@ -79,4 +79,51 @@ export default class RespondentServiceWeb {
       }
     })
   }
+
+  /**
+   * Add a name to the respondent
+   * @param {string} respondentId
+   * @param {string} name
+   * @param {boolean} [isDisplayName]
+   * @param {string} [localeId]
+   * @returns {*}
+   */
+  static addName (respondentId, name, isDisplayName = null, localeId = null) {
+    respondentId = encodeURIComponent(respondentId)
+    return http().post(`respondent/${respondentId}/name`, {
+      name: name,
+      is_display_name: isDisplayName,
+      locale_id: localeId
+    }).then(res => res.data.name)
+  }
+
+  /**
+   * Modify a respondent name
+   * @param {string} respondentId
+   * @param {string} respondentNameId
+   * @param {string} newName
+   * @param {boolean} [isDisplayName]
+   * @param {string} [localeId]
+   * @returns {Promise<Object>}
+   */
+  static editName (respondentId, respondentNameId, newName, isDisplayName = null, localeId = null) {
+    respondentNameId = encodeURIComponent(respondentNameId)
+    return http().put(`respondent/${respondentId}/name/${respondentNameId}`, {
+      name: newName,
+      is_display_name: isDisplayName,
+      locale_id: localeId
+    }).then(res => res.data.name)
+  }
+
+  /**
+   * Delete a respondent name
+   * @param {string} respondentId
+   * @param {string} respondentNameId
+   * @returns {Promise<Object>}
+   */
+  static removeName (respondentId, respondentNameId) {
+    respondentId = encodeURIComponent(respondentId)
+    respondentNameId = encodeURIComponent(respondentNameId)
+    return http().delete(`respondent/${respondentId}/name/${respondentNameId}`)
+  }
 }
