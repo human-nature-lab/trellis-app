@@ -40,14 +40,14 @@
     </v-toolbar>
     <v-container class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
-        <Respondent
+        <RespondentItem
           v-for="respondent in respondentResults"
           :key="respondent.id"
           :formsButtonVisible="formsButtonVisible"
           :infoButtonVisible="infoButtonVisible"
           @selected="onSelectRespondent(respondent)"
           :selected="isSelected(respondent)"
-          :respondent="respondent"/>
+          :respondent="respondent" />
       </v-layout>
     </v-container>
     <v-layout v-if="!respondentResults.length" ma-3>
@@ -63,11 +63,11 @@
 
 <script>
   import _ from 'lodash'
-  import ConditionTagService from '../services/condition-tag/ConditionTagService'
-  import RespondentService from '../services/respondent/RespondentService'
+  import ConditionTagService from '../../services/condition-tag/ConditionTagService'
+  import RespondentService from '../../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
-  import Respondent from './Respondent'
-  import router from '../router/router'
+  import RespondentItem from './RespondentItem'
+  import router from '../../router/router'
 
   /**
    * Keeps the vue router link in sync with the current query. This means that navigating away from this page and then
@@ -240,7 +240,7 @@
     },
     components: {
       RespondentListItem,
-      Respondent
+      RespondentItem
     }
   }
 </script>

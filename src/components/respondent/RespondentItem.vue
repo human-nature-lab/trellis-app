@@ -10,7 +10,7 @@
       </v-card-media>
       <v-card-text class="respondent-name"
                    @click="onClick()">
-        {{respondent.name}}
+        {{name}}
         <!--<v-btn @click="onClick">Select</v-btn>-->
       </v-card-text>
       <v-card-actions>
@@ -34,64 +34,16 @@
       v-model="showInfo"
       transition="dialog-bottom-transition"
       scrollable>
-      <v-card tile>
-        <v-toolbar card color="primary">
-          <v-btn
-            icon
-            dark
-            @click.native="showInfo = false">
-            <v-icon>close</v-icon>
-          </v-btn>
-          <v-toolbar-title>{{respondent.name}}</v-toolbar-title>
-        </v-toolbar>
-        <v-card-text>
-          <h3>Photos</h3>
-          <v-container fluid grid-list-md>
-            <v-layout row wrap>
-              <Photo
-                v-for="photo in respondent.photos"
-                :height="200"
-                :width="200"
-                :key="photo.id"
-                :photo="photo"/>
-              <v-btn @click="photoFromCamera">
-                <v-icon size="100">photo_camera</v-icon>
-              </v-btn>
-              <v-btn @click="photoFromFile">
-                <v-icon size="100">cloud_upload</v-icon>
-              </v-btn>
-            </v-layout>
-          </v-container>
-          <h3>Condition Tags</h3>
-          <v-data-table
-            hide-actions
-            :headers="[{
-              text: 'Tag name',
-              value: 'name'
-            }, {
-              text: 'Last updated',
-              value: 'updated_at'
-            }, {
-              text: 'Created at',
-              value: 'created_at'
-            }]"
-            :items="respondent.respondent_condition_tags">
-            <template slot="items" slot-scope="props">
-              <td>{{ props.item.name }}</td>
-              <td class="text-xs-right">{{ props.item.updated_at }}</td>
-              <td class="text-xs-right">{{ props.item.created_at }}</td>
-            </template>
-          </v-data-table>
-        </v-card-text>
-      </v-card>
+      <RespondentInfo :respondent="respondent" />
     </v-dialog>
   </v-flex>
 </template>
 
 <script>
-  import Photo from './Photo'
+  import Photo from '../Photo'
+  import RespondentInfo from './RespondentInfo'
   export default {
-    name: 'respondent',
+    name: 'respondent-item',
     props: {
       formsButtonVisible: {
         type: Boolean,
@@ -125,8 +77,15 @@
 
       }
     },
+    computed: {
+      name () {
+        let rName = this.respondent.names.find(n => n.is_display_name)
+        return rName ? rName.name : this.respondent.name
+      }
+    },
     components: {
-      Photo
+      Photo,
+      RespondentInfo
     }
   }
 </script>

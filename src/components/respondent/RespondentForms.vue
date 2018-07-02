@@ -13,13 +13,13 @@
 </template>
 
 <script>
-  import FormsView from './FormsView'
+  import FormsView from '../FormsView'
   import SurveyService from '@/services/survey/SurveyService'
   import FormService from '@/services/form/FormService'
   import RespondentService from '@/services/respondent/RespondentService'
-  import singleton from '../singleton'
-  import InterviewService from '../services/interview/InterviewService'
-  import router from '../router/router'
+  import singleton from '../../singleton'
+  import InterviewService from '../../services/interview/InterviewService'
+  import router from '../../router/router'
 
   let data = {}
   function load (respondentId, studyId) {

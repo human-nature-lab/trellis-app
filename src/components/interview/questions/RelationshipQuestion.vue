@@ -44,9 +44,9 @@
 
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
-  import Photo from '@/components/Photo'
-  import RespondentsSearch from '@/components/RespondentsSearch'
-  import EdgeService from '@/services/edge/EdgeService'
+  import Photo from '../../Photo'
+  import RespondentsSearch from '../../respondent/RespondentsSearch'
+  import EdgeService from '../../../services/edge/EdgeService'
   import actionBus from '../services/ActionBus'
   export default {
     name: 'relationship-question',
