@@ -32,11 +32,13 @@
           :canSelect="true"
           :limit="selectLimit"
           :shouldUpdateRoute="false"
+          :canAddRespondent="canAddRespondent"
           @selected="onSelected"
+          :respondentId="respondent.id"
           :formsButtonVisible="false"
           :baseFilters="{locations: [respondent.geo_id]}"
           :selectedRespondents="selectedRespondents"
-          :isLoading="isSavingEdges"/>
+          :isLoading="isSavingEdges" />
       </v-card>
     </v-dialog>
   </v-flex>
@@ -70,6 +72,11 @@
       }
     },
     computed: {
+      canAddRespondent: function () {
+        return this.question.question_parameters.findIndex(p => {
+          return p.parameter.name === 'can_add_respondent' && parseInt(p.val, 10) === 1
+        }) > -1
+      },
       edgeIds: function () {
         return this.question.datum.data.map(d => d.edge_id)
       },
