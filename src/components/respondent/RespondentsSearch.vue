@@ -28,11 +28,24 @@
           @input="onQueryChange"
           :loading="conditionTagsLoading"
           autocomplete/>
-        <v-btn
-          icon
-          @click="clearFilters">
-          <v-icon>clear</v-icon>
-        </v-btn>
+        <v-tooltip bottom>
+          <v-btn
+            slot="activator"
+            icon
+            @click="clearFilters">
+            <v-icon>clear</v-icon>
+          </v-btn>
+          <span>Clear filters</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="canAddRespondent">
+          <v-btn
+            slot="activator"
+            icon
+            @click="showAssociatedRespondentDialog = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+          <span>Add temporary respondent</span>
+        </v-tooltip>
       </v-layout>
       <v-alert v-if="error">
         {{error}}
@@ -53,11 +66,15 @@
     <v-layout v-if="!respondentResults.length" ma-3>
       No results present for the query: {{query}}
     </v-layout>
-    <v-layout ma-3>
-      <v-flex>
-
-      </v-flex>
-    </v-layout>
+    <v-dialog
+      v-model="showAssociatedRespondentDialog">
+      <v-card>
+        <AddRespondentForm
+          @close="addRespondentClose"
+          :studyId="studyId"
+          :associatedRespondentId="respondentId" />
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -67,6 +84,7 @@
   import RespondentService from '../../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
   import RespondentItem from './RespondentItem'
+  import AddRespondentForm from './AddRespondentForm'
   import router from '../../router/router'
 
   /**
@@ -130,6 +148,13 @@
       selectedRespondents: {
         type: Array,
         default: () => []
+      },
+      respondentId: {
+        type: String
+      },
+      canAddRespondent: {
+        type: Boolean,
+        default: false
       }
     },
     head: {
@@ -137,7 +162,7 @@
         inner: 'Respondent search'
       }
     },
-    data: function () {
+    data () {
       return {
         error: null,
         results: [],
@@ -153,10 +178,11 @@
         requestPageSize: 20,
         conditionTagsLoaded: false,
         conditionTagsLoading: false,
-        isLoading: false
+        isLoading: false,
+        showAssociatedRespondentDialog: false
       }
     },
-    created: function () {
+    created () {
       if (this.shouldUpdateRoute) {
         loadRoute(this)
       }
@@ -168,13 +194,13 @@
         this.isLoading = true
         this.search()
       }, 400),
-      search: function () {
+      search () {
         if (this.shouldUpdateRoute) {
           updateRoute(this)
         }
         this.getCurrentPage()
       },
-      loadConditionTags: function () {
+      loadConditionTags () {
         if (this.conditionTagsLoaded) return
         this.conditionTagsLoading = true
         return ConditionTagService.respondent().then(tags => {
@@ -186,13 +212,13 @@
           this.conditionTagsLoading = false
         })
       },
-      clearFilters: function () {
+      clearFilters () {
         this.filters.conditionTags = []
       },
-      getCurrentPage: function () {
+      getCurrentPage () {
         let study = this.global.study
         this.isLoading = true
-        RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize)
+        RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
           .then(respondents => {
             this.results = respondents
             this.error = null
@@ -202,7 +228,7 @@
             this.isLoading = false
           })
       },
-      onSelectRespondent: function (respondent) {
+      onSelectRespondent (respondent) {
         this.$emit('selectRespondent', respondent)
         if (!this.canSelect) return
         if (this.limit && this.selected.length > this.limit) return
@@ -220,27 +246,38 @@
           this.added.push(respondent.id)
         }
       },
-      onDone: function () {
+      onDone () {
         this.$emit('selected', this.added, this.removed)
         this.added = []
         this.removed = []
       },
-      isSelected: function (respondent) {
+      isSelected (respondent) {
         return this.selected.indexOf(respondent.id) > -1
+      },
+      addRespondentClose (respondent) {
+        // TODO: Maybe add this to cache (if there is one)
+        if (!this.query.length) {
+          this.results.push(respondent)
+        }
+        this.showAssociatedRespondentDialog = false
       }
     },
     computed: {
-      selected: function () {
+      studyId () {
+        return this.global.study.id
+      },
+      selected () {
         let selected = this.selectedRespondents.concat(this.added)
         return selected.filter(id => this.removed.indexOf(id) === -1)
       },
-      respondentResults: function () {
+      respondentResults () {
         return _.orderBy(this.results, ['score', 'name'], ['desc', 'asc'])
       }
     },
     components: {
       RespondentListItem,
-      RespondentItem
+      RespondentItem,
+      AddRespondentForm
     }
   }
 </script>

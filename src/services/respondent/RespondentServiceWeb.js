@@ -55,22 +55,22 @@ export default class RespondentServiceWeb {
    * @param {Object} filter
    * @param {Number} page
    * @param {Number} size
+   * @param {String} respondentId - The respondent associated with this search
    * @returns {Promise<Array<Object>>}
    */
-  static getSearchPage (studyId, query, filter, page = 0, size = 50) {
+  static getSearchPage (studyId, query, filter, page = 0, size = 50, respondentId = null) {
     let params = {
-      q: query
+      q: query,
+      offset: page * size,
+      limit: size,
+      associated_respondent_id: respondentId
     }
     if (filter.conditionTags) {
       params.c = filter.conditionTags.join(',')
     }
     studyId = encodeURIComponent(studyId)
     return http().get(`study/${studyId}/respondents/search`, {
-      params: params,
-      query: {
-        offset: page * size,
-        limit: size
-      }
+      params: params
     }).then(res => {
       if (res.data && res.data.respondents) {
         return res.data.respondents.slice(0, size)
@@ -125,5 +125,21 @@ export default class RespondentServiceWeb {
     respondentId = encodeURIComponent(respondentId)
     respondentNameId = encodeURIComponent(respondentNameId)
     return http().delete(`respondent/${respondentId}/name/${respondentNameId}`)
+  }
+
+  /**
+   * Add a new respondent. Can optionally be associated with another respondent
+   * @param {String} studyId
+   * @param {String} name
+   * @param {String} [geoId]
+   * @param {String} [associatedRespondentId] - Add this argument if you want the added respondent to only be visible in
+   * surveys being conducted for the associated respondent.
+   */
+  static createRespondent (studyId, name, geoId = null, associatedRespondentId = null) {
+    return http().post(`study/${studyId}/respondent`, {
+      name: name,
+      geo_id: geoId,
+      associated_respondent_id: associatedRespondentId
+    }).then(res => res.data.respondent)
   }
 }
