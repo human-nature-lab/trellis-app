@@ -8,18 +8,25 @@
       </v-list-tile-content>
       <v-list-tile-action v-if="!hideSelect">
         <v-btn
+          v-if="isSelectable"
           :color="selected && 'primary' || ''"
           @click.stop="$emit('geo-select')">
           <v-icon v-if="selected">check</v-icon>
           <span v-else>Select</span>
+        </v-btn>
+        <v-btn
+          @click.stop="showGeoInfo"
+          icon>
+          <v-icon>info</v-icon>
         </v-btn>
       </v-list-tile-action>
     </v-list-tile>
 </template>
 
 <script>
-  import TranslationMixin from '@/mixins/TranslationMixin'
-  import Photo from '@/components/Photo'
+  import TranslationMixin from '../../mixins/TranslationMixin'
+  import router from '../../router/router'
+  import Photo from '../Photo'
   export default {
     name: 'geo-list-tile',
     props: {
@@ -31,9 +38,13 @@
         type: Boolean,
         default: false
       },
-      hideSelect: {
+      isSelectable: {
         type: Boolean,
         default: false
+      },
+      showInfoView: {
+        type: Boolean,
+        default: true
       }
     },
     computed: {
@@ -42,6 +53,16 @@
       },
       translation: function () {
         return this.geo.name_translation || null
+      }
+    },
+    methods: {
+      showGeoInfo () {
+        router.push({
+          name: 'Geo',
+          params: {
+            geoId: this.geo.id
+          }
+        })
       }
     },
     mixins: [TranslationMixin],

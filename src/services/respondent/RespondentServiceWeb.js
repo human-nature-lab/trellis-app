@@ -52,21 +52,26 @@ export default class RespondentServiceWeb {
    * Get the results of a search query
    * @param {String} studyId - The study id
    * @param {String} query - The query to search
-   * @param {Object} filter
+   * @param {Object} filters
    * @param {Number} page
    * @param {Number} size
    * @param {String} respondentId - The respondent associated with this search
+   * @param {Array} filters.conditionTags - Array of condition tag names. This array is treated as a logical AND
+   * @param {Array} filters.geos - Array of geo ids. This array is treated as a logical OR
    * @returns {Promise<Array<Object>>}
    */
-  static getSearchPage (studyId, query, filter, page = 0, size = 50, respondentId = null) {
+  static getSearchPage (studyId, query, filters, page = 0, size = 50, respondentId = null) {
     let params = {
       q: query,
       offset: page * size,
       limit: size,
       associated_respondent_id: respondentId
     }
-    if (filter.conditionTags) {
-      params.c = filter.conditionTags.join(',')
+    if (filters.conditionTags) {
+      params.c = filters.conditionTags.join(',')
+    }
+    if (filters.geos) {
+      params.g = filters.geos.join(',')
     }
     studyId = encodeURIComponent(studyId)
     return http().get(`study/${studyId}/respondents/search`, {

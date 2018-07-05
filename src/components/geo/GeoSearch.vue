@@ -1,53 +1,55 @@
 <template>
-  <v-container fluid>
-    <v-card>
-      <v-container fluid class="geo-search" :class="{'cart-spacing': selected.length}">
-        <v-alert v-if="error">
-          {{this.error}}
-        </v-alert>
-        <v-layout row wrap>
-          <v-text-field
-            v-model="query"
-            placeholder="Search..."
-            :loading="isSearching_"
-            @input="queryChange"/>
-        </v-layout>
-        <v-list>
-          <v-list-tile
-            v-if="lastParentIds.length"
-            @click="moveUpOneLevel">
-            <v-list-tile-content>
-              <v-container>
-                <v-layout row>
-                  <v-flex xs1>
-                    <v-icon>arrow_upward</v-icon>
-                  </v-flex>
-                  <v-spacer />
-                  <v-flex xs1 class="text-lg-right">
-                    <v-icon>arrow_upward</v-icon>
-                  </v-flex>
-                </v-layout>
-              </v-container>
-            </v-list-tile-content>
-          </v-list-tile>
-          <GeoListTile
-            v-for="geo in results"
-            :selected="selected.indexOf(geo.id) > -1"
-            @click="onGeoClick(geo)"
-            @geo-select="onGeoSelect(geo)"
-            :key="geo.id"
-            :geo="geo" />
-        </v-list>
-        <Cart
-          v-if="selected.length"
-          @done="onDone"
-          :items="selected">
-          <v-flex slot name="item">
-            Item
-          </v-flex>
-        </Cart>
-      </v-container>
-    </v-card>
+  <v-container fluid class="geo-search" :class="{'cart-spacing': selected.length}">
+    <v-alert v-if="error">
+      {{this.error}}
+    </v-alert>
+    <v-layout row wrap>
+      <v-text-field
+        v-model="query"
+        placeholder="Search..."
+        :loading="isSearching_"
+        @input="queryChange"/>
+    </v-layout>
+    <v-list v-if="results.length">
+      <v-list-tile
+        v-if="lastParentIds.length"
+        @click="moveUpOneLevel">
+        <v-list-tile-content>
+          <v-container>
+            <v-layout row>
+              <v-flex xs1>
+                <v-icon>arrow_upward</v-icon>
+              </v-flex>
+              <v-spacer />
+              <v-flex xs1 class="text-lg-right">
+                <v-icon>arrow_upward</v-icon>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-list-tile-content>
+      </v-list-tile>
+      <GeoListTile
+        v-for="geo in results"
+        :showRespondentsLink="showRespondentsLink"
+        :isSelectable="isSelectable"
+        :selected="selected.indexOf(geo.id) > -1"
+        @click="onGeoClick(geo)"
+        @geo-select="onGeoSelect(geo)"
+        :key="geo.id"
+        :geo="geo" />
+    </v-list>
+    <v-flex v-else>
+      <span v-if="query">No locations match this query...</span>
+      <span v-else>It appears that no locations have been added to the database</span>
+    </v-flex>
+    <Cart
+      v-if="selected.length"
+      @done="onDone"
+      :items="selected">
+      <v-flex slot name="item">
+        Item
+      </v-flex>
+    </Cart>
   </v-container>
 </template>
 
@@ -55,17 +57,18 @@
   import _ from 'lodash'
   import GeoService from '@/services/geo/GeoService'
   import GeoListTile from './GeoListTile'
-  import Cart from './Cart'
+  import Cart from '../Cart'
   import singleton from '@/singleton'
   export default {
     name: 'geo-search',
     props: {
       selectedIds: {
-        type: Array
+        type: Array,
+        default: () => []
       },
       baseFilters: {
         type: Object,
-        default: function () {
+        default () {
           return {
             'no-parent': true,
             'study': singleton.study ? singleton.study.id : null
@@ -77,6 +80,14 @@
         default: function () {
           return []
         }
+      },
+      showRespondentsLink: {
+        type: Boolean,
+        default: true
+      },
+      isSelectable: {
+        type: Boolean,
+        default: false
       }
     },
     head: {
@@ -132,7 +143,7 @@
           this.lastParentIds.push(prevId)
         })
       },
-      onGeoSelect: function (geo) {
+      selectGeo (geo) {
         let sIndex = this.selected.indexOf(geo.id)
         let aIndex = this.added.indexOf(geo.id)
         let rIndex = this.removed.indexOf(geo.id)
@@ -146,6 +157,11 @@
           this.added.push(geo.id)
         }
         this.$emit('geoSelected', geo)
+      },
+      onGeoSelect: function (geo) {
+        if (this.isSelectable) {
+          this.selectGeo(geo)
+        }
       },
       onDone: function () {
         this.$emit('doneSelecting', this.added, this.removed)

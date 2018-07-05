@@ -76,11 +76,12 @@
         if (this.isSaving) return
         this.isSaving = true
         if (this.name.id) {
+          let isDisplayName = this.name.is_display_name ? true : false // eslint-disable-line
           RespondentService.editName(
             this.respondent.id,
             this.name.id,
             this.name.name,
-            this.name.is_display_name,
+            isDisplayName,
             this.name.locale_id
           ).then(name => {
             this.$emit('close', name)

@@ -114,7 +114,8 @@
   function loadRoute (vm) {
     vm.query = vm.$route.query.query || ''
     vm.filters = vm.$route.query.filters ? JSON.parse(vm.$route.query.filters) : {
-      conditionTags: []
+      conditionTags: [],
+      locations: []
     }
   }
 
@@ -170,7 +171,7 @@
         query: '',
         filters: Object.assign({
           conditionTags: [],
-          locations: []
+          geos: []
         }, this.baseFilters),
         added: [],
         removed: [],
