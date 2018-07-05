@@ -1,5 +1,5 @@
 <template>
-  <v-flex class="photo" ref="container" :style="{'min-width': width + 'px', 'min-height': height + 'px'}">
+  <v-flex class="photo contained" ref="container" :style="{'min-width': width + 'px', 'min-height': height + 'px'}">
     <v-progress-circular
       v-if="srcLoading || imgLoading"
       indeterminate

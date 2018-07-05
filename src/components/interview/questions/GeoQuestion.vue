@@ -17,17 +17,21 @@
       <v-dialog
         lazy
         v-model="geoSearchDialog">
-        <GeoSearch
-          :selectedIds="geoIds"
-          @doneSelecting="onDoneSelecting" />
+        <v-container fluid>
+          <v-card>
+            <GeoSearch
+              :selectedIds="geoIds"
+              @doneSelecting="onDoneSelecting" />
+          </v-card>
+        </v-container>
       </v-dialog>
     </v-flex>
 </template>
 
 <script>
   import GeoService from '../../../services/geo/GeoService'
-  import GeoSearch from '../../../components/GeoSearch'
-  import GeoListTile from '../../../components/GeoListTile'
+  import GeoSearch from '../../geo/GeoSearch'
+  import GeoListTile from '../../geo/GeoListTile'
   import actionBus from '../services/ActionBus'
   export default {
     name: 'geo-question',
