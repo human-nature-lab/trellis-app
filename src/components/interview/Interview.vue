@@ -6,13 +6,15 @@
     <v-alert v-if="showSafeToExitMessage">
       <p>It is now safe to exit the survey</p>
     </v-alert>
-    <Page :questions="questions"
+    <span v-if="formIsEmpty">This form appears to be empty...</span>
+    <Page v-else
+          :questions="questions"
           :location="location"
           :actions="interviewActions"
           :data="interviewData"
           :isAtEnd="isAtEnd"
           :conditionTags="interviewConditionTags"
-          :interview="interview"/>
+          :interview="interview" />
     <v-dialog
       v-model="dialog.beginning">
       <v-card>
@@ -143,6 +145,7 @@
         interviewActions: {},
         interviewConditionTags: {},
         interview: {},
+        form: null,
         location: {
           section: 0,
           page: 0,
@@ -229,6 +232,7 @@
         this.interviewActions = interviewState.actions.store
         this.location = interviewState.navigator.location
         this.interview = interview
+        this.form = formBlueprint
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
         setTimeout(() => {
@@ -269,6 +273,9 @@
         })
       },
       saveData: function () {
+        if (this.formIsEmpty) {
+          return new Promise(resolve => resolve())
+        }
         this.isSaving = true
         return interviewState.save().then(() => {
           this.isSaving = false
@@ -315,6 +322,9 @@
             return q
           })
         return questions || []
+      },
+      formIsEmpty () {
+        return !(this.form && this.form.sections && this.form.sections.length)
       }
     },
     components: {

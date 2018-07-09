@@ -1,8 +1,13 @@
 <template>
   <v-container fluid>
-    <v-layout>
+    <v-layout column>
       <v-alert v-if="error">{{error}}</v-alert>
-      <h1>{{translated}}</h1>
+      <h1>
+        {{translated}}
+      </h1>
+      <div>
+        <GeoBreadcrumbs :geo-id="geo.parent_id" />
+      </div>
     </v-layout>
     <v-layout>
       Photos
@@ -18,24 +23,29 @@
 <script>
   import TranslationMixin from '../../mixins/TranslationMixin'
   import GeoService from '../../services/geo/GeoService'
+  import GeoBreadcrumbs from './GeoBreadcrumbs'
   import singleton from '../../static/singleton'
   import index from '../../router/index'
+  import {merge} from 'lodash'
 
-  let geo = null
+  let geo = {}
   function loadGeo (id) {
     let loading = singleton.loading
     loading.active = true
     loading.message = `Loading location ${id}...`
     loading.indeterminate = true
+    console.log('loading geo', id)
     return GeoService.getGeoById([id]).then(g => {
-      geo = g
+      merge(geo, g) // Must merge so that vue can react to changes. Can't reassign because we break the reference in the view
       loading.active = false
+      return geo
     }).catch(err => {
       singleton.loading.error = err
     })
   }
   export default {
     name: 'geo-info',
+    components: {GeoBreadcrumbs},
     data () {
       return {
         geo: geo,
@@ -46,8 +56,7 @@
       loadGeo(to.params.geoId).finally(next)
     },
     beforeRouteUpdate (to, from, next) {
-      debugger
-      next()
+      loadGeo(to.params.geoId).finally(next)
     },
     methods: {
       viewRespondents () {
