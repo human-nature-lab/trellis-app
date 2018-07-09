@@ -1,4 +1,5 @@
 import DatumRecycler from './recyclers/DatumRecycler'
+import parameterTypes from '../../../static/parameter.types'
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
@@ -19,20 +20,26 @@ const definitions = {
     for (let param of questionBlueprint.question_parameters) {
       paramMap.set(param.val, param.parameter)
       if (choiceBlueprint.val === param.val) {
-        if (param.parameter.name === 'other_exclusive' || param.parameter.name === 'other') {
+        let pId = parseInt(param.parameter_id, 10)
+        if (pId === parameterTypes.other) {
           choiceHasOtherInput = true
         }
-        if (param.parameter.name === 'other_exclusive') {
+        if (pId === parameterTypes.exclusive) {
           shouldRemoveOthers = true
         }
       }
     }
 
     // Remove any other exclusive choices that are currently selected
-    for (let i = 0; i < questionDatum.data.length; i++) {
-      let p = paramMap.get(questionDatum.data[i].val)
-      if (p && p.name === 'other_exclusive') {
-        questionDatum.data.splice(i, 1)
+    let exclusiveParameter = questionBlueprint.question_parameters.find(p => parseInt(p.parameter_id, 10) === parameterTypes.exclusive)
+    if (exclusiveParameter) {
+      let choice = questionBlueprint.choices.find(c => c.val === exclusiveParameter.val)
+      for (let i = 0; i < questionDatum.data.length; i++) {
+        let datum = questionDatum.data[i]
+        if (datum.choice_id === choice.id) {
+          questionDatum.data.splice(i, 1)
+          break
+        }
       }
     }
 
@@ -42,7 +49,7 @@ const definitions = {
     let datum = DatumRecycler.getNoKey(questionDatum, payload)
     if (choiceHasOtherInput) {
       datum.val = ''
-      datum.other_input = '' // TODO: Handle the visibility of the other_input textbox for a choice
+      datum.other_input = '' // Handle the visibility of the other_input textbox for a choice
     }
     questionDatum.data.push(datum)
   },
