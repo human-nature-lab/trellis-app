@@ -6,7 +6,7 @@
       <v-list-tile-content>
         {{this.translated}}
       </v-list-tile-content>
-      <v-list-tile-action v-if="!hideSelect">
+      <v-list-tile-action>
         <v-btn
           v-if="isSelectable"
           :color="selected && 'primary' || ''"

@@ -2,13 +2,16 @@
   <v-card tile>
     <v-toolbar card prominent>
       <v-toolbar-title>Respondent Info</v-toolbar-title>
+      <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
+        Forms
+      </v-btn>
     </v-toolbar>
     <v-card-text>
       <v-alert v-if="error">
         {{error}}
       </v-alert>
+      <h3>Names</h3>
       <v-container fluid>
-        <h3>Names</h3>
         <v-expansion-panel>
           <v-expansion-panel-content>
             <div slot="header">{{name}}</div>

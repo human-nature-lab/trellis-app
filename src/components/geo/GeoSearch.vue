@@ -10,6 +10,13 @@
         :loading="isSearching_"
         @input="queryChange"/>
     </v-layout>
+    <v-layout class="geo-breadcrumbs">
+      <span
+        v-for="geo in ancestors"
+        class="geo-name">
+        {{translate(geo)}}
+      </span>
+    </v-layout>
     <v-list v-if="results.length">
       <v-list-tile
         v-if="lastParentIds.length"
@@ -59,6 +66,8 @@
   import GeoListTile from './GeoListTile'
   import Cart from '../Cart'
   import singleton from '../../static/singleton'
+  import TranslationService from '../../services/TranslationService'
+  import router from '../../router'
   export default {
     name: 'geo-search',
     props: {
@@ -88,6 +97,10 @@
       isSelectable: {
         type: Boolean,
         default: false
+      },
+      shouldUpdateRoute: {
+        type: Boolean,
+        default: true
       }
     },
     head: {
@@ -97,11 +110,12 @@
     },
     data: function () {
       return {
-        userFilters: {
+        userFilters: this.$route.query.filters ? JSON.parse(this.$route.query.filters) : {
           parent: null,
           types: null
         },
-        query: '',
+        query: this.$route.query.query,
+        ancestorCache_: {},
         results: [],
         added: [],
         removed: [],
@@ -111,8 +125,8 @@
         queryChange: _.debounce(this.search, 300)
       }
     },
-    created: function () {
-      this.search()
+    created () {
+      this.search().then(this.loadAncestors)
     },
     computed: {
       filters: function () {
@@ -124,9 +138,38 @@
           selected.push(id)
         }
         return selected.filter(id => this.removed.indexOf(id) === -1)
+      },
+      ancestors () {
+        return this.lastParentIds.map(id => {
+          return this.ancestorCache_[id]
+        })
       }
     },
     methods: {
+      translate (geo) {
+        if (!geo || !geo.name_translation) return 'No translation'
+        return TranslationService.getAny(geo.name_translation, this.global.locale.id)
+      },
+      loadAncestors () {
+        GeoService.getGeoAncestors(this.results[0].id).then(geos => {
+          geos.forEach(geo => {
+            this.ancestorCache_[geo.id] = geo
+          })
+          this.lastParentIds.push(...geos.map(g => g.id))
+          this.lastParentIds.pop()
+        })
+      },
+      updateRoute () {
+        if (!this.shouldUpdateRoute) return
+        router.replace({
+          name: this.$route.name,
+          params: this.$route.params,
+          query: {
+            query: this.query,
+            filters: JSON.stringify(this.filters)
+          }
+        })
+      },
       moveUpOneLevel: function () {
         let lastId = this.lastParentIds[this.lastParentIds.length - 1]
         this.userFilters.parent = lastId
@@ -139,6 +182,7 @@
         this.query = null
         let prevId = this.filters.parent
         this.userFilters.parent = geo.id
+        this.ancestorCache_[geo.id] = geo
         this.search().then(() => {
           this.lastParentIds.push(prevId)
         })
@@ -185,6 +229,7 @@
           this.error = err
         }).then(() => {
           this.isSearching_ = false
+          this.updateRoute()
         })
       }
     },
