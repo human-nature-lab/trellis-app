@@ -48,6 +48,7 @@
         <v-layout row wrap>
           <Photo
             v-for="photo in respondent.photos"
+            :is-contained="true"
             :height="250"
             :width="250"
             :key="photo.id"
