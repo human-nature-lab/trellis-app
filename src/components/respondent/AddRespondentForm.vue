@@ -16,6 +16,9 @@
 
 <script>
   import RespondentService from '../../services/respondent/RespondentService'
+  import FormService from '../../services/form/FormService'
+  import censusTypes from '../../static/census.types'
+  import {pushRouteAndQueueCurrent} from '../../router'
   export default {
     name: 'add-respondent-form',
     props: {
@@ -32,9 +35,28 @@
     methods: {
       save () {
         this.isSaving = true
-        RespondentService.createRespondent(this.studyId, this.name, this.geoId, this.associatedRespondentId)
-        .then(respondent => {
-          this.$emit('close', respondent)
+        let respondent
+        let censusTypeId
+        RespondentService.createRespondent(this.studyId, this.name, this.geoId, this.associatedRespondentId).then(r => {
+          respondent = r
+          censusTypeId = this.associatedRespondentId ? censusTypes.add_associated_respondent : censusTypes.add_respondent
+          return FormService.hasCensusForm(this.studyId, censusTypeId)
+        }).then(hasCensus => {
+          if (hasCensus) {
+            pushRouteAndQueueCurrent({
+              name: 'StartCensusForm',
+              params: {
+                studyId: this.studyId,
+                censusTypeId: censusTypeId
+              },
+              query: {
+                respondentId: respondent.id
+              }
+            })
+          } else {
+            console.log('no census form found')
+            this.$emit('close', respondent)
+          }
         }).catch(err => {
           this.error = err
         }).finally(() => { this.isSaving = false })

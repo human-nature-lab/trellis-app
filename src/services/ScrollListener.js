@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import Emitter from '@/classes/Emitter'
+import Emitter from '../classes/Emitter'
 export class ScrollListener extends Emitter {
   /**
    * Lazily attached scroll listener with debounce. Useful for limiting the number of debounces being performed

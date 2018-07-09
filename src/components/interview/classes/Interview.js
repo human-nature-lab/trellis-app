@@ -274,7 +274,7 @@ export default class Interview extends Emitter {
   }
 
   /**
-   * Get a section by index
+   * Get a section by router
    * @param {Number} index
    * @private
    */
@@ -303,7 +303,7 @@ export default class Interview extends Emitter {
   /**
    * Remove a single datum from the supplied question datum
    * @param {Object} questionDatum - The question datum reference to remove the datumm from
-   * @param {Number} datumIndex - The index of the datum that should be removed
+   * @param {Number} datumIndex - The router of the datum that should be removed
    */
   deleteSingleQuestionDatumDatum (questionDatum, datumIndex) {
     questionDatum.data.splice(datumIndex, 1)

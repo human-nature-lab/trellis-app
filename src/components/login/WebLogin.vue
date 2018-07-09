@@ -51,7 +51,7 @@
 
 <script>
   import LoginService from '../../services/login/LoginService'
-  import router from '../../router/router'
+  import index from '../../router/index'
   export default {
     name: 'web-login',
     head: {
@@ -84,9 +84,9 @@
         }
         LoginService.login(this.username, this.password, params).then(res => {
           if (this.$route.query.to) {
-            router.push({path: this.$route.query.to})
+            index.push({path: this.$route.query.to})
           } else {
-            router.push({name: 'home'})
+            index.push({name: 'home'})
           }
         }).catch(err => {
           this.error = 'Unable to login with these credentials'

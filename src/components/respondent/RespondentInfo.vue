@@ -8,6 +8,7 @@
         {{error}}
       </v-alert>
       <v-container fluid>
+        <h3>Names</h3>
         <v-expansion-panel>
           <v-expansion-panel-content>
             <div slot="header">{{name}}</div>
@@ -20,12 +21,12 @@
                       <span>
                         <v-btn
                           icon
-                          @click="addNameModal = true">
+                          @click="modal.addName = true">
                           <v-icon>add</v-icon>
                         </v-btn>
                          <v-btn
                            icon
-                           @click="editingName = name; editNameModal = true">
+                           @click="editing.name = name; modal.editName = true">
                           <v-icon>edit</v-icon>
                         </v-btn>
                          <v-btn
@@ -47,8 +48,8 @@
         <v-layout row wrap>
           <Photo
             v-for="photo in respondent.photos"
-            :height="150"
-            :width="150"
+            :height="250"
+            :width="250"
             :key="photo.id"
             :photo="photo"/>
           <v-flex
@@ -59,6 +60,28 @@
             </v-btn>
           </v-flex>
         </v-layout>
+      </v-container>
+      <h3>Locations</h3>
+      <v-container fluid>
+        <v-layout>
+          <v-btn
+            @click="addGeo()">Add location to respondent</v-btn>
+        </v-layout>
+        <v-data-table
+          :headers="locationHeaders"
+          :items="locations"
+          hide-actions>
+          <template slot="items" slot-scope="props">
+            <td v-for="header in locationHeaders" :key="header.value">
+              <GeoBreadcrumbs
+                v-if="header.text === 'Name'"
+               :geo-id="props.item.id" />
+              <span v-else>
+                {{props.item[header.value]}}
+              </span>
+            </td>
+          </template>
+        </v-data-table>
       </v-container>
       <h3>Condition Tags</h3>
       <v-data-table
@@ -96,41 +119,85 @@
       </v-container>
     </v-dialog>
     <v-dialog
-      v-model="addNameModal"
+      v-model="modal.addName"
       lazy>
       <RespondentName
         :respondent="respondent"
         @close="doneAddingName"/>
     </v-dialog>
     <v-dialog
-      v-model="editNameModal"
+      v-model="modal.editName"
       lazy>
       <RespondentName
-        :name="editingName"
+        :name="editing.name"
         :respondent="respondent"
         @close="doneEditingName"/>
+    </v-dialog>
+    <v-dialog
+      lazy
+      v-model="modal.geoSearch">
+      <v-card>
+        <GeoSearch
+          @onGeoSelect="geoSelected"
+          is-selectable />
+      </v-card>
     </v-dialog>
   </v-card>
 </template>
 
 <script>
   import Photo from '../Photo'
+  import GeoSearch from '../geo/GeoSearch'
   import RespondentName from './RespondentName'
   import RespondentService from '../../services/respondent/RespondentService'
+  import TranslationService from '../../services/TranslationService'
+  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
+  import singleton from '../../static/singleton'
+
+  let respondent
+  function preloadRespondent (respondentId) {
+    singleton.loading.active = true
+    singleton.loading.indeterminate = true
+    singleton.loading.message = 'Loading respondent...'
+    return RespondentService.getRespondentById(respondentId).then(r => {
+      respondent = r
+      singleton.loading.active = false
+    })
+  }
+
   export default {
     name: 'respondent-info',
-    props: {
-      respondent: Object,
-      newPhoto: Function
-    },
     data () {
       return {
+        respondent: null,
         error: null,
-        editingName: null,
+        editing: {
+          name: null,
+          geo: null
+        },
+        modal: {
+          editName: false,
+          addName: false,
+          geoSearch: false
+        },
         isAddingPhoto: false,
-        addNameModal: false,
-        editNameModal: false
+        locationHeaders: [{
+          text: 'Name',
+          value: 'translated'
+        }, {
+          text: 'Type',
+          value: 'type'
+        }, {
+          text: 'Current',
+          value: 'isCurrent'
+        }]
       }
+    },
+    beforeRouteEnter (to, from, next) {
+      preloadRespondent(to.params.respondentId).then(next)
+    },
+    created () {
+      this.respondent = respondent
     },
     methods: {
       photoFromCamera () {},
@@ -147,23 +214,42 @@
         if (name) {
           this.respondent.names.push(name)
         }
-        this.addNameModal = false
+        this.modal.addName = false
       },
       doneEditingName (name) {
         let oldIndex = this.respondent.names.findIndex(n => name.previous_respondent_name_id)
         this.respondent.names.splice(oldIndex, 1, [name])
-        this.editNameModal = false
+        this.modal.editName = false
+      },
+      addGeo () {
+        this.modal.geoSearch = true
+        this.editing.geo = null
+      },
+      geoSelected (geo) {
+        this.modal.geoSearch = false
+        debugger
+        if (this.editing.geo) {} else {}
       }
     },
     computed: {
       name () {
         let rName = this.respondent.names.find(n => n.is_display_name)
         return rName ? rName.name : this.respondent.name
+      },
+      locations () {
+        return this.respondent.geos.map(geo => {
+          geo.translated = TranslationService.getAny(geo.name_translation, this.global.locale.id)
+          geo.type = geo.geo_type.name
+          geo.isCurrent = geo.pivot.is_current
+          return geo
+        })
       }
     },
     components: {
       Photo,
-      RespondentName
+      RespondentName,
+      GeoSearch,
+      GeoBreadcrumbs
     }
   }
 </script>
@@ -176,8 +262,8 @@
       &:last-child
         white-space: nowrap
   .add-photo
-    width: 150px
-    height: 150px
+    width: 250px
+    height: 250px
     flex-grow: 0
     button
       width: 100%

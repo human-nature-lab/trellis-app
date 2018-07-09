@@ -24,18 +24,11 @@
         <v-btn
           icon
           v-if="infoButtonVisible"
-          @click="showInfo = true">
+          :to="{name: 'Respondent', params: {studyId: global.study.id, respondentId: respondent.id}}">
           <v-icon>info</v-icon>
         </v-btn>
       </v-card-actions>
     </v-card>
-    <v-dialog
-      lazy
-      v-model="showInfo"
-      transition="dialog-bottom-transition"
-      scrollable>
-      <RespondentInfo :respondent="respondent" />
-    </v-dialog>
   </v-flex>
 </template>
 

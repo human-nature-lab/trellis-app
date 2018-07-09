@@ -17,9 +17,9 @@
   import SurveyService from '@/services/survey/SurveyService'
   import FormService from '@/services/form/FormService'
   import RespondentService from '@/services/respondent/RespondentService'
-  import singleton from '../../singleton'
+  import singleton from '../../static/singleton'
   import InterviewService from '../../services/interview/InterviewService'
-  import router from '../../router/router'
+  import index from '../../router/index'
 
   let data = {}
   function load (respondentId, studyId) {
@@ -103,7 +103,7 @@
           })
         }
         return p.then(interview => {
-          router.push({name: 'Interview', params: {studyId: this.global.study.id, interviewId: interview.id}})
+          index.push({name: 'Interview', params: {studyId: this.global.study.id, interviewId: interview.id}})
         }).catch(err => {
           this.error = err
         })

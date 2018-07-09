@@ -15,7 +15,7 @@
 </template>
 
 <script>
-  import { BUTTON_STATUS } from '@/constants'
+  import { BUTTON_STATUS } from '../static/constants'
   export default {
     name: 'auto-click-button',
     data: function () {

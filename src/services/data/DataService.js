@@ -1,5 +1,5 @@
-import config from '@/config'
-import { APP_MODE } from '@/constants'
+import config from '../../config'
+import { APP_MODE } from '../../static/constants'
 import DataServiceMock from './DataServiceMock'
 import DataServiceWeb from './DataServiceWeb'
 

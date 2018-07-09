@@ -63,8 +63,8 @@
 </template>
 
 <script>
-    import DatabaseService from '@/services/database/DatabaseService'
-    import {COMPARE_SNAPSHOTS_RESULTS as RESULTS} from '@/constants'
+    import DatabaseService from '../../../../services/database/DatabaseService'
+    import {COMPARE_SNAPSHOTS_RESULTS as RESULTS} from '../../../../static/constants'
     export default {
       name: 'compare-snapshots',
       data () {

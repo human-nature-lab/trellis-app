@@ -1,6 +1,6 @@
-import StudyService from '@/services/study/StudyService'
-import storage from '@/services/storage/StorageService'
-import singleton from '@/singleton'
+import StudyService from '../study/StudyService'
+import storage from '../storage/StorageService'
+import singleton from '../../static/singleton'
 import http from '../http/AxiosInstance'
 export default class LocaleService {
   static hasValidLocale () {

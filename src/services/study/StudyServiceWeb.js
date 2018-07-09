@@ -1,6 +1,6 @@
 import storage from '../storage/StorageService'
 import http from '../http/AxiosInstance'
-import singleton from '@/singleton'
+import singleton from '../../static/singleton'
 export default class StudyServiceWeb {
   static getCurrentStudy () {
     return new Promise((resolve, reject) => {
