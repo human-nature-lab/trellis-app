@@ -148,6 +148,7 @@
 .photo.contained
   max-height: 100%
   max-width: 100%
+  flex-grow: 0
   img
    max-height: 100%
    max-width: 100%
