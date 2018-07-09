@@ -19,7 +19,7 @@ export default [{
   beforeEnter: chainableGuards(ValidateStudy)
 }, {
   path: '/study/:studyId/respondent/:respondentId/forms',
-  name: 'respondent-forms',
+  name: 'RespondentForms',
   component: RespondentForms,
   beforeEnter: chainableGuards(ValidateStudy, ValidateLocale)
 }, {

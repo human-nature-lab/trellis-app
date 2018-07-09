@@ -17,7 +17,7 @@
         <v-btn
           icon
           v-if="formsButtonVisible"
-          :to="{name: 'respondent-forms', params: {studyId: global.study.id, respondentId: respondent.id}}">
+          :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
           <v-icon>assignment</v-icon>
         </v-btn>
         <v-spacer></v-spacer>

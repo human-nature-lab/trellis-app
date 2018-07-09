@@ -66,9 +66,10 @@
   }
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
   .error
     color: red
-  .geo-name:not(:first-child):before
-    content: ' > '
+  .geo-breadcrumbs
+    .geo-name:not(:first-child):before
+      content: ' > '
 </style>
