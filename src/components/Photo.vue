@@ -1,5 +1,5 @@
 <template>
-  <v-flex class="photo contained" ref="container" :style="{'width': width + 'px', 'height': height + 'px'}">
+  <v-flex class="photo" :class="{contained: isContained}" ref="container" :style="{'width': width + 'px', 'min-height': height + 'px'}">
     <v-progress-circular
       v-if="srcLoading || imgLoading"
       indeterminate
@@ -24,6 +24,10 @@
       },
       photoId: {
         type: String
+      },
+      isContained: {
+        type: Boolean,
+        default: false
       },
       showAlt: {
         type: Boolean,
