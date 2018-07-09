@@ -228,7 +228,6 @@
       },
       geoSelected (geo) {
         this.modal.geoSearch = false
-        debugger
         if (this.editing.geo) {} else {}
       }
     },

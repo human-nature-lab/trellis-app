@@ -32,7 +32,6 @@ export default function (to, from, next) {
     })
     .catch(err => {
       console.error(err)
-      debugger
       next()
     })
 }
