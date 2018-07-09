@@ -25,7 +25,7 @@
 
 <script>
   import TranslationMixin from '../../mixins/TranslationMixin'
-  import router from '../../router/router'
+  import index from '../../router/index'
   import Photo from '../Photo'
   export default {
     name: 'geo-list-tile',
@@ -57,7 +57,7 @@
     },
     methods: {
       showGeoInfo () {
-        router.push({
+        index.push({
           name: 'Geo',
           params: {
             geoId: this.geo.id

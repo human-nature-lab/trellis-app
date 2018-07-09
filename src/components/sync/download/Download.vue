@@ -104,7 +104,7 @@
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import InsertRows from './substeps/InsertRows.vue'
   import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
-  import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
+  import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '../../../static/constants'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
     CHECKING_LAST_SNAPSHOT: 'Checking latest available snapshot on the server...'

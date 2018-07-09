@@ -1,13 +1,11 @@
-import config from '@/config'
-import { APP_ENV } from '@/constants'
+import {switchByModeEnv} from '../util'
 import DatabaseServiceMock from './DatabaseServiceMock'
 import DatabaseServiceCordova from './DatabaseServiceCordova'
 
-let Constructor = null
-if (config.appEnv === APP_ENV.CORDOVA) {
-  Constructor = DatabaseServiceCordova
-} else {
-  Constructor = DatabaseServiceMock
-}
+const Constructor = switchByModeEnv({
+  WEB: DatabaseServiceMock,
+  CORDOVA: DatabaseServiceCordova
+})
+
 export const DatabaseService = new Constructor()
 export default DatabaseService

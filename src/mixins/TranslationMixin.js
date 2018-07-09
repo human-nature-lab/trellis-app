@@ -1,4 +1,4 @@
-import TranslationService from '@/services/TranslationService'
+import TranslationService from '../services/TranslationService'
 export default {
   computed: {
     translated: function () {

@@ -93,8 +93,8 @@
   import actionBus from './services/ActionBus'
   import {validateParametersWithError} from './services/ValidatorService'
 
-  import router from '../../router/router'
-  import singleton from '../../singleton'
+  import router, {moveToNextOr} from '../../router'
+  import singleton from '../../static/singleton'
   import InterviewLoader from './services/InterviewLoader'
 
   let interviewData = {}
@@ -192,19 +192,6 @@
     },
     beforeRouteLeave  (to, from, next) {
       console.log('before route leave', to)
-      // if (to.name === 'Interview' || to.name === 'InterviewPreview') {
-      //   this.isLoading = true
-      //   interviewData.intervew = null
-      //   interviewData.actions = null
-      //   interviewData.data = null
-      //   interviewData.form = null
-      //   interviewData.preload = null
-      //   interviewGuards(to, from, next).then(() => {
-      //     this.loadInterview()
-      //   })
-      // } else {
-      //   next()
-      // }
       this.saveData().then(() => {
         if (to.name === 'Interview' || to.name === 'InterviewPreview') {
           this.isLoading = true
@@ -270,12 +257,16 @@
           .then(() => InterviewService.complete(this.interview.id))
           .then(() => {
             this.dialog.end = false
-            router.go(-1)
-            // router.push({name: 'home'})
+            this.exit()
           })
           .catch(err => {
             this.error = err
           })
+      },
+      exit () {
+        moveToNextOr(() => {
+          router.go(-1)
+        })
       },
       saveData: function () {
         this.isSaving = true
@@ -286,7 +277,7 @@
       saveAndExit: function () {
         this.saveData().then(() => {
           this.dialog.end = false
-          router.go(-1)
+          this.exit()
         })
       },
       prematureExit: function (e) {

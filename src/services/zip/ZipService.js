@@ -1,14 +1,14 @@
-import config from '@/config'
-import { APP_MODE, APP_ENV } from '@/constants'
+import {switchByModeEnv} from '../util'
 import ZipServiceMock from './ZipServiceMock'
 import ZipServiceCordova from './ZipServiceCordova'
 
-let ZipServiceConstructor = null
-if (config.appEnv === APP_ENV.CORDOVA) {
-  ZipServiceConstructor = (config.appMode === APP_MODE.TEST) ? ZipServiceMock : ZipServiceCordova
-} else {
-  ZipServiceConstructor = ZipServiceMock
-}
+const Constructor = switchByModeEnv({
+  WEB: ZipServiceMock,
+  CORDOVA: {
+    PROD: ZipServiceCordova,
+    TEST: ZipServiceCordova
+  }
+})
 
-export const ZipService = new ZipServiceConstructor()
+export const ZipService = new Constructor()
 export default ZipService

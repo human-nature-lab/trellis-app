@@ -18,16 +18,20 @@
 <script>
   import TranslationMixin from '../../mixins/TranslationMixin'
   import GeoService from '../../services/geo/GeoService'
-  import router from '../../router/router'
+  import singleton from '../../static/singleton'
+  import index from '../../router/index'
+
   let geo = null
-  let error = null
   function loadGeo (id) {
-    return GeoService.getGeosById([id]).then(geos => {
-      if (geos.length) {
-        geo = geos[0]
-      } else {
-        throw new Error('Unable to load geo with id ' + id)
-      }
+    let loading = singleton.loading
+    loading.active = true
+    loading.message = `Loading location ${id}...`
+    loading.indeterminate = true
+    return GeoService.getGeoById([id]).then(g => {
+      geo = g
+      loading.active = false
+    }).catch(err => {
+      singleton.loading.error = err
     })
   }
   export default {
@@ -35,16 +39,11 @@
     data () {
       return {
         geo: geo,
-        error: error,
         translation: geo.name_translation
       }
     },
     beforeRouteEnter (to, from, next) {
-      loadGeo(to.params.geoId)
-        .catch(err => {
-          error = err
-        })
-        .finally(next)
+      loadGeo(to.params.geoId).finally(next)
     },
     beforeRouteUpdate (to, from, next) {
       debugger
@@ -52,7 +51,7 @@
     },
     methods: {
       viewRespondents () {
-        router.push({
+        index.push({
           name: 'RespondentsSearch',
           query: {
             filters: JSON.stringify({

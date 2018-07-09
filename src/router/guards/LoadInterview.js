@@ -1,7 +1,7 @@
 import InterviewService from '../../services/interview/InterviewService'
 import InterviewActionsService from '../../components/interview/services/interview-actions/InterviewActionsService'
 import FormService from '../../services/form/FormService'
-import singleton from '../../singleton'
+import singleton from '../../static/singleton'
 
 export default function loadInterview (to, from, next) {
   let interview = null

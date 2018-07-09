@@ -7,16 +7,16 @@
 </template>
 
 <script>
-  import router from '../router/router'
+  import index from '../router/index'
   import StudySelector from './StudySelector'
   export default {
     name: 'study-selector-page',
     methods: {
       done: function () {
         if (this.$route.query.to) {
-          router.push({path: this.$route.query.to})
+          index.push({path: this.$route.query.to})
         } else {
-          router.push({name: 'home'})
+          index.push({name: 'home'})
         }
       }
     },

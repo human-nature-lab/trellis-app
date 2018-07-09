@@ -41,6 +41,9 @@
 <script>
   import LocaleService from '../../services/locale/LocaleService'
   import RespondentService from '../../services/respondent/RespondentService'
+  import FormService from '../../services/form/FormService'
+  import censusTypes from '../../static/census.types'
+  import { pushRouteAndQueueCurrent } from '../../router'
   export default {
     name: 'respondent-name',
     props: {
@@ -75,29 +78,44 @@
       save () {
         if (this.isSaving) return
         this.isSaving = true
-        if (this.name.id) {
+        let p
+        let isEditingName = this.name.id !== null && this.name.id !== undefined
+        if (isEditingName) {
           let isDisplayName = this.name.is_display_name ? true : false // eslint-disable-line
-          RespondentService.editName(
+          p = RespondentService.editName(
             this.respondent.id,
             this.name.id,
             this.name.name,
             isDisplayName,
             this.name.locale_id
-          ).then(name => {
-            this.$emit('close', name)
-          }).catch(err => {
-            this.error = err
-          }).finally(() => {
-            this.isSaving = false
-          })
+          )
         } else {
-          RespondentService.addName(this.respondent.id, this.name.name, this.name.is_display_name, this.name.locale_id)
-          .then(name => {
-            this.$emit('close', name)
-          }).catch(err => {
-            this.error = err
-          }).finally(() => { this.isSaving = false })
+          p = RespondentService.addName(this.respondent.id, this.name.name, this.name.is_display_name, this.name.locale_id)
         }
+        this.isSaving = true
+        p.catch(err => {
+          this.error = err
+        }).then(r => {
+          return FormService.hasCensusForm(this.global.study.id, censusTypes.rename_respondent)
+        }).then(hasCensus => {
+          if (hasCensus) {
+            pushRouteAndQueueCurrent({
+              name: 'StartCensusForm',
+              params: {
+                studyId: this.global.study.id,
+                censusTypeId: censusTypes.rename_respondent
+              },
+              query: {
+                respondentId: this.respondent.id
+              }
+            })
+          } else {
+            console.log('no census form found')
+            this.$emit('close', name)
+          }
+        }).catch(err => {
+          this.error = err
+        }).finally(() => { this.isSaving = false })
       }
     }
   }

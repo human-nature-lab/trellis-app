@@ -85,7 +85,7 @@
   import RespondentListItem from './RespondentListItem'
   import RespondentItem from './RespondentItem'
   import AddRespondentForm from './AddRespondentForm'
-  import router from '../../router/router'
+  import router from '../../router'
 
   /**
    * Keeps the vue router link in sync with the current query. This means that navigating away from this page and then
@@ -155,7 +155,7 @@
       },
       canAddRespondent: {
         type: Boolean,
-        default: false
+        default: true
       }
     },
     head: {

@@ -55,10 +55,10 @@
 
 <script>
   import _ from 'lodash'
-  import GeoService from '@/services/geo/GeoService'
+  import GeoService from '../../services/geo/GeoService'
   import GeoListTile from './GeoListTile'
   import Cart from '../Cart'
-  import singleton from '@/singleton'
+  import singleton from '../../static/singleton'
   export default {
     name: 'geo-search',
     props: {
@@ -111,7 +111,7 @@
         queryChange: _.debounce(this.search, 300)
       }
     },
-    mounted: function () {
+    created: function () {
       this.search()
     },
     computed: {
