@@ -73,6 +73,9 @@ export default class RespondentServiceWeb {
     if (filters.geos) {
       params.g = filters.geos.join(',')
     }
+    if (filters.include_children) {
+      params.i = filters.include_children
+    }
     studyId = encodeURIComponent(studyId)
     return http().get(`study/${studyId}/respondents/search`, {
       params: params
