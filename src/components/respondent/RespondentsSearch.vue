@@ -85,7 +85,7 @@
 </template>
 
 <script>
-  import _ from 'lodash'
+  import _, {merge} from 'lodash'
   import ConditionTagService from '../../services/condition-tag/ConditionTagService'
   import RespondentService from '../../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
@@ -130,9 +130,8 @@
    */
   function loadRoute (vm) {
     vm.query = vm.$route.query.query || ''
-    vm.filters = vm.$route.query.filters ? JSON.parse(vm.$route.query.filters) : {
-      conditionTags: [],
-      geos: []
+    if (vm.$route.query.filters) {
+      merge(vm.filters, JSON.parse(vm.$route.query.filters))
     }
   }
 
@@ -161,7 +160,11 @@
       },
       baseFilters: {
         type: Object,
-        default: () => ({})
+        default: () => ({
+          conditionTags: [],
+          geos: [],
+          include_children: false
+        })
       },
       selectedRespondents: {
         type: Array,

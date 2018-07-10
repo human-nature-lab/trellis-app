@@ -80,6 +80,7 @@
         default () {
           return {
             'no-parent': true,
+            include_children: true,
             'study': singleton.study ? singleton.study.id : null
           }
         }

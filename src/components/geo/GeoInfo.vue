@@ -64,7 +64,8 @@
           name: 'RespondentsSearch',
           query: {
             filters: JSON.stringify({
-              geos: [this.geo.id]
+              geos: [this.geo.id],
+              include_children: true
             })
           }
         })
