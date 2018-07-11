@@ -45,12 +45,13 @@
         <span>Add temporary respondent</span>
       </v-tooltip>
     </v-layout>
-    <v-layout>
+    <v-layout v-if="filters.geos && filters.geos.length">
+      Search limited to:
       <v-chip
         v-for="(geo, index) in filters.geos"
         :key="geo.id"
         @input="removeGeoFilter(index)"
-        close>
+        :close="canRemoveGeos">
         <GeoBreadcrumbs :geo-id="geo" :show-ancestors="false"/>
       </v-chip>
     </v-layout>
@@ -174,6 +175,10 @@
         type: String
       },
       canAddRespondent: {
+        type: Boolean,
+        default: true
+      },
+      canRemoveGeos: {
         type: Boolean,
         default: true
       }
