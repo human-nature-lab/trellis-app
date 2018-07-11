@@ -1,6 +1,89 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme">
-    <v-toolbar fixed>
+    <v-navigation-drawer
+      v-model="global.menuDrawer.open"
+      fixed
+      app>
+      <v-list dense>
+        <v-list-tile>
+          <v-list-tile-content>
+          </v-list-tile-content>
+          <v-list-tile-action @click="global.menuDrawer.open = false" class="text-right">
+            <v-icon>arrow_back</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-list-tile :to="{name: 'RespondentsSearch'}">
+          <v-list-tile-action>
+            <v-icon>group</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Respondents</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile :to="{name: 'GeoSearch'}">
+          <v-list-tile-action>
+            <v-icon>place</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Locations</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+      <v-divider></v-divider>
+      <v-list subheader>
+        <v-subheader>Settings</v-subheader>
+        <v-list-tile :to="{name: 'Home', query: {to: $route.fullPath}}">
+          <v-list-tile-action>
+            <v-icon>question_answer</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title>Change study</v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile :to="{name: 'locale', query: {to: $route.fullPath}}">
+          <v-list-tile-action>
+            <v-icon>language</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title>Change locale</v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile @click="global.darkTheme=!global.darkTheme">
+          <v-list-tile-action>
+            <v-icon>wb_sunny</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Toggle dark theme
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile @click="refresh()">
+          <v-list-tile-action>
+            <v-icon>refresh</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Refresh app
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <v-navigation-drawer
+      v-model="global.searchDrawer.open"
+      fixed
+      right
+      app>
+      <v-list dense>
+        <v-list-tile>
+          <v-list-tile-action @click="global.searchDrawer.open = false" class="text-right">
+            <v-icon>arrow_forward</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <v-toolbar fixed app>
+      <!-- MainMenu /-->
+      <v-toolbar-side-icon @click.stop="global.menuDrawer.open = !global.menuDrawer.open"></v-toolbar-side-icon>
       <v-toolbar-title class="logo">
         <router-link :to="{name: 'home'}" class="deep-orange--text">
           <img src="../static/img/trellis-logo.png" alt="trellis">
@@ -13,13 +96,9 @@
       <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.fullPath}}">
         {{global.locale ? global.locale.language_tag : ''}}
       </v-btn>
-      <v-btn icon @click="global.darkTheme=!global.darkTheme">
-        <v-icon>wb_sunny</v-icon>
+      <v-btn icon @click.stop="global.searchDrawer.open = !global.searchDrawer.open">
+        <v-icon>search</v-icon>
       </v-btn>
-      <v-btn icon @click="refresh()">
-        <v-icon>refresh</v-icon>
-      </v-btn>
-      <MainMenu />
     </v-toolbar>
     <v-content>
       <v-container fluid class="app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
@@ -72,6 +151,10 @@
   body
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
+  .navigation-drawer
+    z-index: 1600
+  .overlay
+    z-index: 1500
   .app-container
     margin-top: 50px
     margin-bottom: 50px

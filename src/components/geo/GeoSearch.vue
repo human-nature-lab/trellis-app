@@ -181,6 +181,7 @@
         }
         return GeoService.search(filters).then(results => {
           this.results = results
+          this.$emit('returned-geo-results', results)
         }).catch(err => {
           this.error = err
         }).then(() => {

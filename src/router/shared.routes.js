@@ -2,7 +2,7 @@ import Interview from '../components/interview/Interview'
 import RespondentForms from '../components/respondent/RespondentForms'
 import RespondentsSearch from '../components/respondent/RespondentsSearch'
 import CameraTest from '../components/CameraTest'
-import GeoSearch from '../components/geo/GeoSearch'
+import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
 import GeoInfo from '../components/geo/GeoInfo'
 import LocaleSelectorPage from '../components/LocaleSelectorPage'
 import chainableGuards from './guards/ChainableGuards'
@@ -35,7 +35,7 @@ export default [{
 }, {
   path: '/search/locations',
   name: 'GeoSearch',
-  component: GeoSearch,
+  component: GeoSearchWithMap,
   beforeEnter: ValidateLocale
 }, {
   path: '/geo/:geoId',
