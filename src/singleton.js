@@ -2,6 +2,13 @@ export default {
   study: null,
   locale: null,
   darkTheme: false,
+  searchDrawer: {
+    component: null,
+    open: false
+  },
+  menuDrawer: {
+    open: false
+  },
   loading: {
     active: false,
     step: 0,
