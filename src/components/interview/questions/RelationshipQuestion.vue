@@ -23,10 +23,12 @@
     </v-chip>
     <v-btn
       :disabled="isQuestionDisabled"
-      @click="respondentSearchDialog = true">
+      @click="showRespondentSearch()">
       Add Relationship
     </v-btn>
-    <v-dialog v-model="respondentSearchDialog">
+    <v-dialog
+      lazy
+      v-model="respondentSearchDialog">
       <v-card>
         <RespondentsSearch
           :canSelect="true"
@@ -36,8 +38,9 @@
           @selected="onSelected"
           :respondentId="respondent.id"
           :formsButtonVisible="false"
-          :baseFilters="{locations: [respondent.geo_id]}"
+          :baseFilters="baseRespondentFilters"
           :selectedRespondents="selectedRespondents"
+          :canRemoveGeos="false"
           :isLoading="isSavingEdges" />
       </v-card>
     </v-dialog>
@@ -50,6 +53,8 @@
   import RespondentsSearch from '../../respondent/RespondentsSearch'
   import EdgeService from '../../../services/edge/EdgeService'
   import actionBus from '../services/ActionBus'
+  import parameterTypes from '../../../static/parameter.types'
+  import GeoService from '../../../services/geo/GeoService'
   export default {
     name: 'relationship-question',
     props: {
@@ -68,7 +73,8 @@
         respondentSearchDialog: false,
         loadedEdges: {},
         error: null,
-        isSavingEdges: false
+        isSavingEdges: false,
+        baseAncestorId: null
       }
     },
     computed: {
@@ -76,6 +82,22 @@
         return this.question.question_parameters.findIndex(p => {
           return p.parameter.name === 'can_add_respondent' && parseInt(p.val, 10) === 1
         }) > -1
+      },
+      currentGeo () {
+        return this.respondent.geos.find(geo => geo.pivot.is_current)
+      },
+      geoTypeParameterValue () {
+        let geoTypeParameter = this.question.question_parameters.find(p => parseInt(p.parameter_id, 10) === parameterTypes.geo_type)
+        return geoTypeParameter ? geoTypeParameter.val : null
+      },
+      baseRespondentFilters () {
+        let filters = {
+          include_children: true
+        }
+        if (this.geoTypeParameterValue) {
+          filters.geos = [this.baseAncestorId]
+        }
+        return filters
       },
       edgeIds: function () {
         return this.question.datum.data.map(d => d.edge_id)
@@ -109,6 +131,20 @@
       }
     },
     methods: {
+      showRespondentSearch () {
+        let promise = new Promise(resolve => resolve())
+        if (this.geoTypeParameterValue && !this.baseAncestorId) {
+          promise = GeoService.getGeoAncestors(this.currentGeo.id).then(ancestors => {
+            let geoTypeCompareVal = this.geoTypeParameterValue.replace(' ', '').toLowerCase()
+            let baseAncestor = ancestors.find(a => a.geo_type.name.replace(' ', '').toLowerCase() === geoTypeCompareVal)
+            if (!baseAncestor) console.warn('Unable to find respondent ancestor matching', this.geoTypeParameterValue)
+            this.baseAncestorId = baseAncestor ? baseAncestor.id : null
+          })
+        }
+        promise.then(() => {
+          this.respondentSearchDialog = true
+        })
+      },
       loadEdges: function (edgeIds) {
         if (!edgeIds.length) return
         EdgeService.getEdges(edgeIds)
