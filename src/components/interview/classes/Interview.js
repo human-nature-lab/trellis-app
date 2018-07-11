@@ -20,8 +20,6 @@ export default class Interview extends Emitter {
     super()
     this.interview = interview
     this.blueprint = blueprint
-    this.data = new DataStore()
-    this.actions = new ActionStore()
 
     // Indexes and data stores
     this.respondentFills = new RespondentFillStore()
@@ -32,11 +30,14 @@ export default class Interview extends Emitter {
     this.questionIdToPageIndex = new Map()
 
     // Initializing all the custom data types
-    this.load(blueprint)
-    if (actions) this.actions.load(actions)
+    this._loadBlueprint(blueprint)
+    this.data = new DataStore()
+    this.actions = new ActionStore(this.blueprint)
+
     if (data) this.data.loadData(data)
     if (conditionTags) this.data.loadConditionTags(conditionTags)
     if (respondentFills) this.respondentFills.fill(respondentFills)
+    if (actions) this.actions.load(actions)
 
     this.navigator = new InterviewNavigator(this)
     this._initializeConditionAssignment()
@@ -53,8 +54,12 @@ export default class Interview extends Emitter {
   /**
    * Run anything that needs to wait until other stuff is initialized before being run
    */
-  initalize () {
+  initialize () {
+    this.actions.initialize() // This emits an initial state event to any subscribers (the actionsPersistSlave)
+    this.data.initialize()    // This emits an initial state event to any subscribers (the dataPersistSlave)
+    this.data.reset()
     this.makePageQuestionDatum()
+    this.playActions(this.actions.actions)
   }
 
   /**
@@ -115,39 +120,48 @@ export default class Interview extends Emitter {
   /**
    * Play an array of actions
    * @param {Array} actions - The array of actions to play
-   * @param {Boolean} [includeNext = false] - Don't filter out next actions
-   * @param {Boolean} [includePrevious = false] - Don't filter out previous actions
    */
-  playActions (actions, includeNext = false, includePrevious = false) {
-    actions = actions.filter(action => {
-      if (includeNext && action.action_type === 'next') {
-        return true
-      } else if (includePrevious && action.action_type === 'previous') {
-        return true
-      } else {
-        return action.action_type !== 'next' && action.action_type !== 'previous'
-      }
-    })
+  playActions (actions) {
+    const locationMatches = action => {
+      return this.actions.getActionSection(action) === this.location.section &&
+        this.actions.getActionPage(action) === this.location.page &&
+        action.section_repetition === this.location.sectionRepetition &&
+        action.section_follow_up_repetition === this.location.sectionFollowUpDatumRepetition
+    }
     for (let action of actions) {
-      this.performAction(action)
+      if (action.action_type !== 'next' && action.action_type !== 'previous') {
+        let matches = locationMatches(action)
+        if (matches) {
+          this.performAction(action)
+        } else {
+          this.next()
+          if (locationMatches(action)) {
+            this.performAction(action)
+          } else {
+            console.warn('action order does not line up with order of the form')
+            debugger
+          }
+        }
+      }
     }
   }
 
   /**
    * All user created actions should go through this method so that the actions are stored
-   * @param action
+   * @param {Object} action - The action without location information
    */
   pushAction (action) {
     action.interview_id = this.interview.id
     this.actions.add(action, this.location)
-    this.performAction(action)
+    this.performAction(action, true)
   }
 
   /**
    * This method actually modifies the state based on the action type and payload
-   * @param action
+   * @param {Object} action
+   * @param {Boolean} [actionWasInitiatedByAHuman = false]
    */
-  performAction (action) {
+  performAction (action, actionWasInitiatedByAHuman = false) {
     if (actionDefinitions[action.action_type]) {
       let questionDatum = null
       let questionBlueprint = null
@@ -160,7 +174,7 @@ export default class Interview extends Emitter {
         console.error(action)
         throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
       }
-      actionDefinitions[action.action_type](this, action.payload, questionDatum, questionBlueprint)
+      actionDefinitions[action.action_type](this, action.payload, questionDatum, questionBlueprint, actionWasInitiatedByAHuman)
     } else {
       console.error('No actionDefinition has been defined for that action yet')
     }
@@ -356,14 +370,6 @@ export default class Interview extends Emitter {
   }
 
   /**
-   * Load the survey blueprint and existing data
-   * @param blueprint
-   */
-  load (blueprint) {
-    this._loadBlueprint(blueprint)
-  }
-
-  /**
    * Assign the specified condition tag
    * @param assign_condition_tag
    * @private
@@ -407,7 +413,7 @@ export default class Interview extends Emitter {
       }
       return vars
     }, {})
-    console.log('vars', vars)
+    console.log('condition assignment vars', vars)
     for (let question of questionsWithData) {
       for (let act of question.assign_condition_tags) {
         try {
@@ -486,6 +492,18 @@ export default class Interview extends Emitter {
     this.makePageQuestionDatum()
   }
 
+  nextAndReplay () {
+    // debugger
+    this.next()
+    // this.replayToCurrent()
+  }
+
+  previousAndReplay () {
+    // debugger
+    this.previous()
+    // this.replayToCurrent()
+  }
+
   /**
    * Move to the next valid page in the survey. The bulk of the form navigation is handled by the clock class which is
    * an abstraction on this type of incremental movement that is similar to a clock
@@ -545,6 +563,10 @@ export default class Interview extends Emitter {
     console.log('previous done location', JSON.stringify(this.location))
   }
 
+  replayToCurrent () {
+    this.replayTo(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumRepetition)
+  }
+
   /**
    * Zero the state of the survey and replay all of the actions that have happened in the survey so far. The order of the
    * action replay follows the order of the survey as opposed to the order that the actions happened in. Once all actions
@@ -558,30 +580,9 @@ export default class Interview extends Emitter {
     this._isReplaying = true
     this._zeroLocation()
     this._resetState()
-    // Iterate through all of the actions that have been recorded in the survey so far
-    let actions = this.actions.actions
-    for (let i = 0; i < actions.length; i++) {
-      let action = actions[i]
-      // Don't perform an previous actions or do a next action more than once in a row
-      if (action.action_type !== 'previous' && action.action_type !== 'next') {
-        this.performAction(action)
-      } else if (action.action_type === 'next') {
-        this.next()
-      }
-    }
-    // let clock = this._getClockFromLocation({
-    //   section: section,
-    //   page: page,
-    //   sectionRepetition: sectionRepetition,
-    //   sectionFollowUpDatumId: sectionFollowUpDatumId
-    // })
-    // TODO: Is there a better way to achieve this? In theory we could just specify the desired location directly, right?
-    // All valid question datum should have been created so we don't really need to use the next or previous buttons. We
-    // would have to make sure we aren't visiting an invalid part of the form though. idk...
-    // this._setLocationFromClock(clock)
-    // this.seekTo(...clock.time)
-    // this.navigator.section = section
-    this.navigator.setLocation(section, page, sectionRepetition, sectionFollowUpRepetition)
+    this.playActions(this.actions.actions)
+
+    this.seekTo(section, page, sectionRepetition, sectionFollowUpRepetition)
     this._isReplaying = false
   }
 
@@ -593,7 +594,6 @@ export default class Interview extends Emitter {
    * @param sectionFollowUpRepetition
    */
   seekTo (section, sectionRepetition, sectionFollowUpRepetition, page) {
-    // TODO: Should change to a clock based comparison instead.
     let count = 1
     let DIRS = {FORWARD: 0, BACKWARD: 1}
     // Cast the current location and desired location into a 4 digit number with this structure {section}{sectionRepetition}{sectionFollowUpRepetition}{page}
@@ -602,7 +602,7 @@ export default class Interview extends Emitter {
     let previousDirection
     let currentDirection
     do {
-      curLocNumber = this.location.section * 1000000 + this.location.sectionRepetition * 10000 + this.navigator.sectionFollowUpRepetition * 100 + this.location.page
+      curLocNumber = this.location.section * 1000000 + this.location.sectionRepetition * 10000 + this.location.sectionFollowUpDatumRepetition * 100 + this.location.page
       if (curLocNumber < desiredLocNumber) {
         currentDirection = DIRS.FORWARD
       } else if (curLocNumber > desiredLocNumber) {
@@ -663,6 +663,7 @@ export default class Interview extends Emitter {
    */
   atEnd () {
     if (!this._isReplaying) {
+      this._onPageExit()
       this.emit('atEnd', JSON.parse(JSON.stringify(this.location)))
     }
     console.log(`Reached the end of the survey`)

@@ -89,12 +89,20 @@ const definitions = {
       console.error('dk-rf-val', 'invalid input without a questionDatum', payload)
     }
   },
-  'next': function (interview) {
-    interview.next()
+  'next': function (interview, a, b, c, actionWasInitiatedByHuman) {
+    if (actionWasInitiatedByHuman) {
+      interview.nextAndReplay()
+    } else {
+      interview.next()
+    }
     // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
   },
-  'previous': function (interview) {
-    interview.previous()
+  'previous': function (interview, a, b, c, actionWasInitiatedByHuman) {
+    if (actionWasInitiatedByHuman) {
+      interview.previousAndReplay()
+    } else {
+      interview.previous()
+    }
     // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
   },
   'type-text': function (interview, payload, questionDatum, questionBlueprint) {
