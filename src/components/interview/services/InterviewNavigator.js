@@ -39,18 +39,21 @@ export default class InterviewNavigator extends Emitter {
   }
   set section (val) {
     this._location.section = val
+    this.clock.time[0] = val
   }
   get sectionRepetition () {
     return this._location.sectionRepetition
   }
   set sectionRepetition (val) {
     this._location.sectionRepetition = val
+    this.clock.time[1] = val
   }
   get page () {
     return this._location.page
   }
   set page (val) {
     this._location.page = val
+    this.clock.time[3] = val
   }
   get sectionFollowUpDatumId () {
     if (!this._location.sectionFollowUpDatumId) {
@@ -80,6 +83,7 @@ export default class InterviewNavigator extends Emitter {
   set sectionFollowUpDatumRepetition (val) {
     this._location.sectionFollowUpRepetition = val
     this._location.sectionFollowUpDatumId = null
+    this.clock.time[2] = val
   }
 
   /**
@@ -133,6 +137,8 @@ export default class InterviewNavigator extends Emitter {
     this.page = 0
     this.sectionRepetition = 0
     this.sectionFollowUpDatumRepetition = 0
+    this.updateLocation()
+    this.updateMax()
   }
 
   get isAtEnd () {

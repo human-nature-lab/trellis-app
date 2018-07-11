@@ -19,6 +19,13 @@ export default class DataStore extends Emitter {
   }
 
   /**
+   * Intitialize the datastore. Emits an initialState event to any subscribers
+   */
+  initialize () {
+    this.emit('initialState', this.data)
+  }
+
+  /**
    * Reset the state of the data and conditionTags
    */
   reset () {
@@ -52,7 +59,6 @@ export default class DataStore extends Emitter {
     }
     QuestionDatumRecycler.fill(questionDatum)
     DatumRecycler.fill(datum)
-    this.emit('initialState', this.data)
   }
 
   /**
@@ -80,7 +86,6 @@ export default class DataStore extends Emitter {
     RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
     SectionConditionTagRecycler.fill(this.conditionTags.section)
     FormConditionTagRecycler.fill(this.conditionTags.survey)
-    this.emit('initialState', this.data)
   }
 
   /**

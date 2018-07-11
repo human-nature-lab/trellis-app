@@ -225,7 +225,7 @@
           interviewState.attachDataPersistSlave()
           interviewState.attachActionsPersistSlave()
         }
-        interviewState.initalize()
+        interviewState.initialize()
         // Share the relevant parts of the interview with the view
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
