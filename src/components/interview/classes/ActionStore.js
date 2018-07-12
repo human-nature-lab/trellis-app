@@ -1,6 +1,6 @@
 import Emitter from '../../../classes/Emitter'
-import {sortedIndex} from 'lodash'
 import uuidv4 from 'uuid/v4'
+import SortedArray from '../../../classes/SortedArray'
 import {now, parseDate} from '../../../services/DateService'
 
 /**
@@ -12,9 +12,34 @@ export default class ActionStore extends Emitter {
   constructor (blueprint) {
     super()
     this._createPageAndSectionIndexes(blueprint)
+    this.sortedStore = new SortedArray((a, b) => {
+      if (a.question_id && b.question_id) {
+        let sectionA = this.getActionSection(a)
+        let sectionB = this.getActionSection(b)
+        if (sectionA === sectionB) {
+          if (a.section_repetition === b.section_repetition) {
+            if (a.section_follow_up_repetition === b.section_follow_up_repetition) {
+              let pageA = this.getActionPage(a)
+              let pageB = this.getActionPage(b)
+              if (pageA === pageB) {
+                return a.created_at - b.created_at
+              } else {
+                return pageA - pageB
+              }
+            } else {
+              return a.section_follow_up_repetition - b.section_follow_up_repetition
+            }
+          } else {
+            return a.section_repetition - b.section_repetition
+          }
+        } else {
+          return sectionA - sectionB
+        }
+      } else {
+        return (b.question_id != null) - (a.question_id != null)
+      }
+    })
     this.store = []
-    this._storeSortNums = []
-    this._orderedStore = []
     this.questionIndex = new Map()
   }
 
@@ -70,17 +95,7 @@ export default class ActionStore extends Emitter {
    */
   insertIntoStore (action) {
     this.store.push(action)
-    if (action.question_id) {
-      let actionSortVal = this.actionToNum(action)
-      let insertIndex = sortedIndex(this._storeSortNums, actionSortVal)
-      this._storeSortNums.splice(insertIndex, 0, actionSortVal)
-      this._orderedStore.splice(insertIndex, 0, action)
-      return insertIndex
-    } else {
-      this._storeSortNums.push(Number.POSITIVE_INFINITY) // Arbitrarily large number so these stay at the end
-      this._orderedStore.push(action)
-      return this._orderedStore.length - 1
-    }
+    this.sortedStore.insertSorted(action)
   }
 
   /**
@@ -94,8 +109,10 @@ export default class ActionStore extends Emitter {
     // TODO: this has quite a few limitations, but it needs to be something that's comparable using > and < which is tough
     // with a string representation of a number since reliable behaviour of string comparison depends on the strings being
     // the same length.
-    let secondsSortVal = a.created_at.unix()
-    return this.questionToSectionIndex.get(a.question_id) * 1000000 + a.section_repetition * 10000 + a.section_follow_up_repetition * 100 + this.questionToPageIndex.get(a.question_id) + secondsSortVal / 10000000000
+    const millisSortVal = +a.created_at
+    const section = this.questionToSectionIndex.get(a.question_id)
+    const page = this.questionToPageIndex.get(a.question_id)
+    return section * 1000000 + a.section_repetition * 10000 + a.section_follow_up_repetition * 100 + page + millisSortVal / 10000000000000
   }
 
   /**
@@ -103,7 +120,7 @@ export default class ActionStore extends Emitter {
    * @returns {Array|*}
    */
   get actions () {
-    return this._orderedStore
+    return this.sortedStore
   }
 
   /**
