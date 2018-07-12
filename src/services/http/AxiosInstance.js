@@ -1,7 +1,7 @@
 import axios from 'axios'
 import config from '@/config'
 import storage from '../../services/storage/StorageService'
-import index from '../../router/index'
+import router from '../../router'
 import singleton from '../../static/singleton'
 
 let axiosInstance
@@ -35,13 +35,13 @@ export default function defaultInstance () {
       return response
     }, function (err) {
       if (err.response && err.response.status === 401) {
-        let current = index.currentRoute.fullPath
+        let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
         singleton.loading.active = false
-        if (index.currentRoute.name === 'login') {
+        if (router.currentRoute.name === 'login') {
           return err.response
         } else {
-          index.push({name: 'Login', query: {to: current}})
-          return Promise.reject(err)
+          router.replace({name: 'Login', query: {to: nextRoute}})
+          return Promise.resolve(err.response)
         }
       }
       return Promise.reject(err)
