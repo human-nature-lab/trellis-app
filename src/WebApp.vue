@@ -2,7 +2,7 @@
   <v-app light dense class="web" :dark="global.darkTheme">
     <v-toolbar fixed>
       <v-toolbar-title class="logo">
-        <router-link :to="{name: 'home'}" class="deep-orange--text">
+        <router-link :to="{name: 'Home'}" class="deep-orange--text">
           <img src="../static/img/trellis-logo.png" alt="trellis">
         </router-link>
         <span class="study" v-if="global.study">
