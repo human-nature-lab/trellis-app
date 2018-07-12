@@ -1,6 +1,6 @@
-import Recycler from '@/classes/Recycler'
+import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
-import moment from 'moment'
+import {now} from '../../../../services/DateService'
 
 const keyNames = ['scope', 'survey_id', 'condition_id']
 class FormConditionTagRecycler extends Recycler {
@@ -24,8 +24,8 @@ class FormConditionTagRecycler extends Recycler {
       id: uuidv4(),
       survey_id: interview.survey_id,
       condition_id: act.condition.id,
-      created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
+      created_at: now(),
+      updated_at: now()
     }
   }
 }

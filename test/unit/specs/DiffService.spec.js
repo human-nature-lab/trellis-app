@@ -1,5 +1,6 @@
 import DiffService from '@/components/interview/services/DiffService'
 import uuid from 'uuid/v4'
+import {now} from '@/services/DateService'
 describe('DiffService.spec', () => {
   function copy (arr) {
     return JSON.parse(JSON.stringify(arr))
@@ -9,9 +10,9 @@ describe('DiffService.spec', () => {
       id: uuid(),
       dk_rf: null,
       dk_rf_val: null,
-      answered_at: (new Date()).getTime(),
-      updated_at: (new Date()).getTime(),
-      deleted_at: (new Date()).getTime(),
+      answered_at: now(),
+      updated_at: now(),
+      deleted_at: now(),
       data: []
     }
     let baseDatum = {

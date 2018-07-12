@@ -139,7 +139,7 @@ export default class Interview extends Emitter {
             this.performAction(action)
           } else {
             console.warn('action order does not line up with order of the form')
-            debugger
+            // debugger
           }
         }
       }

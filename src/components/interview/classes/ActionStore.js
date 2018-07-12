@@ -1,6 +1,7 @@
 import Emitter from '../../../classes/Emitter'
 import {sortedIndex} from 'lodash'
 import uuidv4 from 'uuid/v4'
+import {now, parseDate} from '../../../services/DateService'
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -90,7 +91,11 @@ export default class ActionStore extends Emitter {
    * @returns {Number}
    */
   actionToNum (a) {
-    return this.questionToSectionIndex.get(a.question_id) * 1000000 + a.section_repetition * 10000 + a.section_follow_up_repetition * 100 + this.questionToPageIndex.get(a.question_id)
+    // TODO: this has quite a few limitations, but it needs to be something that's comparable using > and < which is tough
+    // with a string representation of a number since reliable behaviour of string comparison depends on the strings being
+    // the same length.
+    let secondsSortVal = a.created_at.unix()
+    return this.questionToSectionIndex.get(a.question_id) * 1000000 + a.section_repetition * 10000 + a.section_follow_up_repetition * 100 + this.questionToPageIndex.get(a.question_id) + secondsSortVal / 10000000000
   }
 
   /**
@@ -131,6 +136,9 @@ export default class ActionStore extends Emitter {
       if (typeof action.payload === 'string') {
         action.payload = JSON.parse(action.payload)
       }
+      if (typeof action.created_at === 'string') {
+        action.created_at = parseDate(action.created_at)
+      }
       this.insertIntoStore(action)
     }
   }
@@ -143,7 +151,7 @@ export default class ActionStore extends Emitter {
     action.id = uuidv4()
     action.section_repetition = location.sectionRepetition
     action.section_follow_up_repetition = location.sectionFollowUpDatumRepetition
-    action.created_at = (new Date()).getTime()
+    action.created_at = now()
     this.insertIntoStore(action)
     this.emit('change', this.store)
   }
