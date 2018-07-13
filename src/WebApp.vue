@@ -5,13 +5,14 @@
       fixed
       app>
       <v-list dense>
-        <v-list-tile>
+        <v-list-tile class="grey lighten-4">
           <v-list-tile-content>
           </v-list-tile-content>
           <v-list-tile-action @click="global.menuDrawer.open = false" class="text-right">
             <v-icon>arrow_back</v-icon>
           </v-list-tile-action>
         </v-list-tile>
+        <v-divider></v-divider>
         <v-list-tile :to="{name: 'RespondentsSearch'}">
           <v-list-tile-action>
             <v-icon>group</v-icon>
@@ -34,7 +35,7 @@
         <v-subheader>Settings</v-subheader>
         <v-list-tile :to="{name: 'Home', query: {to: $route.fullPath}}">
           <v-list-tile-action>
-            <v-icon>question_answer</v-icon>
+            <v-icon>assignment</v-icon>
           </v-list-tile-action>
           <v-list-tile-title>Change study</v-list-tile-title>
         </v-list-tile>
@@ -66,21 +67,6 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-navigation-drawer
-      v-model="global.searchDrawer.open"
-      fixed
-      right
-      app>
-      <v-list dense>
-        <v-list-tile>
-          <v-list-tile-action @click="global.searchDrawer.open = false" class="text-right">
-            <v-icon>arrow_forward</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
     <v-toolbar fixed app>
       <!-- MainMenu /-->
       <v-toolbar-side-icon @click.stop="global.menuDrawer.open = !global.menuDrawer.open"></v-toolbar-side-icon>
@@ -96,7 +82,10 @@
       <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.fullPath}}">
         {{global.locale ? global.locale.language_tag : ''}}
       </v-btn>
-      <v-btn icon @click.stop="global.searchDrawer.open = !global.searchDrawer.open">
+      <v-btn
+        icon
+        @click.stop="global.searchDrawer.open = !global.searchDrawer.open"
+        v-if="global.searchDrawer.component !== null">
         <v-icon>search</v-icon>
       </v-btn>
     </v-toolbar>
@@ -121,6 +110,7 @@
   import LoadingPage from './components/LoadingPage'
   import LocaleService from './services/locale/LocaleService'
   import MainMenu from './components/main-menu/MainMenu'
+  import VDivider from 'vuetify/src/components/VDivider/VDivider'
   export default {
     name: 'web-app',
     data: function () {
@@ -139,6 +129,7 @@
       LocaleService.setExistingLocale()
     },
     components: {
+      VDivider,
       LoadingPage,
       MainMenu
     }
@@ -156,8 +147,10 @@
   .overlay
     z-index: 1500
   .app-container
-    margin-top: 50px
-    margin-bottom: 50px
+    /*margin-top: 50px*/
+    /*margin-bottom: 50px*/
+  .list--dense
+    padding-top: 0
   .logo
     height: 60%
     width: 100%

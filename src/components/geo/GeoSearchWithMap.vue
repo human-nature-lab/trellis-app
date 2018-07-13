@@ -1,23 +1,44 @@
 <template>
   <v-container fluid>
     <v-layout row wrap>
-      <v-flex xs12 md3>
-        <geo-search v-on:returned-geo-results="returnedGeoResults"></geo-search>
-      </v-flex>
-      <v-flex id="mapContainer" xs12 md9>
+      <v-flex id="mapContainer">
         <div id="leafletMap"></div>
         <pre>
           {{this.geoResults}}
         </pre>
       </v-flex>
     </v-layout>
+    <v-navigation-drawer
+      disable-resize-watcher="true"
+      v-model="global.searchDrawer.open"
+      fixed
+      right
+      app>
+      <v-list dense>
+        <v-list-tile class="grey lighten-4">
+          <v-list-tile-action @click="global.searchDrawer.open = false" class="text-right">
+            <v-icon>arrow_forward</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-divider></v-divider>
+        <v-flex>
+          <geo-search v-on:returned-geo-results="returnedGeoResults"></geo-search>
+        </v-flex>
+      </v-list>
+    </v-navigation-drawer>
   </v-container>
 </template>
 
 <script>
   import GeoSearch from './GeoSearch'
   import TranslationService from '@/services/TranslationService'
-  import L from 'leaflet'
+  import * as L from 'leaflet'
+  import * as leafletLabel from 'leaflet.label'
+  window.leafletLabel = leafletLabel
+  import Vue from 'vue'
+  import global from '../../singleton'
   export default {
     name: 'geo-search-with-map',
     props: {
@@ -36,10 +57,12 @@
         geoResults: [],
         trellisMap: undefined,
         markers: [],
+        markerPositions: [],
         minZoom: undefined
       }
     },
     mounted () {
+      this.setUpSearch()
       this.setUpMap()
       this.addMarkers()
       this.centerMap()
@@ -47,6 +70,11 @@
     computed: {
     },
     methods: {
+      setUpSearch: function () {
+        let ComponentClass = Vue.extend(GeoSearch)
+        let instance = new ComponentClass()
+        global.searchDrawer.component = instance
+      },
       setUpMap: function () {
         let padding = 16
         let mapHeight = (window.innerHeight - document.getElementsByTagName('nav').item(0).offsetHeight - (padding * 2)) + 'px'
@@ -72,7 +100,18 @@
         this.centerMap()
       },
       addMarkers: function () {
-        // TODO: track and remove existing markers
+        let defaultIcon = L.icon({
+          iconUrl: '../../static/img/map_icons/green_dot.png',
+          iconSize: [10, 10],
+          iconAnchor: [4, 4],
+          popupAnchor: [4, 4],
+          labelAnchor: [1, 0]
+        })
+        this.markers.forEach((marker) => {
+          this.trellisMap.removeLayer(marker)
+        })
+        this.markers = []
+        this.markerPositions = []
         this.minZoom = undefined
         this.geoResults.forEach((geo) => {
           console.log(geo)
@@ -80,20 +119,25 @@
             this.minZoom = (this.minZoom === undefined) ? Number(geo.geo_type.zoom_level) : Math.min(this.minZoom, Number(geo.geo_type.zoom_level))
           }
           let markerCoords = [geo.latitude, geo.longitude]
-          let marker = L.marker(markerCoords).addTo(this.trellisMap)
+          let marker = L.marker(markerCoords, {icon: defaultIcon}).addTo(this.trellisMap)
           let translation = TranslationService.getTranslated(geo.name_translation, this.global.locale)
-          marker.bindPopup(translation).openPopup()
-          this.markers.push(markerCoords)
+          marker.bindLabel(translation, {noHide: true, direction: 'right'})
+          console.log('marker', marker)
+          this.markers.push(marker)
+          this.markerPositions.push(markerCoords)
         })
       },
       centerMap: function () {
-        if (this.markers.length === 0) return
-        let bounds = L.latLngBounds(this.markers)
+        if (this.markerPositions.length === 0) return
+        this.trellisMap.fitBounds(L.latLngBounds(this.markerPositions))
+        /*
+        let bounds = L.latLngBounds(this.markerPositions)
         console.log('bounds', bounds)
         let zoomLevel = (this.minZoom === undefined) ? this.trellisMap.getBoundsZoom(bounds) : Math.min(this.trellisMap.getBoundsZoom(bounds), this.minZoom)
         console.log('zoomLevel', zoomLevel)
         this.trellisMap.setZoom(zoomLevel)
         this.trellisMap.panInsideBounds(bounds)
+        */
       }
     },
     components: {
@@ -104,8 +148,11 @@
 
 <style lang="sass" scoped>
   @import "../../../node_modules/leaflet/dist/leaflet.css"
+  @import "../../../node_modules/leaflet.label/dist/leaflet.label.css"
 
   #leafletMap
     height: 400px /* Temporary height, replaced by actual container height via javascript */
     width: 100%
+  .trellis-popup
+    margin: 2px 2px
 </style>
