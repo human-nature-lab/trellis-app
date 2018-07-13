@@ -66,7 +66,9 @@ export default class DataStore extends Emitter {
    * @param {Object} tags - has respondent, survey and section arrays
    */
   loadConditionTags (tags) {
-    this.baseRespondentConditionTags = tags.respondent
+    if (tags && tags.respondent) {
+      this.baseRespondentConditionTags = tags.respondent
+    }
     for (let type of ['respondent', 'survey', 'section']) {
       if (this.conditionTags[type] && tags[type]) {
         this.conditionTags[type] = this.conditionTags[type].concat(tags[type])
