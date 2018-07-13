@@ -204,12 +204,7 @@ export default class Interview extends Emitter {
         return pageA.pivot.question_group_order - pageB.pivot.question_group_order
       })
       for (let page of section.question_groups) {
-        // for (let skip of page.skips) {
-        //   for (let condition of skip.conditions) {
-        //     console.log('condition', JSON.stringify(condition, null, 2))
-        //     ConditionTagStore.add(condition)
-        //   }
-        // }
+        page.skips.sort((skipA, skipB) => skipA.precedence - skipB.precedence)
         page.questions.sort((questionA, questionB) => {
           return questionA.sort_order - questionB.sort_order
         })
