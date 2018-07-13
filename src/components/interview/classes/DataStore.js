@@ -179,22 +179,22 @@ export default class DataStore extends Emitter {
    * @returns {Array}
    */
   getAllConditionTagsForLocation (sectionRepetition, sectionFollowUpDatumId) {
-    let tags = []
-    this.conditionTags.respondent.forEach(tag => {
-      tags.push(tag)
-    })
-    this.conditionTags.survey.forEach(tag => {
-      tags.push(tag)
-    })
-    this.conditionTags.section.filter(tag => {
+    let tags = this.conditionTags.respondent.concat(this.conditionTags.survey)
+    tags = tags.concat(this.conditionTags.section.filter(tag => {
       return tag.repetition === sectionRepetition &&
         tag.follow_up_datum_id === sectionFollowUpDatumId
-    }).forEach(tag => {
-      tags.push(tag)
-    })
-    return tags.map(tag => {
-      return tag
-    })
+    }))
+    return tags
+  }
+
+  /**
+   * Get an array of all the condition tag names for this location in the survey
+   * @param sectionRepetition
+   * @param sectionFollowUpDatumId
+   * @returns {String[}
+   */
+  getLocationConditionTagNames (sectionRepetition, sectionFollowUpDatumId) {
+    return this.getAllConditionTagsForLocation(sectionRepetition, sectionFollowUpDatumId).map(tag => ConditionTagStore.getNameFromId(tag.condition_id))
   }
 
   /**

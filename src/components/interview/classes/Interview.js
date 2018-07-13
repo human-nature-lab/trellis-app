@@ -433,7 +433,7 @@ export default class Interview extends Emitter {
    * Get all currently assigned condition tags
    */
   _getCurrentConditionTags () {
-    return this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    return this.data.getLocationConditionTagNames(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
   }
 
   /**
@@ -493,13 +493,11 @@ export default class Interview extends Emitter {
   }
 
   nextAndReplay () {
-    // debugger
     this.next()
     // this.replayToCurrent()
   }
 
   previousAndReplay () {
-    // debugger
     this.previous()
     // this.replayToCurrent()
   }
@@ -525,8 +523,7 @@ export default class Interview extends Emitter {
     }
 
     // Get assigned condition tags and convert them into a set of condition ids
-    let cConditionTags = this._getCurrentConditionTags()
-    let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
+    let conditionTagNames = new Set(this._getCurrentConditionTags())
     console.log('next location:', JSON.stringify(this.location), 'conditionTags:', JSON.stringify(Array.from(conditionTagNames)))
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
       console.log('skipping location', JSON.stringify(this.location))
@@ -552,8 +549,7 @@ export default class Interview extends Emitter {
     }
 
     // Get assigned condition tags and convert them into a set of condition ids
-    let cConditionTags = this._getCurrentConditionTags()
-    let conditionTagNames = new Set(cConditionTags.map(tag => tag.name))
+    let conditionTagNames = new Set(this._getCurrentConditionTags())
     console.log('previous location:', JSON.stringify(this.location), 'conditionTags:', JSON.stringify(Array.from(conditionTagNames)))
     if (SkipService.shouldSkipPage(this.currentPage().skips, conditionTagNames)) {
       console.log('skipping location', JSON.stringify(this.location))

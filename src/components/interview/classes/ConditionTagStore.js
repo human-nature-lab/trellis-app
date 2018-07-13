@@ -16,7 +16,7 @@ export class ConditionTagStore {
   /**
    * Return the name of the condition tag based on the name
    * @param {String} id
-   * @returns {String | undefined}
+   * @returns {String | null}
    */
   getNameFromId (id) {
     return this.idToNameMap.get(id)
