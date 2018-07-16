@@ -1,5 +1,5 @@
-import storage from '@/services/storage/StorageService'
-import http, {setToken} from '@/services/http/AxiosInstance'
+import storage from '../storage/StorageService'
+import http, {setToken} from '../http/AxiosInstance'
 
 export default class LoginService {
   static login (username, password, formId) {

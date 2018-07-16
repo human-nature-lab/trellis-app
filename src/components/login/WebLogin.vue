@@ -51,7 +51,8 @@
 
 <script>
   import LoginService from '../../services/login/LoginService'
-  import index from '../../router/index'
+  import UserService from '../../services/user/UserService'
+  import router from '../../router'
   export default {
     name: 'web-login',
     head: {
@@ -82,16 +83,18 @@
         let params = {
           form: this.$route.query.form
         }
-        LoginService.login(this.username, this.password, params).then(res => {
-          if (this.$route.query.to) {
-            index.push({path: this.$route.query.to})
-          } else {
-            index.push({name: 'home'})
-          }
-        }).catch(err => {
+        LoginService.login(this.username, this.password, params).catch(err => {
           this.error = 'Unable to login with these credentials'
           console.error('Login error:')
           console.error(err)
+        }).then(res => {
+          return UserService.loadCurrentUser()
+        }).then(() => {
+          if (this.$route.query.to) {
+            router.push({path: this.$route.query.to})
+          } else {
+            router.push({name: 'home'})
+          }
         })
       }
     }
