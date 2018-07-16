@@ -1,6 +1,75 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme">
-    <v-toolbar fixed>
+    <v-navigation-drawer
+      v-model="global.menuDrawer.open"
+      fixed
+      app>
+      <v-list dense>
+        <v-list-tile class="grey lighten-4">
+          <v-list-tile-content>
+          </v-list-tile-content>
+          <v-list-tile-action @click="global.menuDrawer.open = false" class="text-right">
+            <v-icon>arrow_back</v-icon>
+          </v-list-tile-action>
+        </v-list-tile>
+        <v-divider></v-divider>
+        <v-list-tile :to="{name: 'RespondentsSearch'}">
+          <v-list-tile-action>
+            <v-icon>group</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Respondents</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile :to="{name: 'GeoSearch'}">
+          <v-list-tile-action>
+            <v-icon>place</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Locations</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+      <v-divider></v-divider>
+      <v-list subheader>
+        <v-subheader>Settings</v-subheader>
+        <v-list-tile :to="{name: 'Home', query: {to: $route.fullPath}}">
+          <v-list-tile-action>
+            <v-icon>assignment</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title>Change study</v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile :to="{name: 'locale', query: {to: $route.fullPath}}">
+          <v-list-tile-action>
+            <v-icon>language</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-title>Change locale</v-list-tile-title>
+        </v-list-tile>
+        <v-list-tile @click="global.darkTheme=!global.darkTheme">
+          <v-list-tile-action>
+            <v-icon>wb_sunny</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Toggle dark theme
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile @click="refresh()">
+          <v-list-tile-action>
+            <v-icon>refresh</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>
+              Refresh app
+            </v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <v-toolbar fixed app>
+      <!-- MainMenu /-->
+      <v-toolbar-side-icon @click.stop="global.menuDrawer.open = !global.menuDrawer.open"></v-toolbar-side-icon>
       <v-toolbar-title class="logo">
         <router-link :to="{name: 'Home'}" class="deep-orange--text">
           <img src="../static/img/trellis-logo.png" alt="trellis">
@@ -13,13 +82,12 @@
       <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.fullPath}}">
         {{global.locale ? global.locale.language_tag : ''}}
       </v-btn>
-      <v-btn icon @click="global.darkTheme=!global.darkTheme">
-        <v-icon>wb_sunny</v-icon>
+      <v-btn
+        icon
+        @click.stop="global.searchDrawer.open = !global.searchDrawer.open"
+        v-if="global.searchDrawer.component !== null">
+        <v-icon>search</v-icon>
       </v-btn>
-      <v-btn icon @click="refresh()">
-        <v-icon>refresh</v-icon>
-      </v-btn>
-      <MainMenu />
     </v-toolbar>
     <v-content>
       <v-container fluid class="app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
@@ -42,6 +110,7 @@
   import LoadingPage from './components/LoadingPage'
   import LocaleService from './services/locale/LocaleService'
   import MainMenu from './components/main-menu/MainMenu'
+  import VDivider from 'vuetify/src/components/VDivider/VDivider'
   export default {
     name: 'web-app',
     data: function () {
@@ -60,6 +129,7 @@
       LocaleService.setExistingLocale()
     },
     components: {
+      VDivider,
       LoadingPage,
       MainMenu
     }
@@ -72,9 +142,15 @@
   body
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
+  .navigation-drawer
+    z-index: 1600
+  .overlay
+    z-index: 1500
   .app-container
-    margin-top: 50px
-    margin-bottom: 50px
+    /*margin-top: 50px*/
+    /*margin-bottom: 50px*/
+  .list--dense
+    padding-top: 0
   .logo
     height: 60%
     width: 100%
