@@ -35,15 +35,6 @@
         </v-btn>
         <span>Clear filters</span>
       </v-tooltip>
-      <v-tooltip bottom v-if="canAddRespondent">
-        <v-btn
-          slot="activator"
-          icon
-          @click="showAssociatedRespondentDialog = true">
-          <v-icon>add</v-icon>
-        </v-btn>
-        <span>Add temporary respondent</span>
-      </v-tooltip>
     </v-layout>
     <v-layout v-if="filters.geos && filters.geos.length">
       Search limited to:
@@ -69,6 +60,15 @@
           :selected="isSelected(respondent)"
           :respondent="respondent" />
       </v-layout>
+      <v-tooltip bottom v-if="canAddRespondent">
+        <v-btn
+          slot="activator"
+          icon
+          @click="showAssociatedRespondentDialog = true">
+          <v-icon>add</v-icon>
+        </v-btn>
+        <span>Add temporary respondent</span>
+      </v-tooltip>
     </v-card>
     <v-layout v-if="!respondentResults.length" ma-3>
       No results present for the query: {{query}}
