@@ -88,6 +88,9 @@
         </v-data-table>
       </v-container>
       <h3>Condition Tags</h3>
+      <permission :role-whitelist="['admin','manager']">
+        <v-btn @click="modal.conditionTag = true">Add tag</v-btn>
+      </permission>
       <v-data-table
         hide-actions
         :headers="[{
@@ -146,13 +149,23 @@
           is-selectable />
       </v-card>
     </v-dialog>
+    <v-dialog
+      lazy
+      v-model="modal.conditionTag">
+      <RespondentConditionTagForm
+        :respondentId="respondent.id"
+        :condition-tag="editing.conditionTag"
+        @close="doneEditingOrAddingConditionTag"/>
+    </v-dialog>
   </v-card>
 </template>
 
 <script>
+  import Permission from '../Permission'
   import Photo from '../Photo'
   import GeoSearch from '../geo/GeoSearch'
   import RespondentName from './RespondentName'
+  import RespondentConditionTagForm from './RespondentConditionTagForm'
   import RespondentService from '../../services/respondent/RespondentService'
   import TranslationService from '../../services/TranslationService'
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
@@ -182,7 +195,8 @@
         modal: {
           editName: false,
           addName: false,
-          geoSearch: false
+          geoSearch: false,
+          conditionTag: false
         },
         isAddingPhoto: false,
         locationHeaders: [{
@@ -232,6 +246,13 @@
       geoSelected (geo) {
         this.modal.geoSearch = false
         if (this.editing.geo) {} else {}
+      },
+      doneEditingOrAddingConditionTag (tag) {
+        if (tag.id) {
+          // TODO: Editing tag
+        } else {
+          // TODO: New tag
+        }
       }
     },
     computed: {
@@ -252,7 +273,9 @@
       Photo,
       RespondentName,
       GeoSearch,
-      GeoBreadcrumbs
+      GeoBreadcrumbs,
+      Permission,
+      RespondentConditionTagForm
     }
   }
 </script>
