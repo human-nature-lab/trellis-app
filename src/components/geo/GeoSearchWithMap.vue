@@ -32,11 +32,11 @@
 </template>
 
 <script>
+  /* global L */
   import GeoSearch from './GeoSearch'
   import TranslationService from '@/services/TranslationService'
-  import * as L from 'leaflet'
-  import * as leafletLabel from 'leaflet.label'
-  window.leafletLabel = leafletLabel
+  import 'leaflet'
+  // import 'leaflet.label'
   import Vue from 'vue'
   import global from '../../singleton'
   export default {
@@ -115,14 +115,16 @@
         this.minZoom = undefined
         this.geoResults.forEach((geo) => {
           console.log(geo)
-          if (geo.geo_type.zoom_level !== null) {
+          if (geo.geo_type && geo.geo_type.zoom_level != null) {
             this.minZoom = (this.minZoom === undefined) ? Number(geo.geo_type.zoom_level) : Math.min(this.minZoom, Number(geo.geo_type.zoom_level))
           }
           let markerCoords = [geo.latitude, geo.longitude]
-          let marker = L.marker(markerCoords, {icon: defaultIcon}).addTo(this.trellisMap)
+          let marker = L.marker(markerCoords, {icon: defaultIcon})
           let translation = TranslationService.getTranslated(geo.name_translation, this.global.locale)
-          marker.bindLabel(translation, {noHide: true, direction: 'right'})
+          // marker.bindLabel(translation, {noHide: true, direction: 'right'})
+          marker.bindTooltip(translation, {permanent: true, direction: 'right'})
           console.log('marker', marker)
+          marker.addTo(this.trellisMap)
           this.markers.push(marker)
           this.markerPositions.push(markerCoords)
         })
@@ -148,7 +150,7 @@
 
 <style lang="sass" scoped>
   @import "../../../node_modules/leaflet/dist/leaflet.css"
-  @import "../../../node_modules/leaflet.label/dist/leaflet.label.css"
+  /*@import "../../../node_modules/leaflet.label/dist/leaflet.label.css"*/
 
   #leafletMap
     height: 400px /* Temporary height, replaced by actual container height via javascript */
