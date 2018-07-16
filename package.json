@@ -48,7 +48,7 @@
     "vue-cordova": "^0.1.2",
     "vue-head": "^2.0.12",
     "vue-router": "^2.3.1",
-    "vuetify": "1.0.4",
+    "vuetify": "1.0.19",
     "zip-js": "0.0.2"
   },
   "devDependencies": {
