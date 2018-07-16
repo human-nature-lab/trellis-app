@@ -38,7 +38,7 @@
   import 'leaflet'
   // import 'leaflet.label'
   import Vue from 'vue'
-  import global from '../../singleton'
+  import global from '../../static/singleton'
   export default {
     name: 'geo-search-with-map',
     props: {
