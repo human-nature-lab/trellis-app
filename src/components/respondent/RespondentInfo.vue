@@ -1,7 +1,8 @@
 <template>
   <v-card tile>
     <v-toolbar card prominent>
-      <v-toolbar-title>Respondent Info</v-toolbar-title>
+      <v-toolbar-title>Respondent: {{name}}</v-toolbar-title>
+      <v-spacer />
       <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
         Forms
       </v-btn>
@@ -10,43 +11,17 @@
       <v-alert v-if="error">
         {{error}}
       </v-alert>
-      <h3>Names</h3>
-      <v-container fluid>
-        <v-expansion-panel>
-          <v-expansion-panel-content>
-            <div slot="header">{{name}}</div>
-            <v-card>
-              <v-container fluid>
-                <table class="table datatable">
-                  <tr v-for="(name, index) in respondent.names" :key="name.id">
-                    <td>{{name.name}}</td>
-                    <td>
-                      <span>
-                        <v-btn
-                          icon
-                          @click="modal.addName = true">
-                          <v-icon>add</v-icon>
-                        </v-btn>
-                         <v-btn
-                           icon
-                           @click="editing.name = name; modal.editName = true">
-                          <v-icon>edit</v-icon>
-                        </v-btn>
-                         <v-btn
-                           icon
-                           @click="removeName(index)">
-                          <v-icon>delete</v-icon>
-                        </v-btn>
-                      </span>
-                    </td>
-                  </tr>
-                </table>
-              </v-container>
-            </v-card>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-container>
-      <h3>Photos</h3>
+      <v-toolbar flat>
+        <v-toolbar-title>Photos</v-toolbar-title>
+        <v-spacer />
+        <permission :role-whitelist="['admin','manager']">
+          <v-btn
+            icon
+            @click="isAddingPhoto = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </permission>
+      </v-toolbar>
       <v-container fluid grid-list-md>
         <v-layout row wrap>
           <Photo
@@ -56,58 +31,108 @@
             :width="250"
             :key="photo.id"
             :photo="photo"/>
-          <v-flex
-            v-ripple
-            class="photo add-photo">
-            <v-btn @click="isAddingPhoto = true">
-              <v-icon>add</v-icon>
-            </v-btn>
-          </v-flex>
         </v-layout>
       </v-container>
-      <h3>Locations</h3>
-      <v-container fluid>
-        <v-layout>
+      <v-toolbar flat>
+        <v-toolbar-title>Locations</v-toolbar-title>
+        <v-spacer />
+        <permission :role-whitelist="['admin','manager']">
           <v-btn
-            @click="addGeo()">Add location to respondent</v-btn>
-        </v-layout>
-        <v-data-table
-          :headers="locationHeaders"
-          :items="locations"
-          hide-actions>
-          <template slot="items" slot-scope="props">
-            <td v-for="header in locationHeaders" :key="header.value">
-              <GeoBreadcrumbs
-                v-if="header.text === 'Name'"
-               :geo-id="props.item.id" />
-              <span v-else>
-                {{props.item[header.value]}}
-              </span>
-            </td>
-          </template>
-        </v-data-table>
-      </v-container>
-      <h3>Condition Tags</h3>
-      <permission :role-whitelist="['admin','manager']">
-        <v-btn @click="modal.conditionTag = true">Add tag</v-btn>
-      </permission>
+            icon
+            @click="addGeo()">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </permission>
+      </v-toolbar>
       <v-data-table
+        class="mb-3"
+        :headers="locationHeaders"
+        :items="locations"
+        hide-actions>
+        <template slot="items" slot-scope="props">
+          <td>
+            <GeoBreadcrumbs
+              :geo-id="props.item.id" />
+          </td>
+          <td>
+            {{props.item.type}}
+          </td>
+          <td>
+            <v-icon v-if="props.item.pivot.is_current">check</v-icon>
+          </td>
+        </template>
+      </v-data-table>
+      <v-toolbar flat>
+        <v-toolbar-title>Condition Tags</v-toolbar-title>
+        <v-spacer />
+        <permission :role-whitelist="['admin','manager']">
+          <v-btn
+            icon
+            class="mb-2"
+            @click="modal.conditionTag = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </permission>
+      </v-toolbar>
+      <v-data-table
+        class="mb-3"
         hide-actions
-        :headers="[{
-              text: 'Tag name',
-              value: 'name'
-            }, {
-              text: 'Last updated',
-              value: 'updated_at'
-            }, {
-              text: 'Created at',
-              value: 'created_at'
-            }]"
+        :headers="conditionTagHeaders"
         :items="respondent.respondent_condition_tags">
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
           <td class="text-xs-right">{{ props.item.updated_at }}</td>
           <td class="text-xs-right">{{ props.item.created_at }}</td>
+          <permission :role-whitelist="['admin', 'manager']">
+            <td>
+              <v-btn
+                icon
+                @click="deleteRespondentConditionTag(props.item.pivot.id)">
+                <v-progress-circular
+                  v-if="isDeleting(props.item.pivot.id)"
+                  indeterminate />
+                <v-icon v-else>delete</v-icon>
+              </v-btn>
+            </td>
+          </permission>
+        </template>
+      </v-data-table>
+      <v-toolbar flat>
+        <v-toolbar-title>Names</v-toolbar-title>
+        <v-spacer />
+        <permission :role-whitelist="['admin','manager']">
+          <v-btn
+            icon
+            @click="modal.addName = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </permission>
+      </v-toolbar>
+      <v-data-table
+        class="mb-3"
+        :headers="nameHeaders"
+        :items="respondent.names"
+        hide-actions>
+        <template slot="items" slot-scope="props">
+          <td>{{props.item.name}}</td>
+          <td>
+            <v-icon v-if="props.item.is_display_name">check</v-icon>
+          </td>
+          <permission :role-whitelist="['admin','manager']">
+            <td>
+              <v-btn
+                icon
+                @click="editing.name = props.item; modal.editName = true">
+                <v-icon>edit</v-icon>
+              </v-btn>
+              <v-btn
+                icon
+                @click="removeName(props.item.id)">
+                <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
+                <v-icon v-else>delete</v-icon>
+              </v-btn>
+            </td>
+          </permission>
         </template>
       </v-data-table>
     </v-card-text>
@@ -152,10 +177,12 @@
     <v-dialog
       lazy
       v-model="modal.conditionTag">
-      <RespondentConditionTagForm
-        :respondentId="respondent.id"
-        :condition-tag="editing.conditionTag"
-        @close="doneEditingOrAddingConditionTag"/>
+      <v-card>
+        <RespondentConditionTagForm
+          :respondentId="respondent.id"
+          :condition-tag="editing.conditionTag"
+          @close="doneAddingRespondentConditionTag"/>
+      </v-card>
     </v-dialog>
   </v-card>
 </template>
@@ -170,6 +197,7 @@
   import TranslationService from '../../services/TranslationService'
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
   import singleton from '../../static/singleton'
+  import ConditionTagService from '../../services/condition-tag/ConditionTagService'
 
   let respondent
   function preloadRespondent (respondentId) {
@@ -188,6 +216,7 @@
       return {
         respondent: null,
         error: null,
+        deleting: {},
         editing: {
           name: null,
           geo: null
@@ -208,6 +237,23 @@
         }, {
           text: 'Current',
           value: 'isCurrent'
+        }],
+        conditionTagHeaders: [{
+          text: 'Tag name',
+          value: 'name'
+        }, {
+          text: 'Last updated',
+          value: 'updated_at'
+        }, {
+          text: 'Created at',
+          value: 'created_at'
+        }],
+        nameHeaders: [{
+          text: 'Name',
+          value: 'name'
+        }, {
+          text: 'Current',
+          value: 'is_current'
         }]
       }
     },
@@ -220,12 +266,15 @@
     methods: {
       photoFromCamera () {},
       photoFromFile () {},
-      removeName (index) {
-        let name = this.respondent.names[index]
+      removeName (nameId) {
+        this.deleting[nameId] = true
         RespondentService.removeName(this.respondent.id, name.id).then(res => {
+          let index = this.respondent.names.findIndex(name => name.id === nameId)
           this.respondent.names.splice(index, 1)
         }).catch(err => {
           this.error = err
+        }).finally(() => {
+          this.deleting[nameId] = false
         })
       },
       doneAddingName (name) {
@@ -247,12 +296,25 @@
         this.modal.geoSearch = false
         if (this.editing.geo) {} else {}
       },
-      doneEditingOrAddingConditionTag (tag) {
-        if (tag.id) {
-          // TODO: Editing tag
-        } else {
-          // TODO: New tag
-        }
+      doneAddingRespondentConditionTag (tag) {
+        this.respondent.respondent_condition_tags.push(tag)
+        this.modal.conditionTag = false
+      },
+      deleteRespondentConditionTag (respondentConditionTagId) {
+        // TODO: Finish UI for removing respondent condition tags
+        if (!window.confirm(`Are you sure you want to delete this respondent condition tag?`)) return
+        this.deleting[respondentConditionTagId] = true
+        ConditionTagService.removeRespondentConditionTag(this.respondent.id, respondentConditionTagId).then(msg => {
+          let index = this.respondent.respondent_condition_tags.findIndex(t => t.pivot.id === respondentConditionTagId)
+          this.respondent.respondent_condition_tags.splice(index, 1)
+        }).catch(err => {
+          this.error = err
+        }).finally(() => {
+          this.deleting[respondentConditionTagId] = false
+        })
+      },
+      isDeleting (id) {
+        return this.deleting[id]
       }
     },
     computed: {

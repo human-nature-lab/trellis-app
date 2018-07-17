@@ -115,6 +115,7 @@ export default class RespondentServiceWeb {
    * @returns {Promise<Object>}
    */
   static editName (respondentId, respondentNameId, newName, isDisplayName = null, localeId = null) {
+    respondentId = encodeURIComponent(respondentId)
     respondentNameId = encodeURIComponent(respondentNameId)
     return http().put(`respondent/${respondentId}/name/${respondentNameId}`, {
       name: newName,

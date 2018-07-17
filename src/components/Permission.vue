@@ -1,7 +1,7 @@
 <template functional>
-  <v-flex v-if="isVisible">
+  <span v-if="isVisible">
     <slot></slot>
-  </v-flex>
+  </span>
 </template>
 
 <script>
