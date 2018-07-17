@@ -22,6 +22,13 @@ export default class DataService {
         throw err
       })
   }
+
+  /**
+   * @param respondentId
+   * @param formId
+   * @param sectionId
+   * @returns {Promise<any[]>}
+   */
   static getConditions (respondentId, formId, sectionId) {
     return Promise.all([
       http().get(`conditions/respondent/${respondentId}`),
