@@ -85,6 +85,17 @@
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
+    <v-divider></v-divider>
+    <v-list dense>
+      <v-list-tile @click="logout">
+        <v-list-tile-action>
+          <v-icon>exit_to_app</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          Logout
+        </v-list-tile-content>
+      </v-list-tile>
+    </v-list>
     <v-snackbar
       absolute
       top
@@ -95,8 +106,7 @@
       Current location copied to clipboard
       <v-btn
         flat
-        @click="showCopiedSnackbar = false"
-      >
+        @click="showCopiedSnackbar = false">
         Close
       </v-btn>
     </v-snackbar>
@@ -105,6 +115,8 @@
 
 <script>
   import menuBus from './MenuBus'
+  import LoginService from '../../services/login/LoginService'
+  import router from '../../router'
 
   export default {
     name: 'dropdown-menu',
@@ -118,6 +130,11 @@
       copyCurrentLocation () {
         navigator.clipboard.writeText(window.location.href).then(() => {
           this.showCopiedSnackbar = true
+        })
+      },
+      logout () {
+        LoginService.logout().then(() => {
+          router.push({name: 'Login', query: {to: router.currentRoute.fullPath}})
         })
       }
     },
