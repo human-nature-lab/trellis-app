@@ -3,8 +3,11 @@
     <v-alert color="error" v-if="error">
       {{error}}
     </v-alert>
-    <debug name="Studies">{{studies}}</debug>
+    <debug name="Studies">
+      <pre>{{studies}}</pre>
+    </debug>
     <v-select
+      label="Study"
       :loading="isWorking"
       v-model="study"
       @change="change"

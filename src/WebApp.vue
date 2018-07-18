@@ -30,7 +30,10 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-      <v-container fluid class="app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
+      <v-container
+        fluid
+        fill-height
+        class="ma-0 pa-0 app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
         <LoadingPage
           v-if="global.loading.active"
           :indeterminate="global.loading.indeterminate"

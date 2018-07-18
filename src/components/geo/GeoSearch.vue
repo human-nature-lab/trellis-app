@@ -241,13 +241,3 @@
     }
   }
 </script>
-
-<style lang="sass" scoped>
-.cart-spacing
-  padding-bottom: 150px
-.cart
-  border-top: 1px solid grey
-  position: absolute
-  bottom: 0
-  left: 0
-</style>
