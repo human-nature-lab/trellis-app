@@ -71,5 +71,5 @@
     color: red
   .geo-breadcrumbs
     .geo-name:not(:first-child):before
-      content: ' > '
+      content: ' \ '
 </style>

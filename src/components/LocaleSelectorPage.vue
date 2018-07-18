@@ -1,9 +1,16 @@
 <template>
-    <v-card>
-  <h2>Choose a locale</h2>
-  <LocaleSelector @change="onChange"/>
-  <v-btn @click="done">Done</v-btn>
-</v-card>
+  <v-container fluid>
+    <v-layout column>
+      <v-card>
+        <v-toolbar flat>
+          <v-toolbar-title>Choose a locale</v-toolbar-title>
+        </v-toolbar>
+        <v-container fluid>
+         <LocaleSelector @change="done"/>
+        </v-container>
+      </v-card>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -19,8 +26,7 @@
         } else {
           index.push({name: 'home'})
         }
-      },
-      onChange: function () {}
+      }
     },
     head: {
       title: {
