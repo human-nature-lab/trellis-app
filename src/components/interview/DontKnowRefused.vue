@@ -1,26 +1,23 @@
 <template>
-  <v-layout justify-space-between>
-    <v-flex>
-      <v-layout row>
-        <v-btn
-          v-bind:class="{'primary': dk}"
-          @click="dk=!dk">Don't know</v-btn>
-        <v-btn
-          v-bind:class="{'primary': rf}"
-          @click="rf=!rf">Refuse</v-btn>
-      </v-layout>
-      <v-layout v-if="shouldShowReason" row>
-        <v-text-field
-          name="Reason"
-          label="Reason"
-          :rules="rules"
-          v-model="reason"
-          required
-          autofocus
-        ></v-text-field>
-      </v-layout>
-    </v-flex>
-  </v-layout>
+  <v-flex>
+    <v-layout row>
+      <v-btn
+        v-bind:class="{'primary': dk}"
+        @click="dk=!dk">Don't know</v-btn>
+      <v-btn
+        v-bind:class="{'primary': rf}"
+        @click="rf=!rf">Refuse</v-btn>
+    </v-layout>
+    <v-layout v-if="shouldShowReason">
+      <v-text-field
+        name="Reason"
+        label="Reason"
+        :rules="rules"
+        v-model="reason"
+        required
+        autofocus />
+    </v-layout>
+  </v-flex>
 </template>
 
 <script>

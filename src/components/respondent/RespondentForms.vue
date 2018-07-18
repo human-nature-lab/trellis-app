@@ -1,13 +1,13 @@
 <template>
   <v-flex class="respondent-forms">
-    <v-container fluid class="px-0">
+    <v-container fluid>
       <v-alert v-if="error">{{this.error}}</v-alert>
-      <v-flex>
-        <h3>Forms for: {{respondent.name}}</h3>
-      </v-flex>
-      <v-layout>
+      <v-card>
+        <v-toolbar flat>
+          <v-toolbar-title>Forms for {{respondent.name}}</v-toolbar-title>
+        </v-toolbar>
         <FormsView v-if="forms" :forms="forms" @click="startInterview"/>
-      </v-layout>
+      </v-card>
     </v-container>
   </v-flex>
 </template>

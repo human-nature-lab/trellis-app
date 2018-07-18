@@ -1,20 +1,24 @@
 <template>
-  <v-flex>
-    <v-progress-linear
-      v-if="isSaving"
-      :indeterminate="true" />
-    <v-alert v-if="showSafeToExitMessage">
-      <p>It is now safe to exit the survey</p>
-    </v-alert>
-    <span v-if="formIsEmpty">This form appears to be empty...</span>
-    <Page v-else
-          :questions="questions"
-          :location="location"
-          :actions="interviewActions"
-          :data="interviewData"
-          :isAtEnd="isAtEnd"
-          :conditionTags="interviewConditionTags"
-          :interview="interview" />
+  <v-container fluid fill-height>
+    <v-layout column>
+      <v-flex>
+        <v-progress-linear
+          v-if="isSaving"
+          :indeterminate="true" />
+        <v-alert v-if="showSafeToExitMessage">
+          <p>It is now safe to exit the survey</p>
+        </v-alert>
+        <span v-if="formIsEmpty">This form appears to be empty...</span>
+        <Page v-else
+              :questions="questions"
+              :location="location"
+              :actions="interviewActions"
+              :data="interviewData"
+              :isAtEnd="isAtEnd"
+              :conditionTags="interviewConditionTags"
+              :interview="interview" />
+      </v-flex>
+    </v-layout>
     <v-dialog
       v-model="dialog.beginning">
       <v-card>
@@ -81,7 +85,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-  </v-flex>
+  </v-container>
 </template>
 
 <script>
