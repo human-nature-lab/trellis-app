@@ -21,7 +21,7 @@
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="error"
-      color="warning"
+      color="amber"
       @click.native="ignore">Ignore</v-btn>
   </div>
 </template>

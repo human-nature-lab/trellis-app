@@ -11,7 +11,7 @@
     <span v-if="error" class="red--text">
       <p>{{ errorMessage }}</p>
     </span>
-    <span v-if="warning">
+    <span v-if="warning" class="amber--text">
       <p>{{ warningMessage }}</p>
     </span>
     <v-progress-linear
@@ -25,7 +25,7 @@
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="warning"
-      color="warning"
+      color="amber"
       @click.native="ignore">Ignore</v-btn>
   </div>
 </template>
