@@ -75,6 +75,16 @@ class FileServiceCordova {
     )
   }
 
+  deleteFile (fileEntry) {
+    return new Promise((resolve, reject) => {
+      fileEntry.remove(() => {
+        resolve()
+      }, (err) => {
+        reject(err)
+      })
+    })
+  }
+
   listFiles () {
     this.requestFileSystem()
       .then((fs) => {
@@ -85,6 +95,21 @@ class FileServiceCordova {
             })
           })
       })
+  }
+
+  emptyDirectory (directoryEntry) {
+    return new Promise((resolve, reject) => {
+      directoryEntry
+        .createReader()
+        .readEntries((entries) => {
+          entries.forEach((entry) => {
+            entry.remove(
+              () => { /* success */ },
+              (err) => reject(err))
+          })
+        })
+      resolve()
+    })
   }
 
   calculateMD5Hash (fileEntry) {

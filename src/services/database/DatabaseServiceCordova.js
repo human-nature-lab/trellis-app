@@ -57,71 +57,81 @@ export default class DatabaseServiceCordova {
     })
   }
 
-  importDatabase (extractedSnapshot, trackProgress) {
+  executeSnapshot (queryRunner, extractedSnapshot, trackProgress, isCancelled) {
     return new Promise((resolve, reject) => {
-      if (!extractedSnapshot) {
-        reject('No extracted snapshot provided')
-      }
-      this.getDatabase()
-        .then((connection) => {
-          connection.query('PRAGMA foreign_keys = OFF;')
-          connection.transaction((manager) => {
-            extractedSnapshot.file((file) => {
-              let decoder = new TextDecoder()
-              let start = 0
-              const CHUNK_SIZE = 1024
-              let fileSize = file.size
-              let end = Math.min(fileSize, (start + CHUNK_SIZE))
-              let fileReader = new FileReader(file)
-              let inQuotes = false
-              let escaped = false
-              let buffer = ''
-              let everything = ''
-              fileReader.onload = (event) => {
-                trackProgress({inserted: start, total: fileSize})
-                buffer += decoder.decode(event.target.result, {stream: true})
-                for (let curChar = 0; curChar < buffer.length; curChar++) {
-                  let char = buffer.charAt(curChar)
-                  if (!escaped && char === '\'') {
-                    inQuotes = !inQuotes
-                  }
-                  if (escaped) {
-                    escaped = false
-                  } else {
-                    if (char === '\\') {
-                      escaped = true
-                    }
-                  }
-                  if (!inQuotes) {
-                    if (char === ';') {
-                      let query = buffer.substring(0, (curChar + 1))
-                      everything += query
-                      manager.query(query)
-                      buffer = buffer.substring(curChar + 1, buffer.length)
-                      curChar = 0
-                    }
-                  }
-                }
-                if (end < fileSize) {
-                  start += CHUNK_SIZE
-                  end = Math.min(fileSize, (end + CHUNK_SIZE))
-                  let slice = file.slice(start, end)
-                  inQuotes = false
-                  escaped = false
-                  setTimeout(() => fileReader.readAsArrayBuffer(slice))
-                } else {
-                  console.log(everything)
-                  connection.query('PRAGMA foreign_keys = ON;')
-                  resolve()
-                }
+      extractedSnapshot.file((file) => {
+        let decoder = new TextDecoder()
+        let start = 0
+        const CHUNK_SIZE = 1024000
+        let fileSize = file.size
+        let end = Math.min(fileSize, (start + CHUNK_SIZE))
+        let fileReader = new FileReader(file)
+        let inQuotes = false
+        let escaped = false
+        let buffer = ''
+        fileReader.onload = async function (event) {
+          trackProgress({inserted: start, total: fileSize})
+          buffer += decoder.decode(event.target.result, {stream: true})
+          for (let curChar = 0; curChar < buffer.length; curChar++) {
+            let char = buffer.charAt(curChar)
+            if (!escaped && char === '\'') {
+              inQuotes = !inQuotes
+            }
+            if (escaped) {
+              escaped = false
+            } else {
+              if (char === '\\') {
+                escaped = true
               }
-              fileReader.onerror = (error) => reject(error)
+            }
+            if (!inQuotes) {
+              if (char === ';') {
+                let query = buffer.substring(0, (curChar + 1))
+                await queryRunner.query(query)
+                buffer = buffer.substring(curChar + 1, buffer.length)
+                curChar = 0
+              }
+            }
+          }
+          if (end < fileSize) {
+            if (isCancelled()) {
+              await queryRunner.rollbackTransaction()
+              resolve()
+            } else {
+              start += CHUNK_SIZE
+              end = Math.min(fileSize, (end + CHUNK_SIZE))
               let slice = file.slice(start, end)
+              inQuotes = false
+              escaped = false
               fileReader.readAsArrayBuffer(slice)
-            })
-          })
-        })
+            }
+          } else {
+            resolve()
+          }
+        }
+        fileReader.onerror = (error) => { reject(error) }
+        let slice = file.slice(start, end)
+        fileReader.readAsArrayBuffer(slice)
+      })
     })
+  }
+
+  async importDatabase (extractedSnapshot, trackProgress, isCancelled) {
+    let connection = await this.getDatabase()
+    let queryRunner = await connection.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.query('PRAGMA foreign_keys = OFF;')
+    await queryRunner.startTransaction()
+    try {
+      await this.executeSnapshot(queryRunner, extractedSnapshot, trackProgress, isCancelled)
+      if (!isCancelled()) {
+        await queryRunner.commitTransaction()
+      }
+    } catch (err) {
+      await queryRunner.rollbackTransaction()
+    } finally {
+      await queryRunner.query('PRAGMA foreign_keys = ON;')
+    }
   }
 
   checkForeignKeys () {
@@ -176,7 +186,8 @@ export default class DatabaseServiceCordova {
       location: 'default',
       entities: [
       ],
-      logging: true,
+      logging: ['warning', 'error'], // reduced logging
+      // logging: true, // verbose logging
       synchronize: true
     }).then(async connection => {
       console.log(connection)
