@@ -13,21 +13,21 @@
         {{name}}
         <!--<v-btn @click="onClick">Select</v-btn>-->
       </v-card-text>
-      <v-card-actions>
-        <v-btn
-          icon
-          v-if="formsButtonVisible"
-          :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
-          <v-icon>assignment</v-icon>
-        </v-btn>
-        <v-spacer></v-spacer>
-        <v-btn
-          icon
-          v-if="infoButtonVisible"
-          :to="{name: 'Respondent', params: {studyId: global.study.id, respondentId: respondent.id}}">
-          <v-icon>info</v-icon>
-        </v-btn>
-      </v-card-actions>
+      <!--<v-card-actions>-->
+        <!--<v-btn-->
+          <!--icon-->
+          <!--v-if="formsButtonVisible"-->
+          <!--:to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">-->
+          <!--<v-icon>assignment</v-icon>-->
+        <!--</v-btn>-->
+        <!--<v-spacer></v-spacer>-->
+        <!--<v-btn-->
+          <!--icon-->
+          <!--v-if="infoButtonVisible"-->
+          <!--:to="{name: 'Respondent', params: {studyId: global.study.id, respondentId: respondent.id}}">-->
+          <!--<v-icon>info</v-icon>-->
+        <!--</v-btn>-->
+      <!--</v-card-actions>-->
     </v-card>
   </v-flex>
 </template>
