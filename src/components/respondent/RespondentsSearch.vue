@@ -272,7 +272,10 @@
       },
       onSelectRespondent (respondent) {
         this.$emit('selectRespondent', respondent)
-        if (!this.canSelect) return
+        if (!this.canSelect) {
+          router.push({name: 'Respondent', params: {respondentId: respondent.id, studyId: this.studyId}})
+          return
+        }
         if (this.limit && this.selected.length > this.limit) return
 
         let sIndex = this.selected.indexOf(respondent.id)
