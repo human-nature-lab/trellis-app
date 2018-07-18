@@ -41,7 +41,7 @@
 <script>
   /* global L */
   import GeoSearch from './GeoSearch'
-  import TranslationService from '@/services/TranslationService'
+  import TranslationService from '../../services/TranslationService'
   import 'leaflet'
   // import 'leaflet.label'
   import Vue from 'vue'
@@ -109,7 +109,7 @@
       },
       addMarkers: function () {
         let defaultIcon = L.icon({
-          iconUrl: '../../static/img/map_icons/green_dot.png',
+          iconUrl: require('../../../static/img/map_icons/green_dot.png'),
           iconSize: [10, 10],
           iconAnchor: [4, 4],
           popupAnchor: [4, 4],
