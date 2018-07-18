@@ -1,5 +1,6 @@
 import { DeviceService } from '../device/DeviceService'
 import md5 from 'js-md5'
+/* global md5chksum */
 
 class FileServiceCordova {
 
@@ -112,7 +113,7 @@ class FileServiceCordova {
     })
   }
 
-  calculateMD5Hash (fileEntry) {
+  calculateMD5HashJS (fileEntry) {
     return new Promise((resolve, reject) => {
       DeviceService.isDeviceReady()
         .then(() => {
@@ -128,6 +129,15 @@ class FileServiceCordova {
             }
             reader.readAsArrayBuffer(file)
           })
+        })
+    })
+  }
+
+  calculateMD5Hash (fileEntry) {
+    return new Promise((resolve, reject) => {
+      DeviceService.isDeviceReady()
+        .then(() => {
+          md5chksum.file(fileEntry, resolve, reject)
         })
     })
   }
