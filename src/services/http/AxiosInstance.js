@@ -4,6 +4,7 @@ import storage from '../../services/storage/StorageService'
 import router from '../../router'
 import singleton from '../../static/singleton'
 
+const TOKEN_KEY = 'x-token'
 let axiosInstance
 
 /**
@@ -11,12 +12,16 @@ let axiosInstance
  * @param {String} val - The token value
  */
 export function setToken (val) {
-  storage.set('x-token', val)
+  storage.set(TOKEN_KEY, val)
+}
+
+export function removeToken () {
+  storage.delete(TOKEN_KEY)
 }
 
 /**
  * Create the default axios instance. Any authentication for the web app should probably be handled here if possible
- * @returns {Promise<any>}
+ * @returns {Axios}
  */
 export default function defaultInstance () {
   if (!axiosInstance) {
@@ -28,7 +33,7 @@ export default function defaultInstance () {
 
     // Handle authentication using axios [interceptors](https://github.com/axios/axios#interceptors)
     axiosInstance.interceptors.request.use(function (request) {
-      request.headers['X-Token'] = storage.get('x-token')
+      request.headers['X-Token'] = storage.get(TOKEN_KEY)
       return request
     })
     axiosInstance.interceptors.response.use(function (response) {

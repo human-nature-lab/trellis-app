@@ -42,26 +42,41 @@ export class StorageService {
 
   /**
    * Get a value from the storage service
-   * @param name
+   * @param {String} key
    * @returns {*|null}
    */
-  get (name) {
-    if (this.data.has(name)) {
-      return this.data.get(name)
+  get (key) {
+    if (this.data.has(key)) {
+      return this.data.get(key)
     }
-    let local = this._getLocalStorage(name)
+    let local = this._getLocalStorage(key)
     if (local !== undefined && local !== null) {
-      this.data.set(name, local)
+      this.data.set(key, local)
       return local
     } else {
       return null
     }
   }
 
-  set (name, data) {
-    this._setLocalStorage(name, data)
-    this.data.set(name, data)
+  /**
+   * Set a key, value pair in local storage
+   * @param {String|Number} key
+   * @param {*} data - Must be JSON serializable
+   * @returns {*}
+   */
+  set (key, data) {
+    this._setLocalStorage(key, data)
+    this.data.set(key, data)
     return data
+  }
+
+  /**
+   * Delete a key from local storage
+   * @param {String} key
+   */
+  delete (key) {
+    this.data.delete(key)
+    window.localStorage.removeItem(key)
   }
 }
 

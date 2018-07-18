@@ -1,15 +1,22 @@
 <template>
-  <v-container fluid>
-    <v-layout row wrap>
-      <v-flex id="mapContainer">
-        <div id="leafletMap"></div>
-        <pre>
-          {{this.geoResults}}
-        </pre>
-      </v-flex>
-    </v-layout>
+  <v-layout
+    column
+    fill-height>
+    <v-flex
+      fill-height
+      ref="mapContainer"
+      id="leafletMap"
+      style="position: relative;">
+    </v-flex>
+    <div>
+      <debug name="Geo results">
+          <pre>
+            {{this.geoResults}}
+          </pre>
+      </debug>
+    </div>
     <v-navigation-drawer
-      disable-resize-watcher="true"
+      :disable-resize-watcher="true"
       v-model="global.searchDrawer.open"
       fixed
       right
@@ -28,13 +35,13 @@
         </v-flex>
       </v-list>
     </v-navigation-drawer>
-  </v-container>
+  </v-layout>
 </template>
 
 <script>
   /* global L */
   import GeoSearch from './GeoSearch'
-  import TranslationService from '@/services/TranslationService'
+  import TranslationService from '../../services/TranslationService'
   import 'leaflet'
   // import 'leaflet.label'
   import Vue from 'vue'
@@ -77,9 +84,10 @@
       },
       setUpMap: function () {
         let padding = 16
-        let mapHeight = (window.innerHeight - document.getElementsByTagName('nav').item(0).offsetHeight - (padding * 2)) + 'px'
+        // let mapHeight = (window.innerHeight - document.getElementsByTagName('nav').item(0).offsetHeight - (padding * 2)) + 'px'
+        let mapHeight = this.$refs.mapContainer.clientHeight - (padding * 2)
         console.log('mapHeight', mapHeight)
-        document.getElementById('leafletMap').style.height = mapHeight
+        // this.$refs.leafletMap.style.height = mapHeight
         this.trellisMap = L.map('leafletMap').setView([0.0, 0.0], 1)
         delete L.Icon.Default.prototype._getIconUrl
         L.Icon.Default.mergeOptions({
@@ -101,7 +109,7 @@
       },
       addMarkers: function () {
         let defaultIcon = L.icon({
-          iconUrl: '../../static/img/map_icons/green_dot.png',
+          iconUrl: require('../../../static/img/map_icons/green_dot.png'),
           iconSize: [10, 10],
           iconAnchor: [4, 4],
           popupAnchor: [4, 4],
