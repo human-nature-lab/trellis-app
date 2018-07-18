@@ -13,8 +13,8 @@
 </template>
 
 <script>
-  import PhotoService from '@/services/photo/PhotoService'
-  import ScrollListener from '@/services/ScrollListener'
+  import PhotoService from '../services/photo/PhotoService'
+  import ScrollListener from '../services/ScrollListener'
   const URL_PLACEHOLDER = 'https://vignette.wikia.nocookie.net/prince-of-stride-alternative/images/1/14/Placeholder_person.jpg/revision/latest?cb=20160220192514'
   export default {
     name: 'photo',
@@ -65,7 +65,6 @@
       if (!this.id) {
         return
       }
-      this.loadOrCancelLoading()
     },
     beforeDestroy: function () {
       // console.log('removing scroll listener')
@@ -73,8 +72,8 @@
       window.removeEventListener('resize', this.onViewportChange)
       this.cancelLoad()
     },
-    mounted: function () {
-      this.loadOrCancelLoading()
+    mounted () {
+      this.$nextTick(this.loadOrCancelLoading)
     },
     methods: {
       isWithinViewport: function () {

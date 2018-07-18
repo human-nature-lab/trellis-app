@@ -13,13 +13,14 @@
     <v-layout class="geo-breadcrumbs">
       <span
         v-for="geo in ancestors"
+        v-if="geo"
         class="geo-name">
         {{translate(geo)}}
       </span>
     </v-layout>
     <v-list v-if="results.length">
       <v-list-tile
-        v-if="lastParentIds.length"
+        v-if="lastParentIds.length > 1"
         @click="moveUpOneLevel">
         <v-list-tile-content>
           <v-container>
@@ -80,7 +81,7 @@
         default () {
           return {
             'no-parent': true,
-            include_children: true,
+            include_children: false,
             'study': singleton.study ? singleton.study.id : null
           }
         }
@@ -156,24 +157,26 @@
           geos.forEach(geo => {
             this.ancestorCache_[geo.id] = geo
           })
+          this.lastParentIds.push(null)
           this.lastParentIds.push(...geos.map(g => g.id))
           this.lastParentIds.pop()
         })
       },
       updateRoute () {
         if (!this.shouldUpdateRoute) return
+        let q = {}
+        if (this.query) {
+          q.query = this.query
+        }
+        q.filters = JSON.stringify(this.filters)
         router.replace({
           name: this.$route.name,
           params: this.$route.params,
-          query: {
-            query: this.query,
-            filters: JSON.stringify(this.filters)
-          }
+          query: q
         })
       },
       moveUpOneLevel: function () {
-        let lastId = this.lastParentIds[this.lastParentIds.length - 1]
-        this.userFilters.parent = lastId
+        this.userFilters.parent = this.lastParentIds[this.lastParentIds.length - 2]
         this.query = null
         this.search().then(() => {
           this.lastParentIds.pop()
@@ -181,11 +184,10 @@
       },
       onGeoClick: function (geo) {
         this.query = null
-        let prevId = this.filters.parent
         this.userFilters.parent = geo.id
         this.ancestorCache_[geo.id] = geo
         this.search().then(() => {
-          this.lastParentIds.push(prevId)
+          this.lastParentIds.push(geo.id)
         })
       },
       selectGeo (geo) {
@@ -241,3 +243,9 @@
     }
   }
 </script>
+
+<style lang="sass">
+  .geo-breadcrumbs
+    .geo-name:not(:first-child):before
+      content: ' \\ '
+</style>
