@@ -2,7 +2,7 @@
   <div>
     <ul>
       <li>
-        Extracting the snapshot...
+        Emptying the snapshots directory...
         <strong v-if="success" class="green--text">DONE.</strong>
         <strong v-if="warning" class="amber--text">WARNING.</strong>
         <strong v-if="error" class="red--text">ERROR.</strong>
@@ -15,74 +15,77 @@
       <p>{{ warningMessage }}</p>
     </span>
     <v-progress-linear
-      v-if="extracting"
+      v-if="working"
       height="2"
-      :indeterminate="progressIndeterminate"
-      v-model="extractProgress">
+      :indeterminate="true">
     </v-progress-linear>
     <v-btn
       v-if="error || warning"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
-      v-if="extracting"
+      v-if="warning"
+      color="warning"
+      @click.native="ignore">Ignore</v-btn>
+    <v-btn
+      v-if="working"
       flat
-      @click.native="stopExtraction">Cancel</v-btn>
+      @click.native="stopWork">Cancel</v-btn>
   </div>
 </template>
 
 <script>
     import config from '@/config'
-    import ZipService from '@/services/zip/ZipService'
-    // import FileService from '@/services/file/FileService'
+    import FileService from '@/services/file/FileService'
     export default {
-      name: 'download-snapshot',
+      name: 'empty-snapshots-directory',
       data () {
         return {
           success: false,
           warning: false,
           error: false,
-          extracting: false,
+          working: false,
           apiRoot: config.apiRoot,
-          source: null,
           errorMessage: '',
-          warningMessage: '',
-          progressIndeterminate: true,
-          extractProgress: 0.0
+          warningMessage: ''
         }
       },
       created () {
-        this.extractSnapshot()
+        this.startWork()
       },
-      props: ['fileEntry'],
       methods: {
-        extractSnapshot: function () {
-          this.extracting = true
-          ZipService.unzipFile(this.fileEntry, this.progressCallback)
-            .then((unzippedFile) => {
-              console.log('unzippedFile', unzippedFile)
-              this.extracting = false
+        startWork: function () {
+          this.working = true
+          FileService.requestFileSystem()
+            .then((fileSystem) => FileService.getDirectoryEntry(fileSystem, 'snapshots'))
+            .then((directoryEntry) => FileService.emptyDirectory(directoryEntry))
+            .then(() => {
+              this.working = false
               this.success = true
-              this.$emit('extract-snapshot-done', unzippedFile)
+              this.workDone()
             },
             (error) => {
-              this.extracting = false
+              this.working = false
               this.error = true
+              console.error(error)
               this.errorMessage = error.data
             })
         },
-        stopExtraction: function () {
-          this.extracting = false
+        workDone: function () {
+          this.$emit('empty-snapshots-directory-done')
         },
-        progressCallback: function (progressEvent) {
-          console.log('progressEvent2', progressEvent)
-          this.progressIndeterminate = false
-          this.extractProgress = (progressEvent.loaded / progressEvent.total) * 100
+        stopWork: function () {
+          this.working = false
+        },
+        ignore: function () {
+          this.warning = false
+          this.success = true
+          this.workDone()
         },
         retry: function () {
           this.error = false
           this.warning = false
-          this.extractSnapshot()
+          this.startWork()
         }
       },
       computed: {

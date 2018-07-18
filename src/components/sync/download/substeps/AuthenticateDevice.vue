@@ -44,7 +44,13 @@
       created () {
         this.authenticate()
       },
-      props: {
+      props: ['isCancelled'],
+      watch: {
+        isCancelled: () => {
+          if (this.isCancelled()) {
+            this.stopChecking()
+          }
+        }
       },
       methods: {
         authenticate: function () {

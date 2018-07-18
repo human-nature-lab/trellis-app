@@ -39,25 +39,30 @@
                 v-bind:continue-status="continueStatusArray[1]"
                 v-on:continue-clicked="onContinue"
                 v-on:cancel-clicked="onCancel">
-                <check-download-size
+                <empty-snapshots-directory
                   v-if="downloadStep > 1"
+                  v-bind:snapshotId="serverSnapshotId"
+                  v-on:empty-snapshots-directory-done="emptySnapshotsDirectoryDone">
+                </empty-snapshots-directory>
+                <check-download-size
+                  v-if="downloadStep > 1 && downloadSubStep > 1"
                   v-bind:snapshotId="serverSnapshotId"
                   v-on:check-download-size-done="checkDownloadSizeDone">
                 </check-download-size>
                 <download-snapshot
-                  v-if="downloadStep > 1 && downloadSubStep > 1"
+                  v-if="downloadStep > 1 && downloadSubStep > 2"
                   v-bind:snapshotId="serverSnapshotId"
                   v-bind:snapshotFileSize="snapshotFileSize"
                   v-on:download-snapshot-done="downloadSnapshotDone">
                 </download-snapshot>
                 <verify-download
-                  v-if="downloadStep > 1 && downloadSubStep > 2"
+                  v-if="downloadStep > 1 && downloadSubStep > 3"
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-bind:fileHash="serverSnapshot.hash"
                   v-on:verify-download-done="verifyDownloadDone">
                 </verify-download>
                 <extract-snapshot
-                  v-if="downloadStep > 1 && downloadSubStep > 3"
+                  v-if="downloadStep > 1 && downloadSubStep > 4"
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-on:extract-snapshot-done="extractSnapshotDone">
                 </extract-snapshot>
@@ -97,6 +102,7 @@
   import AuthenticateDevice from './substeps/AuthenticateDevice'
   import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'
   import CompareSnapshots from './substeps/CompareSnapshots'
+  import EmptySnapshotsDirectory from './substeps/EmptySnapshotsDirectory'
   import CheckDownloadSize from './substeps/CheckDownloadSize'
   import DownloadSnapshot from './substeps/DownloadSnapshot.vue'
   import VerifyDownload from './substeps/VerifyDownload.vue'
@@ -169,16 +175,19 @@
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
       },
+      emptySnapshotsDirectoryDone: function () {
+        this.downloadSubStep = 2
+      },
       checkDownloadSizeDone: function (snapshotFileSize) {
         this.snapshotFileSize = snapshotFileSize
-        this.downloadSubStep = 2
+        this.downloadSubStep = 3
       },
       downloadSnapshotDone: function (fileEntry) {
         this.downloadedSnapshotFileEntry = fileEntry
-        this.downloadSubStep = 3
+        this.downloadSubStep = 4
       },
       verifyDownloadDone: function () {
-        this.downloadSubStep = 4
+        this.downloadSubStep = 5
       },
       extractSnapshotDone: function (extractedSnapshot) {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
@@ -214,6 +223,7 @@
       CheckConnection,
       AuthenticateDevice,
       DownloadStep,
+      EmptySnapshotsDirectory,
       CheckDownloadSize,
       DownloadSnapshot,
       ExtractSnapshot,
