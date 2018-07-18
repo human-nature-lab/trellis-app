@@ -137,6 +137,8 @@
 
 <style lang="sass">
   $btn-height: 60px
+  .page
+    margin-bottom: 20px
   .page-footer
     background-color: white
     box-shadow: 0 0px 10px rgba(0, 0, 0, .3)

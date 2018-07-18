@@ -60,19 +60,26 @@
           :selected="isSelected(respondent)"
           :respondent="respondent" />
       </v-layout>
-      <v-tooltip bottom v-if="canAddRespondent">
-        <v-btn
-          slot="activator"
-          icon
-          @click="showAssociatedRespondentDialog = true">
-          <v-icon>add</v-icon>
-        </v-btn>
-        <span>Add temporary respondent</span>
-      </v-tooltip>
+      <v-layout v-if="!respondentResults.length" ma-3>
+        No results present for the query: {{query}}
+      </v-layout>
+      <v-layout row>
+        <v-spacer />
+        <v-tooltip top v-if="canAddRespondent">
+          <v-btn
+            slot="activator"
+            absolute
+            fab
+            bottom
+            right
+            :loading="isLoading"
+            color="primary">
+            <v-icon>add</v-icon>
+          </v-btn>
+          <span>Add temporary respondent</span>
+        </v-tooltip>
+      </v-layout>
     </v-card>
-    <v-layout v-if="!respondentResults.length" ma-3>
-      No results present for the query: {{query}}
-    </v-layout>
     <v-dialog
       v-model="showAssociatedRespondentDialog">
       <v-card>
@@ -265,7 +272,10 @@
       },
       onSelectRespondent (respondent) {
         this.$emit('selectRespondent', respondent)
-        if (!this.canSelect) return
+        if (!this.canSelect) {
+          router.push({name: 'Respondent', params: {respondentId: respondent.id, studyId: this.studyId}})
+          return
+        }
         if (this.limit && this.selected.length > this.limit) return
 
         let sIndex = this.selected.indexOf(respondent.id)

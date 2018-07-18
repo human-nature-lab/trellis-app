@@ -2,7 +2,7 @@
     <v-flex class="red" v-if="isInDebugMode">
       <v-expansion-panel>
         <v-expansion-panel-content>
-          <div class="debug-name" slot="header">{{this.name}}</div>
+          <div class="debug-name" slot="header">DEBUG: {{this.name}}</div>
           <v-card>
             <v-card-text>
               <slot></slot>
