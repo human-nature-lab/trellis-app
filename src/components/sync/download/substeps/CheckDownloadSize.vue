@@ -19,13 +19,13 @@
       height="2"
       :indeterminate="true"></v-progress-linear>
     <v-btn
-      v-if="error || warning"
+      v-if="!checking && !success"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="checking"
       flat
-      @click.native="stopChecking">Cancel</v-btn>
+      @click.native="stopChecking">Stop</v-btn>
   </div>
 </template>
 

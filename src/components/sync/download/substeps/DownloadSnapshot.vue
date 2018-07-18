@@ -21,13 +21,13 @@
       v-model="downloadProgress">
     </v-progress-linear>
     <v-btn
-      v-if="error || warning"
+      v-if="!downloading && !success"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="downloading"
       flat
-      @click.native="stopDownload">Cancel</v-btn>
+      @click.native="stopDownload">Stop</v-btn>
   </div>
 </template>
 
@@ -53,6 +53,9 @@
           errorMessage: '',
           warningMessage: ''
         }
+      },
+      beforeDestroy () {
+        this.stopDownload()
       },
       created () {
         this.downloadSnapshot()

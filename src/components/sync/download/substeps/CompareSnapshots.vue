@@ -59,6 +59,10 @@
       v-if="checking"
       height="2"
       :indeterminate="true"></v-progress-linear>
+    <v-btn
+      v-if="!checking && !success"
+      color="primary"
+      @click.native="retry">Retry</v-btn>
   </div>
 </template>
 
@@ -100,6 +104,13 @@
             this.success = true
           }
           this.$emit('compare-snapshots-done', (this.result < 3), this.warning)
+        },
+        retry: function () {
+          this.error = false
+          this.errorMessage = ''
+          this.warning = false
+          this.warningMessage = ''
+          this.compareDownload()
         },
         compareDownload: function () {
           this.checking = true

@@ -27,10 +27,6 @@
       v-if="warning"
       color="warning"
       @click.native="ignore">Ignore</v-btn>
-    <v-btn
-      v-if="verifying"
-      flat
-      @click.native="stopVerification">Cancel</v-btn>
   </div>
 </template>
 
@@ -80,9 +76,6 @@
         },
         verificationDone: function () {
           this.$emit('verify-download-done')
-        },
-        stopVerification: function () {
-          this.verifying = false
         },
         ignore: function () {
           this.warning = false

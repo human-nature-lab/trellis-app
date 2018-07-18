@@ -15,13 +15,13 @@
       height="2"
       :indeterminate="true"></v-progress-linear>
     <v-btn
-      v-if="error"
+      v-if="!success && !checking"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="checking"
       flat
-      @click.native="stopChecking">Cancel</v-btn>
+      @click.native="stopChecking">Stop</v-btn>
   </div>
 </template>
 
@@ -44,13 +44,7 @@
       created () {
         this.authenticate()
       },
-      props: ['isCancelled'],
-      watch: {
-        isCancelled: () => {
-          if (this.isCancelled()) {
-            this.stopChecking()
-          }
-        }
+      props: {
       },
       methods: {
         authenticate: function () {

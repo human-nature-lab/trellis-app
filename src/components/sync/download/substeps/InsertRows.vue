@@ -5,7 +5,7 @@
         {{ workMessage }}
         <strong v-if="success" class="green--text">DONE.</strong>
         <strong v-if="error" class="red--text">ERROR.</strong>
-        <strong v-if="warning" class="amber--text">CANCELLED.</strong>
+        <strong v-if="warning" class="amber--text">DONE.</strong>
       </li>
     </ul>
     <span v-if="error" class="red--text">
@@ -26,13 +26,15 @@
     <v-btn
       v-if="working && !cancelled"
       flat
-      @click.native="cancelImport">Cancel</v-btn>
+      @click.native="cancelImport">Stop</v-btn>
   </div>
 </template>
 
 <script>
     import config from '@/config'
     import DatabaseService from '@/services/database/DatabaseService'
+    // Additional cancelled variable not bound to the component
+    let cancelled = false
     export default {
       name: 'insert-rows',
       data () {
@@ -50,6 +52,9 @@
           insertProgress: 0
         }
       },
+      beforeDestroy () {
+        this.cancelImport()
+      },
       created () {
         this.startWork()
       },
@@ -64,7 +69,7 @@
               this.working = false
               if (this.cancelled) {
                 this.warning = true
-                this.warningMessage = 'Operation cancelled by user.'
+                this.warningMessage = 'Importing database cancelled by user.'
               } else {
                 this.success = true
                 this.$emit('insert-rows-done')
@@ -78,11 +83,11 @@
             })
         },
         cancelImport: function () {
-          this.cancelled = true
+          this.cancelled = cancelled = true
           this.workMessage = 'Rolling back transaction...'
         },
         isCancelled: function () {
-          return this.cancelled
+          return cancelled
         },
         retry: function () {
           this.clearErrors()
@@ -92,7 +97,7 @@
           this.insertProgress = (progress.inserted / progress.total) * 100
         },
         clearErrors: function () {
-          this.cancelled = false
+          this.cancelled = cancelled = false
           this.warning = false
           this.warningMessage = false
           this.error = false

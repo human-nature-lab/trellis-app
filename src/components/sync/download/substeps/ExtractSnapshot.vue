@@ -21,13 +21,9 @@
       v-model="extractProgress">
     </v-progress-linear>
     <v-btn
-      v-if="error || warning"
+      v-if="!extracting && !success"
       color="primary"
       @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="extracting"
-      flat
-      @click.native="stopExtraction">Cancel</v-btn>
   </div>
 </template>
 
@@ -70,9 +66,6 @@
               this.error = true
               this.errorMessage = error.data
             })
-        },
-        stopExtraction: function () {
-          this.extracting = false
         },
         progressCallback: function (progressEvent) {
           console.log('progressEvent2', progressEvent)
