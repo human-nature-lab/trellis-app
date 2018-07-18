@@ -20,17 +20,13 @@
       :indeterminate="true">
     </v-progress-linear>
     <v-btn
-      v-if="error || warning"
+      v-if="!working && !success"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="warning"
       color="warning"
       @click.native="ignore">Ignore</v-btn>
-    <v-btn
-      v-if="working"
-      flat
-      @click.native="stopWork">Cancel</v-btn>
   </div>
 </template>
 
@@ -73,9 +69,6 @@
         },
         workDone: function () {
           this.$emit('empty-snapshots-directory-done')
-        },
-        stopWork: function () {
-          this.working = false
         },
         ignore: function () {
           this.warning = false

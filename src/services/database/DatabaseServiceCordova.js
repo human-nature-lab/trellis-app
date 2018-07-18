@@ -186,8 +186,8 @@ export default class DatabaseServiceCordova {
       location: 'default',
       entities: [
       ],
-      logging: ['warning', 'error'], // reduced logging
-      // logging: true, // verbose logging
+      // logging: ['warning', 'error'], // reduced logging
+      logging: true, // verbose logging
       synchronize: true
     }).then(async connection => {
       console.log(connection)
