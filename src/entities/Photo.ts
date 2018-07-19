@@ -1,9 +1,8 @@
 import {Entity, PrimaryGeneratedColumn, Column} from "typeorm";
-import Timestamped from "./Timestamped";
-import SoftDelete from "./SoftDelete";
+import TimestampedSoftDelete from "./TimestampedSoftDelete";
 
 @Entity("photo")
-export class Photo extends Timestamped, SoftDelete {
+export class Photo extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 

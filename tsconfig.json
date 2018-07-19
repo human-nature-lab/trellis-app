@@ -4,7 +4,7 @@
     "lib": ["es5", "es2015.promise", "dom", "es2015"],
     "outDir": "www/js",
     "target": "es5",
-    "module": "system",
+    "module": "commonjs",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
