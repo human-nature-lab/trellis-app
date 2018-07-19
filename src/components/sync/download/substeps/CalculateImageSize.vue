@@ -2,7 +2,7 @@
   <div>
     <ul>
       <li>
-        Checking for available storage space...
+        Checking for images to download...
         <strong v-if="success" class="green--text">OK.</strong>
         <strong v-if="warning" class="amber--text">WARNING.</strong>
         <strong v-if="error" class="red--text">ERROR.</strong>
@@ -40,7 +40,7 @@
     import DeviceService from '@/services/device/DeviceService'
     import formatBytesFilter from '@/filters/format-bytes.filter'
     export default {
-      name: 'check-download-size',
+      name: 'calculate-image-size',
       data () {
         return {
           success: false,
@@ -51,40 +51,38 @@
           source: null,
           errorMessage: '',
           warningMessage: '',
-          snapshotFileSize: 0
+          totalImageSize: 0
         }
       },
       created () {
-        this.checkDownloadSize()
+        this.calculateImageSize()
       },
       props: {
-        snapshotId: {
-          type: String,
-          required: true
-        }
       },
       methods: {
-        checkDownloadSize: function () {
+        calculateImageSize: function () {
           const CancelToken = axios.CancelToken
           this.source = CancelToken.source()
           this.checking = true
-          SyncService.getSnapshotFileSize(this.source, this.snapshotId).then((snapshotFileSize) => {
-            this.snapshotFileSize = snapshotFileSize
-            const freeDiskSpace = DeviceService.getFreeDiskSpace()
-            if (snapshotFileSize > freeDiskSpace) {
-              this.warning = true
-              this.warningMessage = `The snapshot is ${formatBytesFilter(snapshotFileSize)} and this device only has ${formatBytesFilter(freeDiskSpace)} free.`
-            } else if ((snapshotFileSize * 5) > freeDiskSpace) {
-              this.warning = true
-              this.warningMessage = `The extracted snapshot requires ~${formatBytesFilter(snapshotFileSize * 5)} and this device only has ${formatBytesFilter(freeDiskSpace)} free.`
-            } else {
-              this.onDone()
-            }
-            this.checking = false
-          }).catch((error) => {
-            this.errorMessage = error
-            this.error = true
-            this.checking = false
+          DeviceService.getFreeDiskSpace().then((freeDiskSpace) => {
+            SyncService.getImageFileList(this.source).then((imageList) => {
+              this.checking = false
+              console.log('imageList', imageList)
+              let totalImageSize = 0
+              imageList.forEach(image => {
+                totalImageSize += image.length
+              })
+              if (totalImageSize > freeDiskSpace) {
+                this.warning = true
+                this.warningMessage = `The images require ${formatBytesFilter(totalImageSize)} to download and this device only has ${formatBytesFilter(freeDiskSpace)} free.`
+              } else {
+                console.log('totalImageSize', totalImageSize, 'freeDiskSpace', freeDiskSpace)
+                this.onDone()
+              }
+            }).catch((error) => {
+              this.errorMessage = error
+              this.error = true
+            })
           })
         },
         stopChecking: function () {
@@ -95,12 +93,12 @@
         },
         onDone: function () {
           this.success = true
-          this.$emit('check-download-size-done', this.snapshotFileSize)
+          this.$emit('calculate-image-size-done', this.totalImageSize)
         },
         retry: function () {
           this.error = false
           this.warning = false
-          this.checkDownloadSize()
+          this.calculateImageSize()
         },
         ignore: function () {
           this.warning = false
