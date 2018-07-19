@@ -51,16 +51,6 @@
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
-      <v-list-tile @click="refresh()">
-        <v-list-tile-action>
-          <v-icon>refresh</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            Refresh app
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
     </v-list>
     <v-divider></v-divider>
     <v-list dense subheader>
@@ -87,6 +77,16 @@
     </v-list>
     <v-divider></v-divider>
     <v-list dense>
+      <v-list-tile @click="refresh()">
+        <v-list-tile-action>
+          <v-icon>refresh</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            Refresh app
+          </v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
       <v-list-tile @click="logout">
         <v-list-tile-action>
           <v-icon>exit_to_app</v-icon>
@@ -124,7 +124,10 @@
       showCopiedSnackbar: false
     }),
     methods: {
-      emit: function (eventName, ...args) {
+      refresh () {
+        window.location.reload(true)
+      },
+      emit (eventName, ...args) {
         menuBus.$emit(eventName, ...args)
       },
       copyCurrentLocation () {
@@ -139,7 +142,7 @@
       }
     },
     computed: {
-      isInterview: function () {
+      isInterview () {
         return this.$route.name === 'Interview' || this.$route.name === 'InterviewPreview'
       }
     }

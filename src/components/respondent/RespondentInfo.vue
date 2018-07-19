@@ -8,7 +8,7 @@
       </v-btn>
     </v-toolbar>
     <v-card-text>
-      <v-alert v-if="error">
+      <v-alert v-show="error" type="error">
         {{error}}
       </v-alert>
       <v-toolbar flat>
@@ -267,14 +267,21 @@
       photoFromCamera () {},
       photoFromFile () {},
       removeName (nameId) {
+        let name = this.respondent.names.find(name => name.id === nameId)
+        if (name && name.is_display_name) {
+          this.error = `Cannot delete the display name for a respondent`
+          return
+        }
         this.deleting[nameId] = true
-        RespondentService.removeName(this.respondent.id, name.id).then(res => {
+        RespondentService.removeName(this.respondent.id, nameId).then(res => {
           let index = this.respondent.names.findIndex(name => name.id === nameId)
           this.respondent.names.splice(index, 1)
         }).catch(err => {
-          this.error = err
+          console.error(err)
+          this.error = `Failed to delete the respondent name -> ${name.name}`
         }).finally(() => {
           this.deleting[nameId] = false
+          this.$forceUpdate()
         })
       },
       doneAddingName (name) {
