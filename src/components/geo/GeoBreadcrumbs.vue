@@ -66,7 +66,7 @@
   }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
   .error
     color: red
   .geo-breadcrumbs
