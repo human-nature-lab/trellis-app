@@ -60,6 +60,24 @@ class SyncService {
         throw err
       })
   }
+  getImageFileList (source) {
+    let options = {}
+    if (source) { options.cancelToken = source.token }
+    return new Promise((resolve, reject) => {
+      DeviceService.getUUID()
+        .then((deviceId) => {
+          http.get(`device/${deviceId}/image`, options)
+            .then(response => {
+              console.log('response', response)
+              resolve(response.data)
+            })
+        })
+        .catch(err => {
+          console.error(err)
+          reject(err)
+        })
+    })
+  }
   downloadSnapshot (source, onDownloadProgress, snapshotId) {
     let options = {
       timeout: 0,

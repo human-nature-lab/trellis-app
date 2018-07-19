@@ -8,6 +8,8 @@
             <v-stepper-step step="2">Downloading latest snapshot</v-stepper-step>
             <v-divider></v-divider>
             <v-stepper-step step="3">Inserting new data</v-stepper-step>
+            <v-divider></v-divider>
+            <v-stepper-step step="4">Downloading images</v-stepper-step>
           </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content step="1">
@@ -90,6 +92,19 @@
                 </check-foreign-keys>
               </download-step>
             </v-stepper-content>
+            <v-stepper-content step="4">
+              <download-step
+                title="Downloading images"
+                v-if="downloadStep === 4"
+                v-bind:continue-status="continueStatusArray[3]"
+                v-on:continue-clicked="onContinue"
+                v-on:cancel-clicked="onCancel">
+                <calculate-image-size
+                  v-if="downloadStep > 3"
+                  v-on:calculate-image-size-done="calculateImageSizeDone">
+                </calculate-image-size>
+              </download-step>
+            </v-stepper-content>
           </v-stepper-items>
         </v-stepper>
     </div>
@@ -110,6 +125,7 @@
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import InsertRows from './substeps/InsertRows.vue'
   import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
+  import CalculateImageSize from './substeps/CalculateImageSize.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
@@ -120,7 +136,7 @@
     data () {
       return {
         status: DOWNLOAD_STATUS.CHECKING_CONNECTION,
-        downloadStep: 1,
+        downloadStep: 4,
         downloadSubStep: 1,
         downloading: false,
         downloadProgress: 0,
@@ -132,7 +148,7 @@
         compareSnapshotsResults: COMPARE_SNAPSHOTS_RESULTS.NONE,
         COMPARE_SNAPSHOTS_RESULTS: COMPARE_SNAPSHOTS_RESULTS,
         autoContinueLabel: '',
-        continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
+        continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
         downloadedSnapshotFileEntry: null,
         extractedSnapshot: null
       }
@@ -146,7 +162,7 @@
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
-        if (this.downloadStep < 3) {
+        if (this.downloadStep < 4) {
           this.downloadStep++
           this.downloadSubStep = 1
         } else {
@@ -200,7 +216,10 @@
         this.downloadSubStep = 3
       },
       checkForeignKeysDone: function () {
-        this.continueStatus = BUTTON_STATUS.ENABLED
+        this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
+      },
+      calculateImageSizeDone: function () {
+        console.log('calculateImageSizeDone')
       }
     },
     computed: {
@@ -230,7 +249,8 @@
       VerifyDownload,
       RemoveDatabase,
       InsertRows,
-      CheckForeignKeys
+      CheckForeignKeys,
+      CalculateImageSize
     }
   }
 </script>

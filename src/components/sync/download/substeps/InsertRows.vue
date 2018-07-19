@@ -63,7 +63,6 @@
         startWork: function () {
           this.working = true
           this.workMessage = 'Importing database...'
-          console.log('this.extractedSnapshot', this.extractedSnapshot)
           DatabaseService.importDatabase(this.extractedSnapshot, this.trackProgress, this.isCancelled)
             .then(() => {
               this.working = false
@@ -71,8 +70,7 @@
                 this.warning = true
                 this.warningMessage = 'Importing database cancelled by user.'
               } else {
-                this.success = true
-                this.$emit('insert-rows-done')
+                this.onDone()
               }
             },
             (error) => {
@@ -88,6 +86,10 @@
         },
         isCancelled: function () {
           return cancelled
+        },
+        onDone: function () {
+          this.success = true
+          this.$emit('insert-rows-done')
         },
         retry: function () {
           this.clearErrors()
