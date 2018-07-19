@@ -327,11 +327,3 @@
     }
   }
 </script>
-
-<style lang="sass" scoped>
-.respondent-search
-  /*position: fixed*/
-  z-index: 10
-.respondents
-  /*padding-top: 130px*/
-</style>
