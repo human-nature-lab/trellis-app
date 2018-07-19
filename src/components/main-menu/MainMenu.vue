@@ -54,7 +54,7 @@
     </v-list>
     <v-divider></v-divider>
     <v-list dense subheader>
-      <v-subheader>Context Options</v-subheader>
+      <v-subheader>General</v-subheader>
       <v-list-tile @click="copyCurrentLocation">
         <v-list-tile-action>
           <v-icon>location_searching</v-icon>
@@ -74,9 +74,6 @@
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
-    </v-list>
-    <v-divider></v-divider>
-    <v-list dense>
       <v-list-tile @click="refresh()">
         <v-list-tile-action>
           <v-icon>refresh</v-icon>
