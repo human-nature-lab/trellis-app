@@ -68,15 +68,17 @@
         <v-tooltip top v-if="canAddRespondent">
           <v-btn
             slot="activator"
-            absolute
+            fixed
             fab
             bottom
             right
+            @click="showAssociatedRespondentDialog = true"
             :loading="isLoading"
             color="primary">
             <v-icon>add</v-icon>
           </v-btn>
-          <span>Add temporary respondent</span>
+          <span v-if="respondentId">Add temporary respondent</span>
+          <span v-else>Add respondent</span>
         </v-tooltip>
       </v-layout>
     </v-card>

@@ -33,35 +33,7 @@
             :photo="photo"/>
         </v-layout>
       </v-container>
-      <v-toolbar flat>
-        <v-toolbar-title>Locations</v-toolbar-title>
-        <v-spacer />
-        <permission :role-whitelist="['admin','manager']">
-          <v-btn
-            icon
-            @click="addGeo()">
-            <v-icon>add</v-icon>
-          </v-btn>
-        </permission>
-      </v-toolbar>
-      <v-data-table
-        class="mb-3"
-        :headers="locationHeaders"
-        :items="locations"
-        hide-actions>
-        <template slot="items" slot-scope="props">
-          <td>
-            <GeoBreadcrumbs
-              :geo-id="props.item.id" />
-          </td>
-          <td>
-            {{props.item.type}}
-          </td>
-          <td>
-            <v-icon v-if="props.item.pivot.is_current">check</v-icon>
-          </td>
-        </template>
-      </v-data-table>
+      <RespondentGeos :respondent="respondent" />
       <v-toolbar flat>
         <v-toolbar-title>Condition Tags</v-toolbar-title>
         <v-spacer />
@@ -167,15 +139,6 @@
     </v-dialog>
     <v-dialog
       lazy
-      v-model="modal.geoSearch">
-      <v-card>
-        <GeoSearch
-          @onGeoSelect="geoSelected"
-          is-selectable />
-      </v-card>
-    </v-dialog>
-    <v-dialog
-      lazy
       v-model="modal.conditionTag">
       <v-card>
         <RespondentConditionTagForm
@@ -190,14 +153,12 @@
 <script>
   import Permission from '../Permission'
   import Photo from '../Photo'
-  import GeoSearch from '../geo/GeoSearch'
   import RespondentName from './RespondentName'
   import RespondentConditionTagForm from './RespondentConditionTagForm'
   import RespondentService from '../../services/respondent/RespondentService'
-  import TranslationService from '../../services/TranslationService'
-  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
   import singleton from '../../static/singleton'
   import ConditionTagService from '../../services/condition-tag/ConditionTagService'
+  import RespondentGeos from './RespondentGeos'
 
   let respondent
   function preloadRespondent (respondentId) {
@@ -228,16 +189,6 @@
           conditionTag: false
         },
         isAddingPhoto: false,
-        locationHeaders: [{
-          text: 'Name',
-          value: 'translated'
-        }, {
-          text: 'Type',
-          value: 'type'
-        }, {
-          text: 'Current',
-          value: 'isCurrent'
-        }],
         conditionTagHeaders: [{
           text: 'Tag name',
           value: 'name'
@@ -295,14 +246,6 @@
         this.respondent.names.splice(oldIndex, 1, [name])
         this.modal.editName = false
       },
-      addGeo () {
-        this.modal.geoSearch = true
-        this.editing.geo = null
-      },
-      geoSelected (geo) {
-        this.modal.geoSearch = false
-        if (this.editing.geo) {} else {}
-      },
       doneAddingRespondentConditionTag (tag) {
         this.respondent.respondent_condition_tags.push(tag)
         this.modal.conditionTag = false
@@ -328,23 +271,14 @@
       name () {
         let rName = this.respondent.names.find(n => n.is_display_name)
         return rName ? rName.name : this.respondent.name
-      },
-      locations () {
-        return this.respondent.geos.map(geo => {
-          geo.translated = TranslationService.getAny(geo.name_translation, this.global.locale.id)
-          geo.type = geo.geo_type.name
-          geo.isCurrent = geo.pivot.is_current
-          return geo
-        })
       }
     },
     components: {
       Photo,
       RespondentName,
-      GeoSearch,
-      GeoBreadcrumbs,
       Permission,
-      RespondentConditionTagForm
+      RespondentConditionTagForm,
+      RespondentGeos
     }
   }
 </script>
