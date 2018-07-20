@@ -16,9 +16,10 @@
       </debug>
     </div>
     <v-navigation-drawer
-      :disable-resize-watcher="true"
-      v-model="global.searchDrawer.open"
       fixed
+      clipped
+      :disable-route-watcher="true"
+      v-model="global.searchDrawer.open"
       right
       app>
       <v-list dense>
@@ -73,8 +74,7 @@
       this.setUpMap()
       this.addMarkers()
       this.centerMap()
-    },
-    computed: {
+      this.$nextTick(() => { this.global.searchDrawer.open = true })
     },
     methods: {
       setUpSearch: function () {
@@ -106,6 +106,7 @@
         this.geoResults = results
         this.addMarkers()
         this.centerMap()
+        this.$nextTick(() => { this.global.searchDrawer.open = true })
       },
       addMarkers: function () {
         let defaultIcon = L.icon({

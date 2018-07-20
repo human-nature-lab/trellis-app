@@ -1,22 +1,35 @@
 <template>
   <v-container fluid>
-    <v-layout column>
-      <v-alert v-if="error">{{error}}</v-alert>
-      <h1>
-        {{translated}}
-      </h1>
-      <div>
-        <GeoBreadcrumbs :geo-id="geo.parent_id" />
-      </div>
-    </v-layout>
-    <v-layout>
-      Photos
-    </v-layout>
-    <v-layout>
-      <v-btn @click="viewRespondents">
-        View Respondents
-      </v-btn>
-    </v-layout>
+    <v-card tile>
+      <v-toolbar card prominent>
+        <v-toolbar-title>Geo: {{translated}}</v-toolbar-title>
+        <v-spacer />
+        <v-btn @click="viewRespondents">
+          Respondents
+        </v-btn>
+      </v-toolbar>
+      <v-card-text>
+        <v-alert v-show="error" color="error">{{error}}</v-alert>
+        <v-layout>
+          <GeoBreadcrumbs :geo-id="geo.parent_id" />
+        </v-layout>
+        <v-toolbar flat>
+          <v-toolbar-title>Photos</v-toolbar-title>
+          <v-spacer />
+        </v-toolbar>
+        <v-container fluid grid-list-md>
+          <v-layout row wrap>
+            <Photo
+              v-for="photo in geo.photos"
+              :is-contained="true"
+              :height="250"
+              :width="250"
+              :key="photo.id"
+              :photo="photo"/>
+          </v-layout>
+        </v-container>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 
@@ -24,6 +37,7 @@
   import TranslationMixin from '../../mixins/TranslationMixin'
   import GeoService from '../../services/geo/GeoService'
   import GeoBreadcrumbs from './GeoBreadcrumbs'
+  import Photo from '../Photo'
   import singleton from '../../static/singleton'
   import index from '../../router/index'
   import {merge} from 'lodash'
@@ -45,7 +59,7 @@
   }
   export default {
     name: 'geo-info',
-    components: {GeoBreadcrumbs},
+    components: {GeoBreadcrumbs, Photo},
     data () {
       return {
         geo: geo,
