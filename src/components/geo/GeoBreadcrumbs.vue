@@ -49,7 +49,7 @@
     },
     methods: {
       translate (geo) {
-        return TranslationService.getAny(geo.name_translation, this.global.locale.id)
+        return TranslationService.getAny(geo.name_translation, this.global.locale)
       },
       load () {
         if (!this.geoId) return

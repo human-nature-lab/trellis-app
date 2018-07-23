@@ -1,21 +1,22 @@
 <template>
-    <v-container class="cart">
-      <v-layout row>
-        <v-flex xs9>
-          <v-layout row class="items">
-            <div
-              class="cart-item"
-              v-for="item in items"
-              :key="item">
-              {{item}}
+  <v-layout row class="cart">
+    <v-flex xs9 >
+      <v-layout row class="items">
+        <div
+          v-for="item in items"
+          :key="item.id">
+          <slot v-bind:item="item">
+            <div class="cart-item elevation-1">
+              {{ item }}
             </div>
-          </v-layout>
-        </v-flex>
-        <v-flex xs3>
-          <v-btn @click="$emit('done')">Done</v-btn>
-        </v-flex>
+          </slot>
+        </div>
       </v-layout>
-    </v-container>
+    </v-flex>
+    <v-flex xs3>
+      <v-btn @click="$emit('done')">Done</v-btn>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -39,7 +40,6 @@
   width: 100px
   flex-shrink: 0
   box-sizing: border-box
-  border: 1px solid grey
 .items
   overflow-y: auto
 </style>

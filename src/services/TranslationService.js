@@ -25,13 +25,14 @@ export default class TranslationService {
    * @returns {null|string}
    */
   static getAny (translation, locale = null) {
-    let translated
-    if (locale) {
-      translated = TranslationService.getTranslated(translation, locale)
-    }
+    let translated = TranslationService.getTranslated(translation, locale)
     if (!translated) {
-      translated = translation.translation_text[0].translated_text
+      let firstTrans = translation.translation_text[0]
+      translated = firstTrans.translated_text
+      if (translated && firstTrans.locale && firstTrans.locale.language_tag) {
+        translated += ` (${firstTrans.locale.language_tag})`
+      }
     }
-    return translated || 'No translation text exists for this translation'
+    return translated || 'No translation text exists for this resource'
   }
 }

@@ -1,29 +1,29 @@
 <template>
-  <v-container fluid class="geo-search" :class="{'cart-spacing': selected.length}">
-    <v-alert v-if="error">
-      {{this.error}}
-    </v-alert>
-    <v-layout row wrap>
-      <v-text-field
-        v-model="query"
-        placeholder="Search..."
-        :loading="isSearching_"
-        @input="queryChange"/>
-    </v-layout>
-    <v-layout class="geo-breadcrumbs">
-      <span
-        v-for="geo in ancestors"
-        v-if="geo"
-        class="geo-name">
-        {{translate(geo)}}
-      </span>
-    </v-layout>
-    <v-list v-if="results.length">
-      <v-list-tile
-        v-if="lastParentIds.length > 1"
-        @click="moveUpOneLevel">
-        <v-list-tile-content>
-          <v-container>
+  <v-card height="100%" class="geo-search h100" :class="{'cart-spacing': selectedGeos.length}">
+    <v-layout column class="h100">
+      <div class="search-header">
+        <v-container fluid class="pb-0">
+          <v-layout row wrap>
+            <v-text-field
+              v-model="query"
+              placeholder="Search..."
+              :loading="isSearching_"
+              @input="queryChange"/>
+          </v-layout>
+          <v-layout class="geo-breadcrumbs">
+            <span
+              v-for="geo in ancestors"
+              v-if="geo"
+              class="geo-name">
+              {{translate(geo)}}
+            </span>
+          </v-layout>
+          <v-alert v-show="error" color="error">
+            {{this.error}}
+          </v-alert>
+          <v-container
+            v-if="lastParentIds.length > 1"
+            @click="moveUpOneLevel">
             <v-layout row>
               <v-flex xs1>
                 <v-icon>arrow_upward</v-icon>
@@ -34,31 +34,42 @@
               </v-flex>
             </v-layout>
           </v-container>
-        </v-list-tile-content>
-      </v-list-tile>
-      <GeoListTile
-        v-for="geo in results"
-        :showRespondentsLink="showRespondentsLink"
-        :isSelectable="isSelectable"
-        :selected="selected.indexOf(geo.id) > -1"
-        @click="onGeoClick(geo)"
-        @geo-select="onGeoSelect(geo)"
-        :key="geo.id"
-        :geo="geo" />
-    </v-list>
-    <v-flex v-else>
-      <span v-if="query">No locations match this query...</span>
-      <span v-else>It appears that no locations have been added to the database</span>
-    </v-flex>
-    <Cart
-      v-if="selected.length"
-      @done="onDone"
-      :items="selected">
-      <v-flex slot name="item">
-        Item
-      </v-flex>
-    </Cart>
-  </v-container>
+        </v-container>
+      </div>
+      <div class="geo-list">
+        <v-list v-if="results.length">
+          <GeoListTile
+            v-for="geo in results"
+            :isSelectable="isSelectable"
+            :selected="isGeoSelected(geo)"
+            @click="onGeoClick(geo)"
+            @geo-select="onGeoSelect(geo)"
+            :key="geo.id"
+            :geo="geo" />
+        </v-list>
+        <v-flex v-else>
+          <span v-if="query">No locations match this query...</span>
+          <span v-else>It appears that no locations have been added to the database</span>
+        </v-flex>
+      </div>
+      <div v-if="selectedGeos.length">
+        <v-card>
+          <v-container fluid>
+            <Cart
+              @done="onDone"
+              @remove="removeGeo"
+              :items="selectedGeos">
+              <template slot-scope="props">
+                <v-chip close @input="removeGeo(props.item)">
+                  {{translate(props.item)}}
+                </v-chip>
+              </template>
+            </Cart>
+          </v-container>
+        </v-card>
+      </div>
+    </v-layout>
+  </v-card>
 </template>
 
 <script>
@@ -72,7 +83,7 @@
   export default {
     name: 'geo-search',
     props: {
-      selectedIds: {
+      selectedGeos: {
         type: Array,
         default: () => []
       },
@@ -103,6 +114,9 @@
       shouldUpdateRoute: {
         type: Boolean,
         default: true
+      },
+      limit: {
+        type: Number
       }
     },
     head: {
@@ -117,10 +131,8 @@
           types: null
         },
         query: this.$route.query.query,
-        ancestorCache_: {},
+        geoCache_: {},
         results: [],
-        added: [],
-        removed: [],
         error: null,
         isSearching_: false,
         lastParentIds: [],
@@ -134,28 +146,24 @@
       filters: function () {
         return Object.assign({}, this.baseFilters, this.userFilters)
       },
-      selected: function () {
-        let selected = this.selectedIds
-        for (let id of this.added) {
-          selected.push(id)
-        }
-        return selected.filter(id => this.removed.indexOf(id) === -1)
+      selectedIds () {
+        return this.selectedGeos.map(g => g.id)
       },
       ancestors () {
         return this.lastParentIds.map(id => {
-          return this.ancestorCache_[id]
+          return this.geoCache_[id]
         })
       }
     },
     methods: {
       translate (geo) {
         if (!geo || !geo.name_translation) return 'No translation'
-        return TranslationService.getAny(geo.name_translation, this.global.locale.id)
+        return TranslationService.getAny(geo.name_translation, this.global.locale)
       },
       loadAncestors () {
         GeoService.getGeoAncestors(this.results[0].id).then(geos => {
           geos.forEach(geo => {
-            this.ancestorCache_[geo.id] = geo
+            this.geoCache_[geo.id] = geo
           })
           this.lastParentIds.push(null)
           this.lastParentIds.push(...geos.map(g => g.id))
@@ -185,25 +193,27 @@
       onGeoClick: function (geo) {
         this.query = null
         this.userFilters.parent = geo.id
-        this.ancestorCache_[geo.id] = geo
+        this.geoCache_[geo.id] = geo
         this.search().then(() => {
           this.lastParentIds.push(geo.id)
         })
       },
-      selectGeo (geo) {
-        let sIndex = this.selected.indexOf(geo.id)
-        let aIndex = this.added.indexOf(geo.id)
-        let rIndex = this.removed.indexOf(geo.id)
-        if (aIndex > -1) {
-          this.added.splice(aIndex, 1)
-        } else if (rIndex > -1) {
-          this.removed.splice(rIndex, 1)
-        } else if (sIndex > -1) {
-          this.removed.push(geo.id)
-        } else {
-          this.added.push(geo.id)
+      removeGeo (geo) {
+        let index = this.selectedIds.indexOf(geo.id)
+        this.selectedGeos.splice(index, 1)
+      },
+      addGeo (geo) {
+        this.selectedGeos.push(geo)
+        if (this.limit && this.selectedGeos.length > this.limit) {
+          this.selectedGeos.shift()
         }
-        this.$emit('geoSelected', geo)
+      },
+      selectGeo (geo) {
+        if (this.selectedIds.indexOf(geo.id) > -1) {
+          this.removeGeo(geo)
+        } else {
+          this.addGeo(geo)
+        }
       },
       onGeoSelect: function (geo) {
         if (this.isSelectable) {
@@ -211,9 +221,11 @@
         }
       },
       onDone: function () {
-        this.$emit('doneSelecting', this.added, this.removed)
-        this.added = []
-        this.removed = []
+        this.$emit('doneSelecting', JSON.parse(JSON.stringify(this.selectedGeos)))
+        // Empty the array without breaking references
+        while (this.selectedGeos.length) {
+          this.selectedGeos.pop()
+        }
       },
       search: function () {
         this.isSearching_ = true
@@ -228,13 +240,20 @@
         }
         return GeoService.search(filters).then(results => {
           this.results = results
+          for (let geo of results) {
+            this.geoCache_[geo.id] = geo
+          }
           this.$emit('returned-geo-results', results)
         }).catch(err => {
-          this.error = err
+          console.error(err)
+          this.error = `Unable to retrieve geos for the current filters`
         }).then(() => {
           this.isSearching_ = false
           this.updateRoute()
         })
+      },
+      isGeoSelected (geo) {
+        return this.selectedIds.indexOf(geo.id) > -1
       }
     },
     components: {
@@ -245,6 +264,13 @@
 </script>
 
 <style lang="sass">
+  .geo-search-dialog
+    height: 90%
+  .geo-list
+    overflow-y: auto
+    flex-grow: 1
+  .h100
+    height: 100%
   .geo-breadcrumbs
     .geo-name:not(:first-child):before
       content: ' \\ '

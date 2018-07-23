@@ -35,7 +35,7 @@
         </td>
         <permission :role-whitelist="['admin', 'manager']">
           <td>
-            <v-tooltip>
+            <v-tooltip v-if="!props.item.pivot.is_current">
               <v-btn
                 slot="activator"
                 icon
@@ -59,13 +59,14 @@
       </template>
     </v-data-table>
     <v-dialog
+      content-class="geo-search-dialog"
       lazy
       v-model="geoSearchModal">
-      <v-card>
-        <GeoSearch
-          @geoSelected="geoSelected"
-          is-selectable />
-      </v-card>
+      <GeoSearch
+        :limit="1"
+        is-selectable
+        :should-update-route="false"
+        @doneSelecting="geoSelected" />
     </v-dialog>
   </v-flex>
 </template>
@@ -119,20 +120,20 @@
       },
       remove (respondentGeoId) {
         return RespondentService.removeRespondentGeo(this.respondent.id, respondentGeoId).then(() => {
-          let index = this.respondent.geos.find(g => g.pivot.id === respondentGeoId)
+          let index = this.respondent.geos.findIndex(g => g.pivot.id === respondentGeoId)
           this.respondent.geos.splice(index, 1)
         })
       },
-      async geoSelected (geo) {
+      async geoSelected (geos) {
+        if (geos.length > 1) this.error = 'Unable to add more than one respondent geo at a time'
         this.isAddingGeo = true
         try {
           if (this.movingRespondentGeo) {
-            await this.moveGeo(this.movingRespondentGeo, geo)
+            await this.moveGeo(this.movingRespondentGeo, geos[0])
           } else {
-            await this.addGeo(geo)
+            await this.addGeo(geos[0])
           }
         } catch (err) {
-          console.error(err)
           this.error = 'Unable to add or move respondent geo'
         } finally {
           this.isAddingGeo = false
