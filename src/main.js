@@ -5,6 +5,7 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.css'
 import VueCordova from 'vue-cordova'
 import VueHead from 'vue-head'
+import lang from './i18n/lang'
 import Debug from './components/Debug'
 import singleton from './static/singleton'
 import 'typeface-roboto/index.css'
@@ -18,7 +19,6 @@ import config from './config'
 import theme from './static/theme'
 import {APP_ENV} from './static/constants'
 
-// Flag for debug
 Vue.use(Vuetify, theme)
 Vue.config.productionTip = false
 Vue.use(VueHead)
@@ -68,6 +68,7 @@ Vue.mixin({
 new Vue({
   el: '#app',
   router,
+  lang,
   template: config.appEnv === APP_ENV.WEB ? '<WebApp />' : '<App />',
   components: {
     App,
