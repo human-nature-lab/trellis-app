@@ -14,12 +14,14 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 })
 
 module.exports = merge(baseWebpackConfig, {
+  mode: 'development',
   module: {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
   },
   // cheap-module-eval-source-map is faster for development
   devtool: 'source-map',
   plugins: [
+    new webpack.LoaderOptionsPlugin({ options: {}}),
     new webpack.DefinePlugin({
       'process.env': config.dev.env
     }),
