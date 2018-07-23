@@ -68,7 +68,7 @@ class SyncService {
         .then((deviceId) => {
           http.get(`device/${deviceId}/image`, options)
             .then(response => {
-              console.log('response', response)
+              console.log('getImageFileList', response)
               resolve(response.data)
             })
         })

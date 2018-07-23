@@ -1,6 +1,7 @@
 import FileService from '@/services/file/FileService'
 import { getRepository } from 'typeorm'
-import { Photo } from '@/entities/Photo'
+import DatabaseService from '@/services/database/DatabaseService'
+import Photo from '@/entities/trellis/Photo'
 import SizeLimitedMap from '@/classes/SizeLimitedMap'
 const cache = new SizeLimitedMap(1000)
 import CancellablePromise from '@/classes/CancellablePromise'
@@ -40,5 +41,15 @@ export default class PhotoServiceCordova {
       }
     })
     return p
+  }
+
+  /**
+   * This method returns all undeleted photos from the Photo table
+   * @returns {Promise<Array>}
+   */
+  static async getPhotos () {
+    const connection = await DatabaseService.getDatabase()
+    const repository = await connection.getRepository(Photo)
+    return repository.find({ deletedAt: null })
   }
 }

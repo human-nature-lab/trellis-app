@@ -47,8 +47,13 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true
+          }
+        },
+        exclude: /node_modules/,
       },
       {
         test: /\.vue$/,
@@ -81,21 +86,11 @@ module.exports = {
         }
       },
       {
-        test: /\.scss$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'sass-loader'
-        ]
-      },
-      {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'file-loader',
+        loader: 'url-loader',
         options: {
           limit: 10000,
-          outputPath: utils.assetsPath('fonts/'),
-          publicPath: '../',
-          name: '[name].[hash:7].[ext]'
+          name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
     ]
