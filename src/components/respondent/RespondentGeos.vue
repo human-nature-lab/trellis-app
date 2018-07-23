@@ -111,17 +111,20 @@
         return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.pivot.id, geo.id).then(resGeo => {
           let index = this.respondent.geos.findIndex(rg => rg.id === respondentGeo.id)
           this.respondent.geos.splice(index, 1, resGeo)
+          this.$emit('after-move', resGeo)
         })
       },
       addGeo (geo) {
-        return RespondentService.addRespondentGeo(this.respondent.id, geo.id).then(returnedGeo => {
-          this.respondent.geos.push(returnedGeo)
+        return RespondentService.addRespondentGeo(this.respondent.id, geo.id).then(resGeo => {
+          this.respondent.geos.push(resGeo)
+          this.$emit('after-add', resGeo)
         })
       },
       remove (respondentGeoId) {
         return RespondentService.removeRespondentGeo(this.respondent.id, respondentGeoId).then(() => {
           let index = this.respondent.geos.findIndex(g => g.pivot.id === respondentGeoId)
-          this.respondent.geos.splice(index, 1)
+          let rm = this.respondent.geos.splice(index, 1)
+          this.$emit('after-remove', rm[0])
         })
       },
       async geoSelected (geos) {
