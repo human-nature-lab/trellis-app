@@ -38,6 +38,8 @@
     import config from '@/config'
     import SyncService from '../../services/SyncService'
     import DeviceService from '@/services/device/DeviceService'
+    import FileService from '@/services/file/FileService'
+    import PhotoService from '@/services/photo/PhotoService'
     import formatBytesFilter from '@/filters/format-bytes.filter'
     export default {
       name: 'calculate-image-size',
@@ -64,12 +66,23 @@
           const CancelToken = axios.CancelToken
           this.source = CancelToken.source()
           this.checking = true
-          DeviceService.getFreeDiskSpace().then((freeDiskSpace) => {
-            SyncService.getImageFileList(this.source).then((imageList) => {
+          Promise.all([
+            DeviceService.getFreeDiskSpace(),
+            SyncService.getImageFileList(this.source),
+            PhotoService.getPhotos(),
+            FileService.listPhotos()])
+            .then((results) => {
               this.checking = false
-              console.log('imageList', imageList)
+              const freeDiskSpace = results[0]
+              const serverList = results[1]
+              const photoList = results[2]
+              const localList = results[3]
+              console.log('freeDiskSpace', freeDiskSpace)
+              console.log('serverList', serverList)
+              console.log('photoList', photoList)
+              console.log('localList', localList)
               let totalImageSize = 0
-              imageList.forEach(image => {
+              serverList.forEach(image => {
                 totalImageSize += image.length
               })
               if (totalImageSize > freeDiskSpace) {
@@ -80,10 +93,10 @@
                 this.onDone()
               }
             }).catch((error) => {
-              this.errorMessage = error
+              console.log('error', error)
+              this.errorMesage = error.message
               this.error = true
             })
-          })
         },
         stopChecking: function () {
           if (this.source) {
