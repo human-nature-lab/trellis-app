@@ -20,7 +20,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json', '.ts', '.tsx'],
+    extensions: ['.js', '.vue', '.json', '.ts', '.tsx', '.csv'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src')
@@ -34,6 +34,14 @@ module.exports = {
       {
         test: /\.txt\.js$/,
         loader: 'raw-loader'
+      },
+      {
+        test: /\.csv$/,
+        loader: 'csv-loader',
+        options: {
+          header: false,
+          skipEmptyLines: true
+        }
       },
       {
         test: /\.(js|vue)$/,
