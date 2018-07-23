@@ -98,6 +98,20 @@ class FileServiceCordova {
       })
   }
 
+  listPhotos () {
+    return this.requestFileSystem()
+      .then((fileSystem) => this.getDirectoryEntry(fileSystem, 'photos'))
+      .then((directoryEntry) => {
+        return new Promise((resolve, reject) => {
+          let reader = directoryEntry.createReader()
+          reader.readEntries((results) => {
+            console.log('listPhotos', results)
+            resolve(results)
+          }, reject)
+        })
+      })
+  }
+
   getPhoto (fileName) {
     return this.requestFileSystem()
       .then((fileSystem) => this.getDirectoryEntry(fileSystem, 'photos'))
