@@ -33,8 +33,7 @@ const trellisConnection = {
     Photo
   ],
   // logging: ['warning', 'error'], // reduced logging
-  logging: true, // verbose logging
-  synchronize: true
+  logging: true // verbose logging
 }
 
 export default class DatabaseServiceCordova {
@@ -140,6 +139,7 @@ export default class DatabaseServiceCordova {
       }
     } catch (err) {
       await queryRunner.rollbackTransaction()
+      throw err
     } finally {
       await queryRunner.query('PRAGMA foreign_keys = ON;')
     }

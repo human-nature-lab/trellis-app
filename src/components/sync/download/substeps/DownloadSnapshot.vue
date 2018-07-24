@@ -41,7 +41,7 @@
       data () {
         return {
           downloadProgress: 0,
-          progressIndeterminate: false,
+          progressIndeterminate: true,
           lastProgressEvent: 0,
           lastDownloadProgress: 0,
           success: false,
@@ -105,8 +105,10 @@
           }
           this.lastDownloadProgress = progressEvent.loaded
           if (progressEvent.lengthComputable) {
-            this.progressIndeterminate = false
             this.downloadProgress = (progressEvent.loaded / progressEvent.total) * 100
+            if (this.downloadProgress > 0) {
+              this.progressIndeterminate = false
+            }
           } else {
             this.progressIndeterminate = true
           }
