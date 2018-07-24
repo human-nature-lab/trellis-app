@@ -60,13 +60,13 @@ class SyncService {
         throw err
       })
   }
-  getImageFileList (source) {
+  getImageFileList (source, fileNames) {
     let options = {}
     if (source) { options.cancelToken = source.token }
     return new Promise((resolve, reject) => {
       DeviceService.getUUID()
         .then((deviceId) => {
-          http.get(`device/${deviceId}/image`, options)
+          http.post(`device/${deviceId}/image_size`, fileNames, options)
             .then(response => {
               console.log('getImageFileList', response)
               resolve(response.data)
@@ -94,6 +94,15 @@ class SyncService {
         console.error(err)
         throw err
       })
+  }
+  downloadImage (source, fileName) {
+    let options = {
+      timeout: 0,
+      responseType: 'blob'
+    }
+    if (source) { options.cancelToken = source.token }
+    return DeviceService.getUUID()
+      .then((deviceId) => http.get(`device/${deviceId}/image/${fileName}`, options))
   }
   hasSynced () {
     return this.synced

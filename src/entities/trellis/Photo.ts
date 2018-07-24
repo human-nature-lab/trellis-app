@@ -3,7 +3,7 @@ import TimestampedSoftDelete from "./TimestampedSoftDelete";
 
 @Entity("photo")
 export default class Photo extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn({ name: "uuid" })
+  @PrimaryGeneratedColumn({ name: "id" })
   id: string;
 
   @Column({ name: "file_name" })

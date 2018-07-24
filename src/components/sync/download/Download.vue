@@ -99,10 +99,21 @@
                 v-bind:continue-status="continueStatusArray[3]"
                 v-on:continue-clicked="onContinue"
                 v-on:cancel-clicked="onCancel">
-                <calculate-image-size
+                <generate-image-list
                   v-if="downloadStep > 3"
+                  v-on:generate-image-list-done="generateImageListDone">
+                </generate-image-list>
+                <calculate-image-size
+                  v-bind:images-to-download="imagesToDownload"
+                  v-if="downloadStep > 3 && downloadSubStep > 1"
                   v-on:calculate-image-size-done="calculateImageSizeDone">
                 </calculate-image-size>
+                <download-images
+                  v-bind:images-to-download="imagesToDownload"
+                  v-bind:photos-found="photosFound"
+                  v-if="downloadStep > 3 && downloadSubStep > 2"
+                  v-on:download-images-done="downloadImagesDone">
+                </download-images>
               </download-step>
             </v-stepper-content>
           </v-stepper-items>
@@ -125,8 +136,11 @@
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import InsertRows from './substeps/InsertRows.vue'
   import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
+  import GenerateImageList from './substeps/GenerateImageList.vue'
   import CalculateImageSize from './substeps/CalculateImageSize.vue'
+  import DownloadImages from './substeps/DownloadImages.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
+  import FileService from '@/services/file/FileService'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
     CHECKING_LAST_SNAPSHOT: 'Checking latest available snapshot on the server...'
@@ -136,7 +150,7 @@
     data () {
       return {
         status: DOWNLOAD_STATUS.CHECKING_CONNECTION,
-        downloadStep: 4,
+        downloadStep: 1,
         downloadSubStep: 1,
         downloading: false,
         downloadProgress: 0,
@@ -150,7 +164,9 @@
         autoContinueLabel: '',
         continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
         downloadedSnapshotFileEntry: null,
-        extractedSnapshot: null
+        extractedSnapshot: null,
+        imagesToDownload: {},
+        photosFound: 0
       }
     },
     created () {
@@ -218,8 +234,19 @@
       checkForeignKeysDone: function () {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
-      calculateImageSizeDone: function () {
-        console.log('calculateImageSizeDone')
+      generateImageListDone: function (imageList) {
+        console.log('calculateImageSizeDone', imageList)
+        this.imagesToDownload = imageList
+        this.downloadSubStep = 2
+      },
+      calculateImageSizeDone: function (photosFound) {
+        console.log('calculateImageSizeDone', photosFound)
+        this.photosFound = photosFound
+        this.downloadSubStep = 3
+      },
+      downloadImagesDone: function (imagesDownloaded) {
+        FileService.listPhotos()
+          .then((photoList) => console.log('downloadImagesDone', imagesDownloaded, photoList))
       }
     },
     computed: {
@@ -250,7 +277,9 @@
       RemoveDatabase,
       InsertRows,
       CheckForeignKeys,
-      CalculateImageSize
+      GenerateImageList,
+      CalculateImageSize,
+      DownloadImages
     }
   }
 </script>
