@@ -6,7 +6,6 @@
     <v-spacer></v-spacer>
     <v-flex class="respondent-name" justify-end align-content-end>
       {{respondent.name}}
-      <v-btn @click="onClick">Select</v-btn>
     </v-flex>
   </v-layout>
 </template>

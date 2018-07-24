@@ -1,10 +1,10 @@
 <template>
   <v-card tile>
     <v-toolbar card prominent>
-      <v-toolbar-title>Respondent: {{name}}</v-toolbar-title>
+      <v-toolbar-title>{{ $t('respondent') }}: {{name}}</v-toolbar-title>
       <v-spacer />
       <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
-        Forms
+        {{ $t('forms') }}
       </v-btn>
     </v-toolbar>
     <v-card-text>
@@ -12,7 +12,9 @@
         {{error}}
       </v-alert>
       <v-toolbar flat>
-        <v-toolbar-title>Photos</v-toolbar-title>
+        <v-toolbar-title>
+          {{ $t('photos') }}
+        </v-toolbar-title>
         <v-spacer />
         <permission :role-whitelist="['admin','manager']">
           <v-btn
@@ -35,7 +37,9 @@
       </v-container>
       <RespondentGeos :respondent="respondent" />
       <v-toolbar flat>
-        <v-toolbar-title>Condition Tags</v-toolbar-title>
+        <v-toolbar-title>
+          {{ $t('condition_tags') }}
+        </v-toolbar-title>
         <v-spacer />
         <permission :role-whitelist="['admin','manager']">
           <v-btn
@@ -70,7 +74,9 @@
         </template>
       </v-data-table>
       <v-toolbar flat>
-        <v-toolbar-title>Names</v-toolbar-title>
+        <v-toolbar-title>
+          {{ $t('names') }}
+        </v-toolbar-title>
         <v-spacer />
         <permission :role-whitelist="['admin','manager']">
           <v-btn

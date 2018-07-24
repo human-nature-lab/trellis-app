@@ -14,7 +14,9 @@
             <v-icon
               slot="activator"
               color="green darken-2">check_circle</v-icon>
-            <span>Complete</span>
+            <span>
+              {{ $t('completed') }}
+            </span>
           </v-tooltip>
           <v-tooltip
             right
@@ -22,7 +24,9 @@
             <v-icon
               slot="activator"
               color="orange darken-2">query_builder</v-icon>
-            <span>Started</span>
+            <span>
+              {{ $t('in_progress') }}
+            </span>
           </v-tooltip>
           <v-tooltip
             right
@@ -30,7 +34,9 @@
             <v-icon slot="activator">
               play_circle_outline
             </v-icon>
-            <span>Not started</span>
+            <span>
+              {{ $t('not_started') }}
+            </span>
           </v-tooltip>
         </v-flex>
         <v-flex
@@ -63,7 +69,9 @@
             <thead>
               <tr>
                 <th>Status</th>
-                <th class="a-left">Interviews</th>
+                <th class="a-left">
+                  {{ $t('interviews') }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -75,20 +83,20 @@
                   <span
                     v-if="survey.completed_at"
                     class="complete">
-                    Complete
+                    {{ $t('completed') }}
                   </span>
                   <span
                     v-else
                     class="incomplete">
-                    Incomplete
+                    {{ $t('in_progress') }}
                   </span>
                 </td>
                 <td>
                   <table>
                     <tr>
-                      <th>Surveyor</th>
-                      <th>Start time</th>
-                      <th>End time</th>
+                      <th>{{ $t('surveyor') }}</th>
+                      <th>{{ $t('start_time') }}</th>
+                      <th>{{ $t('end_time') }}</th>
                     </tr>
                     <tr
                       v-for="interview in survey.interviews"

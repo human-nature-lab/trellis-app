@@ -2,7 +2,9 @@
   <v-container class="web-login">
     <v-layout justify-space-around>
       <v-flex xs6>
-        <h2>Login</h2>
+        <h2>
+          {{ $t('login') }}
+        </h2>
       </v-flex>
     </v-layout>
     <v-layout justify-space-around>
@@ -19,7 +21,7 @@
           @submit="login()">
           <v-text-field
             name="username"
-            label="Username"
+            :label="$t('username')"
             autocapitalize="off"
             autocorrect="off"
             :rules="rules.username"
@@ -28,7 +30,7 @@
             @keyup.enter="login()"
             v-model="username" />
           <v-text-field
-            label="Password"
+            :label="$t('password')"
             autocapitalize="off"
             autocorrect="off"
             required
@@ -41,7 +43,7 @@
           <v-btn
             @click="login()"
             :disabled="!valid">
-            Login
+            {{ $t('login') }}
           </v-btn>
         </v-form>
       </v-flex>
@@ -69,10 +71,10 @@
         valid: false,
         rules: {
           username: [
-            v => !!v || 'Username is required'
+            v => !!v || this.$t('required_field')
           ],
           password: [
-            v => !!v || 'Password is required'
+            v => !!v || this.$t('required_field')
           ]
         }
       }
@@ -84,7 +86,7 @@
           form: this.$route.query.form
         }
         LoginService.login(this.username, this.password, params).catch(err => {
-          this.error = 'Unable to login with these credentials'
+          this.error = this.$t('failed_login')
           console.error('Login error:')
           console.error(err)
         }).then(res => {

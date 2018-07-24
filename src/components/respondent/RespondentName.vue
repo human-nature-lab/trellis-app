@@ -5,19 +5,19 @@
         <v-layout>
           <v-flex>
             <v-text-field
-              label="Name"
+              :label="$t('name')"
               v-model="name.name"/>
           </v-flex>
           <v-flex>
             <v-checkbox
               v-model="name.is_display_name"
-              label="Set as display name"
+              :label="$t('set_primary')"
               hide-details
             ></v-checkbox>
           </v-flex>
           <v-flex>
             <v-select
-              label="Locale (optional)"
+              :label="`${$t('locale')} (${$t('optional')})`"
               :items="locales"
               :loading="localesAreLoading"
               item-text="language_native"
@@ -29,7 +29,9 @@
           <v-flex>
             <v-btn @click="save()">
               <v-progress-circular v-if="isSaving"/>
-              <span v-else>Save</span>
+              <span v-else>
+                {{ $t('save') }}
+              </span>
             </v-btn>
           </v-flex>
         </v-layout>

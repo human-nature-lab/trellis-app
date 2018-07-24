@@ -2,13 +2,19 @@
   <v-flex>
     <table class="table">
       <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Created at</th>
+        <th>
+          {{ $t('name') }}
+        </th>
+        <th>
+          {{ $t('type') }}
+        </th>
+        <th>
+          {{ $t('created_at') }}
+        </th>
       </tr>
       <tr v-if="!allConditions.length">
         <td colspan="3">
-          No conditions have been assigned yet
+          {{ $t('no_condition_tags') }}
         </td>
       </tr>
       <tr v-for="condition in allConditions">

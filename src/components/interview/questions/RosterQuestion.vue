@@ -16,7 +16,9 @@
                 @click="stopEditingAndRevert(row, rowIndex)">
                 <v-icon color="red">clear</v-icon>
               </v-btn>
-              <span>Revert changes</span>
+              <span>
+                {{ $t('revert_changes') }}
+              </span>
             </v-tooltip>
           </v-list-tile-avatar>
           <v-list-tile-content>
@@ -47,7 +49,9 @@
                     <v-btn icon @click="startEditingRow(row, rowIndex)" slot="activator">
                       <v-icon>edit</v-icon>
                     </v-btn>
-                    <span>Edit row</span>
+                    <span>
+                      {{ $t('select_to_edit') }}
+                    </span>
                   </v-tooltip>
                 </v-list-tile>
                 <v-list-tile>
@@ -58,7 +62,7 @@
                       slot="activator">
                       <v-icon color="red">delete</v-icon>
                     </v-btn>
-                    <span>Remove row</span>
+                    <span>{{ $t('delete') }}</span>
                   </v-tooltip>
                 </v-list-tile>
               </v-list>
@@ -72,7 +76,9 @@
                 @click.stop="stopEditingAndSave(row, rowIndex)">
                   <v-icon color="green">check</v-icon>
               </v-btn>
-              <span>Save edits</span>
+              <span>
+                {{ $t('save') }}
+              </span>
             </v-tooltip>
                 <v-progress-circular
               v-if="isSavingEdit || row.isLoading"
@@ -92,7 +98,6 @@
           <v-list-tile-content>
             <v-text-field
               :disabled="isQuestionDisabled"
-              placeholder="Roster value here..."
               v-model="newText"
               autofocus
               @keyup.esc="stopAddingWithoutSaving"

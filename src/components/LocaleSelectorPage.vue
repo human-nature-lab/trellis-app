@@ -3,7 +3,9 @@
     <v-layout column>
       <v-card>
         <v-toolbar flat>
-          <v-toolbar-title>Choose a locale</v-toolbar-title>
+          <v-toolbar-title>
+            {{ $t('select_language') }}
+          </v-toolbar-title>
         </v-toolbar>
         <v-container fluid>
          <LocaleSelector @change="done"/>

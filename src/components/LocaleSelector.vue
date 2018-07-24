@@ -7,7 +7,7 @@
       <pre>{{locales}}</pre>
     </debug>
     <v-select
-      label="Locale"
+      :label="$t('locale')"
       :loading="isWorking"
       v-model="locale"
       @change="change"
@@ -19,6 +19,7 @@
 <script>
   import StudyService from '../services/study/StudyService'
   import LocaleService from '../services/locale/LocaleService'
+  import i18n from '../i18n'
   export default {
     name: 'locale-selector',
     data: function () {
@@ -36,6 +37,7 @@
       change: function (locale) {
         this.locale = locale
         LocaleService.setCurrentLocale(this.locale)
+        i18n.locale = i18n.messages[locale.language_tag] ? locale.language_tag : 'en'
         this.$emit('change', this.locale)
       },
       load: function () {

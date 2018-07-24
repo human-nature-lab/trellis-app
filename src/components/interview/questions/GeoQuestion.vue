@@ -4,7 +4,7 @@
         <v-list>
           <v-list-tile v-for="geo in geos" :key="geo.id">
             <v-list-tile-content>
-              {{geo.name_translation ? translate(geo) : 'Loading...'}}
+              {{geo.name_translation ? translate(geo) : this.$t('loading')}}
             </v-list-tile-content>
           </v-list-tile>
         </v-list>

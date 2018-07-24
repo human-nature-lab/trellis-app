@@ -1,236 +1,282 @@
-key,es,en
-action_send_log,Enviar Registro,Send Log
-action_settings,Configuración,Settings
-add_group,Añadir Grupo,Add Group
-add_location,Añadir Ubicación,Add Location
-add_note,Añadir Nota,Add Note
-add_relationship,Añadir Relación,Add Relationship
-add_respondent,Añadir Informante,Add Respondent
-add_respondent_geo_caps,AÑADIR INFORMANTE/EDIFICIO,ADD RESPONDENT/BUILDING
-add_respondent_note,Agregar nota sobre el encuestado,Add Respondent Note
-add_string,Añadir,Add
-add_tag,Añadir etiqueta,Add Tag
-address_required,Dirección IP requerida,IP Address is required
-addviewgeos,Añadir/Ver Localidad,Add/View Locations
-addviewphotos,Añadir/Ver Fotos,Add/View Photos
-addviewrespondents,Añadir/Ver Relaciones,Add/View Relations
-addviewroster,Añadir/Ver Lista,Add/View Roster
-admin_password,contraseña del administrador,admin password
-admin_username,usuario del administrador,admin username
-admin_username_password_required,Se requiere nombre y contraseña de administrador.,Admin username and password are required
-advanced_search,Búsqueda Avanzada,Advanced Search
-all_trellis_model_tables_cleared,Todas las tablas del modelo de Trellis se eliminaron con éxito,All trellis model tables were successfully cleared
-app_name,Trellis,Trellis
-associated_groups,Grupos Asociados,Associated Groups
-building_list,Construyendo lista...,Building list...
-building_respondents,Construyendo encuestados,Building respondents
-camera_no_permissions,Trellis no puede tomar una foto sin su permiso para acceder la cámara del dispositivo. Puede dar su permiso en la página de configuración del sistema.,Trellis is unable to take a picture without your permission to access the device camera. You are able to grant this in the system settings page.
-cancel_string,Cancelar,Cancel
-cancelling,Cancelando...,Cancelling...
-cannot_add_respondents,No puede agregar participantes a la raíz del estudio.,You cannot add respondents to the study\'s root
-cant_handle_single_and_double_quotes_in_same_argument,No se puede manejar comillas simples y dobles en el mismo argumento.,Can\'t handle single and double quotes in same argument
-census,Censo,Census
-change,Cambiar,Change
-checking_network_status,Verificación del estado de la red ...,Checking network status...
-click_again_to_remove,Haga clic de nuevo para eliminar,Click again to remove
-click_once_to_remove,Haga clic una vez más para eliminar,Click once more to remove
-click_to_type,Haga clic para escribir,Click to Type
-communicating_with_web,Comunicando con la web,Communicating with web
-completed,Completado,Completed
-condition_not_found,¡Condición no encontrada!,Condition not found!
-confirm_string,Confirmar,Confirm
-congratulations,Felicitaciones,Congratulations
-could_not_move_cursor,No se pudo mover el cursor a la posición,Could not move cursor to position click login\nagain to confirm.
-couldnt_create_zip,No se pudo crear zip,Couldn\'t create zip
-couldnt_get_list_of_images_from_server,No se pudo obtener una lista de imágenes del servidor.,Couldn\'t get list of images from server
-create_test_respondents,Crear encuestados de prueba,Create Test Respondents
-createtestdata,Crear Datos de Prueba,Create Test Data
-current_geo_location,Ubicación geográfica actual,Current Geo Location
-current_study_no_base_geo,El estudio actual no tiene una base geo definida,The current study has no base geo defined, por favor consulte a un administrador para su resolución.,
-dashboard,Tablero,Dashboard
-dashboard_selectLang,Seleccionar Idioma:,Select Language:
-dashboard_selectStudy,Seleccionar Estudio:,Select Study:
-datetime_title,Select Date/Time,Select Date/Time
-datum,Dato,Datum
-day,día,day
-days,días,days
-db_move_failed,¡Ay no! ¡El movimiento de la base de datos ha fallado!,Uh-oh! DB move has failed!
-db_moved,Base de datos se ha movido a sdcard/trellis/ para conveniencia.,DB has been moved to sdcard/trellis/ for your viewing pleasure.
-delete,borrar,delete
-delete_respondents,Eliminar encuestados,Delete Respondents
-delete_upload_logs,Eliminar Registros de Carga,Delete Upload Logs
-departments,Departamentos,Departments
-detecting_location_message,Este mensaje se actualizará cada vez que se detecte una ubicación.,This message will update each time a location is detected.
-detecting_location_message_age,Este mensaje se actualizará cada vez que se detecte una ubicación.\n\nLa última ubicación conocida se detectó hace %1$s con una precisión de %2$s. ¿Aún se encuentra en esa ubicación?,This message will update each time a location is detected.\n\nThe last-known location was detected %1$s ago with an accuracy of %2$s
-detecting_location_no,Omitir,Skip Trellis requires your permission to access the device camera.
-detecting_location_title,Detectando la ubicación...,Detecting location... Trellis requires your permission to access the device storage.
-detecting_location_yes,Guardar la última ubicación conocida,Save last-known location
-device_id,ID del dispositivo,device id
-device_name,nombre de dispositivo,device name
-device_not_found,¡Dispositivo no encontrado!,Device not Found!
-device_not_found_in_device_table,ID %1$s no se encuentra en la tabla del dispositivo,DeviceId %1$s not found in device table, consulte el administrador para corregir,
-dismiss,Descartar,Dismiss
-do_not_know,No lo sabe,Do Not Know
-done,Terminado,Done
-download_in_progress,Descargando en este momento,Currently Downloading
-downloading,Descargando...,Downloading...
-empty_value,Valor vació,Empty Value
-error,Error,Error
-error_resuming_activity,Hubo un problema al reanudar esta actividad; Error: %1$s,There was an issue when resuming this activity; Error: %1$s
-error_validating_ip,Error al validar IP,Error Validating IP
-error_verifying_password,Error al verificar la contraseña,Error verifying password
-exit,Salir,Exit
-failed,Ha Fallado,Successful
-file_size_mismatch,Tamaño de archivo no coincide,File size mismatch
-find_respondent,Buscar Encuestados,Find Respondent
-find_respondent_caps,ENCONTRAR INFORMANTE,FIND RESPONDENT
-form_conditions,Condiciones de los formularios,Form Conditions do you wish to exit?\r\n\r\nNote: this will lock the form to prevent future edits.
-forms,Formularios,Forms do you wish to exit?
-free_up_space,La descarga falló,Download failed, por favor libera espacio y vuelve a intentarlo.,
-free_up_space_megabytes,No hay suficiente espacio en el dispositivo. Por favor libere %1$d MB y vuelva a intentarlo.,There is not enough space left on the device.  Please free up %1$d MB and try again.
-geo,Geo,Geo
-geo_cannot_contain_respondents,¡El geo %1$s seleccionado no puede contener encuestados!,Selected geo %1$s cannot contain respondents!
-group_not_found,¡Grupo no encontrado!,Group not found!
-groups,Grupos,Groups
-hide_conditions,Esconder condiciones,Hide Conditions
-hour,hora,hour
-hours,horas,hours
-in_progress,En progreso,In Progress
-input_credentials,Ingresar Credenciales,Input Credentials
-invalid_credentials,Credenciales no válidas...,Invalid credentials...
-invalid_username_password,¡Usuario o contraseña invalido!,Invalid username or password!
-invalide_cursor_attached_to_list,¡Cursor inválido adjuntado a la lista!,Invalid cursor attached to list!
-issue_enumerating_geos,Hubo un problema enumerando Geos para el estudio seleccionado,There was an issue enumerating Geos for the selected study, consulte a un administrador. Error: %1$s,
-issue_validating_service,Hubo un problema al validar el servicio en IP: %1$s. Error %2$s,There was an issue validating the service at IP: %1$s. Error: %2$s
-location,Localidad,Location
-location_must_be_one_of,El tipo de ubicación debe ser uno de: %1$s,Location type must be one of: %1$s
-logged_in_as,Conectado como %1$s,Logged in as %1$s
-logged_in_as_dots,Conectado como...,Logged in as...
-login,Iniciar Sesión,Login
-loginDialogConfirmation,Esta intentando iniciar la sesión con un nuevo usuario,You are attempting to login with a new user, haz clic en iniciar sesión de nuevo para confirmar.,
-logoff,Cerrar Sesión,Log Out
-logoff_confirm,¿Realmente quiere cerrar sesión?,Really log out? please see an administrator for resolution.
-meter,metro,meter please see an administrator.  Error: %1$s
-meters,metros,meters
-minute,minuto,minute
-minutes,minutos,minutes
-month,mes,month
-months,meses,months
-move_database,Mover base de datos,Move Database
-move_db_file,Mover archivo de base de datos,Move DB File
-multiplerespondentsingroup,%1$d entrevistados en el grupo,%1$d respondents in group
-must_have_conditions,Debe tener condiciones,Must Have Conditions
-must_have_listener_attached_capture_validation,Debe tener un oyente conectado para capturar el evento de validación,Must have listener attached to capture validation event
-must_not_have_conditions,No debe tener condiciones,Must Not Have Conditions
-must_supply_name,Debe proporcionar nombre,Must supply name
-name,Nombre,name
-name_translation_not_defined,Traducción de nombre no definida,Name Translation Not Defined
-network_unavailable,Red no disponible,Network unavailable
-never,Nunca,Never
-new_string,Nueva,New please see admin to correct
-next,Siguiente,Next
-no,No,No
-no_census_defined_for_study,No se definió el censo para el estudio,No Census defined for study
-no_geo_types_defined,El sistema está en una configuración no válida,System is in invalid configuration, no se han definido tipos geográficos para el estudio actual. Consulta a un administrador.,
-no_group_types_defined,El sistema está en configuración no válida,System is in invalid configuration, no se han definido tipos de grupos. Consulte a un administrador.,
-no_location_assigned,Sin ubicación asignada,No Location Assigned
-no_photo_returned,¡No se devolvió ninguna foto!,No Photo returned!
-no_photo_selected,No hay foto seleccionada,No Photo Selected
-no_records_to_upload,No hay registros actualizados para cargar.,There are no updated records to upload.
-no_value_input,Sin entrada de valor.,No value input.
-norespondentsingroup,No hay entrevistados en el grupo,No respondents in group
-not_implemented,¡No se ha implementado!,Not Implemented!
-notes,Notas,Notes
-nothing_to_upload,Nada que cargar,Nothing to Upload
-ok,OK,OK
-open_settings,Abrir Configuración,Open Settings
-operation_canceled,Operación cancelada,Operation Canceled
-operation_was_cancelled,Se canceló la operación,Operation was cancelled
-password,Contraseña,Password
-permission_has_been_denied,Permiso denegado,Permission has been denied
-photodetail_tags,Etiquetas:,Tags: no group types have been defined. Please see an administrator.
-photos,Fotos,Photos
-please_connect_to_internet_try_again,Conéctese a Internet y vuelva a intentarlo.,Please connect to the internet and try again.
-previous,Anterior,Previous
-prodmode,Reiniciar en modo de producción,Restart in production mode
-rationale_camera,Para tomar una foto,In order to take a picture, Trellis requiere su permiso para acceder a la cámara del dispositivo.,
-rationale_read_external_storage,Para mostrar fotos de los encuestados,In order to display photos for respondents, Trellis requiere su permiso para acceder al almacenamiento del dispositivo.,
-really_delete_upload_logs,¿Eliminar realmente los registros de carga?,Really delete upload logs?
-refuse_to_answer,Se niega/NQR ,Refuse
-register_device,Registrar Dispositivo,Register Device
-registering_device,Registrando dispositivo...,Registering Device...
-remove_confirm,¿Eliminar realmente %1$s?,Really remove %1$s?
-remove_photo_confirm,¿Eliminar realmente la foto?,Really remove photo?
-repeat_section,Repetir la sección,Repeat Section
-reset_sync,Restablecer Sincronización,Reset Sync
-respondent,Encuestado,Respondent
-respondent_conditions,Condiciones de los encuestados,Respondent Conditions
-respondent_photo,Foto de encuestado,Respondent Photo
-respondent_picture_no_permissions,Trellis no puede mostrar fotos de los encuestados sin su permiso para acceder el almacenamiento del dispositivo. Usted puede dar este permisio en la página de configuración del sistema.,Trellis is unable to display respondent photos without your permission to access the device storage. You are able to grant this in the system settings page.
-respondents,Encuestados,Respondents
-respondents_deleted,¡Los encuestados han sido eliminados!,Respondents Deleted!
-restricted,Restringido,Restricted
-save_string,Guardar,Save
-saving_data,Guardando datos ...,Saving Data...
-search,Buscar,Search no sections defined!
-search_condensed,Buscar,Search
-search_hint,Ingrese Término de Búsqueda...,Type Search Termï¿½
-second,segundo,second
-seconds,segundos,seconds
-section_conditions,Condiciones de las secciones,Section Conditions
-select_date,Seleccionar Fecha,Select Date
-select_dateTime,Seleccionar Fecha/Hora,Select Date/Time
-select_study,Seleccionar Estudio,Select Study
-select_time,Seleccionar Hora,Select Time
-select_to_edit,Seleccionar para editar,Select to edit
-selected_locale,Localidad seleccionada = %1$s,Selected locale = %1$s
-server_busy,Servidor ocupado,Server Busy
-server_device_not_found,El dispositivo no se encontró en el servidor,The device was not found on the server, consulte a un administrador para su resolución.,
-server_generating_snapshot,El servidor actualmente está generando una nueva captura. Inténtalo de nuevo en unos minutos...,The server is currently generating a new snapshot. Please try again in a few minutes.. there is no need for a download.
-server_ip_address,URL del servidor o dirección IP:,Server URL or IP Address:
-service_not_found,Servicio no encontrado.,Service not found.
-set_default,asignar configuracion original,set default
-show_all,Mostrar Todo,Show All
-show_conditions,Mostrar condiciones,Show Conditions
-show_locale,Mostrar configuración regional,Show Locale
-sqliteexception_insertion_failure,SQLiteException: falla de inserción,SQLiteException: insertion failure
-study_doesnt_allow_adding_respondents,"El estudio \""%1$s\"" no permite agregar encuestados.","The study \""%1$s\"" doesn\'t allow adding respondents."
-successful,Exitoso,Successful
-survey_exit_title,Saliendo del formulario de encuesta,Exiting Survey
-survey_message_exit_exit,¿Esta seguro/a que quiere salir de del formulario?,Are you sure you want to exit the survey?
-survey_message_exit_next,Usted está al final del formulario,You are at the end of the survey, ¿desea salir? \r\n\r\nNota: esto cerrará el formulario para prevenir cambios.,
-survey_message_exit_previous,Usted está al comienzo del formulario,You are at the beginning of the survey, ¿desea salir?,
-sync_currently_active,La sincronización está actualmente activa. Espere a que termine.,Sync is currently active. Please wait for it to finish.
-sync_in_progress,Sincronización en curso,Sync in progress
-testmode,Reiniciar en modo de prueba,Restart in test mode
-title_activity_questions,Preguntas,Questions
-title_activity_send_log,Enviar Registro,Send Log
-trellis_logo,Trellis Logo,Trellis Logo
-unable_to_download,No se puede descargar,Unable to Download
-unable_to_run_form_no_sections_defined,No se puede ejecutar el formulario,Unable to run form, no hay secciones definidas.,
-unable_to_upload,No se pudo subir,Unable to Upload
-update_location_denied,Trellis no puede usar datos GPS para entrevistas sin su permiso,Trellis is unable to use GPS data for interviews without\nyour permission
-update_location_rationale,Para capturar correctamente los datos GPS para las entrevistas,In order to properly grab GPS data for interviews\nTrellis requires your permission to access your location data., Trellis requiere su permiso para acceder a sus datos de ubicación.,
-updated_records_must_upload,Has actualizado los registros que aún no se han cargado. Carga antes de proceder a la descarga para evitar pérdida de datos.,You have updated records that have not been uploaded yet. Please upload before proceeding to download to prevent loss of data.
-upload_logs_deleted,Registros de carga han sido eliminados,Upload logs deleted
-uploading,Cargando...,Uploading...
-username,Usuario,Username
-validate,Validar,Validate no geo types have been defined for the current study. Please see an administrator.
-value_must_be_between_min_max,El valor debe ser entre %1$s y %2$s,Value must be between %1$s and %2$s
-value_must_be_greater_than_min,El valor debe ser mayor o igual que %1$s,Value must be greater than or equal to %1$s
-value_must_be_less_than_max,El valor debe ser menor o igual que %1$s,Value must be less than or equal to %1$s
-verifying_ip,Verificando IP...,Verifying IP...
-verifying_password,Verificación de contraseña,Verifying Password
-view,ver,view
-viewdeviceid,Ver ID de Dispositivo,View Device ID
-warning,Advertencia,Warning please see an administrator for resolution.
-wrong_deviceid,¡Dispositivo incorrecto!,Wrong deviceId!
-wrong_filename,Nombre de archivo incorrecto,Wrong filename!
-xgeosfound,%1$d localidad,%1$d locations
-xphotosfound,%1$d Fotos,%1$d Photos are you still at that location?
-xrespondentsfound,%1$d relaciones,%1$d relations
-xrosterfound,%1$d personas en la lista,%1$d people in roster
-year,año,year
-years,años,years
-yes,Sí,Yes please free up some space and try again.
-you_have_latest_database_snapshot,Tiene la última versión de la captura de la base de datos,You have the latest database snapshot version, no hay necesidad de una descarga.,
+key,en,es,comment
+action_send_log,Send Log,Enviar Registro,
+settings,Settings,Configuración,
+add_group,Add Group,Añadir Grupo,
+add_location,Add Location,Añadir Ubicación,
+add_note,Add Note,Añadir Nota,
+add_relationship,Add Relationship,Añadir Relación,
+add_respondent,Add Respondent,Añadir Informante,
+add_respondent_geo_caps,ADD RESPONDENT/BUILDING,AÑADIR INFORMANTE/EDIFICIO,
+add_respondent_note,Add Respondent Note,Agregar nota sobre el encuestado,
+add_string,Add,Añadir,
+add_tag,Add Tag,Añadir etiqueta,
+address_required,IP Address is required,Dirección IP requerida,
+addviewgeos,Add/View Locations,Añadir/Ver Localidad,
+addviewphotos,Add/View Photos,Añadir/Ver Fotos,
+addviewrespondents,Add/View Relations,Añadir/Ver Relaciones,
+addviewroster,Add/View Roster,Añadir/Ver Lista,
+admin_password,admin password,contraseña del administrador,
+admin_username,admin username,usuario del administrador,
+admin_username_password_required,Admin username and password are required,Se requiere nombre y contraseña de administrador.,
+advanced_search,Advanced Search,Búsqueda Avanzada,
+all_trellis_model_tables_cleared,All trellis model tables were successfully cleared,Todas las tablas del modelo de Trellis se eliminaron con éxito,
+app_name,Trellis,Trellis,
+associated_groups,Associated Groups,Grupos Asociados,
+building_list,Building list...,Construyendo lista...,
+building_respondents,Building respondents,Construyendo encuestados,
+camera_no_permissions,Trellis is unable to take a picture without your permission to access the device camera. You are able to grant this in the system settings page.,Trellis no puede tomar una foto sin su permiso para acceder la cámara del dispositivo. Puede dar su permiso en la página de configuración del sistema.,
+cancel,Cancel,Cancelar,
+cancelling,Cancelling...,Cancelando...,
+cannot_add_respondents,You cannot add respondents to the study\'s root,No puede agregar participantes a la raíz del estudio.,
+cant_handle_single_and_double_quotes_in_same_argument,Can\'t handle single and double quotes in same argument,No se puede manejar comillas simples y dobles en el mismo argumento.,
+census,Census,Censo,
+change,Change,Cambiar,
+checking_network_status,Checking network status...,Verificación del estado de la red ...,
+click_again_to_remove,Click again to remove,Haga clic de nuevo para eliminar,
+click_once_to_remove,Click once more to remove,Haga clic una vez más para eliminar,
+click_to_type,Click to Type,Haga clic para escribir,
+communicating_with_web,Communicating with web,Comunicando con la web,
+completed,Completed,Completado,
+condition_not_found,Condition not found!,¡Condición no encontrada!,
+confirm,Confirm,Confirmar,
+congratulations,Congratulations,Felicitaciones,
+could_not_move_cursor,Could not move cursor to position click login\nagain to confirm.,No se pudo mover el cursor a la posición,
+couldnt_create_zip,Couldn\'t create zip,No se pudo crear zip,
+couldnt_get_list_of_images_from_server,Couldn\'t get list of images from server,No se pudo obtener una lista de imágenes del servidor.,
+create_test_respondents,Create Test Respondents,Crear encuestados de prueba,
+createtestdata,Create Test Data,Crear Datos de Prueba,
+current_geo_location,Current Geo Location,Ubicación geográfica actual,
+current_study_no_base_geo,The current study has no base geo defined,"El estudio actual no tiene una base geo definida, por favor consulte a un administrador para su resolución.",
+dashboard,Dashboard,Tablero,
+datetime_title,Select Date/Time,Select Date/Time,
+datum,Datum,Dato,
+day,day,día,
+days,days,días,
+db_move_failed,Uh-oh! DB move has failed!,¡Ay no! ¡El movimiento de la base de datos ha fallado!,
+db_moved,DB has been moved to sdcard/trellis/ for your viewing pleasure.,Base de datos se ha movido a sdcard/trellis/ para conveniencia.,
+delete,delete,borrar,
+delete_respondents,Delete Respondents,Eliminar encuestados,
+delete_upload_logs,Delete Upload Logs,Eliminar Registros de Carga,
+departments,Departments,Departamentos,
+detecting_location_message,This message will update each time a location is detected.,Este mensaje se actualizará cada vez que se detecte una ubicación.,
+detecting_location_message_age,This message will update each time a location is detected.\n\nThe last-known location was detected {0} ago with an accuracy of {1},Este mensaje se actualizará cada vez que se detecte una ubicación.\n\nLa última ubicación conocida se detectó hace {0} con una precisión de {1}. ¿Aún se encuentra en esa ubicación?,
+detecting_location_no,Skip Trellis requires your permission to access the device camera.,Omitir,
+detecting_location_title,Detecting location... Trellis requires your permission to access the device storage.,Detectando la ubicación...,
+detecting_location_yes,Save last-known location,Guardar la última ubicación conocida,
+device_id,device id,ID del dispositivo,
+device_name,device name,nombre de dispositivo,
+device_not_found,Device not Found!,¡Dispositivo no encontrado!,
+device_not_found_in_device_table,DeviceId {0} not found in device table,"ID {0} no se encuentra en la tabla del dispositivo, consulte el administrador para corregir",
+dismiss,Dismiss,Descartar,
+do_not_know,Don't know,No lo sabe,
+done,Done,Terminado,
+download_in_progress,Currently Downloading,Descargando en este momento,
+downloading,Downloading...,Descargando...,
+empty_value,Empty Value,Valor vació,
+error,Error,Error,
+error_resuming_activity,There was an issue when resuming this activity; Error: {0},Hubo un problema al reanudar esta actividad; Error: {0},
+error_validating_ip,Error Validating IP,Error al validar IP,
+error_verifying_password,Error verifying password,Error al verificar la contraseña,
+exit,Exit,Salir,
+failed,Successful,Ha Fallado,
+file_size_mismatch,File size mismatch,Tamaño de archivo no coincide,
+find_respondent,Find Respondent,Buscar Encuestados,
+find_respondent_caps,FIND RESPONDENT,ENCONTRAR INFORMANTE,
+form_conditions,Form Conditions do you wish to exit?\r\n\r\nNote: this will lock the form to prevent future edits.,Condiciones de los formularios,
+forms_exit,Forms do you wish to exit?,Formularios,
+free_up_space,Download failed,"La descarga falló, por favor libera espacio y vuelve a intentarlo.",
+free_up_space_megabytes,There is not enough space left on the device.  Please free up {0} MB and try again.,No hay suficiente espacio en el dispositivo. Por favor libere {0} MB y vuelva a intentarlo.,
+geo,Geo,Geo,
+geo_cannot_contain_respondents,Selected geo {0} cannot contain respondents!,¡El geo {0} seleccionado no puede contener encuestados!,
+group_not_found,Group not found!,¡Grupo no encontrado!,
+groups,Groups,Grupos,
+hide_conditions,Hide Conditions,Esconder condiciones,
+hour,hour,hora,
+hours,hours,horas,
+in_progress,In Progress,En progreso,
+input_credentials,Input Credentials,Ingresar Credenciales,
+invalid_credentials,Invalid credentials...,Credenciales no válidas...,
+invalid_username_password,Invalid username or password!,¡Usuario o contraseña invalido!,
+invalide_cursor_attached_to_list,Invalid cursor attached to list!,¡Cursor inválido adjuntado a la lista!,
+issue_enumerating_geos,There was an issue enumerating Geos for the selected study,"Hubo un problema enumerando Geos para el estudio seleccionado, consulte a un administrador. Error: {0}",
+issue_validating_service,There was an issue validating the service at IP: {0}. Error: {1},Hubo un problema al validar el servicio en IP: {0}. Error {1},
+location,Location,Localidad,
+location_must_be_one_of,Location type must be one of: {0},El tipo de ubicación debe ser uno de: {0},
+logged_in_as,Logged in as {0},Conectado como {0},
+logged_in_as_dots,Logged in as...,Conectado como...,
+login,Login,Iniciar Sesión,
+loginDialogConfirmation,You are attempting to login with a new user,"Esta intentando iniciar la sesión con un nuevo usuario, haz clic en iniciar sesión de nuevo para confirmar.",
+logoff,Log Out,Cerrar Sesión,
+logoff_confirm,Really log out? please see an administrator for resolution.,¿Realmente quiere cerrar sesión?,
+meter,meter please see an administrator.  Error: {0},metro,
+meters,meters,metros,
+minute,minute,minuto,
+minutes,minutes,minutos,
+month,month,mes,
+months,months,meses,
+move_database,Move Database,Mover base de datos,
+move_db_file,Move DB File,Mover archivo de base de datos,
+multiplerespondentsingroup,{0} respondents in group,{0} entrevistados en el grupo,
+must_have_conditions,Must Have Conditions,Debe tener condiciones,
+must_have_listener_attached_capture_validation,Must have listener attached to capture validation event,Debe tener un oyente conectado para capturar el evento de validación,
+must_not_have_conditions,Must Not Have Conditions,No debe tener condiciones,
+must_supply_name,Must supply name,Debe proporcionar nombre,
+name,Name,Nombre,
+name_translation_not_defined,Name Translation Not Defined,Traducción de nombre no definida,
+network_unavailable,Network unavailable,Red no disponible,
+never,Never,Nunca,
+new_string,New please see admin to correct,Nueva,
+next,Next,Siguiente,
+no,No,No,
+no_census_defined_for_study,No Census defined for study,No se definió el censo para el estudio,
+no_geo_types_defined,System is in invalid configuration,"El sistema está en una configuración no válida, no se han definido tipos geográficos para el estudio actual. Consulta a un administrador.",
+no_group_types_defined,System is in invalid configuration,"El sistema está en configuración no válida, no se han definido tipos de grupos. Consulte a un administrador.",
+no_location_assigned,No Location Assigned,Sin ubicación asignada,
+no_photo_returned,No Photo returned!,¡No se devolvió ninguna foto!,
+no_photo_selected,No Photo Selected,No hay foto seleccionada,
+no_records_to_upload,There are no updated records to upload.,No hay registros actualizados para cargar.,
+no_value_input,No value input.,Sin entrada de valor.,
+norespondentsingroup,No respondents in group,No hay entrevistados en el grupo,
+not_implemented,Not Implemented!,¡No se ha implementado!,
+notes,Notes,Notas,
+nothing_to_upload,Nothing to Upload,Nada que cargar,
+ok,OK,OK,
+open_settings,Open Settings,Abrir Configuración,
+operation_canceled,Operation Canceled,Operación cancelada,
+operation_was_cancelled,Operation was cancelled,Se canceló la operación,
+password,Password,Contraseña,
+permission_has_been_denied,Permission has been denied,Permiso denegado,
+photodetail_tags,Tags: no group types have been defined. Please see an administrator.,Etiquetas:,
+photos,Photos,Fotos,
+please_connect_to_internet_try_again,Please connect to the internet and try again.,Conéctese a Internet y vuelva a intentarlo.,
+previous,Previous,Anterior,
+prodmode,Restart in production mode,Reiniciar en modo de producción,
+rationale_camera,In order to take a picture,"Para tomar una foto,Trellis requiere su permiso para acceder a la cámara del dispositivo.",
+rationale_read_external_storage,In order to display photos for respondents,"Para mostrar fotos de los encuestados, Trellis requiere su permiso para acceder al almacenamiento del dispositivo.",
+really_delete_upload_logs,Really delete upload logs?,¿Eliminar realmente los registros de carga?,
+refuse_to_answer,Refuse,Se niega/NQR,
+register_device,Register Device,Registrar Dispositivo,
+registering_device,Registering Device...,Registrando dispositivo...,
+remove_confirm,Really remove {0}?,¿Eliminar realmente {0}?,
+remove_photo_confirm,Really remove photo?,¿Eliminar realmente la foto?,
+repeat_section,Repeat Section,Repetir la sección,
+reset_sync,Reset Sync,Restablecer Sincronización,
+respondent,Respondent,Encuestado,
+respondent_conditions,Respondent Conditions,Condiciones de los encuestados,
+respondent_photo,Respondent Photo,Foto de encuestado,
+respondent_picture_no_permissions,Trellis is unable to display respondent photos without your permission to access the device storage. You are able to grant this in the system settings page.,Trellis no puede mostrar fotos de los encuestados sin su permiso para acceder el almacenamiento del dispositivo. Usted puede dar este permisio en la página de configuración del sistema.,
+respondents,Respondents,Encuestados,
+respondents_deleted,Respondents Deleted!,¡Los encuestados han sido eliminados!,
+restricted,Restricted,Restringido,
+save,Save,Guardar,
+saving_data,Saving Data...,Guardando datos ...,
+search,Search,Buscar,
+search_hint,Type Search Term...,Ingrese Término de Búsqueda...,
+second,second,segundo,
+seconds,seconds,segundos,
+section_conditions,Section Conditions,Condiciones de las secciones,
+select_date,Select Date,Seleccionar Fecha,
+select_dateTime,Select Date/Time,Seleccionar Fecha/Hora,
+select_study,Select Study,Seleccionar Estudio,
+select_time,Select Time,Seleccionar Hora,
+select_to_edit,Select to edit,Seleccionar para editar,
+selected_locale,Selected locale = {0},Localidad seleccionada = {0},
+server_busy,Server Busy,Servidor ocupado,
+server_device_not_found,The device was not found on the server,"El dispositivo no se encontró en el servidor, consulte a un administrador para su resolución.",
+server_generating_snapshot,The server is currently generating a new snapshot. Please try again in a few minutes.. there is no need for a download.,El servidor actualmente está generando una nueva captura. Inténtalo de nuevo en unos minutos...,
+server_ip_address,Server URL or IP Address:,URL del servidor o dirección IP:,
+service_not_found,Service not found.,Servicio no encontrado.,
+set_default,set default,asignar configuracion original,
+show_all,Show All,Mostrar Todo,
+show_conditions,Show Conditions,Mostrar condiciones,
+show_locale,Show Locale,Mostrar configuración regional,
+sqliteexception_insertion_failure,SQLiteException: insertion failure,SQLiteException: falla de inserción,
+study_doesnt_allow_adding_respondents,"The study \""{0}\"" doesn\'t allow adding respondents.","El estudio \""{0}\"" no permite agregar encuestados.",
+successful,Successful,Exitoso,
+survey_exit_title,Exiting Survey,Saliendo del formulario de encuesta,
+survey_message_exit,Are you sure you want to exit the survey?,¿Esta seguro/a que quiere salir de del formulario?,
+survey_message_end,You are at the end of the survey,Usted está al final del formulario.,
+survey_message_beginning,You are at the beginning of the survey,Usted está al comienzo del formulario.,
+survey_message_lock,This survey will be locked to prevent changes.,Esto cerrará el formulario para prevenir cambios.,
+sync_currently_active,Sync is currently active. Please wait for it to finish.,La sincronización está actualmente activa. Espere a que termine.,
+sync_in_progress,Sync in progress,Sincronización en curso,
+testmode,Restart in test mode,Reiniciar en modo de prueba,
+title_activity_questions,Questions,Preguntas,
+title_activity_send_log,Send Log,Enviar Registro,
+trellis_logo,Trellis Logo,Trellis Logo,
+unable_to_download,Unable to Download,No se puede descargar,
+unable_to_run_form_no_sections_defined,Unable to run form,"No se puede ejecutar el formulario, no hay secciones definidas.",
+unable_to_upload,Unable to Upload,No se pudo subir,
+update_location_denied,Trellis is unable to use GPS data for interviews without\nyour permission,Trellis no puede usar datos GPS para entrevistas sin su permiso,
+update_location_rationale,In order to properly grab GPS data for interviews\nTrellis requires your permission to access your location data.,"Para capturar correctamente los datos GPS para las entrevistas, Trellis requiere su permiso para acceder a sus datos de ubicación.",
+updated_records_must_upload,You have updated records that have not been uploaded yet. Please upload before proceeding to download to prevent loss of data.,Has actualizado los registros que aún no se han cargado. Carga antes de proceder a la descarga para evitar pérdida de datos.,
+upload_logs_deleted,Upload logs deleted,Registros de carga han sido eliminados,
+uploading,Uploading...,Cargando...,
+username,Username,Usuario,
+validate,Validate no geo types have been defined for the current study. Please see an administrator.,Validar,
+value_must_be_between_min_max,Value must be between {0} and {1},El valor debe ser entre {0} y {1},
+value_must_be_greater_than_min,Value must be greater than or equal to {0},El valor debe ser mayor o igual que {0},
+value_must_be_less_than_max,Value must be less than or equal to {0},El valor debe ser menor o igual que {0},
+verifying_ip,Verifying IP...,Verificando IP...,
+verifying_password,Verifying Password,Verificación de contraseña,
+view,view,ver,
+viewdeviceid,View Device ID,Ver ID de Dispositivo,
+warning,Warning please see an administrator for resolution.,Advertencia,
+wrong_deviceid,Wrong deviceId!,¡Dispositivo incorrecto!,
+wrong_filename,Wrong filename!,Nombre de archivo incorrecto,
+xgeosfound,{0} locations,{0} localidad,
+xphotosfound,{0} Photos are you still at that location?,{0} Fotos,
+xrespondentsfound,{0} relations,{0} relaciones,
+xrosterfound,{0} people in roster,{0} personas en la lista,
+year,year,año,
+years,years,años,
+yes,Yes please free up some space and try again.,Sí,
+you_have_latest_database_snapshot,You have the latest database snapshot version,"Tiene la última versión de la captura de la base de datos, no hay necesidad de una descarga.",
+general,General,General,Category
+add_locations,Add locations,Añadir Localidad,
+select_language,Select Language,Seleccionar Idioma,
+select_study,Select Study,Seleccionar Estudio,
+conditions,Conditions,Condiciones,
+locations,Locations,,
+names,Names,,
+condition_tags,Condition tags,,
+condition_tag,Condition tag,,
+remove_location,Remove this location,,
+move_respondent_location,Move this respondent location,,
+not_started,Not started,,
+interviews,Interviews,,
+status,Status,,"The state of the interview (completed, in progress...)"
+surveyor,Surveyor,,
+start_time,Start time,,
+end_time,End time,,
+locale,Locale,,
+study,Study,,
+type,Type,,
+created_at,Created at,,
+no_condition_tags,No condition tags have been assigned,,
+reason,Reason,,For don't know/refused explanation
+required_field,This field is required,,
+all_data_saved,All data has been saved.,,
+empty_form,The form is empty,,
+finish,Finish,,Complete the survey. Shown on the last page
+value,Value,,
+loading,Loading...,,
+revert_changes,Revert changes,,Return to the previous state before changes were made
+text_placeholder,Your response here...,,
+failed_login,"Could not login, please try again.",,
+change_study,Change study,,
+change_locale,Change locale,,
+copy_url,Copy URL,,
+refresh,Refresh app,,
+logout,Logout,,
+close,Close,,
+copied_url,Current URL copied to clipboard,,
+forms,Forms,,Section title in respondent page
+respondent_forms,{0}'s forms,,
+set_primary,Set as primary,,
+optional,optional,,
+clear,Clear,,Clear filters and search box
+geo_search_filter,Searching respondents from:,,
+no_results,No results,,
+add_other_respondent,Add other respondent,,
+toggle_dark,Toggle dark theme,,

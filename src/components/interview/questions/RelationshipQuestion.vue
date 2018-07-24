@@ -24,7 +24,7 @@
     <v-btn
       :disabled="isQuestionDisabled"
       @click="showRespondentSearch()">
-      Add Relationship
+      {{ $t('add_relationship') }}
     </v-btn>
     <v-dialog
       lazy

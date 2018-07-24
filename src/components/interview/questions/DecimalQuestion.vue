@@ -4,7 +4,7 @@
         :rules="rules"
         :disabled="isQuestionDisabled"
         v-model.number="value"
-        placeholder="decimal"
+        :placeholder="$t('value')"
         type="number"
       ></v-text-field>
     </v-flex>

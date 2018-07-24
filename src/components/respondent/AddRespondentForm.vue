@@ -2,7 +2,7 @@
   <v-container>
     <v-layout>
       <v-text-field
-        label="Respondent name"
+        :label="$t('name')"
         v-model="name"/>
     </v-layout>
     <v-layout>

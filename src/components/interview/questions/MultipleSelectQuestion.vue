@@ -51,7 +51,6 @@
           agg[choice.id] = this.question.datum.data.findIndex(datum => datum.choice_id === choice.id) > -1
           return agg
         }, {})
-        console.log('selected multiple select', selected)
         return selected
       }
     },

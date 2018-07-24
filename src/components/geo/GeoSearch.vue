@@ -6,7 +6,7 @@
           <v-layout row wrap>
             <v-text-field
               v-model="query"
-              placeholder="Search..."
+              :placeholder="$t('search')"
               :loading="isSearching_"
               @input="queryChange"/>
           </v-layout>

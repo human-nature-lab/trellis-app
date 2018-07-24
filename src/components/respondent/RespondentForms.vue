@@ -4,7 +4,9 @@
       <v-alert v-if="error">{{this.error}}</v-alert>
       <v-card>
         <v-toolbar flat>
-          <v-toolbar-title>Forms for {{respondent.name}}</v-toolbar-title>
+          <v-toolbar-title>
+            {{ $t('respondent_forms', [respondent.name])}}
+          </v-toolbar-title>
         </v-toolbar>
         <FormsView v-if="forms" :forms="forms" @click="startInterview"/>
       </v-card>
