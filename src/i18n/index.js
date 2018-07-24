@@ -22,12 +22,15 @@ let messages = locales.reduce((agg, l) => {
 }, {})
 messages = translations.reduce((trans, t) => {
   for (let i = 0; i < locales.length; i++) {
-    trans[locales[i]][t[0]] = t[i + 1]
+    if (t[i + 1]) {
+      trans[locales[i]][t[0]] = t[i + 1]
+    }
   }
   return trans
 }, messages)
 
 export default new VueI18n({
   locale: 'en',
+  fallbackLocale: 'en',
   messages
 })
