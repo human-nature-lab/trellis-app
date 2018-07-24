@@ -247,6 +247,7 @@
       downloadImagesDone: function (imagesDownloaded) {
         FileService.listPhotos()
           .then((photoList) => console.log('downloadImagesDone', imagesDownloaded, photoList))
+        this.continueStatus = BUTTON_STATUS.ENABLED
       }
     },
     computed: {
