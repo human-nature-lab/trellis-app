@@ -5,11 +5,11 @@
           <v-stepper-header>
             <v-stepper-step step="1">Connecting</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="2">Downloading latest snapshot</v-stepper-step>
+            <v-stepper-step step="2">Downloading</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="3">Inserting new data</v-stepper-step>
+            <v-stepper-step step="3">Inserting</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="4">Downloading images</v-stepper-step>
+            <v-stepper-step step="4">Images</v-stepper-step>
           </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content step="1">
