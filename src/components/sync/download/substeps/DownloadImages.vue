@@ -21,13 +21,13 @@
       v-model="downloadProgress">
     </v-progress-linear>
     <v-btn
-      v-if="!downloading && !success && !error"
-      color="amber"
-      @click.native="ignore">Ignore</v-btn>
-    <v-btn
       v-if="!downloading && !success"
       color="primary"
       @click.native="retry">Retry</v-btn>
+    <v-btn
+      v-if="!downloading && !success && !error"
+      color="amber"
+      @click.native="ignore">Ignore</v-btn>
   </div>
 </template>
 
