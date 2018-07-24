@@ -14,7 +14,9 @@
           <v-icon>group</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
-          <v-list-tile-title>Respondents</v-list-tile-title>
+          <v-list-tile-title>
+            {{ $t('respondents') }}
+          </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
       <v-list-tile :to="{name: 'GeoSearch'}">
@@ -22,24 +24,32 @@
           <v-icon>place</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
-          <v-list-tile-title>Locations</v-list-tile-title>
+          <v-list-tile-title>
+            {{ $t('locations') }}
+          </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
     <v-divider></v-divider>
     <v-list dense subheader>
-      <v-subheader>Settings</v-subheader>
+      <v-subheader>
+        {{ $t('settings') }}
+      </v-subheader>
       <v-list-tile :to="{name: 'Home', query: {to: $route.fullPath}}">
         <v-list-tile-action>
           <v-icon>assignment</v-icon>
         </v-list-tile-action>
-        <v-list-tile-title>Change study</v-list-tile-title>
+        <v-list-tile-title>
+          {{ $t('change_study') }}
+        </v-list-tile-title>
       </v-list-tile>
       <v-list-tile :to="{name: 'locale', query: {to: $route.fullPath}}">
         <v-list-tile-action>
           <v-icon>language</v-icon>
         </v-list-tile-action>
-        <v-list-tile-title>Change locale</v-list-tile-title>
+        <v-list-tile-title>
+          {{ $t('change_locale') }}
+        </v-list-tile-title>
       </v-list-tile>
       <v-list-tile @click="global.darkTheme=!global.darkTheme">
         <v-list-tile-action>
@@ -47,20 +57,22 @@
         </v-list-tile-action>
         <v-list-tile-content>
           <v-list-tile-title>
-            Toggle dark theme
+            {{ $t('toggle_dark') }}
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
     <v-divider></v-divider>
     <v-list dense subheader>
-      <v-subheader>General</v-subheader>
+      <v-subheader>
+        {{ $t('general') }}
+      </v-subheader>
       <v-list-tile @click="copyCurrentLocation">
         <v-list-tile-action>
           <v-icon>location_searching</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
-          Copy location
+          {{ $t('copy_url') }}
         </v-list-tile-content>
       </v-list-tile>
       <v-list-tile v-if="isInterview"
@@ -70,7 +82,7 @@
         </v-list-tile-action>
         <v-list-tile-content>
           <v-list-tile-title>
-            Condition tags
+            {{ $t('condition_tags') }}
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
@@ -80,7 +92,7 @@
         </v-list-tile-action>
         <v-list-tile-content>
           <v-list-tile-title>
-            Refresh app
+            {{ $t('refresh') }}
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
@@ -89,7 +101,7 @@
           <v-icon>exit_to_app</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
-          Logout
+          {{ $t('logout') }}
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
@@ -100,11 +112,11 @@
       color="primary"
       :timeout="5000"
       v-model="showCopiedSnackbar">
-      Current location copied to clipboard
+      {{ $t('copied_url') }}
       <v-btn
         flat
         @click="showCopiedSnackbar = false">
-        Close
+        {{ $t('close') }}
       </v-btn>
     </v-snackbar>
   </v-flex>

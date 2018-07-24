@@ -2,10 +2,10 @@
   <v-container fluid>
     <v-card tile>
       <v-toolbar card prominent>
-        <v-toolbar-title>Geo: {{translated}}</v-toolbar-title>
+        <v-toolbar-title>{{ $t('geo') }}: {{translated}}</v-toolbar-title>
         <v-spacer />
         <v-btn @click="viewRespondents">
-          Respondents
+          {{ $t('respondents') }}
         </v-btn>
       </v-toolbar>
       <v-card-text>
@@ -14,7 +14,9 @@
           <GeoBreadcrumbs :geo-id="geo.parent_id" />
         </v-layout>
         <v-toolbar flat>
-          <v-toolbar-title>Photos</v-toolbar-title>
+          <v-toolbar-title>
+            {{ $t('photos') }}
+          </v-toolbar-title>
           <v-spacer />
         </v-toolbar>
         <v-container fluid grid-list-md>

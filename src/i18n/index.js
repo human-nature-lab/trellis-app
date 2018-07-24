@@ -3,10 +3,9 @@ import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
 
-let locales = translations.shift().filter(t => t !== 'key')
+let locales = translations.shift().filter(t => t !== 'key' && t !== 'comment')
 
-debugger
-// Transform the translations into the required format for the vue-i18n plugin
+// Transform the translations into the required format for the vue-index plugin
 /**
  * {
  *    en: {
@@ -28,12 +27,7 @@ messages = translations.reduce((trans, t) => {
   return trans
 }, messages)
 
-const i18n = new VueI18n({
+export default new VueI18n({
   locale: 'en',
   messages
 })
-
-// Exports the lang configuration for Vuetify constructor
-export default {
-  t: (key, ...params) => i18n.t(key, params)
-}

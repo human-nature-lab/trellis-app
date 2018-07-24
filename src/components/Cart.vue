@@ -14,7 +14,9 @@
       </v-layout>
     </v-flex>
     <v-flex xs3>
-      <v-btn @click="$emit('done')">Done</v-btn>
+      <v-btn @click="$emit('done')">
+        {{ $t('done') }}
+      </v-btn>
     </v-flex>
   </v-layout>
 </template>

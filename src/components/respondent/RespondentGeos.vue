@@ -1,7 +1,7 @@
 <template>
   <v-flex>
     <v-toolbar flat>
-      <v-toolbar-title>Locations</v-toolbar-title>
+      <v-toolbar-title>{{ $t('locations') }}</v-toolbar-title>
       <v-spacer />
       <permission :role-whitelist="['admin','manager']">
         <v-tooltip>
@@ -11,7 +11,7 @@
             @click="geoSearchModal = true">
             <v-icon>add</v-icon>
           </v-btn>
-          <span>Add a respondent location</span>
+          <span>{{ $t('add_locations') }}</span>
         </v-tooltip>
       </permission>
     </v-toolbar>
@@ -42,7 +42,7 @@
                 @click="remove(props.item.pivot.id)">
                 <v-icon>delete</v-icon>
               </v-btn>
-              <span>Remove this location</span>
+              <span>{{ $t('remove_location') }}</span>
             </v-tooltip>
             <v-tooltip>
               <v-btn
@@ -52,7 +52,7 @@
                 @click="startMove(props.item)">
                 <v-icon>arrow_forward</v-icon>
               </v-btn>
-              <span>Move this location to a new location</span>
+              <span>{{ $t('move_respondent_location') }}</span>
             </v-tooltip>
           </td>
         </permission>

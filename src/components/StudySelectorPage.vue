@@ -3,7 +3,9 @@
     <v-layout column>
       <v-card>
         <v-toolbar flat>
-          <v-toolbar-title>Choose a study</v-toolbar-title>
+          <v-toolbar-title>
+            {{ $t('select_study') }}
+          </v-toolbar-title>
         </v-toolbar>
         <v-container fluid>
           <StudySelector @change="done"/>

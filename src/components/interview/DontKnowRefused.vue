@@ -3,15 +3,19 @@
     <v-layout row>
       <v-btn
         v-bind:class="{'primary': dk}"
-        @click="dk=!dk">Don't know</v-btn>
+        @click="dk=!dk">
+        {{ $t('do_not_know') }}
+      </v-btn>
       <v-btn
         v-bind:class="{'primary': rf}"
-        @click="rf=!rf">Refuse</v-btn>
+        @click="rf=!rf">
+        {{ $t('refuse_to_answer') }}
+      </v-btn>
     </v-layout>
     <v-layout v-if="shouldShowReason">
       <v-text-field
         name="Reason"
-        label="Reason"
+        :label="$t('reason')"
         :rules="rules"
         v-model="reason"
         required
@@ -33,7 +37,7 @@
     data: function () {
       return {
         _reason: this.question.datum.dk_rf_val,
-        rules: [value => !!value || 'Reason is required.']
+        rules: [value => !!value || this.$t('required_field')]
       }
     },
     created: function () {

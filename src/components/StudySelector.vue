@@ -7,7 +7,7 @@
       <pre>{{studies}}</pre>
     </debug>
     <v-select
-      label="Study"
+      :label="$t('study')"
       :loading="isWorking"
       v-model="study"
       @change="change"

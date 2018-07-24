@@ -9,7 +9,7 @@
     <v-btn
       flat
       @click="onCancel">
-      Cancel
+      {{ $t('cancel') }}
     </v-btn>
   </v-flex>
 </template>
@@ -76,6 +76,3 @@
     }
   }
 </script>
-
-<style lang="sass" scoped>
-</style>

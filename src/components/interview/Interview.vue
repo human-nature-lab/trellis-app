@@ -5,10 +5,9 @@
         <v-progress-linear
           v-if="isSaving"
           :indeterminate="true" />
-        <v-alert v-if="showSafeToExitMessage">
-          <p>It is now safe to exit the survey</p>
-        </v-alert>
-        <span v-if="formIsEmpty">This form appears to be empty...</span>
+        <span v-if="formIsEmpty">
+          {{ $t('form_empty') }}
+        </span>
         <Page v-else
               :questions="questions"
               :location="location"
@@ -23,21 +22,27 @@
       v-model="dialog.beginning">
       <v-card>
         <v-card-title class="headline">
-          You've reached the beginning of the survey
+          {{ $t('survey_message_beginning') }}
         </v-card-title>
         <v-card-text>
-          All changes have been saved. Would you like to exit the interview?
+          {{ $t('all_data_saved') }}
+          <br>
+          {{ $t('survey_message_exit') }}
         </v-card-text>
         <v-card-actions>
           <v-btn
             flat
             color="error"
-            @click="dialog.beginning = false">Cancel</v-btn>
+            @click="dialog.beginning = false">
+            {{ $t('cancel') }}
+          </v-btn>
           <v-spacer />
           <v-btn
             flat
             color="success"
-            @click="saveAndExit">Confirm</v-btn>
+            @click="saveAndExit">
+            {{ $t('confirm') }}
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -45,21 +50,29 @@
       v-model="dialog.end">
       <v-card>
         <v-card-title class="headline">
-          You've reached the end of the survey
+          {{ $t('survey_message_end' )}}
         </v-card-title>
         <v-card-text>
-          Would you like to exit and permanently lock the survey?
+          {{ $t('all_data_saved') }}
+          <br>
+          {{ $t('survey_message_exit') }}
+          <br>
+          {{ $t('survey_message_lock') }}
         </v-card-text>
         <v-card-actions>
           <v-btn
             flat
             color="error"
-            @click="dialog.end = false">Cancel</v-btn>
+            @click="dialog.end = false">
+            {{ $t('cancel') }}
+          </v-btn>
           <v-spacer />
           <v-btn
             flat
             color="success"
-            @click="lockAndExit()">Confirm</v-btn>
+            @click="lockAndExit()">
+            {{ $t('confirm') }}
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -78,7 +91,9 @@
           <v-btn icon dark @click.native="dialog.conditionTag = false">
             <v-icon>close</v-icon>
           </v-btn>
-          <v-toolbar-title>Conditions</v-toolbar-title>
+          <v-toolbar-title>
+            {{ $t('conditions') }}
+          </v-toolbar-title>
         </v-toolbar>
         <v-card-text>
           <ConditionTagList :conditions="interviewConditionTags" />

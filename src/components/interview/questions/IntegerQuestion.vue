@@ -5,7 +5,7 @@
       :disabled="isQuestionDisabled"
       v-model.number="value"
       type="number"
-      :step="1"></v-text-field>
+      :step="1" />
   </v-flex>
 </template>
 

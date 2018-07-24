@@ -15,7 +15,9 @@
         :items="conditions" />
       <v-btn @click="save">
         <v-progress-circular v-if="isSaving" indeterminate />
-        <span v-else>Save</span>
+        <span v-else>
+          {{ $t('save') }}
+        </span>
       </v-btn>
     </v-layout>
     <v-dialog v-model="showNewConditionTag" max-width="300">
@@ -26,12 +28,14 @@
               autofocus
               :loading="isSavingNew"
               v-model="newConditionTagName"
-              label="Condition Tag Name" />
+              :label="$t('condition_tag')" />
             <v-btn @click="createNewConditionTag">
               <v-progress-circular
                 v-if="isSavingNew"
                 indeterminate />
-              <span v-else>Save</span>
+              <span v-else>
+                {{ $t('save') }}
+              </span>
             </v-btn>
           </v-layout>
         </v-container>

@@ -2,7 +2,7 @@
   <v-container fluid class="respondent-search">
     <v-layout row>
       <v-text-field
-        placeholder="Search..."
+        :placeholder="$t('search')"
         v-model="query"
         :loading="isLoading"
         @input="onQueryChange"></v-text-field>
@@ -11,14 +11,16 @@
         @click="onDone"
         :disabled="isLoading">
         <v-progress-circular v-if="isLoading" indeterminate color="primary" />
-        <span v-else>Done</span>
+        <span v-else>
+          {{ $t('done') }}
+        </span>
       </v-btn>
     </v-layout>
     <v-layout>
       <v-select
         :items="conditionTags"
         v-model="filters.conditionTags"
-        label="Condition Tags"
+        :label="$t('condition_tags')"
         single-line
         dense
         chips
@@ -33,11 +35,15 @@
           @click="clearFilters">
           <v-icon>clear</v-icon>
         </v-btn>
-        <span>Clear filters</span>
+        <span>
+          {{ $t('clear') }}
+        </span>
       </v-tooltip>
     </v-layout>
     <v-layout v-if="filters.geos && filters.geos.length">
-      Search limited to:
+      <span>
+        {{ $t('geo_search_filter') }}
+      </span>
       <v-chip
         v-for="(geo, index) in filters.geos"
         :key="geo.id"
@@ -61,7 +67,7 @@
           :respondent="respondent" />
       </v-layout>
       <v-layout v-if="!respondentResults.length" ma-3>
-        No results present for the query: {{query}}
+        {{ $t('no_results') }}: {{query}}
       </v-layout>
       <v-layout row>
         <v-spacer />
@@ -77,8 +83,12 @@
             color="primary">
             <v-icon>add</v-icon>
           </v-btn>
-          <span v-if="respondentId">Add temporary respondent</span>
-          <span v-else>Add respondent</span>
+          <span v-if="respondentId">
+            {{ $t('add_other_respondent') }}
+          </span>
+          <span v-else>
+            {{ $t('add_respondent') }}
+          </span>
         </v-tooltip>
       </v-layout>
     </v-card>
