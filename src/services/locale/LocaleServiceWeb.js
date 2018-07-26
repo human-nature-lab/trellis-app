@@ -1,7 +1,8 @@
-import StudyService from '@/services/study/StudyService'
-import storage from '@/services/storage/StorageService'
-import singleton from '@/singleton'
+import StudyService from '../study/StudyService'
+import storage from '../storage/StorageService'
+import singleton from '../../static/singleton'
 import http from '../http/AxiosInstance'
+import i18n from '../../i18n'
 export default class LocaleService {
   static hasValidLocale () {
     console.log('TODO: Should probably also check if the current locale is a valid one for the selected study')
@@ -12,7 +13,9 @@ export default class LocaleService {
     return storage.get('current-locale')
   }
   static setExistingLocale () {
-    singleton.locale = LocaleService.getCurrentLocale()
+    let locale = LocaleService.getCurrentLocale()
+    singleton.locale = locale
+    i18n.locale = locale && i18n.messages[locale.language_tag] ? locale.language_tag : 'en'
   }
   static getStudyLocales (studyId) {
     return StudyService.getStudy(studyId).then(study => study.locales)
@@ -20,6 +23,7 @@ export default class LocaleService {
   static setCurrentLocale (locale) {
     storage.set('current-locale', locale)
     singleton.locale = locale
+    i18n.locale = i18n.messages[locale.language_tag] ? locale.language_tag : 'en'
   }
 
   /**

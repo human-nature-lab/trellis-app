@@ -139,8 +139,8 @@
   import GenerateImageList from './substeps/GenerateImageList.vue'
   import CalculateImageSize from './substeps/CalculateImageSize.vue'
   import DownloadImages from './substeps/DownloadImages.vue'
-  import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '@/constants'
-  import FileService from '@/services/file/FileService'
+  import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '../../../static/constants'
+  import FileService from '../../../services/file/FileService'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
     CHECKING_LAST_SNAPSHOT: 'Checking latest available snapshot on the server...'

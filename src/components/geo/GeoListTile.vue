@@ -3,17 +3,18 @@
       <!--<v-list-tile-avatar>-->
         <!--<Photo :photo="primaryPhoto" height="50" width="50" />-->
       <!--</v-list-tile-avatar>-->
+      <v-list-tile-action v-if="isSelectable">
+        <v-btn
+          icon
+          @click.stop="$emit('geo-select')">
+          <v-icon color="primary" v-if="selected">check_box</v-icon>
+          <v-icon v-else>check_box_outline_blank</v-icon>
+        </v-btn>
+      </v-list-tile-action>
       <v-list-tile-content>
         {{this.translated}}
       </v-list-tile-content>
-      <v-list-tile-action v-if="!hideSelect">
-        <v-btn
-          v-if="isSelectable"
-          :color="selected && 'primary' || ''"
-          @click.stop="$emit('geo-select')">
-          <v-icon v-if="selected">check</v-icon>
-          <span v-else>Select</span>
-        </v-btn>
+      <v-list-tile-action>
         <v-btn
           @click.stop="showGeoInfo"
           icon>
@@ -25,7 +26,7 @@
 
 <script>
   import TranslationMixin from '../../mixins/TranslationMixin'
-  import router from '../../router/router'
+  import index from '../../router/index'
   import Photo from '../Photo'
   export default {
     name: 'geo-list-tile',
@@ -57,7 +58,7 @@
     },
     methods: {
       showGeoInfo () {
-        router.push({
+        index.push({
           name: 'Geo',
           params: {
             geoId: this.geo.id

@@ -1,19 +1,14 @@
 import WebLogin from '../components/login/WebLogin'
 import Interview from '../components/interview/Interview'
 import StudySelectorPage from '../components/StudySelectorPage'
-import storage from '../services/storage/StorageService'
+import ValidateLocale from './guards/ValidateLocale'
+import chainableGuards from './guards/ChainableGuards'
+import ValidateStudy from './guards/ValidateStudy'
 
 export default [{
   path: '/login',
   name: 'Login',
-  component: WebLogin,
-  beforeEnter: function (to, from, next) {
-    if (storage.get('interview-id') !== null) {
-      next({name: 'Interview', params: {studyId: storage.get('studyId'), interviewId: storage.get('interview-id')}})
-    } else {
-      next()
-    }
-  }
+  component: WebLogin
 }, {
   path: '/',
   name: 'Home',
@@ -21,7 +16,8 @@ export default [{
 }, {
   path: '/form/:formId/preview',
   name: 'InterviewPreview',
-  component: Interview
+  component: Interview,
+  beforeEnter: chainableGuards(ValidateStudy, ValidateLocale)
 }, {
   path: '*',
   redirect: '/login'

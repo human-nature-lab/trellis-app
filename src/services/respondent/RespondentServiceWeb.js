@@ -73,6 +73,9 @@ export default class RespondentServiceWeb {
     if (filters.geos) {
       params.g = filters.geos.join(',')
     }
+    if (filters.include_children) {
+      params.i = filters.include_children
+    }
     studyId = encodeURIComponent(studyId)
     return http().get(`study/${studyId}/respondents/search`, {
       params: params
@@ -112,6 +115,7 @@ export default class RespondentServiceWeb {
    * @returns {Promise<Object>}
    */
   static editName (respondentId, respondentNameId, newName, isDisplayName = null, localeId = null) {
+    respondentId = encodeURIComponent(respondentId)
     respondentNameId = encodeURIComponent(respondentNameId)
     return http().put(`respondent/${respondentId}/name/${respondentNameId}`, {
       name: newName,
@@ -146,5 +150,61 @@ export default class RespondentServiceWeb {
       geo_id: geoId,
       associated_respondent_id: associatedRespondentId
     }).then(res => res.data.respondent)
+  }
+
+  /**
+   * Add a geo to the respondent
+   * @param {String} respondentId
+   * @param {String} geoId
+   * @returns {Promise<Object>}
+   */
+  static addRespondentGeo (respondentId, geoId) {
+    respondentId = encodeURIComponent(respondentId)
+    geoId = encodeURIComponent(geoId)
+    return http().post(`respondent/${respondentId}/geo`, {
+      geo_id: geoId
+    }).then(res => res.data.geo)
+  }
+
+  /**
+   * Edit the respondent geo (change is current)
+   * @param {String} respondentId
+   * @param {String} respondentGeoId
+   * @param {String} isCurrent
+   * @returns {Promise<Object>}
+   */
+  static editRespondentGeo (respondentId, respondentGeoId, isCurrent) {
+    respondentId = encodeURIComponent(respondentId)
+    respondentGeoId = encodeURIComponent(respondentGeoId)
+    return http().put(`respondent/${respondentId}/geo/${respondentGeoId}`, {
+      is_current: isCurrent
+    }).then(res => res.data.respondent_geo)
+  }
+
+  /**
+   * Move a respondent geo to another location
+   * @param {String} respondentId
+   * @param {String} respondentGeoId
+   * @param {String} newGeoId
+   * @returns {Promise<Object>}
+   */
+  static moveRespondentGeo (respondentId, respondentGeoId, newGeoId) {
+    respondentId = encodeURIComponent(respondentId)
+    respondentGeoId = encodeURIComponent(respondentGeoId)
+    return http().post(`respondent/${respondentId}/geo/${respondentGeoId}/move`, {
+      new_geo_id: newGeoId
+    }).then(res => res.data.geo)
+  }
+
+  /**
+   * Delete the respondent geo by id
+   * @param {String} respondentId
+   * @param {String} respondentGeoId
+   * @returns {Promise<*>}
+   */
+  static removeRespondentGeo (respondentId, respondentGeoId) {
+    respondentId = encodeURIComponent(respondentId)
+    respondentGeoId = encodeURIComponent(respondentGeoId)
+    return http().delete(`respondent/${respondentId}/geo/${respondentGeoId}`)
   }
 }

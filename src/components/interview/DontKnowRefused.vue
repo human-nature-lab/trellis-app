@@ -1,26 +1,27 @@
 <template>
-  <v-layout justify-space-between>
-    <v-flex>
-      <v-layout row>
-        <v-btn
-          v-bind:class="{'primary': dk}"
-          @click="dk=!dk">Don't know</v-btn>
-        <v-btn
-          v-bind:class="{'primary': rf}"
-          @click="rf=!rf">Refuse</v-btn>
-      </v-layout>
-      <v-layout v-if="shouldShowReason" row>
-        <v-text-field
-          name="Reason"
-          label="Reason"
-          :rules="rules"
-          v-model="reason"
-          required
-          autofocus
-        ></v-text-field>
-      </v-layout>
-    </v-flex>
-  </v-layout>
+  <v-flex>
+    <v-layout row>
+      <v-btn
+        v-bind:class="{'primary': dk}"
+        @click="dk=!dk">
+        {{ $t('do_not_know') }}
+      </v-btn>
+      <v-btn
+        v-bind:class="{'primary': rf}"
+        @click="rf=!rf">
+        {{ $t('refuse_to_answer') }}
+      </v-btn>
+    </v-layout>
+    <v-layout v-if="shouldShowReason">
+      <v-text-field
+        name="Reason"
+        :label="$t('reason')"
+        :rules="rules"
+        v-model="reason"
+        required
+        autofocus />
+    </v-layout>
+  </v-flex>
 </template>
 
 <script>
@@ -36,7 +37,7 @@
     data: function () {
       return {
         _reason: this.question.datum.dk_rf_val,
-        rules: [value => !!value || 'Reason is required.']
+        rules: [value => !!value || this.$t('required_field')]
       }
     },
     created: function () {

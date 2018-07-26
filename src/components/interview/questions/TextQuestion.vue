@@ -3,7 +3,7 @@
     v-model="text"
     auto-grow
     full-width
-    placeholder="Your text here..."
+    :placeholder="$t('text_placeholder')"
     textarea
     :disabled="isQuestionDisabled"
     />

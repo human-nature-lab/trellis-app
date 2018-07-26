@@ -1,57 +1,61 @@
 <template>
-  <v-card fluid ma-0 pa-0>
-    <v-toolbar
-      class="respondent-search pa-2"
-      extended
-      dense
-      inline>
+  <v-container fluid class="respondent-search">
+    <v-layout row>
       <v-text-field
-        placeholder="Search..."
+        :placeholder="$t('search')"
         v-model="query"
         :loading="isLoading"
         @input="onQueryChange"></v-text-field>
       <v-btn
+        v-if="canSelect"
         @click="onDone"
         :disabled="isLoading">
-        <span v-if="!isLoading">Done</span>
         <v-progress-circular v-if="isLoading" indeterminate color="primary" />
+        <span v-else>
+          {{ $t('done') }}
+        </span>
       </v-btn>
-      <v-layout class="pa-3" slot="extension">
-        <v-select
-          :items="conditionTags"
-          v-model="filters.conditionTags"
-          label="Condition Tags"
-          single-line
-          dense
-          chips
-          tags
-          @input="onQueryChange"
-          :loading="conditionTagsLoading"
-          autocomplete/>
-        <v-tooltip bottom>
-          <v-btn
-            slot="activator"
-            icon
-            @click="clearFilters">
-            <v-icon>clear</v-icon>
-          </v-btn>
-          <span>Clear filters</span>
-        </v-tooltip>
-        <v-tooltip bottom v-if="canAddRespondent">
-          <v-btn
-            slot="activator"
-            icon
-            @click="showAssociatedRespondentDialog = true">
-            <v-icon>add</v-icon>
-          </v-btn>
-          <span>Add temporary respondent</span>
-        </v-tooltip>
-      </v-layout>
-      <v-alert v-if="error">
-        {{error}}
-      </v-alert>
-    </v-toolbar>
-    <v-container class="respondents" fluid grid-list-sm>
+    </v-layout>
+    <v-layout>
+      <v-select
+        :items="conditionTags"
+        v-model="filters.conditionTags"
+        :label="$t('condition_tags')"
+        single-line
+        dense
+        chips
+        tags
+        @input="onQueryChange"
+        :loading="conditionTagsLoading"
+        autocomplete/>
+      <v-tooltip bottom>
+        <v-btn
+          slot="activator"
+          icon
+          @click="clearFilters">
+          <v-icon>clear</v-icon>
+        </v-btn>
+        <span>
+          {{ $t('clear') }}
+        </span>
+      </v-tooltip>
+    </v-layout>
+    <v-layout v-if="filters.geos && filters.geos.length">
+      <span>
+        {{ $t('geo_search_filter') }}
+      </span>
+      <v-chip
+        v-for="(geo, index) in filters.geos"
+        :key="geo.id"
+        @input="removeGeoFilter(index)"
+        :close="canRemoveGeos">
+        <GeoBreadcrumbs :geo-id="geo" :show-ancestors="false"/>
+      </v-chip>
+    </v-layout>
+    <v-alert v-if="error">
+      {{error}}
+    </v-alert>
+    <v-card class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
         <RespondentItem
           v-for="respondent in respondentResults"
@@ -62,10 +66,32 @@
           :selected="isSelected(respondent)"
           :respondent="respondent" />
       </v-layout>
-    </v-container>
-    <v-layout v-if="!respondentResults.length" ma-3>
-      No results present for the query: {{query}}
-    </v-layout>
+      <v-layout v-if="!respondentResults.length" ma-3>
+        {{ $t('no_results') }}: {{query}}
+      </v-layout>
+      <v-layout row>
+        <v-spacer />
+        <v-tooltip top v-if="canAddRespondent">
+          <v-btn
+            slot="activator"
+            fixed
+            fab
+            bottom
+            right
+            @click="showAssociatedRespondentDialog = true"
+            :loading="isLoading"
+            color="primary">
+            <v-icon>add</v-icon>
+          </v-btn>
+          <span v-if="respondentId">
+            {{ $t('add_other_respondent') }}
+          </span>
+          <span v-else>
+            {{ $t('add_respondent') }}
+          </span>
+        </v-tooltip>
+      </v-layout>
+    </v-card>
     <v-dialog
       v-model="showAssociatedRespondentDialog">
       <v-card>
@@ -75,17 +101,28 @@
           :associatedRespondentId="respondentId" />
       </v-card>
     </v-dialog>
-  </v-card>
+  </v-container>
 </template>
 
 <script>
-  import _ from 'lodash'
+  import _, {merge} from 'lodash'
   import ConditionTagService from '../../services/condition-tag/ConditionTagService'
   import RespondentService from '../../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
   import RespondentItem from './RespondentItem'
   import AddRespondentForm from './AddRespondentForm'
-  import router from '../../router/router'
+  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
+  import router from '../../router'
+  import TranslationService from '../../services/TranslationService'
+
+  function hasAnyFilter (filters) {
+    for (let key in filters) {
+      if (filters[key] && filters[key].length) {
+        return true
+      }
+    }
+    return false
+  }
 
   /**
    * Keeps the vue router link in sync with the current query. This means that navigating away from this page and then
@@ -97,7 +134,7 @@
     if (vm.query) {
       query.query = vm.query
     }
-    if (vm.filters.conditionTags.length) {
+    if (hasAnyFilter(vm.filters)) {
       query.filters = JSON.stringify(vm.filters)
     }
     router.replace({
@@ -113,9 +150,8 @@
    */
   function loadRoute (vm) {
     vm.query = vm.$route.query.query || ''
-    vm.filters = vm.$route.query.filters ? JSON.parse(vm.$route.query.filters) : {
-      conditionTags: [],
-      locations: []
+    if (vm.$route.query.filters) {
+      merge(vm.filters, JSON.parse(vm.$route.query.filters))
     }
   }
 
@@ -144,7 +180,11 @@
       },
       baseFilters: {
         type: Object,
-        default: () => ({})
+        default: () => ({
+          conditionTags: [],
+          geos: [],
+          include_children: false
+        })
       },
       selectedRespondents: {
         type: Array,
@@ -155,7 +195,11 @@
       },
       canAddRespondent: {
         type: Boolean,
-        default: false
+        default: true
+      },
+      canRemoveGeos: {
+        type: Boolean,
+        default: true
       }
     },
     head: {
@@ -191,6 +235,15 @@
       this.getCurrentPage()
     },
     methods: {
+      removeGeoFilter (index) {
+        this.filters.geos.splice(index, 1)
+        this.search().then(() => {
+          updateRoute(this)
+        })
+      },
+      translate (translation) {
+        return TranslationService.getAny(translation, this.global.locale.id)
+      },
       onQueryChange: _.debounce(function () {
         this.isLoading = true
         this.search()
@@ -231,7 +284,10 @@
       },
       onSelectRespondent (respondent) {
         this.$emit('selectRespondent', respondent)
-        if (!this.canSelect) return
+        if (!this.canSelect) {
+          router.push({name: 'Respondent', params: {respondentId: respondent.id, studyId: this.studyId}})
+          return
+        }
         if (this.limit && this.selected.length > this.limit) return
 
         let sIndex = this.selected.indexOf(respondent.id)
@@ -278,15 +334,8 @@
     components: {
       RespondentListItem,
       RespondentItem,
-      AddRespondentForm
+      AddRespondentForm,
+      GeoBreadcrumbs
     }
   }
 </script>
-
-<style lang="sass" scoped>
-.respondent-search
-  /*position: fixed*/
-  z-index: 10
-.respondents
-  /*padding-top: 130px*/
-</style>

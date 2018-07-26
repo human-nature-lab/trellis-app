@@ -1,17 +1,25 @@
 <template>
-  <v-container fluid>
-    <v-layout row wrap>
-      <v-flex id="mapContainer">
-        <div id="leafletMap"></div>
-        <pre>
-          {{this.geoResults}}
-        </pre>
-      </v-flex>
-    </v-layout>
+  <v-layout
+    column
+    fill-height>
+    <v-flex
+      fill-height
+      ref="mapContainer"
+      id="leafletMap"
+      style="position: relative;">
+    </v-flex>
+    <div>
+      <debug name="Geo results">
+          <pre>
+            {{this.geoResults}}
+          </pre>
+      </debug>
+    </div>
     <v-navigation-drawer
-      disable-resize-watcher="true"
-      v-model="global.searchDrawer.open"
       fixed
+      clipped
+      :disable-route-watcher="true"
+      v-model="global.searchDrawer.open"
       right
       app>
       <v-list dense>
@@ -28,17 +36,17 @@
         </v-flex>
       </v-list>
     </v-navigation-drawer>
-  </v-container>
+  </v-layout>
 </template>
 
 <script>
+  /* global L */
   import GeoSearch from './GeoSearch'
-  import TranslationService from '@/services/TranslationService'
-  import * as L from 'leaflet'
-  import * as leafletLabel from 'leaflet.label'
-  window.leafletLabel = leafletLabel
+  import TranslationService from '../../services/TranslationService'
+  import 'leaflet'
+  // import 'leaflet.label'
   import Vue from 'vue'
-  import global from '../../singleton'
+  import global from '../../static/singleton'
   export default {
     name: 'geo-search-with-map',
     props: {
@@ -66,8 +74,7 @@
       this.setUpMap()
       this.addMarkers()
       this.centerMap()
-    },
-    computed: {
+      this.$nextTick(() => { this.global.searchDrawer.open = true })
     },
     methods: {
       setUpSearch: function () {
@@ -77,9 +84,10 @@
       },
       setUpMap: function () {
         let padding = 16
-        let mapHeight = (window.innerHeight - document.getElementsByTagName('nav').item(0).offsetHeight - (padding * 2)) + 'px'
+        // let mapHeight = (window.innerHeight - document.getElementsByTagName('nav').item(0).offsetHeight - (padding * 2)) + 'px'
+        let mapHeight = this.$refs.mapContainer.clientHeight - (padding * 2)
         console.log('mapHeight', mapHeight)
-        document.getElementById('leafletMap').style.height = mapHeight
+        // this.$refs.leafletMap.style.height = mapHeight
         this.trellisMap = L.map('leafletMap').setView([0.0, 0.0], 1)
         delete L.Icon.Default.prototype._getIconUrl
         L.Icon.Default.mergeOptions({
@@ -98,10 +106,11 @@
         this.geoResults = results
         this.addMarkers()
         this.centerMap()
+        this.$nextTick(() => { this.global.searchDrawer.open = true })
       },
       addMarkers: function () {
         let defaultIcon = L.icon({
-          iconUrl: '../../static/img/map_icons/green_dot.png',
+          iconUrl: require('../../../static/img/map_icons/green_dot.png'),
           iconSize: [10, 10],
           iconAnchor: [4, 4],
           popupAnchor: [4, 4],
@@ -115,14 +124,16 @@
         this.minZoom = undefined
         this.geoResults.forEach((geo) => {
           console.log(geo)
-          if (geo.geo_type.zoom_level !== null) {
+          if (geo.geo_type && geo.geo_type.zoom_level != null) {
             this.minZoom = (this.minZoom === undefined) ? Number(geo.geo_type.zoom_level) : Math.min(this.minZoom, Number(geo.geo_type.zoom_level))
           }
           let markerCoords = [geo.latitude, geo.longitude]
-          let marker = L.marker(markerCoords, {icon: defaultIcon}).addTo(this.trellisMap)
+          let marker = L.marker(markerCoords, {icon: defaultIcon})
           let translation = TranslationService.getTranslated(geo.name_translation, this.global.locale)
-          marker.bindLabel(translation, {noHide: true, direction: 'right'})
+          // marker.bindLabel(translation, {noHide: true, direction: 'right'})
+          marker.bindTooltip(translation, {permanent: true, direction: 'right'})
           console.log('marker', marker)
+          marker.addTo(this.trellisMap)
           this.markers.push(marker)
           this.markerPositions.push(markerCoords)
         })
@@ -148,7 +159,7 @@
 
 <style lang="sass" scoped>
   @import "../../../node_modules/leaflet/dist/leaflet.css"
-  @import "../../../node_modules/leaflet.label/dist/leaflet.label.css"
+  /*@import "../../../node_modules/leaflet.label/dist/leaflet.label.css"*/
 
   #leafletMap
     height: 400px /* Temporary height, replaced by actual container height via javascript */

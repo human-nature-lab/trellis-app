@@ -8,7 +8,7 @@ import InterviewActionsService from './interview-actions/InterviewActionsService
  */
 export default function actionsPersistSlave (interviewId, actionStore) {
   function actionsExtractor () {
-    return actionStore.actions
+    return actionStore.store
   }
   function saveCallback (newState, prevState) {
     if (newState.length > prevState.length) {

@@ -13,10 +13,10 @@ export default function (to, from, next) {
       console.log('study valid')
       next()
     } else {
-      next({name: 'StudySelector'})
+      next({name: 'StudySelector', query: {to: to.fullPath}})
     }
   }).catch(err => {
     console.error(err)
-    return next({name: 'home'})
+    return next()
   })
 }

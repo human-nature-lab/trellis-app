@@ -1,13 +1,15 @@
 <template>
   <v-flex class="respondent-forms">
-    <v-container fluid class="px-0">
+    <v-container fluid>
       <v-alert v-if="error">{{this.error}}</v-alert>
-      <v-flex>
-        <h3>Forms for: {{respondent.name}}</h3>
-      </v-flex>
-      <v-layout>
+      <v-card>
+        <v-toolbar flat>
+          <v-toolbar-title>
+            {{ $t('respondent_forms', [respondent.name])}}
+          </v-toolbar-title>
+        </v-toolbar>
         <FormsView v-if="forms" :forms="forms" @click="startInterview"/>
-      </v-layout>
+      </v-card>
     </v-container>
   </v-flex>
 </template>
@@ -17,9 +19,9 @@
   import SurveyService from '@/services/survey/SurveyService'
   import FormService from '@/services/form/FormService'
   import RespondentService from '@/services/respondent/RespondentService'
-  import singleton from '../../singleton'
+  import singleton from '../../static/singleton'
   import InterviewService from '../../services/interview/InterviewService'
-  import router from '../../router/router'
+  import index from '../../router/index'
 
   let data = {}
   function load (respondentId, studyId) {
@@ -103,7 +105,7 @@
           })
         }
         return p.then(interview => {
-          router.push({name: 'Interview', params: {studyId: this.global.study.id, interviewId: interview.id}})
+          index.push({name: 'Interview', params: {studyId: this.global.study.id, interviewId: interview.id}})
         }).catch(err => {
           this.error = err
         })

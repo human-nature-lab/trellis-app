@@ -21,64 +21,58 @@
           :text="translated"
           :location="location" />
       </v-flex>
-      <IntroQuestion
-        v-if="question.type.name === 'intro'"
-        :question="question"/>
-      <MultipleSelectQuestion
-        v-else-if="question.type.name === 'multiple_select' || question.type.name === 'multiple_choice'"
-        :location="location"
-        :question="question"/>
-      <IntegerQuestion
-        v-else-if="question.type.name === 'integer'"
-        :question="question"/>
-      <DecimalQuestion
-        v-else-if="question.type.name === 'decimal'"
-        :question="question"/>
-      <RosterQuestion
-        v-else-if="question.type.name === 'roster'"
-        :question="question"/>
-      <RelationshipQuestion
-        v-else-if="question.type.name === 'relationship'"
+      <component
+        :is="typeMap[question.question_type_id]"
         :question="question"
-        :respondent="interview.survey.respondent"/>
-      <TextQuestion
-        v-else-if="question.type.name === 'text' || question.type.name === 'text_area'"
-        :question="question"/>
-      <DateQuestion
-        v-else-if="['date', 'year', 'year_month', 'year_month_day'].indexOf(question.type.name) > -1"
-        :question="question"/>
-      <TimeQuestion
-        v-else-if="question.type.name === 'time'"
-        :question="question"/>
-      <GeoQuestion
-        v-else-if="question.type.name === 'geo'"
-        :question="question"/>
+        :location="location"
+        :respondent="interview.survey.respondent"></component>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
       <DontKnowRefused
-        :question="question"></DontKnowRefused>
+        :question="question" />
     </v-card-actions>
   </v-card>
 </template>
+
 
 <script>
   // This parent component servers the purpose of handling general functionality that is used across all questions.
   // For example, question title and message fills will be applied here. The question header text will be applied here
   // import translationService from '../services/TranslationService'
+  import DontKnowRefused from './DontKnowRefused.vue'
+  import InterpolatedText from './InterpolatedText'
+  import TranslationMixin from '../../mixins/TranslationMixin'
+  import questionTypes from '../../static/question.types'
+
   import DateQuestion from './questions/DateQuestion'
   import DecimalQuestion from './questions/DecimalQuestion'
-  import DontKnowRefused from './DontKnowRefused.vue'
   import GeoQuestion from './questions/GeoQuestion'
   import IntegerQuestion from './questions/IntegerQuestion'
-  import InterpolatedText from './InterpolatedText'
   import IntroQuestion from './questions/IntroQuestion.vue'
   import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
   import RelationshipQuestion from './questions/RelationshipQuestion'
+  import RespondentGeoQuestion from './questions/RespondentGeoQuestion'
   import RosterQuestion from './questions/RosterQuestion'
   import TextQuestion from './questions/TextQuestion'
   import TimeQuestion from './questions/TimeQuestion'
 
-  import TranslationMixin from '../../mixins/TranslationMixin'
+  const typeMap = {}
+  typeMap[questionTypes.year] = DateQuestion
+  typeMap[questionTypes.year_month] = DateQuestion
+  typeMap[questionTypes.year_month_day] = DateQuestion
+  typeMap[questionTypes.year_month_day_time] = DateQuestion
+  typeMap[questionTypes.decimal] = DecimalQuestion
+  typeMap[questionTypes.geo] = GeoQuestion
+  typeMap[questionTypes.integer] = IntegerQuestion
+  typeMap[questionTypes.intro] = IntroQuestion
+  typeMap[questionTypes.multiple_select] = MultipleSelectQuestion
+  typeMap[questionTypes.multiple_choice] = MultipleSelectQuestion
+  typeMap[questionTypes.relationship] = RelationshipQuestion
+  typeMap[questionTypes.respondent_geo] = RespondentGeoQuestion
+  typeMap[questionTypes.roster] = RosterQuestion
+  typeMap[questionTypes.text] = TextQuestion
+  typeMap[questionTypes.text_area] = TextQuestion
+  typeMap[questionTypes.time] = TimeQuestion
 
   export default {
     name: 'question',
@@ -99,6 +93,7 @@
     },
     data: function () {
       return {
+        typeMap: typeMap,
         translation: this.question.question_translation,
         hasChanged: false
       }
@@ -127,12 +122,12 @@
       MultipleSelectQuestion,
       RelationshipQuestion,
       RosterQuestion,
+      RespondentGeoQuestion,
       TextQuestion,
       TimeQuestion
     }
   }
 </script>
-
 <style lang="sass">
   $question-margin: 15px
   .question

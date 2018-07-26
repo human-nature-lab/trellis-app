@@ -5,20 +5,20 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.css'
 import VueCordova from 'vue-cordova'
 import VueHead from 'vue-head'
-import Debug from '@/components/Debug'
-import singleton from './singleton'
+import i18n from './i18n'
+import Debug from './components/Debug'
+import singleton from './static/singleton'
 import 'typeface-roboto/index.css'
 import 'material-design-icons-iconfont'
 
 import App from './App'
 import WebApp from './WebApp'
-import router from './router/router'
+import router from './router'
 
 import config from './config'
-import theme from './theme'
-import {APP_ENV} from './constants'
+import theme from './static/theme'
+import {APP_ENV} from './static/constants'
 
-// Flag for debug
 Vue.use(Vuetify, theme)
 Vue.config.productionTip = false
 Vue.use(VueHead)
@@ -68,6 +68,7 @@ Vue.mixin({
 new Vue({
   el: '#app',
   router,
+  i18n,
   template: config.appEnv === APP_ENV.WEB ? '<WebApp />' : '<App />',
   components: {
     App,

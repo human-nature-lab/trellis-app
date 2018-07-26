@@ -3,8 +3,11 @@
     <v-alert color="error" :value="error">
       {{error}}
     </v-alert>
-    <debug name="Locales">{{locales}}</debug>
+    <debug name="Locales">
+      <pre>{{locales}}</pre>
+    </debug>
     <v-select
+      :label="$t('locale')"
       :loading="isWorking"
       v-model="locale"
       @change="change"

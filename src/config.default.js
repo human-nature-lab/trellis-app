@@ -1,4 +1,4 @@
-import constants from './constants'
+import constants from './static/constants'
 export default {
   appEnv: constants.APP_ENV.WEB,
   appMode: constants.APP_MODE.TEST,

@@ -1,37 +1,48 @@
 <template>
-  <v-flex>
-    <v-progress-linear
-      v-if="isSaving"
-      :indeterminate="true" />
-    <v-alert v-if="showSafeToExitMessage">
-      <p>It is now safe to exit the survey</p>
-    </v-alert>
-    <Page :questions="questions"
-          :location="location"
-          :actions="interviewActions"
-          :data="interviewData"
-          :isAtEnd="isAtEnd"
-          :conditionTags="interviewConditionTags"
-          :interview="interview"/>
+  <v-container fluid fill-height>
+    <v-layout column>
+      <v-flex>
+        <v-progress-linear
+          v-if="isSaving"
+          :indeterminate="true" />
+        <span v-if="formIsEmpty">
+          {{ $t('form_empty') }}
+        </span>
+        <Page v-else
+              :questions="questions"
+              :location="location"
+              :actions="interviewActions"
+              :data="interviewData"
+              :isAtEnd="isAtEnd"
+              :conditionTags="interviewConditionTags"
+              :interview="interview" />
+      </v-flex>
+    </v-layout>
     <v-dialog
       v-model="dialog.beginning">
       <v-card>
         <v-card-title class="headline">
-          You've reached the beginning of the survey
+          {{ $t('survey_message_beginning') }}
         </v-card-title>
         <v-card-text>
-          All changes have been saved. Would you like to exit the interview?
+          {{ $t('all_data_saved') }}
+          <br>
+          {{ $t('survey_message_exit') }}
         </v-card-text>
         <v-card-actions>
           <v-btn
             flat
             color="error"
-            @click="dialog.beginning = false">Cancel</v-btn>
+            @click="dialog.beginning = false">
+            {{ $t('cancel') }}
+          </v-btn>
           <v-spacer />
           <v-btn
             flat
             color="success"
-            @click="saveAndExit">Confirm</v-btn>
+            @click="saveAndExit">
+            {{ $t('confirm') }}
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -39,21 +50,29 @@
       v-model="dialog.end">
       <v-card>
         <v-card-title class="headline">
-          You've reached the end of the survey
+          {{ $t('survey_message_end' )}}
         </v-card-title>
         <v-card-text>
-          Would you like to exit and permanently lock the survey?
+          {{ $t('all_data_saved') }}
+          <br>
+          {{ $t('survey_message_exit') }}
+          <br>
+          {{ $t('survey_message_lock') }}
         </v-card-text>
         <v-card-actions>
           <v-btn
             flat
             color="error"
-            @click="dialog.end = false">Cancel</v-btn>
+            @click="dialog.end = false">
+            {{ $t('cancel') }}
+          </v-btn>
           <v-spacer />
           <v-btn
             flat
             color="success"
-            @click="lockAndExit()">Confirm</v-btn>
+            @click="lockAndExit()">
+            {{ $t('confirm') }}
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -72,14 +91,16 @@
           <v-btn icon dark @click.native="dialog.conditionTag = false">
             <v-icon>close</v-icon>
           </v-btn>
-          <v-toolbar-title>Conditions</v-toolbar-title>
+          <v-toolbar-title>
+            {{ $t('conditions') }}
+          </v-toolbar-title>
         </v-toolbar>
         <v-card-text>
           <ConditionTagList :conditions="interviewConditionTags" />
         </v-card-text>
       </v-card>
     </v-dialog>
-  </v-flex>
+  </v-container>
 </template>
 
 <script>
@@ -93,8 +114,8 @@
   import actionBus from './services/ActionBus'
   import {validateParametersWithError} from './services/ValidatorService'
 
-  import router from '../../router/router'
-  import singleton from '../../singleton'
+  import router, {moveToNextOr} from '../../router'
+  import singleton from '../../static/singleton'
   import InterviewLoader from './services/InterviewLoader'
 
   let interviewData = {}
@@ -143,6 +164,7 @@
         interviewActions: {},
         interviewConditionTags: {},
         interview: {},
+        form: null,
         location: {
           section: 0,
           page: 0,
@@ -192,19 +214,6 @@
     },
     beforeRouteLeave  (to, from, next) {
       console.log('before route leave', to)
-      // if (to.name === 'Interview' || to.name === 'InterviewPreview') {
-      //   this.isLoading = true
-      //   interviewData.intervew = null
-      //   interviewData.actions = null
-      //   interviewData.data = null
-      //   interviewData.form = null
-      //   interviewData.preload = null
-      //   interviewGuards(to, from, next).then(() => {
-      //     this.loadInterview()
-      //   })
-      // } else {
-      //   next()
-      // }
       this.saveData().then(() => {
         if (to.name === 'Interview' || to.name === 'InterviewPreview') {
           this.isLoading = true
@@ -235,13 +244,14 @@
           interviewState.attachDataPersistSlave()
           interviewState.attachActionsPersistSlave()
         }
-        interviewState.initalize()
+        interviewState.initialize()
         // Share the relevant parts of the interview with the view
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
         this.interviewActions = interviewState.actions.store
         this.location = interviewState.navigator.location
         this.interview = interview
+        this.form = formBlueprint
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
         setTimeout(() => {
@@ -270,14 +280,21 @@
           .then(() => InterviewService.complete(this.interview.id))
           .then(() => {
             this.dialog.end = false
-            router.go(-1)
-            // router.push({name: 'home'})
+            this.exit()
           })
           .catch(err => {
             this.error = err
           })
       },
+      exit () {
+        moveToNextOr(() => {
+          router.go(-1)
+        })
+      },
       saveData: function () {
+        if (this.formIsEmpty) {
+          return new Promise(resolve => resolve())
+        }
         this.isSaving = true
         return interviewState.save().then(() => {
           this.isSaving = false
@@ -286,7 +303,7 @@
       saveAndExit: function () {
         this.saveData().then(() => {
           this.dialog.end = false
-          router.go(-1)
+          this.exit()
         })
       },
       prematureExit: function (e) {
@@ -324,6 +341,9 @@
             return q
           })
         return questions || []
+      },
+      formIsEmpty () {
+        return !(this.form && this.form.sections && this.form.sections.length)
       }
     },
     components: {
