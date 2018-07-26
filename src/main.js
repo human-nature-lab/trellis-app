@@ -11,7 +11,6 @@ import singleton from './static/singleton'
 import 'typeface-roboto/index.css'
 import 'material-design-icons-iconfont'
 
-import App from './App'
 import WebApp from './WebApp'
 import router from './router'
 
@@ -69,9 +68,8 @@ new Vue({
   el: '#app',
   router,
   i18n,
-  template: config.appEnv === APP_ENV.WEB ? '<WebApp />' : '<App />',
+  template: '<WebApp />',
   components: {
-    App,
     WebApp
   },
   head: {

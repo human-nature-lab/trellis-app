@@ -34,7 +34,7 @@
 <script>
     import axios from 'axios'
     import config from '@/config'
-    import SyncService from '../../services/SyncService'
+    // import SyncService from '../../services/SyncService'
     import FileService from '@/services/file/FileService'
     export default {
       name: 'download-snapshot',
@@ -75,6 +75,24 @@
           const CancelToken = axios.CancelToken
           this.source = CancelToken.source()
           this.downloading = true
+          const fileName = this.snapshotId + '.sql.zip'
+          const uri = config.apiRoot + `/sync/snapshot/${this.snapshotId}/download`
+          FileService.requestFileSystem()
+            .then((fileSystem) => FileService.getDirectoryEntry(fileSystem, 'snapshots'))
+            .then((directoryEntry) => FileService.getFileEntry(directoryEntry, fileName))
+            .then((fileEntry) => FileService.download(uri, fileEntry))
+            .then((fileEntry) => {
+              console.log('FileService.download -> fileEntry', fileEntry)
+              this.success = true
+              this.$emit('download-snapshot-done', fileEntry)
+              this.downloading = false
+            })
+            .catch((err) => {
+              this.errorMessage = err.message
+              this.error = true
+              this.downloading = false
+            })
+          /*
           SyncService.downloadSnapshot(this.source, this.onDownloadProgress, this.snapshotId).then((response) => {
             console.log('downloadSnapshot, response', response)
             let fileName = this.snapshotId + '.sql.zip'
@@ -98,6 +116,7 @@
             this.error = true
             this.downloading = false
           })
+          */
         },
         onDownloadProgress: function (progressEvent) {
           if (this.lastDownloadProgress !== progressEvent.loaded) {
