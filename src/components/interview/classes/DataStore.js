@@ -19,6 +19,13 @@ export default class DataStore extends Emitter {
   }
 
   /**
+   * Intitialize the datastore. Emits an initialState event to any subscribers
+   */
+  initialize () {
+    this.emit('initialState', this.data)
+  }
+
+  /**
    * Reset the state of the data and conditionTags
    */
   reset () {
@@ -52,7 +59,6 @@ export default class DataStore extends Emitter {
     }
     QuestionDatumRecycler.fill(questionDatum)
     DatumRecycler.fill(datum)
-    this.emit('initialState', this.data)
   }
 
   /**
@@ -60,7 +66,9 @@ export default class DataStore extends Emitter {
    * @param {Object} tags - has respondent, survey and section arrays
    */
   loadConditionTags (tags) {
-    this.baseRespondentConditionTags = tags.respondent
+    if (tags && tags.respondent) {
+      this.baseRespondentConditionTags = tags.respondent
+    }
     for (let type of ['respondent', 'survey', 'section']) {
       if (this.conditionTags[type] && tags[type]) {
         this.conditionTags[type] = this.conditionTags[type].concat(tags[type])
@@ -80,7 +88,6 @@ export default class DataStore extends Emitter {
     RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
     SectionConditionTagRecycler.fill(this.conditionTags.section)
     FormConditionTagRecycler.fill(this.conditionTags.survey)
-    this.emit('initialState', this.data)
   }
 
   /**
@@ -172,22 +179,22 @@ export default class DataStore extends Emitter {
    * @returns {Array}
    */
   getAllConditionTagsForLocation (sectionRepetition, sectionFollowUpDatumId) {
-    let tags = []
-    this.conditionTags.respondent.forEach(tag => {
-      tags.push(tag)
-    })
-    this.conditionTags.survey.forEach(tag => {
-      tags.push(tag)
-    })
-    this.conditionTags.section.filter(tag => {
+    let tags = this.conditionTags.respondent.concat(this.conditionTags.survey)
+    tags = tags.concat(this.conditionTags.section.filter(tag => {
       return tag.repetition === sectionRepetition &&
         tag.follow_up_datum_id === sectionFollowUpDatumId
-    }).forEach(tag => {
-      tags.push(tag)
-    })
-    return tags.map(tag => {
-      return tag
-    })
+    }))
+    return tags
+  }
+
+  /**
+   * Get an array of all the condition tag names for this location in the survey
+   * @param sectionRepetition
+   * @param sectionFollowUpDatumId
+   * @returns {String[}
+   */
+  getLocationConditionTagNames (sectionRepetition, sectionFollowUpDatumId) {
+    return this.getAllConditionTagsForLocation(sectionRepetition, sectionFollowUpDatumId).map(tag => ConditionTagStore.getNameFromId(tag.condition_id))
   }
 
   /**

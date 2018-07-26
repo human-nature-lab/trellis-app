@@ -1,6 +1,6 @@
-import Recycler from '@/classes/Recycler'
+import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
-import moment from 'moment'
+import {now} from '../../../../services/DateService'
 
 const keyNames = ['respondent_id', 'condition_id']
 class RespondentConditionTagRecycler extends Recycler {
@@ -24,8 +24,8 @@ class RespondentConditionTagRecycler extends Recycler {
       id: uuidv4(),
       respondent_id: interview.survey.respondent_id,
       condition_id: act.condition.id,
-      created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
-      updated_at: moment().format('YYYY-MM-DD HH:mm:ss')
+      created_at: now(),
+      updated_at: now()
     }
   }
 }

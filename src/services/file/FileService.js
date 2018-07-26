@@ -1,14 +1,11 @@
-import config from '@/config'
-import { APP_ENV } from '@/constants'
+import {switchByModeEnv} from '../util'
 import FileServiceMock from './FileServiceMock'
 import FileServiceCordova from './FileServiceCordova'
 
-let FileServiceConstructor = null
-if (config.appEnv === APP_ENV.CORDOVA) {
-  FileServiceConstructor = FileServiceCordova
-} else {
-  FileServiceConstructor = FileServiceMock
-}
+const Constructor = switchByModeEnv({
+  WEB: FileServiceMock,
+  CORDOVA: FileServiceCordova
+})
 
-export const FileService = new FileServiceConstructor()
+export const FileService = new Constructor()
 export default FileService

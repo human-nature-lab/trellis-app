@@ -1,29 +1,33 @@
 <template>
     <v-flex>
-      <v-list>
-        <GeoListTile
-          v-for="geo in geos"
-          :geo="geo"
-          hide-select
-          :key="geo.id">
-        </GeoListTile>
-        <v-list-tile>
-          <v-spacer />
-          <v-list-tile-action>
-            <v-btn @click="geoSearchDialog = true">Add Location</v-btn>
-          </v-list-tile-action>
-        </v-list-tile>
-      </v-list>
+      <v-card>
+        <v-list>
+          <v-list-tile v-for="geo in geos" :key="geo.id">
+            <v-list-tile-content>
+              {{geo.name_translation ? translate(geo) : this.$t('loading')}}
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+        <v-btn
+          absolute
+          color="primary"
+          fab
+          bottom
+          right
+          @click="openGeoSearch()">
+          <v-icon>add</v-icon>
+        </v-btn>
+      </v-card>
+      <!--we need the geo-search-dialog class for geo search to work correctly in the dialog-->
       <v-dialog
+        content-class="geo-search-dialog"
         lazy
         v-model="geoSearchDialog">
-        <v-container fluid>
-          <v-card>
-            <GeoSearch
-              :selectedIds="geoIds"
-              @doneSelecting="onDoneSelecting" />
-          </v-card>
-        </v-container>
+        <GeoSearch
+          is-selectable
+          :selectedGeos="selectedGeos"
+          :should-update-route="false"
+          @doneSelecting="onDoneSelecting" />
       </v-dialog>
     </v-flex>
 </template>
@@ -32,6 +36,7 @@
   import GeoService from '../../../services/geo/GeoService'
   import GeoSearch from '../../geo/GeoSearch'
   import GeoListTile from '../../geo/GeoListTile'
+  import TranslationService from '../../../services/TranslationService'
   import actionBus from '../services/ActionBus'
   export default {
     name: 'geo-question',
@@ -43,6 +48,7 @@
     },
     data: function () {
       return {
+        selectedGeos: [],
         geoSearchDialog: false,
         geoCache: {}
       }
@@ -51,6 +57,13 @@
       this.loadGeos(this.geoIds)
     },
     methods: {
+      translate (geo) {
+        return TranslationService.getAny(geo.name_translation, this.global.locale)
+      },
+      openGeoSearch () {
+        this.selectedGeos = this.geos.map(g => g)
+        this.geoSearchDialog = true
+      },
       loadGeos: function (geoIds, shouldLoadExisting = false) {
         geoIds = Array.from(new Set(geoIds))
         if (!geoIds.length) return
@@ -95,7 +108,22 @@
           }
         })
       },
-      onDoneSelecting: function (added, removed) {
+      onDoneSelecting: function (selectedGeos) {
+        let added = []
+        let removed = []
+        for (let geo of selectedGeos) {
+          let index = this.geoIds.indexOf(geo.id)
+          if (index === -1) {
+            this.geoCache[geo.id] = geo
+            added.push(geo.id)
+          }
+        }
+        for (let id of this.geoIds) {
+          let index = selectedGeos.findIndex(g => g.id === id)
+          if (index === -1) {
+            removed.push(id)
+          }
+        }
         for (let id of added) {
           this.add(id)
         }
@@ -130,7 +158,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

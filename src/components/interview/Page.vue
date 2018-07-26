@@ -38,12 +38,13 @@
             <v-btn @click="onPrevious"
                    :disabled="isFirstPage"
                    justify-left>
-              <v-icon left>chevron_left</v-icon> Previous
+              <v-icon left>chevron_left</v-icon>
+              {{ $t('previous') }}
             </v-btn>
             <v-btn @click="onNext"
                    :disabled="!isNavigationEnabled"
                    justify-right>
-              {{isAtEnd ? 'Finish' : 'Next'}} <v-icon right>chevron_right</v-icon>
+              {{isAtEnd ? $t('finish') : $t('previous')}} <v-icon right>chevron_right</v-icon>
             </v-btn>
           </v-layout>
       </v-flex>
@@ -137,6 +138,8 @@
 
 <style lang="sass">
   $btn-height: 60px
+  .page
+    margin-bottom: 20px
   .page-footer
     background-color: white
     box-shadow: 0 0px 10px rgba(0, 0, 0, .3)

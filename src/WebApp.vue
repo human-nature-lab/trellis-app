@@ -2,76 +2,16 @@
   <v-app light dense class="web" :dark="global.darkTheme">
     <v-navigation-drawer
       v-model="global.menuDrawer.open"
-      fixed
       app>
-      <v-list dense>
-        <v-list-tile class="grey lighten-4">
-          <v-list-tile-content>
-          </v-list-tile-content>
-          <v-list-tile-action @click="global.menuDrawer.open = false" class="text-right">
-            <v-icon>arrow_back</v-icon>
-          </v-list-tile-action>
-        </v-list-tile>
-        <v-divider></v-divider>
-        <v-list-tile :to="{name: 'RespondentsSearch'}">
-          <v-list-tile-action>
-            <v-icon>group</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Respondents</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile :to="{name: 'GeoSearch'}">
-          <v-list-tile-action>
-            <v-icon>place</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Locations</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-      <v-divider></v-divider>
-      <v-list subheader>
-        <v-subheader>Settings</v-subheader>
-        <v-list-tile :to="{name: 'Home', query: {to: $route.fullPath}}">
-          <v-list-tile-action>
-            <v-icon>assignment</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-title>Change study</v-list-tile-title>
-        </v-list-tile>
-        <v-list-tile :to="{name: 'locale', query: {to: $route.fullPath}}">
-          <v-list-tile-action>
-            <v-icon>language</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-title>Change locale</v-list-tile-title>
-        </v-list-tile>
-        <v-list-tile @click="global.darkTheme=!global.darkTheme">
-          <v-list-tile-action>
-            <v-icon>wb_sunny</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>
-              Toggle dark theme
-            </v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-list-tile @click="refresh()">
-          <v-list-tile-action>
-            <v-icon>refresh</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>
-              Refresh app
-            </v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
+      <MainMenu />
     </v-navigation-drawer>
     <v-toolbar fixed app>
       <!-- MainMenu /-->
-      <v-toolbar-side-icon @click.stop="global.menuDrawer.open = !global.menuDrawer.open"></v-toolbar-side-icon>
+      <v-toolbar-side-icon
+        @click.stop="global.menuDrawer.open = !global.menuDrawer.open"
+        v-if="!global.menuDrawer.open"/>
       <v-toolbar-title class="logo">
-        <router-link :to="{name: 'home'}" class="deep-orange--text">
+        <router-link :to="{name: 'Home'}" class="deep-orange--text">
           <img src="../static/img/trellis-logo.png" alt="trellis">
         </router-link>
         <span class="study" v-if="global.study">
@@ -90,7 +30,10 @@
       </v-btn>
     </v-toolbar>
     <v-content>
-      <v-container fluid class="app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
+      <v-container
+        fluid
+        fill-height
+        class="ma-0 pa-0 app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
         <LoadingPage
           v-if="global.loading.active"
           :indeterminate="global.loading.indeterminate"
@@ -117,11 +60,6 @@
       return {
         error: null,
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5']
-      }
-    },
-    methods: {
-      refresh: function () {
-        window.location.reload(true)
       }
     },
     created: function () {

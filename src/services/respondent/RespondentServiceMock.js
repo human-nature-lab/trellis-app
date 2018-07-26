@@ -1,4 +1,5 @@
 import uuid from 'uuid/v4'
+import {now} from '../DateService'
 import MockService from '../mock/MockService'
 const fakeRespondents = [{
   id: uuid(),
@@ -10,18 +11,18 @@ const fakeRespondents = [{
   photos: [{
     id: uuid(),
     file_name: 'fake-file-1.jpg',
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    deleted_at: new Date().getTime()
+    created_at: now(),
+    updated_at: now(),
+    deleted_at: now()
   }, {
     id: uuid(),
     file_name: 'fake-file-11.jpg',
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    deleted_at: new Date().getTime()
+    created_at: now(),
+    updated_at: now(),
+    deleted_at: now()
   }],
-  created_at: new Date().getTime(),
-  updated_at: new Date().getTime(),
+  created_at: now(),
+  updated_at: now(),
   deleted_at: null
 }, {
   id: uuid(),
@@ -33,12 +34,12 @@ const fakeRespondents = [{
   photos: [{
     id: uuid(),
     file_name: 'fake-file-2.jpg',
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    deleted_at: new Date().getTime()
+    created_at: now(),
+    updated_at: now(),
+    deleted_at: now()
   }],
-  created_at: new Date().getTime(),
-  updated_at: new Date().getTime(),
+  created_at: now(),
+  updated_at: now(),
   deleted_at: null
 }, {
   id: uuid(),
@@ -50,12 +51,12 @@ const fakeRespondents = [{
   photos: [{
     id: uuid(),
     file_name: 'fake-file-3.jpg',
-    created_at: new Date().getTime(),
-    updated_at: new Date().getTime(),
-    deleted_at: new Date().getTime()
+    created_at: now(),
+    updated_at: now(),
+    deleted_at: now()
   }],
-  created_at: new Date().getTime(),
-  updated_at: new Date().getTime(),
+  created_at: now(),
+  updated_at: now(),
   deleted_at: null
 }]
 const SERVICE_DELAY = 1000

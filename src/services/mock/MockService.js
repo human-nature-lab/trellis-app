@@ -49,7 +49,7 @@ class MockService {
 
   /**
    * Generate a single choice
-   * @param {Number} i - The index of the choice (used for sort order
+   * @param {Number} i - The router of the choice (used for sort order
    * @returns {{id: v4, val: *, pivot: {sort_order: *}, choice_translation: MockService.translationGenerator}}
    */
   choiceGenerator (i) {

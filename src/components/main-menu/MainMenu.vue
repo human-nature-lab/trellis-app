@@ -1,40 +1,157 @@
 <template>
-  <v-menu offset-y :nudge-top="-15" z-index="1000">
-    <v-btn icon slot="activator">
-      <v-icon>more_vert</v-icon>
-    </v-btn>
-    <v-list>
-      <v-list-tile>
-        <router-link :to="{name: 'RespondentsSearch'}">Respondents</router-link>
+  <v-flex>
+    <v-list dense>
+      <v-list-tile class="grey lighten-4">
+        <v-list-tile-content>
+        </v-list-tile-content>
+        <v-list-tile-action @click="global.menuDrawer.open = false" class="text-right">
+          <v-icon>arrow_back</v-icon>
+        </v-list-tile-action>
       </v-list-tile>
-      <v-list-tile>
-        <router-link :to="{name: 'GeoSearch'}">Locations</router-link>
+      <v-divider></v-divider>
+      <v-list-tile :to="{name: 'RespondentsSearch'}">
+        <v-list-tile-action>
+          <v-icon>group</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{ $t('respondents') }}
+          </v-list-tile-title>
+        </v-list-tile-content>
       </v-list-tile>
-      <v-list-tile>
-        <router-link :to="{name: 'Home', query: {to: $route.fullPath}}">Change study</router-link>
-      </v-list-tile>
-      <v-list-tile>
-        <router-link :to="{name: 'locale', query: {to: $route.fullPath}}">Change locale</router-link>
-      </v-list-tile>
-      <v-list-tile v-if="isInterview">
-        <a @click="emit('showConditionTags')">Condition tags</a>
+      <v-list-tile :to="{name: 'GeoSearch'}">
+        <v-list-tile-action>
+          <v-icon>place</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{ $t('locations') }}
+          </v-list-tile-title>
+        </v-list-tile-content>
       </v-list-tile>
     </v-list>
-  </v-menu>
+    <v-divider></v-divider>
+    <v-list dense subheader>
+      <v-subheader>
+        {{ $t('settings') }}
+      </v-subheader>
+      <v-list-tile :to="{name: 'Home', query: {to: $route.fullPath}}">
+        <v-list-tile-action>
+          <v-icon>assignment</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-title>
+          {{ $t('change_study') }}
+        </v-list-tile-title>
+      </v-list-tile>
+      <v-list-tile :to="{name: 'locale', query: {to: $route.fullPath}}">
+        <v-list-tile-action>
+          <v-icon>language</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-title>
+          {{ $t('change_locale') }}
+        </v-list-tile-title>
+      </v-list-tile>
+      <v-list-tile @click="global.darkTheme=!global.darkTheme">
+        <v-list-tile-action>
+          <v-icon>wb_sunny</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{ $t('toggle_dark') }}
+          </v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
+    </v-list>
+    <v-divider></v-divider>
+    <v-list dense subheader>
+      <v-subheader>
+        {{ $t('general') }}
+      </v-subheader>
+      <v-list-tile @click="copyCurrentLocation">
+        <v-list-tile-action>
+          <v-icon>location_searching</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          {{ $t('copy_url') }}
+        </v-list-tile-content>
+      </v-list-tile>
+      <v-list-tile v-if="isInterview"
+                   @click="emit('showConditionTags')">
+        <v-list-tile-action>
+          <v-icon>local_offer</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{ $t('condition_tags') }}
+          </v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
+      <v-list-tile @click="refresh()">
+        <v-list-tile-action>
+          <v-icon>refresh</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{ $t('refresh') }}
+          </v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
+      <v-list-tile @click="logout">
+        <v-list-tile-action>
+          <v-icon>exit_to_app</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          {{ $t('logout') }}
+        </v-list-tile-content>
+      </v-list-tile>
+    </v-list>
+    <v-snackbar
+      absolute
+      top
+      vertical
+      color="primary"
+      :timeout="5000"
+      v-model="showCopiedSnackbar">
+      {{ $t('copied_url') }}
+      <v-btn
+        flat
+        @click="showCopiedSnackbar = false">
+        {{ $t('close') }}
+      </v-btn>
+    </v-snackbar>
+  </v-flex>
 </template>
 
 <script>
   import menuBus from './MenuBus'
+  import LoginService from '../../services/login/LoginService'
+  import router from '../../router'
 
   export default {
     name: 'dropdown-menu',
+    data: () => ({
+      showCopiedSnackbar: false
+    }),
     methods: {
-      emit: function (eventName, ...args) {
+      refresh () {
+        window.location.reload(true)
+      },
+      emit (eventName, ...args) {
         menuBus.$emit(eventName, ...args)
+      },
+      copyCurrentLocation () {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.showCopiedSnackbar = true
+        })
+      },
+      logout () {
+        LoginService.logout().then(() => {
+          router.push({name: 'Login', query: {to: router.currentRoute.fullPath}})
+        })
       }
     },
     computed: {
-      isInterview: function () {
+      isInterview () {
         return this.$route.name === 'Interview' || this.$route.name === 'InterviewPreview'
       }
     }

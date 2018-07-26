@@ -1,8 +1,15 @@
-import storage from '@/services/storage/StorageService'
-import http, {setToken} from '@/services/http/AxiosInstance'
+import storage from '../storage/StorageService'
+import http, {setToken, removeToken} from '../http/AxiosInstance'
 
 export default class LoginService {
-  static login (username, password, formId) {
+
+  /**
+   * Login to the web app
+   * @param {String} username
+   * @param {String} password
+   * @returns {Promise<Object>}
+   */
+  static login (username, password) {
     return http().post(`login`, {
       username: username,
       pass: password
@@ -15,7 +22,23 @@ export default class LoginService {
       }
     })
   }
+
+  /**
+   * Return a boolean if the user is logged in
+   * @returns {boolean}
+   */
   static isLoggedIn () {
     return storage.get('interview-id', 'string') !== null
+  }
+
+  /**
+   * Logout of the web app
+   * @returns {Promise<null>}
+   */
+  static logout () {
+    return new Promise(resolve => {
+      removeToken()
+      resolve()
+    })
   }
 }

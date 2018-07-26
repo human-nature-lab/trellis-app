@@ -1,9 +1,10 @@
 import axios from 'axios'
 import config from '@/config'
 import storage from '../../services/storage/StorageService'
-import router from '../../router/router'
-import singleton from '../../singleton'
+import router from '../../router'
+import singleton from '../../static/singleton'
 
+const TOKEN_KEY = 'x-token'
 let axiosInstance
 
 /**
@@ -11,12 +12,16 @@ let axiosInstance
  * @param {String} val - The token value
  */
 export function setToken (val) {
-  storage.set('x-token', val)
+  storage.set(TOKEN_KEY, val)
+}
+
+export function removeToken () {
+  storage.delete(TOKEN_KEY)
 }
 
 /**
  * Create the default axios instance. Any authentication for the web app should probably be handled here if possible
- * @returns {Promise<any>}
+ * @returns {Axios}
  */
 export default function defaultInstance () {
   if (!axiosInstance) {
@@ -28,20 +33,20 @@ export default function defaultInstance () {
 
     // Handle authentication using axios [interceptors](https://github.com/axios/axios#interceptors)
     axiosInstance.interceptors.request.use(function (request) {
-      request.headers['X-Token'] = storage.get('x-token')
+      request.headers['X-Token'] = storage.get(TOKEN_KEY)
       return request
     })
     axiosInstance.interceptors.response.use(function (response) {
       return response
     }, function (err) {
       if (err.response && err.response.status === 401) {
-        let current = router.currentRoute.fullPath
+        let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
         singleton.loading.active = false
         if (router.currentRoute.name === 'login') {
           return err.response
         } else {
-          router.push({name: 'Login', query: {to: current}})
-          return Promise.reject(err)
+          router.replace({name: 'Login', query: {to: nextRoute}})
+          return Promise.resolve(err.response)
         }
       }
       return Promise.reject(err)

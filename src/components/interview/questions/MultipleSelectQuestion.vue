@@ -37,7 +37,7 @@
     computed: {
       otherText: function () {
         return this.question.choices.reduce((agg, choice) => {
-          if (choice.parameters && (choice.parameters.other || choice.parameters.other_exclusive)) {
+          if (choice.parameters && choice.parameters.other) {
             let datum = this.question.datum.data.find(datum => datum.choice_id === choice.id)
             if (datum) {
               agg[choice.id] = datum.val
@@ -51,7 +51,6 @@
           agg[choice.id] = this.question.datum.data.findIndex(datum => datum.choice_id === choice.id) > -1
           return agg
         }, {})
-        console.log('selected multiple select', selected)
         return selected
       }
     },
@@ -89,7 +88,7 @@
         })
       },
       showOtherText: function (choice) {
-        return this.selected[choice.id] && choice.parameters && (choice.parameters.other || choice.parameters.other_exclusive)
+        return this.selected[choice.id] && choice.parameters && choice.parameters.other
       }
     },
     components: {

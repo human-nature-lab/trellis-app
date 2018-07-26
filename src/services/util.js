@@ -1,5 +1,5 @@
-import config from '@/config'
-import {APP_ENV, APP_MODE} from '@/constants'
+import config from '../config'
+import {APP_ENV, APP_MODE} from '../static/constants'
 export function switchByModeEnv (args) {
   if (config.appEnv === APP_ENV.CORDOVA) {
     if (config.appMode === APP_MODE.PROD) {

@@ -37,6 +37,9 @@ export default class SkipService {
             }
           }
         }
+        if (!shouldSkip) {
+          return shouldSkip
+        }
       } else {
         if (!skipCondition.any_all) {
           // Hide if any are true
@@ -56,6 +59,9 @@ export default class SkipService {
               break
             }
           }
+        }
+        if (shouldSkip) {
+          return shouldSkip
         }
       }
     }

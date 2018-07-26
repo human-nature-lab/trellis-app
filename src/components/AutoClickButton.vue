@@ -9,13 +9,13 @@
     <v-btn
       flat
       @click="onCancel">
-      Cancel
+      {{ $t('cancel') }}
     </v-btn>
   </v-flex>
 </template>
 
 <script>
-  import { BUTTON_STATUS } from '@/constants'
+  import { BUTTON_STATUS } from '../static/constants'
   export default {
     name: 'auto-click-button',
     data: function () {
@@ -76,6 +76,3 @@
     }
   }
 </script>
-
-<style lang="sass" scoped>
-</style>

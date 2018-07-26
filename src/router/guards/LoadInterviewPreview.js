@@ -1,4 +1,4 @@
-import singleton from '../../singleton'
+import singleton from '../../static/singleton'
 import FormService from '../../services/form/FormService'
 import LocaleService from '../../services/locale/LocaleService'
 

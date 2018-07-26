@@ -1,5 +1,5 @@
-import config from '@/config'
-import { APP_ENV } from '@/constants'
+import config from '../../config'
+import { APP_ENV } from '../../static/constants'
 import DeviceServiceMock from './DeviceServiceMock'
 import DeviceServiceCordova from './DeviceServiceCordova'
 
