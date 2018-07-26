@@ -1,6 +1,7 @@
 import { DeviceService } from '../device/DeviceService'
 import md5 from 'js-md5'
-/* global md5chksum */
+import config from '../../config'
+/* global md5chksum, FileTransfer */
 
 class FileServiceCordova {
 
@@ -130,6 +131,32 @@ class FileServiceCordova {
           })
         })
       resolve()
+    })
+  }
+
+  download (uri, fileEntry) {
+    return new Promise((resolve, reject) => {
+      DeviceService.isDeviceReady()
+      .then(() => {
+        try {
+          const fileTransfer = new FileTransfer()
+          console.log('fileTransfer', fileTransfer)
+          const fileURL = fileEntry.toURL()
+          console.log('fileURL', fileURL)
+          fileTransfer.download(uri, fileURL,
+            (success) => {
+              console.log('fileTRansfer.download success', success)
+              resolve(fileEntry)
+            },
+            (err) => {
+              console.log('fileTransfer.download failed', err)
+              reject(err)
+            },
+            false, { headers: { 'X-Key': config.xKey } })
+        } catch (err) {
+          reject(err)
+        }
+      })
     })
   }
 
