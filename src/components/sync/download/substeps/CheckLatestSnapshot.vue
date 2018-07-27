@@ -8,12 +8,8 @@
         <strong v-if="error" class="red--text">ERROR.</strong>
       </li>
     </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <span v-if="warning">
-      <p>{{ warningMessage }}</p>
-    </span>
+    <error type="warning" :show="warning" :error="warningMessage"></error>
+    <error type="error" :show="error" :error="errorMessage"></error>
     <v-progress-linear
       v-if="checking"
       height="2"
@@ -33,6 +29,7 @@
     import axios from 'axios'
     import config from '@/config'
     import SyncService from '../../services/SyncService'
+    import Error from '../../../Error.vue'
     export default {
       name: 'check-latest-snapshot',
       data () {
@@ -88,6 +85,7 @@
       computed: {
       },
       components: {
+        Error
       }
     }
 </script>
