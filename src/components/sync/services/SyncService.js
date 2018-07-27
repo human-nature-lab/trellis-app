@@ -27,7 +27,6 @@ class SyncService {
         return response.data
       })
       .catch(err => {
-        console.error(err)
         throw err
       })
   }

@@ -5,11 +5,11 @@
         Authenticating device...
         <strong v-if="success" class="green--text">OK.</strong>
         <strong v-if="error" class="red--text">ERROR.</strong>
+        <strong v-if="warning" class="amber--text">WARNING.</strong>
       </li>
     </ul>
-    <span v-if="error" class="red--text">
-      <p>The device was not found on the server, please see an administrator for a resolution.</p>
-    </span>
+    <error type="warning" :show="warning" :error="warningMessage"></error>
+    <error type="error" :show="error" :error="errorMessage"></error>
     <v-progress-linear
       v-if="checking"
       height="2"
@@ -30,15 +30,19 @@
     import config from '@/config'
     import SyncService from '../../services/SyncService'
     import DeviceService from '@/services/device/DeviceService'
+    import Error from '../../../Error.vue'
     export default {
       name: 'authenticate-device',
       data () {
         return {
           success: false,
           error: false,
+          warning: false,
           checking: true,
           apiRoot: config.apiRoot,
-          source: null
+          source: null,
+          errorMessage: '',
+          warningMessage: ''
         }
       },
       created () {
@@ -57,9 +61,16 @@
               this.success = true
               this.checking = false
               this.$emit('authentication-ok')
-            }).catch(() => {
-              this.error = true
+            }).catch((err) => {
               this.checking = false
+              if (err.response && err.response.status === 401) {
+                // Expected result if the device hasn't been added to the server
+                this.warning = true
+                this.warningMessage = 'The device was not found on the server, please see an administrator for a resolution.'
+              } else {
+                this.error = true
+                this.errorMessage = err
+              }
             })
           })
         },
@@ -71,12 +82,16 @@
         },
         retry: function () {
           this.error = false
+          this.errorMessage = ''
+          this.warning = false
+          this.warningMessage = ''
           this.authenticate()
         }
       },
       computed: {
       },
       components: {
+        Error
       }
     }
 </script>
