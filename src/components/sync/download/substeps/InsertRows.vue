@@ -8,9 +8,7 @@
         <strong v-if="warning" class="amber--text">DONE.</strong>
       </li>
     </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
+    <error :show="error" :error="errorMessage"></error>
     <span v-if="warning" class="amber--text">
       <p>{{ warningMessage }}</p>
     </span>
@@ -33,6 +31,7 @@
 <script>
     import config from '@/config'
     import DatabaseService from '@/services/database/DatabaseService'
+    import Error from '../../../Error.vue'
     // Additional cancelled variable not bound to the component
     let cancelled = false
     export default {
@@ -77,7 +76,7 @@
               console.error(err)
               this.working = false
               this.error = true
-              this.errorMessage = err.message
+              this.errorMessage = err
             })
         },
         cancelImport: function () {
@@ -109,6 +108,7 @@
       computed: {
       },
       components: {
+        Error
       }
     }
 </script>

@@ -7,9 +7,7 @@
         <strong v-if="error" class="red--text">ERROR.</strong>
       </li>
     </ul>
-    <span v-if="error" class="red--text">
-      <p>Unable to establish a connection with the server at {{ apiRoot }}</p>
-    </span>
+    <error :show="error" :error="`Unable to establish a connection with the server at ${apiRoot}`"></error>
     <v-progress-linear
       v-if="checking"
       height="2"
@@ -29,6 +27,7 @@
     import axios from 'axios'
     import config from '@/config'
     import SyncService from '../../services/SyncService'
+    import Error from '../../../Error.vue'
     export default {
       name: 'check-connection',
       data () {
@@ -73,6 +72,7 @@
       computed: {
       },
       components: {
+        Error
       }
     }
 </script>
