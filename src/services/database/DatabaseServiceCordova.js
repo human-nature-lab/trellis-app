@@ -7,6 +7,7 @@ import Sync from '@/entities/trellis-config/Sync'
 import SyncMessage from '@/entities/trellis-config/SyncMessage'
 import UpdatedRecords from '@/entities/trellis-config/UpdatedRecords'
 import Photo from '@/entities/trellis/Photo'
+import FileService from '../file/FileService'
 
 const trellisConfigConnection = {
   type: 'cordova',
@@ -67,19 +68,19 @@ export default class DatabaseServiceCordova {
       .then((connection) => connection.dropDatabase())
   }
 
-  executeSnapshot (queryRunner, extractedSnapshot, trackProgress, isCancelled) {
+  async executeSnapshot (queryRunner, file, trackProgress, isCancelled) {
     return new Promise((resolve, reject) => {
-      extractedSnapshot.file((file) => {
-        let decoder = new TextDecoder()
-        let start = 0
-        const CHUNK_SIZE = 1024000
-        let fileSize = file.size
-        let end = Math.min(fileSize, (start + CHUNK_SIZE))
-        let fileReader = new FileReader(file)
-        let inQuotes = false
-        let escaped = false
-        let buffer = ''
-        fileReader.onload = async function (event) {
+      const decoder = new TextDecoder()
+      const fileReader = new FileReader(file)
+      const CHUNK_SIZE = 1024000
+      let start = 0
+      let fileSize = file.size
+      let end = Math.min(fileSize, (start + CHUNK_SIZE))
+      let inQuotes = false
+      let escaped = false
+      let buffer = ''
+      fileReader.onload = async function (event) {
+        try {
           trackProgress({inserted: start, total: fileSize})
           buffer += decoder.decode(event.target.result, {stream: true})
           for (let curChar = 0; curChar < buffer.length; curChar++) {
@@ -118,22 +119,25 @@ export default class DatabaseServiceCordova {
           } else {
             resolve()
           }
+        } catch (err) {
+          reject(err)
         }
-        fileReader.onerror = (error) => { reject(error) }
-        let slice = file.slice(start, end)
-        fileReader.readAsArrayBuffer(slice)
-      })
+      }
+      fileReader.onerror = (error) => { reject(error) }
+      let slice = file.slice(start, end)
+      fileReader.readAsArrayBuffer(slice)
     })
   }
 
   async importDatabase (extractedSnapshot, trackProgress, isCancelled) {
-    let connection = await this.getDatabase()
-    let queryRunner = await connection.createQueryRunner()
+    const connection = await this.getDatabase()
+    const queryRunner = await connection.createQueryRunner()
+    const file = await FileService.fileFromFileEntry(extractedSnapshot)
     await queryRunner.connect()
     await queryRunner.query('PRAGMA foreign_keys = OFF;')
     await queryRunner.startTransaction()
     try {
-      await this.executeSnapshot(queryRunner, extractedSnapshot, trackProgress, isCancelled)
+      await this.executeSnapshot(queryRunner, file, trackProgress, isCancelled)
       if (!isCancelled()) {
         await queryRunner.commitTransaction()
       }

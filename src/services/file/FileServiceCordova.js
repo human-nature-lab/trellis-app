@@ -160,6 +160,18 @@ class FileServiceCordova {
     })
   }
 
+  fileFromFileEntry (fileEntry) {
+    return new Promise((resolve, reject) => {
+      try {
+        fileEntry.file((file) => {
+          resolve(file)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
   calculateMD5HashJS (fileEntry) {
     return new Promise((resolve, reject) => {
       DeviceService.isDeviceReady()
