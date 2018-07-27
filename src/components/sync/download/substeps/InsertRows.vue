@@ -72,12 +72,12 @@
               } else {
                 this.onDone()
               }
-            },
-            (error) => {
-              console.error(error)
+            })
+            .catch((err) => {
+              console.error(err)
               this.working = false
               this.error = true
-              this.errorMessage = error
+              this.errorMessage = err.message
             })
         },
         cancelImport: function () {

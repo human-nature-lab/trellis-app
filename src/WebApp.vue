@@ -90,9 +90,8 @@
   .list--dense
     padding-top: 0
   .logo
-    height: 60%
+    height: 55%
     width: 100%
-    font-size: 28px
     img
       max-width: 100%
       max-height: 100%
