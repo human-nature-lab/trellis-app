@@ -8,10 +8,8 @@
         <strong v-if="warning" class="amber--text">DONE.</strong>
       </li>
     </ul>
-    <error :show="error" :error="errorMessage"></error>
-    <span v-if="warning" class="amber--text">
-      <p>{{ warningMessage }}</p>
-    </span>
+    <trellis-alert :show="error" :message="errorMessage"></trellis-alert>
+    <trellis-alert :show="warning" :message="warningMessage"></trellis-alert>
     <v-progress-linear
       v-show="working"
       height="2"
@@ -31,7 +29,7 @@
 <script>
     import config from '@/config'
     import DatabaseService from '@/services/database/DatabaseService'
-    import Error from '../../../Error.vue'
+    import TrellisAlert from '../../../TrellisAlert.vue'
     // Additional cancelled variable not bound to the component
     let cancelled = false
     export default {
@@ -108,7 +106,7 @@
       computed: {
       },
       components: {
-        Error
+        TrellisAlert
       }
     }
 </script>

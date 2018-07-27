@@ -8,8 +8,8 @@
         <strong v-if="warning" class="amber--text">WARNING.</strong>
       </li>
     </ul>
-    <error type="warning" :show="warning" :error="warningMessage"></error>
-    <error type="error" :show="error" :error="errorMessage"></error>
+    <trellis-alert type="warning" :show="warning" :message="warningMessage"></trellis-alert>
+    <trellis-alert type="error" :show="error" :message="errorMessage"></trellis-alert>
     <v-progress-linear
       v-if="checking"
       height="2"
@@ -30,7 +30,7 @@
     import config from '@/config'
     import SyncService from '../../services/SyncService'
     import DeviceService from '@/services/device/DeviceService'
-    import Error from '../../../Error.vue'
+    import TrellisAlert from '../../../TrellisAlert.vue'
     export default {
       name: 'authenticate-device',
       data () {
@@ -91,7 +91,7 @@
       computed: {
       },
       components: {
-        Error
+        TrellisAlert
       }
     }
 </script>

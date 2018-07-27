@@ -20,38 +20,11 @@
         <strong v-if="error" class="red--text">ERROR.</strong>
       </li>
     </ul>
-    <ul v-if="result === RESULTS.NO_DOWNLOAD">
-      <li>No previous download found.</li>
-    </ul>
-    <ul v-if="result === RESULTS.DOWNLOAD_OLDER">
-      <li>
-        The last download on {{ localDownloadCreatedAt }} is older than the latest server snapshot.
-      </li>
-    </ul>
-    <ul v-if="result < 3">
-      <li>
-        Download of the snapshot created at {{ serverSnapshotCreatedAt }} will begin automatically.
-      </li>
-    </ul>
-    <ul v-if="result === RESULTS.DOWNLOAD_SAME_UPLOAD_OLDER">
-      <li>
-        You have already downloaded the snapshot created at {{ serverSnapshotCreatedAt }}, no download is
-        necessary.
-      </li>
-    </ul>
-    <ul v-if="result === RESULTS.DOWNLOAD_OLDER_UPLOAD_NEWER || result === RESULTS.DOWNLOAD_SAME_UPLOAD_NEWER">
-      <li>
-        You uploaded data at {{ localUploadCreatedAt }} that the server has not processed yet (the last
-        snapshot was generated at {{ serverSnapshotCreatedAt }}). The server is currently generating a new
-        snapshot. Please try again in a few minutes.
-      </li>
-    </ul>
-    <ul v-if="result === RESULTS.DOWNLOAD_NEWER">
-      <li>
-        The snapshot on the server, created at {{ serverSnapshotCreatedAt }}, is older than the last
-        snapshot you downloaded ({{ localDownloadCreatedAt }}). This is unexpected, proceed with caution.
-      </li>
-    </ul>
+    <trellis-alert :show="success || error || warning" :type="getType()">
+      <ul>
+        <li v-for="message in getMessages()">{{ message }}</li>
+      </ul>
+    </trellis-alert>
     <span v-if="error" class="red--text">
       <p>{{ errorMessage }}</p>
     </span>
@@ -69,6 +42,7 @@
 <script>
     import DatabaseService from '../../../../services/database/DatabaseService'
     import {COMPARE_SNAPSHOTS_RESULTS as RESULTS} from '../../../../static/constants'
+    import TrellisAlert from '../../../TrellisAlert.vue'
     export default {
       name: 'compare-snapshots',
       data () {
@@ -77,6 +51,7 @@
           success: false,
           error: false,
           warning: false,
+          info: false,
           checking: false,
           source: null,
           errorMessage: '',
@@ -155,6 +130,37 @@
             this.error = true
             this.errorMessage = error
           })
+        },
+        getMessages: function () {
+          let messages = []
+          if (this.result === RESULTS.NO_DOWNLOAD) {
+            messages.push('No previous download found.')
+          }
+          if (this.result === RESULTS.DOWNLOAD_OLDER) {
+            messages.push(`The last download on ${this.localDownloadCreatedAt} is older than the latest server snapshot.`)
+          }
+          if (this.result < 3) {
+            messages.push(`Download of the snapshot created at ${this.serverSnapshotCreatedAt} will begin automatically.`)
+          }
+          if (this.result === RESULTS.DOWNLOAD_SAME_UPLOAD_OLDER) {
+            messages.push(`You have already downloaded the snapshot created at ${this.serverSnapshotCreatedAt}, no download is necessary.`)
+          }
+          if (this.result === RESULTS.DOWNLOAD_SAME_UPLOAD_NEWER || this.result === RESULTS.DOWNLOAD_SAME_UPLOAD_NEWER) {
+            messages.push(`You uploaded data at ${this.localUploadCreatedAt} that the server has not processed yet (the last snapshot was generated at ${this.serverSnapshotCreatedAt}). The server is currently generating a new snapshot. Please try again in a few minutes.`)
+          }
+          if (this.result === RESULTS.DOWNLOAD_NEWER) {
+            messages.push(`The snapshot on the server, created at ${this.serverSnapshotCreatedAt}, is older than the last snapshot you downloaded (${this.localDownloadCreatedAt}). This is unexpected, proceed with caution.`)
+          }
+          return messages
+        },
+        getType: function () {
+          if (this.error) {
+            return 'error'
+          } else if (this.warning) {
+            return 'warning'
+          } else {
+            return 'info'
+          }
         }
       },
       computed: {
@@ -178,6 +184,7 @@
         }
       },
       components: {
+        TrellisAlert
       }
     }
 </script>
