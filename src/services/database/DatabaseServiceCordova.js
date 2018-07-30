@@ -142,6 +142,7 @@ export default class DatabaseServiceCordova {
         await queryRunner.commitTransaction()
       }
     } catch (err) {
+      console.log('in catch block')
       await queryRunner.rollbackTransaction()
       throw err
     } finally {

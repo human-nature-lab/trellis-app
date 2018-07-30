@@ -17,7 +17,6 @@
     <v-progress-linear
       v-if="downloading"
       height="2"
-      :indeterminate="progressIndeterminate"
       v-model="downloadProgress">
     </v-progress-linear>
     <v-btn
@@ -79,7 +78,7 @@
           FileService.requestFileSystem()
             .then((fileSystem) => FileService.getDirectoryEntry(fileSystem, 'snapshots'))
             .then((directoryEntry) => FileService.getFileEntry(directoryEntry, fileName))
-            .then((fileEntry) => FileService.download(uri, fileEntry))
+            .then((fileEntry) => FileService.download(uri, fileEntry, this.onDownloadProgress))
             .then((fileEntry) => {
               console.log('FileService.download -> fileEntry', fileEntry)
               this.success = true
@@ -118,17 +117,10 @@
           */
         },
         onDownloadProgress: function (progressEvent) {
-          if (this.lastDownloadProgress !== progressEvent.loaded) {
-            this.lastProgressEvent = Date.now()
-          }
-          this.lastDownloadProgress = progressEvent.loaded
-          if (progressEvent.lengthComputable) {
-            this.downloadProgress = (progressEvent.loaded / progressEvent.total) * 100
-            if (this.downloadProgress > 0) {
-              this.progressIndeterminate = false
-            }
-          } else {
-            this.progressIndeterminate = true
+          let curProgress = (progressEvent.loaded / progressEvent.total) * 100
+          // Only update at 5% increments, without this the progress bar does not update
+          if ((curProgress - this.downloadProgress) > 5) {
+            this.downloadProgress = curProgress
           }
         },
         stopDownload: function () {
