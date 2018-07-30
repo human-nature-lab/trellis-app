@@ -22,8 +22,8 @@
 </template>
 
 <script>
-    import FileService from '@/services/file/FileService'
-    import PhotoService from '@/services/photo/PhotoService'
+    import FileService from '../../../../services/file/FileService'
+    import PhotoService from '../../../../services/photo/PhotoService'
     export default {
       name: 'generate-image-list',
       data () {

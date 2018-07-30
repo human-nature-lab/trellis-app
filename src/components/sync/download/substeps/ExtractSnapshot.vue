@@ -28,9 +28,8 @@
 </template>
 
 <script>
-    import config from '@/config'
-    import ZipService from '@/services/zip/ZipService'
-    // import FileService from '@/services/file/FileService'
+    import config from '../../../../config'
+    import ZipService from '../../../../services/zip/ZipService'
     export default {
       name: 'download-snapshot',
       data () {

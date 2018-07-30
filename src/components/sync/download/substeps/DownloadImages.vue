@@ -32,8 +32,8 @@
 </template>
 
 <script>
-    import FileService from '@/services/file/FileService'
-    import SyncService from '../../services/SyncService'
+    import FileService from '../../../../services/file/FileService'
+    import SyncService from '../../../../services/sync/SyncService'
     import axios from 'axios'
     export default {
       name: 'download-images',

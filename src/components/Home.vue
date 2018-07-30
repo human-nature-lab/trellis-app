@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import SyncService from './sync/services/SyncService'
+  import SyncService from '../services/sync/SyncService'
   import Sync from './sync/Sync.vue'
   import Login from './login/Login.vue'
   export default {

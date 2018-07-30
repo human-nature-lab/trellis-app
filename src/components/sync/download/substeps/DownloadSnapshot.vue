@@ -33,9 +33,8 @@
 
 <script>
     import axios from 'axios'
-    import config from '@/config'
-    // import SyncService from '../../services/SyncService'
-    import FileService from '@/services/file/FileService'
+    import config from '../../../../config'
+    import FileService from '../../../../services/file/FileService'
     export default {
       name: 'download-snapshot',
       data () {

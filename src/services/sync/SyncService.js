@@ -1,7 +1,6 @@
-import { DeviceService } from '@/services/device/DeviceService'
-import { syncInstance as http } from '../../../services/http/AxiosInstance'
+import { DeviceService } from '../device/DeviceService'
+import { syncInstance as http } from '../http/AxiosInstance'
 
-'@/services/http/AxiosInstance'
 class SyncService {
   constructor () {
     this.synced = false
