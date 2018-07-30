@@ -134,18 +134,19 @@ class FileServiceCordova {
     })
   }
 
-  download (uri, fileEntry) {
+  download (uri, fileEntry, onDownloadProgress) {
     return new Promise((resolve, reject) => {
       DeviceService.isDeviceReady()
       .then(() => {
         try {
           const fileTransfer = new FileTransfer()
+          fileTransfer.onprogress = onDownloadProgress
           console.log('fileTransfer', fileTransfer)
           const fileURL = fileEntry.toURL()
           console.log('fileURL', fileURL)
           fileTransfer.download(uri, fileURL,
             (success) => {
-              console.log('fileTRansfer.download success', success)
+              console.log('fileTransfer.download success', success)
               resolve(fileEntry)
             },
             (err) => {
