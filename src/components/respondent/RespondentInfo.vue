@@ -35,7 +35,10 @@
             :photo="photo"/>
         </v-layout>
       </v-container>
-      <RespondentGeos :respondent="respondent" />
+      <RespondentGeos
+        :use-census-form="true"
+        :study-id="global.study.id"
+        :respondent="respondent" />
       <v-toolbar flat>
         <v-toolbar-title>
           {{ $t('condition_tags') }}

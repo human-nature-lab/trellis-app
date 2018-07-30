@@ -41,29 +41,4 @@ export default class FormServiceWeb {
       })
   }
 
-  /**
-   * Get the census form of the specified study if there is one
-   * @param studyId
-   * @param censusTypeId
-   * @returns {*}
-   */
-  static getCensusForm (studyId, censusTypeId) {
-    return http().get(`study/${studyId}/form/census`, {
-      params: {
-        census_type: censusTypeId
-      }
-    }).then(res => res.data.form)
-  }
-
-  /**
-   * Check if the study has a census form for the given type
-   * @param studyId
-   * @param censusTypeId
-   * @returns {*}
-   */
-  static hasCensusForm (studyId, censusTypeId) {
-    return FormServiceWeb.getCensusForm(studyId, censusTypeId)
-      .then(form => form ? true : false) // eslint-disable-line
-  }
-
 }

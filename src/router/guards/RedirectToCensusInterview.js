@@ -1,10 +1,10 @@
 import SurveyService from '../../services/survey/SurveyService'
 import InterviewService from '../../services/interview/InterviewService'
-import FormService from '../../services/form/FormService'
+import CensusService from '../../services/census'
 
 export default function (to, from, next) {
   let form
-  FormService.getCensusForm(to.params.studyId, to.params.censusTypeId)
+  CensusService.getCensusForm(to.params.studyId, to.params.censusTypeId)
     .then(f => {
       form = f
       return SurveyService.getSurvey(to.params.studyId, to.query.respondentId, f.id)

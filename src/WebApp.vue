@@ -19,15 +19,25 @@
         </span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn class="subheading" flat :to="{name: 'locale', query: {to: $route.fullPath}}">
-        {{global.locale ? global.locale.language_tag : ''}}
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="global.searchDrawer.open = !global.searchDrawer.open"
-        v-if="global.searchDrawer.component !== null">
-        <v-icon>search</v-icon>
-      </v-btn>
+      <v-tooltip left>
+        <v-btn class="subheading"
+               slot="activator"
+               flat
+               :to="{name: 'locale', query: {to: $route.fullPath}}">
+          {{global.locale ? global.locale.language_tag : ''}}
+        </v-btn>
+        <span>{{$t('change_locale')}}</span>
+      </v-tooltip>
+      <v-tooltip left>
+        <v-btn
+          slot="activator"
+          icon
+          @click.stop="global.searchDrawer.open = !global.searchDrawer.open"
+          v-if="global.searchDrawer.component !== null">
+          <v-icon>search</v-icon>
+        </v-btn>
+        <span>{{$t('search')}}</span>
+      </v-tooltip>
     </v-toolbar>
     <v-content>
       <v-container

@@ -40,7 +40,7 @@
         <v-list v-if="results.length">
           <GeoListTile
             v-for="geo in results"
-            :isSelectable="isSelectable"
+            :isSelectable="geoIsSelectable(geo)"
             :selected="isGeoSelected(geo)"
             @click="onGeoClick(geo)"
             @geo-select="onGeoSelect(geo)"
@@ -108,7 +108,6 @@
         default: true
       },
       isSelectable: {
-        type: Boolean,
         default: false
       },
       shouldUpdateRoute: {
@@ -156,6 +155,9 @@
       }
     },
     methods: {
+      geoIsSelectable (geo) {
+        return typeof this.isSelectable === 'boolean' ? this.isSelectable : this.isSelectable(geo)
+      },
       translate (geo) {
         if (!geo || !geo.name_translation) return 'No translation'
         return TranslationService.getAny(geo.name_translation, this.global.locale)
@@ -216,7 +218,7 @@
         }
       },
       onGeoSelect: function (geo) {
-        if (this.isSelectable) {
+        if (this.geoIsSelectable(geo)) {
           this.selectGeo(geo)
         }
       },

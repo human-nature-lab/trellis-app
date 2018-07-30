@@ -59,12 +59,22 @@
       </template>
     </v-data-table>
     <v-dialog
+      :value="showProgressDialog"
+      lazy>
+      <v-card>
+        <v-container fluid>
+          <h4>{{progressMessage}}</h4>
+          <v-progress-linear indeterminate />
+        </v-container>
+      </v-card>
+    </v-dialog>
+    <v-dialog
       content-class="geo-search-dialog"
       lazy
       v-model="geoSearchModal">
       <GeoSearch
         :limit="1"
-        is-selectable
+        :is-selectable="geoIsSelectable"
         :should-update-route="false"
         @doneSelecting="geoSelected" />
     </v-dialog>
@@ -77,17 +87,28 @@
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
   import GeoSearch from '../geo/GeoSearch'
   import Permission from '../Permission'
+  import CensusFormService from '../../services/census'
+  import CensusTypes from '../../static/census.types'
   export default {
     components: {GeoBreadcrumbs, GeoSearch, Permission},
     name: 'respondent-geos',
     props: {
+      studyId: {
+        type: String
+      },
       respondent: {
         type: Object,
         required: true
+      },
+      useCensusForm: {
+        type: Boolean,
+        default: false
       }
     },
     data: () => ({
       isAddingGeo: false,
+      showProgressDialog: false,
+      progressMessage: '',
       geoSearchModal: false,
       movingRespondentGeo: null,
       error: null,
@@ -103,9 +124,36 @@
       }]
     }),
     methods: {
+      geoIsSelectable (geo) {
+        // Take advantage of JavaScript type coercion here
+        return geo.geo_type.can_contain_respondent == 1 // eslint-disable-line
+      },
       startMove (respondentGeo) {
-        this.movingRespondentGeo = respondentGeo
-        this.geoSearchModal = true
+        let p
+        if (this.useCensusForm) {
+          this.showProgressDialog = true
+          this.progressMessage = 'Checking if move respondent census form exists...'
+          p = CensusFormService.hasCensusForm(this.studyId, CensusTypes.move_respondent)
+        } else {
+          p = new Promise(resolve => {
+            setTimeout(() => {
+              resolve(true)
+            }, 500)
+          })
+        }
+        return p.then(hasMoveRespondentCensus => {
+          if (hasMoveRespondentCensus) {
+            this.progressMessage = 'Redirecting to move respondent census form...'
+            setTimeout(() => {
+              CensusFormService.redirectToCensusForm(this.studyId, CensusTypes.move_respondent, this.respondent.id)
+            }, 1000)
+          } else {
+            this.movingRespondentGeo = respondentGeo
+            this.geoSearchModal = true
+          }
+        }).finally(() => {
+          this.showProgressDialog = false
+        })
       },
       moveGeo (respondentGeo, geo) {
         return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.pivot.id, geo.id).then(resGeo => {
