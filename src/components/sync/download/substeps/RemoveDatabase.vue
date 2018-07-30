@@ -23,8 +23,8 @@
 </template>
 
 <script>
-    import config from '@/config'
-    import DatabaseService from '@/services/database/DatabaseService'
+    import config from '../../../../config'
+    import DatabaseService from '../../../../services/database/DatabaseService'
     export default {
       name: 'remove-database',
       data () {

@@ -27,8 +27,8 @@
 </template>
 
 <script>
-    import config from '@/config'
-    import DatabaseService from '@/services/database/DatabaseService'
+    import config from '../../../../config'
+    import DatabaseService from '../../../../services/database/DatabaseService'
     import TrellisAlert from '../../../TrellisAlert.vue'
     // Additional cancelled variable not bound to the component
     let cancelled = false

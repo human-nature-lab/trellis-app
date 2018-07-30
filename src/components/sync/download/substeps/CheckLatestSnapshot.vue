@@ -27,8 +27,8 @@
 
 <script>
     import axios from 'axios'
-    import config from '@/config'
-    import SyncService from '../../services/SyncService'
+    import config from '../../../../config'
+    import SyncService from '../../../../services/sync/SyncService'
     import TrellisAlert from '../../../TrellisAlert.vue'
     export default {
       name: 'check-latest-snapshot',

@@ -31,8 +31,8 @@
 </template>
 
 <script>
-    import config from '@/config'
-    import FileService from '@/services/file/FileService'
+    import config from '../../../../config'
+    import FileService from '../../../../services/file/FileService'
     export default {
       name: 'verify-download',
       data () {

@@ -28,8 +28,8 @@
 <script>
     import axios from 'axios'
     import config from '@/config'
-    import SyncService from '../../services/SyncService'
-    import DeviceService from '@/services/device/DeviceService'
+    import SyncService from '../../../../services/sync/SyncService'
+    import DeviceService from '../../../../services/device/DeviceService'
     import TrellisAlert from '../../../TrellisAlert.vue'
     export default {
       name: 'authenticate-device',
