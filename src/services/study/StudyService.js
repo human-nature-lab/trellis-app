@@ -1,6 +1,6 @@
 import {switchByModeEnv} from '../util'
 import StudyServiceWeb from './StudyServiceWeb'
-import StudyServiceCordova from './StudyServiceCordova'
+// import StudyServiceCordova from './StudyServiceCordova'
 import StudyServiceMock from './StudyServiceMock'
 
 let Constructor = switchByModeEnv({
@@ -9,7 +9,7 @@ let Constructor = switchByModeEnv({
     TEST: StudyServiceMock
   },
   CORDOVA: {
-    PROD: StudyServiceCordova,
+    PROD: StudyServiceMock,
     TEST: StudyServiceMock
   }
 })

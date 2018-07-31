@@ -1,12 +1,11 @@
 import { DeviceService } from '@/services/device/DeviceService'
 import 'reflect-metadata'
 import { createConnection, getConnection } from 'typeorm'
-import Config from '@/entities/trellis-config/Config'
-import Message from '@/entities/trellis-config/Message'
-import Sync from '@/entities/trellis-config/Sync'
-import SyncMessage from '@/entities/trellis-config/SyncMessage'
-import UpdatedRecords from '@/entities/trellis-config/UpdatedRecords'
-import Photo from '@/entities/trellis/Photo'
+import Config from '../../entities/trellis-config/Config'
+import Log from '../../entities/trellis-config/Log'
+import Sync from '../../entities/trellis-config/Sync'
+import UpdatedRecords from '../../entities/trellis-config/UpdatedRecords'
+import Photo from '../../entities/trellis/Photo'
 import FileService from '../file/FileService'
 
 const trellisConfigConnection = {
@@ -16,9 +15,8 @@ const trellisConfigConnection = {
   location: 'default',
   entities: [
     Config,
-    Message,
+    Log,
     Sync,
-    SyncMessage,
     UpdatedRecords
   ],
   logging: true,

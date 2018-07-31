@@ -21,7 +21,7 @@
                 v-on:cancel-clicked="onCancel">
                 <check-connection
                   v-if="downloadSubStep > 0"
-                  v-on:connection-ok="downloadSubStep = 2"></check-connection>
+                  v-on:connection-ok="downloadSubStep = 1"></check-connection>
                 <authenticate-device
                   v-if="downloadSubStep > 1"
                   v-on:authentication-ok="downloadSubStep = 3"></authenticate-device>
