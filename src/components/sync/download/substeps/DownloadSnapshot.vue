@@ -90,31 +90,6 @@
               this.error = true
               this.downloading = false
             })
-          /*
-          SyncService.downloadSnapshot(this.source, this.onDownloadProgress, this.snapshotId).then((response) => {
-            console.log('downloadSnapshot, response', response)
-            let fileName = this.snapshotId + '.sql.zip'
-            let snapshot = response.data
-            let fileSize = Number(response.headers['content-length'])
-            console.log('fileSize', fileSize)
-            FileService.writeFile('snapshots', snapshot, fileName, fileSize)
-              .then(
-                (fileEntry) => {
-                  this.success = true
-                  this.$emit('download-snapshot-done', fileEntry)
-                  this.downloading = false
-                },
-                (error) => {
-                  this.errorMessage = error.message
-                  this.error = true
-                  this.downloading = false
-                })
-          }).catch((error) => {
-            this.errorMessage = error.message
-            this.error = true
-            this.downloading = false
-          })
-          */
         },
         onDownloadProgress: function (progressEvent) {
           let curProgress = (progressEvent.loaded / progressEvent.total) * 100

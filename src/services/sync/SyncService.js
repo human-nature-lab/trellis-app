@@ -9,7 +9,7 @@ class SyncService {
   getHeartbeat (source) {
     let options = {}
     if (source) { options.cancelToken = source.token }
-    return http.get(`heartbeat`, options)
+    return http.get(`heartbeatx`, options)
       .then(response => {
         return response.data
       })

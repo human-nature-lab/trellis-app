@@ -1,16 +1,16 @@
 <template>
   <v-alert
     :value="show"
-    :type="type"
+    :type="getType()"
     @click="toggleShow"
     outline>
     <v-layout row wrap>
-      <v-flex :xs11="isMore()">
+      <v-flex :xs11="isMore">
         {{ getMessage() }}
         <slot></slot>
       </v-flex>
       <v-flex xs1>
-        <v-icon v-if="isMore()">{{ (showMore) ? 'expand_less' : 'expand_more' }}</v-icon>
+        <v-icon v-if="isMore">{{ (showMore) ? 'expand_less' : 'expand_more' }}</v-icon>
       </v-flex>
     </v-layout>
     <v-layout row wrap v-if="showMore">
@@ -20,7 +20,7 @@
             ref="textarea"
             readonly
             rows="10"
-            @click.stop="selectAll">{{ messageObject() }}</textarea>
+            @click.stop="selectAll">{{ getFullMessage() }}</textarea>
         </div>
       </v-flex>
     </v-layout>
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+  import Log from '../entities/trellis-config/Log'
   /**
    * A component for displaying info/errors/warnings in a friendly format with the
    * ability to view the full error and perhaps copy or share the error message
@@ -36,52 +37,62 @@
     name: 'trellis-alert',
     data () {
       return {
+        isMore: false,
         showMore: false
       }
     },
     props: {
-      message: {
-        required: false,
-        type: [Object, String, Error]
+      currentLog: {
+        required: true,
+        validator: (value) => { return (value === undefined || value instanceof Log) }
       },
       show: {
         required: false,
         'default': true,
         type: Boolean
-      },
-      type: {
-        required: false,
-        'default': 'error',
-        type: String
+      }
+    },
+    created () {
+      if (this.currentLog instanceof Log && this.currentLog.fullMessage !== null) {
+        this.isMore = true
       }
     },
     methods: {
       getMessage: function () {
-        if (!this.message) {
-          return ''
+        if (this.currentLog instanceof Log) {
+          return this.currentLog.message
         }
-        if ((this.message instanceof Object || this.message instanceof Error) &&
-          (this.message.hasOwnProperty('message') || this.message.hasOwnProperty('msg'))) {
-          return (this.message.hasOwnProperty('message')) ? this.message.message : this.message.msg
-        }
-        if (typeof this.message === 'string' || this.message instanceof String) {
-          return this.message
-        }
+        return ''
       },
-      messageObject: function () {
-        if (this.message instanceof Object || this.message instanceof Error) return this.message
-        return {}
+      getFullMessage: function () {
+        if (this.currentLog instanceof Log) {
+          return this.currentLog.fullMessage
+        }
+        return ''
+      },
+      getSeverity: function () {
+        if (this.currentLog instanceof Log) {
+          return this.currentLog.severity
+        }
+        return ''
       },
       toggleShow: function () {
-        if (this.isMore()) {
+        if (this.isMore) {
           this.showMore = !this.showMore
         }
       },
-      isMore: function () {
-        return (Object.keys(this.messageObject()).length > 0)
-      },
       selectAll: function (event) {
         this.$refs.textarea.select()
+      },
+      getType: function () {
+        const curSeverity = this.getSeverity()
+        if (curSeverity === 'error') {
+          return 'error'
+        }
+        if (curSeverity === 'warn') {
+          return 'warning'
+        }
+        return 'info'
       }
     },
     computed: {

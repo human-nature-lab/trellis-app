@@ -1,26 +1,7 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Establishing connection with the server...
-        <strong v-if="success" class="green--text">OK.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <trellis-alert :show="error" :message="`Unable to establish a connection with the server at ${apiRoot}`"></trellis-alert>
-    <v-progress-linear
-      v-if="checking"
-      height="2"
-      :indeterminate="true"></v-progress-linear>
-    <v-btn
-      v-if="!success && !checking"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="checking"
-      flat
-      @click.native="stopChecking">Stop</v-btn>
-  </div>
+  <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :cancel="stopChecking" :retry="retry">
+    Establishing connection with the server...
+  </sync-sub-step>
 </template>
 
 <script>
@@ -28,10 +9,13 @@
     import config from '../../../../config'
     import SyncService from '../../../../services/sync/SyncService'
     import TrellisAlert from '../../../TrellisAlert.vue'
+    import LoggingService from '../../../../services/logging/LoggingService'
+    import SyncSubStep from '../../SyncSubStep.vue'
     export default {
       name: 'check-connection',
       data () {
         return {
+          currentLog: undefined,
           success: false,
           error: false,
           checking: false,
@@ -54,6 +38,10 @@
             this.checking = false
             this.$emit('connection-ok')
           }).catch(() => {
+            LoggingService.log({
+              severity: 'warn',
+              message: `Unable to establish a connection with the server at ${this.apiRoot}`
+            }).then((result) => { this.currentLog = result })
             this.error = true
             this.checking = false
           })
@@ -62,6 +50,10 @@
           if (this.source) {
             this.source.cancel('Operation cancelled by the user.')
           }
+          this.currentLog = LoggingService.log({
+            severity: 'warn',
+            message: 'Operation cancelled by the user.'
+          })
           this.checking = false
         },
         retry: function () {
@@ -72,7 +64,8 @@
       computed: {
       },
       components: {
-        TrellisAlert
+        TrellisAlert,
+        SyncSubStep
       }
     }
 </script>

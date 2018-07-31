@@ -1,5 +1,6 @@
 import MockService from '../mock/MockService'
 import storage from '@/services/storage/StorageService'
+import singleton from '../../static/singleton'
 export default class StudyServiceMock {
   static getCurrentStudy () {
     return MockService.randomlyFail(resolve => {
@@ -24,6 +25,14 @@ export default class StudyServiceMock {
         msg: 'ok'
       })
     }, StudyServiceMock.DELAY, StudyServiceMock.FAILURE_RATE)
+  }
+  /**
+   * Apply the existing version of the study to the global Vue data store
+   */
+  static setExistingStudy () {
+    if (storage.get('current-study')) {
+      singleton.study = storage.get('current-study')
+    }
   }
 }
 
