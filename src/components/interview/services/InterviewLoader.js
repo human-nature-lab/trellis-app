@@ -11,12 +11,12 @@ export default class InterviewLoader {
    * @param {Function} progressCb - A function that is called each time progress is made
    * @returns {Promise<Object>}
    */
-  static load (route, progressCb) {
+  static load (route) {
     let p = []
     if (route.name === 'Interview') {
-      p.push(InterviewLoader.loadInterview(route.params.interviewId, progressCb))
+      p.push(InterviewLoader.loadInterview(route.params.interviewId))
     } else {
-      p.push(InterviewLoader.loadPreview(route.params.formId, progressCb))
+      p.push(InterviewLoader.loadPreview(route.params.formId))
     }
     p.push(InterviewLoader.loadLocale(route))
     return Promise.all(p).then(all => {
@@ -56,9 +56,8 @@ export default class InterviewLoader {
    * @param {Function} progressCb - Called when a single step of progress is made
    * @returns {Promise<Object>}
    */
-  static loadPreview (formId, progressCb) {
+  static loadPreview (formId) {
     return FormService.getForm(formId).then(form => {
-      progressCb(1)
       return {
         form
       }
@@ -71,34 +70,22 @@ export default class InterviewLoader {
    * @param {Function} progressCb - Callback for progress updates
    * @returns {{data: <Array>}}
    */
-  static loadInterview (interviewId, progressCb) {
+  static loadInterview (interviewId) {
     let results = {}
-    let steps = 5
-    let currentStep = 0
     return InterviewService.getInterview(interviewId).then(interview => {
       results.interview = interview
-      currentStep++
-      progressCb(currentStep / steps)
       return Promise.all([
         InterviewActionsService.getActions(interviewId).then(actions => {
           results.actions = actions
-          currentStep++
-          progressCb(currentStep / steps)
         }).catch(() => {}),
         InterviewService.getData(interviewId).then(data => {
           results.data = data
-          currentStep++
-          progressCb(currentStep / steps)
         }).catch(() => {}),
         FormService.getForm(interview.survey.form_id).then(form => {
           results.form = form
-          currentStep++
-          progressCb(currentStep / steps)
         }),
         RespondentService.getRespondentFillsById(interview.survey.respondent_id).then(fills => {
           results.respondentFills = fills
-          currentStep++
-          progressCb(currentStep / steps)
         }).catch(() => {})
       ]).then(() => {
         return results

@@ -2,6 +2,7 @@
   <v-flex class="respondent-geo-question">
     <RespondentGeos
       :respondent="respondent"
+      :study-id="global.study.id"
       @after-add="afterAdd"
       @after-move="afterMove"
       @after-remove="afterRemove" />

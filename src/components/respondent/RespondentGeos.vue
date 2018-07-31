@@ -137,7 +137,7 @@
         } else {
           p = new Promise(resolve => {
             setTimeout(() => {
-              resolve(true)
+              resolve(false)
             }, 500)
           })
         }

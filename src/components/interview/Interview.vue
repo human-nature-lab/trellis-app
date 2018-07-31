@@ -104,42 +104,23 @@
 </template>
 
 <script>
+  import RoutePreloadMixin from '../../mixins/RoutePreloadMixin'
   import Page from './Page'
   import ConditionTagList from './ConditionTagList'
   import menuBus from '../main-menu/MenuBus'
 
   import {sharedInterview, clearSharedInterview} from './classes/Interview'
-
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/ActionBus'
+
   import {validateParametersWithError} from './services/ValidatorService'
-
   import router, {moveToNextOr} from '../../router'
-  import singleton from '../../static/singleton'
   import InterviewLoader from './services/InterviewLoader'
-
-  let interviewData = {}
-
-  function interviewGuards (to, from, next) {
-    let messages = ['Loading form structure', 'Loading all interview data']
-    singleton.loading.active = true
-    singleton.loading.message = messages[0]
-    singleton.loading.step = 0
-    singleton.loading.steps = 6
-    InterviewLoader.load(to, function (progress) {
-      singleton.loading.message = messages[1]
-      singleton.loading.step++
-    }).catch(err => {
-      console.error(err)
-    }).then(results => {
-      interviewData = results
-      singleton.loading.active = false
-    }).then(next)
-  }
 
   let interviewState
   export default {
     name: 'interview',
+    mixins: [RoutePreloadMixin(InterviewLoader.load)],
     head: {
       title: function () {
         let d = {}
@@ -181,7 +162,6 @@
       }
     },
     created () {
-      this.loadInterview()
       actionBus.$on('action', this.actionHandler)
       menuBus.$on('showConditionTags', this.showConditionTags)
       window.onbeforeunload = this.prematureExit
@@ -190,55 +170,26 @@
       window.onbeforeunload = null
       menuBus.$off('showConditionTags', this.showConditionTags)
       actionBus.$off('action', this.actionHandler)
-      interviewState.destroy()
-    },
-    beforeRouteEnter (to, from, next) {
-      console.log('before route enter', to)
-      interviewGuards(to, from, next)
-    },
-    beforeRouteUpdate (to, from, next) {
-      console.log('before route update', to)
-      this.saveData().then(() => {
-        this.isLoading = true
-        interviewData.intervew = null
-        interviewData.actions = null
-        interviewData.data = null
-        interviewData.form = null
-        interviewData.preload = null
-        interviewData.destroy()
-      })
-      .then(() => interviewGuards(to, from, next))
-      .then(() => {
-        this.loadInterview()
-      })
-    },
-    beforeRouteLeave  (to, from, next) {
-      console.log('before route leave', to)
-      this.saveData().then(() => {
-        if (to.name === 'Interview' || to.name === 'InterviewPreview') {
-          this.isLoading = true
-          interviewData.intervew = null
-          interviewData.actions = null
-          interviewData.data = null
-          interviewData.form = null
-          interviewData.preload = null
-          interviewGuards(to, from, next).then(() => {
-            this.loadInterview()
-          })
-        } else {
-          next()
-        }
-      })
+      this.leaving()
     },
     methods: {
-      loadInterview: function () {
-        this.isLoading = false
-        this.type = interviewData.interviewType
-        let d = interviewData
+      // Called by RoutePreloadMixin
+      leaving () {
+        interviewState.destroy()
+        return new Promise(resolve => resolve())
+      },
+      // Called by RoutePreloadMixin
+      hydrate (data) {
+        this.type = data.interviewType
+        let d = data
         this.initializeInterview(d.interview, d.actions, d.data, d.conditionTags, d.form, d.respondentFills)
       },
       initializeInterview: function (interview, actions, data, conditionTags, formBlueprint) {
         clearSharedInterview()
+        this.location = null
+        this.interviewConditionTags = null
+        this.interviewData = null
+        this.interviewActions = null
         interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags)
         if (this.type === 'interview') {
           interviewState.attachDataPersistSlave()
@@ -254,9 +205,6 @@
         this.form = formBlueprint
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
-        setTimeout(() => {
-          this.isLoading = false
-        }, this.artificiallyExtendLoadTime ? 2000 : 0)
       },
       actionHandler: function (action) {
         if (!interviewState) {

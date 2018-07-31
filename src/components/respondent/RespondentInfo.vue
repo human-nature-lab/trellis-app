@@ -160,28 +160,28 @@
 </template>
 
 <script>
+  import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import Permission from '../Permission'
   import Photo from '../Photo'
   import RespondentName from './RespondentName'
   import RespondentConditionTagForm from './RespondentConditionTagForm'
   import RespondentService from '../../services/respondent/RespondentService'
-  import singleton from '../../static/singleton'
   import ConditionTagService from '../../services/condition-tag/ConditionTagService'
   import RespondentGeos from './RespondentGeos'
 
-  let respondent
-  function preloadRespondent (respondentId) {
-    singleton.loading.active = true
-    singleton.loading.indeterminate = true
-    singleton.loading.message = 'Loading respondent...'
-    return RespondentService.getRespondentById(respondentId).then(r => {
-      respondent = r
-      singleton.loading.active = false
-    })
+  /**
+   * The respondent info router loader
+   * @param {Route} route - A VueRouter route object
+   * @returns {Promise<Object>|*}
+   */
+  function preloadRespondent (route) {
+    let respondentId = route.params.respondentId
+    return RespondentService.getRespondentById(respondentId)
   }
 
   export default {
     name: 'respondent-info',
+    mixins: [RouteMixinFactory(preloadRespondent)],
     data () {
       return {
         respondent: null,
@@ -217,13 +217,10 @@
         }]
       }
     },
-    beforeRouteEnter (to, from, next) {
-      preloadRespondent(to.params.respondentId).then(next)
-    },
-    created () {
-      this.respondent = respondent
-    },
     methods: {
+      hydrate (respondent) {
+        this.respondent = respondent
+      },
       photoFromCamera () {},
       photoFromFile () {},
       removeName (nameId) {

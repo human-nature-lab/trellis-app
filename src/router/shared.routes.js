@@ -10,7 +10,7 @@ import chainableGuards from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
 import ValidateLocale from './guards/ValidateLocale'
 import ValidateCensusForm from './guards/ValidateCensusForm'
-import RedirectToCensusInterview from './guards/RedirectToCensusInterview'
+import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
@@ -53,5 +53,6 @@ export default [{
 }, {
   path: '/study/:studyId/census/:censusTypeId',
   name: 'StartCensusForm',
-  beforeEnter: chainableGuards(ValidateStudy, ValidateLocale, ValidateCensusForm, RedirectToCensusInterview)
+  component: CensusFormLoaderPage,
+  beforeEnter: chainableGuards(ValidateStudy, ValidateLocale, ValidateCensusForm)
 }]

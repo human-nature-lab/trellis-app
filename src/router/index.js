@@ -17,7 +17,10 @@ if (config.appEnv === APP_ENV.WEB) {
 Vue.use(Router)
 
 export const router = new Router({
-  routes: routes
+  routes,
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  }
 })
 
 /**

@@ -44,7 +44,7 @@
             <v-btn @click="onNext"
                    :disabled="!isNavigationEnabled"
                    justify-right>
-              {{isAtEnd ? $t('finish') : $t('previous')}} <v-icon right>chevron_right</v-icon>
+              {{isAtEnd ? $t('finish') : $t('next')}} <v-icon right>chevron_right</v-icon>
             </v-btn>
           </v-layout>
       </v-flex>
