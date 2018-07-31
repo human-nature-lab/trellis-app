@@ -14,7 +14,8 @@ export default {
     step: 0,
     steps: 0,
     indeterminate: true,
-    message: ''
+    message: '',
+    error: null
   },
   interview: {
     form: null,

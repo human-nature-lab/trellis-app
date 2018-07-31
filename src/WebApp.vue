@@ -40,19 +40,19 @@
       </v-tooltip>
     </v-toolbar>
     <v-content>
+      <v-progress-linear
+        class="route-loading"
+        indeterminate
+        :height="3"
+        :active="global.loading.active" />
       <v-container
         fluid
         fill-height
         class="ma-0 pa-0 app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
-        <LoadingPage
-          v-if="global.loading.active"
-          :indeterminate="global.loading.indeterminate"
-          :step="global.loading.step"
-          :message="global.loading.message"
-          :max-steps="global.loading.steps" />
-        <router-view
-          class="route-container fade-in"
-          v-show="!global.loading.active"/>
+        <v-alert v-show="global.loading.error">
+          {{global.loading.error}}
+        </v-alert>
+        <router-view class="route-container fade-in" />
       </v-container>
     </v-content>
   </v-app>
@@ -90,6 +90,9 @@
   body
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
+  .route-loading
+    margin: 0
+    margin-top: 2px
   .navigation-drawer
     z-index: 1600
   .overlay
