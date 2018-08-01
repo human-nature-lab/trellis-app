@@ -16,12 +16,12 @@
       :indeterminate="true">
     </v-progress-linear>
     <v-btn
-      v-if="error"
+      v-if="!success && !working"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="error"
-      color="warning"
+      color="amber"
       @click.native="ignore">Ignore</v-btn>
   </div>
 </template>

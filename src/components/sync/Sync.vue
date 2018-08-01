@@ -4,7 +4,7 @@
       <v-flex>
         <v-container>
           <v-layout row class="sync-content">
-            <v-flex class="xs12 sm12 md6 offset-md3">
+            <v-flex class="xs12 sm12 md12">
               <sync-status v-if="!downloading && !uploading"></sync-status>
               <download
                 v-if="downloading"
@@ -14,12 +14,12 @@
             </v-flex>
           </v-layout>
           <v-layout row class="mt-2 sync-footer" justify-space-between>
-            <v-flex class="xs3 text-xs-center">
+            <v-flex class="xs3 text-xs-left">
               <v-btn :disabled="!enableUpload()">
                 <v-icon>cloud_upload</v-icon>
               </v-btn>
             </v-flex>
-            <v-flex class="xs3 text-xs-center">
+            <v-flex class="xs3 text-xs-right">
               <v-btn @click="onDownload"
                      :loading="downloading"
                      :disabled="!enableDownload()">

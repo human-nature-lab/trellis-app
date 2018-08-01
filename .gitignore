@@ -32,3 +32,6 @@ www/js/vendor.*.js
 
 config.js
 config.xml.js
+
+src/entities/**/*.js
+src/entities/**/*.map

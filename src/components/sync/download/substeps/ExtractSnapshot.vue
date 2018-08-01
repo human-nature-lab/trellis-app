@@ -17,16 +17,13 @@
     <v-progress-linear
       v-if="extracting"
       height="2"
-      :indeterminate="true">
+      :indeterminate="progressIndeterminate"
+      v-model="extractProgress">
     </v-progress-linear>
     <v-btn
-      v-if="error || warning"
+      v-if="!extracting && !success"
       color="primary"
       @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="extracting"
-      flat
-      @click.native="stopExtraction">Cancel</v-btn>
   </div>
 </template>
 
@@ -45,7 +42,9 @@
           apiRoot: config.apiRoot,
           source: null,
           errorMessage: '',
-          warningMessage: ''
+          warningMessage: '',
+          progressIndeterminate: true,
+          extractProgress: 0.0
         }
       },
       created () {
@@ -55,8 +54,9 @@
       methods: {
         extractSnapshot: function () {
           this.extracting = true
-          ZipService.unzipFile(this.fileEntry)
+          ZipService.unzipFile(this.fileEntry, this.progressCallback)
             .then((unzippedFile) => {
+              console.log('unzippedFile', unzippedFile)
               this.extracting = false
               this.success = true
               this.$emit('extract-snapshot-done', unzippedFile)
@@ -67,8 +67,10 @@
               this.errorMessage = error.data
             })
         },
-        stopExtraction: function () {
-          this.extracting = false
+        progressCallback: function (progressEvent) {
+          console.log('progressEvent2', progressEvent)
+          this.progressIndeterminate = false
+          this.extractProgress = (progressEvent.loaded / progressEvent.total) * 100
         },
         retry: function () {
           this.error = false

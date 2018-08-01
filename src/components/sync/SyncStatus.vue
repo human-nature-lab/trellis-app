@@ -1,6 +1,6 @@
 <template>
   <v-layout>
-    <v-flex xs12 sm12 md6 offset-md3>
+    <v-flex xs12 sm12 md12>
       <v-card>
         <v-card-title>
           <h3 class="headline mb-0">Sync Status</h3>

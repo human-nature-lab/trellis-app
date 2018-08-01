@@ -190,8 +190,8 @@
   /*padding-top: constant(safe-area-inset-top)*/
   /*padding-top: env(safe-area-inset-top)*/
   .app-container
-    margin-top: 50px
-    margin-bottom: 50px
+    padding-top: 50px
+    padding-bottom: 50px
   .logo
     height: 60%
     width: 100%

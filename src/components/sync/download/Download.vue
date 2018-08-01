@@ -5,9 +5,11 @@
           <v-stepper-header>
             <v-stepper-step step="1">Connecting</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="2">Downloading latest snapshot</v-stepper-step>
+            <v-stepper-step step="2">Downloading</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="3">Inserting new data</v-stepper-step>
+            <v-stepper-step step="3">Inserting</v-stepper-step>
+            <v-divider></v-divider>
+            <v-stepper-step step="4">Images</v-stepper-step>
           </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content step="1">
@@ -39,25 +41,30 @@
                 v-bind:continue-status="continueStatusArray[1]"
                 v-on:continue-clicked="onContinue"
                 v-on:cancel-clicked="onCancel">
-                <check-download-size
+                <empty-snapshots-directory
                   v-if="downloadStep > 1"
+                  v-bind:snapshotId="serverSnapshotId"
+                  v-on:empty-snapshots-directory-done="emptySnapshotsDirectoryDone">
+                </empty-snapshots-directory>
+                <check-download-size
+                  v-if="downloadStep > 1 && downloadSubStep > 1"
                   v-bind:snapshotId="serverSnapshotId"
                   v-on:check-download-size-done="checkDownloadSizeDone">
                 </check-download-size>
                 <download-snapshot
-                  v-if="downloadStep > 1 && downloadSubStep > 1"
+                  v-if="downloadStep > 1 && downloadSubStep > 2"
                   v-bind:snapshotId="serverSnapshotId"
                   v-bind:snapshotFileSize="snapshotFileSize"
                   v-on:download-snapshot-done="downloadSnapshotDone">
                 </download-snapshot>
                 <verify-download
-                  v-if="downloadStep > 1 && downloadSubStep > 2"
+                  v-if="downloadStep > 1 && downloadSubStep > 3"
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-bind:fileHash="serverSnapshot.hash"
                   v-on:verify-download-done="verifyDownloadDone">
                 </verify-download>
                 <extract-snapshot
-                  v-if="downloadStep > 1 && downloadSubStep > 3"
+                  v-if="downloadStep > 1 && downloadSubStep > 4"
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-on:extract-snapshot-done="extractSnapshotDone">
                 </extract-snapshot>
@@ -85,6 +92,30 @@
                 </check-foreign-keys>
               </download-step>
             </v-stepper-content>
+            <v-stepper-content step="4">
+              <download-step
+                title="Downloading images"
+                v-if="downloadStep === 4"
+                v-bind:continue-status="continueStatusArray[3]"
+                v-on:continue-clicked="onContinue"
+                v-on:cancel-clicked="onCancel">
+                <generate-image-list
+                  v-if="downloadStep > 3"
+                  v-on:generate-image-list-done="generateImageListDone">
+                </generate-image-list>
+                <calculate-image-size
+                  v-bind:images-to-download="imagesToDownload"
+                  v-if="downloadStep > 3 && downloadSubStep > 1"
+                  v-on:calculate-image-size-done="calculateImageSizeDone">
+                </calculate-image-size>
+                <download-images
+                  v-bind:images-to-download="imagesToDownload"
+                  v-bind:photos-found="photosFound"
+                  v-if="downloadStep > 3 && downloadSubStep > 2"
+                  v-on:download-images-done="downloadImagesDone">
+                </download-images>
+              </download-step>
+            </v-stepper-content>
           </v-stepper-items>
         </v-stepper>
     </div>
@@ -97,6 +128,7 @@
   import AuthenticateDevice from './substeps/AuthenticateDevice'
   import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'
   import CompareSnapshots from './substeps/CompareSnapshots'
+  import EmptySnapshotsDirectory from './substeps/EmptySnapshotsDirectory'
   import CheckDownloadSize from './substeps/CheckDownloadSize'
   import DownloadSnapshot from './substeps/DownloadSnapshot.vue'
   import VerifyDownload from './substeps/VerifyDownload.vue'
@@ -104,7 +136,11 @@
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import InsertRows from './substeps/InsertRows.vue'
   import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
+  import GenerateImageList from './substeps/GenerateImageList.vue'
+  import CalculateImageSize from './substeps/CalculateImageSize.vue'
+  import DownloadImages from './substeps/DownloadImages.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '../../../static/constants'
+  import FileService from '../../../services/file/FileService'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
     CHECKING_LAST_SNAPSHOT: 'Checking latest available snapshot on the server...'
@@ -126,9 +162,11 @@
         compareSnapshotsResults: COMPARE_SNAPSHOTS_RESULTS.NONE,
         COMPARE_SNAPSHOTS_RESULTS: COMPARE_SNAPSHOTS_RESULTS,
         autoContinueLabel: '',
-        continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
+        continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
         downloadedSnapshotFileEntry: null,
-        extractedSnapshot: null
+        extractedSnapshot: null,
+        imagesToDownload: {},
+        photosFound: 0
       }
     },
     created () {
@@ -140,7 +178,7 @@
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
-        if (this.downloadStep < 3) {
+        if (this.downloadStep < 4) {
           this.downloadStep++
           this.downloadSubStep = 1
         } else {
@@ -169,16 +207,19 @@
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
       },
+      emptySnapshotsDirectoryDone: function () {
+        this.downloadSubStep = 2
+      },
       checkDownloadSizeDone: function (snapshotFileSize) {
         this.snapshotFileSize = snapshotFileSize
-        this.downloadSubStep = 2
+        this.downloadSubStep = 3
       },
       downloadSnapshotDone: function (fileEntry) {
         this.downloadedSnapshotFileEntry = fileEntry
-        this.downloadSubStep = 3
+        this.downloadSubStep = 4
       },
       verifyDownloadDone: function () {
-        this.downloadSubStep = 4
+        this.downloadSubStep = 5
       },
       extractSnapshotDone: function (extractedSnapshot) {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
@@ -191,6 +232,21 @@
         this.downloadSubStep = 3
       },
       checkForeignKeysDone: function () {
+        this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
+      },
+      generateImageListDone: function (imageList) {
+        console.log('calculateImageSizeDone', imageList)
+        this.imagesToDownload = imageList
+        this.downloadSubStep = 2
+      },
+      calculateImageSizeDone: function (photosFound) {
+        console.log('calculateImageSizeDone', photosFound)
+        this.photosFound = photosFound
+        this.downloadSubStep = 3
+      },
+      downloadImagesDone: function (imagesDownloaded) {
+        FileService.listPhotos()
+          .then((photoList) => console.log('downloadImagesDone', imagesDownloaded, photoList))
         this.continueStatus = BUTTON_STATUS.ENABLED
       }
     },
@@ -214,13 +270,17 @@
       CheckConnection,
       AuthenticateDevice,
       DownloadStep,
+      EmptySnapshotsDirectory,
       CheckDownloadSize,
       DownloadSnapshot,
       ExtractSnapshot,
       VerifyDownload,
       RemoveDatabase,
       InsertRows,
-      CheckForeignKeys
+      CheckForeignKeys,
+      GenerateImageList,
+      CalculateImageSize,
+      DownloadImages
     }
   }
 </script>
