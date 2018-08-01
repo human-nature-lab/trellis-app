@@ -1,6 +1,7 @@
 import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
 import {now} from '../../../../services/DateService'
+import Datum from '../../../../entities/Datum'
 
 const keyNames = ['name', 'question_datum_id', 'survey_id', 'choice_id', 'edge_id', 'geo_id', 'photo_id', 'roster_id']
 class DatumRecycler extends Recycler {
@@ -11,20 +12,11 @@ class DatumRecycler extends Recycler {
     return keyNames.map(key => datum[key]).join('-')
   }
   objectCreator (questionDatum, payload) {
-    let maxEventOrder = -1
-    for (let datum of questionDatum.data) {
-      if (datum.event_order > maxEventOrder) {
-        maxEventOrder = datum.event_order
-      }
-    }
-    let datum = {
-      id: uuidv4(),
-      question_datum_id: questionDatum.id,
-      event_order: maxEventOrder + 1,
-      datum_type_id: '0',
-      updated_at: now(),
-      created_at: now()
-    }
+    let maxEventOrder = Math.max(...questionDatum.data.map(d => d.event_order))
+    let datum = new Datum()
+    datum.id = uuidv4()
+    datum.questionDatumId = questionDatum.id
+    datum.eventOrder = maxEventOrder + 1
     for (let key in payload) {
       datum[key] = payload[key]
     }
