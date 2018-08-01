@@ -36,6 +36,7 @@
           :shouldUpdateRoute="false"
           :canAddRespondent="canAddRespondent"
           @selected="onSelected"
+          @respondentAdded="onOtherRespondentAdded"
           :respondentId="respondent.id"
           :formsButtonVisible="false"
           :baseFilters="baseRespondentFilters"
@@ -48,11 +49,12 @@
 </template>
 
 <script>
+  import ActionTypes from '../../../static/action.types'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+  import ActionMixin from '../../../mixins/ActionMixin'
   import Photo from '../../Photo'
   import RespondentsSearch from '../../respondent/RespondentsSearch'
   import EdgeService from '../../../services/edge/EdgeService'
-  import actionBus from '../services/ActionBus'
   import parameterTypes from '../../../static/parameter.types'
   import GeoService from '../../../services/geo/GeoService'
   export default {
@@ -67,7 +69,7 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin],
+    mixins: [QuestionDisabledMixin, ActionMixin],
     data: function () {
       return {
         respondentSearchDialog: false,
@@ -159,23 +161,20 @@
           })
       },
       add: function (edgeId) {
-        actionBus.action({
-          action_type: 'add-edge',
-          question_id: this.question.id,
-          payload: {
-            name: this.question.var_name,
-            val: edgeId,
-            edge_id: edgeId
-          }
+        this.action(ActionTypes.add_edge, {
+          name: this.question.var_name,
+          val: edgeId,
+          edge_id: edgeId
         })
       },
       remove: function (edgeId) {
-        actionBus.action({
-          action_type: 'remove-edge',
-          question_id: this.question.id,
-          payload: {
-            edge_id: edgeId
-          }
+        this.action(ActionTypes.remove_edge, {
+          edge_id: edgeId
+        })
+      },
+      onOtherRespondentAdded (respondent) {
+        this.action(ActionTypes.other_respondent_added, {
+          respondent_id: respondent.id
         })
       },
       onSelected: function (added, removed) {

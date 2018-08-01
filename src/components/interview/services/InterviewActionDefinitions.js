@@ -6,6 +6,95 @@ import QT from '../../../static/question.types'
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
 
+// Operations
+/**
+ * Update a datum with whatever is in the action payload
+ * @param {Function} findFunc
+ * @returns {Function<Datum>}
+ */
+function updateDatum (findFunc) {
+  return function (interview, payload, questionDatum) {
+    let datum = questionDatum.data.find(d => {
+      return findFunc(d, payload)
+    })
+    if (datum) {
+      for (let key in payload) {
+        datum[key] = payload[key]
+      }
+    } else {
+      throw new Error('No datum exists that matches this find closure')
+    }
+    return datum
+  }
+}
+
+/**
+ * Remove a single datum from the questionDatum.data array using the find closure supplied
+ * @param {Function} findFunc - A closure which should identify the correct datum to remove
+ * @returns {Function}
+ */
+function removeDatum (findFunc) {
+  return function (interview, payload, questionDatum) {
+    let index = questionDatum.data.findIndex(datum => {
+      return findFunc(datum, payload)
+    })
+    if (index > -1) {
+      return questionDatum.data.splice(index, 1)[0]
+    } else {
+      throw new Error('No datum exists that matches this find closure')
+    }
+  }
+}
+
+/**
+ * If the datum exists it will be updated with all values in the payload. If there isn't a datum, one will be created.
+ * @param {Object} interview
+ * @param {Object} payload
+ * @param {Object} questionDatum
+ * @returns {Datum}
+ */
+function addOrUpdateSingleDatum (interview, payload, questionDatum) {
+  let datum
+  if (questionDatum.data.length) {
+    datum = questionDatum.data[0]
+    for (let key in payload) {
+      datum[key] = payload[key]
+    }
+  } else {
+    datum = addDatum(interview, payload, questionDatum)
+  }
+  return datum
+}
+
+/**
+ * Push a single datum to the questionDatum.data array. Uses the recycler
+ * @param {Object} interview
+ * @param {Object} payload
+ * @param {Object} questionDatum
+ * @returns {Datum}
+ */
+function addDatum (interview, payload, questionDatum) {
+  let datum = DatumRecycler.getNoKey(questionDatum, payload)
+  questionDatum.data.push(datum)
+  return datum
+}
+
+/**
+ * Add a datum and if we've exceed the supplied limit, we remove the oldest datum
+ * @param {Number} limit
+ * @returns {Function}
+ */
+function addDatumLimit (limit) {
+  return function (interview, payload, questionDatum) {
+    let datum = addDatum(interview, payload, questionDatum)
+    if (questionDatum.data.length > limit) {
+      questionDatum.data.shift()
+    }
+    return datum
+  }
+}
+
+// Definitions
 /**
  * All action handlers are given access to the interview, the action payload, the questionBlueprint and the questionDatum
  * with the datum associated with the question datum at questionDatum.datum. DatumRecycler should be used whenver new
@@ -48,31 +137,14 @@ definitions[AT.select_choice] = function (interview, payload, questionDatum, que
   if (shouldRemoveOthers) {
     questionDatum.data = [] // This could break references... shouldn't be a since we're trying to pass around copies
   }
-  let datum = DatumRecycler.getNoKey(questionDatum, payload)
+  let datum = addDatum(interview, payload, questionDatum)
   if (choiceHasOtherInput) {
     datum.val = ''
   }
-  questionDatum.data.push(datum)
 }
 
-definitions[AT.deselect_choice] = function (interview, payload, questionDatum) {
-  let index = questionDatum.data.findIndex(d => d.choice_id === payload.choice_id)
-  if (index > -1) {
-    interview.deleteSingleQuestionDatumDatum(questionDatum, index)
-  } else {
-    console.error('deselect-choice', 'invalid input without an already selected choice with that id')
-  }
-}
-
-definitions[AT.other_choice_text] = function (interview, payload, questionDatum) {
-  let datum = questionDatum.data.find(d => d.choice_id === payload.choice_id)
-  if (datum) {
-    datum.val = payload.val
-  } else {
-    console.error('other-choice-text', 'invalid input without an already selected choice with that id')
-  }
-}
-
+definitions[AT.deselect_choice] = removeDatum((d, payload) => d.choice_id === payload.choice_id)
+definitions[AT.other_choice_text] = updateDatum((d, payload) => d.choice_id === payload.choice_id)
 definitions[AT.dk_rf] = function (interview, payload, questionDatum, questionBlueprint) {
   if (questionDatum) {
     questionDatum.dk_rf = payload.dk_rf // True or false
@@ -86,7 +158,6 @@ definitions[AT.dk_rf] = function (interview, payload, questionDatum, questionBlu
   //   interview.deleteAllQuestionDatumData(questionDatum)
   // }
 }
-
 definitions[AT.dk_rf_val] = function (interview, payload, questionDatum) {
   if (questionDatum) {
     questionDatum.dk_rf_val = payload.dk_rf_val
@@ -94,7 +165,6 @@ definitions[AT.dk_rf_val] = function (interview, payload, questionDatum) {
     console.error('dk-rf-val', 'invalid input without a questionDatum', payload)
   }
 }
-
 definitions[AT.next] = function (interview, a, b, c, actionWasInitiatedByHuman) {
   if (actionWasInitiatedByHuman) {
     interview.nextAndReplay()
@@ -103,7 +173,6 @@ definitions[AT.next] = function (interview, a, b, c, actionWasInitiatedByHuman) 
   }
   // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
 }
-
 definitions[AT.previous] = function (interview, a, b, c, actionWasInitiatedByHuman) {
   if (actionWasInitiatedByHuman) {
     interview.previousAndReplay()
@@ -113,41 +182,13 @@ definitions[AT.previous] = function (interview, a, b, c, actionWasInitiatedByHum
   // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
 }
 
-definitions[AT.number_change] = function (interview, payload, questionDatum) {
-  if (!questionDatum.data.length) {
-    questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
-  }
-  questionDatum.data[0].val = payload.val
-}
-
-definitions[AT.add_edge] = function (interview, payload, questionDatum) {
-  questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
-}
-
-definitions[AT.remove_edge] = function (interview, payload, questionDatum) {
-  let index = questionDatum.data.findIndex(datum => datum.edge_id === payload.edge_id)
-  if (index > -1) {
-    questionDatum.data.splice(index, 1)
-  } else {
-    throw new Error('No datum exists with this edge_id')
-  }
-}
-
-definitions[AT.add_roster_row] = function (interview, payload, questionDatum) {
-  questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
-}
-
-definitions[AT.remove_roster_row] = function (interview, payload, questionDatum, questionBlueprint) {
-  let index = questionDatum.data.findIndex(datum => datum.roster_id === payload.roster_id)
-  if (index > -1) {
-    questionDatum.data.splice(index, 1)
-  } else {
-    throw new Error('No datum exists with this roster id')
-  }
-}
-
+definitions[AT.number_change] = addOrUpdateSingleDatum
+definitions[AT.add_edge] = addDatum
+definitions[AT.remove_edge] = removeDatum((datum, payload) => datum.edge_id === payload.edge_id)
+definitions[AT.add_roster_row] = addDatum
+definitions[AT.remove_roster_row] = removeDatum((datum, payload) => datum.roster_id === payload.roster_id)
 definitions[AT.change_sort_order] = function (interview, payload, questionDatum) {
-  let datum = questionDatum.data.findIndex(datum => datum.id === payload.datum_id)
+  let datum = questionDatum.data.find(datum => datum.id === payload.datum_id)
   if (datum) {
     datum.sort_order = payload.sort_order
   } else {
@@ -155,45 +196,13 @@ definitions[AT.change_sort_order] = function (interview, payload, questionDatum)
   }
 }
 
-definitions[AT.set_val] = function (interview, payload, questionDatum) {
-  if (!questionDatum.data.length) {
-    questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
-  } else {
-    questionDatum.data[0].val = payload.val
-  }
-}
-
-definitions[AT.remove_geo] = function (interview, payload, questionDatum) {
-  let index = questionDatum.data.findIndex(datum => datum.geo_id === payload.geo_id)
-  if (index > -1) {
-    questionDatum.data.splice(index, 1)
-  } else {
-    throw new Error('No datum exists with this geo id')
-  }
-}
-
-function addDatum (interview, payload, questionDatum) {
-  questionDatum.data.push(DatumRecycler.getNoKey(questionDatum, payload))
-}
-
-/**
- * Add a datum and if we've exceed the supplied limit, we remove the oldest datum
- * @param {Number} limit
- * @returns {Function}
- */
-function addDatumLimit (limit) {
-  return function (interview, payload, questionDatum) {
-    addDatum(interview, payload, questionDatum)
-    if (questionDatum.data.length > limit) {
-      questionDatum.data.shift()
-    }
-  }
-}
-
+definitions[AT.set_val] = addOrUpdateSingleDatum
+definitions[AT.remove_geo] = removeDatum((datum, payload) => datum.geo_id === payload.geo_id)
 definitions[AT.add_geo] = addDatum
 definitions[AT.respondent_move] = addDatumLimit(1)
 definitions[AT.respondent_add_geo] = addDatumLimit(1)
 definitions[AT.respondent_remove_geo] = addDatumLimit(1)
+definitions[AT.other_respondent_added] = definitions[AT.set]
 
 // Action aliases
 definitions[AT.set_date] = definitions[AT.set_val]
