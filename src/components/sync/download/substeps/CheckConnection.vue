@@ -7,21 +7,19 @@
         <strong v-if="error" class="red--text">ERROR.</strong>
       </li>
     </ul>
-    <span v-if="error" class="red--text">
-      <p>Unable to establish a connection with the server at {{ apiRoot }}</p>
-    </span>
+    <trellis-alert :show="error" :message="`Unable to establish a connection with the server at ${apiRoot}`"></trellis-alert>
     <v-progress-linear
       v-if="checking"
       height="2"
       :indeterminate="true"></v-progress-linear>
     <v-btn
-      v-if="error"
+      v-if="!success && !checking"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="checking"
       flat
-      @click.native="stopChecking">Cancel</v-btn>
+      @click.native="stopChecking">Stop</v-btn>
   </div>
 </template>
 
@@ -29,6 +27,7 @@
     import axios from 'axios'
     import config from '@/config'
     import SyncService from '../../services/SyncService'
+    import TrellisAlert from '../../../TrellisAlert.vue'
     export default {
       name: 'check-connection',
       data () {
@@ -73,6 +72,7 @@
       computed: {
       },
       components: {
+        TrellisAlert
       }
     }
 </script>

@@ -21,27 +21,27 @@
       v-model="downloadProgress">
     </v-progress-linear>
     <v-btn
-      v-if="error || warning"
+      v-if="!downloading && !success"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="downloading"
       flat
-      @click.native="stopDownload">Cancel</v-btn>
+      @click.native="stopDownload">Stop</v-btn>
   </div>
 </template>
 
 <script>
     import axios from 'axios'
     import config from '@/config'
-    import SyncService from '../../services/SyncService'
+    // import SyncService from '../../services/SyncService'
     import FileService from '@/services/file/FileService'
     export default {
       name: 'download-snapshot',
       data () {
         return {
           downloadProgress: 0,
-          progressIndeterminate: false,
+          progressIndeterminate: true,
           lastProgressEvent: 0,
           lastDownloadProgress: 0,
           success: false,
@@ -53,6 +53,9 @@
           errorMessage: '',
           warningMessage: ''
         }
+      },
+      beforeDestroy () {
+        this.stopDownload()
       },
       created () {
         this.downloadSnapshot()
@@ -72,6 +75,24 @@
           const CancelToken = axios.CancelToken
           this.source = CancelToken.source()
           this.downloading = true
+          const fileName = this.snapshotId + '.sql.zip'
+          const uri = config.apiRoot + `/sync/snapshot/${this.snapshotId}/download`
+          FileService.requestFileSystem()
+            .then((fileSystem) => FileService.getDirectoryEntry(fileSystem, 'snapshots'))
+            .then((directoryEntry) => FileService.getFileEntry(directoryEntry, fileName))
+            .then((fileEntry) => FileService.download(uri, fileEntry))
+            .then((fileEntry) => {
+              console.log('FileService.download -> fileEntry', fileEntry)
+              this.success = true
+              this.$emit('download-snapshot-done', fileEntry)
+              this.downloading = false
+            })
+            .catch((err) => {
+              this.errorMessage = err.message
+              this.error = true
+              this.downloading = false
+            })
+          /*
           SyncService.downloadSnapshot(this.source, this.onDownloadProgress, this.snapshotId).then((response) => {
             console.log('downloadSnapshot, response', response)
             let fileName = this.snapshotId + '.sql.zip'
@@ -95,6 +116,7 @@
             this.error = true
             this.downloading = false
           })
+          */
         },
         onDownloadProgress: function (progressEvent) {
           if (this.lastDownloadProgress !== progressEvent.loaded) {
@@ -102,8 +124,10 @@
           }
           this.lastDownloadProgress = progressEvent.loaded
           if (progressEvent.lengthComputable) {
-            this.progressIndeterminate = false
             this.downloadProgress = (progressEvent.loaded / progressEvent.total) * 100
+            if (this.downloadProgress > 0) {
+              this.progressIndeterminate = false
+            }
           } else {
             this.progressIndeterminate = true
           }

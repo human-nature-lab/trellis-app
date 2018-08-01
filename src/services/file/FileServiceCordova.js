@@ -1,5 +1,7 @@
 import { DeviceService } from '../device/DeviceService'
 import md5 from 'js-md5'
+import config from '../../config'
+/* global md5chksum, FileTransfer */
 
 class FileServiceCordova {
 
@@ -75,6 +77,16 @@ class FileServiceCordova {
     )
   }
 
+  deleteFile (fileEntry) {
+    return new Promise((resolve, reject) => {
+      fileEntry.remove(() => {
+        resolve()
+      }, (err) => {
+        reject(err)
+      })
+    })
+  }
+
   listFiles () {
     this.requestFileSystem()
       .then((fs) => {
@@ -87,7 +99,80 @@ class FileServiceCordova {
       })
   }
 
-  calculateMD5Hash (fileEntry) {
+  listPhotos () {
+    return this.requestFileSystem()
+      .then((fileSystem) => this.getDirectoryEntry(fileSystem, 'photos'))
+      .then((directoryEntry) => {
+        return new Promise((resolve, reject) => {
+          let reader = directoryEntry.createReader()
+          reader.readEntries((results) => {
+            console.log('listPhotos', results)
+            resolve(results)
+          }, reject)
+        })
+      })
+  }
+
+  getPhoto (fileName) {
+    return this.requestFileSystem()
+      .then((fileSystem) => this.getDirectoryEntry(fileSystem, 'photos'))
+      .then((directoryEntry) => this.getFileEntry(directoryEntry, fileName))
+  }
+
+  emptyDirectory (directoryEntry) {
+    return new Promise((resolve, reject) => {
+      directoryEntry
+        .createReader()
+        .readEntries((entries) => {
+          entries.forEach((entry) => {
+            entry.remove(
+              () => { /* success */ },
+              (err) => reject(err))
+          })
+        })
+      resolve()
+    })
+  }
+
+  download (uri, fileEntry) {
+    return new Promise((resolve, reject) => {
+      DeviceService.isDeviceReady()
+      .then(() => {
+        try {
+          const fileTransfer = new FileTransfer()
+          console.log('fileTransfer', fileTransfer)
+          const fileURL = fileEntry.toURL()
+          console.log('fileURL', fileURL)
+          fileTransfer.download(uri, fileURL,
+            (success) => {
+              console.log('fileTRansfer.download success', success)
+              resolve(fileEntry)
+            },
+            (err) => {
+              console.log('fileTransfer.download failed', err)
+              reject(err)
+            },
+            false, { headers: { 'X-Key': config.xKey } })
+        } catch (err) {
+          reject(err)
+        }
+      })
+    })
+  }
+
+  fileFromFileEntry (fileEntry) {
+    return new Promise((resolve, reject) => {
+      try {
+        fileEntry.file((file) => {
+          resolve(file)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  calculateMD5HashJS (fileEntry) {
     return new Promise((resolve, reject) => {
       DeviceService.isDeviceReady()
         .then(() => {
@@ -103,6 +188,15 @@ class FileServiceCordova {
             }
             reader.readAsArrayBuffer(file)
           })
+        })
+    })
+  }
+
+  calculateMD5Hash (fileEntry) {
+    return new Promise((resolve, reject) => {
+      DeviceService.isDeviceReady()
+        .then(() => {
+          md5chksum.file(fileEntry, resolve, reject)
         })
     })
   }

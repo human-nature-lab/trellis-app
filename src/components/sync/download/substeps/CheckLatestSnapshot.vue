@@ -8,24 +8,20 @@
         <strong v-if="error" class="red--text">ERROR.</strong>
       </li>
     </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <span v-if="warning">
-      <p>{{ warningMessage }}</p>
-    </span>
+    <trellis-alert type="warning" :show="warning" :message="warningMessage"></trellis-alert>
+    <trellis-alert type="error" :show="error" :message="errorMessage"></trellis-alert>
     <v-progress-linear
       v-if="checking"
       height="2"
       :indeterminate="true"></v-progress-linear>
     <v-btn
-      v-if="error || warning"
+      v-if="!checking && !success"
       color="primary"
       @click.native="retry">Retry</v-btn>
     <v-btn
       v-if="checking"
       flat
-      @click.native="stopChecking">Cancel</v-btn>
+      @click.native="stopChecking">Stop</v-btn>
   </div>
 </template>
 
@@ -33,6 +29,7 @@
     import axios from 'axios'
     import config from '@/config'
     import SyncService from '../../services/SyncService'
+    import TrellisAlert from '../../../TrellisAlert.vue'
     export default {
       name: 'check-latest-snapshot',
       data () {
@@ -88,6 +85,7 @@
       computed: {
       },
       components: {
+        TrellisAlert
       }
     }
 </script>
