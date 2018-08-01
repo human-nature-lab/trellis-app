@@ -16,7 +16,7 @@
 
 <script>
   import RespondentService from '../../services/respondent/RespondentService'
-  import FormService from '../../services/form/FormService'
+  import CensusFormService from '../../services/census'
   import censusTypes from '../../static/census.types'
   import {pushRouteAndQueueCurrent} from '../../router'
   export default {
@@ -40,7 +40,7 @@
         RespondentService.createRespondent(this.studyId, this.name, this.geoId, this.associatedRespondentId).then(r => {
           respondent = r
           censusTypeId = this.associatedRespondentId ? censusTypes.add_associated_respondent : censusTypes.add_respondent
-          return FormService.hasCensusForm(this.studyId, censusTypeId)
+          return CensusFormService.hasCensusForm(this.studyId, censusTypeId)
         }).then(hasCensus => {
           if (hasCensus) {
             pushRouteAndQueueCurrent({
