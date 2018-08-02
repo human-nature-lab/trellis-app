@@ -8,6 +8,7 @@ import SyncMessage from '@/entities/trellis-config/SyncMessage'
 import UpdatedRecords from '@/entities/trellis-config/UpdatedRecords'
 import Photo from '@/entities/trellis/Photo'
 import FileService from '../file/FileService'
+import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 
 const trellisConfigConnection = {
   type: 'cordova',
@@ -33,6 +34,7 @@ const trellisConnection = {
   entities: [
     Photo
   ],
+  namingStrategy: new SnakeCaseNamingStrategy(),
   logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
 }
