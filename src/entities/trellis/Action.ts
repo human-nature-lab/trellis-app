@@ -1,6 +1,6 @@
 import {Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {assignJSONProps} from "../../services/JSONUtil";
+import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 export default class Action extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn()
@@ -21,7 +21,7 @@ export default class Action extends TimestampedSoftDelete {
   sectionRepetition: number
 
   fromJSON(json: object) {
-    assignJSONProps(this, json)
+    mapPropsFromJSON(this, json)
     return this
   }
 }

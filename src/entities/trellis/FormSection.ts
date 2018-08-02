@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {assignJSONProps} from "../../services/JSONUtil";
+import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 @Entity()
 export default class FormSection extends TimestampedSoftDelete {
@@ -22,6 +22,7 @@ export default class FormSection extends TimestampedSoftDelete {
   followUpQuestionid: string
 
   fromJSON(json: object) {
-    assignJSONProps(this, json)
-  }
+    mapPropsFromJSON(this, json)
+    return this
+ }
 }

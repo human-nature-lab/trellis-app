@@ -1,6 +1,10 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {assignJSONProps} from "../../services/JSONUtil";
+import {mapFromJSON, mapPropsFromJSON} from "../../services/JSONUtil";
+import QuestionType from "./QuestionType";
+import Translation from "./Translation";
+import Choice from "./Choice";
+import AssignConditionTag from "./AssignConditionTag";
 
 @Entity()
 export default class Question extends TimestampedSoftDelete {
@@ -17,7 +21,19 @@ export default class Question extends TimestampedSoftDelete {
   @Column()
   varName: string
 
-  fromJSON(json: object) {
-    assignJSONProps(this, json)
-  }
+  questionType: QuestionType
+  questionTranslation: Translation
+  choices: Choice[]
+  assignConditionTags: AssignConditionTag[]
+
+  fromJSON(json: any) {
+    mapPropsFromJSON(this, json)
+    mapFromJSON(this, json, {
+      questionType: QuestionType,
+      questionTranslation: Translation,
+      choices: Choice,
+      assignConditionTags: AssignConditionTag
+    })
+    return this
+ }
 }

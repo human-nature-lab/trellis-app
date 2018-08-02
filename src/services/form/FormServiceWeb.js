@@ -1,4 +1,4 @@
-import http from '@/services/http/AxiosInstance'
+import http from '../http/AxiosInstance'
 import formTypes from '../../static/form.types'
 export default class FormServiceWeb {
   /**
@@ -33,6 +33,8 @@ export default class FormServiceWeb {
     return http().get(`form/${formId}`)
       .then(res => {
         if (res.data.form) {
+          // let form = new Form().fromJSON(res.data.form)
+          // console.log(form)
           return res.data.form
         } else {
           console.error(res)

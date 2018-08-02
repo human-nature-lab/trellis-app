@@ -5,6 +5,8 @@ import RespondentConditionTagRecycler from '../services/recyclers/RespondentCond
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
 import ConditionTagStore from './/ConditionTagStore'
+import Datum from '../../../entities/trellis/Datum'
+import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 
 export default class DataStore extends Emitter {
   constructor (throttleRate = 10000) {
@@ -57,8 +59,16 @@ export default class DataStore extends Emitter {
       d.data = []
       questionDatum.push(d)
     }
-    QuestionDatumRecycler.fill(questionDatum)
-    DatumRecycler.fill(datum)
+    QuestionDatumRecycler.fill(questionDatum.map(qD => {
+      let q = new QuestionDatum()
+      q.fromJSON(qD)
+      return q
+    }))
+    DatumRecycler.fill(datum.map(d => {
+      let nD = new Datum()
+      nD.fromJSON(d)
+      return nD
+    }))
   }
 
   /**

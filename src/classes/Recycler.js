@@ -38,8 +38,7 @@ export default class Recycler {
    */
   fill (items) {
     for (let item of items) {
-      let key = this.keyExtractor(item)
-      this.set(key, item)
+      this.add(item)
     }
   }
 
@@ -55,7 +54,8 @@ export default class Recycler {
       obj = this.objectCreator(...params)
       this.set(key, obj)
     }
-    return JSON.parse(JSON.stringify(obj))
+    // return JSON.parse(JSON.stringify(obj))
+    return obj
   }
 
   /**
@@ -76,5 +76,14 @@ export default class Recycler {
    */
   set (key, obj) {
     this.cache.set(key, obj)
+  }
+
+  /**
+   * Add a single item to recycler set using the keyExtractor
+   * @param {any} item
+   */
+  add (item) {
+    let key = this.keyExtractor(item)
+    this.set(key, item)
   }
 }

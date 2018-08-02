@@ -3,7 +3,7 @@ import uuid from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
 import {Column, PrimaryGeneratedColumn} from "typeorm";
-import {assignJSONProps} from "../../services/JSONUtil";
+import {mapPropsFromJSON, mapFromJSON} from "../../services/JSONUtil";
 
 export default class QuestionDatum extends TimestampedSoftDelete implements FromJSON {
   @PrimaryGeneratedColumn()
@@ -25,12 +25,16 @@ export default class QuestionDatum extends TimestampedSoftDelete implements From
   @Column()
   public interviewId: string;
 
+  data: Datum[]
+
   fromJSON (json) {
-    assignJSONProps(this, json)
-    for (let d of json.data) {
-      let datum = new Datum()
-      datum.fromJSON(d)
-    }
+    mapPropsFromJSON(this, json)
+    mapFromJSON(this, json, {
+      data: {
+        constructor: Datum,
+        jsonKey: 'datum'
+      }
+    })
     return this
   }
 

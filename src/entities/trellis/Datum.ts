@@ -2,7 +2,7 @@ import uuidv4 from 'uuid/v4'
 import FromJSON from "../interfaces/FromJSON";
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import {Column, Entity} from "typeorm";
-import {assignJSONProps} from "../../services/JSONUtil";
+import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 @Entity()
 export default class Datum extends TimestampedSoftDelete implements FromJSON {
@@ -34,7 +34,7 @@ export default class Datum extends TimestampedSoftDelete implements FromJSON {
   public val: string;
 
   fromJSON (json) {
-    assignJSONProps(this, json)
+    mapPropsFromJSON(this, json)
     return this
   }
 }

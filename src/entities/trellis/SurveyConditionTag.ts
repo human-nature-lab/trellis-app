@@ -1,6 +1,6 @@
 import {Column, PrimaryGeneratedColumn} from "typeorm";
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
-import {assignJSONProps} from "../../services/JSONUtil";
+import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 export default class SurveyConditionTag extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn()
@@ -13,7 +13,7 @@ export default class SurveyConditionTag extends TimestampedSoftDelete {
   interviewId: string
 
   fromJSON (json: object) {
-    assignJSONProps(this, json)
+    mapPropsFromJSON(this, json)
     return this
   }
 }

@@ -1,6 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {assignJSONProps} from "../../services/JSONUtil";
+import {mapPropsFromJSON, mapFromJSON} from "../../services/JSONUtil";
+import Survey from "./Survey";
 
 @Entity()
 export default class Interview extends TimestampedSoftDelete {
@@ -25,7 +26,13 @@ export default class Interview extends TimestampedSoftDelete {
   @Column({ type: 'datetime', nullable: true })
   completedAt: Date
 
-  fromJSON(json: object) {
-    assignJSONProps(this, json)
-  }
+  survey: Survey
+
+  fromJSON(json: any) {
+    mapPropsFromJSON(this, json)
+    mapFromJSON(this, json, {
+      survey: Survey
+    })
+    return this
+ }
 }

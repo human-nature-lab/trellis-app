@@ -12,7 +12,7 @@ const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val sho
  * @param {Function} findFunc
  * @returns {Function<Datum>}
  */
-function updateDatum (findFunc) {
+function updateDatum (findFunc, name) {
   return function (interview, payload, questionDatum) {
     let datum = questionDatum.data.find(d => {
       return findFunc(d, payload)
@@ -22,7 +22,9 @@ function updateDatum (findFunc) {
         datum[key] = payload[key]
       }
     } else {
-      throw new Error('No datum exists that matches this find closure')
+      let msg = 'No datum exists that matches this find closure.'
+      if (name) msg += `Found in ${name}`
+      throw new Error(msg)
     }
     return datum
   }
@@ -33,7 +35,7 @@ function updateDatum (findFunc) {
  * @param {Function} findFunc - A closure which should identify the correct datum to remove
  * @returns {Function}
  */
-function removeDatum (findFunc) {
+function removeDatum (findFunc, name) {
   return function (interview, payload, questionDatum) {
     let index = questionDatum.data.findIndex(datum => {
       return findFunc(datum, payload)
@@ -41,7 +43,9 @@ function removeDatum (findFunc) {
     if (index > -1) {
       return questionDatum.data.splice(index, 1)[0]
     } else {
-      throw new Error('No datum exists that matches this find closure')
+      let msg = 'No datum exists that matches this find closure.'
+      if (name) msg += `Found in ${name}`
+      throw new Error(msg)
     }
   }
 }
@@ -127,7 +131,7 @@ definitions[AT.select_choice] = function (interview, payload, questionDatum, que
     let choice = questionBlueprint.choices.find(c => c.val === exclusiveParameter.val)
     for (let i = 0; i < questionDatum.data.length; i++) {
       let datum = questionDatum.data[i]
-      if (datum.choice_id === choice.id) {
+      if (datum.choiceId === choice.id) {
         questionDatum.data.splice(i, 1)
         break
       }
@@ -147,10 +151,10 @@ definitions[AT.deselect_choice] = removeDatum((d, payload) => d.choice_id === pa
 definitions[AT.other_choice_text] = updateDatum((d, payload) => d.choice_id === payload.choice_id)
 definitions[AT.dk_rf] = function (interview, payload, questionDatum, questionBlueprint) {
   if (questionDatum) {
-    questionDatum.dk_rf = payload.dk_rf // True or false
+    questionDatum.dkRf = payload.dk_rf // True or false
     // Optionally remove dk_rf responses if they deselect dk_rf
-    if (shouldRemoveDkRfResponsesOnDeselect && questionDatum.dk_rf === null) {
-      questionDatum.dk_rf_val = null
+    if (shouldRemoveDkRfResponsesOnDeselect && questionDatum.dkRf === null) {
+      questionDatum.dkRfVal = null
     }
   }
   // Uncomment this if we want to remove datum associated with this question
@@ -184,9 +188,9 @@ definitions[AT.previous] = function (interview, a, b, c, actionWasInitiatedByHum
 
 definitions[AT.number_change] = addOrUpdateSingleDatum
 definitions[AT.add_edge] = addDatum
-definitions[AT.remove_edge] = removeDatum((datum, payload) => datum.edge_id === payload.edge_id)
+definitions[AT.remove_edge] = removeDatum((datum, payload) => datum.edgeId === payload.edge_id)
 definitions[AT.add_roster_row] = addDatum
-definitions[AT.remove_roster_row] = removeDatum((datum, payload) => datum.roster_id === payload.roster_id)
+definitions[AT.remove_roster_row] = removeDatum((datum, payload) => datum.rosterId === payload.roster_id)
 definitions[AT.change_sort_order] = function (interview, payload, questionDatum) {
   let datum = questionDatum.data.find(datum => datum.id === payload.datum_id)
   if (datum) {
@@ -197,7 +201,7 @@ definitions[AT.change_sort_order] = function (interview, payload, questionDatum)
 }
 
 definitions[AT.set_val] = addOrUpdateSingleDatum
-definitions[AT.remove_geo] = removeDatum((datum, payload) => datum.geo_id === payload.geo_id)
+definitions[AT.remove_geo] = removeDatum((datum, payload) => datum.geoId === payload.geo_id)
 definitions[AT.add_geo] = addDatum
 definitions[AT.respondent_move] = addDatumLimit(1)
 definitions[AT.respondent_add_geo] = addDatumLimit(1)

@@ -1,6 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {assignJSONProps} from "../../services/JSONUtil";
+import {mapPropsFromJSON, mapFromJSON} from "../../services/JSONUtil";
+import GeoType from "./GeoType";
 
 @Entity()
 export default class Geo extends TimestampedSoftDelete {
@@ -19,7 +20,13 @@ export default class Geo extends TimestampedSoftDelete {
   @Column()
   nameTranslationId: string
 
+  geoType: GeoType
+
   fromJSON(json: object) {
-    assignJSONProps(this, json)
-  }
+    mapPropsFromJSON(this, json)
+    mapFromJSON(this, json, {
+      geoType: GeoType
+    })
+    return this
+ }
 }
