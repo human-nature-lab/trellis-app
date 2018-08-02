@@ -1,26 +1,24 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapPropsFromJSON, mapFromJSON} from "../../services/JSONUtil";
-import Question from "./Question";
-import SectionQuestionGroup from "./SectionQuestionGroup";
+import Translation from "./Translation";
 
 @Entity()
-export default class QuestionGroup extends TimestampedSoftDelete {
+export default class Choice extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn()
   id: string
+  @Column()
+  choiceTranslationId: string
+  @Column()
+  val: string
 
-  questions: Question[]
-  sectionQuestionGroup: SectionQuestionGroup
+  choiceTranslation: Translation
 
   fromJSON(json: object) {
     mapPropsFromJSON(this, json)
     mapFromJSON(this, json, {
-      questions: Question,
-      sectionQuestionGroup: {
-        constructor: SectionQuestionGroup,
-        jsonKey: 'pivot'
-      }
+      choiceTranslation: Translation
     })
     return this
- }
+  }
 }

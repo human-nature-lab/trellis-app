@@ -1,7 +1,7 @@
 import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
-import {now} from '../../../../services/DateService'
-import Datum from '../../../../entities/Datum'
+import Datum from '../../../../entities/trellis/Datum'
+import {snakeToCamel} from '../../../../services/JSONUtil'
 
 const keyNames = ['name', 'question_datum_id', 'survey_id', 'choice_id', 'edge_id', 'geo_id', 'photo_id', 'roster_id']
 class DatumRecycler extends Recycler {
@@ -18,7 +18,8 @@ class DatumRecycler extends Recycler {
     datum.questionDatumId = questionDatum.id
     datum.eventOrder = maxEventOrder + 1
     for (let key in payload) {
-      datum[key] = payload[key]
+      let camel = snakeToCamel(key)
+      datum[camel] = payload[key]
     }
     return datum
   }
