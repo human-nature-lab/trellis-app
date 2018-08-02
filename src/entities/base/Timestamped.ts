@@ -1,9 +1,9 @@
 import { CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 export default abstract class Timestamped {
-  @CreateDateColumn({ name: "created_at", type: "datetime" })
+  @CreateDateColumn({ type: "datetime" })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: "updated_at", type: "datetime" })
+  @UpdateDateColumn({ type: "datetime" })
   updatedAt: Date;
 }
