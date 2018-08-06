@@ -20,7 +20,8 @@
             ref="textarea"
             readonly
             rows="10"
-            @click.stop="selectAll">{{ getFullMessage() }}</textarea>
+            :value="getFullMessage()"
+            @click.stop="selectAll"></textarea>
         </div>
       </v-flex>
     </v-layout>
@@ -37,7 +38,6 @@
     name: 'trellis-alert',
     data () {
       return {
-        isMore: false,
         showMore: false
       }
     },
@@ -53,9 +53,6 @@
       }
     },
     created () {
-      if (this.currentLog instanceof Log && this.currentLog.fullMessage !== null) {
-        this.isMore = true
-      }
     },
     methods: {
       getMessage: function () {
@@ -66,6 +63,9 @@
       },
       getFullMessage: function () {
         if (this.currentLog instanceof Log) {
+          if (typeof this.currentLog.fullMessage === 'string') {
+            return this.currentLog.fullMessage.replace(/\\n/g, '\n')
+          }
           return this.currentLog.fullMessage
         }
         return ''
@@ -96,6 +96,9 @@
       }
     },
     computed: {
+      isMore: function () {
+        return (this.currentLog instanceof Log && this.currentLog.fullMessage !== null)
+      }
     },
     components: {
     }
