@@ -10,7 +10,7 @@
     import SyncService from '../../../../services/sync/SyncService'
     import DeviceService from '../../../../services/device/DeviceService'
     import SyncSubStep from '../../SyncSubStep.vue'
-    import LoggingService from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'authenticate-device',
       data () {
@@ -26,6 +26,11 @@
         this.authenticate()
       },
       props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        }
       },
       methods: {
         authenticate: function () {
@@ -41,12 +46,12 @@
               this.checking = false
               if (err.response && err.response.status === 401) {
                 // Expected result if the device hasn't been added to the server
-                LoggingService.log({
+                this.loggingService.log({
                   severity: 'warn',
                   message: 'The device was not found on the server, please see an administrator for a resolution.'
                 }).then((result) => { this.currentLog = result })
               } else {
-                LoggingService.log(err).then((result) => { this.currentLog = result })
+                this.loggingService.log(err).then((result) => { this.currentLog = result })
               }
             })
           })
@@ -54,7 +59,7 @@
         stopChecking: function () {
           if (this.source) {
             this.source.cancel('Operation cancelled by the user.')
-            LoggingService.log({
+            this.loggingService.log({
               severity: 'warn',
               message: 'Operation cancelled by the user.'
             }).then((result) => { this.currentLog = result })
