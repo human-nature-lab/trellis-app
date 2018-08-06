@@ -2,6 +2,7 @@ import _ from 'lodash'
 import uuid from 'uuid/v4'
 import Log from '../../entities/trellis-config/Log'
 import DatabaseService from '../database/DatabaseService'
+import AlertService from '../../services/AlertService'
 const defaultSeverity = 'info'
 
 class LoggingServiceCordova {
@@ -13,7 +14,7 @@ class LoggingServiceCordova {
     }
   }
 
-  async log (_request) {
+  createLog (_request) {
     if (_request === null || _request === undefined) {
       throw new Error('Invalid logger request')
     }
@@ -29,8 +30,25 @@ class LoggingServiceCordova {
     log.deviceId = this.getDeviceId(request)
     log.userId = this.getUserId(request)
     log.createdAt = new Date()
-    const connection = await DatabaseService.getConfigDatabase()
-    await connection.manager.save(log)
+    return log
+  }
+
+  async log (_request) {
+    if (_request === null || _request === undefined) {
+      throw new Error('Invalid logger request')
+    }
+    const log = this.createLog(_request)
+    try {
+      const connection = await DatabaseService.getConfigDatabase()
+      await connection.manager.save(log)
+      /* For debug purposes only */
+      const logs = await connection.getRepository(Log).find()
+      console.log('logs', logs)
+      /* For debug purposes only */
+      throw new Error('Testing global alert service')
+    } catch (err) {
+      AlertService.emit('alert', err)
+    }
     return log
   }
 
@@ -65,7 +83,7 @@ class LoggingServiceCordova {
       if (request.hasOwnProperty('fullMessage')) {
         return request.fullMessage
       } else {
-        return JSON.stringify(request)
+        return JSON.stringify(request, Object.getOwnPropertyNames(request), 2)
       }
     }
     return null

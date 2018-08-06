@@ -1,15 +1,30 @@
+import Sync from '../../entities/trellis-config/Sync'
+import uuid from 'uuid/v4'
+import DatabaseService from '../database/DatabaseService'
 import { DeviceService } from '../device/DeviceService'
 import { syncInstance as http } from '../http/AxiosInstance'
 
 class SyncService {
   constructor () {
-    this.synced = false
     this.deviceId = DeviceService.getUUID()
+    this.synced = false
+  }
+  async createSync (type, deviceId) {
+    const sync = new Sync()
+    sync.id = uuid()
+    sync.type = type
+    sync.status = 'RUNNING'
+    sync.deviceId = deviceId
+    sync.fileName = ''
+    sync.createdAt = new Date()
+    const connection = await DatabaseService.getConfigDatabase()
+    await connection.manager.save(sync)
+    return sync
   }
   getHeartbeat (source) {
     let options = {}
     if (source) { options.cancelToken = source.token }
-    return http.get(`heartbeatx`, options)
+    return http.get(`heartbeat`, options)
       .then(response => {
         return response.data
       })
@@ -50,7 +65,6 @@ class SyncService {
     if (source) { options.cancelToken = source.token }
     return http.get(`snapshot/${snapshotId}/file_size`, options)
       .then(response => {
-        console.log('response', response)
         return response.data
       })
       .catch(err => {
@@ -66,7 +80,6 @@ class SyncService {
         .then((deviceId) => {
           http.post(`device/${deviceId}/image_size`, fileNames, options)
             .then(response => {
-              console.log('getImageFileList', response)
               resolve(response.data)
             })
         })
@@ -85,7 +98,6 @@ class SyncService {
     if (onDownloadProgress) { options.onDownloadProgress = onDownloadProgress }
     return http.get(`snapshot/${snapshotId}/download`, options)
       .then(response => {
-        console.log('response', response)
         return response
       })
       .catch(err => {

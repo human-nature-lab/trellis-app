@@ -1,53 +1,35 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Checking latest available snapshot on the server...
-        <strong v-if="success" class="green--text">OK.</strong>
-        <strong v-if="warning" class="amber--text">WARNING.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <trellis-alert type="warning" :show="warning" :message="warningMessage"></trellis-alert>
-    <trellis-alert type="error" :show="error" :message="errorMessage"></trellis-alert>
-    <v-progress-linear
-      v-if="checking"
-      height="2"
-      :indeterminate="true"></v-progress-linear>
-    <v-btn
-      v-if="!checking && !success"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="checking"
-      flat
-      @click.native="stopChecking">Stop</v-btn>
-  </div>
+  <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :cancel="stopChecking" :retry="retry">
+    Checking latest available snapshot on the server...
+  </sync-sub-step>
 </template>
 
 <script>
     import axios from 'axios'
     import config from '../../../../config'
     import SyncService from '../../../../services/sync/SyncService'
-    import TrellisAlert from '../../../TrellisAlert.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import SyncSubStep from '../../SyncSubStep.vue'
     export default {
       name: 'check-latest-snapshot',
       data () {
         return {
           success: false,
-          error: false,
-          warning: false,
           checking: false,
+          currentLog: undefined,
           apiRoot: config.apiRoot,
-          source: null,
-          errorMessage: '',
-          warningMessage: ''
+          source: null
         }
       },
       created () {
         this.checkLatestSnapshot()
       },
       props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        }
       },
       methods: {
         checkLatestSnapshot: function () {
@@ -55,37 +37,40 @@
           this.source = CancelToken.source()
           this.checking = true
           SyncService.getLatestSnapshot(this.source).then((serverLatestSnapshot) => {
-            console.log('serverLatestSnapshot', serverLatestSnapshot)
             this.checking = false
             if (Object.keys(serverLatestSnapshot).length === 0) {
-              this.warning = true
-              this.warningMessage = 'No snapshot found on the server, contact the server administrator for a solution.'
+              this.loggingService.log({
+                severity: 'warn',
+                message: 'No snapshot found on the server, contact the server administrator for a solution.'
+              }).then((result) => { this.currentLog = result })
             } else {
               this.$emit('check-latest-snapshot-done', serverLatestSnapshot)
               this.success = true
             }
-          }).catch((error) => {
-            this.errorMessage = error
-            this.error = true
+          }).catch((err) => {
             this.checking = false
+            this.loggingService.log(err).then((result) => { this.currentLog = result })
           })
         },
         stopChecking: function () {
           if (this.source) {
             this.source.cancel('Operation cancelled by the user.')
           }
+          this.loggingService.log({
+            severity: 'warn',
+            message: 'Operation cancelled by the user.'
+          }).then((result) => { this.currentLog = result })
           this.checking = false
         },
         retry: function () {
-          this.error = false
-          this.warning = false
+          this.currentLog = undefined
           this.checkLatestSnapshot()
         }
       },
       computed: {
       },
       components: {
-        TrellisAlert
+        SyncSubStep
       }
     }
 </script>

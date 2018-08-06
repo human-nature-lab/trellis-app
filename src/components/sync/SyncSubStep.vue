@@ -8,7 +8,7 @@
         <strong v-if="isError()" class="red--text">ERROR.</strong>
       </li>
     </ul>
-    <trellis-alert :v-if="showLog()" :current-log="currentLog"></trellis-alert>
+    <trellis-alert v-if="showLog()" :current-log="currentLog"></trellis-alert>
     <v-progress-linear
       v-if="working"
       height="2"
@@ -90,7 +90,7 @@
     },
     methods: {
       showLog: function () {
-        return (this.currentLog !== null && this.currentLog instanceof Log)
+        return (this.currentLog !== undefined && this.currentLog instanceof Log)
       },
       isWarning: function () {
         return (this.currentLog instanceof Log && this.currentLog.severity === 'warn')

@@ -1,6 +1,6 @@
 <template>
   <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :cancel="stopChecking" :retry="retry">
-    Establishing connection with the server...
+    Establishing a connection with the server...
   </sync-sub-step>
 </template>
 

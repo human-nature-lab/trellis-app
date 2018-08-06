@@ -10,5 +10,5 @@ const Constructor = switchByModeEnv({
   }
 })
 
-export const LoggingService = new Constructor()
-export default LoggingService
+export default Constructor
+export const defaultLoggingService = new Constructor()

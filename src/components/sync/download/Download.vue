@@ -1,5 +1,6 @@
 <template>
   <div class="download">
+    <trellis-alert v-if="showLog()" :current-log="currentLog"></trellis-alert>
     <div class="download-content">
         <v-stepper v-model="downloadStep">
           <v-stepper-header>
@@ -21,7 +22,7 @@
                 v-on:cancel-clicked="onCancel">
                 <check-connection
                   v-if="downloadSubStep > 0"
-                  v-on:connection-ok="downloadSubStep = 1"></check-connection>
+                  v-on:connection-ok="downloadSubStep = 2"></check-connection>
                 <authenticate-device
                   v-if="downloadSubStep > 1"
                   v-on:authentication-ok="downloadSubStep = 3"></authenticate-device>
@@ -141,6 +142,11 @@
   import DownloadImages from './substeps/DownloadImages.vue'
   import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '../../../static/constants'
   import FileService from '../../../services/file/FileService'
+  import SyncService from '../../../services/sync/SyncService'
+  import DeviceService from '../../../services/device/DeviceService'
+  import Log from '../../../entities/trellis-config/Log'
+  import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
+  import TrellisAlert from '../../TrellisAlert.vue'
   const DOWNLOAD_STATUS = {
     CHECKING_CONNECTION: 'Establishing connection with the server...',
     CHECKING_LAST_SNAPSHOT: 'Checking latest available snapshot on the server...'
@@ -151,7 +157,7 @@
       return {
         status: DOWNLOAD_STATUS.CHECKING_CONNECTION,
         downloadStep: 1,
-        downloadSubStep: 1,
+        downloadSubStep: 0,
         downloading: false,
         downloadProgress: 0,
         progressMessages: [],
@@ -166,14 +172,39 @@
         downloadedSnapshotFileEntry: null,
         extractedSnapshot: null,
         imagesToDownload: {},
-        photosFound: 0
+        photosFound: 0,
+        sync: undefined,
+        currentLog: undefined,
+        loggingService: undefined,
+        deviceId: ''
       }
     },
     created () {
+      DeviceService.getUUID()
+        .then((deviceId) => {
+          this.deviceId = deviceId
+          return SyncService.createSync('download', deviceId)
+        })
+        .then((sync) => {
+          this.sync = sync
+          this.loggingService = new LoggingService({
+            'syncId': (sync.id),
+            'deviceId': (this.deviceId),
+            'component': 'Download'
+          })
+        })
+        .then(() => { this.downloadSubStep = 1 })
+        .catch((err) => {
+          defaultLoggingService.log(err)
+            .then((log) => { this.currentLog = log })
+        })
     },
     props: {
     },
     methods: {
+      showLog: function () {
+        return (this.currentLog !== undefined && this.currentLog instanceof Log)
+      },
       onContinue: function () {
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
@@ -235,12 +266,10 @@
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
       generateImageListDone: function (imageList) {
-        console.log('calculateImageSizeDone', imageList)
         this.imagesToDownload = imageList
         this.downloadSubStep = 2
       },
       calculateImageSizeDone: function (photosFound) {
-        console.log('calculateImageSizeDone', photosFound)
         this.photosFound = photosFound
         this.downloadSubStep = 3
       },
@@ -265,6 +294,7 @@
       }
     },
     components: {
+      TrellisAlert,
       CompareSnapshots,
       CheckLatestSnapshot,
       CheckConnection,

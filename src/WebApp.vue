@@ -30,6 +30,17 @@
       </v-btn>
     </v-toolbar>
     <v-content>
+      <v-dialog :value="alerts && alerts.length > 0" persistent>
+        <v-card>
+          <v-card-text>
+            <trellis-alert :current-log="alerts[alerts.length - 1]"></trellis-alert>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="dismissAlert()">Dismiss</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-container
         fluid
         fill-height
@@ -54,12 +65,15 @@
   import LocaleService from './services/locale/LocaleService'
   import MainMenu from './components/main-menu/MainMenu'
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
+  import AlertService from './services/AlertService'
+  import TrellisAlert from './components/TrellisAlert.vue'
   export default {
     name: 'web-app',
     data: function () {
       return {
         error: null,
-        interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5']
+        interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
+        alerts: AlertService.alerts
       }
     },
     created: function () {
@@ -69,7 +83,15 @@
     components: {
       VDivider,
       LoadingPage,
-      MainMenu
+      MainMenu,
+      TrellisAlert
+    },
+    computed: {
+    },
+    methods: {
+      dismissAlert: function () {
+        AlertService.removeAlert()
+      }
     }
   }
 </script>
