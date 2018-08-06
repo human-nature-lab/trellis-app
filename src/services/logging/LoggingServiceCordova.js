@@ -45,7 +45,6 @@ class LoggingServiceCordova {
       const logs = await connection.getRepository(Log).find()
       console.log('logs', logs)
       /* For debug purposes only */
-      throw new Error('Testing global alert service')
     } catch (err) {
       AlertService.emit('alert', err)
     }

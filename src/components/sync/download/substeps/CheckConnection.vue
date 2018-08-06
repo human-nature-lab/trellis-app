@@ -9,7 +9,7 @@
     import config from '../../../../config'
     import SyncService from '../../../../services/sync/SyncService'
     import TrellisAlert from '../../../TrellisAlert.vue'
-    import LoggingService from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     import SyncSubStep from '../../SyncSubStep.vue'
     export default {
       name: 'check-connection',
@@ -27,6 +27,11 @@
         this.checkConnection()
       },
       props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        }
       },
       methods: {
         checkConnection: function () {
@@ -38,7 +43,7 @@
             this.checking = false
             this.$emit('connection-ok')
           }).catch(() => {
-            LoggingService.log({
+            this.loggingService.log({
               severity: 'warn',
               message: `Unable to establish a connection with the server at ${this.apiRoot}`
             }).then((result) => { this.currentLog = result })
@@ -50,7 +55,7 @@
           if (this.source) {
             this.source.cancel('Operation cancelled by the user.')
           }
-          this.currentLog = LoggingService.log({
+          this.currentLog = this.loggingService.log({
             severity: 'warn',
             message: 'Operation cancelled by the user.'
           })

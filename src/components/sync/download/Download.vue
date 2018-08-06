@@ -22,17 +22,26 @@
                 v-on:cancel-clicked="onCancel">
                 <check-connection
                   v-if="downloadSubStep > 0"
+                  :logging-service="loggingService"
                   v-on:connection-ok="downloadSubStep = 2"></check-connection>
                 <authenticate-device
                   v-if="downloadSubStep > 1"
+                  :logging-service="loggingService"
                   v-on:authentication-ok="downloadSubStep = 3"></authenticate-device>
                 <check-latest-snapshot
                   v-if="downloadSubStep > 2"
+                  :logging-service="loggingService"
                   v-on:check-latest-snapshot-done="checkLatestSnapshotDone"></check-latest-snapshot>
-                <compare-snapshots
+                <compare-download
                   v-if="downloadSubStep > 3"
+                  :logging-service="loggingService"
                   v-bind:server-snapshot="serverSnapshot"
-                  v-on:compare-snapshots-done="compareSnapshotsDone"></compare-snapshots>
+                  v-on:compare-download-done="compareDownloadDone"></compare-download>
+                <compare-upload
+                  v-if="downloadSubStep > 4"
+                  :logging-service="loggingService"
+                  v-bind:server-snapshot="serverSnapshot"
+                  v-on:compare-upload-done="compareUploadDone"></compare-upload>
               </download-step>
             </v-stepper-content>
             <v-stepper-content step="2">
@@ -128,7 +137,8 @@
   import CheckConnection from './substeps/CheckConnection'
   import AuthenticateDevice from './substeps/AuthenticateDevice'
   import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'
-  import CompareSnapshots from './substeps/CompareSnapshots'
+  import CompareDownload from './substeps/CompareDownload'
+  import CompareUpload from './substeps/CompareUpload'
   import EmptySnapshotsDirectory from './substeps/EmptySnapshotsDirectory'
   import CheckDownloadSize from './substeps/CheckDownloadSize'
   import DownloadSnapshot from './substeps/DownloadSnapshot.vue'
@@ -140,7 +150,7 @@
   import GenerateImageList from './substeps/GenerateImageList.vue'
   import CalculateImageSize from './substeps/CalculateImageSize.vue'
   import DownloadImages from './substeps/DownloadImages.vue'
-  import { BUTTON_STATUS, COMPARE_SNAPSHOTS_RESULTS } from '../../../static/constants'
+  import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
   import FileService from '../../../services/file/FileService'
   import SyncService from '../../../services/sync/SyncService'
   import DeviceService from '../../../services/device/DeviceService'
@@ -165,8 +175,10 @@
         serverSnapshot: null,
         localDownload: null,
         localUpload: null,
-        compareSnapshotsResults: COMPARE_SNAPSHOTS_RESULTS.NONE,
-        COMPARE_SNAPSHOTS_RESULTS: COMPARE_SNAPSHOTS_RESULTS,
+        compareDownloadResult: COMPARE_DOWNLOAD_RESULTS.NONE,
+        compareUploadResult: COMPARE_UPLOAD_RESULTS.NONE,
+        COMPARE_DOWNLOAD_RESULTS: COMPARE_DOWNLOAD_RESULTS,
+        COMPARE_UPLOAD_RESULTS: COMPARE_UPLOAD_RESULTS,
         autoContinueLabel: '',
         continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
         downloadedSnapshotFileEntry: null,
@@ -229,11 +241,19 @@
         this.serverSnapshot = serverSnapshot
         this.downloadSubStep = 4
       },
-      compareSnapshotsDone: function (autoDownload, warning) {
-        if (autoDownload) {
+      compareDownloadDone: function (result) {
+        console.log('compareDownloadDone', result)
+        this.compareDownloadResult = result
+        this.downloadSubStep = 5
+      },
+      compareUploadDone: function (result) {
+        console.log('compareUploadDone', result)
+        this.compareUploadResult = result
+        if ((this.compareDownloadResult === COMPARE_DOWNLOAD_RESULTS.NO_DOWNLOAD ||
+             this.compareDownloadResult === COMPARE_DOWNLOAD_RESULTS.DOWNLOAD_OLDER) &&
+            (this.compareUploadResult === COMPARE_UPLOAD_RESULTS.NO_UPLOAD ||
+             this.compareUploadResult === COMPARE_UPLOAD_RESULTS.UPLOAD_OLDER)) {
           this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
-        } else if (warning) {
-          this.continueStatus = BUTTON_STATUS.WARNING
         } else {
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
@@ -295,7 +315,8 @@
     },
     components: {
       TrellisAlert,
-      CompareSnapshots,
+      CompareDownload,
+      CompareUpload,
       CheckLatestSnapshot,
       CheckConnection,
       AuthenticateDevice,
