@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import AutoClickButton from '@/components/AutoClickButton'
+  import AutoClickButton from '../../../components/AutoClickButton'
   export default {
     name: 'download-step',
     data () {
