@@ -38,7 +38,6 @@ class DeviceServiceCordova {
           cordova.exec((result) => {
             // Android reports free space in kB; if this is an android device, multiply by 1000 to get bytes
             let bytes = (device.platform === 'Android') ? result * 1000 : result
-            console.log('getFreeDiskSpace', bytes)
             resolve(bytes)
           },
           (error) => reject(error),

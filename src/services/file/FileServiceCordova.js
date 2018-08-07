@@ -107,7 +107,6 @@ class FileServiceCordova {
         return new Promise((resolve, reject) => {
           let reader = directoryEntry.createReader()
           reader.readEntries((results) => {
-            console.log('listPhotos', results)
             resolve(results)
           }, reject)
         })
