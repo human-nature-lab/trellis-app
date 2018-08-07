@@ -4,6 +4,7 @@ import Log from '../../entities/trellis-config/Log'
 import DatabaseService from '../database/DatabaseService'
 import AlertService from '../../services/AlertService'
 const defaultSeverity = 'info'
+const writeToConsole = true
 
 class LoggingServiceCordova {
 
@@ -45,6 +46,13 @@ class LoggingServiceCordova {
       const logs = await connection.getRepository(Log).find()
       console.log('logs', logs)
       /* For debug purposes only */
+      if (writeToConsole) {
+        if (console.hasOwnProperty(log.severity)) {
+          console[log.severity](log.message, log)
+        } else {
+          console.log(log.message, log)
+        }
+      }
     } catch (err) {
       AlertService.emit('alert', err)
     }
