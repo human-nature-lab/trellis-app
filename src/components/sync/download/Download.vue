@@ -72,6 +72,7 @@
                 </download-snapshot>
                 <verify-download
                   v-if="downloadStep > 1 && downloadSubStep > 3"
+                  :logging-service="loggingService"
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-bind:fileHash="serverSnapshot.hash"
                   v-on:verify-download-done="verifyDownloadDone">
