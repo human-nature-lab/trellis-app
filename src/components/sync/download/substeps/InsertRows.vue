@@ -1,35 +1,20 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        {{ workMessage }}
-        <strong v-if="success" class="green--text">DONE.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-        <strong v-if="warning" class="amber--text">DONE.</strong>
-      </li>
-    </ul>
-    <trellis-alert :show="error" :message="errorMessage"></trellis-alert>
-    <trellis-alert :show="warning" :message="warningMessage"></trellis-alert>
-    <v-progress-linear
-      v-show="working"
-      height="2"
-      v-model="insertProgress">
-    </v-progress-linear>
-    <v-btn
-      v-if="!success && !working"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="working && !cancelled"
-      flat
-      @click.native="cancelImport">Stop</v-btn>
-  </div>
+  <sync-sub-step :working="working"
+                 success-message="DONE"
+                 :success="success"
+                 :current-log="currentLog"
+                 :cancel="cancelImport"
+                 :retry="retry"
+                 :indeterminate="progressIndeterminate"
+                 :progress="insertProgress">
+    {{ workMessage }}
+  </sync-sub-step>
 </template>
 
 <script>
-    import config from '../../../../config'
     import DatabaseService from '../../../../services/database/DatabaseService'
-    import TrellisAlert from '../../../TrellisAlert.vue'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     // Additional cancelled variable not bound to the component
     let cancelled = false
     export default {
@@ -39,14 +24,10 @@
           workMessage: 'Importing database...',
           cancelled: false,
           success: false,
-          warning: false,
-          error: false,
           working: false,
-          apiRoot: config.apiRoot,
-          errorMessage: '',
-          warningMessage: '',
           progressIndeterminate: false,
-          insertProgress: 0
+          insertProgress: 0,
+          currentLog: undefined
         }
       },
       beforeDestroy () {
@@ -55,7 +36,17 @@
       created () {
         this.startWork()
       },
-      props: ['extractedSnapshot'],
+      props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        },
+        extractedSnapshot: {
+          type: Object,
+          required: true
+        }
+      },
       methods: {
         startWork: function () {
           this.working = true
@@ -64,17 +55,17 @@
             .then(() => {
               this.working = false
               if (this.cancelled) {
-                this.warning = true
-                this.warningMessage = 'Importing database cancelled by user.'
+                this.loggingService.log({
+                  severity: 'warn',
+                  message: 'Importing database cancelled by user.'
+                }).then((result) => { this.currentLog = result })
               } else {
                 this.onDone()
               }
             })
             .catch((err) => {
-              console.error(err)
               this.working = false
-              this.error = true
-              this.errorMessage = err
+              this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         },
         cancelImport: function () {
@@ -97,16 +88,13 @@
         },
         clearErrors: function () {
           this.cancelled = cancelled = false
-          this.warning = false
-          this.warningMessage = false
-          this.error = false
-          this.errorMessage = false
+          this.currentLog = undefined
         }
       },
       computed: {
       },
       components: {
-        TrellisAlert
+        SyncSubStep
       }
     }
 </script>
