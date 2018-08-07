@@ -65,7 +65,6 @@
               return this.fileServicePromise
             })
             .then((fileEntry) => {
-              console.log('FileService.download -> fileEntry', fileEntry)
               this.success = true
               this.$emit('download-snapshot-done', fileEntry)
               this.downloading = false
@@ -83,7 +82,6 @@
           }
         },
         stopDownload: function () {
-          console.log('this.fileServicePromise', this.fileServicePromise)
           if (this.fileServicePromise.hasOwnProperty('cancelDownload')) {
             this.fileServicePromise.cancelDownload()
             this.downloading = false
