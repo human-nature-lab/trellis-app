@@ -59,6 +59,7 @@
                 </empty-snapshots-directory>
                 <check-download-size
                   v-if="downloadStep > 1 && downloadSubStep > 1"
+                  :logging-service="loggingService"
                   v-bind:snapshotId="serverSnapshotId"
                   v-on:check-download-size-done="checkDownloadSizeDone">
                 </check-download-size>
