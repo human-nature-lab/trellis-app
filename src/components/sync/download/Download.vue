@@ -94,6 +94,7 @@
                 v-on:cancel-clicked="onCancel">
                 <remove-database
                   v-if="downloadStep > 2"
+                  :logging-service="loggingService"
                   v-on:remove-database-done="removeDatabaseDone">
                 </remove-database>
                 <insert-rows

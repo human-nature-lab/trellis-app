@@ -31,8 +31,8 @@ const trellisConnection = {
   entities: [
     Photo
   ],
-  logging: ['warning', 'error'] // reduced logging
-  // logging: true // verbose logging
+  // logging: ['warning', 'error'] // reduced logging
+  logging: true // verbose logging
 }
 
 export default class DatabaseServiceCordova {
@@ -61,9 +61,9 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis-config')
   }
 
-  removeDatabase () {
-    return this.getDatabase()
-      .then((connection) => connection.dropDatabase())
+  async removeDatabase () {
+    const connection = await this.getDatabase()
+    await connection.dropDatabase()
   }
 
   async executeSnapshot (queryRunner, file, trackProgress, isCancelled) {

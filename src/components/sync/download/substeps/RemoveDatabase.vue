@@ -1,45 +1,36 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Removing previous database...
-        <strong v-if="success" class="green--text">DONE.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <v-progress-linear
-      v-if="removing"
-      height="2"
-      :indeterminate="true">
-    </v-progress-linear>
-    <v-btn
-      v-if="error"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-  </div>
+  <sync-sub-step :working="removing"
+                 success-message="DONE"
+                 :success="success"
+                 :current-log="currentLog"
+                 :retry="retry">
+    Removing previous database...
+  </sync-sub-step>
 </template>
 
 <script>
-    import config from '../../../../config'
     import DatabaseService from '../../../../services/database/DatabaseService'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'remove-database',
       data () {
         return {
           success: false,
-          error: false,
           removing: false,
-          apiRoot: config.apiRoot,
-          errorMessage: ''
+          currentLog: undefined
         }
       },
       created () {
         this.removeDatabase()
       },
-      props: [],
+      props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        }
+      },
       methods: {
         removeDatabase: function () {
           this.removing = true
@@ -48,22 +39,21 @@
               this.removing = false
               this.success = true
               this.$emit('remove-database-done')
-            },
-            (error) => {
-              console.error(error)
+            })
+            .catch((err) => {
               this.removing = false
-              this.error = true
-              this.errorMessage = error
+              this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         },
         retry: function () {
-          this.error = false
+          this.currentLog = undefined
           this.removeDatabase()
         }
       },
       computed: {
       },
       components: {
+        SyncSubStep
       }
     }
 </script>
