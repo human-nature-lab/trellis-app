@@ -65,6 +65,7 @@
                 </check-download-size>
                 <download-snapshot
                   v-if="downloadStep > 1 && downloadSubStep > 2"
+                  :logging-service="loggingService"
                   v-bind:snapshotId="serverSnapshotId"
                   v-bind:snapshotFileSize="snapshotFileSize"
                   v-on:download-snapshot-done="downloadSnapshotDone">
