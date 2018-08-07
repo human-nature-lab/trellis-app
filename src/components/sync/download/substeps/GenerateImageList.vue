@@ -1,44 +1,37 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Generating list of images to download...
-        <strong v-if="success" class="green--text">DONE.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <v-progress-linear
-      v-if="checking"
-      height="2"
-      :indeterminate="true"></v-progress-linear>
-    <v-btn
-      v-if="!checking && !success"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-  </div>
+  <sync-sub-step :working="checking"
+                 success-message="DONE"
+                 :success="success"
+                 :current-log="currentLog"
+                 :retry="retry">
+    Generating list of images to download...
+  </sync-sub-step>
 </template>
 
 <script>
     import FileService from '../../../../services/file/FileService'
     import PhotoService from '../../../../services/photo/PhotoService'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'generate-image-list',
       data () {
         return {
           success: false,
-          error: false,
           checking: false,
-          errorMessage: '',
-          imageList: {}
+          imageList: {},
+          currentLog: undefined
         }
       },
       created () {
         this.generateImageList()
       },
       props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        }
       },
       methods: {
         generateImageList: function () {
@@ -60,29 +53,26 @@
                   delete this.imageList[fileName]
                 }
               }
-              console.log('photoList', photoList)
-              console.log('localList', localList)
               this.onDone()
-            }).catch((error) => {
-              console.log('error', error)
-              this.errorMesage = error.message
-              this.error = true
+            }).catch((err) => {
+              this.checking = false
+              this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         },
         onDone: function () {
           this.success = true
           let imagesToDownload = Object.keys(this.imageList)
-          console.log('onDone', imagesToDownload)
           this.$emit('generate-image-list-done', imagesToDownload)
         },
         retry: function () {
-          this.error = false
+          this.currentLog = undefined
           this.generateImageList()
         }
       },
       computed: {
       },
       components: {
+        SyncSubStep
       }
     }
 </script>
