@@ -79,6 +79,7 @@
                 </verify-download>
                 <extract-snapshot
                   v-if="downloadStep > 1 && downloadSubStep > 4"
+                  :logging-service="loggingService"
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-on:extract-snapshot-done="extractSnapshotDone">
                 </extract-snapshot>

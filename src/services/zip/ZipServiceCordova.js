@@ -12,19 +12,18 @@ class ZipServiceCordova {
           let fileUrl = fileEntry.toURL()
           zip.unzip(fileUrl, dirUrl, function (result) {
             if (result === -1) {
-              reject('Unable to extract the zip file.')
+              reject(new Error('Unable to extract the zip file.'))
             } else {
               directoryEntry
                 .createReader()
                 .readEntries((entries) => {
                   entries.forEach((entry) => {
-                    if (entry.name.slice(-4) === '.zip') {
-                      fileEntry.remove()
-                    } else {
+                    // Ignore the .zip file
+                    if (entry.name.slice(-4) !== '.zip') {
                       resolve(entry)
                     }
                   })
-                  reject('No extracted file found.')
+                  reject(new Error('No extracted file found.'))
                 })
             }
           }, progressCallback)
