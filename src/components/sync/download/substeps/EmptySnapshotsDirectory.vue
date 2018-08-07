@@ -1,5 +1,9 @@
 <template>
-  <sync-sub-step success-message="Done" :working="working" :success="success" :current-log="currentLog" :retry="retry">
+  <sync-sub-step success-message="DONE"
+                 :working="working"
+                 :success="success"
+                 :current-log="currentLog"
+                 :retry="retry">
     Emptying the snapshots directory...
   </sync-sub-step>
 </template>
