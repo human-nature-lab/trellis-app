@@ -53,6 +53,7 @@
                 v-on:cancel-clicked="onCancel">
                 <empty-snapshots-directory
                   v-if="downloadStep > 1"
+                  :logging-service="loggingService"
                   v-bind:snapshotId="serverSnapshotId"
                   v-on:empty-snapshots-directory-done="emptySnapshotsDirectoryDone">
                 </empty-snapshots-directory>
