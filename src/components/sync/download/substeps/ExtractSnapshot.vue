@@ -1,55 +1,44 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Extracting the snapshot...
-        <strong v-if="success" class="green--text">DONE.</strong>
-        <strong v-if="warning" class="amber--text">WARNING.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <span v-if="warning">
-      <p>{{ warningMessage }}</p>
-    </span>
-    <v-progress-linear
-      v-if="extracting"
-      height="2"
-      :indeterminate="progressIndeterminate"
-      v-model="extractProgress">
-    </v-progress-linear>
-    <v-btn
-      v-if="!extracting && !success"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-  </div>
+  <sync-sub-step success-message="DONE"
+                 :working="extracting"
+                 :success="success"
+                 :current-log="currentLog"
+                 :retry="retry"
+                 :indeterminate="progressIndeterminate"
+                 :progress="extractProgress">
+    Extracting the snapshot...
+  </sync-sub-step>
 </template>
 
 <script>
-    import config from '../../../../config'
     import ZipService from '../../../../services/zip/ZipService'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
-      name: 'download-snapshot',
+      name: 'extract-snapshot',
       data () {
         return {
           success: false,
-          warning: false,
-          error: false,
           extracting: false,
-          apiRoot: config.apiRoot,
-          source: null,
-          errorMessage: '',
-          warningMessage: '',
           progressIndeterminate: true,
-          extractProgress: 0.0
+          extractProgress: 0.0,
+          currentLog: undefined
         }
       },
       created () {
         this.extractSnapshot()
       },
-      props: ['fileEntry'],
+      props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        },
+        fileEntry: {
+          type: Object,
+          required: true
+        }
+      },
       methods: {
         extractSnapshot: function () {
           this.extracting = true
@@ -59,27 +48,27 @@
               this.extracting = false
               this.success = true
               this.$emit('extract-snapshot-done', unzippedFile)
-            },
-            (error) => {
+            })
+            .catch((err) => {
               this.extracting = false
-              this.error = true
-              this.errorMessage = error.data
+              this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         },
         progressCallback: function (progressEvent) {
-          console.log('progressEvent2', progressEvent)
+          /* This gets called for each fileEntry returned. In our case, where we're unzipping only one file, we won't
+             see the progress bar update. */
           this.progressIndeterminate = false
           this.extractProgress = (progressEvent.loaded / progressEvent.total) * 100
         },
         retry: function () {
-          this.error = false
-          this.warning = false
+          this.currentLog = undefined
           this.extractSnapshot()
         }
       },
       computed: {
       },
       components: {
+        SyncSubStep
       }
     }
 </script>
