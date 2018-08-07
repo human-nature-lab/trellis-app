@@ -99,6 +99,7 @@
                 </remove-database>
                 <insert-rows
                   v-if="downloadStep > 2 && downloadSubStep > 1"
+                  :logging-service="loggingService"
                   v-on:insert-rows-done="insertRowsDone"
                   v-bind:extracted-snapshot="extractedSnapshot">
                 </insert-rows>
