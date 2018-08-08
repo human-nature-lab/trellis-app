@@ -40,7 +40,6 @@
       }
     },
     created () {
-      this.working = true
     },
     props: {
       progress: {

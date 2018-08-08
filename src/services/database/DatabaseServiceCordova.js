@@ -61,9 +61,22 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis-config')
   }
 
-  async removeDatabase () {
+  async removeDatabase (status) {
     const connection = await this.getDatabase()
-    await connection.dropDatabase()
+    const queryRunner = await connection.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.query('PRAGMA foreign_keys = OFF;')
+    await queryRunner.startTransaction()
+    try {
+      const selectDropsQuery = `SELECT 'DROP TABLE "' || name || '";' as query FROM "sqlite_master" WHERE "type" = 'table' AND "name" != 'sqlite_sequence'`
+      const dropQueries = await queryRunner.query(selectDropsQuery)
+      await Promise.all(dropQueries.map(q => queryRunner.query(q['query'])))
+      return queryRunner
+    } catch (err) {
+      status.message = 'Rolling back transaction...'
+      await queryRunner.rollbackTransaction()
+      throw err
+    }
   }
 
   async executeSnapshot (queryRunner, file, trackProgress, isCancelled) {
@@ -127,20 +140,12 @@ export default class DatabaseServiceCordova {
     })
   }
 
-  async importDatabase (extractedSnapshot, trackProgress, isCancelled) {
-    const connection = await this.getDatabase()
-    const queryRunner = await connection.createQueryRunner()
+  async importDatabase (queryRunner, extractedSnapshot, trackProgress, isCancelled, status) {
     const file = await FileService.fileFromFileEntry(extractedSnapshot)
-    await queryRunner.connect()
-    await queryRunner.query('PRAGMA foreign_keys = OFF;')
-    await queryRunner.startTransaction()
     try {
       await this.executeSnapshot(queryRunner, file, trackProgress, isCancelled)
-      if (!isCancelled()) {
-        await queryRunner.commitTransaction()
-      }
     } catch (err) {
-      console.log('in catch block')
+      status.message = 'Rolling back transaction...'
       await queryRunner.rollbackTransaction()
       throw err
     } finally {
@@ -148,9 +153,15 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  checkForeignKeys () {
-    return this.getDatabase()
-      .then((connection) => connection.query('PRAGMA foreign_key_check;'))
+  async checkForeignKeys (queryRunner, status) {
+    try {
+      await queryRunner.query('PRAGMA foreign_key_check;')
+      await queryRunner.commitTransaction()
+    } catch (err) {
+      status.message = 'Rolling back transaction...'
+      await queryRunner.rollbackTransaction()
+      throw err
+    }
   }
 
   async getLatestDownload () {

@@ -4,7 +4,7 @@
                  :success="success"
                  :current-log="currentLog"
                  :retry="retry">
-    Removing previous database...
+    {{ status.message }}
   </sync-sub-step>
 </template>
 
@@ -18,7 +18,10 @@
         return {
           success: false,
           removing: false,
-          currentLog: undefined
+          currentLog: undefined,
+          status: {
+            message: 'Removing previous database...'
+          }
         }
       },
       created () {
@@ -34,11 +37,11 @@
       methods: {
         removeDatabase: function () {
           this.removing = true
-          DatabaseService.removeDatabase()
-            .then(() => {
+          DatabaseService.removeDatabase(this.status)
+            .then((queryRunner) => {
               this.removing = false
               this.success = true
-              this.$emit('remove-database-done')
+              this.$emit('remove-database-done', queryRunner)
             })
             .catch((err) => {
               this.removing = false
