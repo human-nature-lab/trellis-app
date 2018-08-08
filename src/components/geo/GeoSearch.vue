@@ -73,7 +73,7 @@
 </template>
 
 <script>
-  import _ from 'lodash'
+  import {debounce} from 'lodash'
   import GeoService from '../../services/geo/GeoService'
   import GeoListTile from './GeoListTile'
   import Cart from '../Cart'
@@ -135,7 +135,7 @@
         error: null,
         isSearching_: false,
         lastParentIds: [],
-        queryChange: _.debounce(this.search, 300)
+        queryChange: debounce(this.search, 300)
       }
     },
     created () {
