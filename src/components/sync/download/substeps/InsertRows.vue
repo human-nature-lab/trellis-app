@@ -7,7 +7,7 @@
                  :retry="retry"
                  :indeterminate="progressIndeterminate"
                  :progress="insertProgress">
-    {{ workMessage }}
+    {{ status.message }}
   </sync-sub-step>
 </template>
 
@@ -21,13 +21,15 @@
       name: 'insert-rows',
       data () {
         return {
-          workMessage: 'Importing database...',
           cancelled: false,
           success: false,
           working: false,
-          progressIndeterminate: false,
+          progressIndeterminate: true,
           insertProgress: 0,
-          currentLog: undefined
+          currentLog: undefined,
+          status: {
+            message: 'Importing database...'
+          }
         }
       },
       beforeDestroy () {
@@ -42,6 +44,10 @@
           required: false,
           'default': function () { return defaultLoggingService }
         },
+        queryRunner: {
+          type: Object,
+          required: true
+        },
         extractedSnapshot: {
           type: Object,
           required: true
@@ -50,8 +56,8 @@
       methods: {
         startWork: function () {
           this.working = true
-          this.workMessage = 'Importing database...'
-          DatabaseService.importDatabase(this.extractedSnapshot, this.trackProgress, this.isCancelled)
+          this.status.message = 'Importing database...'
+          DatabaseService.importDatabase(this.queryRunner, this.extractedSnapshot, this.trackProgress, this.isCancelled, this.status)
             .then(() => {
               this.working = false
               if (this.cancelled) {
@@ -70,14 +76,14 @@
         },
         cancelImport: function () {
           this.cancelled = cancelled = true
-          this.workMessage = 'Rolling back transaction...'
+          this.status.message = 'Cancelling...'
         },
         isCancelled: function () {
           return cancelled
         },
         onDone: function () {
           this.success = true
-          this.$emit('insert-rows-done')
+          this.$emit('insert-rows-done', this.queryRunner)
         },
         retry: function () {
           this.clearErrors()
@@ -85,6 +91,9 @@
         },
         trackProgress: function (progress) {
           this.insertProgress = (progress.inserted / progress.total) * 100
+          if (this.insertProgress > 0) {
+            this.progressIndeterminate = false
+          }
         },
         clearErrors: function () {
           this.cancelled = cancelled = false

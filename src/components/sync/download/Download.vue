@@ -100,12 +100,14 @@
                 <insert-rows
                   v-if="downloadStep > 2 && downloadSubStep > 1"
                   :logging-service="loggingService"
+                  :query-runner="queryRunner"
                   v-on:insert-rows-done="insertRowsDone"
                   v-bind:extracted-snapshot="extractedSnapshot">
                 </insert-rows>
                 <check-foreign-keys
                   v-if="downloadStep > 2 && downloadSubStep > 2"
                   :logging-service="loggingService"
+                  :query-runner="queryRunner"
                   v-on:check-foreign-keys-done="checkForeignKeysDone">
                 </check-foreign-keys>
               </download-step>
@@ -199,7 +201,8 @@
         sync: undefined,
         currentLog: undefined,
         loggingService: undefined,
-        deviceId: ''
+        deviceId: '',
+        queryRunner: undefined
       }
     },
     created () {
@@ -287,10 +290,12 @@
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
         this.extractedSnapshot = extractedSnapshot
       },
-      removeDatabaseDone: function () {
+      removeDatabaseDone: function (queryRunner) {
+        this.queryRunner = queryRunner
         this.downloadSubStep = 2
       },
-      insertRowsDone: function () {
+      insertRowsDone: function (queryRunner) {
+        this.queryRunner = queryRunner
         this.downloadSubStep = 3
       },
       checkForeignKeysDone: function () {

@@ -5,7 +5,7 @@
     :current-log="currentLog"
     :ignore="ignore"
     :retry="retry">
-    Checking foreign key constraints...
+    {{ status.message }}
   </sync-sub-step>
 </template>
 
@@ -19,7 +19,10 @@
         return {
           success: false,
           working: false,
-          currentLog: undefined
+          currentLog: undefined,
+          status: {
+            message: 'Checking foreign key constraints...'
+          }
         }
       },
       created () {
@@ -30,12 +33,16 @@
           type: LoggingService,
           required: false,
           'default': function () { return defaultLoggingService }
+        },
+        queryRunner: {
+          type: Object,
+          required: true
         }
       },
       methods: {
         checkForeignKeys: function () {
           this.working = true
-          DatabaseService.checkForeignKeys()
+          DatabaseService.checkForeignKeys(this.queryRunner, this.status)
             .then(() => {
               this.working = false
               this.success = true
