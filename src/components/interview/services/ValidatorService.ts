@@ -1,43 +1,45 @@
+import v18n from '../../../i18n'
+import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 // All of the validation errors that will be displayed when validation fails
 export const validationErrors = {
-  'min': min => `Value is less than the minimum of ${min}`,
-  'max': max => `Value is greater than the maximum of ${max}`,
-  'is_required': () => `A response to this question is required`,
-  'read_only': () => `How did you get here? This question is read only.`,
-  'min_geos': min => `The number of locations is below the minimum of ${min}`,
-  'max_geos': max => `The number of locations is above the maximum of ${max}`,
-  'min_roster': min => `The number of roster rows is below the minimum of ${min}`,
-  'max_roster': max => `The number of roster rows is above the maximum of ${max}`,
-  'min_relationships': min => `The number of relationships is below the minimum of ${min}`,
-  'max_relationships': max => `The number of relationships is above the maximum of ${max}`
+  min: min => v18n.t('value_must_be_greater_than_min', min),
+  max: max => v18n.t('value_must_be_less_than_max', max),
+  is_required: () => v18n.t('response_required'),
+  read_only: () => `How did you get here? This question is read only.`,
+  min_geos: min => v18n.t('value_must_be_greater_than_min', min),
+  max_geos: max => v18n.t('value_must_be_less_than_max', max),
+  min_roster: min => v18n.t('value_must_be_greater_than_min', min),
+  max_roster: max => v18n.t('value_must_be_less_than_max', max),
+  min_relationships: min => v18n.t('value_must_be_greater_than_min', min),
+  max_relationships: max => v18n.t('value_must_be_less_than_max', max)
 }
 
 export const typeHandlers = {
   'read_only': function () {
     return true
   },
-  'min': function (qd, pVal) {
+  'min': function (qd: QuestionDatum, pVal: any) {
     pVal = parseInt(pVal, 10)
     return qd.data.length && qd.data[0].val >= pVal
   },
-  'max': function (qd, pVal) {
+  'max': function (qd: QuestionDatum, pVal: any) {
     pVal = parseInt(pVal, 10)
     return qd.data.length && qd.data[0].val <= pVal
   },
-  'min_geos': function (qd, pVal) {
+  'min_geos': function (qd: QuestionDatum, pVal: any) {
     pVal = parseInt(pVal, 10)
     return qd.data.length >= pVal
   },
-  'max_geos': function (qd, pVal) {
+  'max_geos': function (qd: QuestionDatum, pVal: any) {
     pVal = parseInt(pVal, 10)
     return qd.data.length <= pVal
   },
-  'is_required': function (qd, pVal, pMap) {
+  'is_required': function (qd: QuestionDatum, pVal: any, pMap) {
     if (pVal) {
       if (qd.data && qd.data.length) {
         return true
       } else if (pMap.show_dk || pMap.show_rf) {
-        return qd.dk_rf !== undefined && qd.dk_rf !== null && qd.dk_rf_val && qd.dk_rf_val.length
+        return qd.dkRf !== undefined && qd.dkRf !== null && qd.dkRfVal && qd.dkRfVal.length
       } else {
         return false
       }
@@ -73,7 +75,7 @@ const relevantTypes = [
  * @param {any} value
  * @returns {*}
  */
-function castParameter (questionType, parameterType, value) {
+function castParameter (questionType: any, parameterType: any, value: any) {
   switch (parameterType) {
     case 'min':
     case 'max':
@@ -117,7 +119,7 @@ export function parametersToMap (parameters, question) {
  * @param {Object} questionDatum
  * @returns {boolean}
  */
-export function validateParameters (question, parameters, questionDatum) {
+export function validateParameters (question, parameters, questionDatum: QuestionDatum) {
   return validateParametersWithError(question, parameters, questionDatum) === true
 }
 
@@ -128,7 +130,7 @@ export function validateParameters (question, parameters, questionDatum) {
  * @param {Object} questionDatum
  * @returns {boolean|string}
  */
-export function validateParametersWithError (question, parameters, questionDatum) {
+export function validateParametersWithError (question: any, parameters: any, questionDatum: QuestionDatum) {
   let pMap = parametersToMap(parameters, question)
 
   // Handle the trivial case
@@ -137,7 +139,7 @@ export function validateParametersWithError (question, parameters, questionDatum
   }
 
   if (pMap.is_required && (pMap.show_dk || pMap.show_rf)) {
-    if (questionDatum.dk_rf !== null && questionDatum.dk_rf !== undefined && questionDatum.dk_rf_val && questionDatum.dk_rf_val.length) {
+    if (questionDatum.dkRf !== null && questionDatum.dkRf !== undefined && questionDatum.dkRfVal && questionDatum.dkRfVal.length) {
       return true
     }
   }

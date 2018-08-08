@@ -1,10 +1,12 @@
+export interface Recyclable<T> {
+  keyExtractor(obj: T): string
+  objectCreator(...any): T
+}
 /**
  * Abstract recycler class for reusing objects
  */
-export default class Recycler {
-  constructor () {
-    this.cache = new Map()
-  }
+export default abstract class Recycler<T> {
+  private cache: Map<string, T> = new Map()
 
   /**
    * Remove all previous data by resetting the cache
@@ -19,18 +21,14 @@ export default class Recycler {
    * @param obj
    * @returns {string}
    */
-  keyExtractor (obj) {
-    throw Error('Define a key extractor before using the fill method')
-  }
+  abstract keyExtractor (obj): string
 
   /**
    * Function that must be defined by parent class to use this class effectively
    * @param {...any} params - Any parameters
    * @returns {any}
    */
-  objectCreator (...params) {
-    throw Error('Object creator must be defined to use this class')
-  }
+  abstract objectCreator (...params): T
 
   /**
    * Store a bunch of objects at once to
@@ -45,10 +43,10 @@ export default class Recycler {
   /**
    * Get a single object by key. If the object for that key doesn't already exist it will be created using the
    * objectCreator method. All arguments after the key parameter will be included with the objectCreator method
-   * @param {any} key
+   * @param {string} key
    * @param {..any} params
    */
-  get (key, ...params) {
+  get (key: string, ...params) {
     let obj = this.cache.get(key)
     if (!obj) {
       obj = this.objectCreator(...params)

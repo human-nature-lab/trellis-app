@@ -1,12 +1,14 @@
 import http from '../http/AxiosInstance'
 import formTypes from '../../static/form.types'
-export default class FormServiceWeb {
+import FormServiceInterface from "./FormServiceInterface";
+export class FormServiceWeb implements FormServiceInterface {
+
   /**
    * Gets all forms for the current study
    * @param {String} studyId
    * @returns {Promise<Array>}
    */
-  static getStudyForms (studyId) {
+  getStudyForms (studyId: string) {
     return http().get(`study/${studyId}/forms/published`, {
       params: {
         form_type_id: formTypes.data_collection_form
@@ -29,7 +31,7 @@ export default class FormServiceWeb {
    * @param {String} formId
    * @returns {Promise<Object>}
    */
-  static getForm (formId) {
+  getForm (formId: string) {
     return http().get(`form/${formId}`)
       .then(res => {
         if (res.data.form) {
@@ -44,3 +46,5 @@ export default class FormServiceWeb {
   }
 
 }
+
+export default new FormServiceWeb()

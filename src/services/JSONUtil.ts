@@ -116,3 +116,33 @@ export function mapFromJSON (target: object, source: object, keyMap: object) {
     }
   }
 }
+
+/**
+ * Map an objects camel case properties to a plain object using snake case
+ * @param {object} source
+ * @returns {{}}
+ */
+export function mapCamelToPlain (source: object, keyMap?: string[]|object) {
+  let d = {}
+  keyMap = keyMap || Object.keys(source)
+  if (Array.isArray(keyMap)) {
+    for (let sourceKey of keyMap) {
+      let targetKey = camelToSnake(sourceKey)
+      if (Array.isArray(source[sourceKey])) {
+        d[targetKey] = source[sourceKey].map(o => typeof o === 'object' && o.toSnakeJSON ? o.toSnakeJSON() : o)
+      } else {
+        d[targetKey] = typeof source[sourceKey] === 'object' && source[sourceKey].toSnakeJSON ? source[sourceKey].toSnakeJSON() : source[sourceKey]
+      }
+    }
+  } else {
+    for (let sourceKey in keyMap) {
+      let targetKey = keyMap[sourceKey]
+      if (Array.isArray(source[sourceKey])) {
+        d[targetKey] = source[sourceKey].map(o => typeof o === 'object' && o.toSnakeJSON ? o.toSnakeJSON() : o)
+      } else {
+        d[targetKey] = typeof source[sourceKey] === 'object' && source[sourceKey].toSnakeJSON ? source[sourceKey].toSnakeJSON() : source[sourceKey]
+      }
+    }
+  }
+  return d
+}

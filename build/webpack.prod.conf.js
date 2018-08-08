@@ -34,8 +34,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     new webpack.LoaderOptionsPlugin({ options: {} }),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
-      'process.env': env,
-      CORDOVA_CONTENT_SOURCE: 'index.html'
+      'process.env': env
     }),
     // new webpack.optimize.UglifyJsPlugin({
     //   compress: {

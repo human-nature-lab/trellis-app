@@ -12,7 +12,7 @@
 <script>
   import RespondentGeos from '../../respondent/RespondentGeos'
   import AT from '../../../static/action.types'
-  import ActionMixin from '../../../mixins/ActionMixin'
+  import ActionMixin from '../mixins/ActionMixin'
   export default {
     name: 'respondent-geo-question',
     props: {

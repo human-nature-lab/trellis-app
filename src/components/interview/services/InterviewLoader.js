@@ -1,6 +1,5 @@
 import FormService from '../../../services/form/FormService'
 import InterviewService from '../../../services/interview/InterviewService'
-import InterviewActionsService from './interview-actions/InterviewActionsService'
 import LocaleService from '../../../services/locale/LocaleService'
 import RespondentService from '../../../services/respondent/RespondentService'
 export default class InterviewLoader {
@@ -75,7 +74,7 @@ export default class InterviewLoader {
     return InterviewService.getInterview(interviewId).then(interview => {
       results.interview = interview
       return Promise.all([
-        InterviewActionsService.getActions(interviewId).then(actions => {
+        InterviewService.getActions(interviewId).then(actions => {
           results.actions = actions
         }).catch(() => {}),
         InterviewService.getData(interviewId).then(data => {

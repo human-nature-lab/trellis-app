@@ -1,19 +1,22 @@
 import _ from 'lodash'
+import {AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta} from "../../../services/interview/InterviewDeltaInterface";
+import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 export default class DiffService {
   /**
    * Take two maps and return their
    * @param {Map<string:object>} newObjMap
    * @param {Map<string:object>} oldObjMap
+   * @param {Map<string:object>} comparisonKeys
    * @returns {{added: Array<object>, modified: Array<object>, removed: Array<object>}}
    */
-  static mapDiffByKey (newObjMap, oldObjMap) {
+  static mapDiffByKey (newObjMap: Map<string,object>, oldObjMap: Map<string,object>, comparisonKeys?: string[]|Set<string>) {
     let added = []
     let modified = []
     let removed = []
-    let allKeys = new Set([...newObjMap.keys(), ...oldObjMap.keys()])
+    comparisonKeys = comparisonKeys || new Set([...newObjMap.keys(), ...oldObjMap.keys()])
     let a
     let b
-    for (let key of allKeys) {
+    for (let key of comparisonKeys) {
       if (newObjMap.has(key)) {
         if (!oldObjMap.has(key)) {
           added.push(newObjMap.get(key))
@@ -28,7 +31,7 @@ export default class DiffService {
         removed.push(oldObjMap.get(key))
       }
     }
-    return { added, modified, removed }
+    return new ModifiedDelta(added, removed, modified)
   }
 
   /**
@@ -38,35 +41,42 @@ export default class DiffService {
    * @param {object<interview.data>} oldData
    * @returns {{questionDatum: {added, modified, removed}|*, datum: {added, modified, removed}|*}}
    */
-  static dataDiff (newData, oldData) {
-    newData = JSON.parse(JSON.stringify(newData))
-    oldData = JSON.parse(JSON.stringify(oldData))
+  static dataDiff (newData: QuestionDatum[], oldData: QuestionDatum[]) {
+    // newData = JSON.parse(JSON.stringify(newData))
+    // oldData = JSON.parse(JSON.stringify(oldData))
 
     let newDatum = new Map()
     let oldDatum = new Map()
 
-    let newQDatumMap = new Map(newData.map(q => {
+    let newQDatumMap = new Map()
+    for (let q of newData) {
       for (let d of q.data) {
         newDatum.set(d.id, d)
       }
-      delete q.data
-      return [q.id, q]
-    }))
-    let oldQDatumMap = new Map(oldData.map(q => {
+      newQDatumMap.set(q.id, q)
+    }
+    let oldQDatumMap = new Map()
+    for (let q of oldData) {
       for (let d of q.data) {
         oldDatum.set(d.id, d)
       }
-      delete q.data
-      return [q.id, q]
-    }))
+      oldQDatumMap.set(q.id, q)
+    }
 
-    const questionDatum = DiffService.mapDiffByKey(newQDatumMap, oldQDatumMap)
+    const questionDatum = DiffService.mapDiffByKey(newQDatumMap, oldQDatumMap, [
+      'questionId',
+      'surveyId',
+      'followUpDatumId',
+      'sectionRepetition',
+      'answeredAt',
+      'skippedAt',
+      'dkRf',
+      'dkRfVal'
+    ])
     const datum = DiffService.mapDiffByKey(newDatum, oldDatum)
 
-    return {
-      questionDatum,
-      datum
-    }
+    return new DataDelta(datum, questionDatum)
+
   }
 
   /**
@@ -77,17 +87,16 @@ export default class DiffService {
    * @returns {{respondent: {added, removed}, section: {added, removed}}
    */
   static conditionTagsDiff (newTags, oldTags) {
-    newTags = JSON.parse(JSON.stringify(newTags))
-    oldTags = JSON.parse(JSON.stringify(oldTags))
+    // newTags = JSON.parse(JSON.stringify(newTags))
+    // oldTags = JSON.parse(JSON.stringify(oldTags))
 
-    let res = {}
+    let res = new ConditionTagDelta()
     for (let type of ['respondent', 'section', 'survey']) {
-      let newConditionIds = new Map(newTags[type].map(tag => [tag.condition_id, tag]))
-      let oldConditionIds = new Map(oldTags[type].map(tag => [tag.condition_id, tag]))
+      let newConditionIds: Map<string, object> = new Map(newTags[type].map(tag => [tag.condition_id, tag]))
+      let oldConditionIds: Map<string, object> = new Map(oldTags[type].map(tag => [tag.condition_id, tag]))
 
       let diff = DiffService.mapDiffByKey(newConditionIds, oldConditionIds)
-      delete diff.modified
-      res[type] = diff
+      res[type] = new AddedRemovedDelta(diff.added, diff.removed)
     }
     return res
   }

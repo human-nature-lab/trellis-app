@@ -136,8 +136,9 @@
 
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
-  import RosterService from '@/services/roster/RosterService'
-  import actionBus from '../services/ActionBus'
+  import RosterService from '../../../services/roster/RosterService'
+  import ActionMixin from '../mixins/ActionMixin'
+  import AT from '../../../static/action.types'
   export default {
     name: 'roster-question',
     props: {
@@ -146,7 +147,7 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin],
+    mixins: [QuestionDisabledMixin, ActionMixin],
     data: function () {
       return {
         rosterCache: {},
@@ -197,12 +198,8 @@
         this.isSavingNew = true
         RosterService.createRosterRows([this.newText]).then(rows => {
           for (let row of rows) {
-            actionBus.action({
-              action_type: 'add-roster-row',
-              question_id: this.question.id,
-              payload: {
-                roster_id: row.id
-              }
+            this.action(AT.add_roster_row, {
+              roster_id: row.id
             })
             this.$set(this.rosterCache, row.id, row)
           }
@@ -215,12 +212,8 @@
         })
       },
       removeRosterRow: function (row) {
-        actionBus.action({
-          action_type: 'remove-roster-row',
-          question_id: this.question.id,
-          payload: {
-            roster_id: row.id
-          }
+        this.action(AT.remove_roster_row, {
+          roster_id: row.id
         })
       },
       loadRosters: function (rosterRowIds, shouldLoadExisting = false) {

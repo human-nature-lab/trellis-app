@@ -3,8 +3,8 @@ import uuidv4 from 'uuid/v4'
 import Datum from '../../../../entities/trellis/Datum'
 import {snakeToCamel} from '../../../../services/JSONUtil'
 
-const keyNames = ['name', 'question_datum_id', 'survey_id', 'choice_id', 'edge_id', 'geo_id', 'photo_id', 'roster_id']
-class DatumRecycler extends Recycler {
+const keyNames = ['name', 'questionDatumId', 'surveyId', 'choiceId', 'edgeId', 'geoId', 'photoId', 'rosterId']
+class DatumRecycler extends Recycler<Datum> {
   keyExtractor (datum) {
     // The unique key of a datum is everything except for the id. This means that previously deleted datum could be
     // recreated if it has already been deleted from the server, but it also means that quick changes to datum that end

@@ -12,7 +12,7 @@
 
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
-  import actionBus from '../services/ActionBus'
+  import actionBus from '../services/actions/ActionBus'
   export default {
     name: 'add-respondent-question',
     props: ['question'],

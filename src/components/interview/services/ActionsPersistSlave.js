@@ -1,5 +1,5 @@
 import PersistSlave from '../../../classes/PersistSlave'
-import InterviewActionsService from './interview-actions/InterviewActionsService'
+import InterviewService from '../../../services/interview/InterviewService'
 
 /**
  * Creates a persist slave for syncing up actions with the database
@@ -12,7 +12,7 @@ export default function actionsPersistSlave (interviewId, actionStore) {
   }
   function saveCallback (newState, prevState) {
     if (newState.length > prevState.length) {
-      return InterviewActionsService.saveActions(interviewId, newState.slice(prevState.length))
+      return InterviewService.saveActions(interviewId, newState.slice(prevState.length))
     } else {
       return new Promise(resolve => resolve())
     }
