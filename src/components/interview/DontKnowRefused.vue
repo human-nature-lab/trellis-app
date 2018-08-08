@@ -25,7 +25,8 @@
 </template>
 
 <script>
-  import actionBus from './services/ActionBus'
+  import ActionMixin from './mixins/ActionMixin'
+  import AT from '../../static/action.types'
   export default {
     props: {
       question: {
@@ -33,6 +34,7 @@
         required: true
       }
     },
+    mixins: [ActionMixin],
     name: 'dont-know-refused',
     data: function () {
       return {
@@ -45,56 +47,44 @@
     },
     computed: {
       shouldShowReason: function () {
-        return this.question.datum.dk_rf !== null && this.question.datum.dk_rf !== undefined
+        return this.question.datum.dkRf != null
       },
       reason: {
         get: function () {
-          return this.question.datum.dk_rf_val
+          return this.question.datum.dkRfVal
         },
         set: function (val) {
           this._reason = val
-          actionBus.actionDebounce({
-            action_type: 'dk-rf-val',
-            question_id: this.question.id,
-            payload: {
-              dk_rf_val: val
-            }
+          this.action(AT.dk_rf_val, {
+            dk_rf_val: val
           })
         }
       },
       dk: {
         get: function () {
-          if (this.question.datum.dk_rf === null) {
+          if (this.question.datum.dkRf === null) {
             return false
           } else {
-            return this.question.datum.dk_rf
+            return this.question.datum.dkRf
           }
         },
         set: function (val) {
-          actionBus.action({
-            action_type: 'dk-rf',
-            question_id: this.question.id,
-            payload: {
-              dk_rf: val ? true : this.rf ? false : null
-            }
+          this.action(AT.dk_rf, {
+            dk_rf: val ? true : this.rf ? false : null
           })
         }
       },
       rf: {
         get: function () {
-          if (this.question.datum.dk_rf === null) {
+          if (this.question.datum.dkRf === null) {
             return false
           } else {
-            return !this.question.datum.dk_rf
+            return !this.question.datum.dkRf
           }
         },
         set: function (val) {
-          actionBus.$emit('action', {
-            action_type: 'dk-rf',
-            question_id: this.question.id,
-            payload: {
-              dk_rf: val === false ? null : false
-            }
+          this.action(AT.dk_rf, {
+            dk_rf: val === false ? null : false
           })
         }
       }

@@ -8,9 +8,11 @@
 
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
-  import actionBus from '../services/ActionBus'
+  import ActionMixin from '../mixins/ActionMixin'
+  import AT from '../../../static/action.types'
   export default {
     name: 'date-question',
+    mixins: [QuestionDisabledMixin, ActionMixin],
     props: {
       question: {
         type: Object,
@@ -23,17 +25,12 @@
           return this.question.datum.data.length ? this.question.datum.data[0].val : null
         },
         set: function (val) {
-          actionBus.action({
-            action_type: 'set-date',
-            question_id: this.question.id,
-            payload: {
-              val: val
-            }
+          this.action(AT.set_date, {
+            val: val
           })
         }
       }
-    },
-    mixins: [QuestionDisabledMixin]
+    }
   }
 </script>
 

@@ -51,7 +51,7 @@
 <script>
   import ActionTypes from '../../../static/action.types'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
-  import ActionMixin from '../../../mixins/ActionMixin'
+  import ActionMixin from '../mixins/ActionMixin'
   import Photo from '../../Photo'
   import RespondentsSearch from '../../respondent/RespondentsSearch'
   import EdgeService from '../../../services/edge/EdgeService'
@@ -102,7 +102,7 @@
         return filters
       },
       edgeIds: function () {
-        return this.question.datum.data.map(d => d.edge_id)
+        return this.question.datum.data.map(d => d.edgeId)
       },
       edges: function () {
         let toLoad = []
@@ -148,6 +148,7 @@
         })
       },
       loadEdges: function (edgeIds) {
+        debugger
         if (!edgeIds.length) return
         EdgeService.getEdges(edgeIds)
           .then(edges => {

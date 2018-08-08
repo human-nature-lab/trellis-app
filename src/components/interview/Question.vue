@@ -56,23 +56,24 @@
   import TextQuestion from './questions/TextQuestion'
   import TimeQuestion from './questions/TimeQuestion'
 
-  const typeMap = {}
-  typeMap[questionTypes.year] = DateQuestion
-  typeMap[questionTypes.year_month] = DateQuestion
-  typeMap[questionTypes.year_month_day] = DateQuestion
-  typeMap[questionTypes.year_month_day_time] = DateQuestion
-  typeMap[questionTypes.decimal] = DecimalQuestion
-  typeMap[questionTypes.geo] = GeoQuestion
-  typeMap[questionTypes.integer] = IntegerQuestion
-  typeMap[questionTypes.intro] = IntroQuestion
-  typeMap[questionTypes.multiple_select] = MultipleSelectQuestion
-  typeMap[questionTypes.multiple_choice] = MultipleSelectQuestion
-  typeMap[questionTypes.relationship] = RelationshipQuestion
-  typeMap[questionTypes.respondent_geo] = RespondentGeoQuestion
-  typeMap[questionTypes.roster] = RosterQuestion
-  typeMap[questionTypes.text] = TextQuestion
-  typeMap[questionTypes.text_area] = TextQuestion
-  typeMap[questionTypes.time] = TimeQuestion
+  const typeMap = {
+    [questionTypes.year]: DateQuestion,
+    [questionTypes.year_month]: DateQuestion,
+    [questionTypes.year_month_day]: DateQuestion,
+    [questionTypes.year_month_day_time]: DateQuestion,
+    [questionTypes.decimal]: DecimalQuestion,
+    [questionTypes.geo]: GeoQuestion,
+    [questionTypes.integer]: IntegerQuestion,
+    [questionTypes.intro]: IntroQuestion,
+    [questionTypes.multiple_select]: MultipleSelectQuestion,
+    [questionTypes.multiple_choice]: MultipleSelectQuestion,
+    [questionTypes.relationship]: RelationshipQuestion,
+    [questionTypes.respondent_geo]: RespondentGeoQuestion,
+    [questionTypes.roster]: RosterQuestion,
+    [questionTypes.text]: TextQuestion,
+    [questionTypes.text_area]: TextQuestion,
+    [questionTypes.time]: TimeQuestion
+  }
 
   export default {
     name: 'question',

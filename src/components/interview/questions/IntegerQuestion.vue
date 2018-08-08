@@ -12,7 +12,8 @@
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
-  import actionBus from '../services/ActionBus'
+  import ActionMixin from '../mixins/ActionMixin'
+  import AT from '../../../static/action.types'
   export default {
     name: 'integer-question',
     props: {
@@ -21,7 +22,7 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin, VuetifyValidationRules],
+    mixins: [QuestionDisabledMixin, VuetifyValidationRules, ActionMixin],
     data: function () {
       return {
         _value: null
@@ -34,12 +35,8 @@
         },
         set: function (val) {
           this._value = val
-          actionBus.actionDebounce({
-            action_type: 'number-change',
-            question_id: this.question.id,
-            payload: {
-              val: val
-            }
+          this.action(AT.number_change, {
+            val
           })
         }
       }

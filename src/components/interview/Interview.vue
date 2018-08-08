@@ -111,7 +111,7 @@
 
   import {sharedInterview, clearSharedInterview} from './classes/Interview'
   import InterviewService from '../../services/interview/InterviewService'
-  import actionBus from './services/ActionBus'
+  import actionBus from './services/actions/ActionBus'
 
   import {validateParametersWithError} from './services/ValidatorService'
   import router, {moveToNextOr} from '../../router'

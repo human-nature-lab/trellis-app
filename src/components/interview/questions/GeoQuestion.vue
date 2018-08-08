@@ -4,7 +4,7 @@
         <v-list>
           <v-list-tile v-for="geo in geos" :key="geo.id">
             <v-list-tile-content>
-              {{geo.name_translation ? translate(geo) : this.$t('loading')}}
+              {{geo.name_translation ? translate(geo) : $t('loading')}}
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -24,7 +24,7 @@
         lazy
         v-model="geoSearchDialog">
         <GeoSearch
-          is-selectable
+          :is-selectable="true"
           :selectedGeos="selectedGeos"
           :should-update-route="false"
           @doneSelecting="onDoneSelecting" />
@@ -37,9 +37,11 @@
   import GeoSearch from '../../geo/GeoSearch'
   import GeoListTile from '../../geo/GeoListTile'
   import TranslationService from '../../../services/TranslationService'
-  import actionBus from '../services/ActionBus'
+  import ActionMixin from '../mixins/ActionMixin'
+  import AT from '../../../static/action.types'
   export default {
     name: 'geo-question',
+    mixins: [ActionMixin],
     props: {
       question: {
         type: Object,
@@ -91,30 +93,22 @@
         }
       },
       add: function (geoId) {
-        actionBus.action({
-          question_id: this.question.id,
-          action_type: 'add-geo',
-          payload: {
-            geo_id: geoId
-          }
+        this.action(AT.add_geo, {
+          geo_id: geoId
         })
       },
       remove: function (geoId) {
-        actionBus.action({
-          question_id: this.question.id,
-          action_type: 'remove-geo',
-          payload: {
-            geo_id: geoId
-          }
+        this.action(AT.remove_geo, {
+          geo_id: geoId
         })
       },
       onDoneSelecting: function (selectedGeos) {
         let added = []
         let removed = []
         for (let geo of selectedGeos) {
+          this.geoCache[geo.id] = geo
           let index = this.geoIds.indexOf(geo.id)
           if (index === -1) {
-            this.geoCache[geo.id] = geo
             added.push(geo.id)
           }
         }
@@ -136,7 +130,7 @@
     },
     computed: {
       geoIds: function () {
-        return this.question.datum.data.map(d => d.geo_id)
+        return this.question.datum.data.map(d => d.geoId)
       },
       geos: function () {
         console.log('recalculating any new geos to load')

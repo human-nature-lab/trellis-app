@@ -2,22 +2,25 @@ import FromJSON from "../interfaces/FromJSON";
 import uuid from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
-import {Column, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 import {mapPropsFromJSON, mapFromJSON} from "../../services/JSONUtil";
 
+@Entity()
 export default class QuestionDatum extends TimestampedSoftDelete implements FromJSON {
   @PrimaryGeneratedColumn()
   public id: string = uuid();
   @Column()
   public questionId: string;
   @Column()
-  public followUpDatumId: string;
+  public surveyId: string;
   @Column()
-  public sectionRepetition: number;
+  public followUpDatumId: string
+  @Column()
+  public sectionRepetition: number
   @Column({type: 'datetime'})
-  public answeredAt: Date;
+  public answeredAt: Date
   @Column({type: 'datetime'})
-  public skippedAt: Date;
+  public skippedAt: Date
   @Column()
   public dkRf: boolean;
   @Column()
@@ -25,7 +28,7 @@ export default class QuestionDatum extends TimestampedSoftDelete implements From
   @Column()
   public interviewId: string;
 
-  data: Datum[]
+  data: Datum[] = []
 
   fromJSON (json) {
     mapPropsFromJSON(this, json)
@@ -36,6 +39,15 @@ export default class QuestionDatum extends TimestampedSoftDelete implements From
       }
     })
     return this
+  }
+
+  copy () {
+    let c = new QuestionDatum()
+    const columns = ['id', 'questionId', 'surveyId', 'followUpDatumId', 'sectionRepetition', 'answeredAt', 'skippedAt', 'dkRf', 'dkRfVal', 'interviewId']
+    for (let key in columns) {
+      c[key] = this[key]
+    }
+    return c
   }
 
 }

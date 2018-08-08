@@ -1,9 +1,10 @@
 import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
 import {now} from '../../../../services/DateService'
+import RespondentConditionTag from "../../../../entities/trellis/RespondentConditionTag";
 
 const keyNames = ['respondent_id', 'condition_id']
-class RespondentConditionTagRecycler extends Recycler {
+class RespondentConditionTagRecycler extends Recycler<RespondentConditionTag> {
   /**
    * Takes the same object that objectCreator returns
    * @param tag
@@ -20,13 +21,12 @@ class RespondentConditionTagRecycler extends Recycler {
    * @returns {{id: *, section_repetition: number, follow_up_datum_id: number, section, page, survey_id: *, dk_rf: null, dk_rf_val: null, var_name, datum: Array}}
    */
   objectCreator (interview, act) {
-    return {
-      id: uuidv4(),
-      respondent_id: interview.survey.respondent_id,
-      condition_id: act.condition.id,
-      created_at: now(),
-      updated_at: now()
-    }
+    let r = new RespondentConditionTag()
+    r.id = uuidv4()
+    r.respondentId = interview.survey.respondent_id
+    r.createdAt = now()
+    r.updatedAt = now()
+    return r
   }
 }
 

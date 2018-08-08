@@ -1,6 +1,7 @@
 import PersistSlave from '../../../classes/PersistSlave'
-import InterviewData from './interview-data/InterviewDataService'
 import DiffService from './DiffService'
+import InterviewService from '../../../services/interview/InterviewService'
+import InterviewDeltaInterface from "../../../services/interview/InterviewDeltaInterface";
 
 /**
  * Create a persist slave for a DataStore that uses the InterviewDataService to sync up data using delta encoding
@@ -16,20 +17,12 @@ export default function dataPersistSlave (interviewId, dataStore, throttleRate =
     }
   }
   function saveData (newState, prevState) {
-    let diff = {
-      data: DiffService.dataDiff(newState.data, prevState.data),
-      conditionTags: DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
-    }
-    function transformRespondentTag (tag) {
-      tag.condition_tag_id = tag.condition_id
-      delete tag.condition_id
-      delete tag.name
-      return tag
-    }
-    diff.conditionTags.respondent.added = diff.conditionTags.respondent.added.map(transformRespondentTag)
-    diff.conditionTags.respondent.removed = diff.conditionTags.respondent.removed.map(transformRespondentTag)
+    debugger
+    let dataDiff = DiffService.dataDiff(newState.data, prevState.data)
+    let tagDiff = DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
+    let diff = new InterviewDeltaInterface(dataDiff, tagDiff)
     console.log('saving data', JSON.stringify(newState, null, 2))
-    return InterviewData.sendDiff(interviewId, diff)
+    return InterviewService.saveData(interviewId, diff)
   }
   function shouldSave (newState, prevState) {
     return true
