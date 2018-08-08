@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import {isEqual} from 'lodash'
 import {AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta} from "../../../services/interview/InterviewDeltaInterface";
 import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 export default class DiffService {
@@ -23,7 +23,7 @@ export default class DiffService {
         } else {
           a = newObjMap.get(key)
           b = oldObjMap.get(key)
-          if (!_.isEqual(a, b)) {
+          if (!isEqual(a, b)) {
             modified.push(a)
           }
         }

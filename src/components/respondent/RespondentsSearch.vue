@@ -105,7 +105,7 @@
 </template>
 
 <script>
-  import _, {merge} from 'lodash'
+  import {debounce, orderBy, merge} from 'lodash'
   import ConditionTagService from '../../services/condition-tag/ConditionTagService'
   import RespondentService from '../../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
@@ -244,7 +244,7 @@
       translate (translation) {
         return TranslationService.getAny(translation, this.global.locale.id)
       },
-      onQueryChange: _.debounce(function () {
+      onQueryChange: debounce(function () {
         this.isLoading = true
         this.search()
       }, 400),
@@ -328,7 +328,7 @@
         return selected.filter(id => this.removed.indexOf(id) === -1)
       },
       respondentResults () {
-        return _.orderBy(this.results, ['score', 'name'], ['desc', 'asc'])
+        return orderBy(this.results, ['score', 'name'], ['desc', 'asc'])
       }
     },
     components: {

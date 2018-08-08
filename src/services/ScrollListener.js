@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import { debounce } from 'lodash'
 import Emitter from '../classes/Emitter'
 export class ScrollListener extends Emitter {
   /**
@@ -12,7 +12,7 @@ export class ScrollListener extends Emitter {
     this.rate = rate
     this.isAttached = false
     this.bubbleAll = true
-    this._scrollHandler = _.debounce(() => {
+    this._scrollHandler = debounce(() => {
       this.emit('scroll')
     }, this.rate)
   }

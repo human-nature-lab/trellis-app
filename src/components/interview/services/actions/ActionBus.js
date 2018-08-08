@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import _ from 'lodash'
+import {debounce} from 'lodash'
 // A shared event emitter for sharing data between components without a parent child relationship. This one is used for
 // emitting and acting on actions exclusively
 export const actionBus = new Vue()
@@ -17,7 +17,7 @@ actionBus.action = function (...args) {
  * questions where we're sending the entirety of the text input with the action
  * @type {Function}
  */
-actionBus.actionDebounce = _.debounce(function (...args) {
+actionBus.actionDebounce = debounce(function (...args) {
   actionBus.action(...args)
 }, 500)
 export default actionBus
