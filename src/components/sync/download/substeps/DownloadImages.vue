@@ -76,11 +76,11 @@
                 }
               })
               .catch((err) => {
-                if (err.response && err.response.status === 404) {
-                  // Expected result if the image isn't found
+                if (err.response) {
+                  // 404 Not Found is the expected result if the image isn't found
                   this.failedImages.push({
                     fileName: fileName,
-                    error: err
+                    error: `${err.response.status} ${err.response.statusText}`
                   })
                 } else {
                   this.loggingService.log(err).then((result) => { this.currentLog = result })
@@ -94,11 +94,21 @@
           }
         },
         onDone: function () {
-          // TODO: add combined warning for all this.failedImages
           this.success = true
           this.downloading = false
-          console.log('onDone')
-          this.$emit('download-images-done', this.numImagesDownloaded)
+          if (this.failedImages.length > 0) {
+            this.loggingService.log({
+              severity: 'warn',
+              message: `The server could not find ${this.failedImages.length} images that were requested.`
+              // fullMessage: JSON.stringify(this.failedImages, null, 2)
+            }).then((result) => {
+              console.warn('Failed images', this.failedImages)
+              this.currentLog = result
+              this.$emit('download-images-done', this.numImagesDownloaded)
+            })
+          } else {
+            this.$emit('download-images-done', this.numImagesDownloaded)
+          }
         },
         retry: function () {
           this.currentLog = undefined

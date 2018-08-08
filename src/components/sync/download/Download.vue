@@ -105,6 +105,7 @@
                 </insert-rows>
                 <check-foreign-keys
                   v-if="downloadStep > 2 && downloadSubStep > 2"
+                  :logging-service="loggingService"
                   v-on:check-foreign-keys-done="checkForeignKeysDone">
                 </check-foreign-keys>
               </download-step>
@@ -118,17 +119,20 @@
                 v-on:cancel-clicked="onCancel">
                 <generate-image-list
                   v-if="downloadStep > 3"
+                  :logging-service="loggingService"
                   v-on:generate-image-list-done="generateImageListDone">
                 </generate-image-list>
                 <calculate-image-size
                   v-bind:images-to-download="imagesToDownload"
                   v-if="downloadStep > 3 && downloadSubStep > 1"
+                  :logging-service="loggingService"
                   v-on:calculate-image-size-done="calculateImageSizeDone">
                 </calculate-image-size>
                 <download-images
                   v-bind:images-to-download="imagesToDownload"
-                  v-bind:photos-found="photosFound"
+                  v-bind:num-images-found="numImagesFound"
                   v-if="downloadStep > 3 && downloadSubStep > 2"
+                  :logging-service="loggingService"
                   v-on:download-images-done="downloadImagesDone">
                 </download-images>
               </download-step>
@@ -191,7 +195,7 @@
         downloadedSnapshotFileEntry: null,
         extractedSnapshot: null,
         imagesToDownload: {},
-        photosFound: 0,
+        numImagesFound: 0,
         sync: undefined,
         currentLog: undefined,
         loggingService: undefined,
@@ -297,7 +301,7 @@
         this.downloadSubStep = 2
       },
       calculateImageSizeDone: function (photosFound) {
-        this.photosFound = photosFound
+        this.numImagesFound = photosFound
         this.downloadSubStep = 3
       },
       downloadImagesDone: function (imagesDownloaded) {
