@@ -34,7 +34,6 @@ export default class InterviewLoader {
           }
         }
       }
-      debugger
       res.respondentFills = res.respondentFills || []
       res.conditionTags = res.data && res.data.conditionTags || {}
       res.data = res.data && res.data.data || []
