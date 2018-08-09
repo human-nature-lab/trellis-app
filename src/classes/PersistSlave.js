@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import {throttle, cloneDeep} from 'lodash'
 export default class PersistSlave {
   /**
    * A class that is responsible for syncing up an external source with the supplied data
@@ -19,12 +19,11 @@ export default class PersistSlave {
     this.errors = []
     this.maxFailures = maxFailures
     this.cancelAllRequests = false
-    this.persist = _.throttle(() => {
+    this.persist = throttle(() => {
       this.save()
-    }, throttleRate)
+    }, throttleRate, {leading: false})
     this.store.on('change', this.onChange, this)
-    // Initialize the state here
-    this.lastPersistedState = _.cloneDeep(this.stateExtractor())
+    this.setInitialState()
   }
 
   /**
@@ -34,6 +33,14 @@ export default class PersistSlave {
     this.store.off('change', this.onChange)
     this.persist.cancel()
     this.cancelAllRequests = true
+  }
+
+  /**
+   * Store the intitial state using the stateExtractor callback
+   */
+  setInitialState () {
+    debugger
+    this.lastPersistedState = cloneDeep(this.stateExtractor())
   }
 
   /**
@@ -67,10 +74,10 @@ export default class PersistSlave {
       return
     }
 
-    let existingRequestState = _.cloneDeep(state)
+    let existingRequestState = cloneDeep(state)
     this.existingRequest = this.saveCb(existingRequestState, this.lastPersistedState).then(() => {
       this.lastPersistedState = existingRequestState
-      // Make another throttled request if new data has been stored was stored while the save was happening
+      // Make another throttled request if new data was stored while the save was happening
       if (this.hasNewData) {
         this.persist()
       }

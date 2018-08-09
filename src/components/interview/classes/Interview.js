@@ -1,5 +1,5 @@
 import SkipService from '../services/SkipService'
-import actionDefinitions from '../services/InterviewActionDefinitions'
+import actionManager from '../services/actions/InterviewActionDefinitions'
 import ConditionAssignmentService from '@/services/ConditionAssignmentService'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
@@ -125,11 +125,11 @@ export default class Interview extends Emitter {
     const locationMatches = action => {
       return this.actions.getActionSection(action) === this.location.section &&
         this.actions.getActionPage(action) === this.location.page &&
-        action.section_repetition === this.location.sectionRepetition &&
-        action.section_follow_up_repetition === this.location.sectionFollowUpDatumRepetition
+        action.sectionRepetition === this.location.sectionRepetition &&
+        action.sectionFollowUpRepetition === this.location.sectionFollowUpDatumRepetition
     }
     for (let action of actions) {
-      if (action.action_type !== 'next' && action.action_type !== 'previous') {
+      if (action.actionType !== 'next' && action.actionType !== 'previous') {
         let matches = locationMatches(action)
         if (matches) {
           this.performAction(action)
@@ -148,36 +148,32 @@ export default class Interview extends Emitter {
 
   /**
    * All user created actions should go through this method so that the actions are stored
-   * @param {Object} action - The action without location information
+   * @param {Action} action - The action without location information
    */
   pushAction (action) {
-    action.interview_id = this.interview.id
+    action.interviewId = this.interview.id
     this.actions.add(action, this.location)
     this.performAction(action, true)
   }
 
   /**
    * This method actually modifies the state based on the action type and payload
-   * @param {Object} action
+   * @param {Action} action
    * @param {Boolean} [actionWasInitiatedByAHuman = false]
    */
   performAction (action, actionWasInitiatedByAHuman = false) {
-    if (actionDefinitions[action.action_type]) {
-      let questionDatum = null
-      let questionBlueprint = null
-      if (action.question_id) {
-        let followUpQuestionId = this.questionIdToSectionIndex.get(action.question_id).followUpQuestionId
-        let actionFollowUpDatumId = this.navigator.getFollowUpQuestionDatumIdByFollowUpRepetition(followUpQuestionId, action.section_follow_up_repetition)
-        questionDatum = this.data.getSingleQuestionDatumByLocation(action.question_id, action.section_repetition, actionFollowUpDatumId)
-        questionBlueprint = this._findQuestionBlueprint(action.question_id)
-      } else if (action.action_type !== 'next' && action.action_type !== 'previous') {
-        console.error(action)
-        throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
-      }
-      actionDefinitions[action.action_type](this, action.payload, questionDatum, questionBlueprint, actionWasInitiatedByAHuman)
-    } else {
-      console.error('No actionDefinition has been defined for that action yet')
+    let questionDatum = null
+    let questionBlueprint = null
+    if (action.questionId) {
+      let followUpQuestionId = this.questionIdToSectionIndex.get(action.questionId).followUpQuestionId
+      let actionFollowUpDatumId = this.navigator.getFollowUpQuestionDatumIdByFollowUpRepetition(followUpQuestionId, action.sectionFollowUpRepetition)
+      questionDatum = this.data.getSingleQuestionDatumByLocation(action.questionId, action.sectionRepetition, actionFollowUpDatumId)
+      questionBlueprint = this._findQuestionBlueprint(action.questionId)
+    } else if (action.actionType !== 'next' && action.actionType !== 'previous') {
+      console.error(action)
+      throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
     }
+    actionManager.do(action, this, questionDatum, questionBlueprint, actionWasInitiatedByAHuman)
   }
 
   /**
@@ -226,6 +222,11 @@ export default class Interview extends Emitter {
     }
   }
 
+  /**
+   * Assign parameters as properties on the question
+   * @param question
+   * @private
+   */
   _assignParameters (question) {
     question.parameters = {}
     for (let p of question.question_parameters) {
@@ -745,10 +746,9 @@ export default class Interview extends Emitter {
     let questionData = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), sectionRepetition, sectionFollowUpDatumId)
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
-      question = JSON.parse(JSON.stringify(question)) // Dereference
+      question = JSON.parse(JSON.stringify(question)) // Dereference the question
       // TODO: this should take into account section repetition and follow ups as well
-      let qData = questionData.find(q => q.question_id === question.id)
-      question.datum = qData ? JSON.parse(JSON.stringify(qData)) : {}
+      question.datum = questionData.find(q => q.questionId === question.id)
       return question
     })
   }

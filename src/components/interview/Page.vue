@@ -56,9 +56,11 @@
   import Question from './Question.vue'
   import questionDatumRecycler from './services/recyclers/QuestionDatumRecycler'
   import datumRecycler from './services/recyclers/DatumRecycler'
-  import actionBus from './services/ActionBus'
+  import ActionMixin from './mixins/ActionMixin'
+  import AT from '../../static/action.types'
   export default {
     name: 'page',
+    mixins: [ActionMixin],
     props: {
       questions: {
         type: Array,
@@ -91,14 +93,10 @@
     },
     methods: {
       onNext: function () {
-        actionBus.action({
-          action_type: 'next'
-        })
+        this.actionWithoutQuestion(AT.next)
       },
       onPrevious: function () {
-        actionBus.action({
-          action_type: 'previous'
-        })
+        this.actionWithoutQuestion(AT.previous)
       },
       datumRecyclerSize: function () {
         return datumRecycler.cache.size

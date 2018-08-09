@@ -12,7 +12,8 @@
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
-  import actionBus from '../services/ActionBus'
+  import ActionMixin from '../mixins/ActionMixin'
+  import AT from '../../../static/action.types'
   export default {
     name: 'text-question',
     props: {
@@ -21,7 +22,7 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin, VuetifyValidationRules],
+    mixins: [QuestionDisabledMixin, VuetifyValidationRules, ActionMixin],
     data: function () {
       return {
         newText: null,
@@ -34,12 +35,8 @@
           return this.question.datum.data.length ? this.question.datum.data[0].val : ''
         },
         set: function (val) {
-          actionBus.actionDebounce({
-            action_type: 'set-text',
-            question_id: this.question.id,
-            payload: {
-              val: val
-            }
+          this.action(AT.set_text, {
+            val: val
           })
         }
       }
