@@ -28,7 +28,7 @@
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-file": "^6.0.1",
     "cordova-plugin-file-md5": "^0.3.3",
-    "cordova-plugin-file-transfer": "^1.7.1",
+    "cordova-plugin-file-transfer": "git+https://github.com/human-nature-lab/cordova-plugin-file-transfer.git",
     "cordova-plugin-splashscreen": "^5.0.2",
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-zip": "^3.1.0",

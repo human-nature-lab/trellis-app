@@ -1,12 +1,11 @@
 import { DeviceService } from '@/services/device/DeviceService'
 import 'reflect-metadata'
 import { createConnection, getConnection } from 'typeorm'
-import Config from '@/entities/trellis-config/Config'
-import Message from '@/entities/trellis-config/Message'
-import Sync from '@/entities/trellis-config/Sync'
-import SyncMessage from '@/entities/trellis-config/SyncMessage'
-import UpdatedRecords from '@/entities/trellis-config/UpdatedRecords'
-import Photo from '@/entities/trellis/Photo'
+import Config from '../../entities/trellis-config/Config'
+import Log from '../../entities/trellis-config/Log'
+import Sync from '../../entities/trellis-config/Sync'
+import UpdatedRecords from '../../entities/trellis-config/UpdatedRecords'
+import Photo from '../../entities/trellis/Photo'
 import FileService from '../file/FileService'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 
@@ -17,9 +16,8 @@ const trellisConfigConnection = {
   location: 'default',
   entities: [
     Config,
-    Message,
+    Log,
     Sync,
-    SyncMessage,
     UpdatedRecords
   ],
   logging: true,
@@ -35,8 +33,8 @@ const trellisConnection = {
     Photo
   ],
   namingStrategy: new SnakeCaseNamingStrategy(),
-  logging: ['warning', 'error'] // reduced logging
-  // logging: true // verbose logging
+  // logging: ['warning', 'error'] // reduced logging
+  logging: true // verbose logging
 }
 
 export default class DatabaseServiceCordova {
@@ -65,9 +63,22 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis-config')
   }
 
-  removeDatabase () {
-    return this.getDatabase()
-      .then((connection) => connection.dropDatabase())
+  async removeDatabase (status) {
+    const connection = await this.getDatabase()
+    const queryRunner = await connection.createQueryRunner()
+    await queryRunner.connect()
+    await queryRunner.query('PRAGMA foreign_keys = OFF;')
+    await queryRunner.startTransaction()
+    try {
+      const selectDropsQuery = `SELECT 'DROP TABLE "' || name || '";' as query FROM "sqlite_master" WHERE "type" = 'table' AND "name" != 'sqlite_sequence'`
+      const dropQueries = await queryRunner.query(selectDropsQuery)
+      await Promise.all(dropQueries.map(q => queryRunner.query(q['query'])))
+      return queryRunner
+    } catch (err) {
+      status.message = 'Rolling back transaction...'
+      await queryRunner.rollbackTransaction()
+      throw err
+    }
   }
 
   async executeSnapshot (queryRunner, file, trackProgress, isCancelled) {
@@ -131,19 +142,12 @@ export default class DatabaseServiceCordova {
     })
   }
 
-  async importDatabase (extractedSnapshot, trackProgress, isCancelled) {
-    const connection = await this.getDatabase()
-    const queryRunner = await connection.createQueryRunner()
+  async importDatabase (queryRunner, extractedSnapshot, trackProgress, isCancelled, status) {
     const file = await FileService.fileFromFileEntry(extractedSnapshot)
-    await queryRunner.connect()
-    await queryRunner.query('PRAGMA foreign_keys = OFF;')
-    await queryRunner.startTransaction()
     try {
       await this.executeSnapshot(queryRunner, file, trackProgress, isCancelled)
-      if (!isCancelled()) {
-        await queryRunner.commitTransaction()
-      }
     } catch (err) {
+      status.message = 'Rolling back transaction...'
       await queryRunner.rollbackTransaction()
       throw err
     } finally {
@@ -151,9 +155,15 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  checkForeignKeys () {
-    return this.getDatabase()
-      .then((connection) => connection.query('PRAGMA foreign_key_check;'))
+  async checkForeignKeys (queryRunner, status) {
+    try {
+      await queryRunner.query('PRAGMA foreign_key_check;')
+      await queryRunner.commitTransaction()
+    } catch (err) {
+      status.message = 'Rolling back transaction...'
+      await queryRunner.rollbackTransaction()
+      throw err
+    }
   }
 
   async getLatestDownload () {
