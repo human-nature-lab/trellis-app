@@ -14,7 +14,7 @@
           <v-alert
             v-bind:value="wasSnapshotDownloaded"
             type="info">
-            The last snapshot was downloaded on: {{ snapshotDownloadedAt }}.
+            The last snapshot was downloaded on: <span style="white-space:nowrap">{{ snapshotDownloadedAt }}</span>.
           </v-alert>
           <v-alert
             v-bind:value="areUpdatedRecords"
@@ -28,7 +28,8 @@
 </template>
 
 <script>
-  import DatabaseService from '@/services/database/DatabaseService'
+  import DatabaseService from '../../services/database/DatabaseService'
+  import DateService from '../../services/DateService'
   export default {
     name: 'sync-status',
     data () {
@@ -60,9 +61,8 @@
         return (this.localLatestSnapshot)
       },
       snapshotDownloadedAt: function () {
-        console.log(this.localLatestSnapshot)
-        if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('created_at')) {
-          return this.localLatestSnapshot['created_at']
+        if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('createdAt')) {
+          return DateService.parseDate(this.localLatestSnapshot['createdAt']).format('llll')
         } else {
           return ''
         }

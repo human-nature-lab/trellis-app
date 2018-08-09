@@ -1,53 +1,37 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Emptying the snapshots directory...
-        <strong v-if="success" class="green--text">DONE.</strong>
-        <strong v-if="warning" class="amber--text">WARNING.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <span v-if="warning" class="amber--text">
-      <p>{{ warningMessage }}</p>
-    </span>
-    <v-progress-linear
-      v-if="working"
-      height="2"
-      :indeterminate="true">
-    </v-progress-linear>
-    <v-btn
-      v-if="!working && !success"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="warning"
-      color="amber"
-      @click.native="ignore">Ignore</v-btn>
-  </div>
+  <sync-sub-step success-message="DONE"
+                 :working="working"
+                 :success="success"
+                 :current-log="currentLog"
+                 :retry="retry">
+    Emptying the snapshots directory...
+  </sync-sub-step>
 </template>
 
 <script>
-    import config from '@/config'
-    import FileService from '@/services/file/FileService'
+    import config from '../../../../config'
+    import FileService from '../../../../services/file/FileService'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'empty-snapshots-directory',
       data () {
         return {
           success: false,
-          warning: false,
-          error: false,
           working: false,
           apiRoot: config.apiRoot,
-          errorMessage: '',
-          warningMessage: ''
+          currentLog: undefined
         }
       },
       created () {
         this.startWork()
+      },
+      props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        }
       },
       methods: {
         startWork: function () {
@@ -59,21 +43,13 @@
               this.working = false
               this.success = true
               this.workDone()
-            },
-            (error) => {
-              this.working = false
-              this.error = true
-              console.error(error)
-              this.errorMessage = error.data
+            })
+            .catch((err) => {
+              this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         },
         workDone: function () {
           this.$emit('empty-snapshots-directory-done')
-        },
-        ignore: function () {
-          this.warning = false
-          this.success = true
-          this.workDone()
         },
         retry: function () {
           this.error = false
@@ -84,6 +60,7 @@
       computed: {
       },
       components: {
+        SyncSubStep
       }
     }
 </script>

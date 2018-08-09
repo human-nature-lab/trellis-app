@@ -1,71 +1,52 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Calculating total size of images...
-        <strong v-if="success" class="green--text">OK.</strong>
-        <strong v-if="warnings.length > 0" class="amber--text">WARNING.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <span v-if="warnings.length > 0" class="amber--text">
-      <p>{{ warnings[warnings.length - 1] }}</p>
-    </span>
-    <v-progress-linear
-      v-if="checking"
-      height="2"
-      :indeterminate="true"></v-progress-linear>
-    <v-btn
-      v-if="!checking && !success"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="!checking && !success && !error"
-      color="amber"
-      @click.native="ignore">Ignore</v-btn>
-    <v-btn
-      v-if="checking"
-      flat
-      @click.native="stopChecking">Stop</v-btn>
-  </div>
+  <sync-sub-step :working="checking"
+                 success-message="DONE"
+                 :success="success"
+                 :current-log="currentLog"
+                 :ignore="ignore"
+                 :stop="stopChecking"
+                 :retry="retry">
+    Calculating total size of images...
+  </sync-sub-step>
 </template>
 
 <script>
     import axios from 'axios'
-    import config from '@/config'
-    import SyncService from '../../services/SyncService'
-    import DeviceService from '@/services/device/DeviceService'
-    import formatBytesFilter from '@/filters/format-bytes.filter'
+    import SyncService from '../../../../services/sync/SyncService'
+    import DeviceService from '../../../../services/device/DeviceService'
+    import formatBytesFilter from '../../../../filters/format-bytes.filter'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'calculate-image-size',
       data () {
         return {
           success: false,
-          warning: 0,
-          warnings: [],
-          error: false,
           checking: false,
-          apiRoot: config.apiRoot,
           source: null,
-          errorMessage: '',
-          photosFound: 0
+          photosFound: 0,
+          logs: []
         }
       },
       created () {
         this.calculateImageSize()
       },
       props: {
-        imagesToDownload: Array
+        imagesToDownload: {
+          type: Array,
+          required: true
+        },
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        }
       },
       methods: {
         calculateImageSize: function () {
           const CancelToken = axios.CancelToken
           this.source = CancelToken.source()
           this.checking = true
-          console.log('this.imagesToDownload', this.imagesToDownload)
           Promise.all([
             DeviceService.getFreeDiskSpace(),
             SyncService.getImageFileList(this.source, this.imagesToDownload)
@@ -74,26 +55,30 @@
               this.checking = false
               const freeDiskSpace = results[0]
               const serverList = results[1]
-              console.log('freeDiskSpace', freeDiskSpace)
-              console.log('serverList', serverList)
               let totalImageSize = serverList['total_size']
               let photosRequested = serverList['photos_requested']
               this.photosFound = serverList['photos_found']
+              let warning = false
               if (this.photosFound < photosRequested) {
-                this.warnings.push(`Requested ${photosRequested} images and the server only found ${this.photosFound}.`)
+                warning = true
+                this.loggingService.log({
+                  severity: 'warn',
+                  message: `Requested ${photosRequested} images and the server only found ${this.photosFound}.`
+                }).then((result) => { this.logs.push(result) })
               }
               if (totalImageSize > freeDiskSpace) {
-                this.warnings.push(`The images require ${formatBytesFilter(totalImageSize)} to download and this device only has ${formatBytesFilter(freeDiskSpace)} free.`)
+                warning = true
+                this.loggingService.log({
+                  severity: 'warn',
+                  message: `The images require ${formatBytesFilter(totalImageSize)} to download and this device only has ${formatBytesFilter(freeDiskSpace)} free.`
+                }).then((result) => { this.logs.push(result) })
               }
-              if (this.warnings.length === 0) {
-                console.log('totalImageSize', totalImageSize, 'freeDiskSpace', freeDiskSpace)
-                console.log('photosRequested', photosRequested, 'photosFound', this.photosFound)
+              if (!warning) {
                 this.onDone()
               }
-            }).catch((error) => {
-              console.log('error', error)
-              this.errorMesage = error.message
-              this.error = true
+            }).catch((err) => {
+              this.checking = false
+              this.loggingService.log(err).then((result) => { this.logs.push(result) })
             })
         },
         stopChecking: function () {
@@ -107,20 +92,26 @@
           this.$emit('calculate-image-size-done', this.photosFound)
         },
         retry: function () {
-          this.error = false
-          this.warning = false
+          this.logs = []
           this.calculateImageSize()
         },
         ignore: function () {
-          this.warnings.pop()
-          if (this.warnings.length === 0) {
+          this.logs.pop()
+          if (this.logs.length === 0) {
             this.onDone()
           }
         }
       },
       computed: {
+        currentLog: function () {
+          if (this.logs.length === 0) {
+            return undefined
+          }
+          return this.logs[this.logs.length - 1]
+        }
       },
       components: {
+        SyncSubStep
       }
     }
 </script>
