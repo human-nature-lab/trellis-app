@@ -33,6 +33,7 @@ class QuestionDatumRecycler extends Recycler<QuestionDatum> implements Recyclabl
     qd.dkRf = null
     qd.createdAt = now()
     qd.updatedAt = now()
+    qd.deletedAt = null
     return qd
   }
 }
