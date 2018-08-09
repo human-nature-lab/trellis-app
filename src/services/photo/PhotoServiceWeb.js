@@ -1,8 +1,8 @@
 import http from '../http/AxiosInstance'
 import axios from 'axios'
-import SizeLimitedMap from '@/classes/SizeLimitedMap'
-const cache = new SizeLimitedMap(1000)
-import CancellablePromise from '@/classes/CancellablePromise'
+import SizeLimitedMap from '../../classes/SizeLimitedMap'
+const cache = new SizeLimitedMap(1024 * 10000)
+import CancellablePromise from '../../classes/CancellablePromise'
 export default class PhotoServiceWeb {
   /**
    * This is a special method that can be cancelled. We probably don't need to cancel image loading on tablets, but maybe

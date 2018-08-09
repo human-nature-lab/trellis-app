@@ -29,11 +29,12 @@
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import ChoiceText from './ChoiceText'
   import RadioCheckbox from './RadioCheckbox'
-  import actionBus from '../services/ActionBus'
+  import ActionMixin from '../mixins/ActionMixin'
+  import AT from '../../../static/action.types'
   export default {
     props: ['question', 'location'],
     name: 'multiple-select-question',
-    mixins: [QuestionDisabledMixin],
+    mixins: [QuestionDisabledMixin, ActionMixin],
     computed: {
       otherText: function () {
         return this.question.choices.reduce((agg, choice) => {
@@ -57,34 +58,22 @@
     methods: {
       onChange: function (choice, val) {
         if (val) {
-          actionBus.action({
-            action_type: 'select-choice',
-            question_id: this.question.id,
-            payload: {
-              choice_id: choice.id,
-              val: choice.val
-            }
+          this.action(AT.select_choice, {
+            choice_id: choice.id,
+            val: choice.val
           })
         } else {
-          actionBus.action({
-            action_type: 'deselect-choice',
-            question_id: this.question.id,
-            payload: {
-              choice_id: choice.id,
-              val: choice.val
-            }
+          this.action(AT.deselect_choice, {
+            choice_id: choice.id,
+            val: choice.val
           })
         }
       },
       onOtherChange: function (choice, text) {
         console.log(choice, text)
-        actionBus.actionDebounce({
-          action_type: 'other-choice-text',
-          question_id: this.question.id,
-          payload: {
-            choice_id: choice.id,
-            val: text
-          }
+        this.action(AT.other_choice_text, {
+          choice_id: choice.id,
+          val: text
         })
       },
       showOtherText: function (choice) {

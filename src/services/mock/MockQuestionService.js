@@ -1,5 +1,5 @@
 import faker from 'faker'     // https://github.com/marak/Faker.js/
-import _ from 'lodash'        // https://lodash.com/
+import {merge, cloneDeep} from 'lodash'        // https://lodash.com/
 import GeneratorService from './GeneratorService'
 import MockService from './MockService'
 
@@ -34,7 +34,7 @@ let questionGenerator = {
   multiple_select: {
     choices: () => GeneratorService.arrayGenerate(i => ({
       value: faker.lorem.word,
-      choice_translation: _.cloneDeep(choiceTranslationGenerator)
+      choice_translation: cloneDeep(choiceTranslationGenerator)
     }), 2, 20)
   },
   relationship: {
@@ -52,9 +52,9 @@ questionGenerator['multiple_choice'] = questionGenerator.multiple_select
 
 export default class MockQuestionService {
   static get (type) {
-    let generator = _.cloneDeep(baseGenerator)
+    let generator = cloneDeep(baseGenerator)
     if (questionGenerator[type]) {
-      generator = _.merge(generator, _.cloneDeep(questionGenerator[type]))
+      generator = merge(generator, cloneDeep(questionGenerator[type]))
     }
     return new Promise(resolve => {
       let question = GeneratorService.expand(generator)

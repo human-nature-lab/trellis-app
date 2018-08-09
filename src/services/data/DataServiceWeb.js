@@ -47,14 +47,4 @@ export default class DataService {
         throw err
       })
   }
-  static getActionTypes (formId) {
-    return http().get('form/action-types')
-      .then(function (response) {
-        return response.data
-      })
-      .catch(function (err) {
-        console.log('error', err)
-        throw err
-      })
-  }
 }

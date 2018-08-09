@@ -1,5 +1,6 @@
 import http from '../http/AxiosInstance'
-import router from '../../router'
+import {pushRouteAndQueueCurrent} from '../../router'
+
 export default class CensusServiceWeb {
 
   /**
@@ -9,7 +10,7 @@ export default class CensusServiceWeb {
    * @param {String} respondentId
    */
   static redirectToCensusForm (studyId, censusTypeId, respondentId) {
-    router.push({
+    pushRouteAndQueueCurrent({
       name: 'StartCensusForm',
       params: {
         studyId: studyId,
