@@ -1,8 +1,10 @@
 import {Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapCamelToPlain, mapPropsFromJSON} from "../../services/JSONUtil";
+import ToSnakeJSON from "../interfaces/ToSnakeJSON";
+import FromJSON from "../interfaces/FromJSON";
 
-export default class Action extends TimestampedSoftDelete {
+export default class Action extends TimestampedSoftDelete implements FromJSON, ToSnakeJSON {
   @PrimaryGeneratedColumn()
   id: string
   @Column()
@@ -24,4 +26,11 @@ export default class Action extends TimestampedSoftDelete {
     mapPropsFromJSON(this, json)
     return this
   }
+
+  toSnakeJSON () {
+    let json = mapCamelToPlain(this, true)
+    json['payload'] = this.payload // We don't do any case transformation for this
+    return json
+  }
+
 }

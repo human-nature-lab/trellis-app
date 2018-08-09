@@ -17,7 +17,6 @@ export default function dataPersistSlave (interviewId, dataStore, throttleRate =
     }
   }
   function saveData (newState, prevState) {
-    debugger
     let dataDiff = DiffService.dataDiff(newState.data, prevState.data)
     let tagDiff = DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
     let diff = new InterviewDeltaInterface(dataDiff, tagDiff)

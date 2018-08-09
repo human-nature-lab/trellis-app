@@ -361,7 +361,6 @@ export default class Interview extends Emitter {
    */
   _makeQuestionDatum (questionBlueprint) {
     let questionDatum = QuestionDatumRecycler.getNoKey(this, questionBlueprint) // OPTIMIZATION: This could be optimized by using 'get' instead of getNoKey
-    debugger
     this.data.add(questionDatum)
     return questionDatum
   }
