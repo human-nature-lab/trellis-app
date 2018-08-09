@@ -1,6 +1,7 @@
 import { DeviceService } from '../device/DeviceService'
 import md5 from 'js-md5'
 import config from '../../config'
+import _ from 'lodash'
 /* global md5chksum, FileTransfer */
 
 class FileServiceCordova {
@@ -106,7 +107,6 @@ class FileServiceCordova {
         return new Promise((resolve, reject) => {
           let reader = directoryEntry.createReader()
           reader.readEntries((results) => {
-            console.log('listPhotos', results)
             resolve(results)
           }, reject)
         })
@@ -134,30 +134,37 @@ class FileServiceCordova {
     })
   }
 
-  download (uri, fileEntry) {
-    return new Promise((resolve, reject) => {
+  download (uri, fileEntry, onDownloadProgress) {
+    const promise = new Promise((resolve, reject) => {
       DeviceService.isDeviceReady()
-      .then(() => {
-        try {
-          const fileTransfer = new FileTransfer()
-          console.log('fileTransfer', fileTransfer)
-          const fileURL = fileEntry.toURL()
-          console.log('fileURL', fileURL)
-          fileTransfer.download(uri, fileURL,
-            (success) => {
-              console.log('fileTRansfer.download success', success)
-              resolve(fileEntry)
-            },
-            (err) => {
-              console.log('fileTransfer.download failed', err)
-              reject(err)
-            },
-            false, { headers: { 'X-Key': config.xKey } })
-        } catch (err) {
-          reject(err)
-        }
-      })
+        .then(() => {
+          try {
+            const fileTransfer = new FileTransfer()
+            promise.cancelDownload = fileTransfer.abort.bind(fileTransfer)
+            fileTransfer.onprogress = onDownloadProgress
+            const fileURL = fileEntry.toURL()
+            fileTransfer.download(uri, fileURL,
+              (success) => {
+                resolve(fileEntry)
+              },
+              (err) => {
+                if (err.hasOwnProperty('code') && err.code === 4) {
+                  let errorObject = {
+                    message: 'Operation cancelled by user.'
+                  }
+                  _.merge(errorObject, err)
+                  reject(errorObject)
+                } else {
+                  reject(err)
+                }
+              },
+              false, { headers: { 'X-Key': config.xKey } })
+          } catch (err) {
+            reject(err)
+          }
+        })
     })
+    return promise
   }
 
   fileFromFileEntry (fileEntry) {

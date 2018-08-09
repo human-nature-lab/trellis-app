@@ -1,71 +1,64 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Checking foreign key constraints...
-        <strong v-if="success" class="green--text">OK.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <v-progress-linear
-      v-if="working"
-      height="2"
-      :indeterminate="true">
-    </v-progress-linear>
-    <v-btn
-      v-if="!success && !working"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="error"
-      color="amber"
-      @click.native="ignore">Ignore</v-btn>
-  </div>
+  <sync-sub-step
+    :working="working"
+    :success="success"
+    :current-log="currentLog"
+    :ignore="ignore"
+    :retry="retry">
+    {{ status.message }}
+  </sync-sub-step>
 </template>
 
 <script>
-    import config from '@/config'
-    import DatabaseService from '@/services/database/DatabaseService'
+    import DatabaseService from '../../../../services/database/DatabaseService'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'check-foreign-keys',
       data () {
         return {
           success: false,
-          error: false,
           working: false,
-          apiRoot: config.apiRoot,
-          errorMessage: ''
+          currentLog: undefined,
+          status: {
+            message: 'Checking foreign key constraints...'
+          }
         }
       },
       created () {
         this.checkForeignKeys()
       },
-      props: [],
+      props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        },
+        queryRunner: {
+          type: Object,
+          required: true
+        }
+      },
       methods: {
         checkForeignKeys: function () {
           this.working = true
-          DatabaseService.checkForeignKeys()
+          DatabaseService.checkForeignKeys(this.queryRunner, this.status)
             .then(() => {
               this.working = false
               this.success = true
               this.$emit('check-foreign-keys-done')
-            },
-            (error) => {
-              console.error(error)
+            })
+            .catch((err) => {
               this.working = false
-              this.error = true
-              this.errorMessage = error
+              this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         },
         retry: function () {
-          this.error = false
+          this.currentLog = undefined
           this.checkForeignKeys()
         },
         ignore: function () {
-          this.error = false
+          this.currentLog = undefined
           this.success = true
           this.$emit('check-foreign-keys-done')
         }
@@ -73,6 +66,7 @@
       computed: {
       },
       components: {
+        SyncSubStep
       }
     }
 </script>

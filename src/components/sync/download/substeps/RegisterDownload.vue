@@ -1,56 +1,59 @@
 <template>
-  <sync-sub-step :working="removing"
-                 success-message="DONE"
-                 :success="success"
-                 :current-log="currentLog"
-                 :retry="retry">
-    {{ status.message }}
+  <sync-sub-step
+    success-message="DONE"
+    :working="working"
+    :success="success"
+    :current-log="currentLog"
+    :retry="retry">
+    Registering successful download...
   </sync-sub-step>
 </template>
 
 <script>
-    import DatabaseService from '../../../../services/database/DatabaseService'
+    import SyncService from '../../../../services/sync/SyncService'
+    import Sync from '../../../../entities/trellis-config/Sync'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
-      name: 'remove-database',
+      name: 'register-download',
       data () {
         return {
           success: false,
-          removing: false,
-          currentLog: undefined,
-          status: {
-            message: 'Removing previous database...'
-          }
+          working: false,
+          currentLog: undefined
         }
       },
       created () {
-        this.removeDatabase()
+        this.registerDownload()
       },
       props: {
         loggingService: {
           type: LoggingService,
           required: false,
           'default': function () { return defaultLoggingService }
+        },
+        sync: {
+          type: Sync,
+          required: true
         }
       },
       methods: {
-        removeDatabase: function () {
-          this.removing = true
-          DatabaseService.removeDatabase(this.status)
-            .then((queryRunner) => {
-              this.removing = false
+        registerDownload: function () {
+          this.working = true
+          SyncService.registerSuccessfulSync(this.sync)
+            .then(() => {
+              this.working = false
               this.success = true
-              this.$emit('remove-database-done', queryRunner)
+              this.$emit('register-download-done')
             })
             .catch((err) => {
-              this.removing = false
+              this.working = false
               this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         },
         retry: function () {
           this.currentLog = undefined
-          this.removeDatabase()
+          this.registerDownload()
         }
       },
       computed: {

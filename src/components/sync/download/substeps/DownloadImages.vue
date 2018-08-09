@@ -1,70 +1,59 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Downloading images...
-        <strong v-if="success" class="green--text">DONE.</strong>
-        <strong v-if="warning && !downloading" class="amber--text">WARNING.</strong>
-        <strong v-if="error && !downloading" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <span v-if="warning" class="amber--text">
-      <p>{{ warningMessage }}</p>
-    </span>
-    <v-progress-linear
-      v-if="downloading"
-      height="2"
-      :indeterminate="progressIndeterminate"
-      v-model="downloadProgress">
-    </v-progress-linear>
-    <v-btn
-      v-if="!downloading && !success"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-    <v-btn
-      v-if="!downloading && !success && !error"
-      color="amber"
-      @click.native="ignore">Ignore</v-btn>
-  </div>
+  <sync-sub-step :working="downloading"
+                 success-message="DONE"
+                 :success="success"
+                 :current-log="currentLog"
+                 :ignore="ignore"
+                 :retry="retry"
+                 :cancel="stopDownload"
+                 :progress="downloadProgress"
+                 :indeterminate="progressIndeterminate">
+    Downloading images... {{ numImagesDownloaded }}/{{ numImagesFound }}
+  </sync-sub-step>
 </template>
 
 <script>
-    import FileService from '@/services/file/FileService'
-    import SyncService from '../../services/SyncService'
+    import FileService from '../../../../services/file/FileService'
+    import SyncService from '../../../../services/sync/SyncService'
     import axios from 'axios'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'download-images',
       data () {
         return {
           downloadProgress: 0,
-          progressIndeterminate: false,
+          progressIndeterminate: true,
           success: false,
-          error: false,
-          warning: false,
           downloading: false,
-          errorMessage: '',
-          warningMessage: '',
           numImagesDownloaded: 0,
-          failedImages: []
+          failedImages: [],
+          currentLog: undefined
         }
       },
       created () {
         this.downloadImages()
       },
       props: {
-        imagesToDownload: Array,
-        numImagesFound: Number
+        imagesToDownload: {
+          type: Array,
+          required: true
+        },
+        numImagesFound: {
+          type: Number,
+          required: true
+        },
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        }
       },
       methods: {
         downloadImages: function () {
           if (this.imagesToDownload.length === 0) {
             this.downloading = false
-            if (!this.error && !this.warning) {
-              this.onDone()
-            }
+            this.onDone()
           } else {
             this.downloading = true
             const CancelToken = axios.CancelToken
@@ -77,16 +66,23 @@
                 return FileService.writeFile('photos', photo, fileName, fileSize)
               })
               .then(() => {
+                this.progressIndeterminate = false
                 this.numImagesDownloaded++
                 this.downloadProgress = (this.numImagesDownloaded / this.numImagesFound) * 100
+                if (this.downloadProgress > 0) {
+                  this.progressIndeterminate = false
+                }
               })
               .catch((err) => {
-                this.warning = true
-                this.failedImages.push({
-                  fileName: fileName,
-                  error: err
-                })
-                this.warningMessage = err.response.statusText
+                if (err.response) {
+                  // 404 Not Found is the expected result if the image isn't found
+                  this.failedImages.push({
+                    fileName: fileName,
+                    error: `${err.response.status} ${err.response.statusText}`
+                  })
+                } else {
+                  this.loggingService.log(err).then((result) => { this.currentLog = result })
+                }
               })
               .finally(() => {
                 if (this.downloading) {
@@ -98,15 +94,26 @@
         onDone: function () {
           this.success = true
           this.downloading = false
-          console.log('onDone')
-          this.$emit('download-images-done', this.numImagesDownloaded)
+          if (this.failedImages.length > 0) {
+            this.loggingService.log({
+              severity: 'warn',
+              message: `The server could not find ${this.failedImages.length} images that were requested.`
+              // fullMessage: JSON.stringify(this.failedImages, null, 2)
+            }).then((result) => {
+              console.warn('Failed images', this.failedImages)
+              this.currentLog = result
+              this.$emit('download-images-done', this.numImagesDownloaded)
+            })
+          } else {
+            this.$emit('download-images-done', this.numImagesDownloaded)
+          }
         },
         retry: function () {
-          this.error = false
+          this.currentLog = undefined
           this.downloadImages()
         },
         ignore: function () {
-          this.warning = false
+          this.currentLog = undefined
           this.onDone()
         },
         stopDownload: function () {
@@ -114,11 +121,16 @@
             this.source.cancel('Operation cancelled by the user.')
           }
           this.downloading = false
+          this.loggingService.log({
+            severity: 'info',
+            message: 'Operation cancelled by the user.'
+          }).then((result) => { this.currentLog = result })
         }
       },
       computed: {
       },
       components: {
+        SyncSubStep
       }
     }
 </script>
