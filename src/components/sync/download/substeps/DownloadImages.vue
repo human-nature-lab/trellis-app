@@ -53,9 +53,7 @@
         downloadImages: function () {
           if (this.imagesToDownload.length === 0) {
             this.downloading = false
-            if (!this.error && !this.warning) {
-              this.onDone()
-            }
+            this.onDone()
           } else {
             this.downloading = true
             const CancelToken = axios.CancelToken

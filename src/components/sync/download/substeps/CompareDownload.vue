@@ -9,6 +9,7 @@
     import {COMPARE_DOWNLOAD_RESULTS as RESULTS} from '../../../../static/constants'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import DateService from '../../../../services/DateService'
     export default {
       name: 'compare-download',
       data () {
@@ -86,11 +87,14 @@
                 this.result = RESULTS.NO_DOWNLOAD
               } else {
                 this.localDownload = localDownload
-                this.localDownloadedAt = new Date(this.localDownload['created_at']).now()
-                this.serverCreatedAt = new Date(this.serverSnapshot['created_at']).now()
-                if (this.localDownloadedAt > this.serverCreatedAt) {
+                console.log('localDownload', localDownload)
+                console.log('serverSnapshot', this.serverSnapshot)
+                this.localDownloadedAt = new Date(this.localDownload['createdAt'])
+                console.log('localDownloadedAt', this.localDownloadedAt)
+                this.serverCreatedAt = new Date(this.serverSnapshot['created_at'])
+                if (this.localDownloadedAt.getTime() > this.serverCreatedAt.getTime()) {
                   this.result = RESULTS.DOWNLOAD_NEWER
-                } else if (this.localDownloadedAt === this.serverCreatedAt) {
+                } else if (this.localDownloadedAt.getTime() === this.serverCreatedAt.getTime()) {
                   this.result = RESULTS.DOWNLOAD_SAME
                 } else {
                   this.result = RESULTS.DOWNLOAD_OLDER
@@ -108,13 +112,13 @@
           if (!this.serverSnapshot || !this.serverSnapshot.hasOwnProperty('created_at')) {
             return 'NONE'
           }
-          return this.serverSnapshot['created_at']
+          return DateService.parseDate(this.serverSnapshot['created_at']).format('llll')
         },
         localDownloadCreatedAt: function () {
-          if (!this.localDownload || !this.localDownload.hasOwnProperty('created_at')) {
+          if (!this.localDownload || !this.localDownload.hasOwnProperty('createdAt')) {
             return 'NONE'
           }
-          return this.localDownload['created_at']
+          return DateService.parseDate(this.localDownload['createdAt']).format('llll')
         }
       },
       components: {

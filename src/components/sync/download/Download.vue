@@ -110,6 +110,12 @@
                   :query-runner="queryRunner"
                   v-on:check-foreign-keys-done="checkForeignKeysDone">
                 </check-foreign-keys>
+                <register-download
+                  v-if="downloadStep > 2 && downloadSubStep > 3"
+                  :logging-service="loggingService"
+                  :sync="sync"
+                  v-on:register-download-done="registerDownloadDone">
+                </register-download>
               </download-step>
             </v-stepper-content>
             <v-stepper-content step="4">
@@ -160,11 +166,11 @@
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import InsertRows from './substeps/InsertRows.vue'
   import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
+  import RegisterDownload from './substeps/RegisterDownload.vue'
   import GenerateImageList from './substeps/GenerateImageList.vue'
   import CalculateImageSize from './substeps/CalculateImageSize.vue'
   import DownloadImages from './substeps/DownloadImages.vue'
   import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
-  import FileService from '../../../services/file/FileService'
   import SyncService from '../../../services/sync/SyncService'
   import DeviceService from '../../../services/device/DeviceService'
   import Log from '../../../entities/trellis-config/Log'
@@ -181,9 +187,6 @@
         status: DOWNLOAD_STATUS.CHECKING_CONNECTION,
         downloadStep: 1,
         downloadSubStep: 0,
-        downloading: false,
-        downloadProgress: 0,
-        progressMessages: [],
         snapshotFileSize: null,
         serverSnapshot: null,
         localDownload: null,
@@ -192,7 +195,6 @@
         compareUploadResult: COMPARE_UPLOAD_RESULTS.NONE,
         COMPARE_DOWNLOAD_RESULTS: COMPARE_DOWNLOAD_RESULTS,
         COMPARE_UPLOAD_RESULTS: COMPARE_UPLOAD_RESULTS,
-        autoContinueLabel: '',
         continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
         downloadedSnapshotFileEntry: null,
         extractedSnapshot: null,
@@ -246,9 +248,21 @@
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         } else {
-          this.$emit('download-cancelled')
-          this.downloadStep = 1
-          this.downloadSubStep = 1
+          if (this.sync !== undefined) {
+            SyncService.registerCancelledSync(this.sync)
+              .then(() => {
+                this.$emit('download-cancelled')
+                this.downloadStep = 1
+                this.downloadSubStep = 1
+              })
+              .catch((err) => {
+                this.loggingService.log(err).then((result) => { this.currentLog = result })
+              })
+          } else {
+            this.$emit('download-cancelled')
+            this.downloadStep = 1
+            this.downloadSubStep = 1
+          }
         }
       },
       checkLatestSnapshotDone: function (serverSnapshot) {
@@ -299,6 +313,9 @@
         this.downloadSubStep = 3
       },
       checkForeignKeysDone: function () {
+        this.downloadSubStep = 4
+      },
+      registerDownloadDone: function () {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
       generateImageListDone: function (imageList) {
@@ -310,9 +327,7 @@
         this.downloadSubStep = 3
       },
       downloadImagesDone: function (imagesDownloaded) {
-        FileService.listPhotos()
-          .then((photoList) => console.log('downloadImagesDone', imagesDownloaded, photoList))
-        this.continueStatus = BUTTON_STATUS.ENABLED
+        this.continueStatus = BUTTON_STATUS.DONE
       }
     },
     computed: {
@@ -345,6 +360,7 @@
       RemoveDatabase,
       InsertRows,
       CheckForeignKeys,
+      RegisterDownload,
       GenerateImageList,
       CalculateImageSize,
       DownloadImages

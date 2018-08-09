@@ -44,7 +44,7 @@ class LoggingServiceCordova {
       await connection.manager.save(log)
       /* For debug purposes only */
       const logs = await connection.getRepository(Log).find()
-      console.log('logs', logs)
+      console.debug('logs', logs)
       /* For debug purposes only */
       if (writeToConsole) {
         if (console.hasOwnProperty(log.severity)) {

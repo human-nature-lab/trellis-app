@@ -1,4 +1,5 @@
 import moment from 'moment'
+import 'moment/min/locales.min'
 export const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 
 /**

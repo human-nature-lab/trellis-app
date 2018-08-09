@@ -9,6 +9,7 @@
     import {COMPARE_UPLOAD_RESULTS as RESULTS} from '../../../../static/constants'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     import SyncSubStep from '../../SyncSubStep.vue'
+    import DateService from '../../../../services/DateService'
     export default {
       name: 'compare-upload',
       data () {
@@ -102,13 +103,13 @@
           if (!this.serverSnapshot || !this.serverSnapshot.hasOwnProperty('created_at')) {
             return 'NONE'
           }
-          return this.serverSnapshot['created_at']
+          return DateService.parseDate(this.serverSnapshot['createdAt']).format('llll')
         },
         localUploadCreatedAt: function () {
           if (!this.localUpload || !this.localUpload.hasOwnProperty('created_at')) {
             return 'NONE'
           }
-          return this.localUpload['created_at']
+          return DateService.parseDate(this.localUpload['createdAt']).format('llll')
         }
       },
       components: {

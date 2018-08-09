@@ -13,7 +13,7 @@ class SyncService {
     const sync = new Sync()
     sync.id = uuid()
     sync.type = type
-    sync.status = 'RUNNING'
+    sync.status = 'running'
     sync.deviceId = deviceId
     sync.fileName = ''
     sync.createdAt = new Date()
@@ -115,6 +115,26 @@ class SyncService {
   }
   hasSynced () {
     return this.synced
+  }
+  async registerSuccessfulSync (_sync) {
+    console.debug('sync', _sync)
+    const connection = await DatabaseService.getConfigDatabase()
+    const repository = await connection.getRepository(Sync)
+    await repository.update({id: _sync.id}, {completedAt: new Date(), status: 'success'})
+    /* For debug purposes only */
+    const syncs = await repository.find()
+    console.debug('syncs', syncs)
+    /* For debug purposes only */
+  }
+  async registerCancelledSync (_sync) {
+    console.debug('sync', _sync)
+    const connection = await DatabaseService.getConfigDatabase()
+    const repository = await connection.getRepository(Sync)
+    await repository.update({id: _sync.id}, {status: 'cancelled'})
+    /* For debug purposes only */
+    const syncs = await repository.find()
+    console.debug('syncs', syncs)
+    /* For debug purposes only */
   }
 }
 

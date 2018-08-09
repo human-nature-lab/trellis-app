@@ -1,67 +1,65 @@
 <template>
-  <div>
-    <ul>
-      <li>
-        Registering successful download...
-        <strong v-if="success" class="green--text">OK.</strong>
-        <strong v-if="error" class="red--text">ERROR.</strong>
-      </li>
-    </ul>
-    <span v-if="error" class="red--text">
-      <p>{{ errorMessage }}</p>
-    </span>
-    <v-progress-linear
-      v-if="working"
-      height="2"
-      :indeterminate="true">
-    </v-progress-linear>
-    <v-btn
-      v-if="!success && !working"
-      color="primary"
-      @click.native="retry">Retry</v-btn>
-  </div>
+  <sync-sub-step
+    success-message="DONE"
+    :working="working"
+    :success="success"
+    :current-log="currentLog"
+    :retry="retry">
+    Registering successful download...
+  </sync-sub-step>
 </template>
 
 <script>
-    import DatabaseService from '../../../../services/database/DatabaseService'
+    import SyncService from '../../../../services/sync/SyncService'
+    import Sync from '../../../../entities/trellis-config/Sync'
+    import SyncSubStep from '../../SyncSubStep.vue'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'register-download',
       data () {
         return {
           success: false,
-          error: false,
           working: false,
-          errorMessage: ''
+          currentLog: undefined
         }
       },
       created () {
         this.registerDownload()
       },
-      props: [],
+      props: {
+        loggingService: {
+          type: LoggingService,
+          required: false,
+          'default': function () { return defaultLoggingService }
+        },
+        sync: {
+          type: Sync,
+          required: true
+        }
+      },
       methods: {
         registerDownload: function () {
           this.working = true
-          DatabaseService.checkForeignKeys()
+          SyncService.registerSuccessfulSync(this.sync)
             .then(() => {
               this.working = false
               this.success = true
               this.$emit('register-download-done')
             })
             .catch((err) => {
-              console.error(err)
               this.working = false
-              this.error = true
-              this.errorMessage = err
+              this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         },
         retry: function () {
-          this.error = false
+          this.currentLog = undefined
           this.registerDownload()
         }
       },
       computed: {
       },
       components: {
+        SyncSubStep
       }
     }
 </script>

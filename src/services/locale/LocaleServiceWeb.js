@@ -3,6 +3,7 @@ import storage from '../storage/StorageService'
 import singleton from '../../static/singleton'
 import http from '../http/AxiosInstance'
 import i18n from '../../i18n'
+import moment from 'moment'
 export default class LocaleService {
   static hasValidLocale () {
     console.log('TODO: Should probably also check if the current locale is a valid one for the selected study')
@@ -21,6 +22,7 @@ export default class LocaleService {
     return StudyService.getStudy(studyId).then(study => study.locales)
   }
   static setCurrentLocale (locale) {
+    moment.locale(locale)
     storage.set('current-locale', locale)
     singleton.locale = locale
     i18n.locale = i18n.messages[locale.language_tag] ? locale.language_tag : 'en'
