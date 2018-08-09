@@ -9,21 +9,25 @@ export default class DiffService {
    * @param {Map<string:object>} comparisonKeys
    * @returns {{added: Array<object>, modified: Array<object>, removed: Array<object>}}
    */
-  static mapDiffByKey (newObjMap: Map<string,object>, oldObjMap: Map<string,object>, comparisonKeys?: string[]|Set<string>) {
+  static mapDiffByKey (newObjMap: Map<string, any>, oldObjMap: Map<string, any>, comparisonKeys?: string[]) {
     let added = []
     let modified = []
     let removed = []
-    comparisonKeys = comparisonKeys || new Set([...newObjMap.keys(), ...oldObjMap.keys()])
+    let allKeys = new Set([...newObjMap.keys(), ...oldObjMap.keys()])
     let a
     let b
-    for (let key of comparisonKeys) {
+    for (let key of allKeys) {
       if (newObjMap.has(key)) {
         if (!oldObjMap.has(key)) {
           added.push(newObjMap.get(key))
         } else {
           a = newObjMap.get(key)
           b = oldObjMap.get(key)
-          if (!isEqual(a, b)) {
+          if (comparisonKeys) {
+            if (!DiffService.isEqualKeys(a, b, comparisonKeys)) {
+              modified.push(a)
+            }
+          } else if (!isEqual(a, b)) {
             modified.push(a)
           }
         }
@@ -99,5 +103,21 @@ export default class DiffService {
       res[type] = new AddedRemovedDelta(diff.added, diff.removed)
     }
     return res
+  }
+
+  /**
+   * Compare two objects by checking the array of keys given for referential equality
+   * @param {object} one
+   * @param {object} two
+   * @param {string[]} keys
+   * @returns {boolean}
+   */
+  static isEqualKeys (one: object, two: object, keys: string[]) {
+    for (let key of keys) {
+      if (one[key] !== two[key]) {
+        return false
+      }
+    }
+    return true
   }
 }

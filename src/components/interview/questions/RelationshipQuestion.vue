@@ -148,7 +148,6 @@
         })
       },
       loadEdges: function (edgeIds) {
-        debugger
         if (!edgeIds.length) return
         EdgeService.getEdges(edgeIds)
           .then(edges => {

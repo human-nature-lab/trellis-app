@@ -29,10 +29,11 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
     })
   }
 
-  saveActions (interviewId, actions) {
+  saveActions (interviewId: string, actions: Action[]) {
     interviewId = encodeURI(interviewId)
+
     return http().post(`interview/${interviewId}/actions`, {
-      'actions': actions
+      'actions': actions.map(a => a.toSnakeJSON())
     }).then(res => {
       return res.data
     })
@@ -43,7 +44,7 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
       .then(function (res) {
         if (res.data) {
           let d = {
-            data: res.data.map(q => (new QuestionDatum()).fromJSON(q)),
+            data: res.data.data.map(q => (new QuestionDatum()).fromJSON(q)),
             conditionTags: {
               survey: res.data.conditionTags.survey.map(s => (new SurveyConditionTag()).fromJSON(s)),
               section: res.data.conditionTags.section.map(s => (new SectionConditionTag()).fromJSON(s)),

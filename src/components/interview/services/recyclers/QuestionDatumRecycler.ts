@@ -28,6 +28,7 @@ class QuestionDatumRecycler extends Recycler<QuestionDatum> implements Recyclabl
     qd.sectionRepetition = interview.location.sectionRepetition
     qd.followUpDatumId = interview.location.sectionFollowUpDatumId
     qd.surveyId = interview.interview.survey_id
+    qd.interviewId = interview.interview.id
     qd.questionId = questionBlueprint.id
     qd.dkRf = null
     qd.createdAt = now()

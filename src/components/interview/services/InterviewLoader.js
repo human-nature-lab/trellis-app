@@ -34,6 +34,7 @@ export default class InterviewLoader {
           }
         }
       }
+      debugger
       res.respondentFills = res.respondentFills || []
       res.conditionTags = res.data && res.data.conditionTags || {}
       res.data = res.data && res.data.data || []
@@ -76,10 +77,10 @@ export default class InterviewLoader {
       return Promise.all([
         InterviewService.getActions(interviewId).then(actions => {
           results.actions = actions
-        }).catch(() => {}),
+        }),
         InterviewService.getData(interviewId).then(data => {
           results.data = data
-        }).catch(() => {}),
+        }),
         FormService.getForm(interview.survey.form_id).then(form => {
           results.form = form
         }),

@@ -10,7 +10,7 @@ import Action from "../../../entities/trellis/Action";
  * @param {Object} blueprint - The form blueprint to use
  */
 export default class ActionStore extends Emitter {
-  private store: any[]
+  public store: any[]
   private sortedStore: SortedArray<Action>
   private questionIndex: Map<string, Action[]> = new Map()
   private questionToPageIndex: Map<string, number>

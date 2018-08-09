@@ -120,29 +120,35 @@ export function mapFromJSON (target: object, source: object, keyMap: object) {
 /**
  * Map an objects camel case properties to a plain object using snake case
  * @param {object} source
- * @returns {{}}
+ * @param {string[] | object} keyMap
+ * @returns {object}
  */
-export function mapCamelToPlain (source: object, keyMap?: string[]|object) {
-  let d = {}
-  keyMap = keyMap || Object.keys(source)
-  if (Array.isArray(keyMap)) {
-    for (let sourceKey of keyMap) {
-      let targetKey = camelToSnake(sourceKey)
-      if (Array.isArray(source[sourceKey])) {
-        d[targetKey] = source[sourceKey].map(o => typeof o === 'object' && o.toSnakeJSON ? o.toSnakeJSON() : o)
+export function mapCamelToPlain (source: any, skipSnakeJSON = false, keyMap?: string[]|object): object {
+  if (source == null) return null
+  keyMap = keyMap || Array.from(Object.keys(source))
+  if (Array.isArray(source)) {
+    return source.map(o => mapCamelToPlain(o))
+  } else if (typeof source === 'object') {
+    if (!skipSnakeJSON && 'toSnakeJSON' in source) {
+      return source.toSnakeJSON()
+    } else if ('toJSON' in source) {
+      return source.toJSON()
+    } else {
+      let d = {}
+      if (Array.isArray(keyMap)) {
+        for (let sourceKey of keyMap) {
+          let targetKey = camelToSnake(sourceKey)
+          d[targetKey] = mapCamelToPlain(source[sourceKey])
+        }
       } else {
-        d[targetKey] = typeof source[sourceKey] === 'object' && source[sourceKey].toSnakeJSON ? source[sourceKey].toSnakeJSON() : source[sourceKey]
+        for (let sourceKey in keyMap) {
+          let targetKey = keyMap[sourceKey]
+          d[targetKey] = mapCamelToPlain(source[sourceKey])
+        }
       }
+      return d
     }
   } else {
-    for (let sourceKey in keyMap) {
-      let targetKey = keyMap[sourceKey]
-      if (Array.isArray(source[sourceKey])) {
-        d[targetKey] = source[sourceKey].map(o => typeof o === 'object' && o.toSnakeJSON ? o.toSnakeJSON() : o)
-      } else {
-        d[targetKey] = typeof source[sourceKey] === 'object' && source[sourceKey].toSnakeJSON ? source[sourceKey].toSnakeJSON() : source[sourceKey]
-      }
-    }
+    return source
   }
-  return d
 }

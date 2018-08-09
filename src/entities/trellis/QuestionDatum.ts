@@ -3,10 +3,11 @@ import uuid from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import {mapPropsFromJSON, mapFromJSON} from "../../services/JSONUtil";
+import {mapPropsFromJSON, mapFromJSON, mapCamelToPlain} from "../../services/JSONUtil";
+import ToSnakeJSON from "../interfaces/ToSnakeJSON";
 
 @Entity()
-export default class QuestionDatum extends TimestampedSoftDelete implements FromJSON {
+export default class QuestionDatum extends TimestampedSoftDelete implements FromJSON, ToSnakeJSON {
   @PrimaryGeneratedColumn()
   public id: string = uuid();
   @Column()
@@ -39,6 +40,12 @@ export default class QuestionDatum extends TimestampedSoftDelete implements From
       }
     })
     return this
+  }
+
+  toSnakeJSON () {
+    let d = mapCamelToPlain(this, true)
+    delete d['data']
+    return d
   }
 
   copy () {
