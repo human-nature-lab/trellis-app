@@ -37,7 +37,8 @@ export const BUTTON_STATUS = {
   DISABLED: 0,
   ENABLED: 1,
   WARNING: 2,
-  AUTO_CONTINUE: 2
+  AUTO_CONTINUE: 2,
+  DONE: 3
 }
 
 export default {

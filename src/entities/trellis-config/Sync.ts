@@ -14,11 +14,20 @@ export default class Sync {
   @Column({ name: "device_id" })
   deviceId: string;
 
+  @Column({ name: "snapshot_id", nullable: true })
+  snapshotId: string;
+
+  @Column({ name: "snapshot_created_at", type: "datetime", nullable: true })
+  snapshotCreatedAt: Date;
+
   @Column({ name: "file_name" })
   fileName: string;
 
-  @Column({ name: "created_at" })
+  @Column({ name: "created_at", type: "datetime" })
   createdAt: Date;
+
+  @Column({ name: "completed_at", type: "datetime", nullable: true })
+  completedAt: Date;
 }
 
 /* TODO:

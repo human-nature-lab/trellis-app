@@ -4,10 +4,11 @@
       color="primary"
       @click="onClick"
       v-bind:disabled="buttonStatus === STATUS.DISABLED">
-      <slot></slot>&nbsp;<span v-if="isCountingDown"> {{ continueIn }}</span>
+      <slot></slot><span v-if="isCountingDown">&nbsp;{{ continueIn }}</span>
     </v-btn>
     <v-btn
       flat
+      v-show="buttonStatus !== STATUS.DONE"
       @click="onCancel">
       {{ $t('cancel') }}
     </v-btn>
