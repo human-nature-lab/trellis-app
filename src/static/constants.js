@@ -18,11 +18,27 @@ export const COMPARE_SNAPSHOTS_RESULTS = {
   DOWNLOAD_NEWER: 6 // Local snapshot newer than server snapshot, don't check last upload, stop and warn
 }
 
+export const COMPARE_DOWNLOAD_RESULTS = {
+  NONE: 0, // Not run yet
+  NO_DOWNLOAD: 1, // No local snapshot found, don't check last upload, auto-start download
+  DOWNLOAD_OLDER: 2, // Local snapshot older than server snapshot
+  DOWNLOAD_SAME: 3, // Local snapshot same as server snapshot
+  DOWNLOAD_NEWER: 4 // Local snapshot newer than server snapshot, don't check last upload, stop and warn
+}
+
+export const COMPARE_UPLOAD_RESULTS = {
+  NONE: 0, // Not run yet
+  NO_UPLOAD: 1, // No local upload found
+  UPLOAD_OLDER: 2, // Local upload older than server snapshot
+  UPLOAD_NEWER: 3 // Upload newer than server snapshot, stop and warn
+}
+
 export const BUTTON_STATUS = {
   DISABLED: 0,
   ENABLED: 1,
   WARNING: 2,
-  AUTO_CONTINUE: 2
+  AUTO_CONTINUE: 2,
+  DONE: 3
 }
 
 export default {

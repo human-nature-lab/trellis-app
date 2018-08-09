@@ -27,6 +27,7 @@ module.exports = merge(baseWebpackConfig, {
     chunkFilename: utils.assetsPath('js/[id].[hash].js')
   },
   plugins: [
+    new webpack.LoaderOptionsPlugin({ options: {} }),
     new webpack.DefinePlugin({
       'process.env': config.dev.env
     }),
@@ -51,7 +52,7 @@ module.exports = merge(baseWebpackConfig, {
         var replacements = require('../config/config.xml')
         content = content.toString()
         for (var key in replacements) {
-          content = content.replace(key, replacements[key])
+          content = content.replace(new RegExp(key, 'g'), replacements[key])
         }
         return content
       }

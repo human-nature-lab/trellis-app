@@ -12,13 +12,13 @@
       v-bind:button-status="continueStatus"
       v-on:button-clicked="onClick"
       v-on:cancel-clicked="onCancel">
-      Continue
+      {{ (continueStatus === 3) ? 'Done' : 'Continue' }}
     </auto-click-button>
   </v-flex>
 </template>
 
 <script>
-  import AutoClickButton from '@/components/AutoClickButton'
+  import AutoClickButton from '../../../components/AutoClickButton'
   export default {
     name: 'download-step',
     data () {

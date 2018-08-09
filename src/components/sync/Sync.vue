@@ -35,8 +35,8 @@
 
 <script>
   import SyncStatus from './SyncStatus'
-  import SyncService from './services/SyncService'
-  import DatabaseService from '@/services/database/DatabaseService'
+  import SyncService from '../../services/sync/SyncService'
+  import DatabaseService from '../../services/database/DatabaseService'
   import Download from './download/Download'
 
   export default {
