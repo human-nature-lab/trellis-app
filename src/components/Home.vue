@@ -1,7 +1,13 @@
 <template>
   <v-container fill-height class="home">
-    <Login v-if="hasSynced"></Login>
-    <Sync v-if="isCordova"></Sync>
+    <v-layout row wrap>
+      <v-flex xs12>
+        <Login v-if="hasSynced"></Login>
+      </v-flex>
+      <v-flex xs12>
+        <Sync v-if="isCordova"></Sync>
+      </v-flex>
+    </v-layout>
   </v-container>
 </template>
 
@@ -11,10 +17,16 @@
   import Login from './login/Login.vue'
   export default {
     name: 'home',
-    computed: {
-      hasSynced: function () {
-        return SyncService.hasSynced()
+    data () {
+      return {
+        hasSynced: false
       }
+    },
+    created () {
+      SyncService.hasSynced()
+        .then((_hasSynced) => { this.hasSynced = _hasSynced })
+    },
+    computed: {
     },
     components: {
       Sync,
