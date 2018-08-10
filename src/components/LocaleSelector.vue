@@ -12,14 +12,16 @@
       v-model="locale"
       @change="change"
       item-text="language_name"
-      :items="locales"/>
+      :items="locales">
+    </v-select>
   </v-flex>
 </template>
 
-<script>
+<script lang="ts">
+  import Vue from 'vue'
   import StudyService from '../services/study/StudyService'
   import LocaleService from '../services/locale/LocaleService'
-  export default {
+  export default Vue.extend({
     name: 'locale-selector',
     data: function () {
       return {
@@ -38,28 +40,23 @@
         LocaleService.setCurrentLocale(this.locale)
         this.$emit('change', this.locale)
       },
-      load: function () {
-        this.isWorking = true
-        StudyService.getCurrentStudy().then(study => {
-          StudyService.setCurrentStudy(study)
-          return study
-        })
-        .catch(() => {})
-        .then(study => LocaleService.getStudyLocales(study.id))
-        .then(locales => {
+      load: async function () {
+        try {
+          this.isWorking = true
+          const study = await StudyService.getCurrentStudy()
+          this.locales = await study.locales
           if (!this.locale) {
-            this.locale = locales.find(locale => locale.id === this.global.study.default_locale_id)
+            this.locale = this.locales.find(study.defaultLocale)
           }
-          this.locales = locales
           this.error = null
-        }).catch(err => {
+        } catch (err) {
           this.error = err
-        }).then(() => {
+        } finally {
           this.isWorking = false
-        })
+        }
       }
     }
-  }
+  })
 </script>
 
 <style scoped>

@@ -7,7 +7,6 @@ import { syncInstance as http } from '../http/AxiosInstance'
 class SyncService {
   constructor () {
     this.deviceId = DeviceService.getUUID()
-    this.synced = false
   }
   async createSync (type, deviceId) {
     const sync = new Sync()
@@ -113,8 +112,14 @@ class SyncService {
     return DeviceService.getUUID()
       .then((deviceId) => http.get(`device/${deviceId}/image/${fileName}`, options))
   }
-  hasSynced () {
-    return this.synced
+  async hasSynced () {
+    const connection = await DatabaseService.getConfigDatabase()
+    const repository = await connection.getRepository(Sync)
+    const downloadCount = await repository.count({
+      type: 'download',
+      status: 'success'
+    })
+    return (downloadCount > 0)
   }
   async registerSuccessfulSync (_sync) {
     console.debug('sync', _sync)

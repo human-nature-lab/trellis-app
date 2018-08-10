@@ -1,10 +1,10 @@
 import MockService from '../mock/MockService'
-import storage from '@/services/storage/StorageService'
+import storage from '../storage/StorageService'
 import singleton from '../../static/singleton'
 export default class StudyServiceMock {
   static getCurrentStudy () {
     return MockService.randomlyFail(resolve => {
-      return resolve(storage.get('current-study', 'object'))
+      return resolve(storage.get('current-study'))
     }, StudyServiceMock.DELAY, StudyServiceMock.FAILURE_RATE)
   }
   static getStudy (studyId) {
