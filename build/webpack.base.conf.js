@@ -50,20 +50,17 @@ module.exports = {
         enforce: 'pre',
         include: [resolve('src'), resolve('test')],
         options: {
-          formatter: require('eslint-friendly-formatter')
+          formatter: require('eslint-friendly-formatter'),
+          ts:  'ts-loader!tslint-loader'
         }
       },
       {
         test: /\.tsx?$/,
-        use: [{
-          loader: 'babel-loader'
-        }, {
-          loader: 'ts-loader',
-          options: {
-            appendTsSuffixTo: [/\.vue$/]
-          }
-        }],
-        exclude: /node_modules/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+        },
+        exclude: /node_modules/
       },
       {
         test: /\.vue$/,

@@ -9,13 +9,13 @@ export default {
      * @param [payload]
      */
     action (type: string, payload?: any) {
-      if (!this.question || !this.question.id) {
+      if (!this['question'] || !this['question'].id) {
         throw new Error('Unable to use action method without defining the question. Use actionWithoutQuestion instead.')
       }
       let action = new Action()
       action.id = uuidv4()
       action.actionType = type
-      action.questionId = this.question.id
+      action.questionId = this['question'].id
       action.payload = payload
       actionBus.action(action)
     },

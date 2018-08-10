@@ -1,10 +1,11 @@
 import http from '../http/AxiosInstance'
-export default class ConditionTagService {
+import ConditionTagInterface from "./ConditionTagInterface";
+export class ConditionTagWeb implements ConditionTagInterface {
   /**
    * Creates a new condition tag
    * @param name
    */
-  static createConditionTag (name) {
+  createConditionTag (name) {
     return http().post(`condition-tag`, {
       name
     }).then(res => res.data.condition_tag)
@@ -15,7 +16,7 @@ export default class ConditionTagService {
    * @param {String} conditionTagId
    * @returns {Promise<Object>}
    */
-  static createRespondentConditionTag (respondentId, conditionTagId) {
+  createRespondentConditionTag (respondentId, conditionTagId) {
     respondentId = encodeURIComponent(respondentId)
     conditionTagId = encodeURIComponent(conditionTagId)
     return http().post(`respondent/${respondentId}/condition-tag/${conditionTagId}`).then(res => {
@@ -29,7 +30,7 @@ export default class ConditionTagService {
    * @param {String} conditionTagId
    * @returns {*}
    */
-  static removeRespondentConditionTag (respondentId, conditionTagId) {
+  removeRespondentConditionTag (respondentId, conditionTagId) {
     respondentId = encodeURIComponent(respondentId)
     conditionTagId = encodeURIComponent(conditionTagId)
     return http().delete(`respondent/${respondentId}/condition-tag/${conditionTagId}`).then(res => res.data)
@@ -39,7 +40,7 @@ export default class ConditionTagService {
    * Get all of the available condition tags
    * @returns {Array} - An array of condition tags
    */
-  static respondent () {
+  respondent () {
     return http().get('/condition-tags/respondent').then(res => res.data.conditions)
   }
 
@@ -47,7 +48,9 @@ export default class ConditionTagService {
    * Get all condition tags
    * @returns {Promise<Object[]>}
    */
-  static all () {
+  all () {
     return http().get('/condition-tags').then(res => res.data.condition_tags)
   }
 }
+
+export default new ConditionTagWeb()
