@@ -1,6 +1,8 @@
 import LocaleService from '../../services/locale/LocaleService'
+import SingletonService from '../../services/singleton/SingletonService'
 
-export default function (to, from, next) {
+export default async function (to, from, next) {
+  await SingletonService.hasLoaded()
   if (!LocaleService.hasValidLocale()) {
     return next({path: '/locale', query: {to: to.fullPath}})
   } else {

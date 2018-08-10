@@ -11,7 +11,8 @@
       :loading="isWorking"
       v-model="locale"
       @change="change"
-      item-text="language_name"
+      item-text="languageName"
+      item-value="id"
       :items="locales">
     </v-select>
   </v-flex>
@@ -21,13 +22,14 @@
   import Vue from 'vue'
   import StudyService from '../services/study/StudyService'
   import LocaleService from '../services/locale/LocaleService'
+  import SingletonService from '../services/singleton/SingletonService'
   export default Vue.extend({
     name: 'locale-selector',
     data: function () {
       return {
         error: null,
         locales: [],
-        locale: LocaleService.getCurrentLocale(),
+        locale: null,
         isWorking: false
       }
     },
@@ -35,25 +37,34 @@
       this.load()
     },
     methods: {
-      change: function (locale) {
+      change: function (localeId) {
+        const locale = this.getLocaleById(localeId)
         this.locale = locale
-        LocaleService.setCurrentLocale(this.locale)
-        this.$emit('change', this.locale)
+        LocaleService.setCurrentLocale(locale)
+        this.$emit('change', locale)
       },
       load: async function () {
         try {
           this.isWorking = true
+          await SingletonService.hasLoaded()
           const study = await StudyService.getCurrentStudy()
-          this.locales = await study.locales
-          if (!this.locale) {
-            this.locale = this.locales.find(study.defaultLocale)
-          }
+          this.locales = await LocaleService.getStudyLocales(study.id)
+          this.locale = await LocaleService.getCurrentLocale()
           this.error = null
         } catch (err) {
           this.error = err
         } finally {
           this.isWorking = false
         }
+      },
+      getLocaleById: function (localeId) {
+        for (let i = 0; i < this.locales.length; i++) {
+          let locale = this.locales[i]
+          if (locale.id === localeId) {
+            return locale
+          }
+        }
+        return null
       }
     }
   })
