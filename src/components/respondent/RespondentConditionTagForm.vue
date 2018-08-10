@@ -45,7 +45,7 @@
 </template>
 
 <script>
-  import ConditionTagService from '../../services/condition-tag/ConditionTagService'
+  import ConditionTagWeb from '../../services/condition-tag/ConditionTagWeb'
   export default {
     name: 'respondent-condition-form',
     data: () => ({
@@ -70,7 +70,7 @@
     methods: {
       load () {
         this.isLoading = true
-        ConditionTagService.all().then(conditions => {
+        ConditionTagWeb.all().then(conditions => {
           this.conditions = conditions
         }).catch(err => {
           this.error = err
@@ -80,7 +80,7 @@
       },
       save () {
         this.isSaving = true
-        ConditionTagService.createRespondentConditionTag(this.respondentId, this.conditionTag.id).then(tag => {
+        ConditionTagWeb.createRespondentConditionTag(this.respondentId, this.conditionTag.id).then(tag => {
           let newTag = JSON.parse(JSON.stringify(this.conditionTag))
           newTag.pivot = tag
           this.$emit('close', newTag)
@@ -93,7 +93,7 @@
       },
       createNewConditionTag () {
         this.isSavingNew = true
-        ConditionTagService.createConditionTag(this.newConditionTagName).then(tag => {
+        ConditionTagWeb.createConditionTag(this.newConditionTagName).then(tag => {
           this.conditions.push(tag)
           this.conditionTag = tag
         }).catch(err => {

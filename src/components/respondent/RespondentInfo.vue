@@ -57,7 +57,7 @@
         class="mb-3"
         hide-actions
         :headers="conditionTagHeaders"
-        :items="respondent.respondent_condition_tags">
+        :items="respondent.respondentConditionTags">
         <template slot="items" slot-scope="props">
           <td>{{ props.item.name }}</td>
           <td class="text-xs-right">{{ props.item.updated_at }}</td>
@@ -159,15 +159,23 @@
   </v-card>
 </template>
 
-<script>
-  import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
+<script lang="ts">
+  // @ts-ignore
   import Permission from '../Permission'
+  // @ts-ignore
   import Photo from '../Photo'
+  // @ts-ignore
   import RespondentName from './RespondentName'
+  // @ts-ignore
   import RespondentConditionTagForm from './RespondentConditionTagForm'
-  import RespondentService from '../../services/respondent/RespondentService'
-  import ConditionTagService from '../../services/condition-tag/ConditionTagService'
+  // @ts-ignore
   import RespondentGeos from './RespondentGeos'
+  import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
+  import RespondentService from '../../services/respondent/RespondentService'
+  import ConditionTagWeb from '../../services/condition-tag/ConditionTagWeb'
+  import Respondent from '../../entities/trellis/Respondent'
+  import Vue from 'vue'
+  import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
 
   /**
    * The respondent info router loader
@@ -179,7 +187,7 @@
     return RespondentService.getRespondentById(respondentId)
   }
 
-  export default {
+  export default Vue.extend({
     name: 'respondent-info',
     mixins: [RouteMixinFactory(preloadRespondent)],
     data () {
@@ -218,64 +226,66 @@
       }
     },
     methods: {
-      hydrate (respondent) {
+      hydrate (respondent: Respondent) {
         this.respondent = respondent
       },
       photoFromCamera () {},
       photoFromFile () {},
-      removeName (nameId) {
+      async removeName (nameId: string) {
         let name = this.respondent.names.find(name => name.id === nameId)
-        if (name && name.is_display_name) {
+        if (name && name.isDisplayName) {
           this.error = `Cannot delete the display name for a respondent`
           return
         }
         this.deleting[nameId] = true
-        RespondentService.removeName(this.respondent.id, nameId).then(res => {
+        try {
+          await RespondentService.removeName(this.respondent.id, nameId)
           let index = this.respondent.names.findIndex(name => name.id === nameId)
           this.respondent.names.splice(index, 1)
-        }).catch(err => {
+        } catch (err) {
           console.error(err)
           this.error = `Failed to delete the respondent name -> ${name.name}`
-        }).finally(() => {
+        } finally {
           this.deleting[nameId] = false
           this.$forceUpdate()
-        })
+        }
       },
-      doneAddingName (name) {
+      doneAddingName (name: RespondentName) {
         if (name) {
           this.respondent.names.push(name)
         }
         this.modal.addName = false
       },
-      doneEditingName (name) {
-        let oldIndex = this.respondent.names.findIndex(n => name.previous_respondent_name_id)
+      doneEditingName (name: RespondentName) {
+        let oldIndex = this.respondent.names.findIndex(n => name.previousRespondentNameId)
         this.respondent.names.splice(oldIndex, 1, [name])
         this.modal.editName = false
       },
-      doneAddingRespondentConditionTag (tag) {
-        this.respondent.respondent_condition_tags.push(tag)
+      doneAddingRespondentConditionTag (tag: RespondentConditionTag) {
+        this.respondent.respondentConditionTags.push(tag)
         this.modal.conditionTag = false
       },
-      deleteRespondentConditionTag (respondentConditionTagId) {
+      async deleteRespondentConditionTag (respondentConditionTagId: string) {
         // TODO: Finish UI for removing respondent condition tags
         if (!window.confirm(`Are you sure you want to delete this respondent condition tag?`)) return
         this.deleting[respondentConditionTagId] = true
-        ConditionTagService.removeRespondentConditionTag(this.respondent.id, respondentConditionTagId).then(msg => {
-          let index = this.respondent.respondent_condition_tags.findIndex(t => t.pivot.id === respondentConditionTagId)
-          this.respondent.respondent_condition_tags.splice(index, 1)
-        }).catch(err => {
+        try {
+          await ConditionTagWeb.removeRespondentConditionTag(this.respondent.id, respondentConditionTagId)
+          let index = this.respondent.respondentConditionTags.findIndex(t => t.pivot.id === respondentConditionTagId)
+          this.respondent.respondentConditionTags.splice(index, 1)
+        } catch (err) {
           this.error = err
-        }).finally(() => {
+        } finally {
           this.deleting[respondentConditionTagId] = false
-        })
+        }
       },
-      isDeleting (id) {
+      isDeleting (id: string) {
         return this.deleting[id]
       }
     },
     computed: {
-      name () {
-        let rName = this.respondent.names.find(n => n.is_display_name)
+      name (): string {
+        let rName = this.respondent.names.find(n => n.isDisplayName)
         return rName ? rName.name : this.respondent.name
       }
     },
@@ -286,7 +296,7 @@
       RespondentConditionTagForm,
       RespondentGeos
     }
-  }
+  })
 </script>
 
 <style lang="sass" scoped>

@@ -106,7 +106,7 @@
 
 <script>
   import {debounce, orderBy, merge} from 'lodash'
-  import ConditionTagService from '../../services/condition-tag/ConditionTagService'
+  import ConditionTag from '../../services/condition-tag'
   import RespondentService from '../../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
   import RespondentItem from './RespondentItem'
@@ -257,7 +257,7 @@
       loadConditionTags () {
         if (this.conditionTagsLoaded) return
         this.conditionTagsLoading = true
-        return ConditionTagService.respondent().then(tags => {
+        return ConditionTag.respondent().then(tags => {
           this.conditionTags = Array.from(new Set(tags))
           this.conditionTagsLoaded = true
         }).catch(err => {

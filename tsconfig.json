@@ -1,15 +1,17 @@
 {
   "version": "2.0.2",
   "compilerOptions": {
-    "lib": ["es6", "es2015.promise", "dom", "es2015"],
-    "target": "es6",
+    "lib": ["es6", "es2015.promise", "dom", "es2015", "dom"],
+    "target": "es5",
     "module": "es6",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "declaration": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "noImplicitThis": true,
+    "downlevelIteration": true
   },
   "exclude": [
     "build",

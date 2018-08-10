@@ -32,10 +32,12 @@
   </v-flex>
 </template>
 
-<script>
+<script lang="ts">
+  // @ts-ignore
   import Photo from '../Photo'
-  import RespondentInfo from './RespondentInfo'
-  export default {
+  import Respondent from '../../entities/trellis/Respondent'
+  import Vue from 'vue'
+  export default Vue.extend({
     name: 'respondent-item',
     props: {
       formsButtonVisible: {
@@ -47,40 +49,35 @@
         default: true
       },
       respondent: {
-        type: Object,
+        type: Respondent,
         required: true
       },
       selected: {
         type: Boolean
       }
     },
-    data: function () {
+    data () {
       return {
         showInfo: false
       }
     },
     methods: {
-      onClick: function () {
+      onClick () {
         this.$emit('selected')
       },
-      photoFromFile: function () {
-
-      },
-      photoFromCamera: function () {
-
-      }
+      photoFromFile () {},
+      photoFromCamera () {}
     },
     computed: {
-      name () {
-        let rName = this.respondent.names.find(n => n.is_display_name)
+      name (): string {
+        let rName = this.respondent.names.find(n => n.isDisplayName)
         return rName ? rName.name : this.respondent.name
       }
     },
     components: {
-      Photo,
-      RespondentInfo
+      Photo
     }
-  }
+  })
 </script>
 
 <style lang="sass">
