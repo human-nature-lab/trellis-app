@@ -49,14 +49,18 @@ Object.keys(proxyTable).forEach(function (context) {
 })
 
 app.get('/cordova.js', function (req, res) {
-  fs.readFile('platforms/android/app/src/main/assets/www/cordova.js', function (err, data) {
-    if (err) {
-      res.send(err)
-      console.error(err)
-    } else {
-      res.send(data)
-    }
-  })
+  if (req.hostname.includes('localhost')) {
+    res.send(new Error('Not a device.'))
+  } else {
+    fs.readFile('platforms/android/app/src/main/assets/www/cordova.js', function (err, data) {
+      if (err) {
+        res.send(err)
+        console.error(err)
+      } else {
+        res.send(data)
+      }
+    })
+  }
 })
 
 app.get('/cordova_plugins.js', function (req, res) {

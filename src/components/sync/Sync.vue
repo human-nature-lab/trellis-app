@@ -4,7 +4,7 @@
       <v-flex>
         <v-container>
           <v-layout row class="sync-content">
-            <v-flex class="xs12 sm12 md12">
+            <v-flex class="xs12">
               <sync-status v-if="!downloading && !uploading"></sync-status>
               <download
                 v-if="downloading"
@@ -57,8 +57,6 @@
       ]).then(results => {
         this.localLatestSnapshot = results[0]
         this.updatedRecordsCount = results[1]
-        console.log('localLatestSnapshot', this.localLatestSnapshot)
-        console.log('updatedRecordsCount', this.updatedRecordsCount)
       }, errors => {
         console.error(errors)
       })
@@ -75,7 +73,6 @@
         this.downloading = false
       },
       downloadDone: function () {
-        console.log('downloadDone')
         this.downloading = false
       },
       enableDownload: function () {
