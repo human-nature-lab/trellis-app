@@ -2,7 +2,7 @@
   <v-container>
     <v-layout>
       <v-text-field
-        :label="$t('name')"
+        :label="$t('respondent_full_name')"
         v-model="name"/>
     </v-layout>
     <v-layout>
@@ -33,15 +33,12 @@
       }
     },
     methods: {
-      save () {
+      async save () {
         this.isSaving = true
-        let respondent
-        let censusTypeId
-        RespondentService.createRespondent(this.studyId, this.name, this.geoId, this.associatedRespondentId).then(r => {
-          respondent = r
-          censusTypeId = this.associatedRespondentId ? censusTypes.add_associated_respondent : censusTypes.add_respondent
-          return CensusFormService.hasCensusForm(this.studyId, censusTypeId)
-        }).then(hasCensus => {
+        let censusTypeId = this.associatedRespondentId ? censusTypes.add_associated_respondent : censusTypes.add_respondent
+        try {
+          let respondent = await RespondentService.createRespondent(this.studyId, this.name, this.geoId, this.associatedRespondentId)
+          let hasCensus = await CensusFormService.hasCensusForm(this.studyId, censusTypeId)
           if (hasCensus) {
             pushRouteAndQueueCurrent({
               name: 'StartCensusForm',
@@ -57,9 +54,11 @@
             console.log('no census form found')
             this.$emit('close', respondent)
           }
-        }).catch(err => {
+        } catch (err) {
           this.error = err
-        }).finally(() => { this.isSaving = false })
+        } finally {
+          this.isSaving = false
+        }
       }
     }
   }

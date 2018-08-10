@@ -2,10 +2,14 @@
 
 module.exports = {
   root: true,
-  parser: 'typescript-eslint-parser',
+  parser: 'vue-eslint-parser',
   parserOptions: {
-    sourceType: 'module'
+    parser: 'typescript-eslint-parser'
   },
+  // parser: 'typescript-eslint-parser',
+  // parserOptions: {
+  //   sourceType: 'module'
+  // },
   env: {
     browser: true,
   },
