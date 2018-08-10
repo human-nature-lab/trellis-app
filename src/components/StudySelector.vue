@@ -12,7 +12,8 @@
       v-model="study"
       @change="change"
       item-text="name"
-      :items="studies"/>
+      :items="studies">
+    </v-select>
   </v-flex>
 </template>
 
@@ -46,7 +47,7 @@
         .then(() => StudyService.getMyStudies())
         .then(studies => {
           studies.sort(function (a, b) {
-            return b.updated_at.localeCompare(a.updated_at)
+            return b.name.localeCompare(a.name)
           })
           this.studies = studies
         }).catch(err => {
