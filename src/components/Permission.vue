@@ -6,7 +6,6 @@
 
 <script>
   import UserService from '../services/user/UserService'
-  UserService.loadCurrentUser() // Just make sure we load the user on any page where the permission component is used
   export default {
     name: 'permission',
     props: {
@@ -16,6 +15,9 @@
       roleBlacklist: {
         default: () => []
       }
+    },
+    created () {
+      UserService.loadCurrentUser() // Just make sure we load the user on any page where the permission component is used
     },
     computed: {
       isVisible () {

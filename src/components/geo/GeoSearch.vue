@@ -77,8 +77,8 @@
   import GeoService from '../../services/geo/GeoService'
   import GeoListTile from './GeoListTile'
   import Cart from '../Cart'
-  import singleton from '../../static/singleton'
   import TranslationService from '../../services/TranslationService'
+  import singleton from '../../static/singleton'
   import router from '../../router'
   export default {
     name: 'geo-search',
@@ -125,6 +125,7 @@
     },
     data: function () {
       return {
+        global: singleton,
         userFilters: this.$route.query.filters ? JSON.parse(this.$route.query.filters) : {
           parent: null,
           types: null

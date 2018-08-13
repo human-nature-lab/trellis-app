@@ -46,7 +46,7 @@
           const study = await StudyService.getCurrentStudy()
           this.locales = await study.locales
           if (!this.locale) {
-            this.locale = this.locales.find(study.defaultLocale)
+            // this.locale = this.locales.find(study.defaultLocale)
           }
           this.error = null
         } catch (err) {

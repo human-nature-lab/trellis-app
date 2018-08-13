@@ -51,7 +51,7 @@ module.exports = {
         include: [resolve('src'), resolve('test')],
         options: {
           formatter: require('eslint-friendly-formatter'),
-          ts:  'ts-loader!tslint-loader'
+          // ts:  'ts-loader!typescript-eslint-parser'
         }
       },
       {

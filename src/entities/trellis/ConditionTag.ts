@@ -10,7 +10,7 @@ export default class ConditionTag extends TimestampedSoftDelete {
   name: string
 
   fromJSON(json: object) {
-    mapPropsFromJSON(this, json)
+    mapPropsFromJSON(this, json, ['id', 'name', 'created_at', 'updated_at', 'deleted_at'])
     return this
  }
 }

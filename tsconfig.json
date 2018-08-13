@@ -1,7 +1,7 @@
 {
   "version": "2.0.2",
   "compilerOptions": {
-    "lib": ["es6", "es2015.promise", "dom", "es2015", "dom"],
+    "lib": ["dom", "es6"],
     "target": "es5",
     "module": "es6",
     "moduleResolution": "node",

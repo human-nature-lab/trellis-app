@@ -45,6 +45,7 @@
   import RespondentService from '../../services/respondent/RespondentService'
   import FormService from '../../services/form/FormService'
   import censusTypes from '../../static/census.types'
+  import singleton from '../../static/singleton'
   import { pushRouteAndQueueCurrent } from '../../router'
   export default {
     name: 'respondent-name',
@@ -57,6 +58,7 @@
     },
     data () {
       return {
+        global: singleton,
         isSaving: false,
         locales: [],
         localesAreLoading: false

@@ -21,6 +21,7 @@
 <script>
   import GeoService from '../../services/geo/GeoService'
   import TranslationService from '../../services/TranslationService'
+  import singleton from '../../static/singleton'
   export default {
     name: 'geo-breadcrumbs',
     props: {
@@ -34,6 +35,7 @@
     },
     data () {
       return {
+        global: singleton,
         error: null,
         isLoading: false,
         ancestors: []

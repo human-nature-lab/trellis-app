@@ -10,8 +10,12 @@ export default class Translation extends TimestampedSoftDelete {
 
   translationText: Array<TranslationText>
 
+  get translation_text () {
+    return this.translationText
+  }
+
   fromJSON(json: any) {
-    mapPropsFromJSON(this, json)
+    mapPropsFromJSON(this, json, ['id', 'created_at', 'updated_at', 'deleted_at'])
     mapFromJSON(this, json, {
       translationText: TranslationText
     })

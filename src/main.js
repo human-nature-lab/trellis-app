@@ -7,7 +7,7 @@ import VueCordova from 'vue-cordova'
 import VueHead from 'vue-head'
 import i18n from './i18n'
 import Debug from './components/Debug'
-import singleton from './static/singleton'
+import './mixins/GlobalMixin'
 import 'typeface-roboto/index.css'
 import 'material-design-icons-iconfont'
 
@@ -33,35 +33,6 @@ if (window.location.protocol === 'file:' || window.location.port === '3000') {
   cordovaScript.setAttribute('src', 'cordova.js')
   document.body.appendChild(cordovaScript)
 }
-
-// Global component mixins
-Vue.mixin({
-  data: function () {
-    return {
-      global: singleton
-    }
-  },
-  methods: {
-    log: function (...args) {
-      if (config.debug) {
-        console.log(...args)
-      }
-    },
-    debug: function (...args) {
-      if (config.debug) {
-        console.debug(...args)
-      }
-    }
-  },
-  computed: {
-    isWeb: function () {
-      return config.appEnv === APP_ENV.WEB
-    },
-    isCordova: function () {
-      return config.appEnv === APP_ENV.CORDOVA
-    }
-  }
-})
 
 /* eslint-disable no-new */
 new Vue({
