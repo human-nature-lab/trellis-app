@@ -4,25 +4,23 @@ import {mapFromJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import Photo from "./Photo";
 
 @Entity()
-export default class RespondentPhoto extends TimestampedSoftDelete {
+export default class GeoPhoto extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn()
   id: string
   @Column()
-  respondentId: string
+  geoId: string
   @Column()
   photoId: string
   @Column({ type: 'tinyint' })
   sortOrder: number
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'text' })
   notes: string
 
   photo: Photo
 
-  fromJSON(json: object) {
-    mapPropsFromJSON(this, json, ['id', 'respondent_id', 'photo_id', 'sort_order', 'notes', 'created_at', 'updated_at', 'deleted_at'])
-    mapFromJSON(this, json, {
-      photo: Photo
-    })
+  fromJSON(json: any) {
+    mapPropsFromJSON(this, json.pivot, ['id', 'geo_id', 'photo_id', 'sort_order', 'notes', 'updated_at', 'created_at', 'deleted_at'])
+    this.photo = new Photo().fromJSON(json)
     return this
- }
+  }
 }

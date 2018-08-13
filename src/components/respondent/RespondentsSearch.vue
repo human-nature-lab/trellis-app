@@ -114,6 +114,7 @@
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
   import router from '../../router'
   import TranslationService from '../../services/TranslationService'
+  import singleton from '../../static/singleton'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
@@ -209,6 +210,7 @@
     },
     data () {
       return {
+        global: singleton,
         error: null,
         results: [],
         conditionTags: [],
@@ -274,6 +276,7 @@
         this.isLoading = true
         RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
           .then(respondents => {
+            debugger
             this.results = respondents
             this.error = null
           }).catch(err => {

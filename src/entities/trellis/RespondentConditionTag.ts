@@ -22,7 +22,7 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
   }
 
   fromJSON(json: object) {
-    mapPropsFromJSON(this, json)
+    mapPropsFromJSON(this, json, ['id', 'respondent_id', 'condition_tag_id', 'created_at', 'updated_at', 'deleted_at'])
     mapFromJSON(this, json, {
       condition_tag: ConditionTag
     })

@@ -102,16 +102,19 @@ export function mapFromJSON (target: object, source: object, keyMap: object) {
   for (let targetKey in keyMap) {
     let sourceKey = camelToSnake(targetKey)
     let opts = keyMap[targetKey]
-    let constructor = keyMap[targetKey]
+    let generator = s => new keyMap[targetKey]().fromJSON(s)
     if (typeof opts === 'object') {
-      constructor = keyMap[targetKey].constructor
+      generator = opts.hasOwnProperty('constructor') ? s => {
+        let d = new opts.constructor()
+        return d.fromJSON ? d.fromJSON(s): d
+      } : opts.generator
       if (opts.jsonKey) sourceKey = opts.sourceKey
     }
     if (source[sourceKey]) {
       if (Array.isArray(source[sourceKey])) {
-        target[targetKey] = source[sourceKey].map(s => (new constructor()).fromJSON(s))
+        target[targetKey] = source[sourceKey].map(generator)
       } else {
-        target[targetKey] = (new constructor()).fromJSON(source[sourceKey])
+        target[targetKey] = generator(source[sourceKey])
       }
     }
   }

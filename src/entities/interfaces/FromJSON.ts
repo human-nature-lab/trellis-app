@@ -4,5 +4,5 @@ export default interface FromJSON {
    * web interface
    * @param {object} json
    */
-  fromJSON(json: object): void;
+  fromJSON(json: object): this
 }

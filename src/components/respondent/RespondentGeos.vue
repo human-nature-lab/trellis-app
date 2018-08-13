@@ -31,22 +31,22 @@
           {{props.item.type}}
         </td>
         <td>
-          <v-icon v-if="props.item.pivot.is_current">check</v-icon>
+          <v-icon v-if="props.item.isCurrent">check</v-icon>
         </td>
         <permission :role-whitelist="['admin', 'manager']">
           <td>
-            <v-tooltip v-if="!props.item.pivot.is_current">
+            <v-tooltip v-if="!props.item.isCurrent">
               <v-btn
                 slot="activator"
                 icon
-                @click="remove(props.item.pivot.id)">
+                @click="remove(props.item.id)">
                 <v-icon>delete</v-icon>
               </v-btn>
               <span>{{ $t('remove_location') }}</span>
             </v-tooltip>
             <v-tooltip>
               <v-btn
-                v-if="props.item.pivot.is_current"
+                v-if="props.item.isCurrent"
                 icon
                 slot="activator"
                 @click="startMove(props.item)">
@@ -81,15 +81,23 @@
   </v-flex>
 </template>
 
-<script>
+<script lang="ts">
+  // @ts-ignore
+  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
+  // @ts-ignore
+  import GeoSearch from '../geo/GeoSearch'
+  // @ts-ignore
+  import Permission from '../Permission'
   import TranslationService from '../../services/TranslationService'
   import RespondentService from '../../services/respondent/RespondentService'
-  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
-  import GeoSearch from '../geo/GeoSearch'
-  import Permission from '../Permission'
   import CensusFormService from '../../services/census'
   import CensusTypes from '../../static/census.types'
-  export default {
+  import Respondent from "../../entities/trellis/Respondent"
+  import RespondentGeo from "../../entities/trellis/RespondentGeo"
+  import Geo from '../../entities/trellis/Geo'
+  import Vue from 'vue'
+  import singleton from '../../static/singleton'
+  export default Vue.extend({
     components: {GeoBreadcrumbs, GeoSearch, Permission},
     name: 'respondent-geos',
     props: {
@@ -97,7 +105,7 @@
         type: String
       },
       respondent: {
-        type: Object,
+        type: Respondent,
         required: true
       },
       useCensusForm: {
@@ -106,10 +114,11 @@
       }
     },
     data: () => ({
-      isAddingGeo: false,
-      showProgressDialog: false,
-      progressMessage: '',
-      geoSearchModal: false,
+      global: singleton,
+      isAddingGeo: false as boolean,
+      showProgressDialog: false as boolean,
+      progressMessage: '' as string,
+      geoSearchModal: false as boolean,
       movingRespondentGeo: null,
       error: null,
       locationHeaders: [{
@@ -124,12 +133,12 @@
       }]
     }),
     methods: {
-      geoIsSelectable (geo) {
+      geoIsSelectable (geo: Geo): boolean {
         // Take advantage of JavaScript type coercion here
-        return geo.geo_type.can_contain_respondent == 1 // eslint-disable-line
+        return geo.geoType.canContainRespondent == <any>1 // eslint-disable-line
       },
-      startMove (respondentGeo) {
-        let p
+      startMove (respondentGeo: RespondentGeo): Promise<void> {
+        let p: any = null
         if (this.useCensusForm) {
           this.showProgressDialog = true
           this.progressMessage = 'Checking if move respondent census form exists...'
@@ -155,27 +164,27 @@
           this.showProgressDialog = false
         })
       },
-      moveGeo (respondentGeo, geo) {
-        return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.pivot.id, geo.id).then(resGeo => {
+      moveGeo (respondentGeo: RespondentGeo, geo): Promise<void> {
+        return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.id, geo.id).then(resGeo => {
           let index = this.respondent.geos.findIndex(rg => rg.id === respondentGeo.id)
           this.respondent.geos.splice(index, 1, resGeo)
           this.$emit('after-move', resGeo)
         })
       },
-      addGeo (geo) {
+      addGeo (geo: Geo): Promise<void> {
         return RespondentService.addRespondentGeo(this.respondent.id, geo.id).then(resGeo => {
           this.respondent.geos.push(resGeo)
           this.$emit('after-add', resGeo)
         })
       },
-      remove (respondentGeoId) {
+      remove (respondentGeoId: string): Promise<void> {
         return RespondentService.removeRespondentGeo(this.respondent.id, respondentGeoId).then(() => {
-          let index = this.respondent.geos.findIndex(g => g.pivot.id === respondentGeoId)
+          let index = this.respondent.geos.findIndex(g => g.id === respondentGeoId)
           let rm = this.respondent.geos.splice(index, 1)
           this.$emit('after-remove', rm[0])
         })
       },
-      async geoSelected (geos) {
+      async geoSelected (geos: Geo[]): Promise<void> {
         if (geos.length > 1) this.error = 'Unable to add more than one respondent geo at a time'
         this.isAddingGeo = true
         try {
@@ -194,16 +203,11 @@
       }
     },
     computed: {
-      locations () {
-        return this.respondent.geos.map(geo => {
-          geo.translated = TranslationService.getAny(geo.name_translation, this.global.locale.id)
-          geo.type = geo.geo_type.name
-          geo.isCurrent = geo.pivot.is_current
-          return geo
-        })
+      locations (): Geo[] {
+        return this.respondent.geos.map(rGeo => rGeo.geo)
       }
     }
-  }
+  })
 </script>
 
 <style scoped>
