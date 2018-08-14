@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromJSON, mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import QuestionType from "./QuestionType";
 import Translation from "./Translation";
 import Choice from "./Choice";
@@ -28,7 +28,7 @@ export default class Question extends TimestampedSoftDelete {
 
   fromJSON(json: any) {
     mapPropsFromJSON(this, json)
-    mapFromJSON(this, json, {
+    mapFromSnakeJSON(this, json, {
       questionType: QuestionType,
       questionTranslation: Translation,
       choices: Choice,

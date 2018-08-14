@@ -9,7 +9,7 @@ export default class DatumType extends TimestampedSoftDelete {
   @Column()
   name: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

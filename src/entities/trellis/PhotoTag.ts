@@ -11,7 +11,7 @@ export default class PhotoTag extends TimestampedSoftDelete {
   @Column()
   tagId: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

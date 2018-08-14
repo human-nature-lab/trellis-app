@@ -11,7 +11,7 @@ export default class QuestionGroupSkip extends TimestampedSoftDelete {
   @Column()
   skipid: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

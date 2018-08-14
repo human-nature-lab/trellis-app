@@ -1,10 +1,9 @@
 import {Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapCamelToPlain, mapPropsFromJSON} from "../../services/JSONUtil";
-import ToSnakeJSON from "../interfaces/ToSnakeJSON";
-import FromJSON from "../interfaces/FromJSON";
+import SnakeSerializable from "../interfaces/SnakeSerializable";
 
-export default class Action extends TimestampedSoftDelete implements FromJSON, ToSnakeJSON {
+export default class Action extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryGeneratedColumn()
   id: string
   @Column()
@@ -22,7 +21,7 @@ export default class Action extends TimestampedSoftDelete implements FromJSON, T
   @Column({ type: 'integer' })
   sectionRepetition: number
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
   }

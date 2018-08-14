@@ -11,7 +11,7 @@ export default class Edge extends TimestampedSoftDelete {
   @Column()
   targetRespondentId: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

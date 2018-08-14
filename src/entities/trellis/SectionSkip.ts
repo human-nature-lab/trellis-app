@@ -11,7 +11,7 @@ export default class SectionSkip extends TimestampedSoftDelete {
   @Column()
   skipId: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

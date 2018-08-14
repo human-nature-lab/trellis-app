@@ -13,7 +13,7 @@ export default class Locale extends TimestampedSoftDelete {
   @Column({ nullable: true })
   languageNative: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

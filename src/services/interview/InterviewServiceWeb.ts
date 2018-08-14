@@ -25,7 +25,7 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
   getActions (interviewId) {
     interviewId = encodeURI(interviewId)
     return http().get(`interview/${interviewId}/actions`).then(res => {
-      return res.data.actions.map(a => new Action().fromJSON(a))
+      return res.data.actions.map(a => new Action().fromSnakeJSON(a))
     })
   }
 
@@ -44,11 +44,11 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
       .then(function (res) {
         if (res.data) {
           let d = {
-            data: res.data.data.map(q => (new QuestionDatum()).fromJSON(q)),
+            data: res.data.data.map(q => (new QuestionDatum()).fromSnakeJSON(q)),
             conditionTags: {
-              survey: res.data.conditionTags.survey.map(s => (new SurveyConditionTag()).fromJSON(s)),
-              section: res.data.conditionTags.section.map(s => (new SectionConditionTag()).fromJSON(s)),
-              respondent: res.data.conditionTags.respondent.map(r => (new RespondentConditionTag()).fromJSON(r))
+              survey: res.data.conditionTags.survey.map(s => (new SurveyConditionTag()).fromSnakeJSON(s)),
+              section: res.data.conditionTags.section.map(s => (new SectionConditionTag()).fromSnakeJSON(s)),
+              respondent: res.data.conditionTags.respondent.map(r => (new RespondentConditionTag()).fromSnakeJSON(r))
             }
           }
           return d

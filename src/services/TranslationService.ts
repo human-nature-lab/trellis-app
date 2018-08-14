@@ -9,7 +9,7 @@ import Locale from "../entities/trellis/Locale";
 function transformToTranslation (translation: Translation): Translation {
   if (translation == null) return translation
   if (!(translation instanceof Translation)) {
-    return new Translation().fromJSON(translation)
+    return new Translation().fromSnakeJSON(translation)
   }
   return translation
 }

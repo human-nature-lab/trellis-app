@@ -9,7 +9,7 @@ export default class Roster extends TimestampedSoftDelete {
   @Column({ type: 'text' })
   val: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

@@ -1,6 +1,6 @@
 import {Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromJSON, mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import ConditionTag from "./ConditionTag";
 
 export default class RespondentConditionTag extends TimestampedSoftDelete {
@@ -21,9 +21,9 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
     this.conditionTagId = id
   }
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json, ['id', 'respondent_id', 'condition_tag_id', 'created_at', 'updated_at', 'deleted_at'])
-    mapFromJSON(this, json, {
+    mapFromSnakeJSON(this, json, {
       condition_tag: ConditionTag
     })
     return this

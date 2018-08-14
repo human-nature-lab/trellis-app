@@ -11,7 +11,7 @@ export default class StudyRespondent extends TimestampedSoftDelete {
   @Column()
   respondentId: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

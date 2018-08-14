@@ -61,6 +61,6 @@ export default class LocaleService {
    */
   static async getLocaleById (localeId: string): Promise<Locale> {
     const res = await http().get(`/locale/${localeId}`)
-    return new Locale().fromJSON(res.data.locale)
+    return new Locale().fromSnakeJSON(res.data.locale)
   }
 }
