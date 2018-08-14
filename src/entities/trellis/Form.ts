@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON, mapFromJSON} from "../../services/JSONUtil";
+import {mapPropsFromJSON, mapFromSnakeJSON} from "../../services/JSONUtil";
 import Section from "./Section";
 import Skip from "./Skip";
 import Translation from "./Translation";
@@ -26,7 +26,7 @@ export default class Form extends TimestampedSoftDelete {
     mapPropsFromJSON(this, json, [
       'id', 'form_master_id', 'name_translation_id', 'version', 'is_published'
     ])
-    mapFromJSON(this, json, {
+    mapFromSnakeJSON(this, json, {
       sections: Section,
       skips: Skip,
       nameTranslation: Translation

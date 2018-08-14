@@ -8,7 +8,7 @@ export default class FormType {
   @Column()
   name: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

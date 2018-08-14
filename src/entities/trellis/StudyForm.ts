@@ -17,7 +17,7 @@ export default class StudyForm extends TimestampedSoftDelete {
   @Column({ nullable: true })
   censusTypeId: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

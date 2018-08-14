@@ -21,7 +21,7 @@ export default class FormSection extends TimestampedSoftDelete {
   @Column({ nullable: true })
   followUpQuestionid: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

@@ -9,7 +9,7 @@ export default class QuestionType extends TimestampedSoftDelete {
   @Column()
   name: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

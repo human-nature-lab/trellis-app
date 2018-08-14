@@ -11,7 +11,7 @@ export default class SkipConditionTag extends TimestampedSoftDelete {
   @Column()
   conditionTagName: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

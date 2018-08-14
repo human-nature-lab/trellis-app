@@ -1,18 +1,17 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapCamelToPlain, mapFromJSON, mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapCamelToPlain, mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import RespondentName from "./RespondentName";
 import RespondentGeo from "./RespondentGeo";
 import RespondentConditionTag from "./RespondentConditionTag";
 import Photo from "./Photo";
 import RespondentPhoto from "./RespondentPhoto";
-import FromJSON from "../interfaces/FromJSON";
-import ToSnakeJSON from "../interfaces/ToSnakeJSON";
 import Geo from "./Geo";
 import ConditionTag from "./ConditionTag";
+import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
-export default class Respondent extends TimestampedSoftDelete implements FromJSON, ToSnakeJSON {
+export default class Respondent extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryGeneratedColumn()
   id: string
   @Column({ nullable: true })
@@ -33,28 +32,28 @@ export default class Respondent extends TimestampedSoftDelete implements FromJSO
   respondentConditionTags: RespondentConditionTag[]
   photos: Photo[]
 
-  fromJSON (json: any) {
+  fromSnakeJSON (json: any) {
     mapPropsFromJSON(this, json, ['id', 'assignedId', 'name', 'associatedRespondentId'])
-    mapFromJSON(this, json, {
+    mapFromSnakeJSON(this, json, {
       names: RespondentName,
       photos: {
         generator: photo => {
-          let p = new RespondentPhoto().fromJSON(photo.pivot)
-          p.photo = new Photo().fromJSON(photo)
+          let p = new RespondentPhoto().fromSnakeJSON(photo.pivot)
+          p.photo = new Photo().fromSnakeJSON(photo)
           return p
         }
       },
       geos: {
         generator: geo => {
-          let g = new RespondentGeo().fromJSON(geo.pivot)
-          g.geo = new Geo().fromJSON(geo)
+          let g = new RespondentGeo().fromSnakeJSON(geo.pivot)
+          g.geo = new Geo().fromSnakeJSON(geo)
           return g
         }
       },
       respondent_condition_tags: {
         generator: tag => {
-          let rc = new RespondentConditionTag().fromJSON(tag.pivot)
-          rc.conditionTag = new ConditionTag().fromJSON(tag)
+          let rc = new RespondentConditionTag().fromSnakeJSON(tag.pivot)
+          rc.conditionTag = new ConditionTag().fromSnakeJSON(tag)
           return rc
         }
       }

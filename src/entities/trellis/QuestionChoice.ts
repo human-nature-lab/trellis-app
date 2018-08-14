@@ -13,7 +13,7 @@ export default class QuestionChoice extends TimestampedSoftDelete {
   @Column({ type: 'integer' })
   sortOrder: number
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

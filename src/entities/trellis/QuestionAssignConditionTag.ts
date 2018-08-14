@@ -11,7 +11,7 @@ export default class QuestionAssignConditionTag extends TimestampedSoftDelete {
   @Column()
   assignConditionTagId: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

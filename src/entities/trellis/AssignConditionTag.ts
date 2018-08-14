@@ -13,7 +13,7 @@ export default class AssignConditionTag extends TimestampedSoftDelete {
   @Column({nullable: true})
   scope: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

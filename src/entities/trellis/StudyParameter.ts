@@ -13,7 +13,7 @@ export default class StudyParameter extends TimestampedSoftDelete {
   @Column()
   val: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

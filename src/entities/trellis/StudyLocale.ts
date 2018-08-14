@@ -11,7 +11,7 @@ export default class StudyLocale extends TimestampedSoftDelete {
   @Column()
   localeId: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

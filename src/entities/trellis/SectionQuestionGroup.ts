@@ -13,7 +13,7 @@ export default class SectionQuestionGroup extends TimestampedSoftDelete {
   @Column({ type: 'integer' })
   questionGroupOrder: number
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

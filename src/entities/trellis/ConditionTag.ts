@@ -9,7 +9,7 @@ export default class ConditionTag extends TimestampedSoftDelete {
   @Column()
   name: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json, ['id', 'name', 'created_at', 'updated_at', 'deleted_at'])
     return this
  }

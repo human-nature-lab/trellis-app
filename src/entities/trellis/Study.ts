@@ -22,7 +22,7 @@ export default class Study extends TimestampedSoftDelete {
   @JoinColumn()
   defaultLocale: Locale
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

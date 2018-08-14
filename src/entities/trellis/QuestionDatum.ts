@@ -3,11 +3,11 @@ import uuid from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import {mapPropsFromJSON, mapFromJSON, mapCamelToPlain} from "../../services/JSONUtil";
-import ToSnakeJSON from "../interfaces/ToSnakeJSON";
+import {mapPropsFromJSON, mapFromSnakeJSON, mapCamelToPlain} from "../../services/JSONUtil";
+import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
-export default class QuestionDatum extends TimestampedSoftDelete implements FromJSON, ToSnakeJSON {
+export default class QuestionDatum extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryGeneratedColumn()
   public id: string = uuid();
   @Column()
@@ -31,9 +31,9 @@ export default class QuestionDatum extends TimestampedSoftDelete implements From
 
   data: Datum[] = []
 
-  fromJSON (json) {
+  fromSnakeJSON (json) {
     mapPropsFromJSON(this, json)
-    mapFromJSON(this, json, {
+    mapFromSnakeJSON(this, json, {
       data: {
         constructor: Datum,
         jsonKey: 'datum'

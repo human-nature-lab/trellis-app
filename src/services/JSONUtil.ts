@@ -98,15 +98,15 @@ export function createSnakeCaseAliases (target: object) {
  * @param {object} source
  * @param {object} keyMap
  */
-export function mapFromJSON (target: object, source: object, keyMap: object) {
+export function mapFromSnakeJSON (target: object, source: object, keyMap: object) {
   for (let targetKey in keyMap) {
     let sourceKey = camelToSnake(targetKey)
     let opts = keyMap[targetKey]
-    let generator = s => new keyMap[targetKey]().fromJSON(s)
+    let generator = s => new keyMap[targetKey]().fromSnakeJSON(s)
     if (typeof opts === 'object') {
       generator = opts.hasOwnProperty('constructor') ? s => {
         let d = new opts.constructor()
-        return d.fromJSON ? d.fromJSON(s): d
+        return d.fromSnakeJSON ? d.fromSnakeJSON(s): d
       } : opts.generator
       if (opts.jsonKey) sourceKey = opts.sourceKey
     }

@@ -19,7 +19,7 @@ export default class GeoType extends TimestampedSoftDelete {
   @Column()
   canContainRespondent: boolean
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

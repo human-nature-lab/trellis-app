@@ -13,7 +13,7 @@ export default class Skip extends TimestampedSoftDelete {
   @Column({ type: 'tinyint' })
   precedence: number
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }
