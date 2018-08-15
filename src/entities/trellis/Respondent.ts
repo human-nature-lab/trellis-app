@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapCamelToPlain, mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import RespondentName from "./RespondentName";
 import RespondentGeo from "./RespondentGeo";
 import RespondentConditionTag from "./RespondentConditionTag";
@@ -62,11 +62,4 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
     return this
   }
 
-  toSnakeJSON() {
-    let d = mapCamelToPlain(this)
-    for (let key of ['names', 'geos', 'respondent_condition_tags', 'photos']){
-      delete d[key]
-    }
-    return d
-  }
 }

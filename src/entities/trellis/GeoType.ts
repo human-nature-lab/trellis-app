@@ -1,6 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 @Entity()
 export default class GeoType extends TimestampedSoftDelete {
@@ -18,10 +17,4 @@ export default class GeoType extends TimestampedSoftDelete {
   canUserAddChild: boolean
   @Column()
   canContainRespondent: boolean
-
-  fromSnakeJSON(json: object) {
-    mapPropsFromJSON(this, json)
-    super.fromSnakeJSON(json)
-    return this
- }
 }

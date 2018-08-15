@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON, mapFromSnakeJSON} from "../../services/JSONUtil";
+import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Survey from "./Survey";
 
 @Entity()
@@ -29,7 +29,6 @@ export default class Interview extends TimestampedSoftDelete {
   survey: Survey
 
   fromSnakeJSON(json: any) {
-    mapPropsFromJSON(this, json)
     mapFromSnakeJSON(this, json, {
       survey: Survey
     })

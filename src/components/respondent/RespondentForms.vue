@@ -15,56 +15,49 @@
 </template>
 
 <script>
-  import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
+  // @ts-ignore
   import FormsView from '../FormsView'
-  import SurveyService from '@/services/survey/SurveyService'
-  import FormService from '@/services/form/FormService'
-  import RespondentService from '@/services/respondent/RespondentService'
+  import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
+  import SurveyService from '../../services/survey/SurveyService'
+  import FormService from '../../services/form/FormService'
+  import RespondentService from '../../services/respondent/RespondentService'
   import InterviewService from '../../services/interview/InterviewService'
+  import global from '../../static/singleton'
   import index from '../../router/index'
 
-  function load (to) {
+  async function load (to) {
     let respondentId = to.params.respondentId
     let studyId = to.params.studyId
-    let data = {}
-    return Promise.all([
-      RespondentService.getRespondentById(respondentId)
-        .then(respondent => {
-          data.respondent = respondent
-        }),
-      Promise.all([
-        SurveyService.getRespondentSurveys(studyId, respondentId),
-        FormService.getStudyForms(studyId)
-      ]).then(combined => {
-        let [surveys, forms] = combined
-        data.surveys = surveys
-        data.forms = forms
-      })
-    ]).then(() => data)
+    return {
+      respondent: await RespondentService.getRespondentById(respondentId),
+      surveys: await SurveyService.getRespondentSurveys(studyId, respondentId),
+      forms: await FormService.getStudyForms(studyId)
+    }
   }
 
   export default {
     name: 'respondent-forms',
     mixins: [RouteMixinFactory(load)],
-    data: function () {
+    data () {
       return {
+        global: global,
         forms: {},
         respondent: {},
         error: null
       }
     },
     head: {
-      title: function () {
-        return {
-          inner: `${this.respondent.name} Forms`
+        title () {
+          return {
+            inner: `${this.respondent.name} Forms`
+          }
         }
-      }
     },
     components: {
       FormsView
     },
     methods: {
-      startInterview: function (form) {
+      startInterview (form) {
         if (form.isComplete) return
         let p
         if (form.isStarted) {
@@ -80,19 +73,20 @@
           this.error = err
         })
       },
-      hydrate: function (data) {
+      hydrate (data) {
         // Join any surveys that have been created with the possible forms
+        debugger
         data.forms = data.forms.filter(form => {
-          return form.is_published === '1' || form.is_published === 1 || form.is_published === true // TODO: Filter out any forms that the respondent does not qualify for
+          return form.isPublished // TODO: Filter out any forms that the respondent does not qualify for
         }).map(form => {
-          let formSurveys = data.surveys.filter(survey => survey.form_id === form.id)
+          let formSurveys = data.surveys.filter(survey => survey.formId === form.id)
           if (formSurveys) {
-            form.surveys = formSurveys
+            form['surveys'] = formSurveys
           }
           return form
         })
         data.forms.sort((a, b) => {
-          return a.sort_order - b.sort_order
+          return a.sortOrder - b.sortOrder
         })
         this.respondent = data.respondent
         this.respondentId = data.respondent.id

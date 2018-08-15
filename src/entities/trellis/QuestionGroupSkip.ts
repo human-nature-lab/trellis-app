@@ -1,6 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 @Entity()
 export default class QuestionGroupSkip extends TimestampedSoftDelete {
@@ -10,10 +9,4 @@ export default class QuestionGroupSkip extends TimestampedSoftDelete {
   questionGroupId: string
   @Column()
   skipid: string
-
-  fromSnakeJSON(json: object) {
-    mapPropsFromJSON(this, json)
-    super.fromSnakeJSON(json)
-    return this
- }
 }

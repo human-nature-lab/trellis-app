@@ -1,7 +1,6 @@
 import uuidv4 from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import {Column, Entity} from "typeorm";
-import {mapCamelToPlain, mapPropsFromJSON} from "../../services/JSONUtil";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
@@ -32,14 +31,4 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   public surveyId: string;
   @Column()
   public val: string;
-
-  fromSnakeJSON (json) {
-    mapPropsFromJSON(this, json)
-    super.fromSnakeJSON(json)
-    return this
-  }
-
-  toSnakeJSON () {
-    return mapCamelToPlain(this, true)
-  }
 }

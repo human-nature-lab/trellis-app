@@ -35,7 +35,7 @@ export default class RespondentGeo extends TimestampedSoftDelete {
         geo: Geo
       })
     }
-    super.fromSnakeJSON(json)
+    super.parseDates()
     return this
  }
 }

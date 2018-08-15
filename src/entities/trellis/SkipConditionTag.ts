@@ -1,6 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 @Entity()
 export default class SkipConditionTag extends TimestampedSoftDelete {
@@ -10,10 +9,4 @@ export default class SkipConditionTag extends TimestampedSoftDelete {
   skipId: string
   @Column()
   conditionTagName: string
-
-  fromSnakeJSON(json: object) {
-    mapPropsFromJSON(this, json)
-    super.fromSnakeJSON(json)
-    return this
- }
 }
