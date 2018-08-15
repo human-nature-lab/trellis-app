@@ -38,9 +38,7 @@ export default class PhotoServiceCordova implements PhotoServiceInterface {
     return p
   }
 
-  cancelAllOutstanding () {
-     debugger
-  }
+  cancelAllOutstanding () {}
 
   /**
    * This method returns all undeleted photos from the Photo table
