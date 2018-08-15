@@ -23,7 +23,7 @@
       right
       app>
       <v-list dense>
-        <v-list-tile class="grey lighten-4">
+        <v-list-tile :dark="global.darkTheme">
           <v-list-tile-action @click="global.searchDrawer.open = false" class="text-right">
             <v-icon>arrow_forward</v-icon>
           </v-list-tile-action>
