@@ -254,7 +254,7 @@
         if (this.shouldUpdateRoute) {
           updateRoute(this)
         }
-        this.getCurrentPage()
+        return this.getCurrentPage()
       },
       loadConditionTags () {
         if (this.conditionTagsLoaded) return
@@ -274,14 +274,13 @@
       getCurrentPage () {
         let study = this.global.study
         this.isLoading = true
-        RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
+        return RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
           .then(respondents => {
-            debugger
             this.results = respondents
             this.error = null
           }).catch(err => {
             this.error = err.toLocaleString()
-          }).then(() => {
+          }).finally(() => {
             this.isLoading = false
           })
       },

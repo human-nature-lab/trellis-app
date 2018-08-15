@@ -1,6 +1,6 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
+import {camelToSnake, mapPropsFromJSON} from "../../services/JSONUtil";
 
 @Entity()
 export default class ConditionTag extends TimestampedSoftDelete {
@@ -10,14 +10,14 @@ export default class ConditionTag extends TimestampedSoftDelete {
   name: string
 
   fromJSON (json: object) {
-    for (let key of ['id', 'name', 'updatedAt', 'createdAt', 'deletedAt']) {
+    for (let key of this.__colNames__.map(camelToSnake)) {
       this[key] = json[key]
     }
     return this
   }
 
   fromSnakeJSON (json: object) {
-    mapPropsFromJSON(this, json, ['id', 'name', 'created_at', 'updated_at', 'deleted_at'])
+    mapPropsFromJSON(this, json, this.__colNames__.map(camelToSnake))
     super.fromSnakeJSON(json)
     return this
  }

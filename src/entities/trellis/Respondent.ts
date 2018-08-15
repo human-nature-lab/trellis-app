@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapCamelToPlain, mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import RespondentName from "./RespondentName";

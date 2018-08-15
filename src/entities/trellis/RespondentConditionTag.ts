@@ -1,4 +1,4 @@
-import {Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import ConditionTag from "./ConditionTag";

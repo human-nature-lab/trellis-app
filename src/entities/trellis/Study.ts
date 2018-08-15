@@ -1,4 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToMany, JoinTable, JoinColumn} from 'typeorm'
+import {OneToOne, ManyToMany, JoinTable, JoinColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapPropsFromJSON} from "../../services/JSONUtil";
 import Locale from "./Locale";
