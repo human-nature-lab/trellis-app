@@ -1,4 +1,5 @@
 import singleton from '../static/singleton'
+import router from '../router'
 
 /**
  * Creates a mixin which takes a loadCallback and will call the hydrate method at the appropriate times. This mixin is
@@ -10,6 +11,7 @@ import singleton from '../static/singleton'
 export default function RoutePreloadMixin (loadCallback) {
   let data
   return {
+    router,
     created () {
       this.hydrate(data)
       singleton.loading.error = null

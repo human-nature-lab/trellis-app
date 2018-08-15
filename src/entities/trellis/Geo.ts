@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON, mapFromSnakeJSON} from "../../services/JSONUtil";
+import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import GeoType from "./GeoType";
 import Translation from "./Translation";
 
@@ -25,7 +25,6 @@ export default class Geo extends TimestampedSoftDelete {
   nameTranslation: Translation
 
   fromSnakeJSON(json: object) {
-    mapPropsFromJSON(this, json, ['id', 'geo_type_id', 'parent_id', 'latitude', 'longitude', 'altitude', 'name_translation_id', 'updated_at', 'created_at', 'deleted_at'])
     mapFromSnakeJSON(this, json, {
       geoType: GeoType,
       nameTranslation: Translation

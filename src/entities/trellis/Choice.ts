@@ -1,6 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON, mapFromSnakeJSON} from "../../services/JSONUtil";
+import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Translation from "./Translation";
 
 @Entity()
@@ -15,7 +15,6 @@ export default class Choice extends TimestampedSoftDelete {
   choiceTranslation: Translation
 
   fromSnakeJSON(json: object) {
-    mapPropsFromJSON(this, json)
     mapFromSnakeJSON(this, json, {
       choiceTranslation: Translation
     })

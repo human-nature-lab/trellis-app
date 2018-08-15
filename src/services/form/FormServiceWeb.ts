@@ -1,6 +1,8 @@
 import http from '../http/AxiosInstance'
 import formTypes from '../../static/form.types'
 import FormServiceInterface from "./FormServiceInterface";
+import StudyForm from "../../entities/trellis/StudyForm";
+import Form from "../../entities/trellis/Form";
 export class FormServiceWeb implements FormServiceInterface {
 
   /**
@@ -8,17 +10,14 @@ export class FormServiceWeb implements FormServiceInterface {
    * @param {String} studyId
    * @returns {Promise<Array>}
    */
-  getStudyForms (studyId: string) {
+  getStudyForms (studyId: string): Promise<StudyForm[]> {
     return http().get(`study/${studyId}/forms/published`, {
       params: {
         form_type_id: formTypes.data_collection_form
       }
     }).then(res => {
       if (res.data.forms) {
-        return res.data.forms.map(form => {
-          form.sort_order = form.study_form[0].sort_order
-          return form
-        })
+        return res.data.forms.map(form => new StudyForm().fromSnakeJSON(form))
       } else {
         console.error(res)
         throw Error('Unable to retrieve forms')
@@ -31,13 +30,13 @@ export class FormServiceWeb implements FormServiceInterface {
    * @param {String} formId
    * @returns {Promise<Object>}
    */
-  getForm (formId: string) {
+  getForm (formId: string): Promise<Form> {
     return http().get(`form/${formId}`)
       .then(res => {
         if (res.data.form) {
           // let form = new Form().fromSnakeJSON(res.data.form)
           // console.log(form)
-          return res.data.form
+          return new Form().fromSnakeJSON(res.data.form)
         } else {
           console.error(res)
           throw Error('Unable to retrieve form')
@@ -47,4 +46,4 @@ export class FormServiceWeb implements FormServiceInterface {
 
 }
 
-export default new FormServiceWeb()
+export default FormServiceWeb

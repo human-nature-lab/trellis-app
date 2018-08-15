@@ -1,4 +1,4 @@
-import switchByModeEnv from '@/services/util'
+import switchByModeEnv from '../util'
 import FormServiceMock from './FormServiceMock'
 import FormServiceWeb from './FormServiceWeb'
 import FormServiceCordova from './FormServiceCordova'
@@ -13,4 +13,4 @@ export const FormService = switchByModeEnv({
     TEST: FormServiceMock
   }
 })
-export default FormService
+export default new FormService()

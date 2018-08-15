@@ -3,7 +3,7 @@ import uuid from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
 import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
-import {mapPropsFromJSON, mapFromSnakeJSON, mapCamelToPlain} from "../../services/JSONUtil";
+import {mapFromSnakeJSON, mapCamelToPlain} from "../../services/JSONUtil";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
@@ -32,7 +32,6 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   data: Datum[] = []
 
   fromSnakeJSON (json) {
-    mapPropsFromJSON(this, json)
     mapFromSnakeJSON(this, json, {
       data: {
         constructor: Datum,
@@ -48,14 +47,4 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     delete d['data']
     return d
   }
-
-  copy () {
-    let c = new QuestionDatum()
-    const columns = ['id', 'questionId', 'surveyId', 'followUpDatumId', 'sectionRepetition', 'answeredAt', 'skippedAt', 'dkRf', 'dkRfVal', 'interviewId']
-    for (let key in columns) {
-      c[key] = this[key]
-    }
-    return c
-  }
-
 }

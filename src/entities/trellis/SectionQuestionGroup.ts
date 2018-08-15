@@ -1,6 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 @Entity()
 export default class SectionQuestionGroup extends TimestampedSoftDelete {
@@ -12,10 +11,4 @@ export default class SectionQuestionGroup extends TimestampedSoftDelete {
   questionGroupId: string
   @Column({ type: 'integer' })
   questionGroupOrder: number
-
-  fromSnakeJSON(json: object) {
-    mapPropsFromJSON(this, json)
-    super.fromSnakeJSON(json)
-    return this
- }
 }

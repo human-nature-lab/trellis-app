@@ -15,7 +15,6 @@ export default class Translation extends TimestampedSoftDelete {
   }
 
   fromSnakeJSON (json: any) {
-    mapPropsFromJSON(this, json, ['id', 'created_at', 'updated_at', 'deleted_at'])
     mapFromSnakeJSON(this, json, {
       translationText: TranslationText
     })
