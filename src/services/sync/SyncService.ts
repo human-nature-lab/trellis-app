@@ -3,12 +3,14 @@ import uuid from 'uuid/v4'
 import DatabaseService from '../database/DatabaseService'
 import { DeviceService } from '../device/DeviceService'
 import { syncInstance as http } from '../http/AxiosInstance'
+import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
 
 class SyncService {
+  private deviceId: string
   constructor () {
     this.deviceId = DeviceService.getUUID()
   }
-  async createSync (type, deviceId) {
+  async createSync (type: string, deviceId: string): Promise<Sync> {
     const sync = new Sync()
     sync.id = uuid()
     sync.type = type
@@ -20,8 +22,8 @@ class SyncService {
     await connection.manager.save(sync)
     return sync
   }
-  getHeartbeat (source) {
-    let options = {}
+  getHeartbeat (source: CancelTokenSource) {
+    let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     return http.get(`heartbeat`, options)
       .then(response => {
@@ -32,8 +34,8 @@ class SyncService {
         throw err
       })
   }
-  authenticate (source, deviceId) {
-    let options = {}
+  authenticate (source: CancelTokenSource, deviceId: string) {
+    let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     return http.get(`device/${deviceId}/syncv2/authenticate`, options)
       .then(response => {
@@ -43,11 +45,11 @@ class SyncService {
         throw err
       })
   }
-  getLatestSnapshot (source) {
+  getLatestSnapshot (source: CancelTokenSource) {
     return new Promise((resolve, reject) => {
       DeviceService.getUUID()
         .then((deviceId) => {
-          let options = {}
+          let options = {} as AxiosRequestConfig
           if (source) { options.cancelToken = source.token }
           http.get(`device/${deviceId}/syncv2/snapshot`, options)
             .then(response => {
@@ -59,8 +61,8 @@ class SyncService {
         })
     })
   }
-  getSnapshotFileSize (source, snapshotId) {
-    let options = {}
+  getSnapshotFileSize (source: CancelTokenSource, snapshotId: string): Promise<number> {
+    let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     return http.get(`snapshot/${snapshotId}/file_size`, options)
       .then(response => {
@@ -70,8 +72,8 @@ class SyncService {
         throw err
       })
   }
-  getImageFileList (source, fileNames) {
-    let options = {}
+  getImageFileList (source: CancelTokenSource, fileNames: string[]): Promise<string[]> {
+    let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     return new Promise((resolve, reject) => {
       DeviceService.getUUID()
@@ -87,11 +89,11 @@ class SyncService {
         })
     })
   }
-  downloadSnapshot (source, onDownloadProgress, snapshotId) {
+  downloadSnapshot (source: CancelTokenSource, onDownloadProgress, snapshotId: string): Promise<AxiosResponse> {
     let options = {
       timeout: 0,
       responseType: 'blob'
-    }
+    } as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     if (onDownloadProgress) { options.onDownloadProgress = onDownloadProgress }
     return http.get(`snapshot/${snapshotId}/download`, options)
@@ -103,16 +105,16 @@ class SyncService {
         throw err
       })
   }
-  downloadImage (source, fileName) {
+  downloadImage (source: CancelTokenSource, fileName: string): Promise<any> {
     let options = {
       timeout: 0,
       responseType: 'blob'
-    }
+    } as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     return DeviceService.getUUID()
       .then((deviceId) => http.get(`device/${deviceId}/image/${fileName}`, options))
   }
-  async hasSynced () {
+  async hasSynced (): Promise<boolean> {
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     const downloadCount = await repository.count({
@@ -121,7 +123,7 @@ class SyncService {
     })
     return (downloadCount > 0)
   }
-  async registerSuccessfulSync (_sync) {
+  async registerSuccessfulSync (_sync: Sync): Promise<void> {
     console.debug('sync', _sync)
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
@@ -131,7 +133,7 @@ class SyncService {
     console.debug('syncs', syncs)
     /* For debug purposes only */
   }
-  async registerCancelledSync (_sync) {
+  async registerCancelledSync (_sync: Sync): Promise<void> {
     console.debug('sync', _sync)
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
