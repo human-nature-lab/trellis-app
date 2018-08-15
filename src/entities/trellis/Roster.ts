@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapPropsFromJSON} from "../../services/JSONUtil";
 
@@ -9,8 +9,9 @@ export default class Roster extends TimestampedSoftDelete {
   @Column({ type: 'text' })
   val: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
  }
 }

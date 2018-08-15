@@ -1,7 +1,8 @@
-import { Column } from "typeorm";
-import Timestamped from "./Timestamped"
+import {AsDate, Column} from '../TypeOrmDecorators'
+import Timestamped from './Timestamped'
 
 export default abstract class TimestampedSoftDelete extends Timestamped {
-  @Column({ name: "deleted_at", type: "datetime", nullable: true })
+  @Column({ name: "deleted_at", type: "datetime", nullable: true }) @AsDate
   deletedAt: Date = null;
+
 }

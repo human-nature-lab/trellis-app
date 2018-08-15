@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import {mapPropsFromJSON} from "../../services/JSONUtil";
 
 @Entity()
@@ -8,7 +8,7 @@ export default class FormType {
   @Column()
   name: string
 
-  fromJSON(json: object) {
+  fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
     return this
  }

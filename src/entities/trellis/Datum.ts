@@ -1,12 +1,11 @@
 import uuidv4 from 'uuid/v4'
-import FromJSON from "../interfaces/FromJSON";
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import {Column, Entity} from "typeorm";
 import {mapCamelToPlain, mapPropsFromJSON} from "../../services/JSONUtil";
-import ToSnakeJSON from "../interfaces/ToSnakeJSON";
+import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
-export default class Datum extends TimestampedSoftDelete implements FromJSON, ToSnakeJSON {
+export default class Datum extends TimestampedSoftDelete implements SnakeSerializable {
   @Column()
   public choiceId: string;
   @Column()
@@ -34,8 +33,9 @@ export default class Datum extends TimestampedSoftDelete implements FromJSON, To
   @Column()
   public val: string;
 
-  fromJSON (json) {
+  fromSnakeJSON (json) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
   }
 

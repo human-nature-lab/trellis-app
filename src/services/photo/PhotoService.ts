@@ -1,4 +1,4 @@
-import switchByModeEnv from '@/services/util'
+import switchByModeEnv from '../util'
 import PhotoServiceWeb from './PhotoServiceWeb'
 import PhotoServiceMock from './PhotoServiceMock'
 import PhotoServiceCordova from './PhotoServiceCordova'
@@ -16,4 +16,4 @@ let Constructor = switchByModeEnv({
 
 export const PhotoService = Constructor
 
-export default PhotoService
+export default new PhotoService()

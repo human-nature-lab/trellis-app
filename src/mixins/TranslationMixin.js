@@ -1,5 +1,11 @@
 import TranslationService from '../services/TranslationService'
+import singleton from '../static/singleton'
 export default {
+  data () {
+    return {
+      global: singleton
+    }
+  },
   computed: {
     translated: function () {
       if (!this.global.locale) return 'Using this mixin requires registering the global locale variable!'

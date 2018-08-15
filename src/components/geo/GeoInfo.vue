@@ -11,7 +11,7 @@
       <v-card-text>
         <v-alert v-show="error" color="error">{{error}}</v-alert>
         <v-layout>
-          <GeoBreadcrumbs :geo-id="geo.parent_id" />
+          <GeoBreadcrumbs :geo-id="geo.parentId" />
         </v-layout>
         <v-toolbar flat>
           <v-toolbar-title>
@@ -35,28 +35,39 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+  // @ts-ignore
+  import GeoBreadcrumbs from './GeoBreadcrumbs'
+  // @ts-ignore
+  import Photo from '../Photo'
+
   import TranslationMixin from '../../mixins/TranslationMixin'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import GeoService from '../../services/geo/GeoService'
-  import GeoBreadcrumbs from './GeoBreadcrumbs'
-  import Photo from '../Photo'
   import router from '../../router'
+  import {Route} from 'vue-router'
+  import Geo from '../../entities/trellis/Geo'
+  import Translation from "../../entities/trellis/Translation"
+  import Vue from 'vue'
 
-  export default {
+  export default Vue.extend({
     name: 'geo-info',
-    mixins: [RouteMixinFactory(r => GeoService.getGeoById(r.params.geoId)), TranslationMixin],
+    mixins: [
+      RouteMixinFactory((r: Route) => GeoService.getGeoById(r.params.geoId)),
+      TranslationMixin
+    ],
     components: {GeoBreadcrumbs, Photo},
     data () {
       return {
-        geo: {},
-        translation: {}
+        geo: new Geo(),
+        translation: new Translation(),
+        error: null
       }
     },
     methods: {
-      hydrate (geo) {
+      hydrate (geo: Geo) {
         this.geo = geo
-        this.translation = geo.name_translation
+        this.translation = geo.nameTranslation
       },
       viewRespondents () {
         router.push({
@@ -70,5 +81,5 @@
         })
       }
     }
-  }
+  })
 </script>

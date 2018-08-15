@@ -1,6 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
+import Locale from "./Locale";
 
 @Entity()
 export default class TranslationText extends TimestampedSoftDelete {
@@ -13,8 +14,18 @@ export default class TranslationText extends TimestampedSoftDelete {
   @Column('text')
   translatedText: string
 
-  fromJSON(json: object) {
-    mapPropsFromJSON(this, json)
+  locale: Locale
+
+  // Aliases
+  get translated_text () { return this.translatedText }
+  get locale_id () { return this.localeId }
+
+  fromSnakeJSON(json: object) {
+    mapPropsFromJSON(this, json, ['id', 'translation_id', 'locale_id', 'translated_text', 'updated_at', 'created_at', 'deleted_at'])
+    mapFromSnakeJSON(this, json, {
+      locale: Locale
+    })
+    super.fromSnakeJSON(json)
     return this
   }
 }

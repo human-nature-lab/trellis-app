@@ -114,6 +114,9 @@
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
   import router from '../../router'
   import TranslationService from '../../services/TranslationService'
+  import singleton from '../../static/singleton'
+  import PhotoService from '../../services/photo/PhotoService'
+  import Photo from '../../entities/trellis/Photo'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
@@ -209,6 +212,7 @@
     },
     data () {
       return {
+        global: singleton,
         error: null,
         results: [],
         conditionTags: [],
@@ -235,6 +239,9 @@
       this.getCurrentPage()
     },
     methods: {
+      leaving () {
+        PhotoService.cancelAllOutstanding()
+      },
       removeGeoFilter (index) {
         this.filters.geos.splice(index, 1)
         this.search().then(() => {
@@ -252,7 +259,7 @@
         if (this.shouldUpdateRoute) {
           updateRoute(this)
         }
-        this.getCurrentPage()
+        return this.getCurrentPage()
       },
       loadConditionTags () {
         if (this.conditionTagsLoaded) return
@@ -272,13 +279,14 @@
       getCurrentPage () {
         let study = this.global.study
         this.isLoading = true
-        RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
+        PhotoService.cancelAllOutstanding()
+        return RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
           .then(respondents => {
             this.results = respondents
             this.error = null
           }).catch(err => {
             this.error = err.toLocaleString()
-          }).then(() => {
+          }).finally(() => {
             this.isLoading = false
           })
       },
@@ -313,6 +321,7 @@
       },
       addRespondentClose (respondent) {
         // TODO: Maybe add this to cache (if there is one)
+        debugger
         if (!this.query.length) {
           this.results.push(respondent)
         }

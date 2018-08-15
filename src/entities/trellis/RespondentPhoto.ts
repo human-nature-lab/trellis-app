@@ -1,6 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
+import Photo from "./Photo";
 
 @Entity()
 export default class RespondentPhoto extends TimestampedSoftDelete {
@@ -15,8 +16,14 @@ export default class RespondentPhoto extends TimestampedSoftDelete {
   @Column({ type: 'text', nullable: true })
   notes: string
 
-  fromJSON(json: object) {
-    mapPropsFromJSON(this, json)
+  photo: Photo
+
+  fromSnakeJSON(json: object) {
+    mapPropsFromJSON(this, json, ['id', 'respondent_id', 'photo_id', 'sort_order', 'notes', 'created_at', 'updated_at', 'deleted_at'])
+    mapFromSnakeJSON(this, json, {
+      photo: Photo
+    })
+    super.fromSnakeJSON(json)
     return this
  }
 }

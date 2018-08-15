@@ -15,6 +15,7 @@
 <script>
   import PhotoService from '../services/photo/PhotoService'
   import ScrollListener from '../services/ScrollListener'
+
   const URL_PLACEHOLDER = 'https://vignette.wikia.nocookie.net/prince-of-stride-alternative/images/1/14/Placeholder_person.jpg/revision/latest?cb=20160220192514'
   export default {
     name: 'photo',
@@ -50,9 +51,10 @@
         imgLoading: false,
         imgLoaded: false,
         randId: Math.random().toString(16),
-        onViewportChange: () => {
+        onViewportChange: function () {
           this.loadOrCancelLoading()
-        }
+        }.bind(this),
+        loadingPromise: null
       }
     },
     created: function () {
@@ -72,27 +74,29 @@
       window.removeEventListener('resize', this.onViewportChange)
       this.cancelLoad()
     },
-    mounted () {
+    mounted: function () {
       this.$nextTick(this.loadOrCancelLoading)
     },
     methods: {
       isWithinViewport: function () {
         if (!this.$refs.container) return false
-        let rect = this.$refs.container.getBoundingClientRect()
+        let container = this.$refs.container
+        let rect = container.getBoundingClientRect()
         return (rect.top >= 0 ||
             rect.bottom >= (window.innerHeight || document.documentElement.clientHeight)) &&
           (rect.left >= 0 ||
             rect.right >= (window.innerWidth || document.documentElement.clientWidth)
         )
       },
-      setSrc: function (src) {
+      setSrc (src) {
         this.src = src
         this.srcLoaded = true
         this.srcLoading = false
         this.imgLoading = true
         this.$nextTick(() => {
           let _this = this
-          this.$refs.img.addEventListener('load', function () {
+          let img = this.$refs.img
+          img.addEventListener('load', function () {
             _this.imgLoading = false
             _this.imgLoaded = true
           })

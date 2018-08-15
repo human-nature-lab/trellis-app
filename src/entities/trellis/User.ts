@@ -1,9 +1,10 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapCamelToPlain, mapPropsFromJSON} from "../../services/JSONUtil";
+import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
-export default class User extends TimestampedSoftDelete {
+export default class User extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryGeneratedColumn()
   id: string
   @Column()
@@ -17,8 +18,19 @@ export default class User extends TimestampedSoftDelete {
   @Column({ nullable: true })
   selectedStudyId: string
 
-  fromJSON(json: object) {
+  fromJSON (json: object) {
+    for (let key of ['id', 'name', 'username', 'password', 'role', 'selectedStudyId']) {
+      this[key] = json[key]
+    }
+  }
+
+  fromSnakeJSON (json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
+  }
+
+  toSnakeJSON () {
+    return mapCamelToPlain(this, true)
   }
 }

@@ -1,29 +1,14 @@
 import Study from '../../entities/trellis/Study'
-import storage from '../storage/StorageService'
-import singleton from '../../static/singleton'
+import SingletonService from '../singleton/SingletonService'
 
 export default abstract class StudyService {
   /**
    * Get the currently selected study
    * @returns {Promise<Study>}
    */
-  getCurrentStudy (): Promise<Study> {
-    return new Promise((resolve, reject) => {
-      if (storage.get('current-study', 'object')) {
-        return resolve(storage.get('current-study', 'object'))
-      } else {
-        return reject()
-      }
-    })
-  }
-
-  /**
-   * Apply the existing version of the study to the global Vue data store
-   */
-  setExistingStudy (): void {
-    if (storage.get('current-study')) {
-      singleton.study = storage.get('current-study')
-    }
+  getCurrentStudy (): Study|null {
+    const study = SingletonService.get('study')
+    return (study instanceof Study) ? study : null
   }
 
   /**
@@ -31,8 +16,7 @@ export default abstract class StudyService {
    * @param {Study} study
    */
   setCurrentStudy (study: Study): void {
-    storage.set('current-study', study)
-    singleton.study = study
+    SingletonService.setCurrentStudy(study)
   }
 
   /**
