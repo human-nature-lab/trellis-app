@@ -1,3 +1,4 @@
+import {debounce} from 'lodash'
 export default class SizeLimitedMap<T> {
   private map: Map<any, T> = new Map()
   private meta: object = {}
@@ -5,12 +6,20 @@ export default class SizeLimitedMap<T> {
   public entries: Function = this.map.entries.bind(this.map)
   public forEach: Function = this.map.forEach.bind(this.map)
   public keys: Function = this.map.keys.bind(this.map)
+
+  private evict: Function
   /**
    * An instrumented map which keeps track of the approximate size of our map and evicts the last used values first. It
    * has pretty much the same interface as the ECMAScript 6 Map
    * @param maxByteSize
    */
-  constructor (public maxByteSize: number = 10000) {}
+  constructor (public maxByteSize: number = 10000) {
+    const debounced = debounce(this._evict.bind(this), 0)
+    this.evict = () => {
+      console.log('evicting at next tick')
+      debounced()
+    }
+  }
 
   /**
    * Get an item by key
@@ -55,7 +64,7 @@ export default class SizeLimitedMap<T> {
     }
     this.byteSize += size
     if (this.byteSize > this.maxByteSize) {
-      this._evict()
+      this.evict()
     }
   }
 
@@ -75,17 +84,19 @@ export default class SizeLimitedMap<T> {
    * @private
    */
   private _evict () {
-    console.debug(`evicting members because size has reached: ${this.maxByteSize} with ${this.size} items`)
     let keyOrder = Object.keys(this.meta).map(key => ({
       key: key,
       date: this.meta[key].touched
     })).sort(function (a, b) {
       return b.date - a.date
     })
+    let count = 0
     while ((this.byteSize - (this.maxByteSize / 10)) > this.maxByteSize) {
       let next = keyOrder.pop()
       this.delete(next.key)
+      count++
     }
+    console.log(`evicting ${count} members`)
   }
 
   /**

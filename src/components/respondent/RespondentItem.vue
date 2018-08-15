@@ -6,7 +6,7 @@
       :class="{selected: selected === true, respondent: true}">
       <v-card-media class="respondent-photo"
                     @click="onClick()">
-        <Photo :photo="respondent.photos[0].photo" width="150" height="150"></Photo>
+        <Photo :photo="photo" width="150" height="150"></Photo>
       </v-card-media>
       <v-card-text class="respondent-name"
                    @click="onClick()">
@@ -66,12 +66,18 @@
         this.$emit('selected')
       },
       photoFromFile () {},
-      photoFromCamera () {}
+      photoFromCamera () {},
+      cancelLoad () {
+        this
+      }
     },
     computed: {
       name (): string {
         let rName = this.respondent.names.find(n => n.isDisplayName)
         return rName ? rName.name : this.respondent.name
+      },
+      photo (): Photo {
+        return this.respondent.photos.length ? this.respondent.photos[0].photo : null
       }
     },
     components: {

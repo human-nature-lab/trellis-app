@@ -3,14 +3,22 @@ import axios from 'axios'
 import SizeLimitedMap from '../../classes/SizeLimitedMap'
 const cache = new SizeLimitedMap(1024 * 10000)
 import CancellablePromise from '../../classes/CancellablePromise'
-export default class PhotoServiceWeb {
-  /**
-   * This is a special method that can be cancelled. We probably don't need to cancel image loading on tablets, but maybe
-   * we could.
-   * @param photoId
-   * @returns {Promise<string>}
-   */
-  static getPhotoSrc (photoId) {
+import PhotoServiceInterface from "./PhotoServiceInterface";
+
+export default class PhotoServiceWeb implements PhotoServiceInterface {
+
+  private existingCancelTokens = new Set()
+
+  cancelAllOutstanding () {
+    let count = 0
+    for (let source of this.existingCancelTokens) {
+      source.cancel('All outstanding requests cancelled')
+      count++
+    }
+    console.log(`cancelled ${count} outstanding photo requests`)
+  }
+
+  getPhotoSrc (photoId) {
     let source
     // Get the base64 encoded photo and return the url. This method is cached
     const p = new CancellablePromise(resolve => {
@@ -26,7 +34,10 @@ export default class PhotoServiceWeb {
           return src
         }).catch(err => {
           throw err
+        }).finally(() => {
+          this.existingCancelTokens.delete(source)
         }))
+        this.existingCancelTokens.add(source)
       }
     }, () => {
       if (source && source.cancel) {
