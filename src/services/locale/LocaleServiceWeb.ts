@@ -10,7 +10,7 @@ class LocaleServiceWeb extends LocaleServiceAbstract {
 
   async getStudyLocales (studyId: string): Promise<Locale[]> {
     const res = await http().get(`/study/${studyId}/locales`)
-    return res.data.locale.maps(l => new Locale().fromSnakeJSON(l))
+    return res.data.locales.map(l => new Locale().fromSnakeJSON(l))
   }
 }
 

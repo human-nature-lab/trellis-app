@@ -127,11 +127,13 @@
   import LoginService from '../../services/login/LoginService'
   import router from '../../router'
   import SingletonService from '../../services/singleton/SingletonService'
+  import global from '../../static/singleton'
 
   export default {
     name: 'dropdown-menu',
     data: () => ({
-      showCopiedSnackbar: false
+      showCopiedSnackbar: false,
+      global
     }),
     methods: {
       refresh () {

@@ -7,7 +7,7 @@ export default async function (to, from, next) {
   if (to.params.studyId) {
     study = await StudyService.getStudy(to.params.studyId)
   } else {
-    study = StudyService.getCurrentStudy()
+    study = await StudyService.getCurrentStudy()
   }
   try {
     if (study) {
