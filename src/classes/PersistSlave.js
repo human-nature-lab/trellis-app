@@ -39,7 +39,6 @@ export default class PersistSlave {
    * Store the intitial state using the stateExtractor callback
    */
   setInitialState () {
-    debugger
     this.lastPersistedState = cloneDeep(this.stateExtractor())
   }
 
