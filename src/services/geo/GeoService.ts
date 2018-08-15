@@ -1,7 +1,5 @@
-import switchByModeEnv from '@/services/util'
+import switchByModeEnv from '../../services/util'
 import GeoServiceWeb from './GeoServiceWeb'
-// import GeoServiceMock from './GeoServiceMock'
-// import GeoServiceCordova from './GeoServiceCordova'
 
 let Constructor = switchByModeEnv({
   WEB: {

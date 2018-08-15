@@ -25,6 +25,7 @@ export default class TranslationText extends TimestampedSoftDelete {
     mapFromSnakeJSON(this, json, {
       locale: Locale
     })
+    super.fromSnakeJSON(json)
     return this
   }
 }

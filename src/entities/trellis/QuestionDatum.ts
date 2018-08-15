@@ -39,6 +39,7 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
         jsonKey: 'datum'
       }
     })
+    super.fromSnakeJSON(json)
     return this
   }
 

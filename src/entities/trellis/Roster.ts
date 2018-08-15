@@ -11,6 +11,7 @@ export default class Roster extends TimestampedSoftDelete {
 
   fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
  }
 }

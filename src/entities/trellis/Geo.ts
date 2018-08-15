@@ -27,9 +27,10 @@ export default class Geo extends TimestampedSoftDelete {
   fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json, ['id', 'geo_type_id', 'parent_id', 'latitude', 'longitude', 'altitude', 'name_translation_id', 'updated_at', 'created_at', 'deleted_at'])
     mapFromSnakeJSON(this, json, {
-      geo_type: GeoType,
-      name_translation: Translation
+      geoType: GeoType,
+      nameTranslation: Translation
     })
+    super.fromSnakeJSON(json)
     return this
  }
 }

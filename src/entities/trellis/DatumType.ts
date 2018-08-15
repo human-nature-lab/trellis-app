@@ -11,6 +11,7 @@ export default class DatumType extends TimestampedSoftDelete {
 
   fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
  }
 }

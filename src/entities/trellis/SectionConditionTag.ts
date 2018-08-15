@@ -25,6 +25,7 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
 
   fromSnakeJSON (json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
   }
 }

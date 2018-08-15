@@ -23,6 +23,7 @@ export default class Section extends TimestampedSoftDelete {
       questionGroups: QuestionGroup,
       formSections: FormSection
     })
+    super.fromSnakeJSON(json)
     return this
  }
 }

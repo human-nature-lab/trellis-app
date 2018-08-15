@@ -18,7 +18,7 @@ export abstract class UserServiceAbstract {
       let jsonUser = storage.get(CURRENT_USER_KEY)
       let user = null
       if (jsonUser) {
-        user = new User().fromJSON(jsonUser)
+        user = new User().fromSnakeJSON(jsonUser)
         this.user = user
       }
       return user

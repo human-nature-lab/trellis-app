@@ -23,6 +23,7 @@ export default class RespondentPhoto extends TimestampedSoftDelete {
     mapFromSnakeJSON(this, json, {
       photo: Photo
     })
+    super.fromSnakeJSON(json)
     return this
  }
 }

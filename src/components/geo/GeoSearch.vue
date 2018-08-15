@@ -22,6 +22,7 @@
             {{this.error}}
           </v-alert>
           <v-container
+            class="move-up"
             v-if="lastParentIds.length > 1"
             @click="moveUpOneLevel">
             <v-layout row>
@@ -73,14 +74,18 @@
 </template>
 
 <script>
+  // @ts-ignore
+  import GeoListTile from './GeoListTile'
+  // @ts-ignore
+  import Cart from '../Cart'
   import {debounce} from 'lodash'
   import GeoService from '../../services/geo/GeoService'
-  import GeoListTile from './GeoListTile'
-  import Cart from '../Cart'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
   import router from '../../router'
-  export default {
+  import Vue from 'vue'
+  export default Vue.extend({
+    router,
     name: 'geo-search',
     props: {
       selectedGeos: {
@@ -118,11 +123,6 @@
         type: Number
       }
     },
-    head: {
-      title: {
-        inner: 'Geo Search'
-      }
-    },
     data: function () {
       return {
         global: singleton,
@@ -143,7 +143,7 @@
       this.search().then(this.loadAncestors)
     },
     computed: {
-      filters: function () {
+      filters () {
         return Object.assign({}, this.baseFilters, this.userFilters)
       },
       selectedIds () {
@@ -160,8 +160,8 @@
         return typeof this.isSelectable === 'boolean' ? this.isSelectable : this.isSelectable(geo)
       },
       translate (geo) {
-        if (!geo || !geo.name_translation) return 'No translation'
-        return TranslationService.getAny(geo.name_translation, this.global.locale)
+        if (!geo || !geo.nameTranslation) return 'No translation'
+        return TranslationService.getAny(geo.nameTranslation, this.global.locale)
       },
       loadAncestors () {
         GeoService.getGeoAncestors(this.results[0].id).then(geos => {
@@ -173,7 +173,7 @@
           this.lastParentIds.pop()
         })
       },
-      updateRoute () {
+      updateRoute: function () {
         if (!this.shouldUpdateRoute) return
         let q = {}
         if (this.query) {
@@ -263,10 +263,14 @@
       GeoListTile,
       Cart
     }
-  }
+  })
 </script>
 
 <style lang="sass">
+  .move-up
+    cursor: pointer
+    &:hover
+      background: rgba(0, 0, 0, .2)
   .geo-search-dialog
     height: 90%
   .geo-list

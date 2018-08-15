@@ -22,7 +22,7 @@ export default class Form extends TimestampedSoftDelete {
   skips: Array<Skip>
   nameTranslation: Translation
 
-  fromJSON(json: any) {
+  fromSnakeJSON(json: any) {
     mapPropsFromJSON(this, json, [
       'id', 'form_master_id', 'name_translation_id', 'version', 'is_published'
     ])
@@ -31,6 +31,7 @@ export default class Form extends TimestampedSoftDelete {
       skips: Skip,
       nameTranslation: Translation
     })
+    super.fromSnakeJSON(json)
     return this
   }
 }

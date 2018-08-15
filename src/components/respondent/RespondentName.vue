@@ -3,6 +3,9 @@
     <v-card-text>
       <v-container>
         <v-layout>
+          <v-alert v-show="error">
+            {{error}}
+          </v-alert>
           <v-flex>
             <v-text-field
               :label="$t('name')"
@@ -10,7 +13,7 @@
           </v-flex>
           <v-flex>
             <v-checkbox
-              v-model="name.is_display_name"
+              v-model="name.isDisplayName"
               :label="$t('set_primary')"
               hide-details
             ></v-checkbox>
@@ -22,7 +25,7 @@
               :loading="localesAreLoading"
               item-text="language_native"
               item-value="id"
-              v-model="name.locale_id" />
+              v-model="name.localeId" />
           </v-flex>
         </v-layout>
         <v-layout>
@@ -43,17 +46,20 @@
 <script>
   import LocaleService from '../../services/locale/LocaleService'
   import RespondentService from '../../services/respondent/RespondentService'
-  import FormService from '../../services/form/FormService'
+  import CensusFormService from '../../services/census'
   import censusTypes from '../../static/census.types'
   import singleton from '../../static/singleton'
   import { pushRouteAndQueueCurrent } from '../../router'
-  export default {
+  import Respondent from "../../entities/trellis/Respondent"
+  import RespondentName from "../../entities/trellis/RespondentName"
+  import Vue from 'vue'
+  export default Vue.extend({
     name: 'respondent-name',
     props: {
-      respondent: Object,
+      respondent: Respondent,
       name: {
-        type: Object,
-        default: () => ({name: '', is_display_name: false, locale_id: ''})
+        type: RespondentName,
+        default: () => new RespondentName()
       }
     },
     data () {
@@ -61,7 +67,8 @@
         global: singleton,
         isSaving: false,
         locales: [],
-        localesAreLoading: false
+        localesAreLoading: false,
+        error: null
       }
     },
     created: function () {
@@ -79,29 +86,25 @@
           this.localesAreLoading = false
         })
       },
-      save () {
+      async save () {
         if (this.isSaving) return
         this.isSaving = true
-        let p
-        let isEditingName = this.name.id !== null && this.name.id !== undefined
-        if (isEditingName) {
-          let isDisplayName = this.name.is_display_name ? true : false // eslint-disable-line
-          p = RespondentService.editName(
-            this.respondent.id,
-            this.name.id,
-            this.name.name,
-            isDisplayName,
-            this.name.locale_id
-          )
-        } else {
-          p = RespondentService.addName(this.respondent.id, this.name.name, this.name.is_display_name, this.name.locale_id)
-        }
-        this.isSaving = true
-        p.catch(err => {
-          this.error = err
-        }).then(r => {
-          return FormService.hasCensusForm(this.global.study.id, censusTypes.rename_respondent)
-        }).then(hasCensus => {
+        try {
+          let name
+          let isEditingName = this.name.id !== null && this.name.id !== undefined
+          if (isEditingName) {
+            let isDisplayName = !!this.name.isDisplayName
+            name = await  RespondentService.editName(
+              this.respondent.id,
+              this.name.id,
+              this.name.name,
+              isDisplayName,
+              this.name.locale_id
+            )
+          } else {
+            name = await RespondentService.addName(this.respondent.id, this.name.name, this.name.isDisplayName, this.name.localeId)
+          }
+          let hasCensus = await CensusFormService.hasCensusForm(this.global.study.id, censusTypes.rename_respondent)
           if (hasCensus) {
             pushRouteAndQueueCurrent({
               name: 'StartCensusForm',
@@ -117,12 +120,16 @@
             console.log('no census form found')
             this.$emit('close', name)
           }
-        }).catch(err => {
+        } catch (err) {
           this.error = err
-        }).finally(() => { this.isSaving = false })
+          this.$emit('error', err)
+        } finally {
+          this.isSaving = false
+        }
+        this.isSaving = true
       }
     }
-  }
+  })
 </script>
 
 <style scoped>

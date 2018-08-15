@@ -29,6 +29,7 @@ export default class Action extends TimestampedSoftDelete implements SnakeSerial
   toSnakeJSON () {
     let json = mapCamelToPlain(this, true)
     json['payload'] = this.payload // We don't do any case transformation for this
+    super.fromSnakeJSON(json)
     return json
   }
 

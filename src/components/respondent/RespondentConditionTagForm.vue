@@ -81,9 +81,8 @@
       save () {
         this.isSaving = true
         ConditionTagWeb.createRespondentConditionTag(this.respondentId, this.conditionTag.id).then(tag => {
-          let newTag = JSON.parse(JSON.stringify(this.conditionTag))
-          newTag.pivot = tag
-          this.$emit('close', newTag)
+          tag.conditionTag = this.conditionTag.copy()
+          this.$emit('close', tag)
           this.conditionTag = null
         }).catch(err => {
           this.error = err
