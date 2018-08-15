@@ -60,8 +60,8 @@
         :items="respondent.respondentConditionTags">
         <template slot="items" slot-scope="props">
           <td>{{ props.item.conditionTag.name }}</td>
-          <td class="text-xs-right">{{ props.item.updated_at }}</td>
-          <td class="text-xs-right">{{ props.item.created_at }}</td>
+          <td class="text-xs-right">{{ props.item.updatedAt.fromNow() }}</td>
+          <td class="text-xs-right">{{ props.item.createdAt.fromNow() }}</td>
           <permission :role-whitelist="['admin', 'manager']">
             <td>
               <v-btn
@@ -97,7 +97,7 @@
         <template slot="items" slot-scope="props">
           <td>{{props.item.name}}</td>
           <td>
-            <v-icon v-if="props.item.is_display_name">check</v-icon>
+            <v-icon v-if="props.item.isDisplayName">check</v-icon>
           </td>
           <permission :role-whitelist="['admin','manager']">
             <td>
@@ -260,8 +260,7 @@
       },
       doneEditingName (name: RespondentName): void {
         let oldIndex = this.respondent.names.findIndex(n => name.previousRespondentNameId === n.id)
-        // @ts-ignore
-        this.respondent.names.splice(oldIndex, 1, [name])
+        this.respondent.names.splice(oldIndex, 1, name)
         this.modal.editName = false
       },
       doneAddingRespondentConditionTag (tag: RespondentConditionTag): void {

@@ -28,11 +28,12 @@ export default class Interview extends TimestampedSoftDelete {
 
   survey: Survey
 
-  fromJSON(json: any) {
+  fromSnakeJSON(json: any) {
     mapPropsFromJSON(this, json)
     mapFromSnakeJSON(this, json, {
       survey: Survey
     })
+    super.fromSnakeJSON(json)
     return this
  }
 }

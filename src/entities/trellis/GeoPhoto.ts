@@ -21,6 +21,7 @@ export default class GeoPhoto extends TimestampedSoftDelete {
   fromSnakeJSON(json: any) {
     mapPropsFromJSON(this, json.pivot, ['id', 'geo_id', 'photo_id', 'sort_order', 'notes', 'updated_at', 'created_at', 'deleted_at'])
     this.photo = new Photo().fromSnakeJSON(json)
+    super.fromSnakeJSON(json)
     return this
   }
 }

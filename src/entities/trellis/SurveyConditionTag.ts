@@ -19,6 +19,7 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
 
   fromSnakeJSON (json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
   }
 }

@@ -21,11 +21,27 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
     this.conditionTagId = id
   }
 
+  fromJSON (json: RespondentConditionTag) {
+    this.id = json.id
+    this.respondentId = json.respondentId
+    this.conditionTagId = json.conditionTagId
+    this.conditionTag = json.conditionTag
+    for (let key of ['id', 'respondentId', 'conditionTagId', 'conditionTag']) {
+      this[key] = json[key]
+    }
+    return this
+  }
+
   fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json, ['id', 'respondent_id', 'condition_tag_id', 'created_at', 'updated_at', 'deleted_at'])
     mapFromSnakeJSON(this, json, {
       condition_tag: ConditionTag
     })
+    super.fromSnakeJSON(json)
     return this
+  }
+
+  copy () {
+    return new RespondentConditionTag().fromJSON(this)
   }
 }

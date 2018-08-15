@@ -50,7 +50,7 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
           return g
         }
       },
-      respondent_condition_tags: {
+      respondentConditionTags: {
         generator: tag => {
           let rc = new RespondentConditionTag().fromSnakeJSON(tag.pivot)
           rc.conditionTag = new ConditionTag().fromSnakeJSON(tag)
@@ -58,6 +58,7 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
         }
       }
     })
+    super.fromSnakeJSON(json)
     return this
   }
 

@@ -16,6 +16,7 @@ export default class Photo extends TimestampedSoftDelete {
 
   fromSnakeJSON (json: any) {
     mapPropsFromJSON(this, json, ['id', 'file_name', 'created_at', 'updated_at', 'deleted_at'])
+    super.fromSnakeJSON(json)
     return this
   }
 }

@@ -35,7 +35,7 @@ if (window.location.protocol === 'file:' || window.location.port === '3000') {
 }
 
 /* eslint-disable no-new */
-new Vue({
+export default new Vue({
   el: '#app',
   router,
   i18n,

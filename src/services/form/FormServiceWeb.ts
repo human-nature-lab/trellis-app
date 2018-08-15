@@ -35,7 +35,7 @@ export class FormServiceWeb implements FormServiceInterface {
     return http().get(`form/${formId}`)
       .then(res => {
         if (res.data.form) {
-          // let form = new Form().fromJSON(res.data.form)
+          // let form = new Form().fromSnakeJSON(res.data.form)
           // console.log(form)
           return res.data.form
         } else {

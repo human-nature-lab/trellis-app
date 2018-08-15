@@ -26,6 +26,7 @@ export default class User extends TimestampedSoftDelete implements SnakeSerializ
 
   fromSnakeJSON (json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
   }
 

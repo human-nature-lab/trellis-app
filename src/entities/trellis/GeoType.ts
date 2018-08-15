@@ -21,6 +21,7 @@ export default class GeoType extends TimestampedSoftDelete {
 
   fromSnakeJSON(json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
  }
 }

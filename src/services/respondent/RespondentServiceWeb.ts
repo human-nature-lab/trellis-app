@@ -47,7 +47,7 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
     respondentId = encodeURIComponent(respondentId)
     let res = await http().post(`respondent/${respondentId}/name`, {
       name: name,
-      is_display_name: isDisplayName,
+      is_display_name: !!isDisplayName,
       locale_id: localeId
     })
     return new RespondentName().fromSnakeJSON(res.data.name)
@@ -92,7 +92,7 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
     respondentGeoId = encodeURIComponent(respondentGeoId)
     return http().post(`respondent/${respondentId}/geo/${respondentGeoId}/move`, {
       new_geo_id: newGeoId
-    }).then(res => new Geo().fromSnakeJSON(res.data.geo))
+    }).then(res => new RespondentGeo().fromSnakeJSON(res.data.geo))
   }
   removeRespondentGeo (respondentId, respondentGeoId) {
     respondentId = encodeURIComponent(respondentId)

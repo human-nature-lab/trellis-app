@@ -25,10 +25,10 @@
       <template slot="items" slot-scope="props">
         <td>
           <GeoBreadcrumbs
-            :geo-id="props.item.id" />
+            :geo-id="props.item.geoId" />
         </td>
         <td>
-          {{props.item.type}}
+          {{props.item.geo.geoType.name}}
         </td>
         <td>
           <v-icon v-if="props.item.isCurrent">check</v-icon>
@@ -88,7 +88,6 @@
   import GeoSearch from '../geo/GeoSearch'
   // @ts-ignore
   import Permission from '../Permission'
-  import TranslationService from '../../services/TranslationService'
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusFormService from '../../services/census'
   import CensusTypes from '../../static/census.types'
@@ -165,6 +164,7 @@
         })
       },
       moveGeo (respondentGeo: RespondentGeo, geo): Promise<void> {
+        debugger
         return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.id, geo.id).then(resGeo => {
           let index = this.respondent.geos.findIndex(rg => rg.id === respondentGeo.id)
           this.respondent.geos.splice(index, 1, resGeo)
@@ -203,8 +203,8 @@
       }
     },
     computed: {
-      locations (): Geo[] {
-        return this.respondent.geos.map(rGeo => rGeo.geo)
+      locations (): RespondentGeo[] {
+        return this.respondent.geos.map(rGeo => rGeo)
       }
     }
   })

@@ -35,6 +35,7 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
 
   fromSnakeJSON (json) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
   }
 

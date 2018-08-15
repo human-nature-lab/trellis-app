@@ -21,6 +21,7 @@ export default class QuestionGroup extends TimestampedSoftDelete {
         jsonKey: 'pivot'
       }
     })
+    super.fromSnakeJSON(json)
     return this
  }
 }

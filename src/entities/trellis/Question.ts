@@ -26,7 +26,7 @@ export default class Question extends TimestampedSoftDelete {
   choices: Choice[]
   assignConditionTags: AssignConditionTag[]
 
-  fromJSON(json: any) {
+  fromSnakeJSON(json: any) {
     mapPropsFromJSON(this, json)
     mapFromSnakeJSON(this, json, {
       questionType: QuestionType,
@@ -34,6 +34,7 @@ export default class Question extends TimestampedSoftDelete {
       choices: Choice,
       assignConditionTags: AssignConditionTag
     })
+    super.fromSnakeJSON(json)
     return this
  }
 }
