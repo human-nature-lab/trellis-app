@@ -30,7 +30,7 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   names: RespondentName[]
   geos: RespondentGeo[]
   respondentConditionTags: RespondentConditionTag[]
-  photos: Photo[]
+  photos: RespondentPhoto[]
 
   fromSnakeJSON (json: any) {
     mapPropsFromJSON(this, json, ['id', 'assignedId', 'name', 'associatedRespondentId'])

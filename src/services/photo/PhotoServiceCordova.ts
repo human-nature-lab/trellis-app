@@ -1,18 +1,13 @@
-import FileService from '@/services/file/FileService'
+import FileService from '../file/FileService'
 import { getRepository } from 'typeorm'
-import DatabaseService from '@/services/database/DatabaseService'
-import Photo from '@/entities/trellis/Photo'
-import SizeLimitedMap from '@/classes/SizeLimitedMap'
+import DatabaseService from '../database/DatabaseService'
+import Photo from '../../entities/trellis/Photo'
+import SizeLimitedMap from '../../classes/SizeLimitedMap'
 const cache = new SizeLimitedMap(1000)
-import CancellablePromise from '@/classes/CancellablePromise'
-export default class PhotoServiceCordova {
-  /**
-   * This is a special method that can be cancelled. We probably don't need to cancel image loading on tablets, but maybe
-   * we could.
-   * @param photoId
-   * @returns {Promise<string>}
-   */
-  static getPhotoSrc (photoId) {
+import CancellablePromise from '../../classes/CancellablePromise'
+import PhotoServiceInterface from "./PhotoServiceInterface";
+export default class PhotoServiceCordova implements PhotoServiceInterface {
+   getPhotoSrc (photoId) {
     // Get the base64 encoded photo and return the url. This method is cached
     const p = new CancellablePromise(resolve => {
       if (cache.has(photoId)) {
@@ -20,7 +15,7 @@ export default class PhotoServiceCordova {
       } else {
         const photoRepository = getRepository(Photo)
         photoRepository.findOne(photoId)
-          .then((photo) => {
+          .then((photo: Photo) => {
             console.log('photo', photo)
             FileService.getPhoto(photo.fileName)
               .then((fileEntry) => {
@@ -41,6 +36,10 @@ export default class PhotoServiceCordova {
       }
     })
     return p
+  }
+
+  cancelAllOutstanding () {
+     debugger
   }
 
   /**

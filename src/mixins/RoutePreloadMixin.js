@@ -48,7 +48,12 @@ export default function RoutePreloadMixin (loadCallback) {
       singleton.loading.active = true
       singleton.loading.message = 'Validating guards...'
       if (this.leaving) {
-        this.leaving().then(next)
+        let p = this.leaving()
+        if (p instanceof Promise) {
+          this.leaving().then(next)
+        } else {
+          next()
+        }
       } else {
         next()
       }

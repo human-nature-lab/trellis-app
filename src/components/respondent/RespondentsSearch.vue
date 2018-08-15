@@ -115,6 +115,8 @@
   import router from '../../router'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
+  import PhotoService from '../../services/photo/PhotoService'
+  import Photo from '../../entities/trellis/Photo'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
@@ -237,6 +239,9 @@
       this.getCurrentPage()
     },
     methods: {
+      leaving () {
+        PhotoService.cancelAllOutstanding()
+      },
       removeGeoFilter (index) {
         this.filters.geos.splice(index, 1)
         this.search().then(() => {
@@ -274,6 +279,7 @@
       getCurrentPage () {
         let study = this.global.study
         this.isLoading = true
+        PhotoService.cancelAllOutstanding()
         return RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
           .then(respondents => {
             this.results = respondents
@@ -315,6 +321,7 @@
       },
       addRespondentClose (respondent) {
         // TODO: Maybe add this to cache (if there is one)
+        debugger
         if (!this.query.length) {
           this.results.push(respondent)
         }

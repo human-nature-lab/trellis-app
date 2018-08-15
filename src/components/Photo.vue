@@ -15,10 +15,9 @@
 <script>
   import PhotoService from '../services/photo/PhotoService'
   import ScrollListener from '../services/ScrollListener'
-  import Vue from 'vue'
 
   const URL_PLACEHOLDER = 'https://vignette.wikia.nocookie.net/prince-of-stride-alternative/images/1/14/Placeholder_person.jpg/revision/latest?cb=20160220192514'
-  export default Vue.extend({
+  export default {
     name: 'photo',
     props: {
       photo: {
@@ -145,7 +144,7 @@
         return this.srcLoading || this.imgLoading
       }
     }
-  })
+  }
 </script>
 
 <style lang="sass">
