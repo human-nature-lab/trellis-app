@@ -1,9 +1,9 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
 import {mapPropsFromJSON} from "../../services/JSONUtil";
+import BaseEntity from "../base/BaseEntity";
 
 @Entity()
-export default class CensusType {
+export default class CensusType extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string
   @Column()
