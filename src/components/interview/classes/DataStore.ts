@@ -71,8 +71,8 @@ export default class DataStore extends Emitter {
       d.data = []
       questionDatum.push(d)
     }
-    QuestionDatumRecycler.fill(questionDatum.map(qD => new QuestionDatum().fromJSON(qD)))
-    DatumRecycler.fill(datum.map(d => new Datum().fromJSON(d)))
+    QuestionDatumRecycler.fill(questionDatum.map(qD => new QuestionDatum().fromSnakeJSON(qD)))
+    DatumRecycler.fill(datum.map(d => new Datum().fromSnakeJSON(d)))
   }
 
   /**
@@ -100,9 +100,9 @@ export default class DataStore extends Emitter {
       }
       return tag
     })
-    RespondentConditionTagRecycler.fill(this.conditionTags.respondent.map(t => new RespondentConditionTag().fromJSON(t)))
-    SectionConditionTagRecycler.fill(this.conditionTags.section.map(t => new SectionConditionTag().fromJSON(t)))
-    FormConditionTagRecycler.fill(this.conditionTags.survey.map(t => new SurveyConditionTag().fromJSON(t)))
+    RespondentConditionTagRecycler.fill(this.conditionTags.respondent.map(t => new RespondentConditionTag().fromSnakeJSON(t)))
+    SectionConditionTagRecycler.fill(this.conditionTags.section.map(t => new SectionConditionTag().fromSnakeJSON(t)))
+    FormConditionTagRecycler.fill(this.conditionTags.survey.map(t => new SurveyConditionTag().fromSnakeJSON(t)))
   }
 
   /**

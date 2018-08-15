@@ -24,7 +24,7 @@
                slot="activator"
                flat
                :to="{name: 'locale', query: {to: $route.fullPath}}">
-          {{global.locale ? global.locale.language_tag : ''}}
+          {{global.locale ? global.locale.languageTag : ''}}
         </v-btn>
         <span>{{$t('change_locale')}}</span>
       </v-tooltip>
@@ -70,25 +70,26 @@
 </template>
 
 <script>
-  import StudyService from './services/study/StudyService'
+  // import SingletonService from './services/singleton/SingletonService'
   import LoadingPage from './components/LoadingPage'
-  import LocaleService from './services/locale/LocaleService'
   import MainMenu from './components/main-menu/MainMenu'
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
+  import singleton from './static/singleton'
   export default {
     name: 'web-app',
     data: function () {
       return {
+        global: singleton,
         error: null,
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
         alerts: AlertService.alerts
       }
     },
-    created: function () {
-      StudyService.setExistingStudy()
-      LocaleService.setExistingLocale()
+    created: async function () {
+      /* load the singleton object (selected study, locale, theme) from local storage */
+      // await SingletonService.loadFromLocalStorage()
     },
     components: {
       VDivider,

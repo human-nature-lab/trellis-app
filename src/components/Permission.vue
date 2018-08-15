@@ -1,12 +1,11 @@
-<template functional>
-  <span v-if="isVisible">
+<template>
+  <span v-show="isVisible">
     <slot></slot>
   </span>
 </template>
 
 <script>
   import UserService from '../services/user/UserService'
-  UserService.loadCurrentUser() // Just make sure we load the user on any page where the permission component is used
   export default {
     name: 'permission',
     props: {
@@ -17,8 +16,14 @@
         default: () => []
       }
     },
+    beforeCreate () {
+      UserService.loadCurrentUser().then(user => {
+        this.user = user
+      })
+    },
     computed: {
       isVisible () {
+        if (!this.user) return false
         if (this.roleWhitelist.length) {
           return this.userInWhitelist()
         } else {
@@ -28,6 +33,7 @@
     },
     data () {
       return {
+        user: null,
         whitelist_: this.roleWhitelist.map(r => r.toLowerCase()),
         blacklist_: this.roleBlacklist.map(r => r.toLowerCase())
       }
@@ -42,12 +48,12 @@
       },
       userInWhitelist () {
         if (!this.roleWhitelist.length) return false
-        let role = UserService.getCurrentUser().role.toLowerCase()
+        let role = this.user.role.toLowerCase()
         return this.isInList(this.whitelist_, role)
       },
       userInBlacklist () {
         if (!this.roleBlacklist.length) return false
-        let role = UserService.getCurrentUser().role.toLowerCase()
+        let role = this.user.role.toLowerCase()
         this.isInList(this.blacklist_, role)
       }
     }

@@ -23,7 +23,7 @@
       right
       app>
       <v-list dense>
-        <v-list-tile class="grey lighten-4">
+        <v-list-tile :dark="global.darkTheme">
           <v-list-tile-action @click="global.searchDrawer.open = false" class="text-right">
             <v-icon>arrow_forward</v-icon>
           </v-list-tile-action>
@@ -44,8 +44,6 @@
   import GeoSearch from './GeoSearch'
   import TranslationService from '../../services/TranslationService'
   import 'leaflet'
-  // import 'leaflet.label'
-  import Vue from 'vue'
   import global from '../../static/singleton'
   export default {
     name: 'geo-search-with-map',
@@ -62,6 +60,7 @@
     },
     data: function () {
       return {
+        global: global,
         geoResults: [],
         trellisMap: undefined,
         markers: [],
@@ -78,9 +77,7 @@
     },
     methods: {
       setUpSearch: function () {
-        let ComponentClass = Vue.extend(GeoSearch)
-        let instance = new ComponentClass()
-        global.searchDrawer.component = instance
+        global.searchDrawer.component = GeoSearch
       },
       setUpMap: function () {
         let padding = 16
@@ -124,12 +121,12 @@
         this.minZoom = undefined
         this.geoResults.forEach((geo) => {
           console.log(geo)
-          if (geo.geo_type && geo.geo_type.zoom_level != null) {
-            this.minZoom = (this.minZoom === undefined) ? Number(geo.geo_type.zoom_level) : Math.min(this.minZoom, Number(geo.geo_type.zoom_level))
+          if (geo.geoType && geo.geoType.zoomLevel != null) {
+            this.minZoom = (this.minZoom === undefined) ? Number(geo.geoType.zoomLevel) : Math.min(this.minZoom, Number(geo.geoType.zoomLevel))
           }
           let markerCoords = [geo.latitude, geo.longitude]
           let marker = L.marker(markerCoords, {icon: defaultIcon})
-          let translation = TranslationService.getTranslated(geo.name_translation, this.global.locale)
+          let translation = TranslationService.getTranslated(geo.nameTranslation, this.global.locale)
           // marker.bindLabel(translation, {noHide: true, direction: 'right'})
           marker.bindTooltip(translation, {permanent: true, direction: 'right'})
           console.log('marker', marker)

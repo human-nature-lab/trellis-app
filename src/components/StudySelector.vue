@@ -12,6 +12,7 @@
       v-model="study"
       @change="change"
       item-text="name"
+      item-value="id"
       :items="studies">
     </v-select>
   </v-flex>
@@ -19,6 +20,7 @@
 
 <script>
   import StudyService from '../services/study/StudyService'
+  import SingletonService from '../services/singleton/SingletonService'
   export default {
     name: 'study-selector',
     data: function () {
@@ -33,28 +35,34 @@
       this.load()
     },
     methods: {
-      change: function (study) {
+      change: function (studyId) {
+        const study = this.getStudyById(studyId)
         this.study = study
-        StudyService.setCurrentStudy(this.study)
-        this.$emit('change', this.study)
+        StudyService.setCurrentStudy(study)
+        this.$emit('change', study)
       },
-      load: function () {
-        this.isWorking = true
-        return StudyService.getCurrentStudy().then(current => {
-          this.study = current
-        })
-        .catch(() => {}) // This is a useless error that should be ignored
-        .then(() => StudyService.getMyStudies())
-        .then(studies => {
-          studies.sort(function (a, b) {
+      load: async function () {
+        try {
+          this.isWorking = true
+          await SingletonService.hasLoaded()
+          this.study = await StudyService.getCurrentStudy()
+          this.studies = await StudyService.getMyStudies()
+          this.studies.sort(function (a, b) {
             return b.name.localeCompare(a.name)
           })
-          this.studies = studies
-        }).catch(err => {
+        } catch (err) {
           this.error = err
-        }).then(() => {
+        } finally {
           this.isWorking = false
-        })
+        }
+      },
+      getStudyById: function (studyId) {
+        for (let i = 0; i < this.studies.length; i++) {
+          if (this.studies[i].id === studyId) {
+            return this.studies[i]
+          }
+        }
+        return null
       }
     }
   }

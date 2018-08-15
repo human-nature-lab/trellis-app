@@ -11,13 +11,13 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
     respondentId = encodeURIComponent(respondentId)
     let res = await http().get(`respondent/${respondentId}/fills`)
     return res.data.fills.map((f: object) => {
-      return new RespondentFill().fromJSON(f)
+      return new RespondentFill().fromSnakeJSON(f)
     })
   }
   async getRespondentById (respondentId) {
     respondentId = encodeURIComponent(respondentId)
     let res = await http().get(`respondent/${respondentId}`)
-    return new Respondent().fromJSON(res.data.respondent)
+    return new Respondent().fromSnakeJSON(res.data.respondent)
   }
   async getSearchPage (studyId, query, filters, page = 0, size = 50, respondentId = null) {
     let params = {
@@ -40,17 +40,17 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
       params: params
     })
     return res.data.respondents.slice(0, size).map(r => {
-      return new Respondent().fromJSON(r)
+      return new Respondent().fromSnakeJSON(r)
     })
   }
   async addName (respondentId, name, isDisplayName = null, localeId = null) {
     respondentId = encodeURIComponent(respondentId)
     let res = await http().post(`respondent/${respondentId}/name`, {
       name: name,
-      is_display_name: isDisplayName,
+      is_display_name: !!isDisplayName,
       locale_id: localeId
     })
-    return new RespondentName().fromJSON(res.data.name)
+    return new RespondentName().fromSnakeJSON(res.data.name)
   }
   editName (respondentId, respondentNameId, newName, isDisplayName = null, localeId = null) {
     respondentId = encodeURIComponent(respondentId)
@@ -59,7 +59,7 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
       name: newName,
       is_display_name: isDisplayName,
       locale_id: localeId
-    }).then(res => new RespondentName().fromJSON(res.data.name))
+    }).then(res => new RespondentName().fromSnakeJSON(res.data.name))
   }
   removeName (respondentId, respondentNameId) {
     respondentId = encodeURIComponent(respondentId)
@@ -71,28 +71,28 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
       name: name,
       geo_id: geoId,
       associated_respondent_id: associatedRespondentId
-    }).then(res => new Respondent().fromJSON(res.data.respondent))
+    }).then(res => new Respondent().fromSnakeJSON(res.data.respondent))
   }
   addRespondentGeo (respondentId, geoId) {
     respondentId = encodeURIComponent(respondentId)
     geoId = encodeURIComponent(geoId)
     return http().post(`respondent/${respondentId}/geo`, {
       geo_id: geoId
-    }).then(res => new RespondentGeo().fromJSON(res.data.geo))
+    }).then(res => new RespondentGeo().fromSnakeJSON(res.data.geo))
   }
   editRespondentGeo (respondentId, respondentGeoId, isCurrent) {
     respondentId = encodeURIComponent(respondentId)
     respondentGeoId = encodeURIComponent(respondentGeoId)
     return http().put(`respondent/${respondentId}/geo/${respondentGeoId}`, {
       is_current: isCurrent
-    }).then(res => new RespondentGeo().fromJSON(res.data.respondent_geo))
+    }).then(res => new RespondentGeo().fromSnakeJSON(res.data.respondent_geo))
   }
   moveRespondentGeo (respondentId, respondentGeoId, newGeoId) {
     respondentId = encodeURIComponent(respondentId)
     respondentGeoId = encodeURIComponent(respondentGeoId)
     return http().post(`respondent/${respondentId}/geo/${respondentGeoId}/move`, {
       new_geo_id: newGeoId
-    }).then(res => new Geo().fromJSON(res.data.geo))
+    }).then(res => new RespondentGeo().fromSnakeJSON(res.data.geo))
   }
   removeRespondentGeo (respondentId, respondentGeoId) {
     respondentId = encodeURIComponent(respondentId)

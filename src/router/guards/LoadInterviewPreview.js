@@ -1,9 +1,7 @@
 import singleton from '../../static/singleton'
 import FormService from '../../services/form/FormService'
-import LocaleService from '../../services/locale/LocaleService'
 
 export default function (to, from, next) {
-  LocaleService.setExistingLocale()
   let promises = [
     FormService.getForm(to.params.formId).then(form => {
       singleton.interview.form = form

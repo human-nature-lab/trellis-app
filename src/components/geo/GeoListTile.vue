@@ -28,11 +28,12 @@
   import TranslationMixin from '../../mixins/TranslationMixin'
   import index from '../../router/index'
   import Photo from '../Photo'
+  import Geo from '../../entities/trellis/Geo'
   export default {
     name: 'geo-list-tile',
     props: {
       geo: {
-        type: Object,
+        type: Geo,
         required: true
       },
       selected: {
@@ -50,10 +51,10 @@
     },
     computed: {
       primaryPhoto: function () {
-        return this.geo.photos.length ? this.geo.photos[0] : {}
+        return this.geo.photos.length ? this.geo.photos[0].photo : {}
       },
       translation: function () {
-        return this.geo.name_translation || null
+        return this.geo.nameTranslation || null
       }
     },
     methods: {

@@ -118,12 +118,12 @@ export default interface RespondentServiceInterface {
 
   /**
    * Move a respondent geo to another location
-   * @param {String} respondentId
-   * @param {String} respondentGeoId
-   * @param {String} newGeoId
-   * @returns {Promise<Object>}
+   * @param respondentId
+   * @param respondentGeoId
+   * @param newGeoId
+   * @returns Promise<RespondentGeo>
    */
-  moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string): Promise<Geo>
+  moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string): Promise<RespondentGeo>
 
   /**
    * Delete the respondent geo by id

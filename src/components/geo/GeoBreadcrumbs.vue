@@ -18,14 +18,18 @@
   </span>
 </template>
 
-<script>
+<script lang="ts">
   import GeoService from '../../services/geo/GeoService'
   import TranslationService from '../../services/TranslationService'
-  export default {
+  import singleton from '../../static/singleton'
+  import Vue from 'vue'
+  import Geo from "../../entities/trellis/Geo"
+  export default Vue.extend({
     name: 'geo-breadcrumbs',
     props: {
       geoId: {
-        type: String
+        type: String,
+        required: true
       },
       showAncestors: {
         type: Boolean,
@@ -34,6 +38,7 @@
     },
     data () {
       return {
+        global: singleton,
         error: null,
         isLoading: false,
         ancestors: []
@@ -48,8 +53,8 @@
       }
     },
     methods: {
-      translate (geo) {
-        return TranslationService.getAny(geo.name_translation, this.global.locale)
+      translate (geo: Geo) {
+        return TranslationService.getAny(geo.nameTranslation, this.global.locale)
       },
       load () {
         if (!this.geoId) return
@@ -63,7 +68,7 @@
         })
       }
     }
-  }
+  })
 </script>
 
 <style lang="sass" scoped>

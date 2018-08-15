@@ -1,7 +1,7 @@
 <template>
   <v-flex>
     <v-list dense>
-      <v-list-tile class="grey lighten-4">
+      <v-list-tile :dark="global.darkTheme">
         <v-list-tile-content>
         </v-list-tile-content>
         <v-list-tile-action @click="global.menuDrawer.open = false" class="text-right">
@@ -51,7 +51,7 @@
           {{ $t('change_locale') }}
         </v-list-tile-title>
       </v-list-tile>
-      <v-list-tile @click="global.darkTheme=!global.darkTheme">
+      <v-list-tile @click="toggleDarkTheme()">
         <v-list-tile-action>
           <v-icon>wb_sunny</v-icon>
         </v-list-tile-action>
@@ -126,11 +126,14 @@
   import menuBus from './MenuBus'
   import LoginService from '../../services/login/LoginService'
   import router from '../../router'
+  import SingletonService from '../../services/singleton/SingletonService'
+  import global from '../../static/singleton'
 
   export default {
     name: 'dropdown-menu',
     data: () => ({
-      showCopiedSnackbar: false
+      showCopiedSnackbar: false,
+      global
     }),
     methods: {
       refresh () {
@@ -148,6 +151,9 @@
         LoginService.logout().then(() => {
           router.push({name: 'Login', query: {to: router.currentRoute.fullPath}})
         })
+      },
+      toggleDarkTheme () {
+        SingletonService.setDarkTheme(!SingletonService.get('darkTheme'))
       }
     },
     computed: {

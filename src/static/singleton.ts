@@ -1,4 +1,16 @@
-export default {
+import Study from '../entities/trellis/Study'
+import Locale from '../entities/trellis/Locale'
+interface Singleton {
+  study: Study|null;
+  locale: Locale|null;
+  darkTheme: boolean;
+  searchDrawer: object;
+  menuDrawer: object;
+  loading: object;
+  interview: object;
+}
+
+const singleton: Singleton = {
   study: null,
   locale: null,
   darkTheme: false,
@@ -24,3 +36,5 @@ export default {
     conditionTags: null
   }
 }
+
+export default singleton

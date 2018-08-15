@@ -1,13 +1,15 @@
 import StudyService from '../../services/study/StudyService'
+import SingletonService from '../../services/singleton/SingletonService'
 
-export default function (to, from, next) {
-  let p
+export default async function (to, from, next) {
+  await SingletonService.hasLoaded()
+  let study
   if (to.params.studyId) {
-    p = StudyService.getStudy(to.params.studyId)
+    study = await StudyService.getStudy(to.params.studyId)
   } else {
-    p = StudyService.getCurrentStudy()
+    study = await StudyService.getCurrentStudy()
   }
-  p.then(study => {
+  try {
     if (study) {
       StudyService.setCurrentStudy(study)
       console.log('study valid')
@@ -15,8 +17,8 @@ export default function (to, from, next) {
     } else {
       next({name: 'StudySelector', query: {to: to.fullPath}})
     }
-  }).catch(err => {
+  } catch (err) {
     console.error(err)
     return next()
-  })
+  }
 }

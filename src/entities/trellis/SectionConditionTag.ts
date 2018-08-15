@@ -1,8 +1,9 @@
 import {Column, PrimaryGeneratedColumn} from "typeorm";
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
-import {mapPropsFromJSON} from "../../services/JSONUtil";
+import {mapCamelToPlain, mapPropsFromJSON} from "../../services/JSONUtil";
+import SnakeSerializable from "../interfaces/SnakeSerializable";
 
-export default class SectionConditionTag extends TimestampedSoftDelete {
+export default class SectionConditionTag extends TimestampedSoftDelete implements SnakeSerializable{
   @PrimaryGeneratedColumn()
   id: string;
   @Column()
@@ -18,8 +19,13 @@ export default class SectionConditionTag extends TimestampedSoftDelete {
   @Column()
   interviewId: string
 
-  fromJSON (json: object) {
+  toSnakeJSON () {
+    return mapCamelToPlain(this)
+  }
+
+  fromSnakeJSON (json: object) {
     mapPropsFromJSON(this, json)
+    super.fromSnakeJSON(json)
     return this
   }
 }
