@@ -1,6 +1,8 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import Skip from "./Skip";
+import {mapFromSnakeJSON} from "../../services/JSONUtil";
 
 @Entity()
 export default class QuestionGroupSkip extends TimestampedSoftDelete {
@@ -9,5 +11,14 @@ export default class QuestionGroupSkip extends TimestampedSoftDelete {
   @Column() @Serializable
   questionGroupId: string
   @Column() @Serializable
-  skipid: string
+  skipId: string
+
+  skip: Skip
+
+  fromSnakeJSON (json: any) {
+    mapFromSnakeJSON(this, json, {
+      skip: Skip
+    })
+    return super.fromSnakeJSON(json)
+  }
 }

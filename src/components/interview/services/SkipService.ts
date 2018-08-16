@@ -1,3 +1,5 @@
+import Skip from "../../../entities/trellis/Skip";
+
 export default class SkipService {
   /**
    * Check if the supplied skipConditions should return a 'skip' value. This is the only method responsible for
@@ -6,23 +8,15 @@ export default class SkipService {
    * @param {Set} conditions - A Set of existing condition ids
    * @returns {boolean}
    */
-  static shouldSkipPage (skipConditions, conditionTags) {
+  static shouldSkipPage (skipConditions: Skip[], conditionTags: Set<string>) {
     let shouldSkip = false
     let conditionKey = 'condition_tag_name'
     for (let skipCondition of skipConditions) {
-      // Cast condition booleans as boolean
-      for (let boolKey of ['show_hide', 'any_all']) {
-        if (skipCondition[boolKey] === '0' || skipCondition[boolKey] === 0 || skipCondition[boolKey] === 'false') {
-          skipCondition[boolKey] = false
-        } else if (skipCondition[boolKey] === '1' || skipCondition[boolKey] === 1 || skipCondition[boolKey] === 'true') {
-          skipCondition[boolKey] = true
-        }
-      }
-      if (skipCondition.show_hide) {
-        if (!skipCondition.any_all) {
+      if (skipCondition.showHide) {
+        if (!skipCondition.anyAll) {
           // Show if any are true
           shouldSkip = true
-          for (let condition of skipCondition.conditions) {
+          for (let condition of skipCondition.conditionTags) {
             if (conditionTags.has(condition[conditionKey])) {
               shouldSkip = false
               break
@@ -30,8 +24,8 @@ export default class SkipService {
           }
         } else {
           // Show if all are true
-          shouldSkip = skipCondition.conditions.length === 0
-          for (let condition of skipCondition.conditions) {
+          shouldSkip = skipCondition.conditionTags.length === 0
+          for (let condition of skipCondition.conditionTags) {
             if (!conditionTags.has(condition[conditionKey])) {
               shouldSkip = true
             }
@@ -41,10 +35,10 @@ export default class SkipService {
           return shouldSkip
         }
       } else {
-        if (!skipCondition.any_all) {
+        if (!skipCondition.anyAll) {
           // Hide if any are true
           shouldSkip = false
-          for (let condition of skipCondition.conditions) {
+          for (let condition of skipCondition.conditionTags) {
             if (conditionTags.has(condition[conditionKey])) {
               shouldSkip = true
               break
@@ -52,8 +46,8 @@ export default class SkipService {
           }
         } else {
           // Hide if all are true
-          shouldSkip = skipCondition.conditions.length !== 0
-          for (let condition of skipCondition.conditions) {
+          shouldSkip = skipCondition.conditionTags.length !== 0
+          for (let condition of skipCondition.conditionTags) {
             if (!conditionTags.has(condition[conditionKey])) {
               shouldSkip = false
               break

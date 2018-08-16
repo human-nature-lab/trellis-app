@@ -3,6 +3,7 @@ import {AsDate, Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Survey from "./Survey";
+import User from "./User";
 
 @Entity()
 export default class Interview extends TimestampedSoftDelete {
@@ -28,10 +29,12 @@ export default class Interview extends TimestampedSoftDelete {
   completedAt: Date
 
   survey: Survey
+  user: User
 
   fromSnakeJSON(json: any) {
     mapFromSnakeJSON(this, json, {
-      survey: Survey
+      survey: Survey,
+      user: User
     })
     super.fromSnakeJSON(json)
     return this

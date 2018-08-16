@@ -8,7 +8,7 @@ export default class BaseEntity implements SnakeSerializable {
    */
   protected parseDates () {
     for (let key of getColumnMeta(this).dates) {
-      if (key in this) {
+      if (key in this && this[key]) {
         this[key] = parseDate(this[key]) // This returns a moment object which will automatically be serialized correctly
       }
     }

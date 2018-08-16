@@ -21,12 +21,12 @@
   // @ts-ignore
   import FormsView from '../FormsView'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
-  import SurveyService from '../../services/survey/SurveyService'
+  import SurveyService from '../../services/survey'
   import FormService from '../../services/form/FormService'
   import RespondentService from '../../services/respondent/RespondentService'
   import InterviewService from '../../services/interview/InterviewService'
   import global from '../../static/singleton'
-  import index from '../../router/index'
+  import router from '../../router'
   import Vue from 'vue'
   import Survey from "../../entities/trellis/Survey"
   import StudyForm from "../../entities/trellis/StudyForm"
@@ -93,7 +93,7 @@
           })
         }
         return p.then(interview => {
-          index.push({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
+          router.push({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
         }).catch(err => {
           this.error = err
         })
@@ -107,10 +107,7 @@
           return studyForm.form.isPublished // TODO: Filter out any forms that the respondent does not qualify for
         }).map((studyForm: StudyForm) => {
           let formSurveys = data.surveys.filter((survey: Survey) => survey.formId === studyForm.formMasterId)
-          if (formSurveys) {
-            studyForm['surveys'] = formSurveys
-          }
-          return new DisplayForm(studyForm.formMasterId, studyForm.form.nameTranslation, formSurveys, )
+          return new DisplayForm(studyForm.formMasterId, studyForm.form.nameTranslation, formSurveys)
         })
         this.respondent = data.respondent
         this.forms.push(...forms)

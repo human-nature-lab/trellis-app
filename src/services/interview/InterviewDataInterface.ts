@@ -3,11 +3,13 @@ import RespondentConditionTag from "../../entities/trellis/RespondentConditionTa
 import SurveyConditionTag from "../../entities/trellis/SurveyConditionTag";
 import SectionConditionTag from "../../entities/trellis/SectionConditionTag";
 
+export interface ConditionTagInterface {
+  respondent: RespondentConditionTag[]
+  section: SectionConditionTag[]
+  survey: SurveyConditionTag[]
+}
+
 export default interface InterviewDataInterface {
   data: QuestionDatum[],
-  conditionTags: {
-    respondent: RespondentConditionTag[],
-    section: SectionConditionTag[],
-    survey: SurveyConditionTag[]
-  }
+  conditionTags: ConditionTagInterface
 }

@@ -11,51 +11,34 @@ import InterviewDeltaInterface from './InterviewDeltaInterface'
 
 export class InterviewServiceWeb implements InterviewServiceInterface {
 
-  getInterview (interviewId: string) {
-    return http().get(`interview/${interviewId}`)
-      .then(function (res) {
-        if (res.data.interview) {
-          return res.data.interview
-        } else {
-          throw Error(`Unable to fetch interview with id: ${interviewId}`)
-        }
-      })
+  async getInterview (interviewId: string) {
+    let res = await http().get(`interview/${interviewId}`)
+    return new Interview().fromSnakeJSON(res.data.interview)
   }
 
-  getActions (interviewId) {
+  async getActions (interviewId) {
     interviewId = encodeURI(interviewId)
-    return http().get(`interview/${interviewId}/actions`).then(res => {
-      return res.data.actions.map(a => new Action().fromSnakeJSON(a))
-    })
+    let res = await http().get(`interview/${interviewId}/actions`)
+    return res.data.actions.map(a => new Action().fromSnakeJSON(a))
   }
 
-  saveActions (interviewId: string, actions: Action[]) {
+  async saveActions (interviewId: string, actions: Action[]) {
     interviewId = encodeURI(interviewId)
-
     return http().post(`interview/${interviewId}/actions`, {
       'actions': actions.map(a => a.toSnakeJSON())
-    }).then(res => {
-      return res.data
     })
   }
 
-  getData (interviewId: string) {
-    return http().get(`interview/${interviewId}/data`)
-      .then(function (res) {
-        if (res.data) {
-          let d = {
-            data: res.data.data.map(q => (new QuestionDatum()).fromSnakeJSON(q)),
-            conditionTags: {
-              survey: res.data.conditionTags.survey.map(s => (new SurveyConditionTag()).fromSnakeJSON(s)),
-              section: res.data.conditionTags.section.map(s => (new SectionConditionTag()).fromSnakeJSON(s)),
-              respondent: res.data.conditionTags.respondent.map(r => (new RespondentConditionTag()).fromSnakeJSON(r))
-            }
-          }
-          return d
-        } else {
-          throw Error(`Unable to fetch data for interview with id: ${interviewId}`)
-        }
-      })
+  async getData (interviewId: string) {
+    let res = await http().get(`interview/${interviewId}/data`)
+    return {
+      data: res.data.data.map(q => (new QuestionDatum()).fromSnakeJSON(q)),
+      conditionTags: {
+        survey: res.data.conditionTags.survey.map(s => (new SurveyConditionTag()).fromSnakeJSON(s)),
+        section: res.data.conditionTags.section.map(s => (new SectionConditionTag()).fromSnakeJSON(s)),
+        respondent: res.data.conditionTags.respondent.map(r => (new RespondentConditionTag()).fromSnakeJSON(r))
+      }
+    }
   }
 
   saveData (interviewId: string, diff: InterviewDeltaInterface) {
@@ -72,10 +55,9 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
     return http().post(`interview/${interviewId}/complete`)
   }
 
-  create (surveyId: string): Promise<Interview> {
-    return http().post(`survey/${surveyId}/interview`).then(res => {
-      return res.data.interview
-    })
+  async create (surveyId: string): Promise<Interview> {
+    let res = await http().post(`survey/${surveyId}/interview`)
+    return new Interview().fromSnakeJSON(res.data.interview)
   }
 
 }
