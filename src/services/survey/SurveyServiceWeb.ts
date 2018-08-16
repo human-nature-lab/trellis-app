@@ -1,5 +1,7 @@
 import http from '../http/AxiosInstance'
-export default class SurveyService {
+import SurveyServiceInterface from "./SurveyServiceInterface";
+import Survey from "../../entities/trellis/Survey";
+export default class SurveyService implements SurveyServiceInterface {
 
   /**
    * Get an existing survey by form id
@@ -8,11 +10,12 @@ export default class SurveyService {
    * @param {string} formId
    * @returns {Promise<Object|null>}
    */
-  static getSurvey (studyId, respondentId, formId) {
+  async getSurvey (studyId, respondentId, formId) {
     studyId = encodeURIComponent(studyId)
     respondentId = encodeURIComponent(respondentId)
     formId = encodeURIComponent(formId)
-    return http().get(`study/${studyId}/respondent/${respondentId}/form/${formId}/survey`).then(res => res.data.survey)
+    let res = await http().get(`study/${studyId}/respondent/${respondentId}/form/${formId}/survey`)
+    return new Survey().fromSnakeJSON(res.data.survey)
   }
 
   /**
@@ -21,16 +24,11 @@ export default class SurveyService {
    * @param {String} respondentId - The respondent id
    * @returns {Promise<Array>}
    */
-  static getRespondentSurveys (studyId, respondentId) {
+  async getRespondentSurveys (studyId, respondentId) {
     studyId = encodeURIComponent(studyId)
     respondentId = encodeURIComponent(respondentId)
-    return http().get(`study/${studyId}/respondent/${respondentId}/surveys`).then(res => {
-      if (res.data.surveys) {
-        return res.data.surveys
-      } else {
-        throw Error('Unable to load surveys')
-      }
-    })
+    let res = await http().get(`study/${studyId}/respondent/${respondentId}/surveys`)
+    return res.data.surveys.map(s => new Survey().fromSnakeJSON(s))
   }
 
   /**
@@ -40,12 +38,11 @@ export default class SurveyService {
    * @param {String} formId
    * @returns {*|AxiosPromise<any>}
    */
-  static create (studyId, respondentId, formId) {
+  async create (studyId, respondentId, formId) {
     studyId = encodeURIComponent(studyId)
     formId = encodeURIComponent(formId)
     respondentId = encodeURIComponent(respondentId)
-    return http().post(`study/${studyId}/respondent/${respondentId}/form/${formId}/survey`).then(res => {
-      return res.data.survey
-    })
+    let res = await http().post(`study/${studyId}/respondent/${respondentId}/form/${formId}/survey`)
+    return new Survey().fromSnakeJSON(res.data.survey)
   }
 }
