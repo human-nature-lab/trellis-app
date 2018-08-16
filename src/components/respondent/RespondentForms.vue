@@ -8,13 +8,16 @@
             {{ $t('respondent_forms', [respondent.name])}}
           </v-toolbar-title>
         </v-toolbar>
-        <FormsView v-if="forms" :forms="forms" @click="startInterview"/>
+        <FormsView
+          v-if="forms"
+          :forms="forms"
+          @click="startInterview"/>
       </v-card>
     </v-container>
   </v-flex>
 </template>
 
-<script>
+<script lang="ts">
   // @ts-ignore
   import FormsView from '../FormsView'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
@@ -24,6 +27,28 @@
   import InterviewService from '../../services/interview/InterviewService'
   import global from '../../static/singleton'
   import index from '../../router/index'
+  import Vue from 'vue'
+  import Survey from "../../entities/trellis/Survey"
+  import StudyForm from "../../entities/trellis/StudyForm"
+  import Respondent from "../../entities/trellis/Respondent"
+  import Translation from "../../entities/trellis/Translation"
+
+  export class DisplayForm {
+    constructor (
+      public id: string,
+      public nameTranslation: Translation,
+      public surveys: Survey[],
+      public isComplete?: boolean,
+      public isStarted?: boolean,
+      public nComplete?: number
+    ) {}
+  }
+
+  interface RespondentFormsData {
+    respondent: Respondent,
+    surveys: Survey[],
+    forms: StudyForm[]
+  }
 
   async function load (to) {
     let respondentId = to.params.respondentId
@@ -35,66 +60,63 @@
     }
   }
 
-  export default {
+  export default Vue.extend({
     name: 'respondent-forms',
     mixins: [RouteMixinFactory(load)],
     data () {
       return {
         global: global,
-        forms: {},
-        respondent: {},
-        error: null
+        forms: [] as DisplayForm[],
+        respondent: null as Respondent,
+        error: ''
       }
     },
-    head: {
-        title () {
-          return {
-            inner: `${this.respondent.name} Forms`
-          }
-        }
-    },
+    // head: {
+    //     title () {
+    //       return {
+    //         inner: `${this.respondent.name} Forms`
+    //       }
+    //     }
+    // },
     components: {
       FormsView
     },
     methods: {
-      startInterview (form) {
+      startInterview (form: DisplayForm) {
         if (form.isComplete) return
         let p
         if (form.isStarted) {
           p = InterviewService.create(form.surveys[0].id)
         } else {
-          p = SurveyService.create(this.global.study.id, this.respondent.id, form.id).then(survey => {
+          p = SurveyService.create(this.global['study'].id, this.respondent.id, form.id).then(survey => {
             return InterviewService.create(survey.id)
           })
         }
         return p.then(interview => {
-          index.push({name: 'Interview', params: {studyId: this.global.study.id, interviewId: interview.id}})
+          index.push({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
         }).catch(err => {
           this.error = err
         })
       },
-      hydrate (data) {
+      hydrate (data: RespondentFormsData) {
         // Join any surveys that have been created with the possible forms
-        debugger
-        data.forms = data.forms.filter(form => {
-          return form.isPublished // TODO: Filter out any forms that the respondent does not qualify for
-        }).map(form => {
-          let formSurveys = data.surveys.filter(survey => survey.formId === form.id)
-          if (formSurveys) {
-            form['surveys'] = formSurveys
-          }
-          return form
-        })
         data.forms.sort((a, b) => {
           return a.sortOrder - b.sortOrder
         })
+        let forms: DisplayForm[] = data.forms.filter((studyForm: StudyForm) => {
+          return studyForm.form.isPublished // TODO: Filter out any forms that the respondent does not qualify for
+        }).map((studyForm: StudyForm) => {
+          let formSurveys = data.surveys.filter((survey: Survey) => survey.formId === studyForm.formMasterId)
+          if (formSurveys) {
+            studyForm['surveys'] = formSurveys
+          }
+          return new DisplayForm(studyForm.formMasterId, studyForm.form.nameTranslation, formSurveys, )
+        })
         this.respondent = data.respondent
-        this.respondentId = data.respondent.id
-        this.forms = data.forms
-        this.error = data.error
+        this.forms.push(...forms)
       }
     }
-  }
+  })
 </script>
 
 <style scoped>

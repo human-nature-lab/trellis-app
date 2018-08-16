@@ -1,18 +1,19 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class User extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   name: string
-  @Column()
+  @Column() @Serializable
   username: string
-  @Column()
+  @Column() @Serializable
   password: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   role: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   selectedStudyId: string
 }

@@ -1,15 +1,15 @@
-import {Entity} from '../TypeOrmDecorators'
-import {Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class AssignConditionTag extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   conditionTagId: string
-  @Column({ type: 'text' })
+  @Column({ type: 'text' }) @Serializable
   logic: string
-  @Column({nullable: true})
+  @Column({nullable: true}) @Serializable
   scope: string
 }

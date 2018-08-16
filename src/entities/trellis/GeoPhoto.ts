@@ -1,18 +1,19 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Photo from "./Photo";
 
 @Entity()
 export default class GeoPhoto extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   geoId: string
-  @Column()
+  @Column() @Serializable
   photoId: string
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'tinyint' }) @Serializable
   sortOrder: number
-  @Column({ type: 'text' })
+  @Column({ type: 'text' }) @Serializable
   notes: string
 
   photo: Photo

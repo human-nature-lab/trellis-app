@@ -1,4 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Section from "./Section";
@@ -7,15 +8,15 @@ import Translation from "./Translation";
 
 @Entity()
 export default class Form extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   formMasterId: string
-  @Column()
+  @Column() @Serializable
   nameTranslationId: string
-  @Column({type: 'integer'})
+  @Column({type: 'integer'}) @Serializable
   version: number
-  @Column()
+  @Column() @Serializable
   isPublished: boolean
 
   sections: Array<Section>
@@ -29,6 +30,9 @@ export default class Form extends TimestampedSoftDelete {
       nameTranslation: Translation
     })
     super.fromSnakeJSON(json)
+    // Simple way to convert into an integer and then to a boolean. Possible values for this are "1", "0", 1, 0, true, false
+    // and all of them are interpreted correctly by this statement
+    this.isPublished = !!+this.isPublished
     return this
   }
 }

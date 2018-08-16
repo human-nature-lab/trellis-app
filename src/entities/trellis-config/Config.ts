@@ -1,10 +1,11 @@
-import {PrimaryColumn, Entity, Column} from "typeorm";
+import {PrimaryColumn, Entity, Column} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 
 @Entity("config")
 export default class Config {
-  @PrimaryColumn({ name: "name" })
+  @PrimaryColumn({ name: "name" }) @Serializable
   name: string;
 
-  @Column({ name: "val" })
+  @Column({ name: "val" }) @Serializable
   val: string;
 }

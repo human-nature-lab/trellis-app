@@ -1,14 +1,15 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class SectionQuestionGroup extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   sectionId: string
-  @Column()
+  @Column() @Serializable
   questionGroupId: string
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer' }) @Serializable
   questionGroupOrder: number
 }

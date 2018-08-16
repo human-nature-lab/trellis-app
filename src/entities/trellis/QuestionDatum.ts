@@ -1,32 +1,32 @@
-import FromJSON from "../interfaces/FromJSON";
 import uuid from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import {mapFromSnakeJSON, mapCamelToPlain} from "../../services/JSONUtil";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
 export default class QuestionDatum extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   public id: string = uuid();
-  @Column()
+  @Column() @Serializable
   public questionId: string;
-  @Column()
+  @Column() @Serializable
   public surveyId: string;
-  @Column()
+  @Column() @Serializable
   public followUpDatumId: string
-  @Column()
+  @Column() @Serializable
   public sectionRepetition: number
-  @Column({type: 'datetime'})
+  @Column({type: 'datetime'}) @Serializable
   public answeredAt: Date
-  @Column({type: 'datetime'})
+  @Column({type: 'datetime'}) @Serializable
   public skippedAt: Date
-  @Column()
+  @Column() @Serializable
   public dkRf: boolean;
-  @Column()
+  @Column() @Serializable
   public dkRfVal: string;
-  @Column()
+  @Column() @Serializable
   public interviewId: string;
 
   data: Datum[] = []

@@ -1,14 +1,15 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class Skip extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   showHide: boolean
-  @Column()
+  @Column() @Serializable
   anyAll: boolean
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'tinyint' }) @Serializable
   precedence: number
 }

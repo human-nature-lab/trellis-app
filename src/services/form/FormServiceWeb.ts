@@ -5,11 +5,6 @@ import StudyForm from "../../entities/trellis/StudyForm";
 import Form from "../../entities/trellis/Form";
 export class FormServiceWeb implements FormServiceInterface {
 
-  /**
-   * Gets all forms for the current study
-   * @param {String} studyId
-   * @returns {Promise<Array>}
-   */
   getStudyForms (studyId: string): Promise<StudyForm[]> {
     return http().get(`study/${studyId}/forms/published`, {
       params: {
@@ -25,11 +20,6 @@ export class FormServiceWeb implements FormServiceInterface {
     })
   }
 
-  /**
-   * Gets a single form by id
-   * @param {String} formId
-   * @returns {Promise<Object>}
-   */
   getForm (formId: string): Promise<Form> {
     return http().get(`form/${formId}`)
       .then(res => {

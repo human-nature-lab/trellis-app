@@ -1,14 +1,15 @@
-import {Column, PrimaryGeneratedColumn} from "typeorm";
+import {Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 export default class SurveyConditionTag extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string;
-  @Column()
+  @Column() @Serializable
   surveyId: string
-  @Column()
+  @Column() @Serializable
   conditionId: string
-  @Column()
+  @Column() @Serializable
   interviewId: string
 }

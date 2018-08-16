@@ -1,34 +1,35 @@
-import {PrimaryColumn, Entity, Column} from "typeorm";
+import {PrimaryColumn, Entity, Column} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 
 @Entity("log")
 export default class Log {
-  @PrimaryColumn({ name: "id" })
+  @PrimaryColumn({ name: "id" }) @Serializable
   id: string;
 
-  @Column({ name: "message" })
+  @Column({ name: "message" }) @Serializable
   message: string;
 
-  @Column({ name: "full_message" })
+  @Column({ name: "full_message" }) @Serializable
   fullMessage: string;
 
-  @Column({ name: "severity", comment: "error, warn, info, verbose, debug, trace" })
+  @Column({ name: "severity", comment: "error, warn, info, verbose, debug, trace" }) @Serializable
   severity: string;
 
-  @Column({ name: "component", nullable: true })
+  @Column({ name: "component", nullable: true }) @Serializable
   component: string;
 
-  @Column({ name: "sync_id", nullable: true })
+  @Column({ name: "sync_id", nullable: true }) @Serializable
   syncId: string;
 
-  @Column({ name: "interview_id", nullable: true })
+  @Column({ name: "interview_id", nullable: true }) @Serializable
   interviewId: string;
 
-  @Column({ name: "device_id", nullable: true })
+  @Column({ name: "device_id", nullable: true }) @Serializable
   deviceId: string;
 
-  @Column({ name: "user_id", nullable: true })
+  @Column({ name: "user_id", nullable: true }) @Serializable
   userId: string;
 
-  @Column({ name: "created_at" })
+  @Column({ name: "created_at" }) @Serializable
   createdAt: Date;
 }

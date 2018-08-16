@@ -9,31 +9,31 @@
 </template>
 
 <script>
+  import Vue from 'vue'
   import FormListItem from './FormListItem'
-  export default {
+
+  export default Vue.extend({
     name: 'forms-view',
     props: {
       forms: {
-        type: Array
+        type: Array,
+        required: true
       }
     },
-    data: function () {
-      return {
-        cForms: []
+    computed: {
+      cForms () {
+        return this.forms.map((form, i) => {
+          form.nComplete = form.surveys.reduce((c, s) => (s.completedAt ? c + 1 : c), 0)
+          form.isComplete = form.surveys.length && form.surveys[0].completedAt || false
+          form.isStarted = form.surveys.length && !form.surveys[0].completedAt || false
+          return form
+        })
       }
-    },
-    created: function () {
-      this.cForms = this.forms.map((form, i) => {
-        form.nComplete = form.surveys.reduce((c, s) => (s.completed_at ? c + 1 : c), 0)
-        form.isComplete = form.surveys.length && form.surveys[0].completed_at || false
-        form.isStarted = form.surveys.length && !form.surveys[0].completed_at || false
-        return form
-      })
     },
     components: {
       FormListItem
     }
-  }
+  })
 </script>
 
 <style lang="sass" scoped>

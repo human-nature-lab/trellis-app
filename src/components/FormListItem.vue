@@ -43,7 +43,7 @@
           class="centered clickable"
           @click="$emit('click')">
           <TranslatedText
-            :translation="form.name_translation"
+            :translation="form.nameTranslation"
             :locale="global.locale"/>
         </v-flex>
         <v-spacer />
@@ -81,7 +81,7 @@
                 :key="survey.id">
                 <td>
                   <span
-                    v-if="survey.completed_at"
+                    v-if="survey.completedAt"
                     class="complete">
                     {{ $t('completed') }}
                   </span>
@@ -103,8 +103,8 @@
                       :data-interview-id="interview.id"
                       :key="interview.id">
                       <td>{{interview.user.name}} <span class="light">({{interview.user.username}})</span></td>
-                      <td>{{interview.start_time}}</td>
-                      <td>{{interview.end_time}}</td>
+                      <td>{{interview.startTime}}</td>
+                      <td>{{interview.endTime}}</td>
                     </tr>
                   </table>
                 </td>
@@ -118,7 +118,10 @@
 </template>
 
 <script>
+  // @ts-ignore
   import TranslatedText from './TranslatedText'
+  import global from '../static/singleton'
+
   export default {
     name: 'form-list-item',
     props: {
@@ -127,13 +130,21 @@
         required: true
       }
     },
-    data: function () {
+    data () {
       return {
-        isOpen: false,
-        isComplete: this.form.isComplete,
-        isStarted: this.form.isStarted,
-        nSurveys: this.form.nSurveys,
-        completedSurveys: this.form.completedSurveys
+        global: global,
+        isOpen: false
+      }
+    },
+    computed: {
+      isComplete () {
+        return this.form.isComplete
+      },
+      isStarted () {
+        return this.form.isStarted
+      },
+      nSurveys () {
+        return this.form.surveys.length
       }
     },
     components: {

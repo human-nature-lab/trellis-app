@@ -1,14 +1,15 @@
-import {Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import ConditionTag from "./ConditionTag";
 
 export default class RespondentConditionTag extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   respondentId: string
-  @Column()
+  @Column() @Serializable
   conditionTagId: string
 
   conditionTag: ConditionTag
