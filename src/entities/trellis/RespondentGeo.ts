@@ -1,21 +1,22 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import Geo from "./Geo";
 
 @Entity()
 export default class RespondentGeo extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   geoId: string
-  @Column()
+  @Column() @Serializable
   respondentId: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   previousRespondentGeoId: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   notes: string
-  @Column()
+  @Column() @Serializable
   isCurrent: boolean
 
   geo: Geo

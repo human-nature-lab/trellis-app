@@ -1,17 +1,17 @@
-import {OneToOne, ManyToMany, JoinTable, JoinColumn} from 'typeorm'
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {OneToOne, ManyToMany, JoinTable, JoinColumn, Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Locale from "./Locale";
 
 @Entity()
 export default class Study extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   name: string
-  @Column({ type: "tinyint" })
+  @Column({ type: "tinyint" }) @Serializable
   photoQuality: number
-  @Column()
+  @Column() @Serializable
   defaultLocaleId: string
 
   @ManyToMany(type => Locale)

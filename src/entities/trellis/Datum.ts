@@ -1,34 +1,35 @@
 import uuidv4 from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
-import {Column, Entity} from "typeorm";
+import {Column, Entity} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
 export default class Datum extends TimestampedSoftDelete implements SnakeSerializable {
-  @Column()
+  @Column() @Serializable
   public choiceId: string;
-  @Column()
+  @Column() @Serializable
   public datumTypeId: string = '0';
-  @Column()
+  @Column() @Serializable
   public edgeId: string;
-  @Column({type: 'integer'})
+  @Column({type: 'integer'}) @Serializable
   public eventOrder: number;
-  @Column()
+  @Column() @Serializable
   public geoId: string;
-  @Column()
+  @Column() @Serializable
   public id: string = uuidv4();
-  @Column()
+  @Column() @Serializable
   public name: string;
-  @Column()
+  @Column() @Serializable
   public photoId: string;
-  @Column()
+  @Column() @Serializable
   public questionDatumId: string;
-  @Column()
+  @Column() @Serializable
   public rosterId: string;
-  @Column({type: 'integer'})
+  @Column({type: 'integer'}) @Serializable
   public sortOrder: number;
-  @Column()
+  @Column() @Serializable
   public surveyId: string;
-  @Column()
+  @Column() @Serializable
   public val: string;
 }

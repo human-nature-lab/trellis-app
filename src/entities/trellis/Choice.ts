@@ -1,15 +1,16 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Translation from "./Translation";
 
 @Entity()
 export default class Choice extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   choiceTranslationId: string
-  @Column()
+  @Column() @Serializable
   val: string
 
   choiceTranslation: Translation

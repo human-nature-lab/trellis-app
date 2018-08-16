@@ -1,20 +1,21 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class GeoType extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   parentId: string
-  @Column()
+  @Column() @Serializable
   studyId: string
-  @Column()
+  @Column() @Serializable
   name: string
-  @Column()
+  @Column() @Serializable
   canUserAdd: boolean
-  @Column()
+  @Column() @Serializable
   canUserAddChild: boolean
-  @Column()
+  @Column() @Serializable
   canContainRespondent: boolean
 }

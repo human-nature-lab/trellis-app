@@ -1,16 +1,13 @@
 import {parseDate} from '../../services/DateService'
 import SnakeSerializable from "../interfaces/SnakeSerializable";
+import {getColumnMeta} from "../TypeOrmDecorators";
 
 export default class BaseEntity implements SnakeSerializable {
-  protected __dates__: string[]
-  protected __colNames__: string[]
-  protected __snakeNames__: string[]
-
   /**
    * Just pars all of the dates defined in the model's __dates__ array
    */
   protected parseDates () {
-    for (let key of this.__dates__) {
+    for (let key of getColumnMeta(this).dates) {
       if (key in this) {
         this[key] = parseDate(this[key]) // This returns a moment object which will automatically be serialized correctly
       }
@@ -22,7 +19,7 @@ export default class BaseEntity implements SnakeSerializable {
    */
   toJSON (): object {
     let r = {}
-    for (let key of this.__colNames__) {
+    for (let key of getColumnMeta(this).names) {
       r[key] = this[key]
     }
     return r
@@ -33,7 +30,7 @@ export default class BaseEntity implements SnakeSerializable {
    * @param json
    */
   fromJSON (json: object): this {
-    for (let key of this.__colNames__) {
+    for (let key of getColumnMeta(this).names) {
       this[key] = json[key]
     }
     return this
@@ -45,9 +42,10 @@ export default class BaseEntity implements SnakeSerializable {
    * @param json
    */
   fromSnakeJSON (json: any): this {
-    for (let i = 0; i < this.__colNames__.length; i++) {
-      if (this.__snakeNames__[i] in json) {
-        this[this.__colNames__[i]] = json[this.__snakeNames__[i]]
+    let colMeta = getColumnMeta(this)
+    for (let i = 0; i < colMeta.names.length; i++) {
+      if (colMeta.snake[i] in json) {
+        this[colMeta.names[i]] = json[colMeta.snake[i]]
       }
     }
     this.parseDates()
@@ -58,9 +56,10 @@ export default class BaseEntity implements SnakeSerializable {
    * Map all camel case column names to the equivalent snake case name and return a plain object
    */
   toSnakeJSON (): object {
+    let colMeta = getColumnMeta(this)
     let r = {}
-    for (let i = 0; i < this.__colNames__.length; i++) {
-      r[this.__snakeNames__[i]] = this[this.__colNames__[i]]
+    for (let i = 0; i < colMeta.names.length; i++) {
+      r[colMeta.snake[i]] = this[colMeta.names[i]]
     }
     return r
   }

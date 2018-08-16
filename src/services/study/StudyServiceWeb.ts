@@ -16,11 +16,7 @@ class StudyServiceWeb extends StudyServiceAbstract {
 
   getMyStudies (): Promise<Study[]> {
     return http().get(`me/studies`).then(res => {
-      let studies: Study[] = []
-      for (let i = 0; i < res.data.studies.length; i++) {
-        studies.push(new Study().fromSnakeJSON(res.data.studies[i]))
-      }
-      return studies
+      return res.data.studies.map(s => new Study().fromSnakeJSON(s))
     })
   }
 }

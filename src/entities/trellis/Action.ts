@@ -1,24 +1,25 @@
-import {Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Column, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapCamelToPlain} from '../../services/JSONUtil'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
+import {Serializable} from '../TypeOrmDecorators'
 
 export default class Action extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   surveyId: string
-  @Column()
+  @Column() @Serializable
   questionId: string
-  @Column({ type: 'text' })
+  @Column({ type: 'text' }) @Serializable
   payload: string
-  @Column()
+  @Column() @Serializable
   actionType: string
-  @Column()
+  @Column() @Serializable
   interviewId: string
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer' }) @Serializable
   sectionFollowUpRepetition: number
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer' }) @Serializable
   sectionRepetition: number
 
   toSnakeJSON () {

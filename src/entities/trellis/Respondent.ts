@@ -1,4 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import RespondentName from "./RespondentName";
@@ -12,19 +13,19 @@ import SnakeSerializable from "../interfaces/SnakeSerializable";
 
 @Entity()
 export default class Respondent extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   assignedId: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   geoId: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   notes: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   geoNotes: string
-  @Column()
+  @Column() @Serializable
   name: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   associatedRespondentId: string
 
   names: RespondentName[]

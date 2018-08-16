@@ -1,42 +1,51 @@
-import {
-  PrimaryColumn as PC,
-  PrimaryGeneratedColumn as PGC,
-  Column as C,
-  CreateDateColumn as CDC,
-  UpdateDateColumn as UDC,
-  Entity as E
-} from 'typeorm'
 import {camelToSnake} from "../services/JSONUtil";
 
+const columnMetaMap: Map<any, ColumnMeta> = new Map()
 
-function addColumnNameOverride (TypeOrmDecorator: Function) {
-  return function (this: any, ...args) {
-    let typeOrmColumnDecorator = TypeOrmDecorator(...args)
-    return function (target: any, propertyKey: string, ...args: any[]) {
-      if (!('__colNames__' in target)) {
-        target.__colNames__ = []
-      }
-      if (!('__snakeNames__' in target)) {
-        target.__snakeNames__ = []
-      }
-      target.__colNames__.push(propertyKey)
-      target.__snakeNames__.push(camelToSnake(propertyKey))
-      return typeOrmColumnDecorator(target, propertyKey, ...args)
-    }
-  }
+export interface ColumnMeta {
+  names: string[],
+  snake: string[],
+  dates: string[]
 }
+
 
 export function AsDate (target: any, propertyKey: string) {
-  if (!('__dates__' in target)) {
-    target.__dates__ = []
-  }
-  target.__dates__.push(propertyKey)
+  let columnMeta = getMeta(target)
+  columnMeta.dates.push(propertyKey)
 }
 
+export function getColumnMeta (target: any): ColumnMeta {
+  return columnMetaMap.get(target.constructor.name)
+}
 
-export const Entity = E
-export const Column = addColumnNameOverride(C)
-export const PrimaryColumn = addColumnNameOverride(PC)
-export const PrimaryGeneratedColumn = addColumnNameOverride(PGC)
-export const CreateDateColumn = addColumnNameOverride(CDC)
-export const UpdateDateColumn = addColumnNameOverride(UDC)
+function getMeta (target: any): ColumnMeta {
+  if (columnMetaMap.has(target.constructor.name)) {
+    return columnMetaMap.get(target.constructor.name)
+  } else {
+    let columnMeta = {
+      names: [],
+      snake: [],
+      dates: []
+    }
+    columnMetaMap.set(target.constructor.name, columnMeta)
+    let con = target.__proto__.constructor
+    let hasInheritedColumns = columnMetaMap.has(con.name)
+    if (hasInheritedColumns) {
+      let inheritedMeta = columnMetaMap.get(con.name)
+      for (let key of ['names', 'snake', 'dates']){
+        columnMeta[key].push(...inheritedMeta[key])
+      }
+    }
+    return columnMeta
+  }
+}
+
+export function Serializable (target: any, propertyKey: string): any {
+  let columnMeta = getMeta(target)
+  let colNamesSet = new Set(columnMeta.names)
+  let snakeNamesSet = new Set(columnMeta.snake)
+  colNamesSet.add(propertyKey)
+  snakeNamesSet.add(camelToSnake(propertyKey))
+  columnMeta.names = Array.from(colNamesSet)
+  columnMeta.snake = Array.from(snakeNamesSet)
+}

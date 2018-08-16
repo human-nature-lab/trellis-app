@@ -1,18 +1,19 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class RespondentName extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   isDisplayName: boolean
-  @Column()
+  @Column() @Serializable
   name: string
-  @Column()
+  @Column() @Serializable
   respondentId: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   localeId: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   previousRespondentNameId: string
 }

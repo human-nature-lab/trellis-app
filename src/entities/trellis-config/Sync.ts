@@ -1,32 +1,33 @@
-import {PrimaryColumn, Entity, Column} from "typeorm";
+import {PrimaryColumn, Entity, Column} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 
 @Entity("sync")
 export default class Sync {
-  @PrimaryColumn({ name: "id" })
+  @PrimaryColumn({ name: "id" }) @Serializable
   id: string;
 
-  @Column({ name: "type" })
+  @Column({ name: "type" }) @Serializable
   type: string;
 
-  @Column({ name: "status" })
+  @Column({ name: "status" }) @Serializable
   status: string;
 
-  @Column({ name: "device_id" })
+  @Column({ name: "device_id" }) @Serializable
   deviceId: string;
 
-  @Column({ name: "snapshot_id", nullable: true })
+  @Column({ name: "snapshot_id", nullable: true }) @Serializable
   snapshotId: string;
 
-  @Column({ name: "snapshot_created_at", type: "datetime", nullable: true })
+  @Column({ name: "snapshot_created_at", type: "datetime", nullable: true }) @Serializable
   snapshotCreatedAt: Date;
 
-  @Column({ name: "file_name" })
+  @Column({ name: "file_name" }) @Serializable
   fileName: string;
 
-  @Column({ name: "created_at", type: "datetime" })
+  @Column({ name: "created_at", type: "datetime" }) @Serializable
   createdAt: Date;
 
-  @Column({ name: "completed_at", type: "datetime", nullable: true })
+  @Column({ name: "completed_at", type: "datetime", nullable: true }) @Serializable
   completedAt: Date;
 }
 

@@ -1,4 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Translation from "./Translation";
@@ -7,9 +8,9 @@ import QuestionGroup from "./QuestionGroup";
 
 @Entity()
 export default class Section extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   nameTranslationId: string
 
   nameTranslation: Translation

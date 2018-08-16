@@ -1,22 +1,23 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class FormSection extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   formId: string
-  @Column()
+  @Column() @Serializable
   sectionId: string
-  @Column({type: 'integer'})
+  @Column({type: 'integer'}) @Serializable
   sortOrder: number
-  @Column()
+  @Column() @Serializable
   isRepeatable: boolean
-  @Column()
+  @Column() @Serializable
   maxRepetitions: number
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   repeatPromptTranslationid: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   followUpQuestionid: string
 }

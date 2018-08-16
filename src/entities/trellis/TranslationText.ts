@@ -1,17 +1,18 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Locale from "./Locale";
 
 @Entity()
 export default class TranslationText extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   translationId: string
-  @Column({ nullable: true })
+  @Column({ nullable: true }) @Serializable
   localeId: string
-  @Column('text')
+  @Column('text') @Serializable
   translatedText: string
 
   locale: Locale

@@ -1,4 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn} from '../TypeOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import QuestionType from "./QuestionType";
@@ -8,17 +9,17 @@ import AssignConditionTag from "./AssignConditionTag";
 
 @Entity()
 export default class Question extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column()
+  @Column() @Serializable
   questionTypeId: string
-  @Column()
+  @Column() @Serializable
   questionTranslationId: string
-  @Column()
+  @Column() @Serializable
   questionGroupId: string
-  @Column({ type: 'tinyint' })
+  @Column({ type: 'tinyint' }) @Serializable
   sortOrder: number
-  @Column()
+  @Column() @Serializable
   varName: string
 
   questionType: QuestionType
