@@ -2,39 +2,42 @@ import Recycler, {Recyclable} from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
 import {now} from '../../../../services/DateService'
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
+import Question from "../../../../entities/trellis/Question";
+import InterviewManager from "../../classes/InterviewManager";
 
-// const keyNames = ['survey_id', 'section_repetition', 'follow_up_datum_id', 'question_id']
-const keyNames = ['surveyId', 'sectionRepetition', 'followUpDatumId', 'questionId']
 class QuestionDatumRecycler extends Recycler<QuestionDatum> implements Recyclable<QuestionDatum> {
   /**
-   * Takes the same object that objectCreator returns
-   * @param qd
+   * @param {QuestionDatum} qd
    * @returns {string}
    */
-  keyExtractor (qd) {
-    // The unique key of a single question datum
-    return keyNames.map(key => qd[key] === null ? 'null' : qd[key]).join('-')
+  keyExtractor (qd: QuestionDatum): string {
+    return [
+      qd.surveyId,
+      qd.sectionRepetition,
+      qd.followUpDatumId,
+      qd.questionId
+    ].join('-')
   }
 
   /**
    * Returns a questionDatum object
-   * @param interview
-   * @param questionBlueprint
-   * @returns QuestionDatum
+   * @param {InterviewManager} interview
+   * @param {Question} questionBlueprint
+   * @returns {QuestionDatum}
    */
-  objectCreator (interview, questionBlueprint) {
-    let qd = new QuestionDatum()
-    qd.id = uuidv4()
-    qd.sectionRepetition = interview.location.sectionRepetition
-    qd.followUpDatumId = interview.location.sectionFollowUpDatumId
-    qd.surveyId = interview.interview.survey_id
-    qd.interviewId = interview.interview.id
-    qd.questionId = questionBlueprint.id
-    qd.dkRf = null
-    qd.createdAt = now()
-    qd.updatedAt = now()
-    qd.deletedAt = null
-    return qd
+  objectCreator (interview: InterviewManager, questionBlueprint: Question): QuestionDatum {
+    return new QuestionDatum().fromRecycler(
+      uuidv4(),
+      questionBlueprint.id,
+      interview.interview.surveyId,
+      interview.location.sectionFollowUpDatumId,
+      interview.location.sectionRepetition,
+      now(),
+      now(),
+      interview.interview.id,
+    null,
+    null,
+    )
   }
 }
 

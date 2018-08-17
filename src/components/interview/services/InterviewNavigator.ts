@@ -1,10 +1,39 @@
 import Emitter from '../../../classes/Emitter'
 import Clock from '../../../classes/Clock'
+import InterviewManager from "../classes/InterviewManager";
+import Form from "../../../entities/trellis/Form";
+import Survey from "../../../entities/trellis/Survey";
+
+export interface InterviewLocation {
+  section: number
+  sectionRepetition: number
+  sectionFollowUpRepetition: number
+  sectionFollowUpDatumId: string
+  page: number
+  sectionId?: string
+  pageId?: string
+}
+
+interface SurveyLocation {
+  page: number
+  section: number
+  sectionRepetition: number
+  sectionFollowUpDatumRepetition: number
+}
+
 export default class InterviewNavigator extends Emitter {
-  constructor (interview) {
+
+  public location: InterviewLocation
+
+  private _location: InterviewLocation
+  private max: SurveyLocation
+  private blueprint: Form
+  public clock: Clock
+
+  constructor (private interview: InterviewManager) {
     super()
     // Section, sectionFollowUpRepetition, sectionRepetition, page
-    this.location = {}
+    this.location = {} as InterviewLocation
     this._location = {
       section: 0,
       sectionRepetition: 0,
@@ -12,8 +41,7 @@ export default class InterviewNavigator extends Emitter {
       sectionFollowUpRepetition: 0,
       page: 0
     }
-    this.max = {}
-    this.interview = interview
+    this.max = {} as SurveyLocation
     this.blueprint = interview.blueprint
     this.clock = new Clock([0, 0, 0, 0])
     this.clock.on('beforeIndexChange', (index, direction) => {
@@ -37,21 +65,21 @@ export default class InterviewNavigator extends Emitter {
   get section () {
     return this._location.section
   }
-  set section (val) {
+  set section (val: number) {
     this._location.section = val
     this.clock.time[0] = val
   }
   get sectionRepetition () {
     return this._location.sectionRepetition
   }
-  set sectionRepetition (val) {
+  set sectionRepetition (val: number) {
     this._location.sectionRepetition = val
     this.clock.time[1] = val
   }
   get page () {
     return this._location.page
   }
-  set page (val) {
+  set page (val: number) {
     this._location.page = val
     this.clock.time[3] = val
   }
@@ -64,14 +92,14 @@ export default class InterviewNavigator extends Emitter {
     }
     return this._location.sectionFollowUpDatumId
   }
-  set sectionFollowUpDatumId (newId) {
+  set sectionFollowUpDatumId (newId: string) {
     this._location.sectionFollowUpDatumId = null
     let followUpQuestionId = this.blueprint.sections[this.section].followUpQuestionId
     if (newId && followUpQuestionId) {
       // TODO: Handle follow up questions from repeatedSections and follow up sections
       let data = this.interview.getFollowUpQuestionDatumData(followUpQuestionId)
       if (data && data.length) {
-        let index = data.find(datum => datum.id === newId)
+        let index = data.findIndex(datum => datum.id === newId)
         this._location.sectionFollowUpDatumId = newId
         this._location.sectionFollowUpRepetition = index
       }
@@ -80,7 +108,7 @@ export default class InterviewNavigator extends Emitter {
   get sectionFollowUpDatumRepetition () {
     return this._location.sectionFollowUpRepetition
   }
-  set sectionFollowUpDatumRepetition (val) {
+  set sectionFollowUpDatumRepetition (val: number) {
     this._location.sectionFollowUpRepetition = val
     this._location.sectionFollowUpDatumId = null
     this.clock.time[2] = val
@@ -94,11 +122,12 @@ export default class InterviewNavigator extends Emitter {
    * @returns {String} - The datum id for this repetition
    * @throws An error if there is no datum present that matches the followUpRepetition
    */
-  getFollowUpQuestionDatumIdByFollowUpRepetition (questionId, followUpRepetition) {
+  getFollowUpQuestionDatumIdByFollowUpRepetition (questionId: string, followUpRepetition: number): string {
     let data = this.interview.getFollowUpQuestionDatumData(questionId)
     if (data && data.length) {
-      let datum = data.find(d => d.event_order === followUpRepetition)
+      let datum = data.find(d => d.eventOrder === followUpRepetition)
       if (!datum) {
+        debugger
         throw Error('No datum present with that event order')
       }
       return datum.id
@@ -109,7 +138,7 @@ export default class InterviewNavigator extends Emitter {
     let max = this.getMax(this.clock.time[3], this.clock.time[0], this.clock.time[1], this.clock.time[2])
     this.setMax(max)
   }
-  setMax (max) {
+  setMax (max: number[]) {
     this.clock.setMaximums(max)
     this.max.section = max[0]
     this.max.sectionRepetition = max[1]
@@ -127,12 +156,14 @@ export default class InterviewNavigator extends Emitter {
     this.sectionFollowUpDatumRepetition = this.clock.time[2]
     this.page = this.clock.time[3]
     this.location.section = this.section
+    this.location.sectionId = this.blueprint.sections[this.section].id
     this.location.sectionRepetition = this.sectionRepetition
     this.location.sectionFollowUpDatumId = this.sectionFollowUpDatumId
-    this.location.sectionFollowUpDatumRepetition = this.sectionFollowUpDatumRepetition
+    this.location.sectionFollowUpRepetition = this.sectionFollowUpDatumRepetition
     this.location.page = this.page
+    this.location.pageId = this.blueprint.sections[this.section].pages[this.page].id
   }
-  zero () {
+  zero (): void {
     this.section = 0
     this.page = 0
     this.sectionRepetition = 0
@@ -141,17 +172,17 @@ export default class InterviewNavigator extends Emitter {
     this.updateMax()
   }
 
-  get isAtEnd () {
+  get isAtEnd (): boolean {
     return this.clock.isAtMax
   }
 
-  get isAtStart () {
+  get isAtStart (): boolean {
     return this.clock.isAtMin
   }
   getCurrentMax () {
     return this.getMax(this.page, this.section, this.sectionRepetition, this.sectionFollowUpDatumRepetition)
   }
-  getMax (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+  getMax (page: number, section: number, sectionRepetition: number, sectionFollowUpDatumRepetition: number): number[] {
     let max = []
     max[0] = this.blueprint.sections.length - 1
     max[1] = this.blueprint.sections[section].maxRepetitions
@@ -166,7 +197,7 @@ export default class InterviewNavigator extends Emitter {
     return max
   }
 
-  setLocation (section, page, sectionRepetition, sectionFollowUpDatumId) {
+  setLocation (section: number, page: number, sectionRepetition: number, sectionFollowUpDatumId: string): void {
     this.section = section
     this.page = page
     this.sectionRepetition = sectionRepetition
@@ -174,14 +205,14 @@ export default class InterviewNavigator extends Emitter {
     this.updateLocation()
   }
 
-  isValidLocation (max, page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+  isValidLocation (max: SurveyLocation, page: number, section: number, sectionRepetition: number, sectionFollowUpDatumRepetition: number) {
     return page <= max.page &&
       section <= max.section &&
       sectionRepetition <= max.sectionRepetition &&
       sectionFollowUpDatumRepetition <= max.sectionFollowUpDatumRepetition
   }
 
-  getNext (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+  getNext (page: number, section: number, sectionRepetition: number, sectionFollowUpDatumRepetition: number): SurveyLocation {
     let m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
     let max = {
       section: m[0],
@@ -223,7 +254,7 @@ export default class InterviewNavigator extends Emitter {
     return {page, section, sectionRepetition, sectionFollowUpDatumRepetition}
   }
 
-  getPrevious (page, section, sectionRepetition, sectionFollowUpDatumRepetition) {
+  getPrevious (page: number, section: number, sectionRepetition: number, sectionFollowUpDatumRepetition: number): SurveyLocation {
     let m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
     let max = {
       section: m[0],
@@ -244,11 +275,11 @@ export default class InterviewNavigator extends Emitter {
       sectionFollowUpDatumRepetition = max.sectionFollowUpDatumRepetition
       section--
       m = this.getMax(page, section, sectionRepetition, sectionFollowUpDatumRepetition)
-      max = {
-        sectionRepetition: m[1],
-        sectionFollowUpDatumRepetition: m[2],
-        page: m[3]
-      }
+
+      max.sectionRepetition = m[1]
+      max.sectionFollowUpDatumRepetition = m[2]
+      max.page = m[3]
+
       sectionRepetition = max.sectionRepetition
       sectionFollowUpDatumRepetition = max.sectionFollowUpDatumRepetition
       page = max.page

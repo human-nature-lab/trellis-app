@@ -4,6 +4,8 @@ import QT from '../../../../static/question.types'
 import QuestionDatum from "../../../../entities/trellis/QuestionDatum";
 import actionManager from './ActionManager'
 import {addDatum, addDatumLimit, addOrUpdateSingleDatum, removeDatum, updateDatum} from "./DatumOperations";
+import Question from "../../../../entities/trellis/Question";
+import InterviewManager from "../../classes/InterviewManager";
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
@@ -14,17 +16,17 @@ const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val sho
  * with the datum associated with the question datum at questionDatum.datum. DatumRecycler should be used whenver new
  * datum are being created so that the ids are recycled
  */
-actionManager.add(AT.select_choice, function (interview, payload, questionDatum: QuestionDatum, questionBlueprint) {
-  let choiceBlueprint = questionBlueprint.choices.find(choice => choice.id === payload.choice_id)
-  let shouldRemoveOthers = questionBlueprint.question_type_id === QT.multiple_choice
+actionManager.add(AT.select_choice, function (interview: InterviewManager, payload: any, questionDatum: QuestionDatum, questionBlueprint: Question) {
+  let choice = questionBlueprint.choices.map(c => c.choice).find(c => c.id === payload.choice_id)
+  let shouldRemoveOthers = questionBlueprint.questionTypeId === QT.multiple_choice
   let paramMap = new Map()
 
   // Handle any parameters on the choice being selected
   let choiceHasOtherInput = false
-  for (let param of questionBlueprint.question_parameters) {
+  for (let param of questionBlueprint.questionParameters) {
     paramMap.set(param.val, param.parameter)
-    if (choiceBlueprint.val === param.val) {
-      let pId = parseInt(param.parameter_id, 10)
+    if (choice.val === param.val) {
+      let pId = parseInt(param.parameterId, 10)
       if (pId === parameterTypes.other) {
         choiceHasOtherInput = true
       }
@@ -35,9 +37,9 @@ actionManager.add(AT.select_choice, function (interview, payload, questionDatum:
   }
 
   // Remove any other exclusive choices that are currently selected
-  let exclusiveParameter = questionBlueprint.question_parameters.find(p => parseInt(p.parameter_id, 10) === parameterTypes.exclusive)
+  let exclusiveParameter = questionBlueprint.questionParameters.find(p => parseInt(p.parameterId, 10) === parameterTypes.exclusive)
   if (exclusiveParameter) {
-    let choice = questionBlueprint.choices.find(c => c.val === exclusiveParameter.val)
+    let choice = questionBlueprint.choices.find(c => c.choice.val === exclusiveParameter.val)
     for (let i = 0; i < questionDatum.data.length; i++) {
       let datum = questionDatum.data[i]
       if (datum.choiceId === choice.id) {

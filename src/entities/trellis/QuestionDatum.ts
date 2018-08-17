@@ -9,11 +9,11 @@ import SnakeSerializable from "../interfaces/SnakeSerializable";
 @Entity()
 export default class QuestionDatum extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryGeneratedColumn() @Serializable
-  public id: string = uuid();
+  public id: string
   @Column() @Serializable
-  public questionId: string;
+  public questionId: string
   @Column() @Serializable
-  public surveyId: string;
+  public surveyId: string
   @Column() @Serializable
   public followUpDatumId: string
   @Column() @Serializable
@@ -23,13 +23,50 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   @Column({type: 'datetime'}) @Serializable
   public skippedAt: Date
   @Column() @Serializable
-  public dkRf: boolean;
+  public dkRf: boolean
   @Column() @Serializable
-  public dkRfVal: string;
+  public dkRfVal: string
   @Column() @Serializable
-  public interviewId: string;
+  public interviewId: string
 
   data: Datum[] = []
+
+  /**
+   * Called from the recycler
+   * @param {string} id
+   * @param {string} questionId
+   * @param {string} surveyId
+   * @param {string} followUpDatumId
+   * @param {number} sectionRepetition
+   * @param {Date} answeredAt
+   * @param {Date} skippedAt
+   * @param {string} interviewId
+   * @param {boolean} dkRf
+   * @param {string} dkRfVal
+   * @returns {this}
+   */
+  fromRecycler (id: string,
+                questionId: string,
+                surveyId: string,
+                followUpDatumId: string,
+                sectionRepetition: number,
+                answeredAt: Date,
+                skippedAt: Date,
+                interviewId: string,
+                dkRf: boolean = null,
+                dkRfVal: string = null) {
+    this.id = id
+    this.questionId = questionId
+    this.surveyId = surveyId
+    this.followUpDatumId = followUpDatumId
+    this.sectionRepetition = sectionRepetition
+    this.answeredAt = answeredAt
+    this.skippedAt = skippedAt
+    this.interviewId = interviewId
+    this.dkRfVal = dkRfVal
+    this.dkRf = dkRf
+    return this
+  }
 
   fromSnakeJSON (json) {
     mapFromSnakeJSON(this, json, {

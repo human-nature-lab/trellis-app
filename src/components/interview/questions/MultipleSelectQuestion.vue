@@ -2,7 +2,7 @@
   <div class="multiple-select" role="radiogroup">
     <div class="checkbox-group"
          :key="choice.id"
-         v-for="choice in question.choices">
+         v-for="choice in choices">
       <v-checkbox
         v-if="question.type.name==='multiple_select'"
         :disabled="isQuestionDisabled"
@@ -37,7 +37,7 @@
     mixins: [QuestionDisabledMixin, ActionMixin],
     computed: {
       otherText () {
-        return this.question.choices.reduce((agg, choice) => {
+        return this.choices.reduce((agg, choice) => {
           if (choice.parameters && choice.parameters.other) {
             let datum = this.question.datum.data.find(datum => datum.choiceId === choice.id)
             if (datum) {
@@ -48,15 +48,18 @@
         }, {})
       },
       selected () {
-        let selected = this.question.choices.reduce((agg, choice) => {
+        let selected = this.choices.reduce((agg, choice) => {
           agg[choice.id] = this.question.datum.data.findIndex(datum => datum.choiceId === choice.id) > -1
           return agg
         }, {})
         return selected
+      },
+      choices () {
+        return this.question.choices.map(c => c.choice)
       }
     },
     methods: {
-      onChange: function (choice, val) {
+      onChange (choice, val) {
         if (val) {
           this.action(AT.select_choice, {
             choice_id: choice.id,
@@ -69,14 +72,14 @@
           })
         }
       },
-      onOtherChange: function (choice, text) {
+      onOtherChange (choice, text) {
         console.log(choice, text)
         this.action(AT.other_choice_text, {
           choice_id: choice.id,
           val: text
         })
       },
-      showOtherText: function (choice) {
+      showOtherText (choice) {
         return this.selected[choice.id] && choice.parameters && choice.parameters.other
       }
     },
