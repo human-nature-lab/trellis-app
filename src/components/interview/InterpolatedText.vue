@@ -9,7 +9,7 @@
 
 <script>
   import StringInterpolationService from '@/services/StringInterpolationService'
-  import {sharedInterview} from './classes/Interview'
+  import {sharedInterview} from './classes/InterviewManager'
   import EdgeService from '@/services/edge/EdgeService'
   import RosterService from '@/services/roster/RosterService'
 

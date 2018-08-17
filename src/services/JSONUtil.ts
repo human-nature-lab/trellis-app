@@ -91,6 +91,12 @@ export function createSnakeCaseAliases (target: object) {
   }
 }
 
+interface KeyMapOpts {
+  jsonKey?: string
+  constructor? (): void
+  generator? (json): any
+}
+
 /**
  * Take a snake key for the json source and apply it to the target (in camel case) if the property is defined. If the
  * the source is an Array, the map method will be used to map each member of the array to the appropriate class.
@@ -101,14 +107,14 @@ export function createSnakeCaseAliases (target: object) {
 export function mapFromSnakeJSON (target: object, source: object, keyMap: object) {
   for (let targetKey in keyMap) {
     let sourceKey = camelToSnake(targetKey)
-    let opts = keyMap[targetKey]
+    let opts = keyMap[targetKey] as KeyMapOpts
     let generator = s => new keyMap[targetKey]().fromSnakeJSON(s)
     if (typeof opts === 'object') {
       generator = opts.hasOwnProperty('constructor') ? s => {
         let d = new opts.constructor()
         return d.fromSnakeJSON ? d.fromSnakeJSON(s): d
       } : opts.generator
-      if (opts.jsonKey) sourceKey = opts.sourceKey
+      if (opts.jsonKey) sourceKey = opts.jsonKey
     }
     if (source[sourceKey]) {
       if (Array.isArray(source[sourceKey])) {

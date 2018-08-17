@@ -146,7 +146,7 @@ export default class DataStore extends Emitter {
    * @param {String} sectionFollowUpDatumId
    * @returns {Object | undefined}
    */
-  getSingleQuestionDatumByLocation (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string) {
+  getSingleQuestionDatumByLocation (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string, ...args) {
     return this.questionDatumQuestionIdIndex.get(questionId).find(qD =>
       qD.sectionRepetition === sectionRepetition &&
       qD.followUpDatumId === sectionFollowUpDatumId)

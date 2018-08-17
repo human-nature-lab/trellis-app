@@ -1,4 +1,4 @@
-import switchByModeEnv from '@/services/util'
+import switchByModeEnv from '../util'
 import EdgeServiceWeb from './EdgeServiceWeb'
 import EdgeServiceCordova from './EdgeServiceCordova'
 import EdgeServiceMock from './EdgeServiceMock'
@@ -16,4 +16,4 @@ let Constructor = switchByModeEnv({
 
 export const EdgeService = Constructor
 
-export default EdgeService
+export default new EdgeService()

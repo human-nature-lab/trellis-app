@@ -4,7 +4,7 @@
         <v-list>
           <v-list-tile v-for="geo in geos" :key="geo.id">
             <v-list-tile-content>
-              {{geo.name_translation ? translate(geo) : $t('loading')}}
+              {{geo.nameTranslation ? translate(geo) : $t('loading')}}
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -39,6 +39,7 @@
   import TranslationService from '../../../services/TranslationService'
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
+  import global from '../../../static/singleton'
   export default {
     name: 'geo-question',
     mixins: [ActionMixin],
@@ -50,6 +51,7 @@
     },
     data: function () {
       return {
+        global,
         selectedGeos: [],
         geoSearchDialog: false,
         geoCache: {}
@@ -60,7 +62,7 @@
     },
     methods: {
       translate (geo) {
-        return TranslationService.getAny(geo.name_translation, this.global.locale)
+        return TranslationService.getAny(geo.nameTranslation, this.global.locale)
       },
       openGeoSearch () {
         this.selectedGeos = this.geos.map(g => g)

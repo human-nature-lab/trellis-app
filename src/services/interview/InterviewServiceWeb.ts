@@ -26,7 +26,7 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
     interviewId = encodeURI(interviewId)
     return http().post(`interview/${interviewId}/actions`, {
       'actions': actions.map(a => a.toSnakeJSON())
-    })
+    }).then(r => r.data)
   }
 
   async getData (interviewId: string) {

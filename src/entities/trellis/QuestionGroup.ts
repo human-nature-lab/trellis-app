@@ -4,6 +4,7 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Question from "./Question";
 import SectionQuestionGroup from "./SectionQuestionGroup";
+import Skip from "./Skip";
 
 @Entity()
 export default class QuestionGroup extends TimestampedSoftDelete {
@@ -12,10 +13,12 @@ export default class QuestionGroup extends TimestampedSoftDelete {
 
   questions: Question[]
   sectionQuestionGroup: SectionQuestionGroup
+  skips: Skip[]
 
   fromSnakeJSON(json: object) {
     mapFromSnakeJSON(this, json, {
       questions: Question,
+      skips: Skip,
       sectionQuestionGroup: {
         constructor: SectionQuestionGroup,
         jsonKey: 'pivot'

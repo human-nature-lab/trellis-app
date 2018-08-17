@@ -1,17 +1,10 @@
 import switchByModeEnv from '../util'
 import PhotoServiceWeb from './PhotoServiceWeb'
-import PhotoServiceMock from './PhotoServiceMock'
 import PhotoServiceCordova from './PhotoServiceCordova'
 
 let Constructor = switchByModeEnv({
-  WEB: {
-    PROD: PhotoServiceWeb,
-    TEST: PhotoServiceMock
-  },
-  CORDOVA: {
-    PROD: PhotoServiceCordova,
-    TEST: PhotoServiceMock
-  }
+  WEB: PhotoServiceWeb,
+  CORDOVA: PhotoServiceCordova
 })
 
 export const PhotoService = Constructor

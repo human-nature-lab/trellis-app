@@ -87,7 +87,6 @@ export default class InterviewLoader {
     respondentFills: RespondentFill[]
   }> {
     let interview = await InterviewService.getInterview(interviewId)
-    debugger
     return {
       actions: await InterviewService.getActions(interviewId),
       data: await InterviewService.getData(interviewId),

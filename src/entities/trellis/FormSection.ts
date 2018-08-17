@@ -17,7 +17,15 @@ export default class FormSection extends TimestampedSoftDelete {
   @Column() @Serializable
   maxRepetitions: number
   @Column({ nullable: true }) @Serializable
-  repeatPromptTranslationid: string
+  repeatPromptTranslationId: string
   @Column({ nullable: true }) @Serializable
-  followUpQuestionid: string
+  followUpQuestionId: string
+
+  fromSnakeJSON (json: any) {
+    super.fromSnakeJSON(json)
+    this.sortOrder = +this.sortOrder
+    this.isRepeatable = !!+this.isRepeatable
+    this.maxRepetitions = +this.maxRepetitions
+    return this
+  }
 }

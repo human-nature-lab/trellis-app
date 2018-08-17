@@ -8,7 +8,7 @@ import User from "./User";
 @Entity()
 export default class Interview extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
-  id: string
+  public id: string
   @Column() @Serializable
   surveyId: string
   @Column({ nullable: true }) @Serializable

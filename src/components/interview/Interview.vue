@@ -109,7 +109,7 @@
   import ConditionTagList from './ConditionTagList'
   import menuBus from '../main-menu/MenuBus'
 
-  import {sharedInterview, clearSharedInterview} from './classes/Interview'
+  import {sharedInterview, clearSharedInterview} from './classes/InterviewManager'
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/actions/ActionBus'
 
@@ -280,9 +280,9 @@
             this.location.page
           ).map(q => {
             q.type = {
-              name: q.question_type.name
+              name: q.questionType.name
             }
-            let validation = validateParametersWithError(q, q.question_parameters, q.datum)
+            let validation = validateParametersWithError(q, q.questionParameters, q.datum)
             q.allParametersSatisfied = validation === true // Makes non-boolean types falsey
             q.validationError = typeof validation === 'string' ? validation : null
             q.isAnswered = false

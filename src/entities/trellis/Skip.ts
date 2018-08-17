@@ -3,6 +3,7 @@ import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import ConditionTag from "./ConditionTag";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
+import QuestionGroupSkip from "./QuestionGroupSkip";
 
 @Entity()
 export default class Skip extends TimestampedSoftDelete {
@@ -18,9 +19,11 @@ export default class Skip extends TimestampedSoftDelete {
   conditionTags: ConditionTag[]
 
   fromSnakeJSON (json: any) {
-    debugger
     mapFromSnakeJSON(this, json, {
-      conditionTags: ConditionTag
+      conditionTags: {
+        constructor: ConditionTag,
+        jsonKey: 'conditions'
+      }
     })
     return super.fromSnakeJSON(json)
   }
