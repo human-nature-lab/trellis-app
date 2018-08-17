@@ -9,7 +9,7 @@ import dataPersistSlave from '../services/DataPersistSlave'
 import actionsPersistSlave from '../services/ActionsPersistSlave'
 import Emitter from '../../../classes/Emitter'
 
-import InterviewNavigator from '../services/InterviewNavigator'
+import InterviewNavigator, {InterviewLocation} from '../services/InterviewNavigator'
 import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
@@ -24,6 +24,8 @@ import Page from '../../../entities/trellis/QuestionGroup'
 import Section from '../../../entities/trellis/Section'
 import PersistSlave from '../../../classes/PersistSlave'
 import Interview from "../../../entities/trellis/Interview";
+import AssignConditionTag from "../../../entities/trellis/AssignConditionTag";
+import Datum from "../../../entities/trellis/Datum";
 
 
 export default class InterviewManager extends Emitter {
@@ -141,7 +143,7 @@ export default class InterviewManager extends Emitter {
    * Getter for the current location in the survey
    * @returns {{section: *, sectionRepetition: *, sectionFollowUpDatumId: null, page: *}}
    */
-  get location () {
+  get location (): InterviewLocation {
     return this.navigator.location
   }
 
@@ -154,7 +156,7 @@ export default class InterviewManager extends Emitter {
       return this.actions.getActionSection(action) === this.location.section &&
         this.actions.getActionPage(action) === this.location.page &&
         action.sectionRepetition === this.location.sectionRepetition &&
-        action.sectionFollowUpRepetition === this.location.sectionFollowUpDatumRepetition
+        action.sectionFollowUpRepetition === this.location.sectionFollowUpRepetition
     }
     for (let action of actions) {
       if (action.actionType !== 'next' && action.actionType !== 'previous') {
@@ -250,21 +252,21 @@ export default class InterviewManager extends Emitter {
 
   /**
    * Assign parameters as properties on the question
-   * @param question
+   * @param {Question} question
    * @private
    */
-  _assignParameters (question) {
+  _assignParameters (question: Question) {
     question.parameters = {}
     for (let p of question.questionParameters) {
       switch (p.parameter.name) {
         case 'other':
         case 'other_exclusive':
-          for (let choice of question.choices) {
-            if (choice.val === p.val) {
-              if (!choice.parameters) {
-                choice.parameters = {}
+          for (let qChoice of question.choices) {
+            if (qChoice.choice.val === p.val) {
+              if (!qChoice.choice.parameters) {
+                qChoice.choice.parameters = {}
               }
-              choice.parameters[p.parameter.name] = p.val
+              qChoice.choice.parameters[p.parameter.name] = p.val
             }
           }
           break
@@ -337,55 +339,12 @@ export default class InterviewManager extends Emitter {
   }
 
   /**
-   * Remove a single datum from the supplied question datum
-   * @param {Object} questionDatum - The question datum reference to remove the datumm from
-   * @param {Number} datumIndex - The router of the datum that should be removed
-   */
-  deleteSingleQuestionDatumDatum (questionDatum, datumIndex) {
-    questionDatum.data.splice(datumIndex, 1)
-  }
-
-  /**
-   * Remove the data associated with this questionDatum.
-   * @param questionDatum
-   */
-  deleteAllQuestionDatumData (questionDatum) {
-    // let qDatum = this.data.find(qDatum => qDatum.id === questionDatum.id)
-    // if (qDatum) {
-    //   qDatum.data = []
-    // }
-  }
-
-  /**
-   * Get all question data for the current page
-   * @returns {Array}
-   * @private
-   */
-  _getCurrentPageData () {
-    // return this.data.get(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-  }
-
-  /**
-   * Question data is valid for this location
-   * @param location
-   * @param questionDatum
-   * @returns {boolean}
-   * @private
-   */
-  _locationMatchesQuestionDatum (location, questionDatum) {
-    return questionDatum.section === this.location.section &&
-    questionDatum.page === this.location.page &&
-    questionDatum.section_repetition === this.location.sectionRepetition &&
-    questionDatum.follow_up_datum_id === this.location.sectionFollowUpDatumId
-  }
-
-  /**
    * Make a single questionDatum from the provided questionBlueprint
    * @param questionBlueprint
    * @returns {{id: *, section_repetition: number, section_follow_up_repetition: number, page: number, section: number, question_id, survey_id: *, created_at: number, updated_at: number, dk_rf: null, dk_rf_val: null, var_name, datum: Array}}
    * @private
    */
-  _makeQuestionDatum (questionBlueprint) {
+  _makeQuestionDatum (questionBlueprint: Question) {
     let questionDatum = QuestionDatumRecycler.getNoKey(this, questionBlueprint) // OPTIMIZATION: This could be optimized by using 'get' instead of getNoKey
     this.data.add(questionDatum)
     return questionDatum
@@ -396,7 +355,7 @@ export default class InterviewManager extends Emitter {
    * @param assign_condition_tag
    * @private
    */
-  _assignConditionTag (act) {
+  _assignConditionTag (act: AssignConditionTag) {
     // TODO: We could check for existing condition tags before creating it again, but this will
     // be taken care of by the resetting of the form and replaying existing conditions for pages
     // that are being modified as opposed to being created for the first time
@@ -476,7 +435,7 @@ export default class InterviewManager extends Emitter {
    * @param useRandom
    * @private
    */
-  _getQuestionDatumDataInOrder (questionDatumId, useRandom = false) {
+  _getQuestionDatumDataInOrder (questionDatumId: string, useRandom: boolean = false) {
     let data = this.data.getQuestionDatumById(questionDatumId).data
     if (useRandom) {
       data.sort(function (a, b) {
@@ -488,13 +447,6 @@ export default class InterviewManager extends Emitter {
       })
     }
     return data
-  }
-
-  /**
-   * Get the corresponding questionDatum for this place in the survey
-   */
-  _getQuestionDatumByLocation (location, questionId) {
-    return this.data.getSingleQuestionDatumByLocation(questionId, location.section, location.page, location.sectionRepetition, location.sectionFollowUpDatumId)
   }
 
   /**
@@ -582,7 +534,7 @@ export default class InterviewManager extends Emitter {
   }
 
   replayToCurrent () {
-    this.replayTo(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumRepetition)
+    this.replayTo(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpRepetition)
   }
 
   /**
@@ -594,7 +546,7 @@ export default class InterviewManager extends Emitter {
    * @param sectionRepetition
    * @param sectionFollowUpRepetition
    */
-  replayTo (section, page, sectionRepetition, sectionFollowUpRepetition) {
+  replayTo (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
     this._isReplaying = true
     this._zeroLocation()
     this._resetState()
@@ -606,12 +558,12 @@ export default class InterviewManager extends Emitter {
 
   /**
    * Seek to a specific location in the survey
-   * @param section
-   * @param page
-   * @param sectionRepetition
-   * @param sectionFollowUpRepetition
+   * @param {number} section
+   * @param {number} sectionRepetition
+   * @param {number} sectionFollowUpRepetition
+   * @param {number} page
    */
-  seekTo (section, sectionRepetition, sectionFollowUpRepetition, page) {
+  seekTo (section: number, sectionRepetition: number, sectionFollowUpRepetition: number, page: number) {
     let count = 1
     let DIRS = {FORWARD: 0, BACKWARD: 1}
     // Cast the current location and desired location into a 4 digit number with this structure {section}{sectionRepetition}{sectionFollowUpRepetition}{page}
@@ -620,7 +572,7 @@ export default class InterviewManager extends Emitter {
     let previousDirection
     let currentDirection
     do {
-      curLocNumber = this.location.section * 1000000 + this.location.sectionRepetition * 10000 + this.location.sectionFollowUpDatumRepetition * 100 + this.location.page
+      curLocNumber = this.location.section * 1000000 + this.location.sectionRepetition * 10000 + this.location.sectionFollowUpRepetition * 100 + this.location.page
       if (curLocNumber < desiredLocNumber) {
         currentDirection = DIRS.FORWARD
       } else if (curLocNumber > desiredLocNumber) {
@@ -689,10 +641,10 @@ export default class InterviewManager extends Emitter {
 
   /**
    * Get the questionDatum corresponding with this follow up section
-   * @param sectionFollowUpQuestionId
-   * @returns {T}
+   * @param {string} sectionFollowUpQuestionId
+   * @returns {QuestionDatum}
    */
-  getFollowUpQuestionDatum (sectionFollowUpQuestionId) {
+  getFollowUpQuestionDatum (sectionFollowUpQuestionId: string): QuestionDatum {
     let qDatum = this.data.getQuestionDataByQuestionId(sectionFollowUpQuestionId)
     if (qDatum && qDatum.length > 1) {
       throw Error('We need to handle follow up questions. Too many question datum for this followUpQuestionId')
@@ -702,10 +654,10 @@ export default class InterviewManager extends Emitter {
 
   /**
    * Returns the value for a respondent fill with the specified varName
-   * @param {String} varName
-   * @returns {String|null}
+   * @param {string} varName
+   * @returns {any}
    */
-  getRespondentFillByVarName (varName) {
+  getRespondentFillByVarName (varName: string) {
     return this.respondentFills.get(varName)
   }
 
@@ -715,7 +667,7 @@ export default class InterviewManager extends Emitter {
    * @param {Number} sectionFollowUpRepetition
    * @returns {Object}
    */
-  getSingleDatumByQuestionVarName (varName, sectionFollowUpRepetition) {
+  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpRepetition: number): QuestionDatum {
     let questionId = this.varNameIndex.get(varName)
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
@@ -740,7 +692,7 @@ export default class InterviewManager extends Emitter {
    * @returns {T | undefined}
    * @private
    */
-  getFollowUpQuestionDatumData (sectionFollowUpQuestionId, currentRepetition = 0, currentFollowUpSection = 0) {
+  getFollowUpQuestionDatumData (sectionFollowUpQuestionId: string, currentRepetition: number = 0, currentFollowUpSection: number = 0): Datum[] {
     let qDatum = this.getFollowUpQuestionDatum(sectionFollowUpQuestionId)
     // TODO: This should change if we're using randomization for follow up sections
     if (!qDatum || !qDatum.data) return []
@@ -766,13 +718,19 @@ export default class InterviewManager extends Emitter {
   /**
    * Get an array of the questions for the current page. This function handles merging existing datum with
    * the question blueprint and dereferences everything
+   * @param {number} section
+   * @param {number} sectionRepetition
+   * @param {number} sectionFollowUpDatumId
+   * @param page
+   * @returns {any}
    */
-  getPageQuestions (section, sectionRepetition, sectionFollowUpDatumId, page) {
+  getPageQuestions (section: number, sectionRepetition: number, sectionFollowUpDatumId: string, page?) {
     let questionDefinitions = this.currentPage().questions
     let questionData = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), sectionRepetition, sectionFollowUpDatumId)
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
-      question = JSON.parse(JSON.stringify(question)) // Dereference the question
+      question = question.copy() // Dereference the question
+      // question = JSON.parse(JSON.stringify(question)) // Dereference the question
       // TODO: this should take into account section repetition and follow ups as well
       question.datum = questionData.find(q => q.questionId === question.id)
       return question

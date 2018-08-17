@@ -1,5 +1,7 @@
 import v18n from '../../../i18n'
 import QuestionDatum from "../../../entities/trellis/QuestionDatum";
+import Question from "../../../entities/trellis/Question";
+import QuestionParameter from "../../../entities/trellis/QuestionParameter";
 // All of the validation errors that will be displayed when validation fails
 export const validationErrors = {
   min: min => v18n.t('value_must_be_greater_than_min', min),
@@ -75,7 +77,7 @@ const relevantTypes = [
  * @param {any} value
  * @returns {*}
  */
-function castParameter (questionType: any, parameterType: any, value: any) {
+function castParameter (questionType: string, parameterType: string, value: any) {
   switch (parameterType) {
     case 'min':
     case 'max':
@@ -94,12 +96,12 @@ function castParameter (questionType: any, parameterType: any, value: any) {
   }
 }
 
-export function parametersToMap (parameters, question) {
+export function parametersToMap (parameters: QuestionParameter[], question: Question) {
   let pMap = parameters.reduce((map, p) => {
-    map[p.parameter.name] = castParameter(question.type.name, p.parameter.name, p.val)
+    map[p.parameter.name] = castParameter(question.questionType.name, p.parameter.name, p.val)
     return map
   }, {
-    read_only: question.type.name === 'intro',
+    read_only: question.questionType.name === 'intro',
     is_required: true,
     show_dk: true,
     show_rf: true
@@ -119,7 +121,7 @@ export function parametersToMap (parameters, question) {
  * @param {Object} questionDatum
  * @returns {boolean}
  */
-export function validateParameters (question, parameters, questionDatum: QuestionDatum) {
+export function validateParameters (question: Question, parameters: QuestionParameter[], questionDatum: QuestionDatum) {
   return validateParametersWithError(question, parameters, questionDatum) === true
 }
 
@@ -130,7 +132,7 @@ export function validateParameters (question, parameters, questionDatum: Questio
  * @param {Object} questionDatum
  * @returns {boolean|string}
  */
-export function validateParametersWithError (question: any, parameters: any, questionDatum: QuestionDatum) {
+export function validateParametersWithError (question: Question, parameters: QuestionParameter[], questionDatum: QuestionDatum) {
   let pMap = parametersToMap(parameters, question)
 
   // Handle the trivial case

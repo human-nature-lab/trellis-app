@@ -1,9 +1,9 @@
 import Emitter from '../../../classes/Emitter'
-import uuidv4 from 'uuid/v4'
 import SortedArray from '../../../classes/SortedArray'
 import {now, parseDate} from '../../../services/DateService'
 import Action from "../../../entities/trellis/Action";
 import Form from "../../../entities/trellis/Form";
+import {InterviewLocation} from "../services/InterviewNavigator";
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -160,13 +160,10 @@ export default class ActionStore extends Emitter {
    * Load the actions into the store without triggering the persist method
    * @param {array} actions
    */
-  load (actions) {
+  load (actions: Action[]) {
     for (let action of actions) {
       if (typeof action.payload === 'string') {
         action.payload = JSON.parse(action.payload)
-      }
-      if (typeof action.created_at === 'string') {
-        action.created_at = parseDate(action.created_at)
       }
       this.insertIntoStore(action)
     }
@@ -176,9 +173,9 @@ export default class ActionStore extends Emitter {
    * Add an action to the store. This will trigger the throttled persist method
    * @param action
    */
-  add (action: Action, location: any) {
+  add (action: Action, location: InterviewLocation) {
     action.sectionRepetition = location.sectionRepetition
-    action.sectionFollowUpRepetition = location.sectionFollowUpDatumRepetition
+    action.sectionFollowUpRepetition = location.sectionFollowUpRepetition
     action.createdAt = now()
     this.insertIntoStore(action)
     this.emit('change', this.store)
@@ -203,7 +200,7 @@ export default class ActionStore extends Emitter {
   /**
    * Get all actions for a page
    */
-  getLocationActions (location: any) {
+  getLocationActions (location: InterviewLocation) {
     // TODO: Should handle sectionRepetition and sectionFollowUpRepetition too
     return this.store.filter(action => action.section === location.section && action.page === location.page)
   }

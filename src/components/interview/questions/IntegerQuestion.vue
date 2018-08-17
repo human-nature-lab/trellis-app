@@ -14,11 +14,12 @@
   import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
+  import Question from '../../../entities/trellis/Question'
   export default {
     name: 'integer-question',
     props: {
       question: {
-        type: Object,
+        type: Question,
         required: true
       }
     },
@@ -30,10 +31,10 @@
     },
     computed: {
       value: {
-        get: function () {
+        get () {
           return this.question.datum.data.length ? this.question.datum.data[0].val : this._value
         },
-        set: function (val) {
+        set (val) {
           this._value = val
           this.action(AT.number_change, {
             val

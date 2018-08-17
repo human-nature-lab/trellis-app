@@ -15,6 +15,8 @@ export default class Choice extends TimestampedSoftDelete {
 
   choiceTranslation: Translation
 
+  parameters?: object // Assigned and used by InterviewManager
+
   fromSnakeJSON(json: object) {
     mapFromSnakeJSON(this, json, {
       choiceTranslation: Translation

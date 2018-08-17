@@ -69,8 +69,27 @@ export default class BaseEntity implements SnakeSerializable {
    * assign the props
    */
   copy () {
-    const constructor: any = this.constructor
-    return new constructor().fromJSON(JSON.parse(JSON.stringify(this)))
+    function recursiveCopy (old: any, includeSelf = false) {
+      if (!old) return old
+      else if (typeof old === 'object') {
+        if (includeSelf && old.copy && typeof old.copy === 'function') {
+          return old.copy()
+        } else {
+          let d = Object.assign( Object.create( Object.getPrototypeOf(old)), old)
+          for (let key in old) {
+            if (typeof old['key'] === 'object') {
+              d[key] = recursiveCopy(old[key], true)
+            }
+          }
+          return d
+        }
+      } else if (Array.isArray(old)) {
+        return old.map(o => recursiveCopy(o, true))
+      } else {
+        return old
+      }
+    }
+    return recursiveCopy(this)
   }
 
 }

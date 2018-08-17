@@ -1,6 +1,5 @@
 import config from '../config'
 import {APP_ENV} from '../static/constants'
-import singleton from '../static/singleton'
 import Vue from 'vue'
 
 export default Vue.mixin({

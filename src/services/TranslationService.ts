@@ -23,7 +23,7 @@ export default class TranslationService {
    * @returns {string|null}
    */
   static getTranslated (translation: Translation, locale: Locale): string {
-    translation = transformToTranslation(translation)
+    // translation = transformToTranslation(translation)
     if (locale) {
       if (translation.translationText) {
         let translationText = translation.translationText.find(tt => {
@@ -43,7 +43,7 @@ export default class TranslationService {
    * @returns {null|string}
    */
   static getAny (translation: Translation, locale: Locale = null) {
-    translation = transformToTranslation(translation)
+    // translation = transformToTranslation(translation)
     let translated = TranslationService.getTranslated(translation, locale)
     if (!translated) {
       let firstTrans = translation.translationText[0]

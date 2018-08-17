@@ -1,9 +1,10 @@
 import { makeValidationRules } from '../services/ValidatorService'
+import Vue from 'vue'
 
-export default {
+export default Vue.extend({
   computed: {
-    rules: function () {
-      return makeValidationRules(this.question, this.question.question_parameters)
+    rules () {
+      return makeValidationRules(this.question, this.question.questionParameters)
     }
   }
-}
+})

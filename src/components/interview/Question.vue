@@ -4,7 +4,7 @@
       <v-layout row>
         <v-spacer></v-spacer>
         <v-flex sm6 class="text-xs-right">
-          {{question.var_name}} : {{question.type.name}}
+          {{question.varName}} : {{question.questionType.name}}
         </v-flex>
       </v-layout>
       <!--<v-toolbar>-->
@@ -22,7 +22,7 @@
           :location="location" />
       </v-flex>
       <component
-        :is="typeMap[question.question_type_id]"
+        :is="typeMap[question.questionTypeId]"
         :question="question"
         :location="location"
         :respondent="interview.survey.respondent"></component>
@@ -95,7 +95,7 @@
     data: function () {
       return {
         typeMap: typeMap,
-        translation: this.question.question_translation,
+        translation: this.question.questionTranslation,
         hasChanged: false
       }
     },
@@ -106,7 +106,7 @@
     },
     computed: {
       validationError: function () {
-        if (!this.hasChanged || (this.question.dk_rf !== null && this.question.dk_rf !== undefined)) {
+        if (!this.hasChanged || (this.question.dkRf !== null && this.question.dkRf !== undefined)) {
           return null
         }
         return this.question.validationError

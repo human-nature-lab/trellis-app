@@ -163,12 +163,12 @@
       this.loadRosters(this.rosterIds)
     },
     methods: {
-      startEditingRow: function (row, index) {
+      startEditingRow (row, index) {
         this.newText = row.val
         this.oldText = row.val
         this.editingIndex = index
       },
-      stopEditingAndSave: function (row, index) {
+      stopEditingAndSave (row, index) {
         this.isSavingEdit = true
         row.val = this.newText
         RosterService.editRosterRow(row).then(newRow => {
@@ -182,19 +182,19 @@
           this.editingIndex = -1
         })
       },
-      stopEditingAndRevert: function (row, index) {
+      stopEditingAndRevert (row, index) {
         row.val = this.oldText
         this.oldText = null
         this.newText = null
         this.editingIndex = -1
       },
-      stopAddingWithoutSaving: function () {
+      stopAddingWithoutSaving () {
         this.isSavingNew = false
         this.isAddingNew = false
         this.newText = null
         this.oldText = null
       },
-      stopAddingAndSave: function () {
+      stopAddingAndSave () {
         this.isSavingNew = true
         RosterService.createRosterRows([this.newText]).then(rows => {
           for (let row of rows) {
@@ -211,12 +211,12 @@
           this.newText = null
         })
       },
-      removeRosterRow: function (row) {
+      removeRosterRow (row) {
         this.action(AT.remove_roster_row, {
           roster_id: row.id
         })
       },
-      loadRosters: function (rosterRowIds, shouldLoadExisting = false) {
+      loadRosters (rosterRowIds, shouldLoadExisting = false) {
         if (!rosterRowIds.length) return
         if (!shouldLoadExisting) {
           rosterRowIds = rosterRowIds.filter(row => !this.rosterCache[row.id]) // Filter out previously loaded roster rows
@@ -231,10 +231,10 @@
       }
     },
     computed: {
-      rosterIds: function () {
-        return this.question.datum.data.map(datum => datum.roster_id)
+      rosterIds () {
+        return this.question.datum.data.map(d => d.rosterId)
       },
-      roster: function () {
+      roster () {
         console.log('recalculating roster values')
         let toLoad = []
         let rows = this.rosterIds.map(id => {

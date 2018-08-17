@@ -3,6 +3,7 @@ import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import ConditionTag from "./ConditionTag";
+import {now} from '../../services/DateService'
 
 export default class RespondentConditionTag extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
@@ -22,12 +23,24 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
     this.conditionTagId = id
   }
 
-  fromSnakeJSON(json: object) {
-    mapFromSnakeJSON(this, json, {
-      condition_tag: ConditionTag
-    })
-    super.fromSnakeJSON(json)
+  fromRecycler (id, respondentId, conditionTagId) {
+    this.id = id
+    this.respondentId = respondentId
+    this.conditionTagId = conditionTagId
+    this.updatedAt = now()
+    this.createdAt = now()
     return this
+  }
+
+  fromSnakeJSON(json: object) {
+    debugger
+    mapFromSnakeJSON(this, json, {
+      conditionTag: {
+        constructor: ConditionTag,
+        jsonKey: 'condition'
+      }
+    })
+    return super.fromSnakeJSON(json)
   }
 
 }
