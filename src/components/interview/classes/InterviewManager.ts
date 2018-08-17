@@ -1,33 +1,61 @@
 import SkipService from '../services/SkipService'
 import actionManager from '../services/actions/InterviewActionDefinitions'
-import ConditionAssignmentService from '@/services/ConditionAssignmentService'
+import ConditionAssignmentService from '../../../services/ConditionAssignmentService'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
 import ConditionTagStore from './ConditionTagStore'
 import RespondentFillStore from './RespondentFillStore'
 import dataPersistSlave from '../services/DataPersistSlave'
 import actionsPersistSlave from '../services/ActionsPersistSlave'
-import Emitter from '@/classes/Emitter'
+import Emitter from '../../../classes/Emitter'
 
 import InterviewNavigator from '../services/InterviewNavigator'
 import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
+import Form from '../../../entities/trellis/Form'
+import QuestionDatum from '../../../entities/trellis/QuestionDatum'
+import Action from '../../../entities/trellis/Action'
+import ConditionTagInterface from '../../../services/condition-tag/ConditionTagInterface'
+import RespondentFill from '../../../entities/trellis/RespondentFill'
+import Question from '../../../entities/trellis/Question'
+import Page from '../../../entities/trellis/QuestionGroup'
+import Section from '../../../entities/trellis/Section'
+import PersistSlave from '../../../classes/PersistSlave'
+import Interview from "../../../entities/trellis/Interview";
 
-export default class Interview extends Emitter {
-  constructor (interview, blueprint, actions, data, conditionTags, respondentFills) {
+
+export default class InterviewManager extends Emitter {
+
+  navigator: InterviewNavigator
+  _dataPersistSlave: PersistSlave
+  _actionsPersistSlave: PersistSlave
+
+  // Indexes and data stores
+  respondentFills: RespondentFillStore = new RespondentFillStore()
+  conditionAssigner: ConditionAssignmentService = new ConditionAssignmentService()
+  varNameIndex: Map<string, string> = new Map()
+  questionIndex: Map<string, Question> = new Map()
+  questionIdToSectionIndex: Map<string, Section> = new Map()
+  questionIdToPageIndex: Map<string, Page> = new Map()
+
+  data: DataStore
+  actions: ActionStore
+
+  private _isReplaying: boolean
+
+  constructor (
+    public interview: Interview,
+    public blueprint: Form,
+    actions?: Action[],
+    data?: QuestionDatum[],
+    conditionTags?: ConditionTagInterface,
+    respondentFills?: RespondentFill[]
+  ) {
     super()
-    this.interview = interview
-    this.blueprint = blueprint
 
     // Indexes and data stores
-    this.respondentFills = new RespondentFillStore()
-    this.conditionAssigner = new ConditionAssignmentService()
-    this.varNameIndex = new Map()
-    this.questionIndex = new Map()
-    this.questionIdToSectionIndex = new Map()
-    this.questionIdToPageIndex = new Map()
 
     // Initializing all the custom data types
     this._loadBlueprint(blueprint)
@@ -119,9 +147,9 @@ export default class Interview extends Emitter {
 
   /**
    * Play an array of actions
-   * @param {Array} actions - The array of actions to play
+   * @param {Action[]} actions - The array of actions to play
    */
-  playActions (actions) {
+  playActions (actions: Action[]) {
     const locationMatches = action => {
       return this.actions.getActionSection(action) === this.location.section &&
         this.actions.getActionPage(action) === this.location.page &&
@@ -150,7 +178,7 @@ export default class Interview extends Emitter {
    * All user created actions should go through this method so that the actions are stored
    * @param {Action} action - The action without location information
    */
-  pushAction (action) {
+  pushAction (action: Action) {
     action.interviewId = this.interview.id
     this.actions.add(action, this.location)
     this.performAction(action, true)
@@ -161,7 +189,7 @@ export default class Interview extends Emitter {
    * @param {Action} action
    * @param {Boolean} [actionWasInitiatedByAHuman = false]
    */
-  performAction (action, actionWasInitiatedByAHuman = false) {
+  performAction (action: Action, actionWasInitiatedByAHuman: boolean = false) {
     let questionDatum = null
     let questionBlueprint = null
     if (action.questionId) {
@@ -181,36 +209,35 @@ export default class Interview extends Emitter {
    * @param {Object} blueprint
    * @private
    */
-  _loadBlueprint (blueprint) {
+  _loadBlueprint (blueprint: Form) {
     this.blueprint = Object.assign({}, blueprint)
     ConditionTagStore.clear()
     this.varNameIndex.clear()
     this.questionIndex.clear()
     // Sort all levels
     this.blueprint.sections.sort((sectionA, sectionB) => {
-      return sectionA.form_sections[0].sort_order - sectionB.form_sections[0].sort_order
+      return sectionA.formSections[0].sortOrder - sectionB.formSections[0].sortOrder
     })
 
     for (let s = 0; s < this.blueprint.sections.length; s++) {
       let section = this.blueprint.sections[s]
-      section.maxRepetitions = section.form_sections[0].max_repetitions
-      section.isRepeatable = parseInt(section.form_sections[0].is_repeatable, 10) === 1
-      section.followUpQuestionId = section.form_sections[0].follow_up_question_id
-      section.question_groups.sort((pageA, pageB) => {
-        return pageA.pivot.question_group_order - pageB.pivot.question_group_order
+      section.isRepeatable = section.formSections[0].isRepeatable
+      section.maxRepetitions = section.formSections[0].maxRepetitions
+      section.followUpQuestionId = section.formSections[0].followUpQuestionId
+      section.questionGroups.sort((pageA, pageB) => {
+        return pageA.sectionQuestionGroup.questionGroupOrder - pageB.sectionQuestionGroup.questionGroupOrder
       })
-      for (let page of section.question_groups) {
+      for (let page of section.questionGroups) {
         page.skips.sort((skipA, skipB) => skipA.precedence - skipB.precedence)
         page.questions.sort((questionA, questionB) => {
-          return questionA.sort_order - questionB.sort_order
+          return questionA.sortOrder - questionB.sortOrder
         })
         for (let question of page.questions) {
-          this.varNameIndex.set(question.var_name, question.id)
+          this.varNameIndex.set(question.varName, question.id)
           this.questionIndex.set(question.id, question)
-          question.section = s
           if (question.choices) {
             question.choices.sort((cA, cB) => {
-              return cA.pivot.sort_order - cB.pivot.sort_order
+              return cA.sortOrder - cB.sortOrder
             })
           }
           this.questionIdToSectionIndex.set(question.id, section)
@@ -218,7 +245,6 @@ export default class Interview extends Emitter {
           this._assignParameters(question)
         }
       }
-      section.pages = section.question_groups
     }
   }
 
@@ -229,7 +255,7 @@ export default class Interview extends Emitter {
    */
   _assignParameters (question) {
     question.parameters = {}
-    for (let p of question.question_parameters) {
+    for (let p of question.questionParameters) {
       switch (p.parameter.name) {
         case 'other':
         case 'other_exclusive':
@@ -255,10 +281,10 @@ export default class Interview extends Emitter {
   _initializeConditionAssignment () {
     this.conditionAssigner.clear()
     this.blueprint.sections.forEach(section => {
-      section.question_groups.forEach(page => {
+      section.pages.forEach(page => {
         page.questions.forEach(question => {
-          question.assign_condition_tags.forEach(act => {
-            ConditionTagStore.add(act.condition)
+          question.assignConditionTags.forEach(act => {
+            ConditionTagStore.add(act.conditionTag)
             this.conditionAssigner.register(act.id, act.logic)
           })
         })
@@ -273,7 +299,7 @@ export default class Interview extends Emitter {
    */
   _findQuestionBlueprint (questionId) {
     for (let section of this.blueprint.sections) {
-      for (let page of section.question_groups) {
+      for (let page of section.questionGroups) {
         for (let question of page.questions) {
           if (questionId === question.id) {
             return question
@@ -324,10 +350,10 @@ export default class Interview extends Emitter {
    * @param questionDatum
    */
   deleteAllQuestionDatumData (questionDatum) {
-    let qDatum = this.data.find(qDatum => qDatum.id === questionDatum.id)
-    if (qDatum) {
-      qDatum.data = []
-    }
+    // let qDatum = this.data.find(qDatum => qDatum.id === questionDatum.id)
+    // if (qDatum) {
+    //   qDatum.data = []
+    // }
   }
 
   /**
@@ -336,7 +362,7 @@ export default class Interview extends Emitter {
    * @private
    */
   _getCurrentPageData () {
-    return this.data.get(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    // return this.data.get(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
   }
 
   /**
@@ -397,21 +423,21 @@ export default class Interview extends Emitter {
       if (!question.datum || !question.datum.data) {
         throw Error('question datum and data should already exist!')
       }
-      switch (question.question_type.name) {
+      switch (question.questionType.name) {
         case 'multiple_select':
         case 'relationship':
         case 'geo':
         case 'photo':
-          vars[question.var_name] = question.datum.data.map(datum => datum.val)
+          vars[question.varName] = question.datum.data.map(datum => datum.val)
           break
         default:
-          vars[question.var_name] = question.datum.data.length ? question.datum.data[0].val : undefined
+          vars[question.varName] = question.datum.data.length ? question.datum.data[0].val : undefined
       }
       return vars
     }, {})
     console.log('condition assignment vars', vars)
     for (let question of questionsWithData) {
-      for (let act of question.assign_condition_tags) {
+      for (let act of question.assignConditionTags) {
         try {
           if (this.conditionAssigner.run(act.id, vars)) {
             console.log('assigning', act)
@@ -454,11 +480,11 @@ export default class Interview extends Emitter {
     let data = this.data.getQuestionDatumById(questionDatumId).data
     if (useRandom) {
       data.sort(function (a, b) {
-        return a.random_val - b.random_val
+        return a['randomVal'] - b['randomVal']
       })
     } else {
       data.sort(function (a, b) {
-        return a.sort_val - b.sort_val
+        return a.sortOrder - b.sortOrder
       })
     }
     return data
@@ -697,7 +723,7 @@ export default class Interview extends Emitter {
     console.log('Getting question by varname', varName, sectionFollowUpRepetition)
     let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
     for (let qD of questionDatum) {
-      if (qD.data.findIndex(d => d.event_order === sectionFollowUpRepetition) > -1) {
+      if (qD.data.findIndex(d => d.eventOrder === sectionFollowUpRepetition) > -1) {
         return qD
       }
     }
@@ -724,7 +750,7 @@ export default class Interview extends Emitter {
       throw Error(`Can't handle follow up questions from repeated sections currently`)
     }
     qDatum.data.sort(function (a, b) {
-      return a.sort_val - b.sort_val
+      return a.sortOrder - b.sortOrder
     })
     return qDatum.data
   }
@@ -758,14 +784,19 @@ export default class Interview extends Emitter {
    * @returns {Interview}
    */
   copy () {
-    return new Interview(JSON.parse(JSON.stringify(this.interview)), JSON.parse(JSON.stringify(this.blueprint)), JSON.parse(JSON.stringify(this.data)))
+    return new InterviewManager(JSON.parse(JSON.stringify(this.interview)), JSON.parse(JSON.stringify(this.blueprint)), JSON.parse(JSON.stringify(this.data)))
   }
 }
 
 let sharedInterviewInstance = null
-export function sharedInterview (...args) {
+export function sharedInterview (interview: Interview,
+                                 blueprint: Form,
+                                 actions?: Action[],
+                                 data?: QuestionDatum[],
+                                 conditionTags?: ConditionTagInterface,
+                                 respondentFills?: RespondentFill[]) {
   if (!sharedInterviewInstance) {
-    sharedInterviewInstance = new Interview(...args)
+    sharedInterviewInstance = new InterviewManager(interview, blueprint, actions, data, conditionTags, respondentFills)
   }
   return sharedInterviewInstance
 }

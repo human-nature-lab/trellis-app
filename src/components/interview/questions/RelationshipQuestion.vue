@@ -11,7 +11,7 @@
       v-for="edge in edges">
       <v-avatar v-if="!edge.isLoading">
         <Photo
-          :photo="edge.target_respondent.photos.length ? edge.target_respondent.photos[0] : null"
+          :photo="edge.targetRespondent.photos.length ? edge.targetRespondent.photos[0] : null"
           :showAlt="false"
           :width="20"
           :height="20"/>
@@ -19,7 +19,7 @@
       <v-avatar v-if="edge.isLoading">
         <v-progress-circular indeterminate color="primary" />
       </v-avatar>
-      {{edge.isLoading ? 'Loading...' : edge.target_respondent.name}}
+      {{edge.isLoading ? 'Loading...' : edge.targetRespondent.name}}
     </v-chip>
     <v-btn
       :disabled="isQuestionDisabled"
@@ -81,7 +81,7 @@
     },
     computed: {
       canAddRespondent: function () {
-        return this.question.question_parameters.findIndex(p => {
+        return this.question.questionParameters.findIndex(p => {
           return p.parameter.name === 'can_add_respondent' && parseInt(p.val, 10) === 1
         }) > -1
       },
@@ -89,7 +89,7 @@
         return this.respondent.geos.find(geo => geo.pivot.is_current)
       },
       geoTypeParameterValue () {
-        let geoTypeParameter = this.question.question_parameters.find(p => parseInt(p.parameter_id, 10) === parameterTypes.geo_type)
+        let geoTypeParameter = this.question.questionParameters.find(p => parseInt(p.parameterId, 10) === parameterTypes.geo_type)
         return geoTypeParameter ? geoTypeParameter.val : null
       },
       baseRespondentFilters () {
@@ -120,11 +120,11 @@
       selectedRespondents: function () {
         console.log('recalculating selected respondents')
         return this.edges.map(edge => {
-          return edge.target_respondent_id
+          return edge.targetRespondentId
         })
       },
       selectLimit: function () {
-        for (let p of this.question.question_parameters) {
+        for (let p of this.question.questionParameters) {
           if (p.parameter.name === 'max_relationships') {
             return parseInt(p.val, 10)
           }
@@ -162,7 +162,7 @@
       },
       add: function (edgeId) {
         this.action(ActionTypes.add_edge, {
-          name: this.question.var_name,
+          name: this.question.varName,
           val: edgeId,
           edge_id: edgeId
         })
@@ -190,7 +190,7 @@
             this.add(edge.id)
           }
           for (let respondentId of removed) {
-            let edge = this.edges.find(edge => edge.target_respondent_id === respondentId)
+            let edge = this.edges.find(edge => edge.targetRespondentId === respondentId)
             this.remove(edge.id)
           }
         }).catch(err => {

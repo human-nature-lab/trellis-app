@@ -3,6 +3,7 @@ import uuidv4 from 'uuid/v4'
 import SortedArray from '../../../classes/SortedArray'
 import {now, parseDate} from '../../../services/DateService'
 import Action from "../../../entities/trellis/Action";
+import Form from "../../../entities/trellis/Form";
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -16,7 +17,7 @@ export default class ActionStore extends Emitter {
   private questionToPageIndex: Map<string, number>
   private questionToSectionIndex: Map<string, number>
 
-  constructor (blueprint) {
+  constructor (blueprint: Form) {
     super()
     this._createPageAndSectionIndexes(blueprint)
     this.sortedStore = new SortedArray((a: Action, b: Action) => {
@@ -65,14 +66,14 @@ export default class ActionStore extends Emitter {
    * Create indexes for both the form pages and sections. Improves sort performance.
    * @param {Object} blueprint - A sorted blueprint
    */
-  _createPageAndSectionIndexes (blueprint: any) {
+  _createPageAndSectionIndexes (blueprint: Form) {
     this.questionToPageIndex = new Map()
     this.questionToSectionIndex = new Map()
     for (let s = 0; s < blueprint.sections.length; s++) {
-      console.log('action section sort order', blueprint.sections[s].form_sections[0].sort_order)
-      for (let p = 0; p < blueprint.sections[s].question_groups.length; p++) {
-        console.log('action page sort order', blueprint.sections[s].question_groups[p].pivot.question_group_order)
-        for (let question of blueprint.sections[s].question_groups[p].questions) {
+      console.log('action section sort order', blueprint.sections[s].formSections[0].sortOrder)
+      for (let p = 0; p < blueprint.sections[s].pages.length; p++) {
+        console.log('action page sort order', blueprint.sections[s].pages[p].sectionQuestionGroup.questionGroupOrder)
+        for (let question of blueprint.sections[s].pages[p].questions) {
           this.questionToPageIndex.set(question.id, p)
           this.questionToSectionIndex.set(question.id, s)
         }

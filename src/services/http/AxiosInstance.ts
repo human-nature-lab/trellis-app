@@ -1,5 +1,5 @@
-import axios from 'axios'
-import config from '@/config'
+import axios, {AxiosInstance} from 'axios'
+import config from '../../config'
 import storage from '../../services/storage/StorageService'
 import router from '../../router'
 import singleton from '../../static/singleton'
@@ -23,7 +23,7 @@ export function removeToken () {
  * Create the default axios instance. Any authentication for the web app should probably be handled here if possible
  * @returns {Axios}
  */
-export default function defaultInstance () {
+export default function defaultInstance (): AxiosInstance {
   if (!axiosInstance) {
     axiosInstance = axios.create({
       baseURL: config.apiRoot + '/survey-view',

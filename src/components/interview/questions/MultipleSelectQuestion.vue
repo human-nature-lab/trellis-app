@@ -8,14 +8,14 @@
         :disabled="isQuestionDisabled"
         v-model="selected[choice.id]"
         @change="onChange(choice, selected[choice.id])">
-        <ChoiceText :translation="choice.choice_translation" :location="location" slot="label"/>
+        <ChoiceText :translation="choice.choiceTranslation" :location="location" slot="label"/>
       </v-checkbox>
       <radio-checkbox
         v-else
         :disabled="isQuestionDisabled"
         v-model="selected[choice.id]"
         @change="onChange(choice, selected[choice.id])">
-        <ChoiceText :translation="choice.choice_translation" :location="location" slot="label"/>
+        <ChoiceText :translation="choice.choiceTranslation" :location="location" slot="label"/>
       </radio-checkbox>
       <v-text-field
         v-if="showOtherText(choice)"
@@ -36,10 +36,10 @@
     name: 'multiple-select-question',
     mixins: [QuestionDisabledMixin, ActionMixin],
     computed: {
-      otherText: function () {
+      otherText () {
         return this.question.choices.reduce((agg, choice) => {
           if (choice.parameters && choice.parameters.other) {
-            let datum = this.question.datum.data.find(datum => datum.choice_id === choice.id)
+            let datum = this.question.datum.data.find(datum => datum.choiceId === choice.id)
             if (datum) {
               agg[choice.id] = datum.val
             }
@@ -47,9 +47,9 @@
           return agg
         }, {})
       },
-      selected: function () {
+      selected () {
         let selected = this.question.choices.reduce((agg, choice) => {
-          agg[choice.id] = this.question.datum.data.findIndex(datum => datum.choice_id === choice.id) > -1
+          agg[choice.id] = this.question.datum.data.findIndex(datum => datum.choiceId === choice.id) > -1
           return agg
         }, {})
         return selected

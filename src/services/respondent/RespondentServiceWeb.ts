@@ -4,7 +4,6 @@ import RespondentFill from "../../entities/trellis/RespondentFill";
 import Respondent from "../../entities/trellis/Respondent";
 import RespondentName from "../../entities/trellis/RespondentName";
 import RespondentGeo from "../../entities/trellis/RespondentGeo";
-import Geo from "../../entities/trellis/Geo";
 export class RespondentServiceWeb implements RespondentServiceInterface {
 
   async getRespondentFillsById (respondentId) {
@@ -64,7 +63,7 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
   removeName (respondentId, respondentNameId) {
     respondentId = encodeURIComponent(respondentId)
     respondentNameId = encodeURIComponent(respondentNameId)
-    return http().delete(`respondent/${respondentId}/name/${respondentNameId}`)
+    return http().delete(`respondent/${respondentId}/name/${respondentNameId}`).then(r => r.data)
   }
   createRespondent (studyId, name, geoId = null, associatedRespondentId = null) {
     return http().post(`study/${studyId}/respondent`, {
@@ -97,7 +96,7 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
   removeRespondentGeo (respondentId, respondentGeoId) {
     respondentId = encodeURIComponent(respondentId)
     respondentGeoId = encodeURIComponent(respondentGeoId)
-    return http().delete(`respondent/${respondentId}/geo/${respondentGeoId}`)
+    return http().delete(`respondent/${respondentId}/geo/${respondentGeoId}`).then(r => r.data)
   }
 }
 

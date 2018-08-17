@@ -12,4 +12,10 @@ export default class SectionQuestionGroup extends TimestampedSoftDelete {
   questionGroupId: string
   @Column({ type: 'integer' }) @Serializable
   questionGroupOrder: number
+
+  fromSnakeJSON (json: any) {
+    super.fromSnakeJSON(json)
+    this.questionGroupOrder = +this.questionGroupOrder
+    return this
+  }
 }

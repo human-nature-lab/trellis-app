@@ -14,8 +14,16 @@ export default class Section extends TimestampedSoftDelete {
   nameTranslationId: string
 
   nameTranslation: Translation
-  questionGroups: Array<QuestionGroup>
-  formSections: Array<FormSection>
+  questionGroups: QuestionGroup[]
+  formSections: FormSection[]
+
+  maxRepetitions?: number
+  isRepeatable?: boolean
+  followUpQuestionId?: string
+
+  get pages () {
+    return this.questionGroups
+  }
 
   fromSnakeJSON(json: object) {
     mapFromSnakeJSON(this, json, {

@@ -6,6 +6,9 @@ import QuestionType from "./QuestionType";
 import Translation from "./Translation";
 import Choice from "./Choice";
 import AssignConditionTag from "./AssignConditionTag";
+import QuestionParameter from "./QuestionParameter";
+import QuestionChoice from "./QuestionChoice";
+import QuestionDatum from "./QuestionDatum";
 
 @Entity()
 export default class Question extends TimestampedSoftDelete {
@@ -24,17 +27,27 @@ export default class Question extends TimestampedSoftDelete {
 
   questionType: QuestionType
   questionTranslation: Translation
-  choices: Choice[]
+  choices: QuestionChoice[]
   assignConditionTags: AssignConditionTag[]
+  questionParameters: QuestionParameter[]
+
+  datum?: QuestionDatum           // Assigned and used by InterviewManager only
+  parameters?: object             // Assigned and used by InterviewManager only
+
+  toJSON () {
+    return this
+  }
 
   fromSnakeJSON(json: any) {
     mapFromSnakeJSON(this, json, {
       questionType: QuestionType,
       questionTranslation: Translation,
-      choices: Choice,
-      assignConditionTags: AssignConditionTag
+      choices: QuestionChoice,
+      assignConditionTags: AssignConditionTag,
+      questionParameters: QuestionParameter
     })
     super.fromSnakeJSON(json)
+    this.sortOrder = +this.sortOrder
     return this
  }
 }
