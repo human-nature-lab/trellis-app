@@ -4,7 +4,7 @@
 
 <script>
   import RouteMixinFactory from '../mixins/RoutePreloadMixin'
-  import CensusService from '../services/census'
+  import CensusService from '../services/census/index'
   import SurveyService from '../services/survey'
   import InterviewService from '../services/interview/InterviewService'
   import router from '../router'

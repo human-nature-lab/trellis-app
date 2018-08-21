@@ -89,7 +89,7 @@
   // @ts-ignore
   import Permission from '../Permission'
   import RespondentService from '../../services/respondent/RespondentService'
-  import CensusFormService from '../../services/census'
+  import CensusFormService from '../../services/census/index'
   import CensusTypes from '../../static/census.types'
   import Respondent from "../../entities/trellis/Respondent"
   import RespondentGeo from "../../entities/trellis/RespondentGeo"

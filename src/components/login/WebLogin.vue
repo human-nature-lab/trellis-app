@@ -52,7 +52,7 @@
 </template>
 
 <script>
-  import LoginService from '../../services/login/LoginService'
+  import LoginService from '../../services/login'
   import UserService from '../../services/user/UserService'
   import router from '../../router'
   export default {

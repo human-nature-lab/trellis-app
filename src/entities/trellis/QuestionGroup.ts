@@ -8,7 +8,7 @@ import Skip from "./Skip";
 
 @Entity()
 export default class QuestionGroup extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable @Serializable
+  @PrimaryGeneratedColumn() @Serializable
   id: string
 
   questions: Question[]

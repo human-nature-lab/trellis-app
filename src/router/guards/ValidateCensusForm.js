@@ -1,4 +1,4 @@
-import CensusFormService from '../../services/census'
+import CensusFormService from '../../services/census/index'
 import router from '../index'
 
 export default function ValidateCensusForm (to, from, next) {

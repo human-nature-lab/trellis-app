@@ -46,7 +46,7 @@
 <script>
   import LocaleService from '../../services/locale/LocaleService'
   import RespondentService from '../../services/respondent/RespondentService'
-  import CensusFormService from '../../services/census'
+  import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import singleton from '../../static/singleton'
   import { pushRouteAndQueueCurrent } from '../../router'

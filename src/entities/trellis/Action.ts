@@ -23,10 +23,19 @@ export default class Action extends TimestampedSoftDelete implements SnakeSerial
   sectionRepetition: number
 
   toSnakeJSON () {
-    let json = mapCamelToPlain(this, true)
-    json['payload'] = this.payload // We don't do any case transformation for the payload
+    let d = super.toSnakeJSON()
+    if (typeof d['payload'] !== 'string') {
+      d['payload'] = JSON.stringify(d['payload'])
+    }
+    return d
+  }
+
+  fromSnakeJSON (json: any) {
     super.fromSnakeJSON(json)
-    return json
+    if (typeof this.payload === 'string') {
+      this.payload = JSON.parse(this.payload)
+    }
+    return this
   }
 
 }

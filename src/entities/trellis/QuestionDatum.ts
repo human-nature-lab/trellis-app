@@ -5,6 +5,7 @@ import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
 import {mapFromSnakeJSON, mapCamelToPlain} from "../../services/JSONUtil";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
+import {now} from '../../services/DateService'
 
 @Entity()
 export default class QuestionDatum extends TimestampedSoftDelete implements SnakeSerializable {
@@ -65,6 +66,8 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     this.interviewId = interviewId
     this.dkRfVal = dkRfVal
     this.dkRf = dkRf
+    this.createdAt = now()
+    this.updatedAt = now()
     return this
   }
 
@@ -80,7 +83,7 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   }
 
   toSnakeJSON () {
-    let d = mapCamelToPlain(this, true)
+    let d = super.toSnakeJSON()
     delete d['data']
     return d
   }

@@ -24,8 +24,10 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
 
   async saveActions (interviewId: string, actions: Action[]) {
     interviewId = encodeURI(interviewId)
+    let nActions = actions.map(a => a.toSnakeJSON())
+    debugger
     return http().post(`interview/${interviewId}/actions`, {
-      'actions': actions.map(a => a.toSnakeJSON())
+      'actions': nActions
     }).then(r => r.data)
   }
 
@@ -44,6 +46,7 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
   saveData (interviewId: string, diff: InterviewDeltaInterface) {
     interviewId = encodeURIComponent(interviewId)
     let d = diff.toSnakeJSON()
+    debugger
     return http().post(`interview/${interviewId}/data`, d).then(res => res.data)
   }
 

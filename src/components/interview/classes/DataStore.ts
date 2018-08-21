@@ -58,6 +58,7 @@ export default class DataStore extends Emitter {
    * @MOVE_TO_SERVICE_LAYER
    */
   loadData (data) {
+    debugger
     data = JSON.parse(JSON.stringify(data))
     let datum = []
     let questionDatum = []

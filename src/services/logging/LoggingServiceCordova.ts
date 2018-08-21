@@ -8,6 +8,8 @@ const writeToConsole = true
 
 class LoggingServiceCordova {
 
+  defaultOptions: object
+
   constructor (options) {
     this.defaultOptions = {}
     if (typeof options === 'object') {
