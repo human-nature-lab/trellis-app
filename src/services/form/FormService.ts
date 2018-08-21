@@ -1,7 +1,7 @@
 import switchByModeEnv from '../util'
 import FormServiceMock from './FormServiceMock'
 import FormServiceWeb from './FormServiceWeb'
-import FormServiceCordova from './FormServiceCordova'
+// import FormServiceCordova from './FormServiceCordova'
 
 export const FormService = switchByModeEnv({
   WEB: {
@@ -9,7 +9,7 @@ export const FormService = switchByModeEnv({
     TEST: FormServiceMock
   },
   CORDOVA: {
-    PROD: FormServiceCordova,
+    PROD: FormServiceMock, // TODO
     TEST: FormServiceMock
   }
 })

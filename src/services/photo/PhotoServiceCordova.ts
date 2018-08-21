@@ -44,7 +44,7 @@ export default class PhotoServiceCordova implements PhotoServiceInterface {
    * This method returns all undeleted photos from the Photo table
    * @returns {Promise<Array>}
    */
-  static async getPhotos () {
+  async getPhotos () {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Photo)
     return repository.find({ deletedAt: null })
