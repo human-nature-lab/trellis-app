@@ -1,9 +1,9 @@
-import switchByModeEnv from '@/services/util'
+import switchByModeEnv from '../util'
 import RespondentServiceWeb from './RespondentServiceWeb'
 import RespondentServiceCordova from './RespondentServiceCordova'
 import RespondentServiceMock from './RespondentServiceMock'
 
-let Constructor = switchByModeEnv({
+export const RespondentService = switchByModeEnv({
   WEB: {
     PROD: RespondentServiceWeb,
     TEST: RespondentServiceMock
@@ -14,6 +14,4 @@ let Constructor = switchByModeEnv({
   }
 })
 
-export const RespondentService = Constructor
-
-export default RespondentService
+export default new RespondentService()

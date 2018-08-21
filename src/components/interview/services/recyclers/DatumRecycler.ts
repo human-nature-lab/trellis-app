@@ -1,9 +1,18 @@
 import Recycler from '../../../../classes/Recycler'
-import uuidv4 from 'uuid/v4'
 import Datum from '../../../../entities/trellis/Datum'
-import {snakeToCamel} from '../../../../services/JSONUtil'
 import {now} from '../../../../services/DateService';
 import QuestionDatum from "../../../../entities/trellis/QuestionDatum";
+
+export interface DatumPayload {
+  name?: string
+  val?: string
+  sort_order?: number
+  choice_id?: string
+  geo_id?: string
+  edge_id?: string
+  photo_id?: string
+  roster_id?: string
+}
 
 class DatumRecycler extends Recycler<Datum> {
   keyExtractor (d: Datum) {
@@ -21,19 +30,20 @@ class DatumRecycler extends Recycler<Datum> {
       d.rosterId
     ].join('-')
   }
-  objectCreator (questionDatum: QuestionDatum, payload: object) {
+  objectCreator (questionDatum: QuestionDatum, payload: DatumPayload) {
     let maxEventOrder = Math.max(-1, ...questionDatum.data.map(d => d.eventOrder))
-    let datum = new Datum()
-    datum.id = uuidv4()
-    datum.questionDatumId = questionDatum.id
-    datum.eventOrder = maxEventOrder + 1 // start at 0
-    datum.createdAt = now()
-    datum.updatedAt = now()
-    for (let key in payload) {
-      let camel = snakeToCamel(key)
-      datum[camel] = payload[key]
-    }
-    return datum
+    return new Datum().fromRecycler(
+      questionDatum.surveyId,
+      questionDatum.id,
+      maxEventOrder + 1,
+      payload.val,
+      payload.sort_order,
+      payload.name,
+      payload.edge_id,
+      payload.geo_id,
+      payload.photo_id,
+      payload.roster_id
+    )
   }
 }
 

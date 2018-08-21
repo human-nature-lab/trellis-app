@@ -1,8 +1,9 @@
 import uuidv4 from 'uuid/v4'
-import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
+import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {Column, Entity} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
-import SnakeSerializable from "../interfaces/SnakeSerializable";
+import SnakeSerializable from '../interfaces/SnakeSerializable'
+import {now} from '../../services/DateService'
 
 @Entity()
 export default class Datum extends TimestampedSoftDelete implements SnakeSerializable {
@@ -17,7 +18,7 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   @Column() @Serializable
   public geoId: string;
   @Column() @Serializable
-  public id: string = uuidv4();
+  public id: string;
   @Column() @Serializable
   public name: string;
   @Column() @Serializable
@@ -32,4 +33,32 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   public surveyId: string;
   @Column() @Serializable
   public val: string;
+
+  fromRecycler (
+    surveyId: string,
+    questionDatumId: string,
+    eventOrder: number,
+    val: string,
+    sortOrder: number,
+    name: string,
+    edgeId: string,
+    geoId: string,
+    photoId: string,
+    rosterId: string
+  ){
+    this.id = uuidv4()
+    this.updatedAt = now()
+    this.createdAt = now()
+    this.surveyId = surveyId
+    this.questionDatumId = questionDatumId
+    this.eventOrder = eventOrder
+    this.val = val
+    this.sortOrder = sortOrder
+    this.name = name
+    this.edgeId = edgeId
+    this.geoId = geoId
+    this.photoId = photoId
+    this.rosterId = rosterId
+    return this
+  }
 }

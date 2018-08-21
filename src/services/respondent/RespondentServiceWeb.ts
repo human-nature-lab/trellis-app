@@ -1,10 +1,10 @@
 import http from '../http/AxiosInstance'
-import RespondentServiceInterface from "./RespondentServiceInterface";
-import RespondentFill from "../../entities/trellis/RespondentFill";
-import Respondent from "../../entities/trellis/Respondent";
-import RespondentName from "../../entities/trellis/RespondentName";
-import RespondentGeo from "../../entities/trellis/RespondentGeo";
-export class RespondentServiceWeb implements RespondentServiceInterface {
+import RespondentServiceInterface from './RespondentServiceInterface'
+import RespondentFill from '../../entities/trellis/RespondentFill'
+import Respondent from '../../entities/trellis/Respondent'
+import RespondentName from '../../entities/trellis/RespondentName'
+import RespondentGeo from '../../entities/trellis/RespondentGeo'
+export default class RespondentServiceWeb implements RespondentServiceInterface {
 
   async getRespondentFillsById (respondentId) {
     respondentId = encodeURIComponent(respondentId)
@@ -99,5 +99,3 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
     return http().delete(`respondent/${respondentId}/geo/${respondentGeoId}`).then(r => r.data)
   }
 }
-
-export default new RespondentServiceWeb()

@@ -124,7 +124,7 @@
 
 <script>
   import menuBus from './MenuBus'
-  import LoginService from '../../services/login/LoginService'
+  import LoginService from '../../services/login'
   import router from '../../router'
   import SingletonService from '../../services/singleton/SingletonService'
   import global from '../../static/singleton'

@@ -16,7 +16,7 @@
 
 <script>
   import RespondentService from '../../services/respondent/RespondentService'
-  import CensusFormService from '../../services/census'
+  import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import {pushRouteAndQueueCurrent} from '../../router'
   export default {
