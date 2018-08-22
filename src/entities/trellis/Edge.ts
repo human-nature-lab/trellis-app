@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Respondent from "./Respondent";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
@@ -13,14 +13,9 @@ export default class Edge extends TimestampedSoftDelete {
   @Column() @Serializable
   targetRespondentId: string
 
+  @Relationship(Respondent)
   targetRespondent: Respondent
+  @Relationship(Respondent)
   sourceRespondent: Respondent
 
-  fromSnakeJSON (json: any) {
-    mapFromSnakeJSON(this, json, {
-      sourceRespondent: Respondent,
-      targetRespondent: Respondent
-    })
-    return super.fromSnakeJSON(json)
-  }
 }

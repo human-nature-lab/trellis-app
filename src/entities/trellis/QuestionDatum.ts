@@ -2,7 +2,7 @@ import uuid from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import {mapFromSnakeJSON, mapCamelToPlain} from "../../services/JSONUtil";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 import {now} from '../../services/DateService'
@@ -30,7 +30,8 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   @Column() @Serializable
   public interviewId: string
 
-  data: Datum[] = []
+  @Relationship(Datum)
+  data: Datum[]
 
   /**
    * Called from the recycler
@@ -68,23 +69,8 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     this.dkRf = dkRf
     this.createdAt = now()
     this.updatedAt = now()
+    this.data = []
     return this
   }
 
-  fromSnakeJSON (json) {
-    mapFromSnakeJSON(this, json, {
-      data: {
-        constructor: Datum,
-        jsonKey: 'datum'
-      }
-    })
-    super.fromSnakeJSON(json)
-    return this
-  }
-
-  toSnakeJSON () {
-    let d = super.toSnakeJSON()
-    delete d['data']
-    return d
-  }
 }

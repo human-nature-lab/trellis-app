@@ -1,10 +1,10 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import Respondent from './Respondent'
+import Form from './Form'
+import Interview from './Interview'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
-import Respondent from "./Respondent";
-import Form from "./Form";
-import Interview from "./Interview";
 
 @Entity()
 export default class Survey extends TimestampedSoftDelete {
@@ -21,17 +21,18 @@ export default class Survey extends TimestampedSoftDelete {
   @Column({ type: 'datetime', nullable: true}) @Serializable
   completedAt: Date
 
+  @Relationship(Form)
   form: Form
+  @Relationship(Respondent)
   respondent: Respondent
-  interviews: Interview[]
+  // @Relationship(Interview)
+  interviews?: Interview[]
 
-  fromSnakeJSON(json: any) {
+  fromSnakeJSON (json) {
     mapFromSnakeJSON(this, json, {
-      form: Form,
-      respondent: Respondent,
       interviews: Interview
     })
-    super.fromSnakeJSON(json)
-    return this
- }
+    return super.fromSnakeJSON(json)
+  }
+
 }

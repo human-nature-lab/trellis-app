@@ -1,14 +1,13 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {AsDate, Serializable} from '../TypeOrmDecorators'
+import {AsDate, Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Survey from "./Survey";
 import User from "./User";
 
 @Entity()
-export default class Interview extends TimestampedSoftDelete {
+export class Interview extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
-  public id: string
+  id: string
   @Column() @Serializable
   surveyId: string
   @Column({ nullable: true }) @Serializable
@@ -28,15 +27,14 @@ export default class Interview extends TimestampedSoftDelete {
   @Column({ type: 'datetime', nullable: true }) @Serializable @AsDate
   completedAt: Date
 
+  @Relationship(Survey)
   survey: Survey
+  @Relationship(User)
   user: User
 
-  fromSnakeJSON(json: any) {
-    mapFromSnakeJSON(this, json, {
-      survey: Survey,
-      user: User
-    })
-    super.fromSnakeJSON(json)
-    return this
- }
+  fromSnakeJSON (json) {
+    return super.fromSnakeJSON(json)
+  }
 }
+
+export default Interview

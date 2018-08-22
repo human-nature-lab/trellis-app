@@ -742,7 +742,7 @@ export default class InterviewManager extends Emitter {
    * @returns {Interview}
    */
   copy () {
-    return new InterviewManager(JSON.parse(JSON.stringify(this.interview)), JSON.parse(JSON.stringify(this.blueprint)), JSON.parse(JSON.stringify(this.data)))
+    return new InterviewManager(this.interview.copy(), this.blueprint.copy(), [], this.data.copy())
   }
 }
 

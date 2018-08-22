@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import Geo from "./Geo";
@@ -19,24 +19,20 @@ export default class RespondentGeo extends TimestampedSoftDelete {
   @Column() @Serializable
   isCurrent: boolean
 
+  @Relationship(Geo)
   geo: Geo
 
   fromSnakeJSON(json: any) {
-    const snakeCols = ['id', 'geo_id', 'respondent_id', 'previous_respondent_geo_id', 'notes', 'is_current', 'updated_at', 'created_at', 'deleted_at']
     // I hate that this is necessary, but the json comes in two different forms
     if (json.pivot) {
-      mapPropsFromJSON(this, json.pivot, snakeCols)
+      super.fromSnakeJSON(json.pivot)
       this.geo = new Geo().fromSnakeJSON(json)
       if (!this.geoId) {
         this.geoId = this.geo.id
       }
     } else {
-      mapPropsFromJSON(this, json, snakeCols)
-      mapFromSnakeJSON(this, json, {
-        geo: Geo
-      })
+      super.fromSnakeJSON(json)
     }
-    super.parseDates()
     return this
  }
 }

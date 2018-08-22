@@ -13,8 +13,14 @@
   import RespondentGeos from '../../respondent/RespondentGeos'
   import AT from '../../../static/action.types'
   import ActionMixin from '../mixins/ActionMixin'
+  import global from '../../../static/singleton'
   export default {
     name: 'respondent-geo-question',
+    data () {
+      return {
+        global
+      }
+    },
     props: {
       question: {
         type: Object,
@@ -28,19 +34,19 @@
     methods: {
       afterMove (resGeo) {
         this.action(AT.respondent_move, {
-          respondent_geo_id: resGeo.pivot.id,
+          respondent_geo_id: resGeo.id,
           val: 'Move respondent'
         })
       },
       afterAdd (resGeo) {
         this.action(AT.respondent_add_geo, {
-          respondent_geo_id: resGeo.pivot.id,
+          respondent_geo_id: resGeo.id,
           val: 'Add respondent geo'
         })
       },
       afterRemove (resGeo) {
         this.action(AT.respondent_remove_geo, {
-          respondent_geo_id: resGeo.pivot.id,
+          respondent_geo_id: resGeo.id,
           val: 'Remove respondent geo'
         })
       }

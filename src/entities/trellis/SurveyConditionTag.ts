@@ -1,5 +1,5 @@
 import {Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 import ConditionTag from "./ConditionTag";
@@ -16,6 +16,10 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
   @Column() @Serializable
   interviewId: string
 
+  @Relationship({
+    constructor: ConditionTag,
+    jsonKey: 'condition'
+  })
   conditionTag: ConditionTag
 
   /**
@@ -41,15 +45,5 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
       // TODO: Lookup and assign the condition tag
     }
     return this
-  }
-
-  fromSnakeJSON (json: any) {
-    mapFromSnakeJSON(this, json, {
-      conditionTag: {
-        constructor: ConditionTag,
-        jsonKey: 'condition'
-      }
-    })
-    return super.fromSnakeJSON(json)
   }
 }

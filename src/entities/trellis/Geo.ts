@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import GeoType from "./GeoType";
@@ -22,15 +22,9 @@ export default class Geo extends TimestampedSoftDelete {
   @Column() @Serializable
   nameTranslationId: string
 
+  @Relationship(GeoType)
   geoType: GeoType
+  @Relationship(Translation)
   nameTranslation: Translation
 
-  fromSnakeJSON(json: object) {
-    mapFromSnakeJSON(this, json, {
-      geoType: GeoType,
-      nameTranslation: Translation
-    })
-    super.fromSnakeJSON(json)
-    return this
- }
 }

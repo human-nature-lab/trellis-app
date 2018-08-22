@@ -1,5 +1,5 @@
 import {CreateDateColumn, UpdateDateColumn} from 'typeorm'
-import {AsDate, Serializable} from '../TypeOrmDecorators'
+import {AsDate, Serializable} from '../WebOrmDecorators'
 import BaseEntity from './BaseEntity'
 
 export default abstract class Timestamped extends BaseEntity {
