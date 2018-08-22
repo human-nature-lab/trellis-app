@@ -1,3 +1,6 @@
+import {AssignerFunction, RelationshipOpts} from '../entities/WebOrmDecorators'
+import moment from 'moment'
+
 /**
  * Convert a camel case string into snake case
  * @param {string} str
@@ -67,36 +70,6 @@ export function mapPropsFromJSON (target: object, source: object, map?: object |
   }
 }
 
-
-/**
- * Create getters and setters for all properties defined on this object
- * @param {object} target
- */
-export function createSnakeCaseAliases (target: object) {
-  const props = Object.getOwnPropertyNames(target)
-  for (let prop of props) {
-    let snake = camelToSnake(prop)
-    if (snake !== prop) {
-      (camelCase => {
-        Object.defineProperty(target, snake, {
-          get() {
-            return target[camelCase]
-          },
-          set (val) {
-            target[camelCase] = val
-          }
-        })
-      })(prop)
-    }
-  }
-}
-
-interface KeyMapOpts {
-  jsonKey?: string
-  constructor? (): void
-  generator? (json): any
-}
-
 /**
  * Take a snake key for the json source and apply it to the target (in camel case) if the property is defined. If the
  * the source is an Array, the map method will be used to map each member of the array to the appropriate class.
@@ -106,22 +79,35 @@ interface KeyMapOpts {
  */
 export function mapFromSnakeJSON (target: object, source: object, keyMap: object) {
   for (let targetKey in keyMap) {
+    let opts = keyMap[targetKey] as RelationshipOpts
+    getSnakeAssignmentFunc(targetKey, opts)(target, source)
+  }
+}
+
+/**
+ * Create a function which will assign the relationship to the source object when it is called
+ * @param {string} sourceKey
+ * @param {string} targetKey
+ * @param {RelationshipOpts} opts
+ * @returns {AssignerFunction}
+ */
+export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpts): AssignerFunction {
+  return function Assigner (to, from) {
+    let generator
     let sourceKey = camelToSnake(targetKey)
-    let opts = keyMap[targetKey] as KeyMapOpts
-    let generator = s => new keyMap[targetKey]().fromSnakeJSON(s)
     if (typeof opts === 'object') {
+      if (targetKey === 'interviews') debugger
       generator = opts.hasOwnProperty('constructor') ? s => {
         let d = new opts.constructor()
         return d.fromSnakeJSON ? d.fromSnakeJSON(s): d
       } : opts.generator
       if (opts.jsonKey) sourceKey = opts.jsonKey
+    } else if (typeof opts === 'function') {
+      // @ts-ignore
+      generator = s => new opts().fromSnakeJSON(s)
     }
-    if (source[sourceKey]) {
-      if (Array.isArray(source[sourceKey])) {
-        target[targetKey] = source[sourceKey].map(generator)
-      } else {
-        target[targetKey] = generator(source[sourceKey])
-      }
+    if (from[sourceKey] !== null && from[sourceKey] !== undefined) {
+      to[targetKey] = Array.isArray(from[sourceKey]) ? from[sourceKey].map(generator) : generator(from[sourceKey])
     }
   }
 }
@@ -159,5 +145,36 @@ export function mapCamelToPlain (source: any, skipSnakeJSON = false, keyMap?: st
     }
   } else {
     return source
+  }
+}
+
+/**
+ * Recursive, deep copy of any object
+ * @param obj
+ * @returns {any}
+ */
+export function deepCopy (obj: any, copySelf: boolean = false): any {
+  if (obj === null || obj === undefined) {
+    return obj
+  } else if (Array.isArray(obj)) {
+    return obj.map(o => deepCopy(o, true))
+  } else if (obj instanceof Date || moment.isMoment(obj)) {
+    return moment(obj)
+  } else if (typeof obj === 'object') {
+    if (obj.copy && copySelf) {
+      return obj.copy()
+    } else if (obj.constructor) {
+      let d = new obj.constructor()
+      for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          d[key] = deepCopy(obj[key], true)
+        }
+      }
+      return d
+    } else {
+      return Object.assign({}, obj)
+    }
+  } else {
+    return obj
   }
 }

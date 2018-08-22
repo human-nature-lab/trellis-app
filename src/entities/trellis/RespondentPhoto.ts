@@ -1,7 +1,6 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Photo from "./Photo";
 
 @Entity()
@@ -17,13 +16,7 @@ export default class RespondentPhoto extends TimestampedSoftDelete {
   @Column({ type: 'text', nullable: true }) @Serializable
   notes: string
 
+  @Relationship(Photo)
   photo: Photo
 
-  fromSnakeJSON(json: object) {
-    mapFromSnakeJSON(this, json, {
-      photo: Photo
-    })
-    super.fromSnakeJSON(json)
-    return this
- }
 }

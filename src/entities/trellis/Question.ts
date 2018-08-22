@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import QuestionType from "./QuestionType";
@@ -25,27 +25,21 @@ export default class Question extends TimestampedSoftDelete {
   @Column() @Serializable
   varName: string
 
+  @Relationship(QuestionType)
   questionType: QuestionType
+  @Relationship(Translation)
   questionTranslation: Translation
+  @Relationship(QuestionChoice)
   choices: QuestionChoice[]
+  @Relationship(AssignConditionTag)
   assignConditionTags: AssignConditionTag[]
+  @Relationship(QuestionParameter)
   questionParameters: QuestionParameter[]
 
   datum?: QuestionDatum           // Assigned and used by InterviewManager only
   parameters?: object             // Assigned and used by InterviewManager only
 
-  toJSON () {
-    return this
-  }
-
   fromSnakeJSON(json: any) {
-    mapFromSnakeJSON(this, json, {
-      questionType: QuestionType,
-      questionTranslation: Translation,
-      choices: QuestionChoice,
-      assignConditionTags: AssignConditionTag,
-      questionParameters: QuestionParameter
-    })
     super.fromSnakeJSON(json)
     this.sortOrder = +this.sortOrder
     return this

@@ -1,5 +1,5 @@
 import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 
 @Entity("photo")

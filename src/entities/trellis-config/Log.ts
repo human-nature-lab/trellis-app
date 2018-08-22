@@ -1,5 +1,5 @@
 import {PrimaryColumn, Entity, Column} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Serializable} from '../WebOrmDecorators'
 
 @Entity("log")
 export default class Log {

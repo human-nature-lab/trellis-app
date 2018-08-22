@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Translation from "./Translation";
@@ -13,15 +13,8 @@ export default class Choice extends TimestampedSoftDelete {
   @Column() @Serializable
   val: string
 
+  @Relationship(Translation)
   choiceTranslation: Translation
 
   parameters?: object // Assigned and used by InterviewManager
-
-  fromSnakeJSON(json: object) {
-    mapFromSnakeJSON(this, json, {
-      choiceTranslation: Translation
-    })
-    super.fromSnakeJSON(json)
-    return this
-  }
 }

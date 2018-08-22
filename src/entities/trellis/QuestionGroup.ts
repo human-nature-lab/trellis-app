@@ -1,7 +1,6 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Entity, PrimaryGeneratedColumn} from 'typeorm'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Question from "./Question";
 import SectionQuestionGroup from "./SectionQuestionGroup";
 import Skip from "./Skip";
@@ -11,20 +10,14 @@ export default class QuestionGroup extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
 
+  @Relationship(Question)
   questions: Question[]
+  @Relationship({
+    constructor: SectionQuestionGroup,
+    jsonKey: 'pivot'
+  })
   sectionQuestionGroup: SectionQuestionGroup
+  @Relationship(Skip)
   skips: Skip[]
 
-  fromSnakeJSON(json: object) {
-    mapFromSnakeJSON(this, json, {
-      questions: Question,
-      skips: Skip,
-      sectionQuestionGroup: {
-        constructor: SectionQuestionGroup,
-        jsonKey: 'pivot'
-      }
-    })
-    super.fromSnakeJSON(json)
-    return this
- }
 }

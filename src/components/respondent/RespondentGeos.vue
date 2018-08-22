@@ -163,8 +163,7 @@
           this.showProgressDialog = false
         })
       },
-      moveGeo (respondentGeo: RespondentGeo, geo): Promise<void> {
-        debugger
+      moveGeo (respondentGeo: RespondentGeo, geo: Geo): Promise<void> {
         return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.id, geo.id).then(resGeo => {
           let index = this.respondent.geos.findIndex(rg => rg.id === respondentGeo.id)
           this.respondent.geos.splice(index, 1, resGeo)

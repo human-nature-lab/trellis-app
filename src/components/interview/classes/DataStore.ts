@@ -59,21 +59,23 @@ export default class DataStore extends Emitter {
    */
   loadData (data) {
     debugger
-    data = JSON.parse(JSON.stringify(data))
+    // data = JSON.parse(JSON.stringify(data))
+    let oData = data
+    data = data.map(c => c.copy())
     let datum = []
     let questionDatum = []
     for (let d of data) {
-      d.section_repetition = parseInt(d.section_repetition, 10)
       for (let dat of d.data) {
         datum.push(dat)
       }
       this.add(d, false)
-      d = JSON.parse(JSON.stringify(d))
+      // d = JSON.parse(JSON.stringify(d))
+      d = d.copy()
       d.data = []
       questionDatum.push(d)
     }
-    QuestionDatumRecycler.fill(questionDatum.map(qD => new QuestionDatum().fromSnakeJSON(qD)))
-    DatumRecycler.fill(datum.map(d => new Datum().fromSnakeJSON(d)))
+    QuestionDatumRecycler.fill(questionDatum)
+    DatumRecycler.fill(datum)
   }
 
   /**
@@ -244,6 +246,11 @@ export default class DataStore extends Emitter {
   getQuestionDatumById (id: string) {
     return this.questionDatumIdMap.get(id)
   }
+
+  /**
+   * TODO: Copy the datastore into a new version
+   */
+  copy () {return []}
 }
 
 /**
