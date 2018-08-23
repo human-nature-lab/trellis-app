@@ -3,7 +3,7 @@ import WebLogin from '../components/login/WebLogin.vue'
 
 export default [{
   path: '/',
-  name: 'Sync',
+  name: 'Home',
   component: Sync
 }, {
   path: '/sync',

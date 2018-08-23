@@ -11,7 +11,7 @@ export default [{
   component: WebLogin
 }, {
   path: '/',
-  name: 'Home',
+  name: 'StudySelector',
   component: StudySelectorPage
 }, {
   path: '/form/:formId/preview',
