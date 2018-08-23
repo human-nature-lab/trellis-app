@@ -26,7 +26,6 @@ export default class BaseEntity implements SnakeSerializable {
     for (let o of relationships) {
       let [key, assigner] = o
       assigner(this, json)
-      console.log(key)
     }
     return this
   }
