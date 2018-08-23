@@ -23,6 +23,7 @@
   "dependencies": {
     "@types/node": "^10.5.2",
     "axios": "^0.18.0",
+    "bcryptjs": "^2.4.3",
     "cordova-android": "^7.1.1",
     "cordova-osx": "^4.0.1",
     "cordova-plugin-device": "^2.0.2",
