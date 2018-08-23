@@ -26,7 +26,9 @@ class SingletonService {
       const localeId = storage.get('current-locale')
       singleton.locale = await LocaleService.getLocaleById(localeId)
     }
-    console.debug('loadFromLocalStorage', singleton)
+    if (storage.get('offline')) {
+      singleton.offline = storage.get('offline')
+    }
   }
 
   setCurrentStudy (study) {
@@ -53,6 +55,10 @@ class SingletonService {
       return singleton[key]
     }
     return null
+  }
+
+  set (key, value) {
+    storage.set(key, value)
   }
 }
 

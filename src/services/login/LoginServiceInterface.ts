@@ -11,9 +11,9 @@ export default interface LoginServiceInterface {
   /**
    * Return a boolean indicating if the user is logged in. This should be present in memory or determined
    * synchronously
-   * @returns {boolean}
+   * @returns {Promise<boolean>}
    */
-  isLoggedIn (): boolean
+  isLoggedIn (): Promise<boolean>
 
   /**
    * Logout of application
