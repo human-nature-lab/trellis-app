@@ -1,9 +1,7 @@
-import uuid from 'uuid/v4'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../WebOrmDecorators'
-import {mapFromSnakeJSON, mapCamelToPlain} from "../../services/JSONUtil";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 import {now} from '../../services/DateService'
 
@@ -27,8 +25,8 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   public dkRf: boolean
   @Column() @Serializable
   public dkRfVal: string
-  @Column() @Serializable
-  public interviewId: string
+  // @Column() @Serializable
+  // public interviewId: string
 
   @Relationship(Datum)
   data: Datum[]
@@ -64,12 +62,12 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     this.sectionRepetition = sectionRepetition
     this.answeredAt = answeredAt
     this.skippedAt = skippedAt
-    this.interviewId = interviewId
     this.dkRfVal = dkRfVal
     this.dkRf = dkRf
     this.createdAt = now()
     this.updatedAt = now()
     this.data = []
+    // this.interviewId = interviewId
     return this
   }
 
