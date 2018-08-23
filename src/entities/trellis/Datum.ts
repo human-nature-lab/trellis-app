@@ -1,6 +1,6 @@
 import uuidv4 from 'uuid/v4'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {Column, Entity} from 'typeorm'
+import {Column, Entity, PrimaryColumn} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'
@@ -17,7 +17,7 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   public eventOrder: number;
   @Column() @Serializable
   public geoId: string;
-  @Column() @Serializable
+  @PrimaryColumn() @Serializable
   public id: string;
   @Column() @Serializable
   public name: string;

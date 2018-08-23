@@ -1,4 +1,3 @@
-import storage from '../storage/StorageService'
 import UserService from '../user/UserService'
 import http, {setToken, removeToken} from '../http/AxiosInstance'
 import LoginServiceInterface from "./LoginServiceInterface";
@@ -21,8 +20,9 @@ export default class LoginServiceWeb implements LoginServiceInterface {
     })
   }
 
-  isLoggedIn () {
-    return storage.get('interview-id', 'string') !== null
+  async isLoggedIn (): Promise<boolean> {
+    const res = await http().get(`user/me`)
+    return (res.status === 200)
   }
 
   logout () {

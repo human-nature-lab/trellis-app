@@ -2,6 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import config from '../config'
 import {APP_ENV} from '../static/constants'
+import SingletonService from '../services/singleton/SingletonService'
+import ValidateSync from './guards/ValidateSync'
+import ValidateLogin from './guards/ValidateLogin'
+import chain from './guards/ChainableGuards'
 
 import appRoutes from './app.routes'
 import webRoutes from './web.routes'
@@ -22,6 +26,11 @@ export const router = new Router({
     return { x: 0, y: 0 }
   }
 })
+
+// If we're in offline mode, require that the application is synced
+if (SingletonService.get('offline')) {
+  router.beforeEach(chain(ValidateSync, ValidateLogin))
+}
 
 /**
  * Add element to browser history and try to return to the current location
