@@ -1,15 +1,15 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, JoinTable, ManyToMany} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
-import RespondentName from "./RespondentName";
-import RespondentGeo from "./RespondentGeo";
-import RespondentConditionTag from "./RespondentConditionTag";
-import Photo from "./Photo";
-import RespondentPhoto from "./RespondentPhoto";
-import Geo from "./Geo";
-import ConditionTag from "./ConditionTag";
-import SnakeSerializable from "../interfaces/SnakeSerializable";
+import {mapFromSnakeJSON, mapPropsFromJSON} from '../../services/JSONUtil'
+import RespondentName from './RespondentName'
+import RespondentGeo from './RespondentGeo'
+import RespondentConditionTag from './RespondentConditionTag'
+import Photo from './Photo'
+import RespondentPhoto from './RespondentPhoto'
+import Geo from './Geo'
+import ConditionTag from './ConditionTag'
+import SnakeSerializable from '../interfaces/SnakeSerializable'
 
 @Entity()
 export default class Respondent extends TimestampedSoftDelete implements SnakeSerializable {
@@ -28,10 +28,17 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   @Column({ nullable: true }) @Serializable
   associatedRespondentId: string
 
-  names: RespondentName[]
-  geos: RespondentGeo[]
   respondentConditionTags: RespondentConditionTag[]
-  photos: RespondentPhoto[]
+
+  @OneToMany(type => RespondentGeo, respondentGeo => respondentGeo.respondent, { eager: true })
+  geos: RespondentGeo[]
+
+  @OneToMany(type => RespondentName, respondentName => respondentName.respondent, { eager: true })
+  names: RespondentName[]
+
+  @ManyToMany(type => Photo, photo => photo.respondents, { eager: true })
+  @JoinTable({ name: 'respondent_photo' })
+  photos: Photo[]
 
   fromSnakeJSON (json: any) {
     mapPropsFromJSON(this, json, ['id', 'assignedId', 'name', 'associatedRespondentId'])

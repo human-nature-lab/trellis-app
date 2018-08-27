@@ -61,6 +61,7 @@
         this.isLoading = true
         GeoService.getGeoAncestors(this.geoId).then(ancestors => {
           this.ancestors = ancestors
+          console.log('ancestors', ancestors)
         }).catch(err => {
           this.error = err
         }).finally(() => {
