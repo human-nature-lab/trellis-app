@@ -54,7 +54,7 @@ class DeviceServiceCordova {
         if (this.isReady) {
           resolve(true)
         } else {
-          setTimeout(checkReady)
+          setTimeout(checkReady, 100)
         }
       }
       checkReady()
