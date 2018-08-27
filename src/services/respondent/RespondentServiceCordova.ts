@@ -19,14 +19,14 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   async getRespondentById (respondentId) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Respondent)
-    return await repository.findOne({ deletedAt: null, respondentId: respondentId })
+    return await repository.findOne({ deletedAt: null, id: respondentId })
   }
 
   async getSearchPage (studyId, query, filters, page = 0, size = 50, respondentId = null) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
-    let q = queryBuilder.where('id in (select respondent_id from study_respondent where study_id = :studyId', {studyId: studyId})
+    let q = queryBuilder.where('"respondent"."id" in (select respondent_id from study_respondent where study_id = :studyId)', {studyId: studyId})
 
     if (respondentId !== null) {
       q = q.andWhere(new Brackets(qb => {
@@ -37,27 +37,31 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
     if (typeof query === 'string' && query.trim().length > 0) {
       const searchTerms = query.split(' ')
+      console.log('searchTerms', searchTerms)
       for (let i = 0; i < searchTerms.length; i++) {
-        let searchTerm = searchTerms[i].trim()
-        q = q.andWhere('id in (select distinct respondent_id from respondent_name where name like "%:searchTerm%")', {searchTerm: searchTerm})
+        let searchTerm = '% ' + searchTerms[i].trim() + '%'
+        q = q.andWhere(`"respondent"."id" in (select distinct respondent_id from respondent_name where " " || name like :searchTerm${i})`, {[`searchTerm${i}`]: searchTerm})
       }
     }
 
-    if (filters.conditionTags instanceof Array) {
+    if (filters.conditionTags instanceof Array && filters.conditionTags.length > 0) {
       let conditionTagNames = filters.conditionTags.map((tag) => { return '"' + tag + '"' }).join(',')
-      q = q.andWhere('id in (select distinct respondent_id from respondent_condition_tag where condition_tag_id in (select id from condition_tag where name in (:conditionTagNames))))', {conditionTagNames: conditionTagNames})
+      q = q.andWhere('"respondent"."id" in (select distinct respondent_id from respondent_condition_tag where condition_tag_id in (select id from condition_tag where name in (:conditionTagNames))))', {conditionTagNames: conditionTagNames})
     }
 
-    if (filters.geos instanceof Array) {
+    if (filters.geos instanceof Array && filters.geos.length > 0) {
       let geos = filters.geos
       if (filters.include_children) {
         // TODO: Include geo IDs from children of geos
       }
       const geoIds = geos.join(',')
-      q = q.andWhere('id in (select distinct respondent_id from respondent_geo where geo_id in (:geoIds))', {geoIds: geoIds})
+      q = q.andWhere('"respondent"."id" in (select distinct respondent_id from respondent_geo where geo_id in (:geoIds))', {geoIds: geoIds})
     }
 
-    return q.getMany()
+    q = q.limit(size).offset(page * size)
+    q = q.leftJoinAndSelect('respondent.photos', 'photo')
+    q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
+    return await q.getMany()
   }
 
   async addName (respondentId, name, isDisplayName = null, localeId = null) {

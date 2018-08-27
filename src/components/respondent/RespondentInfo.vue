@@ -229,6 +229,7 @@
     },
     methods: {
       hydrate (respondent: Respondent) {
+        console.log('hydrate', respondent)
         this.respondent = respondent
       },
       photoFromCamera () {},

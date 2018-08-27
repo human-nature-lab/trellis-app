@@ -1,8 +1,9 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
-import Photo from "./Photo";
+import {mapFromSnakeJSON} from '../../services/JSONUtil'
+import Photo from './Photo'
+import Respondent from './Respondent'
 
 @Entity()
 export default class RespondentPhoto extends TimestampedSoftDelete {
