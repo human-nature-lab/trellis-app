@@ -78,13 +78,14 @@ class LoggingServiceCordova {
       return request
     }
     if (typeof request === 'object') {
-      if (request.hasOwnProperty('message')) {
+      if (request.hasOwnProperty('message') && typeof request.message === 'string') {
         return request.message
       }
-      if (request.hasOwnProperty('msg')) {
+      if (request.hasOwnProperty('msg') && typeof request.msg === 'string') {
         return request.msg
       }
     }
+    return ''
   }
 
   getFullMessage (request) {
