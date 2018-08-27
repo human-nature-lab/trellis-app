@@ -2,6 +2,7 @@ import {Entity, PrimaryGeneratedColumn, Column, ManyToMany} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Respondent from './Respondent'
+import Geo from './Geo'
 
 @Entity("photo")
 export default class Photo extends TimestampedSoftDelete {
@@ -13,4 +14,7 @@ export default class Photo extends TimestampedSoftDelete {
 
   @ManyToMany(type => Respondent, respondent => respondent.photos)
   respondents: Respondent[]
+
+  @ManyToMany(type => Geo, geo => geo.photos)
+  geos: Geo[]
 }
