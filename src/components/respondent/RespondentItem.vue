@@ -77,7 +77,7 @@
         return rName ? rName.name : this.respondent.name
       },
       photo (): Photo {
-        return this.respondent.photos.length ? this.respondent.photos[0].photo : null
+        return this.respondent.photos.length ? this.respondent.photos[0] : null
       }
     },
     components: {

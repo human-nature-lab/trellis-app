@@ -19,7 +19,7 @@ export abstract class UserServiceAbstract {
       let user = null
       if (jsonUser) {
         user = new User().fromSnakeJSON(jsonUser)
-        this.user = user
+        this._user = user
       }
       return user
     }
@@ -43,7 +43,17 @@ export abstract class UserServiceAbstract {
    * Set the user
    * @param user
    */
-  setCurrentuser (user: User): void {
+  setCurrentUser (user: User): void {
     this.user = user
   }
+
+  /**
+   * Remove current user
+   */
+  removeCurrentUser (): void {
+    delete(this._user)
+    storage.delete(CURRENT_USER_KEY)
+  }
+
+
 }

@@ -11,12 +11,17 @@ import ValidateStudy from './guards/ValidateStudy'
 import ValidateLocale from './guards/ValidateLocale'
 import ValidateCensusForm from './guards/ValidateCensusForm'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
+import StudySelectorPage from '../components/StudySelectorPage'
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
   name: 'Interview',
   component: Interview,
   beforeEnter: ValidateStudy
+}, {
+  path: '/',
+  name: 'StudySelector',
+  component: StudySelectorPage
 }, {
   path: '/study/:studyId/respondent/:respondentId/forms',
   name: 'RespondentForms',

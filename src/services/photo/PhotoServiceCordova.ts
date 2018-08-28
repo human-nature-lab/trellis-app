@@ -1,41 +1,41 @@
 import FileService from '../file/FileService'
-import { getRepository } from 'typeorm'
 import DatabaseService from '../database/DatabaseService'
 import Photo from '../../entities/trellis/Photo'
 import SizeLimitedMap from '../../classes/SizeLimitedMap'
-const cache = new SizeLimitedMap(1000)
-import CancellablePromise from '../../classes/CancellablePromise'
-import PhotoServiceInterface from "./PhotoServiceInterface";
+const cache = new SizeLimitedMap(1024 * 10000)
+import PhotoServiceInterface from './PhotoServiceInterface'
 export default class PhotoServiceCordova implements PhotoServiceInterface {
-   getPhotoSrc (photoId) {
-    // Get the base64 encoded photo and return the url. This method is cached
-    const p = new CancellablePromise(resolve => {
-      if (cache.has(photoId)) {
-        return resolve(cache.get(photoId))
-      } else {
-        const photoRepository = getRepository(Photo)
-        photoRepository.findOne(photoId)
-          .then((photo: Photo) => {
-            console.log('photo', photo)
-            FileService.getPhoto(photo.fileName)
-              .then((fileEntry) => {
-                fileEntry.file((blob) => {
-                  const reader = new FileReader()
-                  reader.readAsDataURL(blob)
-                  reader.onloadend = function () {
-                    let src = reader.result
-                    cache.set(photoId, src)
-                    return src
-                  }
-                })
-              })
-          })
-          .catch(err => {
-            throw err
-          })
-      }
-    })
-    return p
+
+   async getPhotoSrc (photoId: string): Promise<any> {
+     if (cache.has(photoId)) {
+       return cache.get(photoId)
+     }
+
+     const connection = await DatabaseService.getDatabase()
+     const repository = await connection.getRepository(Photo)
+     const photo = await repository.findOne(photoId)
+     if (!photo) {
+       throw new Error('Invalid photo ID')
+     }
+
+     const fileEntry = await FileService.getPhoto(photo.fileName)
+
+     return new Promise((resolve, reject) => {
+       fileEntry.file((blob) => {
+         const reader = new FileReader()
+         reader.onloadend = function () {
+           let src = reader.result
+           cache.set(photoId, src)
+           resolve(src)
+         }
+
+         reader.onerror = function(err) {
+           reject(err)
+         }
+
+         reader.readAsDataURL(blob)
+       })
+     })
   }
 
   cancelAllOutstanding () {}
@@ -44,7 +44,7 @@ export default class PhotoServiceCordova implements PhotoServiceInterface {
    * This method returns all undeleted photos from the Photo table
    * @returns {Promise<Array>}
    */
-  static async getPhotos () {
+  async getPhotos () {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Photo)
     return repository.find({ deletedAt: null })

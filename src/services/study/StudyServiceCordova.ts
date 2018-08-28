@@ -2,7 +2,7 @@ import StudyServiceAbstract from './StudyServiceAbstract'
 import DatabaseService from '../database/DatabaseService'
 import Study from '../../entities/trellis/Study'
 
-export default class StudyServiceCordova extends StudyServiceAbstract {
+class StudyServiceCordova extends StudyServiceAbstract {
   async getStudy (studyId: string): Promise<Study> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Study)
@@ -16,3 +16,5 @@ export default class StudyServiceCordova extends StudyServiceAbstract {
     return repository.find({ deletedAt: null })
   }
 }
+
+export default new StudyServiceCordova()

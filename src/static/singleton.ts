@@ -1,5 +1,6 @@
 import Study from '../entities/trellis/Study'
 import Locale from '../entities/trellis/Locale'
+declare const cordova: any
 
 export class SearchDrawer {
   constructor (
@@ -30,6 +31,7 @@ export class Singleton {
     public study: Study,
     public locale: Locale,
     public darkTheme: boolean,
+    public offline: boolean = (typeof cordova === 'object'),
     public searchDrawer: SearchDrawer = new SearchDrawer(),
     public menuDrawer: MenuDrawer = new MenuDrawer(),
     public loading: Loading = new Loading(),

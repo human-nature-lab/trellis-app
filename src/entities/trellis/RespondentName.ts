@@ -1,6 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import {Serializable} from '../WebOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import Respondent from './Respondent'
 
 @Entity()
 export default class RespondentName extends TimestampedSoftDelete {
@@ -16,4 +17,7 @@ export default class RespondentName extends TimestampedSoftDelete {
   localeId: string
   @Column({ nullable: true }) @Serializable
   previousRespondentNameId: string
+
+  @ManyToOne(type => Respondent, respondent => respondent.names)
+  respondent: Respondent
 }

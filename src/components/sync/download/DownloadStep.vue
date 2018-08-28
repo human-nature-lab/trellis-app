@@ -4,7 +4,7 @@
       <v-card-title>
         <h3>{{ title }}</h3>
       </v-card-title>
-      <v-card-text>
+      <v-card-text class="download-step-text">
         <slot></slot>
       </v-card-text>
     </v-card>
@@ -45,5 +45,7 @@
   }
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
+  .download-step-text li
+    margin-left: 1em
 </style>

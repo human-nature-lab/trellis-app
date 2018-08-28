@@ -1,8 +1,8 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../WebOrmDecorators'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import Geo from "./Geo";
+import Respondent from './Respondent'
 
 @Entity()
 export default class RespondentGeo extends TimestampedSoftDelete {
@@ -19,7 +19,12 @@ export default class RespondentGeo extends TimestampedSoftDelete {
   @Column() @Serializable
   isCurrent: boolean
 
+  @ManyToOne(type => Respondent, respondent => respondent.geos)
+  respondent: Respondent
+
   @Relationship(Geo)
+  @OneToOne(type => Geo, { eager: true })
+  @JoinColumn({ name: 'geo_id' })
   geo: Geo
 
   fromSnakeJSON(json: any) {

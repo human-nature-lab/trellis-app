@@ -12,6 +12,7 @@ class LocaleServiceCordova extends LocaleServiceAbstract {
 
   async getStudyLocales (studyId: string): Promise<Locale[]> {
     const study = await StudyService.getStudy(studyId)
+    console.log('study', study)
     return await study.locales
   }
 }

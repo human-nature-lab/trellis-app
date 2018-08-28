@@ -24,6 +24,7 @@
     "@types/node": "^10.5.2",
     "axios": "^0.18.0",
     "cordova-android": "^6.3.0",
+    "bcryptjs": "^2.4.3",
     "cordova-osx": "^4.0.1",
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-file": "^6.0.1",
