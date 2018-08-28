@@ -28,6 +28,7 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   @Column({ nullable: true }) @Serializable
   associatedRespondentId: string
 
+  @OneToMany(type => RespondentConditionTag, respondentConditionTag => respondentConditionTag.respondent, { eager: true })
   respondentConditionTags: RespondentConditionTag[]
 
   @OneToMany(type => RespondentGeo, respondentGeo => respondentGeo.respondent, { eager: true })

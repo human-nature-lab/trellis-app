@@ -1,10 +1,12 @@
-import {Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
-import ConditionTag from "./ConditionTag";
+import {mapFromSnakeJSON} from '../../services/JSONUtil'
+import ConditionTag from './ConditionTag'
 import {now} from '../../services/DateService'
+import Respondent from './Respondent'
 
+@Entity()
 export default class RespondentConditionTag extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
@@ -13,7 +15,12 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
   @Column() @Serializable
   conditionTagId: string
 
+  @OneToOne(type => ConditionTag, { eager: true })
+  @JoinColumn({ name: 'condition_tag_id' })
   conditionTag: ConditionTag
+
+  @ManyToOne(type => Respondent, respondent => respondent.respondentConditionTags)
+  respondent: Respondent
 
   // Handle naming inconsistencies with Section and Survey condition tags
   get conditionId () {
