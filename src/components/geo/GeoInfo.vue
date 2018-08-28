@@ -11,7 +11,7 @@
       <v-card-text>
         <v-alert v-show="error" color="error">{{error}}</v-alert>
         <v-layout>
-          <GeoBreadcrumbs :geo-id="geo.parentId" />
+          <GeoBreadcrumbs v-if="geo.parentId" :geo-id="geo.parentId"></GeoBreadcrumbs>
         </v-layout>
         <v-toolbar flat>
           <v-toolbar-title>
@@ -67,6 +67,7 @@
     methods: {
       hydrate (geo: Geo) {
         this.geo = geo
+        console.log('GeoInfo', geo)
         this.translation = geo.nameTranslation
       },
       viewRespondents () {

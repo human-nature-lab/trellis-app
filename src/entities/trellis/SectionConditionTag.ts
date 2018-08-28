@@ -1,4 +1,4 @@
-import {Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
 import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
@@ -6,6 +6,7 @@ import ConditionTag from "./ConditionTag";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import {now} from '../../services/DateService'
 
+@Entity()
 export default class SectionConditionTag extends TimestampedSoftDelete implements SnakeSerializable{
   @PrimaryGeneratedColumn() @Serializable
   id: string;
