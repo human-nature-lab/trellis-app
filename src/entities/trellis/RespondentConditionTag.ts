@@ -1,5 +1,5 @@
 import {Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import ConditionTag from "./ConditionTag";
@@ -13,6 +13,10 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
   @Column() @Serializable
   conditionTagId: string
 
+  @Relationship({
+    constructor: ConditionTag,
+    jsonKey: 'condition'
+  })
   conditionTag: ConditionTag
 
   // Handle naming inconsistencies with Section and Survey condition tags
@@ -30,17 +34,6 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
     this.updatedAt = now()
     this.createdAt = now()
     return this
-  }
-
-  fromSnakeJSON(json: object) {
-    debugger
-    mapFromSnakeJSON(this, json, {
-      conditionTag: {
-        constructor: ConditionTag,
-        jsonKey: 'condition'
-      }
-    })
-    return super.fromSnakeJSON(json)
   }
 
 }

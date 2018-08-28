@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
-    "dev-android": "npx webpack --config build/webpack.dev.mobile.conf.js && cordova run android --device && node build/dev-server.mobile.js",
+    "dev-android": "node build/dev-server.mobile.js",
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
@@ -23,17 +23,18 @@
   "dependencies": {
     "@types/node": "^10.5.2",
     "axios": "^0.18.0",
+    "cordova-android": "^6.3.0",
     "bcryptjs": "^2.4.3",
-    "cordova-android": "^7.1.1",
     "cordova-osx": "^4.0.1",
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-file": "^6.0.1",
     "cordova-plugin-file-md5": "^0.3.3",
-    "cordova-plugin-file-transfer": "git+https://github.com/human-nature-lab/cordova-plugin-file-transfer.git",
+    "cordova-plugin-file-transfer": "^1.7.1",
+    "cordova-plugin-geolocation": "^4.0.1",
     "cordova-plugin-splashscreen": "^5.0.2",
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-zip": "^3.1.0",
-    "cordova-sqlite-storage": "^2.3.3",
+    "cordova-sqlite-storage": "^2.4.0",
     "js-md5": "^0.7.3",
     "json-loader": "^0.5.7",
     "jszip": "^3.1.5",
@@ -83,6 +84,7 @@
     "eslint-plugin-vue": "^4.7.1",
     "eventsource-polyfill": "^0.9.6",
     "express": "^4.16.3",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "faker": "^4.1.0",
     "file-loader": "^1.1.11",
     "friendly-errors-webpack-plugin": "^1.7.0",
@@ -135,7 +137,7 @@
     "vue-loader": "^15.3.0",
     "vue-style-loader": "^4.1.1",
     "vue-template-compiler": "^2.5.16",
-    "webpack": "^4.16.1",
+    "webpack": "^4.8.3",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^3.1.0",
     "webpack-dev-middleware": "^3.1.3",
@@ -155,17 +157,17 @@
   "cordova": {
     "plugins": {
       "cordova-plugin-device": {},
+      "cordova-plugin-file": {},
+      "cordova-plugin-file-md5": {},
+      "cordova-plugin-zip": {},
+      "cordova-plugin-splashscreen": {},
       "cordova-plugin-whitelist": {},
       "cordova-sqlite-storage": {},
-      "cordova-plugin-file": {},
-      "cordova-plugin-splashscreen": {},
-      "cordova-plugin-zip": {},
-      "cordova-plugin-file-md5": {},
-      "cordova-plugin-file-transfer": {}
+      "cordova-plugin-file-transfer": {},
+      "cordova-plugin-geolocation": {}
     },
     "platforms": [
-      "android",
-      "osx"
+      "android"
     ]
   }
 }

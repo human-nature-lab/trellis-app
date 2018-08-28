@@ -1,5 +1,5 @@
+import {Serializable} from '../WebOrmDecorators'
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Respondent from './Respondent'
 

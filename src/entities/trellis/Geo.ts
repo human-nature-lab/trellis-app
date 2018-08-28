@@ -1,5 +1,5 @@
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, JoinTable, ManyToMany} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from '../../services/JSONUtil'
 import GeoType from './GeoType'
@@ -23,10 +23,12 @@ export default class Geo extends TimestampedSoftDelete {
   @Column() @Serializable
   nameTranslationId: string
 
+  @Relationship(GeoType)
   @OneToOne(type => GeoType, { eager: true })
   @JoinColumn({ name: 'geo_type_id' })
   geoType: GeoType
 
+  @Relationship(Translation)
   @OneToOne(type => Translation, { eager: true })
   @JoinColumn({ name: 'name_translation_id' })
   nameTranslation: Translation
@@ -35,12 +37,4 @@ export default class Geo extends TimestampedSoftDelete {
   @JoinTable({ name: 'geo_photo' })
   photos: Photo[]
 
-  fromSnakeJSON(json: object) {
-    mapFromSnakeJSON(this, json, {
-      geoType: GeoType,
-      nameTranslation: Translation
-    })
-    super.fromSnakeJSON(json)
-    return this
- }
 }

@@ -1,6 +1,7 @@
 import {parseDate} from '../../services/DateService'
 import SnakeSerializable from "../interfaces/SnakeSerializable";
-import {getColumnMeta} from "../TypeOrmDecorators";
+import {getColumnMeta} from "../WebOrmDecorators";
+import {deepCopy} from "../../services/JSONUtil";
 
 export default class BaseEntity implements SnakeSerializable {
   /**
@@ -12,24 +13,24 @@ export default class BaseEntity implements SnakeSerializable {
         this[key] = parseDate(this[key]) // This returns a moment object which will automatically be serialized correctly
       }
     }
+    return this
   }
 
   /**
-   * Return a JSON.stringify-able object that excludes relationships by default
-   */
-  toJSON (): object {
-    let r = {}
-    for (let key of getColumnMeta(this).names) {
-      r[key] = this[key]
-    }
-    return r
-  }
-
-  /**
-   * Default behavior is to just assign only column names without copying any relationships that may be defined
+   * Map all relationships defined using the Relationship decorator
    * @param json
+   * @returns {this}
    */
-  fromJSON (json: object): this {
+  protected mapRelationships (json: any) {
+    let relationships = getColumnMeta(this).relationships
+    for (let o of relationships) {
+      let [key, assigner] = o
+      assigner(this, json)
+    }
+    return this
+  }
+
+  protected mapColumns (json: any) {
     for (let key of getColumnMeta(this).names) {
       this[key] = json[key]
     }
@@ -37,7 +38,24 @@ export default class BaseEntity implements SnakeSerializable {
   }
 
   /**
-   * Default fromSnakeJSON will only assign properties defined with Column type decorators. See TypeOrmDecorators.ts
+   * Return a JSON.stringify-able object with relationshiops
+   */
+  // toJSON (): object {
+  //   // let r = {}
+  //   // const meta = getColumnMeta(this)
+  //   // for (let key of meta.names) {
+  //   //   r[key] = this[key]
+  //   // }
+  //   // for (let o of meta.relationships) {
+  //   //   let [key, _] = o
+  //   //   r[key] = Array.isArray(this[key]) ? this[key].map(b => b.toJSON()) : this[key].toJSON()
+  //   // }
+  //   // return r
+  //   return this
+  // }
+
+  /**
+   * Default fromSnakeJSON will only assign properties defined with Column type decorators. See WebOrmDecorators.ts
    * for implementation details.
    * @param json
    */
@@ -48,6 +66,7 @@ export default class BaseEntity implements SnakeSerializable {
         this[colMeta.names[i]] = json[colMeta.snake[i]]
       }
     }
+    this.mapRelationships(json)
     this.parseDates()
     return this
   }
@@ -65,31 +84,10 @@ export default class BaseEntity implements SnakeSerializable {
   }
 
   /**
-   * Default copy method is to call JSON.parse(JSON.stringify(this)) and then use the fromJSON method to correctly
-   * assign the props
+   * The default strategy for returning a cloned object.
    */
   copy () {
-    function recursiveCopy (old: any, includeSelf = false) {
-      if (!old) return old
-      else if (typeof old === 'object') {
-        if (includeSelf && old.copy && typeof old.copy === 'function') {
-          return old.copy()
-        } else {
-          let d = Object.assign( Object.create( Object.getPrototypeOf(old)), old)
-          for (let key in old) {
-            if (typeof old['key'] === 'object') {
-              d[key] = recursiveCopy(old[key], true)
-            }
-          }
-          return d
-        }
-      } else if (Array.isArray(old)) {
-        return old.map(o => recursiveCopy(o, true))
-      } else {
-        return old
-      }
-    }
-    return recursiveCopy(this)
+    return deepCopy(this)
   }
 
 }

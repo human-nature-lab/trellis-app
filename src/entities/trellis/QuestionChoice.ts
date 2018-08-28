@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Choice from "./Choice";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
@@ -15,17 +15,18 @@ export default class QuestionChoice extends TimestampedSoftDelete {
   @Column({ type: 'integer' }) @Serializable
   sortOrder: number
 
+  @Relationship(Choice)
   choice: Choice
 
   fromSnakeJSON (json: any) {
     if (json.pivot) {
-      this.choice = new Choice().fromSnakeJSON(json)
       super.fromSnakeJSON(json.pivot)
+      this.choice = new Choice().fromSnakeJSON(json)
     } else {
+      super.fromSnakeJSON(json)
       mapFromSnakeJSON(this, json, {
         choice: Choice
       })
-      super.fromSnakeJSON(json)
     }
     return this
   }

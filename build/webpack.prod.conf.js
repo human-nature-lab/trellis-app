@@ -7,7 +7,7 @@ var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
-var MiniCssExtractPlugin = require('mini-css-extract-plugin')
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 var loadMinified = require('./load-minified')
@@ -33,6 +33,7 @@ var webpackConfig = merge(baseWebpackConfig, {
   },
   optimization: {
     minimizer: [
+      // we specify a custom UglifyJsPlugin here to get source maps in production
       new UglifyJsPlugin({
         cache: true,
         parallel: true,
@@ -40,7 +41,8 @@ var webpackConfig = merge(baseWebpackConfig, {
           compress: false,
           ecma: 6,
           mangle: true
-        }
+        },
+        sourceMap: true
       })
     ]
   },
@@ -50,14 +52,8 @@ var webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
-    // new webpack.optimize.UglifyJsPlugin({
-    //   compress: {
-    //     warnings: false
-    //   },
-    //   sourceMap: true
-    // }),
     // extract css into its own file
-    new MiniCssExtractPlugin({
+    new ExtractTextPlugin({
       filename: utils.assetsPath('css/[name].[md5:contenthash:hex:15].css')
     }),
     // Compress extracted CSS. We are using this plugin so that possible
@@ -78,7 +74,7 @@ var webpackConfig = merge(baseWebpackConfig, {
       inject: true,
       minify: {
         removeComments: true,
-        // collapseWhitespace: true,
+        collapseWhitespace: true,
         removeAttributeQuotes: true
         // more options:
         // https://github.com/kangax/html-minifier#options-quick-reference
@@ -104,7 +100,6 @@ var webpackConfig = merge(baseWebpackConfig, {
           }
           content = content.toString()
           for (var key in replacements) {
-            console.log(content)
             content = content.replace(key, replacements[key])
           }
           return content
@@ -113,7 +108,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     ]),
     // service worker caching
     new SWPrecacheWebpackPlugin({
-      cacheId: 'my-vue-app',
+      cacheId: 'trellis-2',
       filename: 'service-worker.js',
       staticFileGlobs: ['dist/**/*.{js,html,css}'],
       minify: true,

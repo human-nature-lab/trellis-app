@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import ConditionTag from "./ConditionTag";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
@@ -15,15 +15,9 @@ export default class AssignConditionTag extends TimestampedSoftDelete {
   @Column({nullable: true}) @Serializable
   scope: string
 
+  @Relationship({
+    constructor: ConditionTag,
+    jsonKey: 'condition'
+  })
   conditionTag: ConditionTag
-
-  fromSnakeJSON (json: any) {
-    mapFromSnakeJSON(this, json, {
-      conditionTag: {
-        constructor: ConditionTag,
-        jsonKey: 'condition'
-      }
-    })
-    return super.fromSnakeJSON(json)
-  }
 }

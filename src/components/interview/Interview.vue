@@ -116,6 +116,7 @@
   import {validateParametersWithError} from './services/ValidatorService'
   import router, {moveToNextOr} from '../../router'
   import InterviewLoader from './services/InterviewLoader'
+  import SurveyService from '../../services/survey'
 
   let interviewState
   export default {
@@ -174,9 +175,10 @@
     },
     methods: {
       // Called by RoutePreloadMixin
-      leaving () {
+      async leaving () {
         interviewState.destroy()
-        return new Promise(resolve => resolve())
+        await this.completeInterview()
+        return await this.saveData()
       },
       // Called by RoutePreloadMixin
       hydrate (data) {
@@ -225,7 +227,12 @@
         console.log('TODO: Make sure everything is saved before marking the survey complete and exiting')
         console.log('TODO: Lock and exit the survey')
         this.saveData()
-          .then(() => InterviewService.complete(this.interview.id))
+          .then(() => {
+            return Promise.all([
+              this.completeInterview(),
+              this.completeSurvey()
+            ])
+          })
           .then(() => {
             this.dialog.end = false
             this.exit()
@@ -248,16 +255,23 @@
           this.isSaving = false
         })
       },
-      saveAndExit: function () {
-        this.saveData().then(() => {
-          this.dialog.end = false
-          this.exit()
-        })
+      async completeSurvey () {
+        return await SurveyService.complete(this.interview.surveyId)
+      },
+      async completeInterview () {
+        return await InterviewService.complete(this.interview.id)
+      },
+      async saveAndExit () {
+        await this.saveData()
+        await this.completeInterview()
+        this.dialog.end = false
+        this.exit()
       },
       prematureExit: function (e) {
         this.saveData().then(() => {
           this.showSafeToExitMessage = true
         })
+        this.completeInterview()
         const dialogText = 'You have unsaved changes. Are you sure you want to leave?'
         e.returnValue = dialogText
         return dialogText

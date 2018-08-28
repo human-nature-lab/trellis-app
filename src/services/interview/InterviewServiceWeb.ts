@@ -8,6 +8,7 @@ import InterviewServiceInterface from './InterviewServiceInterface'
 import Interview from '../../entities/trellis/Interview'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
+import GeoLocationService from '../geolocation'
 
 export class InterviewServiceWeb implements InterviewServiceInterface {
 
@@ -46,7 +47,6 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
   saveData (interviewId: string, diff: InterviewDeltaInterface) {
     interviewId = encodeURIComponent(interviewId)
     let d = diff.toSnakeJSON()
-    debugger
     return http().post(`interview/${interviewId}/data`, d).then(res => res.data)
   }
 
@@ -59,7 +59,13 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
   }
 
   async create (surveyId: string): Promise<Interview> {
-    let res = await http().post(`survey/${surveyId}/interview`)
+    let position = await GeoLocationService.getCurrentPosition()
+    let res = await http().post(`survey/${surveyId}/interview`, {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      altitude: position.coords.altitude,
+      accuracy: position.coords.accuracy
+    })
     return new Interview().fromSnakeJSON(res.data.interview)
   }
 

@@ -53,4 +53,8 @@ npm run android
 npm run android-vm
 ```
 
+## Build Errors
+Many errors in the build process are caused by not removing or changing plugins correctly. The simplest remedy is to simply run "cordova platform rm android && cordova platform add android" to reinstall them all with fresh configuration.
+You may also need to add the plugins again using "cordova plugin add {name}" after removing and adding the platform.
+
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

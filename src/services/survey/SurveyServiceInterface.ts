@@ -27,4 +27,10 @@ export default interface SurveyServiceInterface {
    * @returns {*|AxiosPromise<any>}
    */
   create (studyId: string, respondentId: string, formId: string): Promise<Survey>
+
+  /**
+   * Mark the survey as complete
+   * @param {String} surveyId
+   */
+  complete (surveyId: string): Promise<Survey>
 }

@@ -1,8 +1,8 @@
-const path = require('path')
-const utils = require('./utils')
-const config = require('../config')
-const vueLoaderConfig = require('./vue-loader.conf')
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
+var path = require('path')
+var utils = require('./utils')
+var config = require('../config')
+var vueLoaderConfig = require('./vue-loader.conf')
+
 const { VueLoaderPlugin } = require('vue-loader')
 
 function resolve (dir) {
@@ -10,6 +10,7 @@ function resolve (dir) {
 }
 
 module.exports = {
+  target: 'web',
   entry: {
     app: ['babel-polyfill', './src/main.js']
   },
@@ -50,8 +51,7 @@ module.exports = {
         enforce: 'pre',
         include: [resolve('src'), resolve('test')],
         options: {
-          formatter: require('eslint-friendly-formatter'),
-          // ts:  'ts-loader!typescript-eslint-parser'
+          formatter: require('eslint-friendly-formatter')
         }
       },
       {
@@ -104,9 +104,6 @@ module.exports = {
     ]
   },
   plugins: [
-    new FilterWarningsPlugin({
-      exclude: [/Critical dependency/, /mongodb/, /mssql/, /mysql/, /mysql2/, /oracledb/, /pg/, /pg-native/, /pg-query-stream/, /redis/, /react-native-sqlite-storage/, /sqlite3/]
-    }),
     new VueLoaderPlugin()
   ]
 }
