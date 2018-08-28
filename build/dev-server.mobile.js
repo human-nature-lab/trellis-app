@@ -12,6 +12,7 @@ var express = require('express')
 var webpack = require('webpack')
 var proxyMiddleware = require('http-proxy-middleware')
 var webpackConfig = require('./webpack.dev.mobile.conf')
+const exec = require('child_process').exec;
 
 // default port where dev server listens for incoming traffic
 var port = process.env.PORT || config.dev.port
@@ -52,7 +53,7 @@ app.get('/cordova.js', function (req, res) {
   if (req.hostname.includes('localhost')) {
     res.send(new Error('Not a device.'))
   } else {
-    fs.readFile('platforms/android/app/src/main/assets/www/cordova.js', function (err, data) {
+    fs.readFile('platforms/android/assets/www/cordova.js', function (err, data) {
       if (err) {
         res.send(err)
         console.error(err)
@@ -64,7 +65,7 @@ app.get('/cordova.js', function (req, res) {
 })
 
 app.get('/cordova_plugins.js', function (req, res) {
-  fs.readFile('platforms/android/app/src/main/assets/www/cordova_plugins.js', function (err, data) {
+  fs.readFile('platforms/android/assets/www/cordova_plugins.js', function (err, data) {
     if (err) {
       res.send(err)
       console.error(err)
@@ -88,7 +89,7 @@ app.use(hotMiddleware)
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-app.use('/plugins', express.static('./platforms/android/app/src/main/assets/www/plugins'))
+app.use('/plugins', express.static('./platforms/android/assets/www/plugins'))
 
 var uri = 'http://localhost:' + port
 
@@ -99,12 +100,24 @@ var readyPromise = new Promise(resolve => {
 
 console.log('> Starting dev server...')
 devMiddleware.waitUntilValid(() => {
-  console.log('> Listening at ' + uri + '\n')
-  // when env is testing, don't need open it
-  if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
-    opn(uri)
+  console.log('compiling mobile app')
+  var code = exec('cordova run android', {}, () => {
+    console.log('> Listening at ' + uri + '\n')
+    // when env is testing, don't need open it
+    if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
+      opn(uri)
+    }
+    _resolve()
+  })
+  function filteredLog () {
+    if (arguments.length) {
+      if (arguments[0].replace(/\s/g, '').length) {
+        console.log.apply(console, arguments)
+      }
+    }
   }
-  _resolve()
+  code.stdout.on('data', filteredLog);
+  code.stderr.on('data', filteredLog);
 })
 
 var server = app.listen(port)
