@@ -106,7 +106,7 @@
 
 <script>
   import {debounce, orderBy, merge} from 'lodash'
-  import ConditionTag from '../../services/condition-tag'
+  import ConditionTagService from '../../services/condition-tag'
   import RespondentService from '../../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
   import RespondentItem from './RespondentItem'
@@ -264,7 +264,7 @@
       loadConditionTags () {
         if (this.conditionTagsLoaded) return
         this.conditionTagsLoading = true
-        return ConditionTag.respondent().then(tags => {
+        return ConditionTagService.respondent().then(tags => {
           this.conditionTags = Array.from(new Set(tags))
           this.conditionTagsLoaded = true
         }).catch(err => {
@@ -282,6 +282,7 @@
         PhotoService.cancelAllOutstanding()
         return RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
           .then(respondents => {
+            console.log('respondents', respondents)
             this.results = respondents
             this.error = null
           }).catch(err => {
@@ -292,6 +293,7 @@
       },
       onSelectRespondent (respondent) {
         this.$emit('selectRespondent', respondent)
+        console.log('onSelectRespondent', respondent)
         if (!this.canSelect) {
           router.push({name: 'Respondent', params: {respondentId: respondent.id, studyId: this.studyId}})
           return

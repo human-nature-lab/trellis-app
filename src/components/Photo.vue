@@ -16,7 +16,8 @@
   import PhotoService from '../services/photo/PhotoService'
   import ScrollListener from '../services/ScrollListener'
 
-  const URL_PLACEHOLDER = 'https://vignette.wikia.nocookie.net/prince-of-stride-alternative/images/1/14/Placeholder_person.jpg/revision/latest?cb=20160220192514'
+  // TODO: consider replacing this with a material design icon
+  const URL_PLACEHOLDER = '../static/img/Placeholder_person.jpg'
   export default {
     name: 'photo',
     props: {
@@ -107,7 +108,8 @@
         this.loadingPromise = PhotoService.getPhotoSrc(this.id).then(src => {
           this.setSrc(src)
         }).catch(err => {
-          if (err && err.response && err.response.status === 404) {
+          console.log('err', err)
+          if (err) {
             this.setSrc(URL_PLACEHOLDER)
           }
         })

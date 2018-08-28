@@ -1,8 +1,8 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
 import {Serializable, enumerable, Relationship} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Locale from "./Locale";
+import Translation from './Translation'
 
 @Entity()
 export default class TranslationText extends TimestampedSoftDelete {
@@ -17,5 +17,8 @@ export default class TranslationText extends TimestampedSoftDelete {
 
   @Relationship(Locale)
   locale: Locale
+
+  @ManyToOne(type => Translation, translation => translation.translationText)
+  translation: Translation
 
 }

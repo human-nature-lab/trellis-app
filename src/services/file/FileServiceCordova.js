@@ -116,7 +116,7 @@ class FileServiceCordova {
   getPhoto (fileName) {
     return this.requestFileSystem()
       .then((fileSystem) => this.getDirectoryEntry(fileSystem, 'photos'))
-      .then((directoryEntry) => this.getFileEntry(directoryEntry, fileName))
+      .then((directoryEntry) => this.getFileEntry(directoryEntry, fileName, {create: false, exclusive: false}))
   }
 
   emptyDirectory (directoryEntry) {

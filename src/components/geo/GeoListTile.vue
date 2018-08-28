@@ -51,9 +51,10 @@
     },
     computed: {
       primaryPhoto: function () {
-        return this.geo.photos.length ? this.geo.photos[0].photo : {}
+        return this.geo.photos.length ? this.geo.photos[0] : {}
       },
       translation: function () {
+        console.log('this.geo', this.geo)
         return this.geo.nameTranslation || null
       }
     },

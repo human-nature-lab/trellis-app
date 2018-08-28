@@ -32,7 +32,7 @@
             :height="250"
             :width="250"
             :key="photo.id"
-            :photo="photo.photo"/>
+            :photo="photo"/>
         </v-layout>
       </v-container>
       <RespondentGeos
@@ -229,6 +229,7 @@
     },
     methods: {
       hydrate (respondent: Respondent) {
+        console.log('hydrate', respondent)
         this.respondent = respondent
       },
       photoFromCamera () {},

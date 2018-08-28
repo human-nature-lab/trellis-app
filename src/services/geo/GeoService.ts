@@ -1,5 +1,6 @@
 import switchByModeEnv from '../../services/util'
 import GeoServiceWeb from './GeoServiceWeb'
+import GeoServiceCordova from './GeoServiceCordova'
 
 let Constructor = switchByModeEnv({
   WEB: {
@@ -7,8 +8,8 @@ let Constructor = switchByModeEnv({
     TEST: GeoServiceWeb
   },
   CORDOVA: {
-    PROD: GeoServiceWeb,
-    TEST: GeoServiceWeb
+    PROD: GeoServiceCordova,
+    TEST: GeoServiceCordova
   }
 })
 
