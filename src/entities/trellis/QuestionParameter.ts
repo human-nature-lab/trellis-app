@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Parameter from "./Parameter";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
@@ -15,12 +15,7 @@ export default class QuestionParameter extends TimestampedSoftDelete {
   @Column() @Serializable
   val: string
 
+  @Relationship(Parameter)
   parameter: Parameter
 
-  fromSnakeJSON (json: any) {
-    mapFromSnakeJSON(this, json, {
-      parameter: Parameter
-    })
-    return super.fromSnakeJSON(json)
-  }
 }

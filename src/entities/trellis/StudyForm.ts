@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {getColumnMeta, Serializable} from '../TypeOrmDecorators'
+import {getColumnMeta, Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON, mapPropsFromJSON} from "../../services/JSONUtil";
 import Form from "./Form";
@@ -19,18 +19,14 @@ export default class StudyForm extends TimestampedSoftDelete {
   @Column({ nullable: true }) @Serializable
   censusTypeId: string
 
+  @Relationship(Form)
   form: Form
 
   fromSnakeJSON(json: any) {
-    let colMeta = getColumnMeta(this)
     if (json.study_form && json.study_form.length) {
-      mapPropsFromJSON(this, json.study_form[0], colMeta.snake)
+      super.fromSnakeJSON(json.study_form[0])
       this.form = new Form().fromSnakeJSON(json)
-      this.parseDates()
     } else {
-      mapFromSnakeJSON(this, json, {
-        form: Form
-      })
       super.fromSnakeJSON(json)
     }
     this.sortOrder = +this.sortOrder // Convert to a number

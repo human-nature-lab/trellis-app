@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import ConditionTag from "./ConditionTag";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
@@ -16,15 +16,10 @@ export default class Skip extends TimestampedSoftDelete {
   @Column({ type: 'tinyint' }) @Serializable
   precedence: number
 
+  @Relationship({
+    constructor: ConditionTag,
+    jsonKey: 'conditions'
+  })
   conditionTags: ConditionTag[]
 
-  fromSnakeJSON (json: any) {
-    mapFromSnakeJSON(this, json, {
-      conditionTags: {
-        constructor: ConditionTag,
-        jsonKey: 'conditions'
-      }
-    })
-    return super.fromSnakeJSON(json)
-  }
 }

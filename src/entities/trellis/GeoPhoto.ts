@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Photo from "./Photo";
 
@@ -16,5 +16,6 @@ export default class GeoPhoto extends TimestampedSoftDelete {
   @Column({ type: 'text' }) @Serializable
   notes: string
 
+  @Relationship(Photo)
   photo: Photo
 }

@@ -1,5 +1,5 @@
 import {Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../TypeOrmDecorators'
+import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 import ConditionTag from "./ConditionTag";
@@ -22,6 +22,10 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
   @Column() @Serializable
   interviewId: string
 
+  @Relationship({
+    constructor: ConditionTag,
+    jsonKey: 'condition'
+  })
   conditionTag: ConditionTag
 
   fromRecycler (id: string, sectionId: string, conditionId: string, repetition: number, followUpDatumId: string, interviewId: string, surveyId: string) {
@@ -37,13 +41,4 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
     return this
   }
 
-  fromSnakeJSON (json: any) {
-    mapFromSnakeJSON(this, json, {
-      conditionTag: {
-        constructor: ConditionTag,
-        jsonKey: 'condition'
-      }
-    })
-    return super.fromSnakeJSON(json)
-  }
 }

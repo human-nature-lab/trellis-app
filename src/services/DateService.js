@@ -37,7 +37,7 @@ export function dateFormat (date) {
  * @returns {*|moment.Moment}
  */
 export function parseDate (date) {
-  let d = moment(date, DATE_FORMAT)
+  let d = moment.utc(date, DATE_FORMAT)
   d.toJSON = function () {
     return dateFormat(this)
   }
