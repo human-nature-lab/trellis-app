@@ -1,10 +1,19 @@
 import {parseDate} from '../../services/DateService'
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 import {getColumnMeta} from "../TypeOrmDecorators";
+import {AfterLoad} from 'typeorm'
 
 export default class BaseEntity implements SnakeSerializable {
   /**
-   * Just pars all of the dates defined in the model's __dates__ array
+   * After the entity loads parse the dates into Moment objects
+   */
+  @AfterLoad()
+  whenLoad() {
+    this.parseDates()
+  }
+
+  /**
+   * Just parse all of the dates defined in the model's __dates__ array
    */
   protected parseDates () {
     for (let key of getColumnMeta(this).dates) {
