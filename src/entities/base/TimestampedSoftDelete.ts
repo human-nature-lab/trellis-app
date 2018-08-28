@@ -7,5 +7,4 @@ export default abstract class TimestampedSoftDelete extends Timestamped {
   @AsDate
   @Serializable
   public deletedAt: Date = null;
-
 }

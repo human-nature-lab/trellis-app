@@ -42,6 +42,7 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   photos: Photo[]
 
   @Relationship({ generator: rctGenerator })
+  @OneToMany(type => RespondentConditionTag, respondentConditionTag => respondentConditionTag.respondent, { eager: true })
   respondentConditionTags: RespondentConditionTag[]
 
 }
