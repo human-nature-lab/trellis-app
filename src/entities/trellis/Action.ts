@@ -1,9 +1,10 @@
-import {Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapCamelToPlain} from '../../services/JSONUtil'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {Serializable} from '../WebOrmDecorators'
 
+@Entity()
 export default class Action extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryGeneratedColumn() @Serializable
   id: string
