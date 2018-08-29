@@ -98,26 +98,32 @@ var readyPromise = new Promise(resolve => {
   _resolve = resolve
 })
 
+var buildApp = process.argv.indexOf('--build-apk') !== -1
+if(buildApp) console.log('compiling mobile app')
 console.log('> Starting dev server...')
 devMiddleware.waitUntilValid(() => {
-  console.log('compiling mobile app')
-  var code = exec('cordova run android --device', {}, () => {
+  function finish () {
     console.log('> Listening at ' + uri + '\n')
     // when env is testing, don't need open it
     if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
       opn(uri)
     }
     _resolve()
-  })
-  function filteredLog () {
-    if (arguments.length) {
-      if (arguments[0].replace(/\s/g, '').length) {
-        console.log.apply(console, arguments)
+  }
+  if (buildApp) {
+    var code = exec('cordova run android --device', {}, finish)
+    function filteredLog () {
+      if (arguments.length) {
+        if (arguments[0].replace(/\s/g, '').length) {
+          console.log.apply(console, arguments)
+        }
       }
     }
+    code.stdout.on('data', filteredLog);
+    code.stderr.on('data', filteredLog);
+  } else {
+    finish()
   }
-  code.stdout.on('data', filteredLog);
-  code.stderr.on('data', filteredLog);
 })
 
 var server = app.listen(port)
