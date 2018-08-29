@@ -1,7 +1,7 @@
 <template>
   <v-flex class="photo" :class="{contained: isContained}" ref="container" :style="{'width': width + 'px', 'min-height': height + 'px'}">
     <v-progress-circular
-      v-if="srcLoading || imgLoading"
+      v-if="isLoading"
       indeterminate
       color="primary" />
     <img
@@ -14,10 +14,29 @@
 
 <script>
   import PhotoService from '../services/photo/PhotoService'
-  import ScrollListener from '../services/ScrollListener'
 
-  // TODO: consider replacing this with a material design icon
+  // TODO: consider replacing this with a material design icon.
+  // This can't be dynamically sized, so image is better
   const URL_PLACEHOLDER = '../static/img/Placeholder_person.jpg'
+
+  const observer = new IntersectionObserver(handleIntersections, {
+    threshold: 0.5
+  })
+
+  function handleIntersections (entries) {
+    entries.sort((a, b) => b.boundingClientRect.top - a.boundingClientRect.top)
+    for (let entry of entries) {
+      let vm = entry.target.__vue__
+      if (vm) {
+        if (entry.isIntersecting) {
+          vm.load()
+        } else {
+          vm.cancelLoad()
+        }
+      }
+    }
+  }
+
   export default {
     name: 'photo',
     props: {
@@ -52,43 +71,23 @@
         imgLoading: false,
         imgLoaded: false,
         randId: Math.random().toString(16),
-        onViewportChange: function () {
-          this.loadOrCancelLoading()
-        }.bind(this),
-        loadingPromise: null
+        loadingPromise: null,
+        loadingError: null
       }
     },
-    created: function () {
-      ScrollListener.on('scroll', this.onViewportChange)
-      window.addEventListener('resize', this.onViewportChange)
+    mounted () {
+      observer.observe(this.$refs.container)
       this.id = this.photo ? this.photo.id : this.photoId
       if (this.showAlt && this.photo && this.photo.alt) {
         this.alt = this.photo.alt
       }
-      if (!this.id) {
-        return
-      }
     },
     beforeDestroy: function () {
       // console.log('removing scroll listener')
-      ScrollListener.off('scroll', this.onViewportChange, true)
-      window.removeEventListener('resize', this.onViewportChange)
+      observer.unobserve(this.$refs.container)
       this.cancelLoad()
     },
-    mounted: function () {
-      this.$nextTick(this.loadOrCancelLoading)
-    },
     methods: {
-      isWithinViewport: function () {
-        if (!this.$refs.container) return false
-        let container = this.$refs.container
-        let rect = container.getBoundingClientRect()
-        return (rect.top >= 0 ||
-            rect.bottom >= (window.innerHeight || document.documentElement.clientHeight)) &&
-          (rect.left >= 0 ||
-            rect.right >= (window.innerWidth || document.documentElement.clientWidth)
-        )
-      },
       setSrc (src) {
         this.src = src
         this.srcLoaded = true
@@ -97,24 +96,42 @@
         this.$nextTick(() => {
           let _this = this
           let img = this.$refs.img
+          if (!img) return
           img.addEventListener('load', function () {
             _this.imgLoading = false
             _this.imgLoaded = true
           })
         })
       },
-      loadSrc: function () {
-        this.srcLoading = true
-        this.loadingPromise = PhotoService.getPhotoSrc(this.id).then(src => {
-          this.setSrc(src)
-        }).catch(err => {
-          console.log('err', err)
-          if (err) {
-            this.setSrc(URL_PLACEHOLDER)
-          }
-        })
+      setError (err) {
+        this.srcLoaded = true
+        this.imgLoaded = true
+        this.srcLoading = false
+        this.imgLoading = false
+        this.loadingError = err
+        this.setSrc(URL_PLACEHOLDER)
       },
-      cancelLoad: function () {
+      load () {
+        if (this.isLoaded) return
+        if (!this.id) {
+          this.setError(new Error('No id present for this photo'))
+        }
+        if (!this.srcLoaded && !this.loadingError) {
+          this.srcLoading = true
+          this.loadingPromise = PhotoService.getPhotoSrc(this.id).then(src => {
+            this.setSrc(src)
+          }).catch(err => {
+            console.log('err', err)
+            if (!(err && err.message && err.message === 'Canceled image load')) {
+              this.setError(err)
+            }
+          })
+        }
+      },
+      cancelLoad () {
+        if (this.srcLoaded && this.imgLoaded) return
+        this.imgLoading = false
+        this.srcLoading = false
         if (this.loadingPromise && this.loadingPromise.cancel) {
           this.srcLoading = false
           this.srcLoaded = false
@@ -125,25 +142,17 @@
           this.imgLoaded = false
           this.imgLoading = false
         }
-      },
-      loadOrCancelLoading: function () {
-        let inViewport = this.isWithinViewport()
-        if (inViewport && !this.srcLoaded && !this.srcLoading) {
-          this.loadSrc()
-        } else if (!this.isLoaded && this.isLoading && !inViewport) {
-          this.cancelLoad()
-        }
       }
     },
     computed: {
-      shouldLoad: function () {
-        return !this.isLoaded && !this.isLoading && this.isWithinViewport()
-      },
       isLoaded: function () {
         return this.srcLoaded && this.imgLoaded
       },
       isLoading: function () {
         return this.srcLoading || this.imgLoading
+      },
+      hasError () {
+        return !!this.loadingError
       }
     }
   }

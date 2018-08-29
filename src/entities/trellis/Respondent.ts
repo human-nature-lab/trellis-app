@@ -36,7 +36,7 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   @OneToMany(type => RespondentName, respondentName => respondentName.respondent, { eager: true })
   names: RespondentName[]
 
-  @Relationship({ generator: rPhotoGenerator })
+  @Relationship(Photo)
   @ManyToMany(type => Photo, photo => photo.respondents, { eager: true })
   @JoinTable({ name: 'respondent_photo' })
   photos: Photo[]
@@ -51,12 +51,6 @@ function geoGenerator (geo) {
   let g = new RespondentGeo().fromSnakeJSON(geo.pivot)
   g.geo = new Geo().fromSnakeJSON(geo)
   return g
-}
-
-function rPhotoGenerator (p) {
-  let rp = new RespondentPhoto().fromSnakeJSON(p.pivot)
-  rp.photo = new Photo().fromSnakeJSON(p)
-  return rp
 }
 
 function rctGenerator (tag) {

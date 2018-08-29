@@ -26,14 +26,6 @@ if (config.appEnv === APP_ENV.CORDOVA) {
 }
 Vue.component('debug', Debug)
 
-// add cordova.js only if serving the app through file://
-// if (window.location.protocol === 'file:' || window.location.port === '3000') {
-let cordovaScript = document.createElement('script')
-cordovaScript.setAttribute('type', 'text/javascript')
-cordovaScript.setAttribute('src', 'cordova.js')
-document.body.appendChild(cordovaScript)
-// }
-
 /* eslint-disable no-new */
 export default new Vue({
   el: '#app',
