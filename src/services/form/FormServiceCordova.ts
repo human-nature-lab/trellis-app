@@ -1,15 +1,11 @@
 import FormServiceInterface from './FormServiceInterface'
 import DatabaseService from '../database/DatabaseService'
-import Form from '../../entities/trellis/Form'
 import StudyForm from "../../entities/trellis/StudyForm";
+import Form from "../../entities/trellis/Form";
 
 export default class FormServiceCordova implements FormServiceInterface {
 
-  async getRepo () {
-    return await DatabaseService.getRepository(Form)
-  }
-
-  async getStudyForms (studyId: string) {
+  async getStudyForms (studyId: string): Promise<StudyForm[]> {
     const repo = await DatabaseService.getRepository(StudyForm)
     let studyForms = await repo.find({
       studyId,
@@ -18,9 +14,12 @@ export default class FormServiceCordova implements FormServiceInterface {
     return studyForms
   }
 
-  async getForm (id: string) {
-    const repo = await this.getRepo()
-    let form = await repo.findOne({id})
+  async getForm (id: string): Promise<Form> {
+    const repo = await DatabaseService.getRepository(Form)
+    const form = await repo.findOne({
+      id,
+      relations: ['sections']
+    })
     debugger
     return form
   }
