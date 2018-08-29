@@ -33,8 +33,8 @@
         <td>
           <v-icon v-if="props.item.isCurrent">check</v-icon>
         </td>
-        <permission :role-whitelist="['admin', 'manager']">
-          <td>
+        <td>
+          <permission :role-whitelist="['admin', 'manager']">
             <v-tooltip v-if="!props.item.isCurrent">
               <v-btn
                 slot="activator"
@@ -50,12 +50,12 @@
                 icon
                 slot="activator"
                 @click="startMove(props.item)">
-                <v-icon>arrow_forward</v-icon>
+                <v-icon>edit</v-icon>
               </v-btn>
               <span>{{ $t('move_respondent_location') }}</span>
             </v-tooltip>
-          </td>
-        </permission>
+          </permission>
+        </td>
       </template>
     </v-data-table>
     <v-dialog
@@ -129,6 +129,9 @@
       }, {
         text: 'Current',
         value: 'isCurrent'
+      }, {
+        text: '',
+        value: 'edit'
       }]
     }),
     methods: {

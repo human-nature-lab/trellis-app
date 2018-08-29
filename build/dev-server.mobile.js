@@ -53,7 +53,7 @@ app.get('/cordova.js', function (req, res) {
   if (req.hostname.includes('localhost')) {
     res.send(new Error('Not a device.'))
   } else {
-    fs.readFile('platforms/android/assets/www/cordova.js', function (err, data) {
+    fs.readFile('platforms/android/platform_www/cordova.js', function (err, data) {
       if (err) {
         res.send(err)
         console.error(err)
@@ -65,7 +65,7 @@ app.get('/cordova.js', function (req, res) {
 })
 
 app.get('/cordova_plugins.js', function (req, res) {
-  fs.readFile('platforms/android/assets/www/cordova_plugins.js', function (err, data) {
+  fs.readFile('platforms/android/platform_www/cordova_plugins.js', function (err, data) {
     if (err) {
       res.send(err)
       console.error(err)
@@ -89,7 +89,7 @@ app.use(hotMiddleware)
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-app.use('/plugins', express.static('./platforms/android/assets/www/plugins'))
+app.use('/plugins', express.static('./platforms/android/platform_www/plugins'))
 
 var uri = 'http://localhost:' + port
 
