@@ -22,6 +22,17 @@ module.exports = {
       : config.dev.assetsPublicPath,
     chunkFilename: '[name].[chunkhash:15].js'
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendor",
+          chunks: "initial",
+        },
+      },
+    },
+  },
   resolve: {
     extensions: ['.js', '.vue', '.json', '.ts', '.tsx', '.csv'],
     alias: {

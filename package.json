@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
-    "dev-android": "node build/dev-server.mobile.js",
+    "dev-android": "node build/dev-server.mobile.js --build-apk",
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
@@ -23,8 +23,8 @@
   "dependencies": {
     "@types/node": "^10.5.2",
     "axios": "^0.18.0",
-    "cordova-android": "^6.3.0",
     "bcryptjs": "^2.4.3",
+    "cordova-android": "^6.3.0",
     "cordova-osx": "^4.0.1",
     "cordova-plugin-device": "^2.0.2",
     "cordova-plugin-file": "^6.0.1",
