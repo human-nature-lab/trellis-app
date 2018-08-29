@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn} from 'typeorm'
 import {AsDate, Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Survey from "./Survey";
@@ -6,7 +6,7 @@ import User from "./User";
 
 @Entity()
 export class Interview extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable
   surveyId: string
@@ -22,19 +22,20 @@ export class Interview extends TimestampedSoftDelete {
   longitude: string
   @Column({ nullable: true }) @Serializable
   altitude: string
-  @Column({ nullable: true }) @Serializable
-  previousInterviewId: string
-  @Column({ type: 'datetime', nullable: true }) @Serializable @AsDate
-  completedAt: Date
+  // @Column({ nullable: true }) @Serializable
+  // previousInterviewId: string
+  // @Column({ type: 'datetime', nullable: true }) @Serializable @AsDate
+  // completedAt: Date
 
   @Relationship(Survey)
+  @ManyToOne(type => Survey)
   survey: Survey
+
   @Relationship(User)
+  @OneToOne(type => User, { eager: true })
+  @JoinColumn()
   user: User
 
-  fromSnakeJSON (json) {
-    return super.fromSnakeJSON(json)
-  }
 }
 
 export default Interview

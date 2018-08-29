@@ -42,7 +42,7 @@ var webpackConfig = merge(baseWebpackConfig, {
           ecma: 6,
           mangle: true
         },
-        sourceMap: true
+        // sourceMap: true
       })
     ]
   },

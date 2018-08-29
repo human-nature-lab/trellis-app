@@ -102,7 +102,7 @@
                       v-for="interview in survey.interviews"
                       :data-interview-id="interview.id"
                       :key="interview.id">
-                      <td>{{interview.user.name}} <span class="light">({{interview.user.username}})</span></td>
+                      <td>{{getName(interview.user)}} <span class="light">({{getUsername(interview.user)}})</span></td>
                       <td>{{interview.startTime}}</td>
                       <td>{{interview.endTime}}</td>
                     </tr>
@@ -145,6 +145,16 @@
       },
       nSurveys () {
         return this.form.surveys.length
+      }
+    },
+    methods: {
+      getName (user) {
+        if (!user) return 'No user defined'
+        else return user.name
+      },
+      getUsername (user) {
+        if (!user) return ''
+        else return user.username
       }
     },
     components: {

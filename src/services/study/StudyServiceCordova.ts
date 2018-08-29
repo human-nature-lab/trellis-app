@@ -17,4 +17,4 @@ class StudyServiceCordova extends StudyServiceAbstract {
   }
 }
 
-export default new StudyServiceCordova()
+export default StudyServiceCordova

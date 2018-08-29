@@ -82,21 +82,21 @@
       FormsView
     },
     methods: {
-      startInterview (form: DisplayForm) {
+      async startInterview (form: DisplayForm) {
         if (form.isComplete) return
-        let p
-        if (form.isStarted) {
-          p = InterviewService.create(form.surveys[0].id)
-        } else {
-          p = SurveyService.create(this.global['study'].id, this.respondent.id, form.id).then(survey => {
-            return InterviewService.create(survey.id)
-          })
-        }
-        return p.then(interview => {
+        let interview
+        debugger
+        try {
+          if (form.isStarted) {
+            interview = await InterviewService.create(form.surveys[0].id)
+          } else {
+            let survey = await SurveyService.create(this.global.study.id, this.respondent.id, form.id)
+            interview = await InterviewService.create(survey.id)
+          }
           router.push({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
-        }).catch(err => {
+        } catch (err) {
           this.error = err
-        })
+        }
       },
       hydrate (data: RespondentFormsData) {
         // Join any surveys that have been created with the possible forms
