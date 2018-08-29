@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, JoinColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, JoinTable, ManyToMany} from 'typeorm'
 import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Section from './Section'
@@ -20,9 +20,13 @@ export default class Form extends TimestampedSoftDelete {
   isPublished: boolean
 
   @Relationship(Section)
+  @ManyToMany(type => Section, section => section.forms)
+  @JoinTable({ name: 'form_section' })
   sections: Section[]
 
   @Relationship(Skip)
+  @ManyToMany(type => Skip, skip => skip.forms, { eager: true })
+  @JoinTable({ name: 'form_skip' })
   skips: Skip[]
 
   @Relationship(Translation)
