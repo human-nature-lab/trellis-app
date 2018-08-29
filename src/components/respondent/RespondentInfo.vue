@@ -60,8 +60,7 @@
         :items="respondent.respondentConditionTags">
         <template slot="items" slot-scope="props">
           <td>{{ props.item.conditionTag.name }}</td>
-          <td class="text-xs-right">{{ props.item.updatedAt.fromNow() }}</td>
-          <td class="text-xs-right">{{ props.item.createdAt.fromNow() }}</td>
+          <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
           <permission :role-whitelist="['admin', 'manager']">
             <td>
               <v-btn
@@ -99,8 +98,8 @@
           <td>
             <v-icon v-if="props.item.isDisplayName">check</v-icon>
           </td>
-          <permission :role-whitelist="['admin','manager']">
-            <td>
+          <td>
+            <permission :role-whitelist="['admin','manager']">
               <v-btn
                 icon
                 @click="editing.name = props.item; modal.editName = true">
@@ -112,8 +111,8 @@
                 <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
                 <v-icon v-else>delete</v-icon>
               </v-btn>
-            </td>
-          </permission>
+            </permission>
+          </td>
         </template>
       </v-data-table>
     </v-card-text>
@@ -212,11 +211,13 @@
           text: 'Tag name',
           value: 'name'
         }, {
-          text: 'Last updated',
-          value: 'updated_at'
+          text: 'Date added',
+          value: 'created_at',
+          width: '15%'
         }, {
-          text: 'Created at',
-          value: 'created_at'
+          text: '',
+          value: 'remove',
+          width: '10%'
         }],
         nameHeaders: [{
           text: 'Name',
@@ -224,6 +225,9 @@
         }, {
           text: 'Current',
           value: 'is_current'
+        }, {
+          text: '',
+          value: 'actions'
         }]
       }
     },
