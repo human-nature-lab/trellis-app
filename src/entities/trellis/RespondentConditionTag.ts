@@ -7,7 +7,7 @@ import Respondent from './Respondent'
 
 @Entity()
 export default class RespondentConditionTag extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable
   respondentId: string
