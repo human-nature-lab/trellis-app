@@ -1,11 +1,10 @@
 import {switchByModeEnv} from '../util'
 import UserServiceWeb from './UserServiceWeb'
+import UserServiceCordova from './UserServiceCordova'
 
-let Constructor = switchByModeEnv({
+export const UserService = switchByModeEnv({
   WEB: UserServiceWeb,
-  CORDOVA: UserServiceWeb
+  CORDOVA: UserServiceCordova
 })
 
-export const UserService = Constructor
-
-export default UserService
+export default new UserService()

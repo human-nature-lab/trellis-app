@@ -32,7 +32,7 @@ export class Interview extends TimestampedSoftDelete {
   survey: Survey
 
   @Relationship(User)
-  @OneToOne(type => User, { eager: true })
+  @OneToOne(type => User)
   @JoinColumn()
   user: User
 

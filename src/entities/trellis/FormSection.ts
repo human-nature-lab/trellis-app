@@ -1,6 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
 import {Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import Section from "./Section";
 
 @Entity()
 export default class FormSection extends TimestampedSoftDelete {
@@ -20,6 +21,9 @@ export default class FormSection extends TimestampedSoftDelete {
   repeatPromptTranslationId: string
   @Column({ nullable: true }) @Serializable
   followUpQuestionId: string
+
+  @ManyToOne(type => Section, section => section.formSections)
+  section: Section
 
   fromSnakeJSON (json: any) {
     super.fromSnakeJSON(json)

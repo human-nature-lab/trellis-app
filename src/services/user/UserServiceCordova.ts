@@ -20,4 +20,4 @@ export class UserServiceCordova extends UserServiceAbstract {
 
 }
 
-export default new UserServiceCordova()
+export default UserServiceCordova

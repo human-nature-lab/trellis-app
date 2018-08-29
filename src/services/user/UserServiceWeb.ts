@@ -27,4 +27,4 @@ export class UserServiceWeb extends UserServiceAbstract {
 
 }
 
-export default new UserServiceWeb()
+export default UserServiceWeb
