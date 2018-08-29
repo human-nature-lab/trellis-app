@@ -45,8 +45,19 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     }
 
     if (filters.conditionTags instanceof Array && filters.conditionTags.length > 0) {
-      let conditionTagNames = filters.conditionTags.map((tag) => { return '"' + tag + '"' }).join(',')
-      q = q.andWhere('"respondent"."id" in (select distinct respondent_id from respondent_condition_tag where condition_tag_id in (select id from condition_tag where name in (:conditionTagNames))))', {conditionTagNames: conditionTagNames})
+      let conditionTagNames = filters.conditionTags
+      if (conditionTagNames.length > 1) {
+        q = q.andWhere('"respondent"."id" in (' +
+                          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
+                            'select id from condition_tag where name in (:...conditionTagNames)) ' +
+                          'group by respondent_id having count(distinct condition_tag_id) = :conditionCount)',
+          {conditionTagNames: conditionTagNames, conditionCount: conditionTagNames.length})
+      } else {
+        q = q.andWhere('"respondent"."id" in (' +
+                          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
+                            'select id from condition_tag where name in (:...conditionTagNames)))',
+          {conditionTagNames: conditionTagNames})
+      }
     }
 
     if (filters.geos instanceof Array && filters.geos.length > 0) {

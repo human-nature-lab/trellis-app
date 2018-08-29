@@ -265,7 +265,7 @@
         if (this.conditionTagsLoaded) return
         this.conditionTagsLoading = true
         return ConditionTagService.respondent().then(tags => {
-          this.conditionTags = Array.from(new Set(tags))
+          this.conditionTags = Array.from(new Set(tags)).map((conditionTag) => { return conditionTag.name })
           this.conditionTagsLoaded = true
         }).catch(err => {
           this.error = err
