@@ -6,6 +6,15 @@ import uuid from 'uuid/v4'
 
 export class ConditionTagCordova implements ConditionTagInterface {
 
+  async getRespondentConditionTagById (respondentConditionTagId) {
+    const repository = await DatabaseService.getRepository(RespondentConditionTag)
+    const respondentConditionTag = await repository.findOneOrFail({
+      id: respondentConditionTagId,
+      deletedAt: null
+    })
+    return respondentConditionTag
+  }
+
   async createConditionTag (name) {
     const connection = await DatabaseService.getDatabase()
     const conditionTag = new ConditionTag()
@@ -18,11 +27,10 @@ export class ConditionTagCordova implements ConditionTagInterface {
   async createRespondentConditionTag (respondentId, conditionTagId) {
     const connection = await DatabaseService.getDatabase()
     const respondentConditionTag = new RespondentConditionTag()
-    respondentConditionTag.id = uuid()
     respondentConditionTag.respondentId = respondentId
     respondentConditionTag.conditionTagId = conditionTagId
-    await connection.manager.save(respondentConditionTag)
-    return respondentConditionTag
+    const returnConditionTag = await connection.manager.save(respondentConditionTag)
+    return await this.getRespondentConditionTagById(returnConditionTag.id)
   }
 
   async removeRespondentConditionTag (respondentId, conditionTagId) {
