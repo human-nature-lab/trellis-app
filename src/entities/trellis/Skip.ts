@@ -1,9 +1,9 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany} from 'typeorm'
 import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import ConditionTag from "./ConditionTag";
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
-import QuestionGroupSkip from "./QuestionGroupSkip";
+import Form from "./Form";
+import QuestionGroup from "./QuestionGroup";
 
 @Entity()
 export default class Skip extends TimestampedSoftDelete {
@@ -21,5 +21,11 @@ export default class Skip extends TimestampedSoftDelete {
     jsonKey: 'conditions'
   })
   conditionTags: ConditionTag[]
+
+  // Inverse relationships
+  @ManyToMany(type => Form)
+  forms: Form[]
+  @ManyToMany(type => QuestionGroup, qg => qg.skips)
+  questionGroups: QuestionGroup
 
 }

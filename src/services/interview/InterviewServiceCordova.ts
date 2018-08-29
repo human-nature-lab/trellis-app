@@ -13,7 +13,8 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
   async getInterview (id: string) {
     const repo = await DatabaseService.getRepository(Interview)
     const interview = await repo.findOne({
-      id
+      id,
+      relations: ['survey', 'user']
     })
     return interview
   }
@@ -25,7 +26,8 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     interview.startTime = now()
     interview.surveyId = surveyId
     interview.userId = user.id
-    return await repo.save(interview)
+    interview = await repo.save(interview)
+    return await this.getInterview(interview.id)
   }
 
   async complete (id: string) {

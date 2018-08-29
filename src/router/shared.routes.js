@@ -12,6 +12,7 @@ import ValidateLocale from './guards/ValidateLocale'
 import ValidateCensusForm from './guards/ValidateCensusForm'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
 import StudySelectorPage from '../components/StudySelectorPage'
+import WebLogin from '../components/login/WebLogin'
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
@@ -61,4 +62,8 @@ export default [{
   name: 'StartCensusForm',
   component: CensusFormLoaderPage,
   beforeEnter: chain(ValidateStudy, ValidateLocale, ValidateCensusForm)
+}, {
+  path: '/login',
+  name: 'Login',
+  component: WebLogin
 }]
