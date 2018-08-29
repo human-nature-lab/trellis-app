@@ -157,6 +157,12 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis')
   }
 
+  async getRepository (...args) {
+    const conn = await this.getDatabase()
+    let repo = await conn.getRepository(...args)
+    return repo
+  }
+
   static createConfigDatabase () {
     return DeviceService.isDeviceReady()
       .then(() => createConnection(trellisConfigConnection))

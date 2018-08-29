@@ -10,7 +10,7 @@ import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import GeoLocationService from '../geolocation'
 
-export class InterviewServiceWeb implements InterviewServiceInterface {
+export default class InterviewServiceWeb implements InterviewServiceInterface {
 
   async getInterview (interviewId: string) {
     let res = await http().get(`interview/${interviewId}`)
@@ -70,5 +70,3 @@ export class InterviewServiceWeb implements InterviewServiceInterface {
   }
 
 }
-
-export default new InterviewServiceWeb()
