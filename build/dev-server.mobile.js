@@ -101,7 +101,7 @@ var readyPromise = new Promise(resolve => {
 console.log('> Starting dev server...')
 devMiddleware.waitUntilValid(() => {
   console.log('compiling mobile app')
-  var code = exec('cordova run android', {}, () => {
+  var code = exec('cordova run android --device', {}, () => {
     console.log('> Listening at ' + uri + '\n')
     // when env is testing, don't need open it
     if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {

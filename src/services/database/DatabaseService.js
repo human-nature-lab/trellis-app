@@ -2,10 +2,12 @@ import {switchByModeEnv} from '../util'
 import DatabaseServiceMock from './DatabaseServiceMock'
 import DatabaseServiceCordova from './DatabaseServiceCordova'
 
-const Constructor = switchByModeEnv({
+export const DatabaseService = switchByModeEnv({
   WEB: DatabaseServiceMock,
   CORDOVA: DatabaseServiceCordova
 })
 
-export const DatabaseService = new Constructor()
-export default DatabaseService
+const dbDefault = new DatabaseService()
+export default dbDefault
+
+window.dbDefault = dbDefault

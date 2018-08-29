@@ -1,13 +1,16 @@
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapCamelToPlain} from '../../services/JSONUtil'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
-import {Serializable} from '../WebOrmDecorators'
+import {AsDate, Serializable} from '../WebOrmDecorators'
+import BaseEntity from "../base/BaseEntity";
 
 @Entity()
-export default class Action extends TimestampedSoftDelete implements SnakeSerializable {
+export default class Action extends BaseEntity implements SnakeSerializable {
   @PrimaryGeneratedColumn() @Serializable
   id: string
+  @Column() @Serializable @AsDate
+  createdAt: Date
+  @Column() @Serializable @AsDate
+  deletedAt: Date
   @Column() @Serializable
   surveyId: string
   @Column() @Serializable
