@@ -1,4 +1,14 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, OneToMany, JoinTable} from 'typeorm'
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  ManyToMany,
+  OneToMany,
+  JoinTable,
+  OneToOne,
+  JoinColumn
+} from 'typeorm'
 import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
@@ -15,6 +25,8 @@ export default class Section extends TimestampedSoftDelete {
   nameTranslationId: string
 
   @Relationship(Translation)
+  @OneToOne(type => Translation, { eager: true })
+  @JoinColumn()
   nameTranslation: Translation
 
   @Relationship(QuestionGroup)
