@@ -42,8 +42,20 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   photos: Photo[]
 
   @Relationship({ generator: rctGenerator })
-  @OneToMany(type => RespondentConditionTag, respondentConditionTag => respondentConditionTag.respondent, { eager: true })
-  respondentConditionTags: RespondentConditionTag[]
+  // @OneToMany(type => RespondentConditionTag, respondentConditionTag => respondentConditionTag.respondent, { eager: true })
+  get respondentConditionTags (): Promise<RespondentConditionTag[]> {
+    let _respondentConditionTags
+    if (_respondentConditionTags !== undefined) {
+      return new Promise(resolve => { resolve(_respondentConditionTags) })
+    } else {
+      const DatabaseService = require('../../services/database/DatabaseService').default
+      return DatabaseService.getRepository(RespondentConditionTag).then((repository) => repository.find({
+        respondentId: this.id,
+        deletedAt: null
+      }))
+    }
+  }
+
 
 }
 

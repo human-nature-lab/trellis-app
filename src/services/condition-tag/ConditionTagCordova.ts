@@ -34,9 +34,12 @@ export class ConditionTagCordova implements ConditionTagInterface {
   }
 
   async removeRespondentConditionTag (respondentId, conditionTagId) {
+    console.log('removeRespondentConditionTag', conditionTagId)
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentConditionTag)
     await repository.update({id: conditionTagId}, {deletedAt: new Date()})
+    const removedRCT = await repository.find({id: conditionTagId})
+    console.log('removedRCT', removedRCT)
   }
 
   async respondent () {
