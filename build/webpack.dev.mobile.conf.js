@@ -57,6 +57,9 @@ module.exports = merge(baseWebpackConfig, {
         return content
       }
     }]),
-    new BundleAnalyzerPlugin()
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      openAnalyzer: false
+    })
   ]
 })
