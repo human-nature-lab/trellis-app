@@ -37,7 +37,6 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       .set({ endTime: now()})
       .where('id = :id', { id })
       .execute()
-    debugger
     return interview
   }
 
@@ -47,14 +46,12 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       interviewId,
       deletedAt: null
     })
-    debugger
     return actions
   }
 
   async saveActions (interviewId: string, actions: Action[]) {
     const repo = await DatabaseService.getRepository(Action)
     let res = await repo.insert(actions)
-    debugger
     return res
   }
 
