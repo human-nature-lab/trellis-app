@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
-import {Serializable, enumerable, Relationship} from '../WebOrmDecorators'
+import {Serializable, enumerable, Relationship} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Locale from "./Locale";
 import Translation from './Translation'

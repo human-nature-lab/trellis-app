@@ -1,6 +1,6 @@
 import {parseDate} from '../../services/DateService'
 import SnakeSerializable from "../interfaces/SnakeSerializable";
-import {getColumnMeta} from "../WebOrmDecorators";
+import {getColumnMeta} from "../decorators/WebOrmDecorators";
 import {deepCopy} from "../../services/JSONUtil";
 import {AfterLoad} from 'typeorm'
 

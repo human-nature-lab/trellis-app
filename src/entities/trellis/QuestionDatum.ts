@@ -1,7 +1,7 @@
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import Datum from "./Datum";
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
-import {Relationship, Serializable} from '../WebOrmDecorators'
+import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 import {now} from '../../services/DateService'
 

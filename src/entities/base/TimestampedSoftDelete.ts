@@ -1,5 +1,5 @@
 import {Column} from 'typeorm'
-import {AsDate, Serializable} from '../WebOrmDecorators'
+import {AsDate, Serializable} from '../decorators/WebOrmDecorators'
 import Timestamped from './Timestamped'
 
 export default abstract class TimestampedSoftDelete extends Timestamped {

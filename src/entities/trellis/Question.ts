@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, OneToMany, JoinTable} from 'typeorm'
-import {Relationship, Serializable} from '../WebOrmDecorators'
+import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import QuestionType from "./QuestionType";

@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../WebOrmDecorators'
+import {Serializable} from '../decorators/WebOrmDecorators'
 import BaseEntity from '../base/BaseEntity'
 
 @Entity()
