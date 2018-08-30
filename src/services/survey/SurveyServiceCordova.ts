@@ -8,7 +8,6 @@ export default class SurveyServiceCordova implements SurveyServiceInterface {
 
   async getSurvey (surveyId: string) {
     const repo = await DatabaseService.getRepository(Survey)
-    debugger
     return await repo.findOne({
       deletedAt: null,
       id: surveyId
@@ -45,7 +44,6 @@ export default class SurveyServiceCordova implements SurveyServiceInterface {
     })
     survey.completedAt = now()
     let res = await repo.save(survey)
-    debugger
     return survey
   }
 
