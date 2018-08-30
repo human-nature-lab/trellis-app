@@ -16,47 +16,50 @@ export default function RoutePreloadMixin (loadCallback) {
       this.hydrate(data)
       singleton.loading.error = null
     },
-    beforeRouteEnter (to, from, next) {
+    async beforeRouteEnter (to, from, next) {
       singleton.loading.indeterminate = true
       singleton.loading.active = true
-      loadCallback(to).then(d => {
-        data = d
+      try {
+        data = await loadCallback(to)
         next()
-      }).catch(err => {
+      } catch (err) {
+        console.error('Unable to load route:', to)
         console.error(err)
         singleton.loading.error = err.toString()
-      }).finally(() => {
+      } finally {
         singleton.loading.active = false
-      })
+      }
     },
-    beforeRouteUpdate (to, from, next) {
+    async beforeRouteUpdate (to, from, next) {
       singleton.loading.active = true
       singleton.loading.indeterminate = true
-      let l = () => loadCallback(to)
-      let p = this.leaving ? this.leaving().then(l) : l()
-      p.then(data => {
-        // We're reusing the component so 'this' is defined here, but not in the routeEnter method
-        this.hydrate(data)
+      if (this.leaving) {
+        await this.leaving()
+      }
+      try {
+        let routeData = await loadCallback(to)
+        this.hydrate(routeData)
         singleton.loading.error = null
-      }).catch(err => {
+      } catch (err) {
+        console.error('Unable to update route:', to)
         console.error(err)
         singleton.loading.error = err.toString()
-      }).finally(() => {
+      } finally {
         singleton.loading.active = false
         next()
-      })
+      }
     },
-    beforeRouteLeave (to, from, next) {
+    async beforeRouteLeave (to, from, next) {
       singleton.loading.active = true
       singleton.loading.message = 'Validating guards...'
-      if (this.leaving) {
-        let p = this.leaving()
-        if (p instanceof Promise) {
-          this.leaving().then(next)
-        } else {
-          next()
+      try {
+        if (this.leaving) {
+          await this.leaving()
         }
-      } else {
+      } catch (err) {
+        console.error('Error leaving:', to)
+        console.error(err)
+      } finally {
         next()
       }
     }

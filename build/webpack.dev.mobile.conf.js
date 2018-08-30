@@ -8,6 +8,8 @@ var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 
 // add hot-reload related code to entry chunks
 Object.keys(baseWebpackConfig.entry).forEach(function (name) {
@@ -55,5 +57,6 @@ module.exports = merge(baseWebpackConfig, {
         return content
       }
     }]),
+    new BundleAnalyzerPlugin()
   ]
 })
