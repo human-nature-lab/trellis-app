@@ -1,8 +1,9 @@
 import {parseDate} from '../../services/DateService'
-import SnakeSerializable from "../interfaces/SnakeSerializable";
-import {getColumnMeta} from "../WebOrmDecorators";
-import {deepCopy} from "../../services/JSONUtil";
-import {AfterLoad} from 'typeorm'
+import SnakeSerializable from '../interfaces/SnakeSerializable'
+import {getColumnMeta} from '../WebOrmDecorators'
+import {deepCopy, camelToSnake} from '../../services/JSONUtil'
+import {AfterInsert, AfterLoad, AfterRemove, AfterUpdate} from 'typeorm'
+import UpdatedRecords from '../trellis-config/UpdatedRecords'
 
 export default class BaseEntity implements SnakeSerializable {
   /**
@@ -11,6 +12,52 @@ export default class BaseEntity implements SnakeSerializable {
   @AfterLoad()
   whenLoad() {
     this.parseDates()
+  }
+
+  @AfterUpdate()
+  async whenUpdate() {
+    console.log('whenUpdate', this)
+    // Requiring DatabaseService to break circular dependency issue when importing
+    const DatabaseService = require('../../services/database/DatabaseService').default
+    const connection = await DatabaseService.getConfigDatabase()
+    const repository = await connection.getRepository(UpdatedRecords)
+    const updatedRecord = new UpdatedRecords()
+    console.log('this.constructor.name', this.constructor.name)
+    console.log('camelToSnake(this.constructor.name)', camelToSnake(this.constructor.name))
+    updatedRecord.table = camelToSnake(this.constructor.name)
+    updatedRecord.updatedRecordId = this['id']
+    updatedRecord.isUpdate = true
+    repository.save(updatedRecord)
+  }
+
+  @AfterRemove()
+  async whenRemove() {
+    console.log('whenRemove', this)
+    const DatabaseService = require('../../services/database/DatabaseService').default
+    const connection = await DatabaseService.getConfigDatabase()
+    const repository = await connection.getRepository(UpdatedRecords)
+    const updatedRecord = new UpdatedRecords()
+    console.log('this.constructor.name', this.constructor.name)
+    console.log('camelToSnake(this.constructor.name)', camelToSnake(this.constructor.name))
+    updatedRecord.table = camelToSnake(this.constructor.name)
+    updatedRecord.updatedRecordId = this['id']
+    updatedRecord.isRemove = true
+    repository.save(updatedRecord)
+  }
+
+  @AfterInsert()
+  async whenInsert() {
+    console.log('whenInsert', this)
+    const DatabaseService = require('../../services/database/DatabaseService').default
+    const connection = await DatabaseService.getConfigDatabase()
+    const repository = await connection.getRepository(UpdatedRecords)
+    const updatedRecord = new UpdatedRecords()
+    console.log('this.constructor.name', this.constructor.name)
+    console.log('camelToSnake(this.constructor.name)', camelToSnake(this.constructor.name))
+    updatedRecord.table = camelToSnake(this.constructor.name)
+    updatedRecord.updatedRecordId = this['id']
+    updatedRecord.isInsert = true
+    repository.save(updatedRecord)
   }
 
   /**
