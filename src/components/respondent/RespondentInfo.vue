@@ -57,7 +57,7 @@
         class="mb-3"
         hide-actions
         :headers="conditionTagHeaders"
-        :items="respondent.respondentConditionTags">
+        :items="respondentConditionTags">
         <template slot="items" slot-scope="props">
           <td>{{ props.item.conditionTag.name }}</td>
           <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
@@ -171,7 +171,7 @@
   import RespondentGeos from './RespondentGeos'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import RespondentService from '../../services/respondent/RespondentService'
-  import ConditionTagWeb from '../../services/condition-tag/ConditionTagWeb'
+  import ConditionTagService from '../../services/condition-tag'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
@@ -194,6 +194,7 @@
       return {
         global: singleton,
         respondent: null as Respondent,
+        respondentConditionTags: [] as RespondentConditionTag[],
         error: null as any,
         deleting: {} as object,
         editing: {
@@ -232,9 +233,13 @@
       }
     },
     methods: {
-      hydrate (respondent: Respondent) {
+      async hydrate (respondent: Respondent) {
         console.log('hydrate', respondent)
         this.respondent = respondent
+        this.respondentConditionTags = await respondent.respondentConditionTags
+      },
+      leaving () {
+        this.respondentConditionTags = null
       },
       photoFromCamera () {},
       photoFromFile () {},
@@ -269,17 +274,18 @@
         this.modal.editName = false
       },
       doneAddingRespondentConditionTag (tag: RespondentConditionTag): void {
-        this.respondent.respondentConditionTags.push(tag)
+        this.respondentConditionTags.push(tag)
         this.modal.conditionTag = false
       },
       async deleteRespondentConditionTag (respondentConditionTagId: string): Promise<void> {
+        console.log('deleteRespondentConditionTag', respondentConditionTagId)
         // TODO: Finish UI for removing respondent condition tags
         if (!window.confirm(`Are you sure you want to delete this respondent condition tag?`)) return
         this.deleting[respondentConditionTagId] = true
         try {
-          await ConditionTagWeb.removeRespondentConditionTag(this.respondent.id, respondentConditionTagId)
-          let index = this.respondent.respondentConditionTags.findIndex(t => t.id === respondentConditionTagId)
-          this.respondent.respondentConditionTags.splice(index, 1)
+          await ConditionTagService.removeRespondentConditionTag(this.respondent.id, respondentConditionTagId)
+          let index = this.respondentConditionTags.findIndex(t => t.id === respondentConditionTagId)
+          this.respondentConditionTags.splice(index, 1)
         } catch (err) {
           this.error = err
         } finally {
