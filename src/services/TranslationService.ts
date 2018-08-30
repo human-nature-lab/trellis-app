@@ -46,10 +46,12 @@ export default class TranslationService {
     // translation = transformToTranslation(translation)
     let translated = TranslationService.getTranslated(translation, locale)
     if (!translated) {
-      let firstTrans = translation.translationText[0]
-      translated = firstTrans.translatedText
-      if (translated && firstTrans.locale && firstTrans.locale.languageTag) {
-        translated += ` (${firstTrans.locale.languageTag})`
+      if (translation.translationText && translation.translationText.length) {
+        let firstTrans = translation.translationText[0]
+        translated = firstTrans.translatedText
+        if (translated && firstTrans.locale && firstTrans.locale.languageTag) {
+          translated += ` (${firstTrans.locale.languageTag})`
+        }
       }
     }
     return translated || '[No translation text exists for this resource]'

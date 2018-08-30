@@ -31,11 +31,11 @@ export default class Question extends TimestampedSoftDelete {
   questionType: QuestionType
 
   @Relationship(Translation)
-  @OneToOne(type => Translation, { eager: true })
+  // @OneToOne(type => Translation, { eager: true })
   questionTranslation: Translation
 
   @Relationship(QuestionChoice)
-  // @OneToMany(type => QuestionChoice, choice => choice.question, { eager: true })
+  @OneToMany(type => QuestionChoice, choice => choice.question, { eager: true })
   choices: QuestionChoice[]
 
   @Relationship(AssignConditionTag)
@@ -44,7 +44,7 @@ export default class Question extends TimestampedSoftDelete {
   assignConditionTags: AssignConditionTag[]
 
   @Relationship(QuestionParameter)
-  // @OneToMany(type => QuestionParameter, qp => qp.question, { eager: true })
+  @OneToMany(type => QuestionParameter, qp => qp.question, { eager: true })
   questionParameters: QuestionParameter[]
 
   // Inverse relationships

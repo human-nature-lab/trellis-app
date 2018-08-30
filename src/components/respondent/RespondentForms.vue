@@ -85,7 +85,6 @@
       async startInterview (form: DisplayForm) {
         if (form.isComplete) return
         let interview
-        debugger
         try {
           if (form.isStarted) {
             interview = await InterviewService.create(form.surveys[0].id)

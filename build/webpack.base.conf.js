@@ -116,6 +116,9 @@ module.exports = {
     ]
   },
   plugins: [
+    new FilterWarningsPlugin({
+      exclude: [/Critical dependency/, /mongodb/, /mssql/, /mysql/, /mysql2/, /oracledb/, /pg/, /pg-native/, /pg-query-stream/, /redis/, /react-native-sqlite-storage/, /sqlite3/]
+    }),
     new VueLoaderPlugin()
   ]
 }

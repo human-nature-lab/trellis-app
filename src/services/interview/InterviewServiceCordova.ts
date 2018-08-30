@@ -47,7 +47,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       interviewId,
       deletedAt: null
     })
-    debugger
+    if (actions.length) debugger
     return actions
   }
 
