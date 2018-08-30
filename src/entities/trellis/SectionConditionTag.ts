@@ -1,4 +1,4 @@
-import {Relationship, Serializable} from '../WebOrmDecorators'
+import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import SnakeSerializable from "../interfaces/SnakeSerializable";

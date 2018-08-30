@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, JoinTable, ManyToMany} from 'typeorm'
-import {Relationship, Serializable} from '../WebOrmDecorators'
+import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Section from './Section'
 import Skip from './Skip'

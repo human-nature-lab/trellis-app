@@ -1,5 +1,5 @@
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
-import {Relationship, Serializable} from '../WebOrmDecorators'
+import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 import ConditionTag from "./ConditionTag";

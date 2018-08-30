@@ -1,5 +1,5 @@
 import {PrimaryColumn, Entity, Column} from 'typeorm'
-import {Serializable} from '../WebOrmDecorators'
+import {Serializable} from '../decorators/WebOrmDecorators'
 
 @Entity("sync")
 export default class Sync {

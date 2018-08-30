@@ -1,6 +1,6 @@
 import uuidv4 from 'uuid/v4'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {Serializable} from '../WebOrmDecorators'
+import {Serializable} from '../decorators/WebOrmDecorators'
 import {Column, Entity, PrimaryColumn} from 'typeorm'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'

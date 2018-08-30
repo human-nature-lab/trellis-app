@@ -1,4 +1,4 @@
-import {AssignerFunction, RelationshipOpts} from '../entities/WebOrmDecorators'
+import {AssignerFunction, RelationshipOpts} from '../entities/decorators/WebOrmDecorators'
 import moment from 'moment'
 
 /**

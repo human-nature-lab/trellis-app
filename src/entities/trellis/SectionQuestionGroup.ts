@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn} from 'typeorm'
-import {Serializable} from '../WebOrmDecorators'
+import {Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import QuestionGroup from "./QuestionGroup";
 

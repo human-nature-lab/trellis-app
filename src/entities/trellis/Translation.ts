@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm'
-import {enumerable, Relationship, Serializable} from '../WebOrmDecorators'
+import {enumerable, Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {mapPropsFromJSON, mapFromSnakeJSON} from "../../services/JSONUtil";
 import TranslationText from "./TranslationText";

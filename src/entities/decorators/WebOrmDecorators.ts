@@ -1,4 +1,4 @@
-import {camelToSnake, getSnakeAssignmentFunc} from "../services/JSONUtil";
+import {camelToSnake, getSnakeAssignmentFunc} from "../../services/JSONUtil";
 
 const columnMetaMap: Map<any, ColumnMeta> = new Map()
 
