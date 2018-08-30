@@ -13,14 +13,10 @@ export default class QuestionGroup extends TimestampedSoftDelete {
 
   @Relationship(Question)
   @OneToMany(type => Question, q => q.questionGroup, { eager: true })
-  @JoinColumn()
   questions: Question[]
 
-  @Relationship({
-    constructor: SectionQuestionGroup,
-    jsonKey: 'pivot'
-  })
-  @OneToOne(type => SectionQuestionGroup, { eager: true })
+  @Relationship({ constructor: SectionQuestionGroup, jsonKey: 'pivot' })
+  @OneToOne(type => SectionQuestionGroup, sqg => sqg.questionGroup, { eager: true })
   sectionQuestionGroup: SectionQuestionGroup
 
   @Relationship(Skip)

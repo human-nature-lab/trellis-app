@@ -1,8 +1,9 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToOne} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne} from 'typeorm'
 import {Relationship, Serializable} from '../WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Choice from "./Choice";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
+import Question from "./Question";
 
 @Entity()
 export default class QuestionChoice extends TimestampedSoftDelete {
@@ -16,8 +17,12 @@ export default class QuestionChoice extends TimestampedSoftDelete {
   sortOrder: number
 
   @Relationship(Choice)
-  // @OneToOne(type => Choice)
+  @OneToOne(type => Choice)
+  @JoinColumn()
   choice: Choice
+
+  @ManyToOne(type => Question, question => question.choices)
+  question: Question
 
   fromSnakeJSON (json: any) {
     if (json.pivot) {

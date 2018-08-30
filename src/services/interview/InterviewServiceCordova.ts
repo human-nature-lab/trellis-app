@@ -46,7 +46,9 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       interviewId,
       deletedAt: null
     })
-    return actions
+    if (actions.length) {
+      return actions
+    }
   }
 
   async saveActions (interviewId: string, actions: Action[]) {
