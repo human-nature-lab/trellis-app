@@ -24,6 +24,8 @@ module.exports = {
     chunkFilename: '[name].[chunkhash:15].js'
   },
   optimization: {
+    usedExports: true,
+    concatenateModules: true,
     splitChunks: {
       cacheGroups: {
         commons: {
