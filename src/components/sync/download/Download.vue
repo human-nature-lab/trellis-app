@@ -185,7 +185,7 @@
     data () {
       return {
         status: DOWNLOAD_STATUS.CHECKING_CONNECTION,
-        downloadStep: 1,
+        downloadStep: this.initDownloadStep,
         downloadSubStep: 0,
         snapshotFileSize: null,
         serverSnapshot: null,
@@ -228,6 +228,10 @@
         })
     },
     props: {
+      initDownloadStep: {
+        type: Number,
+        required: true
+      }
     },
     methods: {
       showLog: function () {
@@ -252,7 +256,7 @@
             SyncService.registerCancelledSync(this.sync)
               .then(() => {
                 this.$emit('download-cancelled')
-                this.downloadStep = 1
+                this.downloadStep = this.initDownloadStep
                 this.downloadSubStep = 1
               })
               .catch((err) => {
@@ -260,7 +264,7 @@
               })
           } else {
             this.$emit('download-cancelled')
-            this.downloadStep = 1
+            this.downloadStep = this.initDownloadStep
             this.downloadSubStep = 1
           }
         }

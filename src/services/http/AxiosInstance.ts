@@ -5,7 +5,8 @@ import router from '../../router'
 import singleton from '../../static/singleton'
 
 const TOKEN_KEY = 'x-token'
-let axiosInstance
+let defaultInst
+let syncInst
 
 /**
  * Set the token value. This stores it in local storage as well
@@ -24,19 +25,19 @@ export function removeToken () {
  * @returns {Axios}
  */
 export default function defaultInstance (): AxiosInstance {
-  if (!axiosInstance) {
-    axiosInstance = axios.create({
+  if (!defaultInst) {
+    defaultInst = axios.create({
       baseURL: config.apiRoot + '/survey-view',
       timeout: 20000,
       headers: {'X-Key': config.xKey}
     })
 
     // Handle authentication using axios [interceptors](https://github.com/axios/axios#interceptors)
-    axiosInstance.interceptors.request.use(function (request) {
+    defaultInst.interceptors.request.use(function (request) {
       request.headers['X-Token'] = storage.get(TOKEN_KEY)
       return request
     })
-    axiosInstance.interceptors.response.use(function (response) {
+    defaultInst.interceptors.response.use(function (response) {
       return response
     }, function (err) {
       if (err.response && err.response.status === 401) {
@@ -52,10 +53,16 @@ export default function defaultInstance (): AxiosInstance {
       return Promise.reject(err)
     })
   }
-  return axiosInstance
+  return defaultInst
 }
 
-export const syncInstance = axios.create({
-  baseURL: config.apiRoot + '/sync',
-  timeout: 0
-})
+export function syncInstance (): AxiosInstance  {
+  if (syncInst === undefined) {
+    syncInst = axios.create({
+      baseURL: config.apiRoot + '/sync',
+      timeout: 0
+    })
+  }
+  return syncInst
+
+}
