@@ -152,7 +152,7 @@
 </template>
 
 <script>
-  import DownloadStep from './DownloadStep'
+  import DownloadStep from '../SyncStep'
   import CheckConnection from './substeps/CheckConnection'
   import AuthenticateDevice from './substeps/AuthenticateDevice'
   import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'

@@ -4,7 +4,7 @@
       <v-card-title>
         <h3>{{ title }}</h3>
       </v-card-title>
-      <v-card-text class="download-step-text">
+      <v-card-text class="sync-step-text">
         <slot></slot>
       </v-card-text>
     </v-card>
@@ -18,9 +18,9 @@
 </template>
 
 <script>
-  import AutoClickButton from '../../../components/AutoClickButton'
+  import AutoClickButton from '../AutoClickButton'
   export default {
-    name: 'download-step',
+    name: 'sync-step',
     data () {
       return {}
     },
@@ -46,6 +46,6 @@
 </script>
 
 <style lang="sass">
-  .download-step-text li
+  .sync-step-text li
     margin-left: 1em
 </style>
