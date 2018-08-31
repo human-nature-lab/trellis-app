@@ -78,7 +78,7 @@
   import GeoListTile from './GeoListTile'
   // @ts-ignore
   import Cart from '../Cart'
-  import {debounce} from 'lodash'
+  import debounce from 'lodash/debounce'
   import GeoService from '../../services/geo/GeoService'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'

@@ -1,7 +1,7 @@
 import { DeviceService } from '../device/DeviceService'
 import md5 from 'js-md5'
 import config from '../../config'
-import _ from 'lodash'
+import merge from 'lodash/merge'
 /* global md5chksum, FileTransfer */
 
 class FileServiceCordova {
@@ -152,7 +152,7 @@ class FileServiceCordova {
                   let errorObject = {
                     message: 'Operation cancelled by user.'
                   }
-                  _.merge(errorObject, err)
+                  merge(errorObject, err)
                   reject(errorObject)
                 } else {
                   reject(err)
