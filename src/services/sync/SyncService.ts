@@ -25,7 +25,7 @@ class SyncService {
   getHeartbeat (source: CancelTokenSource) {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return http.get(`heartbeat`, options)
+    return http().get(`heartbeat`, options)
       .then(response => {
         return response.data
       })
@@ -37,7 +37,7 @@ class SyncService {
   authenticate (source: CancelTokenSource, deviceId: string) {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return http.get(`device/${deviceId}/syncv2/authenticate`, options)
+    return http().get(`device/${deviceId}/syncv2/authenticate`, options)
       .then(response => {
         return response.data
       })
@@ -51,7 +51,7 @@ class SyncService {
         .then((deviceId) => {
           let options = {} as AxiosRequestConfig
           if (source) { options.cancelToken = source.token }
-          http.get(`device/${deviceId}/syncv2/snapshot`, options)
+          http().get(`device/${deviceId}/syncv2/snapshot`, options)
             .then(response => {
               resolve(response.data)
             })
@@ -64,7 +64,7 @@ class SyncService {
   getSnapshotFileSize (source: CancelTokenSource, snapshotId: string): Promise<number> {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return http.get(`snapshot/${snapshotId}/file_size`, options)
+    return http().get(`snapshot/${snapshotId}/file_size`, options)
       .then(response => {
         return response.data
       })
@@ -78,7 +78,7 @@ class SyncService {
     return new Promise((resolve, reject) => {
       DeviceService.getUUID()
         .then((deviceId) => {
-          http.post(`device/${deviceId}/image_size`, fileNames, options)
+          http().post(`device/${deviceId}/image_size`, fileNames, options)
             .then(response => {
               resolve(response.data)
             })
@@ -96,7 +96,7 @@ class SyncService {
     } as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     if (onDownloadProgress) { options.onDownloadProgress = onDownloadProgress }
-    return http.get(`snapshot/${snapshotId}/download`, options)
+    return http().get(`snapshot/${snapshotId}/download`, options)
       .then(response => {
         return response
       })
@@ -112,7 +112,7 @@ class SyncService {
     } as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     return DeviceService.getUUID()
-      .then((deviceId) => http.get(`device/${deviceId}/image/${fileName}`, options))
+      .then((deviceId) => http().get(`device/${deviceId}/image/${fileName}`, options))
   }
   async hasSynced (): Promise<boolean> {
     const connection = await DatabaseService.getConfigDatabase()
