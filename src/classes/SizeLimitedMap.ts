@@ -1,4 +1,4 @@
-import {debounce} from 'lodash'
+import debounce from 'lodash/debounce'
 export default class SizeLimitedMap<T> {
   private map: Map<any, T> = new Map()
   private meta: object = {}

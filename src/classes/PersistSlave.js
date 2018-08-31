@@ -1,4 +1,5 @@
-import {throttle, cloneDeep} from 'lodash'
+import throttle from 'lodash/throttle'
+import cloneDeep from 'lodash/cloneDeep'
 export default class PersistSlave {
   /**
    * A class that is responsible for syncing up an external source with the supplied data

@@ -15,6 +15,12 @@ export default class FormServiceCordova implements FormServiceInterface {
   }
 
   async getForm (id: string): Promise<Form> {
+    console.log('getForm', id)
+    const connection = await DatabaseService.getDatabase()
+    console.log('connection foo', connection)
+    //connection.createQueryBuilder
+    return new Form()
+    /*
     const repo = await DatabaseService.getRepository(Form)
     const form = await repo.findOne({
       id,
@@ -22,6 +28,7 @@ export default class FormServiceCordova implements FormServiceInterface {
     })
     debugger
     return form
+    */
   }
 
 }

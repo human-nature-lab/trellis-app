@@ -1,4 +1,4 @@
-import { debounce } from 'lodash'
+import debounce from 'lodash/debounce'
 import Emitter from '../classes/Emitter'
 export class ScrollListener extends Emitter {
   /**

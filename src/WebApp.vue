@@ -77,6 +77,7 @@
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
   import singleton from './static/singleton'
+
   export default {
     name: 'web-app',
     data: function () {
@@ -86,10 +87,6 @@
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
         alerts: AlertService.alerts
       }
-    },
-    created: async function () {
-      /* load the singleton object (selected study, locale, theme) from local storage */
-      // await SingletonService.loadFromLocalStorage()
     },
     components: {
       VDivider,

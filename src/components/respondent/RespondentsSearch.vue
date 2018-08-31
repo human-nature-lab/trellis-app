@@ -105,7 +105,9 @@
 </template>
 
 <script>
-  import {debounce, orderBy, merge} from 'lodash'
+  import debounce from 'lodash/debounce'
+  import orderBy from 'lodash/orderBy'
+  import merge from 'lodash/merge'
   import ConditionTagService from '../../services/condition-tag'
   import RespondentService from '../../services/respondent/RespondentService'
   import RespondentListItem from './RespondentListItem'
