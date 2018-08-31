@@ -6,6 +6,11 @@
           <v-layout row class="sync-content">
             <v-flex class="xs12">
               <sync-status v-if="!downloading && !uploading && !downloadingPhotos"></sync-status>
+              <upload
+                v-if="uploading"
+                v-on:upload-done="uploadDone"
+                v-on:upload-cancelled="uploadCancelled">
+              </upload>
               <download
                 v-if="downloading || downloadingPhotos"
                 :init-download-step="downloadStep"
@@ -16,7 +21,8 @@
           </v-layout>
           <v-layout row class="mt-2 sync-footer" justify-space-between>
             <v-flex class="xs3 text-xs-left">
-              <v-btn :disabled="!enableUpload()">
+              <v-btn :disabled="!enableUpload()"
+                     @click="onUpload">
                 <v-icon>cloud_upload</v-icon>
               </v-btn>
             </v-flex>
@@ -44,6 +50,7 @@
   import SyncService from '../../services/sync/SyncService'
   import DatabaseService from '../../services/database/DatabaseService'
   import Download from './download/Download'
+  import Upload from './upload/Upload'
 
   export default {
     name: 'sync',
@@ -80,17 +87,25 @@
         this.downloadStep = 1
         this.downloading = true
       },
+      onUpload: function () {
+        this.uploading = true
+      },
       onDownloadPhotos: function () {
         this.downloadStep = 4
         this.downloadingPhotos = true;
       },
       downloadCancelled: function () {
-        console.log('foo')
         this.downloading = false
         this.downloadingPhotos = false
       },
       downloadDone: function () {
         this.downloading = false
+      },
+      uploadCancelled: function () {
+        this.uploading = false
+      },
+      uploadDone: function () {
+        this.uploading = false
       },
       enableDownload: function () {
         return ( (this.updatedRecordsCount === 0) && this.enableAll() )
@@ -108,6 +123,7 @@
     computed: {},
     components: {
       Download,
+      Upload,
       SyncStatus
     }
   }
