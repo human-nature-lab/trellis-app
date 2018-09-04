@@ -10,8 +10,8 @@ class SingletonService {
     this.loadPromise = this.loadFromLocalStorage()
   }
 
-  async hasLoaded () {
-    return await this.loadPromise
+  hasLoaded () {
+    return this.loadPromise
   }
 
   async loadFromLocalStorage () {

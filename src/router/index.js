@@ -29,7 +29,6 @@ export const router = new Router({
 
 // If we're in offline mode, require that the application is synced
 if (singleton.offline) {
-  debugger
   router.beforeEach(chain(ValidateSync, ValidateLogin))
 }
 

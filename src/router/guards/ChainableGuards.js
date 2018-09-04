@@ -11,10 +11,8 @@ export function parallel (...guards) {
   function incrementAndFailOrFinish (...args) {
     nDone++
     if (args.length) {
-      console.log('redirecting', args)
       return next(...args)
     } else if (nDone === guards.length) {
-      console.log('finished with all guards')
       return next()
     }
   }
@@ -31,16 +29,13 @@ export default function chainableGuards (...guards) {
   function callNextGuardOrFinish () {
     let guard = guards.shift()
     if (!guard) {
-      console.log('finished with all guards')
       return next()
     } else {
       return guard(to, from, function (...args) {
         // Bail early if any arguments are present
         if (args.length) {
-          console.log('redirecting', args)
           return next(...args)
         } else {
-          console.log('moving to next guard')
           return callNextGuardOrFinish()
         }
       })

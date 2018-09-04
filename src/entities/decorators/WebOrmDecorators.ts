@@ -20,6 +20,7 @@ export interface RelationshipOpts {
   generator? (json: any): any
   constructor? (): void
   jsonKey?: string
+  async?: boolean
 }
 
 /**
