@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import config from '../config'
-import {APP_ENV} from '../static/constants'
-import SingletonService from '../services/singleton/SingletonService'
+import singleton from '../static/singleton'
 import ValidateSync from './guards/ValidateSync'
 import ValidateLogin from './guards/ValidateLogin'
 import chain from './guards/ChainableGuards'
@@ -12,11 +10,13 @@ import webRoutes from './web.routes'
 import sharedRoutes from './shared.routes'
 
 let routes = sharedRoutes
-if (config.appEnv === APP_ENV.WEB) {
-  routes = routes.concat(webRoutes)
-} else {
+if (singleton.offline) {
   routes = routes.concat(appRoutes)
+} else {
+  routes = routes.concat(webRoutes)
 }
+
+console.log('Routes', routes)
 
 Vue.use(Router)
 
@@ -28,9 +28,21 @@ export const router = new Router({
 })
 
 // If we're in offline mode, require that the application is synced
-if (SingletonService.get('offline')) {
+if (singleton.offline) {
+  debugger
   router.beforeEach(chain(ValidateSync, ValidateLogin))
 }
+
+router.beforeEach((to, from, next) => {
+  console.log('before navigating to', to)
+  setTimeout(next)
+})
+
+router.afterEach((to) => console.log('after navigating to', to))
+
+router.onReady(() => console.log('router ready'))
+
+router.onError(err => console.error('Router error:', err))
 
 /**
  * Add element to browser history and try to return to the current location

@@ -1,8 +1,12 @@
 import config from '../config'
 import {APP_ENV, APP_MODE} from '../static/constants'
+import storage from './StorageService'
+
+const isOffline = config.appEnv !== APP_ENV.WEB && storage.get('offline') !== null ? storage.get('offline') : true
+console.log(`App is offline: ${isOffline}`)
 /* global cordova */
 export function switchByModeEnv (args) {
-  if (config.appEnv === APP_ENV.CORDOVA) {
+  if (isOffline) {
     if (config.appMode === APP_MODE.PROD) {
       return args.CORDOVA && args.CORDOVA.PROD ? args.CORDOVA.PROD : args.CORDOVA
     } else {

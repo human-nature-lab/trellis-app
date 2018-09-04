@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import {merge} from 'lodash'
 import uuid from 'uuid/v4'
 import Log from '../../entities/trellis-config/Log'
 import DatabaseService from '../database/DatabaseService'
@@ -13,7 +13,7 @@ class LoggingServiceCordova {
   constructor (options) {
     this.defaultOptions = {}
     if (typeof options === 'object') {
-      _.merge(this.defaultOptions, options)
+      merge(this.defaultOptions, options)
     }
   }
 
@@ -21,7 +21,7 @@ class LoggingServiceCordova {
     if (_request === null || _request === undefined) {
       throw new Error('Invalid logger request')
     }
-    const request = _.merge(_request, this.defaultOptions)
+    const request = merge(_request, this.defaultOptions)
     const log = new Log()
     log.id = uuid()
     log.message = this.getMessage(request)

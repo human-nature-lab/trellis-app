@@ -71,11 +71,11 @@
 
 <script>
   // import SingletonService from './services/singleton/SingletonService'
-  import LoadingPage from './components/LoadingPage'
   import MainMenu from './components/main-menu/MainMenu'
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
+  import router from './router'
   import singleton from './static/singleton'
   export default {
     name: 'web-app',
@@ -87,22 +87,51 @@
         alerts: AlertService.alerts
       }
     },
-    created: async function () {
+    created () {
       /* load the singleton object (selected study, locale, theme) from local storage */
       // await SingletonService.loadFromLocalStorage()
+      if (this.withinCordova) {
+        document.addEventListener('pause', this.onPause, false)
+        document.addEventListener('resume', this.onResume, false)
+        document.addEventListener('backbutton', this.onBackButton)
+      }
+    },
+    beforeDestroy () {
+      if (this.withinCordova) {
+        document.removeEventListener('pause', this.onPause)
+        document.removeEventListener('resume', this.onResume, false)
+        document.removeEventListener('backbutton', this.onBackButton)
+      }
     },
     components: {
       VDivider,
-      LoadingPage,
       MainMenu,
       TrellisAlert
     },
     computed: {
+      withinCordova () {
+        return window.cordova && typeof cordova === 'object'
+      }
     },
     methods: {
-      dismissAlert: function () {
+      dismissAlert () {
         AlertService.removeAlert()
-      }
+      },
+      onPause () {
+        // Handle the pause lifecycle event.
+        console.log('pause')
+      },
+      onResume () {
+        // Handle the resume lifecycle event.
+        // SetTimeout required for iOS.
+        setTimeout(function () {
+          console.log('resume')
+        }, 0)
+      },
+      onBackButton () {
+        console.log('back button pressed')
+        router.go(-1)
+      },
     }
   }
 </script>

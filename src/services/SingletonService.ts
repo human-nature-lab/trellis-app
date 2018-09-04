@@ -1,7 +1,7 @@
-import singleton from '../../static/singleton'
-import storage from '../storage/StorageService'
-import LocaleService from '../locale/LocaleService'
-import StudyService from '../study/StudyService'
+import singleton from '../static/singleton'
+import storage from './StorageService'
+import LocaleService from './locale/LocaleService'
+import StudyService from './study/StudyService'
 
 class SingletonService {
   loadPromise: Promise<void>
@@ -11,7 +11,7 @@ class SingletonService {
   }
 
   async hasLoaded () {
-    return this.loadPromise
+    return await this.loadPromise
   }
 
   async loadFromLocalStorage () {
@@ -27,7 +27,7 @@ class SingletonService {
       singleton.locale = await LocaleService.getLocaleById(localeId)
     }
     if (storage.get('offline')) {
-      singleton.offline = storage.get('offline')
+      singleton.offline = !!storage.get('offline')
     }
   }
 
@@ -44,6 +44,11 @@ class SingletonService {
   setDarkTheme (useDarkTheme) {
     singleton.darkTheme = useDarkTheme
     storage.set('dark-theme', useDarkTheme)
+  }
+
+  setOnlineOffline (isOffline) {
+    storage.set('offline', isOffline)
+    singleton.offline = isOffline
   }
 
   get (key) {

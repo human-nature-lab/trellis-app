@@ -14,7 +14,7 @@
 
 <script>
     import FileService from '../../../../services/file/FileService'
-    import SyncService from '../../../../services/sync/SyncService'
+    import SyncService from '../../../../services/SyncService'
     import axios from 'axios'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'

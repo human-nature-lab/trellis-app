@@ -2,6 +2,7 @@ import LoginServiceInterface from './LoginServiceInterface'
 import DatabaseService from '../database/DatabaseService'
 import UserService from '../user/UserService'
 import User from '../../entities/trellis/User'
+import singleton from '../../static/singleton'
 import bcrypt from 'bcryptjs'
 
 export default class LoginServiceCordova implements LoginServiceInterface {
@@ -17,6 +18,7 @@ export default class LoginServiceCordova implements LoginServiceInterface {
       throw Error('Unable to log in with the provided credentials (incorrect password)')
     }
     UserService.setCurrentUser(user)
+    singleton.user = user
     return user
   }
 

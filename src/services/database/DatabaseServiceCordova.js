@@ -1,4 +1,4 @@
-import { DeviceService } from '@/services/device/DeviceService'
+import DeviceService from '@/services/device/DeviceService'
 import 'reflect-metadata'
 import { createConnection, getConnection } from 'typeorm'
 import Config from '../../entities/trellis-config/Config'

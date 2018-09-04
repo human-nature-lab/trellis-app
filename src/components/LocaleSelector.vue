@@ -22,7 +22,7 @@
   import Vue from 'vue'
   import StudyService from '../services/study/StudyService'
   import LocaleService from '../services/locale/LocaleService'
-  import SingletonService from '../services/singleton/SingletonService'
+  import SingletonService from '../services/SingletonService'
   export default Vue.extend({
     name: 'locale-selector',
     data: function () {
