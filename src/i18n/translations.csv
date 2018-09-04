@@ -1,4 +1,6 @@
 key,en,es,comment
+online,Online,,
+offline,Offline,,
 respondent_full_name,Respondent's full name (with nickname),,
 locations,Locations,Ubicaciones,
 names,Names,Nombres,
@@ -245,6 +247,7 @@ survey_message_beginning,You are at the beginning of the survey,Usted está al c
 survey_message_lock,This survey will be locked to prevent changes.,Esto cerrará el formulario para prevenir cambios.,
 sync_currently_active,Sync is currently active. Please wait for it to finish.,La sincronización está actualmente activa. Espere a que termine.,
 sync_in_progress,Sync in progress,Sincronización en curso,
+sync,Sync,Sincronización,
 testmode,Restart in test mode,Reiniciar en modo de prueba,
 title_activity_questions,Questions,Preguntas,
 title_activity_send_log,Send Log,Enviar Registro,

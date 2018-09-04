@@ -1,19 +1,17 @@
 import Interview from '../components/interview/Interview'
-import StudySelectorPage from '../components/StudySelectorPage'
+import RespondentsSearch from '../components/respondent/RespondentsSearch'
 import ValidateLocale from './guards/ValidateLocale'
-import chainableGuards from './guards/ChainableGuards'
+import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
 
 export default [{
   path: '/',
-  name: 'StudySelector',
-  component: StudySelectorPage
+  name: 'Home',
+  component: RespondentsSearch,
+  beforeEnter: chain(ValidateStudy, ValidateLocale)
 }, {
   path: '/form/:formId/preview',
   name: 'InterviewPreview',
   component: Interview,
-  beforeEnter: chainableGuards(ValidateStudy, ValidateLocale)
-}, {
-  path: '*',
-  redirect: '/login'
+  beforeEnter: chain(ValidateStudy, ValidateLocale)
 }]

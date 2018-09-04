@@ -1,7 +1,8 @@
-import SyncService from '../../services/sync/SyncService'
-import SingletonService from '../../services/singleton/SingletonService'
+import SyncService from '../../services/SyncService'
+import SingletonService from '../../services/SingletonService'
 
 export default async function (to, from, next) {
+  console.log('ValidateSync', to)
   await SingletonService.hasLoaded()
   if (SingletonService.get('synced')) {
     next()

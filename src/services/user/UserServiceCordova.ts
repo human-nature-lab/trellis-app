@@ -1,5 +1,6 @@
 import User from '../../entities/trellis/User'
 import { UserServiceAbstract } from './UserServiceAbstract'
+import router from '../../router'
 export class UserServiceCordova extends UserServiceAbstract {
 
   private _currentUserRequest: Promise<any>
@@ -10,7 +11,10 @@ export class UserServiceCordova extends UserServiceAbstract {
       if (this.user) {
         return resolve(this.user)
       } else {
-        return resolve(null)
+        resolve(null)
+        if (router.currentRoute.name !== 'Login') {
+          router.push("/login")
+        }
       }
     }).finally(() => {
       this._currentUserRequest = null

@@ -7,7 +7,7 @@
 <script>
     import axios from 'axios'
     import config from '@/config'
-    import SyncService from '../../../../services/sync/SyncService'
+    import SyncService from '../../../../services/SyncService'
     import DeviceService from '../../../../services/device/DeviceService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'

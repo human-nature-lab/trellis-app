@@ -1,4 +1,7 @@
-class DeviceServiceMock {
+export default class DeviceServiceMock {
+  private isReady: boolean = false
+  private uuid: string
+
   constructor () {
     this.isReady = false
     this.uuid = ''
@@ -33,5 +36,3 @@ class DeviceServiceMock {
     })
   }
 }
-
-export default DeviceServiceMock

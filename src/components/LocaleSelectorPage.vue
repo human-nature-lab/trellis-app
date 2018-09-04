@@ -26,7 +26,7 @@
           let path = this.$route.query.to.replace(/locale=[^&?]*/g, '')
           index.push({path: path})
         } else {
-          index.push({name: 'home'})
+          index.push({name: 'Home'})
         }
       }
     },

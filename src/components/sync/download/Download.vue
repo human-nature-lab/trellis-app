@@ -171,7 +171,7 @@
   import CalculateImageSize from './substeps/CalculateImageSize.vue'
   import DownloadImages from './substeps/DownloadImages.vue'
   import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
-  import SyncService from '../../../services/sync/SyncService'
+  import SyncService from '../../../services/SyncService'
   import DeviceService from '../../../services/device/DeviceService'
   import Log from '../../../entities/trellis-config/Log'
   import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'

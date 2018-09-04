@@ -1,6 +1,6 @@
 import JSZip from 'jszip'
-import { DeviceService } from '@/services/device/DeviceService'
-import { FileService } from '@/services/file/FileService'
+import DeviceService from '../device/DeviceService'
+import { FileService } from '../file/FileService'
 
 class ZipServiceMock {
 
