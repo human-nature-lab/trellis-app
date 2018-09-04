@@ -1,7 +1,7 @@
 import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
 import config from '../../config'
-import {merge} from 'lodash'
+import merge from 'lodash/merge'
 /* global md5chksum, FileTransfer */
 
 class FileServiceCordova {

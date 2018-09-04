@@ -77,6 +77,7 @@
   import TrellisAlert from './components/TrellisAlert.vue'
   import router from './router'
   import singleton from './static/singleton'
+
   export default {
     name: 'web-app',
     data: function () {
