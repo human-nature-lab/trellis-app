@@ -1,6 +1,6 @@
 import Interview from '../../entities/trellis/Interview'
 import {now} from '../DateService'
-import SingletonService from '../singleton/SingletonService'
+import SingletonService from '../SingletonService'
 import DatabaseService from '../database/DatabaseService'
 import InterviewServiceInterface from './InterviewServiceInterface'
 import Action from "../../entities/trellis/Action";

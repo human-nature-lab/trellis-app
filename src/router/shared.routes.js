@@ -6,12 +6,12 @@ import CameraTest from '../components/CameraTest'
 import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
 import GeoInfo from '../components/geo/GeoInfo'
 import LocaleSelectorPage from '../components/LocaleSelectorPage'
+import StudySelectorPage from '../components/StudySelectorPage'
 import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
 import ValidateLocale from './guards/ValidateLocale'
 import ValidateCensusForm from './guards/ValidateCensusForm'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
-import StudySelectorPage from '../components/StudySelectorPage'
 import WebLogin from '../components/login/WebLogin'
 
 export default [{
@@ -19,10 +19,6 @@ export default [{
   name: 'Interview',
   component: Interview,
   beforeEnter: ValidateStudy
-}, {
-  path: '/',
-  name: 'StudySelector',
-  component: StudySelectorPage
 }, {
   path: '/study/:studyId/respondent/:respondentId/forms',
   name: 'RespondentForms',
@@ -66,4 +62,8 @@ export default [{
   path: '/login',
   name: 'Login',
   component: WebLogin
+}, {
+  path: '/study',
+  name: 'StudySelector',
+  component: StudySelectorPage
 }]

@@ -114,6 +114,17 @@
           {{ $t('logout') }}
         </v-list-tile-content>
       </v-list-tile>
+      <v-list-tile
+        v-if="hasRole(['admin']) && isCordovaBuild"
+        @click="toggleOffline">
+        <v-list-tile-action>
+          <v-icon>exit_to_app</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <span v-if="global.offline">{{$t('offline')}}</span>
+          <span v-else>{{$t('online')}}</span>
+        </v-list-tile-content>
+      </v-list-tile>
     </v-list>
     <v-snackbar
       absolute
@@ -133,14 +144,19 @@
 </template>
 
 <script>
+  import config from '../../config'
   import menuBus from './MenuBus'
   import LoginService from '../../services/login'
   import router from '../../router'
-  import SingletonService from '../../services/singleton/SingletonService'
+  import SingletonService from '../../services/SingletonService'
+  import storage from '../../services/StorageService'
   import global from '../../static/singleton'
+  import PermissionMixin from '../../mixins/PermissionMixin'
+  import {APP_ENV} from '../../static/constants'
 
   export default {
     name: 'dropdown-menu',
+    mixins: [PermissionMixin],
     data: () => ({
       showCopiedSnackbar: false,
       global
@@ -164,9 +180,20 @@
       },
       toggleDarkTheme () {
         SingletonService.setDarkTheme(!SingletonService.get('darkTheme'))
+      },
+      toggleOffline () {
+        let offline = !SingletonService.get('offline')
+        storage.clear()
+        SingletonService.setOnlineOffline(offline)
+        setTimeout(() => this.refresh(), 50)
       }
     },
     computed: {
+      isCordovaBuild () {
+        const v = config.appEnv === APP_ENV.CORDOVA
+        console.log('isCordovaBuild', v)
+        return v
+      },
       isInterview () {
         return this.$route.name === 'Interview' || this.$route.name === 'InterviewPreview'
       }

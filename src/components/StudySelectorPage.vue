@@ -25,7 +25,7 @@
         if (this.$route.query.to) {
           index.push({path: this.$route.query.to})
         } else {
-          index.push({name: 'home'})
+          index.push({name: 'Home'})
         }
       }
     },

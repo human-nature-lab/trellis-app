@@ -3,14 +3,8 @@ import GeoServiceWeb from './GeoServiceWeb'
 import GeoServiceCordova from './GeoServiceCordova'
 
 let Constructor = switchByModeEnv({
-  WEB: {
-    PROD: GeoServiceWeb,
-    TEST: GeoServiceWeb
-  },
-  CORDOVA: {
-    PROD: GeoServiceCordova,
-    TEST: GeoServiceCordova
-  }
+  WEB: GeoServiceWeb,
+  CORDOVA: GeoServiceCordova
 })
 
 export const GeoService = Constructor

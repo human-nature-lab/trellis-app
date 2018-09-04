@@ -1,4 +1,10 @@
-class DeviceServiceCordova {
+declare const device
+declare const cordova
+
+export default class DeviceServiceCordova {
+  private isReady: boolean = false
+  private platform: string
+  private uuid: string
   constructor () {
     this.isReady = false
     this.uuid = undefined
@@ -61,5 +67,3 @@ class DeviceServiceCordova {
     })
   }
 }
-
-export default DeviceServiceCordova

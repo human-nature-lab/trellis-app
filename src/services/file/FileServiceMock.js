@@ -1,4 +1,4 @@
-import { DeviceService } from '@/services/device/DeviceService'
+import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
 
 class FileServiceMock {
