@@ -2,7 +2,6 @@ import StudyService from '../../services/study/StudyService'
 import SingletonService from '../../services/SingletonService'
 
 export default async function (to, from, next) {
-  console.log('ValidateStudy', to)
   await SingletonService.hasLoaded()
   let study
   if (to.params.studyId) {
