@@ -149,6 +149,7 @@
   import LoginService from '../../services/login'
   import router from '../../router'
   import SingletonService from '../../services/SingletonService'
+  import storage from '../../services/StorageService'
   import global from '../../static/singleton'
   import PermissionMixin from '../../mixins/PermissionMixin'
   import {APP_ENV} from '../../static/constants'
@@ -181,7 +182,9 @@
         SingletonService.setDarkTheme(!SingletonService.get('darkTheme'))
       },
       toggleOffline () {
-        SingletonService.setOnlineOffline(!SingletonService.get('offline'))
+        let offline = !SingletonService.get('offline')
+        storage.clear()
+        SingletonService.setOnlineOffline(offline)
         setTimeout(() => this.refresh(), 50)
       }
     },

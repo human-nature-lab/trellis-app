@@ -9,7 +9,7 @@ import Geo from "./Geo";
 import ConditionTag from "./ConditionTag";
 import SnakeSerializable from "../interfaces/SnakeSerializable";
 import Photo from "./Photo";
-import {AsyncQuery} from "../decorators/QueryDecorator";
+import {LazyQuery} from "../decorators/QueryDecorator";
 
 
 @Entity()
@@ -42,14 +42,14 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   @JoinTable({ name: 'respondent_photo' })
   photos: Photo[]
 
-  @Relationship({ generator: rctGenerator })
+  @Relationship({ generator: rctGenerator, async: true })
   // @OneToMany(type => RespondentConditionTag, respondentConditionTag => respondentConditionTag.respondent, { eager: true })
-  // @AsyncQuery(RespondentConditionTag, (repo, respondent) => {
-  //   return repo.find({
-  //     respondentId: respondent.id,
-  //     deletedAt: null
-  //   })
-  // }, { cached: false })
+  @LazyQuery(RespondentConditionTag, (repo, respondent) => {
+    return repo.find({
+      respondentId: respondent.id,
+      deletedAt: null
+    })
+  }, { cached: false })
   respondentConditionTags: Promise<RespondentConditionTag[]>
   // get respondentConditionTags (): Promise<RespondentConditionTag[]> {
   //   let _respondentConditionTags

@@ -20,14 +20,13 @@ class SingletonService {
     }
     if (storage.get('current-study')) {
       const studyId = storage.get('current-study')
+      if (!studyId) return
       singleton.study = await StudyService.getStudy(studyId)
     }
     if (storage.get('current-locale')) {
       const localeId = storage.get('current-locale')
+      if (!localeId) return
       singleton.locale = await LocaleService.getLocaleById(localeId)
-    }
-    if (storage.get('offline')) {
-      singleton.offline = !!storage.get('offline')
     }
   }
 
