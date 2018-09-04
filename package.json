@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
-    "dev-android": "webpack --config=build/webpack.dev.mobile.conf.js && cordova run android --device && node build/dev-server.mobile.js",
+    "dev-android": "webpack --config=build/webpack.dev.mobile.conf.js && cordova run android && node build/dev-server.mobile.js",
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
@@ -53,6 +53,7 @@
     "vuetify": "1.0.19"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.0.0",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.26.3",
     "babel-eslint": "^7.1.1",

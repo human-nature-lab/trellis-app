@@ -8,6 +8,14 @@ export class StorageService {
   }
 
   /**
+   * Clear all items out of local storage
+   */
+  clear () {
+    this.data = new Map()
+    window.localStorage.clear()
+  }
+
+  /**
    * Get a value from localStorage with a type hint. The type is necessary to parse the data correctly on get
    * @param name
    * @param type

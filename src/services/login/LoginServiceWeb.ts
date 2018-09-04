@@ -1,6 +1,7 @@
 import UserService from '../user/UserService'
 import http, {setToken, removeToken} from '../http/AxiosInstance'
-import LoginServiceInterface from "./LoginServiceInterface";
+import LoginServiceInterface from './LoginServiceInterface'
+import singleton from '../../static/singleton'
 
 export default class LoginServiceWeb implements LoginServiceInterface {
 
@@ -12,7 +13,9 @@ export default class LoginServiceWeb implements LoginServiceInterface {
       if (res.status >= 200 && res.status < 400) {
         setToken(res.data.token.hash)
         UserService._user = null
-        UserService.loadCurrentUser()
+        UserService.loadCurrentUser().then(user => {
+          singleton.user = user
+        })
         return res
       } else {
         throw Error('Unable to log in to this form with the provided credentials')
