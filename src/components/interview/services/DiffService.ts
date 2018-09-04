@@ -1,4 +1,4 @@
-import {isEqual} from 'lodash'
+import isEqual from 'lodash/isEqual'
 import {AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta} from "../../../services/interview/InterviewDeltaInterface";
 import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 export default class DiffService {

@@ -5,9 +5,10 @@
         <v-container>
           <v-layout row class="sync-content">
             <v-flex class="xs12">
-              <sync-status v-if="!downloading && !uploading"></sync-status>
+              <sync-status v-if="!downloading && !uploading && !downloadingPhotos"></sync-status>
               <download
-                v-if="downloading"
+                v-if="downloading || downloadingPhotos"
+                :init-download-step="downloadStep"
                 v-on:download-done="downloadDone"
                 v-on:download-cancelled="downloadCancelled">
               </download>
@@ -19,11 +20,16 @@
                 <v-icon>cloud_upload</v-icon>
               </v-btn>
             </v-flex>
-            <v-flex class="xs3 text-xs-right">
+            <v-flex class="xs6 text-xs-right">
               <v-btn @click="onDownload"
                      :loading="downloading"
                      :disabled="!enableDownload()">
                 <v-icon>cloud_download</v-icon>
+              </v-btn>
+              <v-btn @click="onDownloadPhotos"
+                     :loading="downloadingPhotos"
+                     :disabled="!enablePhotoDownload()">
+                <v-icon>portrait</v-icon>
               </v-btn>
             </v-flex>
           </v-layout>
@@ -43,8 +49,11 @@
     name: 'sync',
     data () {
       return {
+        loading: true,
+        downloadStep: 1,
         uploading: false,
         downloading: false,
+        downloadingPhotos: false,
         serverLatestSnapshot: null,
         localLatestSnapshot: null,
         updatedRecordsCount: null
@@ -57,6 +66,7 @@
       ]).then(results => {
         this.localLatestSnapshot = results[0]
         this.updatedRecordsCount = results[1]
+        this.loading = false
       }, errors => {
         console.error(errors)
       })
@@ -67,25 +77,32 @@
         return SyncService.getHeartbeat()
       },
       onDownload: function () {
+        this.downloadStep = 1
         this.downloading = true
       },
+      onDownloadPhotos: function () {
+        this.downloadStep = 4
+        this.downloadingPhotos = true;
+      },
       downloadCancelled: function () {
+        console.log('foo')
         this.downloading = false
+        this.downloadingPhotos = false
       },
       downloadDone: function () {
         this.downloading = false
       },
       enableDownload: function () {
-        if (this.localLatestSnapshot === null || this.updatedRecordsCount === null || this.downloading) {
-          return false
-        }
-        return this.updatedRecordsCount === 0
+        return ( (this.updatedRecordsCount === 0) && this.enableAll() )
       },
       enableUpload: function () {
-        if (this.localLatestSnapshot === null || this.updatedRecordsCount === null) {
-          return false
-        }
-        return this.updatedRecordsCount > 0
+        return ( (this.updatedRecordsCount > 0) && this.enableAll() )
+      },
+      enablePhotoDownload: function () {
+        return ( (this.localLatestSnapshot !== null) && this.enableAll() )
+      },
+      enableAll: function () {
+        return ( !this.loading && !this.downloading && !this.downloadingPhotos && !this.uploading )
       }
     },
     computed: {},
