@@ -92,6 +92,19 @@ export function mapFromSnakeJSON (target: object, source: object, keyMap: object
  * @returns {AssignerFunction}
  */
 export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpts): AssignerFunction {
+
+  function assign (key: string, to: object, value: any): void {
+    if (typeof opts === 'object' && opts.async) {
+      Object.defineProperty(to, key, {
+        get () {
+          return new Promise(resolve => resolve(value))
+        }
+      })
+    } else {
+      to[key] = value
+    }
+  }
+
   return function Assigner (to, from) {
     let generator
     let sourceKey = camelToSnake(targetKey)
@@ -107,9 +120,10 @@ export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpt
       generator = s => new opts().fromSnakeJSON(s)
     }
     if (from[sourceKey] !== null && from[sourceKey] !== undefined) {
-      to[targetKey] = Array.isArray(from[sourceKey]) ? from[sourceKey].map(generator) : generator(from[sourceKey])
+      assign(targetKey, to, Array.isArray(from[sourceKey]) ? from[sourceKey].map(generator) : generator(from[sourceKey]))
     }
   }
+
 }
 
 /**
