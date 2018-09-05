@@ -1,18 +1,18 @@
 import {Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, JoinTable, ManyToMany} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
 import Section from './Section'
 import Skip from './Skip'
 import Translation from './Translation'
 import {OneToOne} from "typeorm/browser";
 
 @Entity()
-export default class Form extends TimestampedSoftDelete {
+export default class Form extends BareTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   formMasterId: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   nameTranslationId: string
   @Column({type: 'integer'}) @Serializable
   version: number

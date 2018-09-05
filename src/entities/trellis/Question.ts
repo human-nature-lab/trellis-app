@@ -1,6 +1,16 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, OneToMany, JoinTable} from 'typeorm'
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToOne,
+  OneToMany,
+  JoinTable,
+  ManyToMany,
+  JoinColumn
+} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import QuestionType from "./QuestionType";
 import Translation from "./Translation";
@@ -12,14 +22,14 @@ import QuestionDatum from "./QuestionDatum";
 import QuestionGroup from "./QuestionGroup";
 
 @Entity()
-export default class Question extends TimestampedSoftDelete {
+export default class Question extends BareTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   questionTypeId: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   questionTranslationId: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   questionGroupId: string
   @Column({ type: 'tinyint' }) @Serializable
   sortOrder: number
@@ -27,11 +37,12 @@ export default class Question extends TimestampedSoftDelete {
   varName: string
 
   @Relationship(QuestionType)
-  // @ManyToOne(type => QuestionType, qt => qt.questions, {eager: true})
+  @ManyToOne(type => QuestionType, qt => qt.questions, {eager: true})
   questionType: QuestionType
 
   @Relationship(Translation)
-  // @OneToOne(type => Translation, { eager: true })
+  @OneToOne(type => Translation, { eager: true })
+  @JoinColumn()
   questionTranslation: Translation
 
   @Relationship(QuestionChoice)
@@ -39,17 +50,13 @@ export default class Question extends TimestampedSoftDelete {
   choices: QuestionChoice[]
 
   @Relationship(AssignConditionTag)
-  // @ManyToMany(type => AssignConditionTag, act => act.question, { eager: true })
-  // @JoinTable({ name: 'question_assign_condition_tag' })
+  @ManyToMany(type => AssignConditionTag, act => act.questions, { eager: true })
+  @JoinTable({ name: 'question_assign_condition_tag' })
   assignConditionTags: AssignConditionTag[]
 
   @Relationship(QuestionParameter)
   @OneToMany(type => QuestionParameter, qp => qp.question, { eager: true })
   questionParameters: QuestionParameter[]
-
-  // Inverse relationships
-  @ManyToOne(type => QuestionGroup, qg => qg.questions)
-  questionGroup: QuestionGroup
 
   datum?: QuestionDatum           // Assigned and used by InterviewManager only
   parameters?: object             // Assigned and used by InterviewManager only

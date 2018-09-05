@@ -1,15 +1,15 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
 import QuestionGroup from "./QuestionGroup";
 
 @Entity()
-export default class SectionQuestionGroup extends TimestampedSoftDelete {
+export default class SectionQuestionGroup extends BareTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   sectionId: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   questionGroupId: string
   @Column({ type: 'integer' }) @Serializable
   questionGroupOrder: number

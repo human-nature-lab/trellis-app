@@ -1,23 +1,23 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
 import Choice from "./Choice";
 import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Question from "./Question";
 
 @Entity()
-export default class QuestionChoice extends TimestampedSoftDelete {
+export default class QuestionChoice extends BareTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   questionId: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   choiceId: string
   @Column({ type: 'integer' }) @Serializable
   sortOrder: number
 
   @Relationship(Choice)
-  @OneToOne(type => Choice)
+  @OneToOne(type => Choice, { eager: true })
   @JoinColumn()
   choice: Choice
 

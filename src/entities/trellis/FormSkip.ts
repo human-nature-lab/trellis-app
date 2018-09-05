@@ -1,9 +1,9 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
 
 @Entity()
-export default class FormSkip extends TimestampedSoftDelete {
+export default class FormSkip extends BareTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column() @Serializable
