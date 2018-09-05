@@ -1,13 +1,13 @@
 import {Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Question from './Question'
 import SectionQuestionGroup from './SectionQuestionGroup'
 import Skip from './Skip'
 import Section from './Section'
 
 @Entity()
-export default class QuestionGroup extends BareTimestampedSoftDelete {
+export default class QuestionGroup extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
 

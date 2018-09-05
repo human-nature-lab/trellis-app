@@ -11,8 +11,8 @@ export default class Action extends BaseEntity implements SnakeSerializable {
   createdAt: Date
   @Column() @Serializable @AsDate
   deletedAt: Date
-  @Column() @Serializable
-  surveyId: string
+  // @Column() @Serializable
+  // surveyId: string
   @Column() @Serializable
   questionId: string
   @Column({ type: 'text' }) @Serializable
@@ -28,6 +28,7 @@ export default class Action extends BaseEntity implements SnakeSerializable {
 
   toSnakeJSON () {
     let d = super.toSnakeJSON()
+    debugger
     if (typeof d['payload'] !== 'string') {
       d['payload'] = JSON.stringify(d['payload'])
     }

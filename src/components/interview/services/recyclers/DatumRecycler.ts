@@ -42,7 +42,8 @@ class DatumRecycler extends Recycler<Datum> {
       payload.edge_id,
       payload.geo_id,
       payload.photo_id,
-      payload.roster_id
+      payload.roster_id,
+      payload.choice_id
     )
   }
 }

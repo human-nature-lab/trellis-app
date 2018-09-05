@@ -9,6 +9,7 @@ import ConditionTag from './ConditionTag'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import Photo from './Photo'
 import {LazyQuery} from '../decorators/QueryDecorator'
+import Survey from "./Survey";
 
 
 @Entity()
@@ -62,6 +63,10 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   //     }))
   //   }
   // }
+
+  // Inverse relationships
+  @OneToMany(type => Survey, survey => survey.respondent)
+  surveys: Survey[]
 
 
 }

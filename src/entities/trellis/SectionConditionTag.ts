@@ -19,8 +19,10 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
   repetition: number
   @Column() @Serializable
   followUpDatumId: string
-  @Column() @Serializable
-  interviewId: string
+
+  //Future
+  // @Column() @Serializable
+  // interviewId: string
 
   @Relationship({
     constructor: () => ConditionTag,
@@ -34,7 +36,7 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
     this.conditionId = conditionId
     this.repetition = repetition
     this.followUpDatumId = followUpDatumId
-    this.interviewId = interviewId
+    // this.interviewId = interviewId
     this.surveyId = surveyId
     this.createdAt = now()
     this.updatedAt = now()
