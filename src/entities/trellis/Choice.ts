@@ -14,7 +14,7 @@ export default class Choice extends SparseTimestampedSoftDelete {
   val: string
 
   @Relationship(type => Translation)
-  @OneToOne(type => Translation)
+  @OneToOne(type => Translation, { eager: true })
   @JoinColumn()
   choiceTranslation: Translation
 

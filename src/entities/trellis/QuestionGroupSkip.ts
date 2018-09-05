@@ -2,7 +2,6 @@ import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Skip from './Skip'
-import {mapFromSnakeJSON} from '../../services/JSONUtil'
 
 @Entity()
 export default class QuestionGroupSkip extends SparseTimestampedSoftDelete {

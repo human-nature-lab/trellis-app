@@ -4,29 +4,28 @@ export default class SkipService {
   /**
    * Check if the supplied skipConditions should return a 'skip' value. This is the only method responsible for
    * evaluating skip condtions
-   * @param {Array} skipCondition - Skip conditions as defined by the form blueprint
-   * @param {Set} conditions - A Set of existing condition ids
+   * @param {Skip[]} skips - Skips as defined by the form blueprint
+   * @param {Set<string>} conditionTags - A Set of existing condition names
    * @returns {boolean}
    */
-  static shouldSkipPage (skipConditions: Skip[], conditionTags: Set<string>) {
+  static shouldSkipPage (skips: Skip[], conditionTags: Set<string>) {
     let shouldSkip = false
-    let conditionKey = 'condition_tag_name'
-    for (let skipCondition of skipConditions) {
-      if (skipCondition.showHide) {
-        if (!skipCondition.anyAll) {
+    for (let skip of skips) {
+      if (skip.showHide) {
+        if (!skip.anyAll) {
           // Show if any are true
           shouldSkip = true
-          for (let condition of skipCondition.conditionTags) {
-            if (conditionTags.has(condition[conditionKey])) {
+          for (let condition of skip.conditionTags) {
+            if (conditionTags.has(condition.conditionTagName)) {
               shouldSkip = false
               break
             }
           }
         } else {
           // Show if all are true
-          shouldSkip = skipCondition.conditionTags.length === 0
-          for (let condition of skipCondition.conditionTags) {
-            if (!conditionTags.has(condition[conditionKey])) {
+          shouldSkip = skip.conditionTags.length === 0
+          for (let condition of skip.conditionTags) {
+            if (!conditionTags.has(condition.conditionTagName)) {
               shouldSkip = true
             }
           }
@@ -35,20 +34,20 @@ export default class SkipService {
           return shouldSkip
         }
       } else {
-        if (!skipCondition.anyAll) {
+        if (!skip.anyAll) {
           // Hide if any are true
           shouldSkip = false
-          for (let condition of skipCondition.conditionTags) {
-            if (conditionTags.has(condition[conditionKey])) {
+          for (let condition of skip.conditionTags) {
+            if (conditionTags.has(condition.conditionTagName)) {
               shouldSkip = true
               break
             }
           }
         } else {
           // Hide if all are true
-          shouldSkip = skipCondition.conditionTags.length !== 0
-          for (let condition of skipCondition.conditionTags) {
-            if (!conditionTags.has(condition[conditionKey])) {
+          shouldSkip = skip.conditionTags.length !== 0
+          for (let condition of skip.conditionTags) {
+            if (!conditionTags.has(condition.conditionTagName)) {
               shouldSkip = false
               break
             }

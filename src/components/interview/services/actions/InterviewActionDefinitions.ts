@@ -3,7 +3,7 @@ import AT from '../../../../static/action.types'
 import QT from '../../../../static/question.types'
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import actionManager from './ActionManager'
-import {addDatum, addDatumLimit, addOrUpdateSingleDatum, removeDatum, updateDatum} from './DatumOperations'
+import {addDatum, addDatumLimit, addOrUpdateSingleDatum, removeDatum, updateDatum, ActionPayload} from './DatumOperations'
 import Question from '../../../../entities/trellis/Question'
 import InterviewManager from '../../classes/InterviewManager'
 
@@ -16,7 +16,7 @@ const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val sho
  * with the datum associated with the question datum at questionDatum.datum. DatumRecycler should be used whenver new
  * datum are being created so that the ids are recycled
  */
-actionManager.add(AT.select_choice, function (interview: InterviewManager, payload: any, questionDatum: QuestionDatum, questionBlueprint: Question) {
+actionManager.add(AT.select_choice, function (interview: InterviewManager, payload: ActionPayload, questionDatum: QuestionDatum, questionBlueprint: Question) {
   let choice = questionBlueprint.choices.map(c => c.choice).find(c => c.id === payload.choice_id)
   let shouldRemoveOthers = questionBlueprint.questionTypeId === QT.multiple_choice
   let paramMap = new Map()
@@ -72,7 +72,7 @@ actionManager.add(AT.dk_rf, function (interview, payload, questionDatum) {
   //   interview.deleteAllQuestionDatumData(questionDatum)
   // }
 })
-actionManager.add(AT.dk_rf_val, function (interview, payload, questionDatum) {
+actionManager.add(AT.dk_rf_val, function (interview, payload: ActionPayload, questionDatum) {
   if (questionDatum) {
     questionDatum.dkRfVal = payload.dk_rf_val
   } else {

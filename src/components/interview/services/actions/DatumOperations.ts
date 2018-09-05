@@ -4,7 +4,20 @@ import DatumRecycler from '../recyclers/DatumRecycler'
 import Datum from '../../../../entities/trellis/Datum'
 
 interface DatumFindFunc {
-  (value: Datum, payload: any): boolean
+  (value: Datum, payload: ActionPayload): boolean
+}
+
+export interface ActionPayload {
+  val: string
+  name: string
+  dk_rf?: boolean
+  dk_rf_val?: string
+  choice_id?: string
+  sort_order?: number
+  roster_id?: string
+  geo_id?: string
+  edge_id?: string
+  photo_id?: string
 }
 
 /**
@@ -37,7 +50,7 @@ export function updateDatum (findFunc: DatumFindFunc, name?: string) {
  * @returns {Function}
  */
 export function removeDatum (findFunc: DatumFindFunc, name?: string) {
-  return function (interview: object, payload: object, questionDatum: QuestionDatum) {
+  return function (interview: object, payload: ActionPayload, questionDatum: QuestionDatum) {
     let index = questionDatum.data.findIndex(datum => {
       return findFunc(datum, payload)
     })
@@ -58,7 +71,7 @@ export function removeDatum (findFunc: DatumFindFunc, name?: string) {
  * @param {Object} questionDatum
  * @returns {Datum}
  */
-export function addOrUpdateSingleDatum (interview: object, payload: object, questionDatum: QuestionDatum) {
+export function addOrUpdateSingleDatum (interview: object, payload: ActionPayload, questionDatum: QuestionDatum) {
   let datum
   if (questionDatum.data.length) {
     datum = questionDatum.data[0]
@@ -79,7 +92,7 @@ export function addOrUpdateSingleDatum (interview: object, payload: object, ques
  * @param {Object} questionDatum
  * @returns {Datum}
  */
-export function addDatum (interview: any, payload: any, questionDatum: QuestionDatum) {
+export function addDatum (interview: any, payload: ActionPayload, questionDatum: QuestionDatum) {
   let datum = DatumRecycler.getNoKey(questionDatum, payload)
   questionDatum.data.push(datum)
   return datum
@@ -91,7 +104,7 @@ export function addDatum (interview: any, payload: any, questionDatum: QuestionD
  * @returns {Function}
  */
 export function addDatumLimit (limit: number) {
-  return function (interview: object, payload: object, questionDatum: QuestionDatum) {
+  return function (interview: object, payload: ActionPayload, questionDatum: QuestionDatum) {
     let datum = addDatum(interview, payload, questionDatum)
     if (questionDatum.data.length > limit) {
       questionDatum.data.shift()

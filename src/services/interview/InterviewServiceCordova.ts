@@ -9,7 +9,7 @@ import UserService from '../user/UserService'
 import SurveyConditionTag from "../../entities/trellis/SurveyConditionTag";
 import SectionConditionTag from "../../entities/trellis/SectionConditionTag";
 import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag";
-import {SelectQueryBuilder} from "typeorm";
+import {QueryRunner, SelectQueryBuilder} from "typeorm";
 import Survey from "../../entities/trellis/Survey";
 import Datum from "../../entities/trellis/Datum";
 
@@ -133,23 +133,44 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
 
   async saveData (interviewId: string, diff: InterviewDeltaInterface) {
     const conn = await DatabaseService.getDatabase()
-    return await conn.transaction(async transactionalEntityManager => {
+    const qr = conn.createQueryRunner()
 
+    async function update (qr: QueryRunner, model: any, values: Array<typeof model>) {
+      if (values.length) {
+        return await qr.manager.save(values)
+      }
+    }
+
+    async function insert (qr: QueryRunner, model: any, values: Array<typeof model>) {
+      if (values.length) {
+        return await qr.manager.insert(model, values)
+      }
+    }
+
+    await qr.startTransaction()
+    try {
       // Remove stuff first
-      await transactionalEntityManager.update(diff.data.datum.removed)
-      await transactionalEntityManager.update(diff.data.questionDatum.removed)
+      await update(qr, Datum, diff.data.datum.removed)
+      await update(qr, QuestionDatum, diff.data.questionDatum.removed)
 
       // Insert second
-      await transactionalEntityManager.insert(diff.data.questionDatum.added)
-      await transactionalEntityManager.insert(diff.data.datum.added)
+      await insert(qr, QuestionDatum, diff.data.questionDatum.added)
+      await insert(qr, Datum, diff.data.datum.added)
 
-      // Update last
-      await transactionalEntityManager.update(diff.data.questionDatum.modified)
-      await transactionalEntityManager.update(diff.data.datum.modified)
+      // Update last0
+      await update(qr, QuestionDatum, diff.data.questionDatum.modified)
+      await update(qr, Datum, diff.data.datum.modified)
 
-      // TODO: Can't
-    })
-    throw Error('need to save data')
+      // TODO: Save the condition tags as well
+
+      await qr.commitTransaction()
+    } catch (err) {
+      console.error('Unable to save data')
+      console.error(err)
+      await qr.rollbackTransaction()
+    }
+
+
   }
 
   async getPreload (interviewId: string) {

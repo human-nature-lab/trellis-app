@@ -4,10 +4,11 @@ import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'
+import {PrimaryColumn} from "typeorm/browser";
 
 @Entity()
 export default class QuestionDatum extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryColumn() @Serializable
   public id: string
   @Column() @Serializable
   public questionId: string
