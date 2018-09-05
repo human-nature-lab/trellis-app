@@ -1,8 +1,8 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
-import Skip from "./Skip";
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
+import Skip from './Skip'
+import {mapFromSnakeJSON} from '../../services/JSONUtil'
 
 @Entity()
 export default class QuestionGroupSkip extends BareTimestampedSoftDelete {
@@ -13,7 +13,7 @@ export default class QuestionGroupSkip extends BareTimestampedSoftDelete {
   @Column() @Serializable
   skipId: string
 
-  @Relationship(Skip)
+  @Relationship(type => Skip)
   skip: Skip
 
 }

@@ -15,7 +15,7 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
   conditionTagId: string
 
   @Relationship({
-    constructor: ConditionTag,
+    constructor: () => ConditionTag,
     jsonKey: 'condition'
   })
   @OneToOne(type => ConditionTag, { eager: true })

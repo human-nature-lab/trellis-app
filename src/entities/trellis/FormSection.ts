@@ -1,7 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import Section from "./Section";
-import BareTimestampedSoftDelete from "../base/BareTimestampedSoftDelete";
+import Section from './Section'
+import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
 
 @Entity()
 export default class FormSection extends BareTimestampedSoftDelete {

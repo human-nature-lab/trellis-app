@@ -1,7 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
 import {Serializable, enumerable, Relationship} from '../decorators/WebOrmDecorators'
 import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
-import Locale from "./Locale";
+import Locale from './Locale'
 import Translation from './Translation'
 
 @Entity()
@@ -15,7 +15,7 @@ export default class TranslationText extends BareTimestampedSoftDelete {
   @Column('text') @Serializable
   translatedText: string
 
-  @Relationship(Locale)
+  @Relationship(type => Locale)
   locale: Locale
 
   @ManyToOne(type => Translation, translation => translation.translationText)

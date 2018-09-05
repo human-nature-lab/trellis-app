@@ -2,14 +2,14 @@ import FormService from '../../../services/form/FormService'
 import InterviewService from '../../../services/interview/InterviewService'
 import LocaleService from '../../../services/locale/LocaleService'
 import RespondentService from '../../../services/respondent/RespondentService'
-import {Route} from "vue-router";
-import RespondentFill from "../../../entities/trellis/RespondentFill";
-import Locale from "../../../entities/trellis/Locale";
-import Interview from "../../../entities/trellis/Interview";
-import Action from "../../../entities/trellis/Action";
-import Form from "../../../entities/trellis/Form";
-import InterviewDataInterface, {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
-import QuestionDatum from "../../../entities/trellis/QuestionDatum";
+import {Route} from 'vue-router'
+import RespondentFill from '../../../entities/trellis/RespondentFill'
+import Locale from '../../../entities/trellis/Locale'
+import Interview from '../../../entities/trellis/Interview'
+import Action from '../../../entities/trellis/Action'
+import Form from '../../../entities/trellis/Form'
+import InterviewDataInterface, {ConditionTagInterface} from '../../../services/interview/InterviewDataInterface'
+import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 
 export interface InterviewData {
   respondentFills?: RespondentFill[]

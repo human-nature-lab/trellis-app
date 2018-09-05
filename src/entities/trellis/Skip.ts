@@ -1,9 +1,9 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
-import ConditionTag from "./ConditionTag";
-import Form from "./Form";
-import QuestionGroup from "./QuestionGroup";
+import ConditionTag from './ConditionTag'
+import Form from './Form'
+import QuestionGroup from './QuestionGroup'
 
 @Entity()
 export default class Skip extends BareTimestampedSoftDelete {
@@ -17,7 +17,7 @@ export default class Skip extends BareTimestampedSoftDelete {
   precedence: number
 
   @Relationship({
-    constructor: ConditionTag,
+    constructor: () => ConditionTag,
     jsonKey: 'conditions'
   })
   conditionTags: ConditionTag[]

@@ -1,7 +1,7 @@
 import PersistSlave from '../../../classes/PersistSlave'
 import DiffService from './DiffService'
 import InterviewService from '../../../services/interview/InterviewService'
-import InterviewDeltaInterface from "../../../services/interview/InterviewDeltaInterface";
+import InterviewDeltaInterface from '../../../services/interview/InterviewDeltaInterface'
 
 /**
  * Create a persist slave for a DataStore that uses the InterviewDataService to sync up data using delta encoding

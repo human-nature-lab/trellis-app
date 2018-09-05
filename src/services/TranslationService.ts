@@ -1,5 +1,5 @@
-import Translation from "../entities/trellis/Translation";
-import Locale from "../entities/trellis/Locale";
+import Translation from '../entities/trellis/Translation'
+import Locale from '../entities/trellis/Locale'
 
 /**
  * Temp function used to determine the keys to use when accessing translation properties. Can handle plain object or

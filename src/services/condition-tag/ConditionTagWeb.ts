@@ -1,7 +1,7 @@
 import http from '../http/AxiosInstance'
-import ConditionTagInterface from "./ConditionTagInterface";
-import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag";
-import ConditionTag from "../../entities/trellis/ConditionTag";
+import ConditionTagInterface from './ConditionTagInterface'
+import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
+import ConditionTag from '../../entities/trellis/ConditionTag'
 export class ConditionTagWeb implements ConditionTagInterface {
 
   createConditionTag (name) {

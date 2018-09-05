@@ -1,7 +1,7 @@
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {AsDate, Serializable} from '../decorators/WebOrmDecorators'
-import BaseEntity from "../base/BaseEntity";
+import BaseEntity from '../base/BaseEntity'
 
 @Entity()
 export default class Action extends BaseEntity implements SnakeSerializable {

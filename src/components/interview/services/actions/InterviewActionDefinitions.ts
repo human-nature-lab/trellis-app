@@ -1,11 +1,11 @@
 import parameterTypes from '../../../../static/parameter.types'
 import AT from '../../../../static/action.types'
 import QT from '../../../../static/question.types'
-import QuestionDatum from "../../../../entities/trellis/QuestionDatum";
+import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import actionManager from './ActionManager'
-import {addDatum, addDatumLimit, addOrUpdateSingleDatum, removeDatum, updateDatum} from "./DatumOperations";
-import Question from "../../../../entities/trellis/Question";
-import InterviewManager from "../../classes/InterviewManager";
+import {addDatum, addDatumLimit, addOrUpdateSingleDatum, removeDatum, updateDatum} from './DatumOperations'
+import Question from '../../../../entities/trellis/Question'
+import InterviewManager from '../../classes/InterviewManager'
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form

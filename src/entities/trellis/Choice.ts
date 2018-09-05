@@ -1,8 +1,8 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
-import Translation from "./Translation";
-import Question from "./Question";
+import Translation from './Translation'
+import Question from './Question'
 
 @Entity()
 export default class Choice extends BareTimestampedSoftDelete {
@@ -13,7 +13,7 @@ export default class Choice extends BareTimestampedSoftDelete {
   @Column() @Serializable
   val: string
 
-  @Relationship(Translation)
+  @Relationship(type => Translation)
   @OneToOne(type => Translation)
   @JoinColumn()
   choiceTranslation: Translation

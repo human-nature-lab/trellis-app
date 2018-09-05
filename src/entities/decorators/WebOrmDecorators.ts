@@ -1,4 +1,4 @@
-import {camelToSnake, getSnakeAssignmentFunc} from "../../services/JSONUtil";
+import {camelToSnake, getSnakeAssignmentFunc} from '../../services/JSONUtil'
 
 const columnMetaMap: Map<any, ColumnMeta> = new Map()
 
@@ -101,18 +101,18 @@ export function Serializable (target: any, propertyKey: string): any {
 
 /**
  * Define a relationship that will be automatically converted to the correct type via the default toSnakeJSON method
- * @param {RelationshipOpts | Function} optsOrConstructor
+ * @param {RelationshipOpts | Function} optsOrConstructorGenerator
  * @returns {(target: any) => void}
  * @constructor
  */
-export function Relationship (optsOrConstructor: object|Function) {
+export function Relationship (optsOrConstructorGenerator: object|Function) {
   return function (target: any, propertyKey: string) {
     let columnMeta = getOrCreateMeta(target)
-    if (typeof optsOrConstructor === 'object') {
-      columnMeta.relationships.set(propertyKey, getSnakeAssignmentFunc(propertyKey, optsOrConstructor as RelationshipOpts))
+    if (typeof optsOrConstructorGenerator === 'object') {
+      columnMeta.relationships.set(propertyKey, getSnakeAssignmentFunc(propertyKey, optsOrConstructorGenerator as RelationshipOpts))
     } else {
       columnMeta.relationships.set(propertyKey, getSnakeAssignmentFunc(propertyKey, {
-        constructor: optsOrConstructor
+        constructor: optsOrConstructorGenerator // Function that returns the constructor
       } as RelationshipOpts))
     }
   }

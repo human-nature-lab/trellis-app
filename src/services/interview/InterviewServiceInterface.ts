@@ -1,7 +1,7 @@
-import Interview from "../../entities/trellis/Interview";
-import Action from "../../entities/trellis/Action";
-import InterviewDeltaInterface from "./InterviewDeltaInterface";
-import InterviewDataInterface from "./InterviewDataInterface";
+import Interview from '../../entities/trellis/Interview'
+import Action from '../../entities/trellis/Action'
+import InterviewDeltaInterface from './InterviewDeltaInterface'
+import InterviewDataInterface from './InterviewDataInterface'
 
 export default interface InterviewServiceInterface {
   /**

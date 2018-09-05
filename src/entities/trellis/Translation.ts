@@ -1,7 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm'
 import {enumerable, Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TranslationText from "./TranslationText";
-import BareTimestampedSoftDelete from "../base/BareTimestampedSoftDelete";
+import TranslationText from './TranslationText'
+import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
 
 @Entity()
 export default class Translation extends BareTimestampedSoftDelete {
@@ -13,7 +13,7 @@ export default class Translation extends BareTimestampedSoftDelete {
     return this.translationText
   }
 
-  @Relationship(TranslationText)
+  @Relationship(type => TranslationText)
   @OneToMany(type => TranslationText, translationText => translationText.translation, { eager: true })
   translationText: Array<TranslationText>
 

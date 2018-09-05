@@ -1,7 +1,7 @@
-import {snakeToCamel} from "../../../../services/JSONUtil";
-import QuestionDatum from "../../../../entities/trellis/QuestionDatum";
-import DatumRecycler from "../recyclers/DatumRecycler";
-import Datum from "../../../../entities/trellis/Datum";
+import {snakeToCamel} from '../../../../services/JSONUtil'
+import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
+import DatumRecycler from '../recyclers/DatumRecycler'
+import Datum from '../../../../entities/trellis/Datum'
 
 interface DatumFindFunc {
   (value: Datum, payload: any): boolean

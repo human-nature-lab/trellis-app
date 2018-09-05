@@ -10,11 +10,13 @@ import {
   JoinColumn
 } from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import Translation from "./Translation";
-import FormSection from "./FormSection";
-import QuestionGroup from "./QuestionGroup";
-import Form from "./Form";
-import BareTimestampedSoftDelete from "../base/BareTimestampedSoftDelete";
+import Translation from './Translation'
+import FormSection from './FormSection'
+import QuestionGroup from './QuestionGroup'
+import Form from './Form'
+import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+
+console.log(QuestionGroup)
 
 @Entity()
 export default class Section extends BareTimestampedSoftDelete {
@@ -24,17 +26,17 @@ export default class Section extends BareTimestampedSoftDelete {
   @Column({select: false}) @Serializable
   nameTranslationId: string
 
-  @Relationship(Translation)
+  @Relationship(type => Translation)
   @OneToOne(type => Translation, { eager: true })
   @JoinColumn()
   nameTranslation: Translation
 
-  @Relationship(QuestionGroup)
   @ManyToMany(type => QuestionGroup, qg => qg.section, { eager: true })
   @JoinTable({ name: 'section_question_group' })
+  @Relationship(type => QuestionGroup)
   questionGroups: QuestionGroup[]
 
-  @Relationship(FormSection)
+  @Relationship(type => FormSection)
   @OneToMany(type => FormSection, formSection => formSection.section, { eager: true })
   formSections: FormSection[]
 

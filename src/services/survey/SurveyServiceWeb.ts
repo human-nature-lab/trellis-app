@@ -1,6 +1,6 @@
 import http from '../http/AxiosInstance'
-import SurveyServiceInterface from "./SurveyServiceInterface";
-import Survey from "../../entities/trellis/Survey";
+import SurveyServiceInterface from './SurveyServiceInterface'
+import Survey from '../../entities/trellis/Survey'
 export default class SurveyService implements SurveyServiceInterface {
 
   async getSurvey (studyId, respondentId, formId) {

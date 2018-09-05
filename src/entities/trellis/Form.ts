@@ -4,7 +4,7 @@ import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
 import Section from './Section'
 import Skip from './Skip'
 import Translation from './Translation'
-import {OneToOne} from "typeorm/browser";
+import {OneToOne} from 'typeorm/browser'
 
 @Entity()
 export default class Form extends BareTimestampedSoftDelete {
@@ -19,17 +19,17 @@ export default class Form extends BareTimestampedSoftDelete {
   @Column() @Serializable
   isPublished: boolean
 
-  @Relationship(Section)
+  @Relationship(type => Section)
   @ManyToMany(type => Section, section => section.forms)
   @JoinTable({ name: 'form_section' })
   sections: Section[]
 
-  @Relationship(Skip)
+  @Relationship(type => Skip)
   @ManyToMany(type => Skip, skip => skip.forms, { eager: true })
   @JoinTable({ name: 'form_skip' })
   skips: Skip[]
 
-  @Relationship(Translation)
+  @Relationship(type => Translation)
   @OneToOne(type => Translation, {eager: true})
   @JoinColumn()
   nameTranslation: Translation

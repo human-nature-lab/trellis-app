@@ -1,5 +1,5 @@
 import DeviceService from '../device/DeviceService'
-import GeoLocationAbstract from "./GeoLocationAbstract";
+import GeoLocationAbstract from './GeoLocationAbstract'
 
 export default class GeoLocationCordova extends GeoLocationAbstract {
   async getCurrentPosition () {

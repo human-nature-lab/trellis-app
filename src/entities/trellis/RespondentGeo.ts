@@ -1,7 +1,7 @@
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import Geo from "./Geo";
+import Geo from './Geo'
 import Respondent from './Respondent'
 
 @Entity()
@@ -22,7 +22,7 @@ export default class RespondentGeo extends TimestampedSoftDelete {
   @ManyToOne(type => Respondent, respondent => respondent.geos)
   respondent: Respondent
 
-  @Relationship(Geo)
+  @Relationship(type =>Geo)
   @OneToOne(type => Geo, { eager: true })
   @JoinColumn({ name: 'geo_id' })
   geo: Geo

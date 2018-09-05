@@ -1,8 +1,8 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn} from 'typeorm'
 import {AsDate, Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import Survey from "./Survey";
-import User from "./User";
+import Survey from './Survey'
+import User from './User'
 
 @Entity()
 export class Interview extends TimestampedSoftDelete {
@@ -27,11 +27,11 @@ export class Interview extends TimestampedSoftDelete {
   // @Column({ type: 'datetime', nullable: true }) @Serializable @AsDate
   // completedAt: Date
 
-  @Relationship(Survey)
+  @Relationship(type => Survey)
   @ManyToOne(type => Survey)
   survey: Survey
 
-  @Relationship(User)
+  @Relationship(type => User)
   @OneToOne(type => User)
   @JoinColumn()
   user: User

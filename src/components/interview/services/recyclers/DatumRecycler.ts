@@ -1,7 +1,7 @@
 import Recycler from '../../../../classes/Recycler'
 import Datum from '../../../../entities/trellis/Datum'
 import {now} from '../../../../services/DateService';
-import QuestionDatum from "../../../../entities/trellis/QuestionDatum";
+import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 
 export interface DatumPayload {
   name?: string

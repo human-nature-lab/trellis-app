@@ -1,8 +1,8 @@
 import Emitter from '../../../classes/Emitter'
 import Clock from '../../../classes/Clock'
-import InterviewManager from "../classes/InterviewManager";
-import Form from "../../../entities/trellis/Form";
-import Survey from "../../../entities/trellis/Survey";
+import InterviewManager from '../classes/InterviewManager'
+import Form from '../../../entities/trellis/Form'
+import Survey from '../../../entities/trellis/Survey'
 
 export interface InterviewLocation {
   section: number
