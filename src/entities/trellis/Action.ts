@@ -2,6 +2,17 @@ import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {AsDate, Serializable} from '../decorators/WebOrmDecorators'
 import BaseEntity from '../base/BaseEntity'
+import {ActionPayload} from "../../components/interview/services/actions/DatumOperations";
+import {ValueTransformer} from "typeorm/decorator/options/ValueTransformer";
+
+export class PayloadTransformer implements ValueTransformer {
+  to (actionPayload: ActionPayload) {
+    return JSON.stringify(actionPayload)
+  }
+  from (payloadString: string) {
+    return JSON.parse(payloadString) as PayloadTransformer
+  }
+}
 
 @Entity()
 export default class Action extends BaseEntity implements SnakeSerializable {
@@ -15,8 +26,8 @@ export default class Action extends BaseEntity implements SnakeSerializable {
   // surveyId: string
   @Column() @Serializable
   questionId: string
-  @Column({ type: 'text' }) @Serializable
-  payload: string
+  @Column({ type: 'text' , transformer: new PayloadTransformer()}) @Serializable
+  payload: ActionPayload
   @Column() @Serializable
   actionType: string
   @Column() @Serializable

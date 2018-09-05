@@ -1,9 +1,9 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, OneToMany, JoinTable} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
-import ConditionTag from './ConditionTag'
 import Form from './Form'
 import QuestionGroup from './QuestionGroup'
+import SkipConditionTag from "./SkipConditionTag";
 
 @Entity()
 export default class Skip extends SparseTimestampedSoftDelete {
@@ -17,10 +17,11 @@ export default class Skip extends SparseTimestampedSoftDelete {
   precedence: number
 
   @Relationship({
-    constructor: () => ConditionTag,
+    constructor: () => SkipConditionTag,
     jsonKey: 'conditions'
   })
-  conditionTags: ConditionTag[]
+  @OneToMany(type => SkipConditionTag, sct => sct.skip, { eager: true })
+  conditionTags: SkipConditionTag[]
 
   // Inverse relationships
   @ManyToMany(type => Form)
