@@ -20,7 +20,7 @@ export class FormServiceWeb implements FormServiceInterface {
     })
   }
 
-  getForm (formId: string): Promise<Form> {
+  getForm (formId: string, bareBones: boolean = false): Promise<Form> {
     return http().get(`form/${formId}`)
       .then(res => {
         if (res.data.form) {

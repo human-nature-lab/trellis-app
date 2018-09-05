@@ -5,7 +5,7 @@ import BaseEntity from "../base/BaseEntity";
 
 @Entity()
 export default class Action extends BaseEntity implements SnakeSerializable {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable @AsDate
   createdAt: Date

@@ -45,7 +45,7 @@
       <v-subheader>
         {{ $t('settings') }}
       </v-subheader>
-      <v-list-tile :to="{name: 'Home', query: {to: $route.fullPath}}">
+      <v-list-tile :to="{name: 'StudySelector', query: {to: $route.fullPath}}">
         <v-list-tile-action>
           <v-icon>assignment</v-icon>
         </v-list-tile-action>
@@ -115,7 +115,7 @@
         </v-list-tile-content>
       </v-list-tile>
       <v-list-tile
-        v-if="hasRole(['admin']) && isCordovaBuild"
+        v-if="isCordovaBuild"
         @click="toggleOffline">
         <v-list-tile-action>
           <v-icon>exit_to_app</v-icon>
@@ -151,12 +151,12 @@
   import SingletonService from '../../services/SingletonService'
   import storage from '../../services/StorageService'
   import global from '../../static/singleton'
-  import PermissionMixin from '../../mixins/PermissionMixin'
+  // import PermissionMixin from '../../mixins/PermissionMixin'
   import {APP_ENV} from '../../static/constants'
 
   export default {
     name: 'dropdown-menu',
-    mixins: [PermissionMixin],
+    // mixins: [PermissionMixin],
     data: () => ({
       showCopiedSnackbar: false,
       global

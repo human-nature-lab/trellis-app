@@ -10,18 +10,18 @@ import {
   JoinColumn
 } from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
 import Translation from "./Translation";
 import FormSection from "./FormSection";
 import QuestionGroup from "./QuestionGroup";
 import Form from "./Form";
+import BareTimestampedSoftDelete from "../base/BareTimestampedSoftDelete";
 
 @Entity()
-export default class Section extends TimestampedSoftDelete {
+export default class Section extends BareTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column({select: false}) @Serializable
   nameTranslationId: string
 
   @Relationship(Translation)

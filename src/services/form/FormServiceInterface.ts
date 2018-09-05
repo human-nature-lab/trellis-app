@@ -12,8 +12,10 @@ export default interface FormServiceInterface {
 
   /**
    * Gets a single form by id
-   * @param {String} formId
-   * @returns {}Promise<Form>}
+   * @param {string} formId
+   * @param {boolean} bareBones - Only get the parts required to navigate the form
+   * @returns {Promise<Form>}
    */
-  getForm (formId: string): Promise<Form>
+  getForm (formId: string, bareBones: boolean): Promise<Form>
+
 }

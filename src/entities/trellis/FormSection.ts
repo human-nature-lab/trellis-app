@@ -1,15 +1,15 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Section from "./Section";
+import BareTimestampedSoftDelete from "../base/BareTimestampedSoftDelete";
 
 @Entity()
-export default class FormSection extends TimestampedSoftDelete {
+export default class FormSection extends BareTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+  @Column({select: false}) @Serializable
   formId: string
-  @Column() @Serializable
+  @Column({select: false}) @Serializable
   sectionId: string
   @Column({type: 'integer'}) @Serializable
   sortOrder: number
