@@ -1,4 +1,4 @@
-import {Entity, EntitySchema, Repository} from "typeorm";
+import {Entity, EntitySchema, Repository} from 'typeorm'
 
 export interface QueryCallback<T> {
   (repo: Repository<T>, obj: T): Promise<T|T[]>|T|T[]

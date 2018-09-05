@@ -1,5 +1,5 @@
-import Form from "../../entities/trellis/Form";
-import StudyForm from "../../entities/trellis/StudyForm";
+import Form from '../../entities/trellis/Form'
+import StudyForm from '../../entities/trellis/StudyForm'
 
 export default interface FormServiceInterface {
 

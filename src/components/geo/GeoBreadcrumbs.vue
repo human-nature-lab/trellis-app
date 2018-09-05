@@ -23,7 +23,7 @@
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
   import Vue from 'vue'
-  import Geo from "../../entities/trellis/Geo"
+  import Geo from '../../entities/trellis/Geo'
   export default Vue.extend({
     name: 'geo-breadcrumbs',
     props: {

@@ -1,8 +1,8 @@
-import RespondentFill from "../../entities/trellis/RespondentFill";
-import Respondent from "../../entities/trellis/Respondent";
-import RespondentName from "../../entities/trellis/RespondentName";
-import RespondentGeo from "../../entities/trellis/RespondentGeo";
-import Geo from "../../entities/trellis/Geo";
+import RespondentFill from '../../entities/trellis/RespondentFill'
+import Respondent from '../../entities/trellis/Respondent'
+import RespondentName from '../../entities/trellis/RespondentName'
+import RespondentGeo from '../../entities/trellis/RespondentGeo'
+import Geo from '../../entities/trellis/Geo'
 
 export interface SearchFilter {
   conditionTags: string[], // Array of condition tag names

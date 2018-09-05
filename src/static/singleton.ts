@@ -1,6 +1,6 @@
 import Study from '../entities/trellis/Study'
 import Locale from '../entities/trellis/Locale'
-import User from "../entities/trellis/User";
+import User from '../entities/trellis/User'
 import storage from '../services/StorageService'
 declare const cordova: any
 

@@ -1,8 +1,8 @@
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
-import SnakeSerializable from "../interfaces/SnakeSerializable";
-import ConditionTag from "./ConditionTag";
+import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import SnakeSerializable from '../interfaces/SnakeSerializable'
+import ConditionTag from './ConditionTag'
 import {now} from '../../services/DateService'
 
 @Entity()
@@ -17,7 +17,7 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
   interviewId: string
 
   @Relationship({
-    constructor: ConditionTag,
+    constructor: () => ConditionTag,
     jsonKey: 'condition'
   })
   conditionTag: ConditionTag

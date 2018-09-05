@@ -3,10 +3,10 @@ import {now} from '../DateService'
 import SingletonService from '../SingletonService'
 import DatabaseService from '../database/DatabaseService'
 import InterviewServiceInterface from './InterviewServiceInterface'
-import Action from "../../entities/trellis/Action";
-import InterviewDeltaInterface from "./InterviewDeltaInterface";
-import QuestionDatum from "../../entities/trellis/QuestionDatum";
-import UserService from "../user/UserService";
+import Action from '../../entities/trellis/Action'
+import InterviewDeltaInterface from './InterviewDeltaInterface'
+import QuestionDatum from '../../entities/trellis/QuestionDatum'
+import UserService from '../user/UserService'
 
 export default class InterviewServiceCordova implements InterviewServiceInterface {
 

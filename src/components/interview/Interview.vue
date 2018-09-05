@@ -183,7 +183,8 @@
       // Called by RoutePreloadMixin
       hydrate (data) {
         this.type = data.interviewType
-        let d = data
+        const d = data
+        debugger
         this.initializeInterview(d.interview, d.actions, d.data, d.conditionTags, d.form, d.respondentFills)
       },
       initializeInterview: function (interview, actions, data, conditionTags, formBlueprint) {

@@ -1,5 +1,5 @@
-import QuestionDatum from "../../../../entities/trellis/QuestionDatum";
-import Action from "../../../../entities/trellis/Action";
+import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
+import Action from '../../../../entities/trellis/Action'
 
 export interface ActionHandler {
   (interview: any, payload?: any, questionDatum?: QuestionDatum, questionBlueprint?: any)

@@ -28,10 +28,10 @@
   import global from '../../static/singleton'
   import router from '../../router'
   import Vue from 'vue'
-  import Survey from "../../entities/trellis/Survey"
-  import StudyForm from "../../entities/trellis/StudyForm"
-  import Respondent from "../../entities/trellis/Respondent"
-  import Translation from "../../entities/trellis/Translation"
+  import Survey from '../../entities/trellis/Survey'
+  import StudyForm from '../../entities/trellis/StudyForm'
+  import Respondent from '../../entities/trellis/Respondent'
+  import Translation from '../../entities/trellis/Translation'
 
   export class DisplayForm {
     constructor (

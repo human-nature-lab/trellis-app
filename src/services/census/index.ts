@@ -1,6 +1,6 @@
 import switchByModeEnv from '../util'
 import CensusServiceWeb from './CensusServiceWeb'
-import CensusServiceCordova from "./CensusServiceCordova";
+import CensusServiceCordova from './CensusServiceCordova'
 
 export const CensusService = switchByModeEnv({
   WEB: CensusServiceWeb,

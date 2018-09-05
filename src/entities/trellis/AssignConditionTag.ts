@@ -16,7 +16,7 @@ export default class AssignConditionTag extends BareTimestampedSoftDelete {
   scope: string
 
   @Relationship({
-    constructor: ConditionTag,
+    constructor: () => ConditionTag,
     jsonKey: 'condition'
   })
   @OneToOne(type => ConditionTag, {eager: true})

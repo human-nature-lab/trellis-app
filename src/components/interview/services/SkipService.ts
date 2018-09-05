@@ -1,4 +1,4 @@
-import Skip from "../../../entities/trellis/Skip";
+import Skip from '../../../entities/trellis/Skip'
 
 export default class SkipService {
   /**

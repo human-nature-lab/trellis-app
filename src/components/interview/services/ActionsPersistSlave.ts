@@ -1,7 +1,7 @@
 import PersistSlave from '../../../classes/PersistSlave'
 import InterviewService from '../../../services/interview/InterviewService'
-import ActionStore from "../classes/ActionStore";
-import Action from "../../../entities/trellis/Action";
+import ActionStore from '../classes/ActionStore'
+import Action from '../../../entities/trellis/Action'
 
 /**
  * Creates a persist slave for syncing up actions with the database

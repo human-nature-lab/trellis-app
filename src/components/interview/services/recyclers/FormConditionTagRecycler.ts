@@ -1,8 +1,8 @@
 import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
 import {now} from '../../../../services/DateService'
-import SurveyConditionTag from "../../../../entities/trellis/SurveyConditionTag";
-import InterviewManager from "../../classes/InterviewManager";
+import SurveyConditionTag from '../../../../entities/trellis/SurveyConditionTag'
+import InterviewManager from '../../classes/InterviewManager'
 
 class FormConditionTagRecycler extends Recycler<SurveyConditionTag> {
   keyExtractor (tag: SurveyConditionTag) {

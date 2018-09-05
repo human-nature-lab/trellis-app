@@ -3,7 +3,7 @@ import uuid from 'uuid/v4'
 import DatabaseService from './database/DatabaseService'
 import DeviceService from './device/DeviceService'
 import { syncInstance as http } from './http/AxiosInstance'
-import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
+import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from 'axios'
 
 class SyncService {
   private deviceId: string

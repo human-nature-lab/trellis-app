@@ -1,15 +1,14 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, JoinTable, ManyToMany} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import RespondentName from "./RespondentName";
-import RespondentGeo from "./RespondentGeo";
-import RespondentConditionTag from "./RespondentConditionTag";
-import RespondentPhoto from "./RespondentPhoto";
-import Geo from "./Geo";
-import ConditionTag from "./ConditionTag";
-import SnakeSerializable from "../interfaces/SnakeSerializable";
-import Photo from "./Photo";
-import {LazyQuery} from "../decorators/QueryDecorator";
+import RespondentName from './RespondentName'
+import RespondentGeo from './RespondentGeo'
+import RespondentConditionTag from './RespondentConditionTag'
+import Geo from './Geo'
+import ConditionTag from './ConditionTag'
+import SnakeSerializable from '../interfaces/SnakeSerializable'
+import Photo from './Photo'
+import {LazyQuery} from '../decorators/QueryDecorator'
 
 
 @Entity()
@@ -33,11 +32,11 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   @OneToMany(type => RespondentGeo, respondentGeo => respondentGeo.respondent, { eager: true })
   geos: RespondentGeo[]
 
-  @Relationship(RespondentName)
+  @Relationship(type => RespondentName)
   @OneToMany(type => RespondentName, respondentName => respondentName.respondent, { eager: true })
   names: RespondentName[]
 
-  @Relationship(Photo)
+  @Relationship(type => Photo)
   @ManyToMany(type => Photo, photo => photo.respondents, { eager: true })
   @JoinTable({ name: 'respondent_photo' })
   photos: Photo[]

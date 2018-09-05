@@ -1,8 +1,8 @@
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
-import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
-import SnakeSerializable from "../interfaces/SnakeSerializable";
-import ConditionTag from "./ConditionTag";
+import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import SnakeSerializable from '../interfaces/SnakeSerializable'
+import ConditionTag from './ConditionTag'
 import {now} from '../../services/DateService'
 
 @Entity()
@@ -23,7 +23,7 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
   interviewId: string
 
   @Relationship({
-    constructor: ConditionTag,
+    constructor: () => ConditionTag,
     jsonKey: 'condition'
   })
   conditionTag: ConditionTag

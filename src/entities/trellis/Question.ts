@@ -11,15 +11,15 @@ import {
 } from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
-import QuestionType from "./QuestionType";
-import Translation from "./Translation";
-import Choice from "./Choice";
-import AssignConditionTag from "./AssignConditionTag";
-import QuestionParameter from "./QuestionParameter";
-import QuestionChoice from "./QuestionChoice";
-import QuestionDatum from "./QuestionDatum";
-import QuestionGroup from "./QuestionGroup";
+import {mapFromSnakeJSON} from '../../services/JSONUtil'
+import QuestionType from './QuestionType'
+import Translation from './Translation'
+import Choice from './Choice'
+import AssignConditionTag from './AssignConditionTag'
+import QuestionParameter from './QuestionParameter'
+import QuestionChoice from './QuestionChoice'
+import QuestionDatum from './QuestionDatum'
+import QuestionGroup from './QuestionGroup'
 
 @Entity()
 export default class Question extends BareTimestampedSoftDelete {
@@ -36,27 +36,31 @@ export default class Question extends BareTimestampedSoftDelete {
   @Column() @Serializable
   varName: string
 
-  @Relationship(QuestionType)
+  @Relationship(type => QuestionType)
   @ManyToOne(type => QuestionType, qt => qt.questions, {eager: true})
   questionType: QuestionType
 
-  @Relationship(Translation)
+  @Relationship(type => Translation)
   @OneToOne(type => Translation, { eager: true })
   @JoinColumn()
   questionTranslation: Translation
 
-  @Relationship(QuestionChoice)
+  @Relationship(type => QuestionChoice)
   @OneToMany(type => QuestionChoice, choice => choice.question, { eager: true })
   choices: QuestionChoice[]
 
-  @Relationship(AssignConditionTag)
+  @Relationship(type => AssignConditionTag)
   @ManyToMany(type => AssignConditionTag, act => act.questions, { eager: true })
   @JoinTable({ name: 'question_assign_condition_tag' })
   assignConditionTags: AssignConditionTag[]
 
-  @Relationship(QuestionParameter)
+  @Relationship(type => QuestionParameter)
   @OneToMany(type => QuestionParameter, qp => qp.question, { eager: true })
   questionParameters: QuestionParameter[]
+
+  // Inverse relationships
+  @ManyToOne(type => QuestionGroup, qg => qg.questions)
+  questionGroup: QuestionGroup
 
   datum?: QuestionDatum           // Assigned and used by InterviewManager only
   parameters?: object             // Assigned and used by InterviewManager only

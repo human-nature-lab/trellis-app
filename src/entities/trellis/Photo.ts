@@ -1,6 +1,6 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToMany} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
+import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Respondent from './Respondent'
 import Geo from './Geo'
 

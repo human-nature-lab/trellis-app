@@ -1,4 +1,4 @@
-import Roster from "../../entities/trellis/Roster";
+import Roster from '../../entities/trellis/Roster'
 
 export default interface RosterServiceInterface {
 

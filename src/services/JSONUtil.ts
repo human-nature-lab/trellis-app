@@ -93,6 +93,10 @@ export function mapFromSnakeJSON (target: object, source: object, keyMap: object
  */
 export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpts): AssignerFunction {
 
+  if (opts.hasOwnProperty('constructor') && !opts.constructor) {
+    debugger
+  }
+
   function assign (key: string, to: object, value: any): void {
     if (typeof opts === 'object' && opts.async) {
       Object.defineProperty(to, key, {
@@ -111,7 +115,9 @@ export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpt
     if (typeof opts === 'object') {
       if (targetKey === 'interviews') debugger
       generator = opts.hasOwnProperty('constructor') ? s => {
-        let d = new opts.constructor()
+        let constructor = opts.constructor()
+        // @ts-ignore
+        let d = new constructor()
         return d.fromSnakeJSON ? d.fromSnakeJSON(s): d
       } : opts.generator
       if (opts.jsonKey) sourceKey = opts.jsonKey

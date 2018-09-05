@@ -1,4 +1,4 @@
-import Geo from "../../entities/trellis/Geo";
+import Geo from '../../entities/trellis/Geo'
 
 export abstract class GeoSearchParams {
   constructor (
