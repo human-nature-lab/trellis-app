@@ -162,7 +162,7 @@ export default class ActionStore extends Emitter {
    */
   load (actions: Action[]) {
     for (let action of actions) {
-      if (typeof action.payload === 'string') {
+      if (action.payload && typeof action.payload === 'string') {
         action.payload = JSON.parse(action.payload)
       }
       this.insertIntoStore(action)

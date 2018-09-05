@@ -1,9 +1,10 @@
 import uuidv4 from 'uuid/v4'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import {Column, Entity, PrimaryColumn} from 'typeorm'
+import {Column, Entity, ManyToOne, PrimaryColumn} from 'typeorm'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'
+import QuestionDatum from "./QuestionDatum";
 
 @Entity()
 export default class Datum extends TimestampedSoftDelete implements SnakeSerializable {
@@ -34,6 +35,9 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   @Column() @Serializable
   public val: string;
 
+  @ManyToOne(type => QuestionDatum, questionDatum => questionDatum.data)
+  questionDatum: QuestionDatum
+
   fromRecycler (
     surveyId: string,
     questionDatumId: string,
@@ -44,7 +48,8 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
     edgeId: string,
     geoId: string,
     photoId: string,
-    rosterId: string
+    rosterId: string,
+    choiceId: string
   ){
     this.id = uuidv4()
     this.updatedAt = now()
@@ -59,6 +64,7 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
     this.geoId = geoId
     this.photoId = photoId
     this.rosterId = rosterId
+    this.choiceId = choiceId
     return this
   }
 }

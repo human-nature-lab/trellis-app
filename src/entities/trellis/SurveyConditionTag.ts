@@ -13,8 +13,9 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
   surveyId: string
   @Column() @Serializable
   conditionId: string
-  @Column() @Serializable
-  interviewId: string
+  // Future
+  // @Column() @Serializable
+  // interviewId: string
 
   @Relationship({
     constructor: () => ConditionTag,
@@ -35,7 +36,7 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
     this.id = id
     this.surveyId = surveyId
     this.conditionId = conditionId
-    this.interviewId = interviewId
+    // this.interviewId = interviewId
     this.createdAt = now()
     this.updatedAt = now()
 

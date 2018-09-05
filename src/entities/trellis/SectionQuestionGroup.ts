@@ -1,10 +1,10 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import QuestionGroup from './QuestionGroup'
 
 @Entity()
-export default class SectionQuestionGroup extends BareTimestampedSoftDelete {
+export default class SectionQuestionGroup extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column({ select: false }) @Serializable

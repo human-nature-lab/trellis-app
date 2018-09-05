@@ -1,8 +1,8 @@
 import {Column} from 'typeorm'
 import {AsDate, Serializable} from '../decorators/WebOrmDecorators'
-import BareTimestamped from './BareTimestamped'
+import SparseTimestamped from './SparseTimestamped'
 
-export default abstract class BareTimestampedSoftDelete extends BareTimestamped {
+export default abstract class SparseTimestampedSoftDelete extends SparseTimestamped {
   @Column({ select: false, name: "deleted_at", type: "datetime", nullable: true })
   @AsDate
   @Serializable

@@ -1,10 +1,10 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Question from './Question'
 
 @Entity()
-export default class QuestionType extends BareTimestampedSoftDelete {
+export default class QuestionType extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column() @Serializable

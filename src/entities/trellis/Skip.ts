@@ -1,12 +1,12 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import ConditionTag from './ConditionTag'
 import Form from './Form'
 import QuestionGroup from './QuestionGroup'
 
 @Entity()
-export default class Skip extends BareTimestampedSoftDelete {
+export default class Skip extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column() @Serializable

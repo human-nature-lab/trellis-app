@@ -1,6 +1,6 @@
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Datum from './Datum'
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'
@@ -29,6 +29,7 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   // public interviewId: string
 
   @Relationship(type => Datum)
+  @OneToMany(type => Datum, datum => datum.questionDatum)
   data: Datum[]
 
   /**

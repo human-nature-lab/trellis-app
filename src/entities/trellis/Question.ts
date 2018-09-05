@@ -10,7 +10,7 @@ import {
   JoinColumn
 } from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import {mapFromSnakeJSON} from '../../services/JSONUtil'
 import QuestionType from './QuestionType'
 import Translation from './Translation'
@@ -22,10 +22,10 @@ import QuestionDatum from './QuestionDatum'
 import QuestionGroup from './QuestionGroup'
 
 @Entity()
-export default class Question extends BareTimestampedSoftDelete {
+export default class Question extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column({ select: false }) @Serializable
+  @Column() @Serializable
   questionTypeId: string
   @Column({ select: false }) @Serializable
   questionTranslationId: string

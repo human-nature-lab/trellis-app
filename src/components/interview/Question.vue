@@ -21,11 +21,11 @@
           :text="translated"
           :location="location" />
       </v-flex>
-      <component
-        :is="typeMap[question.questionTypeId]"
+      <div
+        :is="currentQuestionComponent"
         :question="question"
         :location="location"
-        :respondent="interview.survey.respondent"></component>
+        :respondent="interview.survey.respondent" />
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
       <DontKnowRefused
@@ -94,7 +94,6 @@
     },
     data: function () {
       return {
-        typeMap: typeMap,
         translation: this.question.questionTranslation,
         hasChanged: false
       }
@@ -105,6 +104,9 @@
       }
     },
     computed: {
+      currentQuestionComponent () {
+        return typeMap[this.question.questionTypeId]
+      },
       validationError: function () {
         if (!this.hasChanged || (this.question.dkRf !== null && this.question.dkRf !== undefined)) {
           return null

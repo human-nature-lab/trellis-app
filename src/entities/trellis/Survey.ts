@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, ManyToOne} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Respondent from './Respondent'
@@ -27,8 +27,7 @@ export default class Survey extends TimestampedSoftDelete {
   form: Form
 
   @Relationship(type => Respondent)
-  // @OneToOne(type => Respondent, { eager: true })
-  // @JoinColumn()
+  @ManyToOne(type => Respondent, respondent => respondent.surveys)
   respondent: Respondent
 
   // @Relationship(type => Interview)

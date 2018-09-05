@@ -1,9 +1,9 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
-import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
 @Entity()
-export default class QuestionAssignConditionTag extends BareTimestampedSoftDelete {
+export default class QuestionAssignConditionTag extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column() @Serializable

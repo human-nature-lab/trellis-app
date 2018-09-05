@@ -1,20 +1,26 @@
 import Interview from '../../entities/trellis/Interview'
 import {now} from '../DateService'
-import SingletonService from '../SingletonService'
 import DatabaseService from '../database/DatabaseService'
 import InterviewServiceInterface from './InterviewServiceInterface'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import QuestionDatum from '../../entities/trellis/QuestionDatum'
 import UserService from '../user/UserService'
+import SurveyConditionTag from "../../entities/trellis/SurveyConditionTag";
+import SectionConditionTag from "../../entities/trellis/SectionConditionTag";
+import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag";
+import {SelectQueryBuilder} from "typeorm";
+import Survey from "../../entities/trellis/Survey";
+import Datum from "../../entities/trellis/Datum";
 
 export default class InterviewServiceCordova implements InterviewServiceInterface {
 
-  async getInterview (id: string) {
+  async getInterview (interviewId: string) {
     const repo = await DatabaseService.getRepository(Interview)
     const interview = await repo.findOne({
-      id,
-      relations: ['survey', 'user']
+      id: interviewId,
+      deletedAt: null,
+      relations: ['survey', 'user', 'survey.respondent']
     })
     return interview
   }
@@ -42,10 +48,17 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
 
   async getActions (interviewId: string) {
     const repo = await DatabaseService.getRepository(Action)
-    let actions = await repo.find({
-      interviewId,
-      deletedAt: null
-    })
+    let actions = await repo.createQueryBuilder('action')
+      .where(qb => {
+        return 'action.interviewId in ' +  qb.subQuery().select('interview.id')
+          .from(Interview, 'interview')
+          .where(qb2 => {
+            return 'interview.surveyId = ' + qb2.subQuery().select('interview.surveyId')
+              .from(Interview, 'interview')
+              .where('interview.id = :interviewId', {interviewId})
+              .getQuery()
+          }).getQuery()
+      }).getMany()
     return actions
   }
 
@@ -55,21 +68,88 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return res
   }
 
+  private surveyIdSubQuery (interviewId: string, qb: SelectQueryBuilder<any>): string {
+    return qb.subQuery()
+      .select('interview.surveyId')
+      .from(Interview, 'interview')
+      .where('interview.id = :interviewId', {interviewId})
+      .getQuery()
+  }
+
+  private respondentIdSubQuery (interviewId: string, qb: SelectQueryBuilder<any>): string {
+    return qb.subQuery()
+      .select('survey.respondentId')
+      .from(Survey, 'survey')
+      .where(qb2 => `survey.id = ${this.surveyIdSubQuery(interviewId, qb2)}`)
+      .getQuery()
+  }
+
+  private async getQuestionDatum (interviewId: string): Promise<QuestionDatum[]> {
+    return await (await DatabaseService.getRepository(QuestionDatum)).createQueryBuilder('question_datum')
+      .where(qb => {
+        return `question_datum.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`
+      })
+      .leftJoinAndSelect('question_datum.data', 'datum')
+      .getMany()
+  }
+
+  private async getSurveyConditionTags (interviewId: string): Promise<SurveyConditionTag[]> {
+    return await (await DatabaseService.getRepository(SurveyConditionTag)).createQueryBuilder('survey_condition_tag')
+      .where(qb => `survey_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`).getMany()
+  }
+
+  private async getSectionConditionTags (interviewId: string): Promise<SectionConditionTag[]> {
+    return await (await DatabaseService.getRepository(SurveyConditionTag)).createQueryBuilder('section_condition_tag')
+      .where(qb => {
+        return `section_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`
+      }).getMany()
+  }
+
+  private async getRespondentConditionTags (interviewId: string): Promise<RespondentConditionTag[]> {
+    return await (await DatabaseService.getRepository(RespondentConditionTag)).createQueryBuilder('respondent_condition_tag')
+      .where(qb => {
+        return `respondent_condition_tag.respondentId = ${this.respondentIdSubQuery(interviewId, qb)}`
+      }).getMany()
+  }
+
   async getData (interviewId: string) {
-    const repo = await DatabaseService.getRepository(QuestionDatum)
-    console.log('TODO: Fetch QuestionDatum and condition tags')
+    let data = []
+    let survey = []
+    let section = []
+    let respondent = []
+    data = await this.getQuestionDatum(interviewId)
+    survey = await this.getSurveyConditionTags(interviewId)
+    section = await this.getSectionConditionTags(interviewId)
+    respondent = await this.getRespondentConditionTags(interviewId)
     return {
-      data: [],
+      data,
       conditionTags: {
-        survey: [],
-        respondent: [],
-        section: []
+        survey,
+        section,
+        respondent
       }
     }
   }
 
   async saveData (interviewId: string, diff: InterviewDeltaInterface) {
+    const conn = await DatabaseService.getDatabase()
+    return await conn.transaction(async transactionalEntityManager => {
 
+      // Remove stuff first
+      await transactionalEntityManager.update(diff.data.datum.removed)
+      await transactionalEntityManager.update(diff.data.questionDatum.removed)
+
+      // Insert second
+      await transactionalEntityManager.insert(diff.data.questionDatum.added)
+      await transactionalEntityManager.insert(diff.data.datum.added)
+
+      // Update last
+      await transactionalEntityManager.update(diff.data.questionDatum.modified)
+      await transactionalEntityManager.update(diff.data.datum.modified)
+
+      // TODO: Can't
+    })
+    throw Error('need to save data')
   }
 
   async getPreload (interviewId: string) {

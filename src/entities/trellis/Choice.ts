@@ -1,11 +1,11 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Translation from './Translation'
 import Question from './Question'
 
 @Entity()
-export default class Choice extends BareTimestampedSoftDelete {
+export default class Choice extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column() @Serializable

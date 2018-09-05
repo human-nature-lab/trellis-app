@@ -14,12 +14,12 @@ import Translation from './Translation'
 import FormSection from './FormSection'
 import QuestionGroup from './QuestionGroup'
 import Form from './Form'
-import BareTimestampedSoftDelete from '../base/BareTimestampedSoftDelete'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
 console.log(QuestionGroup)
 
 @Entity()
-export default class Section extends BareTimestampedSoftDelete {
+export default class Section extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
 
