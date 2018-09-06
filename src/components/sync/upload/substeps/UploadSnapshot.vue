@@ -2,7 +2,7 @@
   <sync-sub-step
     :working="working"
     :success="success"
-    :success-message="DONE"
+    success-message="DONE"
     :current-log="currentLog"
     :cancel="stopWorking"
     :retry="retry">

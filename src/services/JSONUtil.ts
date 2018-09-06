@@ -8,8 +8,9 @@ import moment from 'moment'
  */
 export function camelToSnake (str: string) {
   let snake = ''
-  for (let char of str) {
-    snake += char === char.toUpperCase() ? `_${char.toLowerCase()}` : char
+  for (let i = 0; i < str.length; i++) {
+    let char = str[i]
+    snake += char === char.toUpperCase() ? ((i > 0) ? `_${char.toLowerCase()}` : `${char.toLowerCase()}`) : char
   }
   return snake
 }

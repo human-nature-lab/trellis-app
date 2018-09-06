@@ -14,7 +14,7 @@
           </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content step="1">
-              <download-step
+              <sync-step
                 title="Connecting"
                 v-if="downloadStep === 1"
                 v-bind:continue-status="continueStatusArray[0]"
@@ -42,10 +42,10 @@
                   :logging-service="loggingService"
                   v-bind:server-snapshot="serverSnapshot"
                   v-on:compare-upload-done="compareUploadDone"></compare-upload>
-              </download-step>
+              </sync-step>
             </v-stepper-content>
             <v-stepper-content step="2">
-              <download-step
+              <sync-step
                 title="Downloading"
                 v-if="downloadStep === 2"
                 v-bind:continue-status="continueStatusArray[1]"
@@ -83,10 +83,10 @@
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-on:extract-snapshot-done="extractSnapshotDone">
                 </extract-snapshot>
-              </download-step>
+              </sync-step>
             </v-stepper-content>
             <v-stepper-content step="3">
-              <download-step
+              <sync-step
                 title="Inserting"
                 v-if="downloadStep === 3"
                 v-bind:continue-status="continueStatusArray[2]"
@@ -116,10 +116,10 @@
                   :sync="sync"
                   v-on:register-download-done="registerDownloadDone">
                 </register-download>
-              </download-step>
+              </sync-step>
             </v-stepper-content>
             <v-stepper-content step="4">
-              <download-step
+              <sync-step
                 title="Downloading images"
                 v-if="downloadStep === 4"
                 v-bind:continue-status="continueStatusArray[3]"
@@ -143,7 +143,7 @@
                   :logging-service="loggingService"
                   v-on:download-images-done="downloadImagesDone">
                 </download-images>
-              </download-step>
+              </sync-step>
             </v-stepper-content>
           </v-stepper-items>
         </v-stepper>
@@ -152,7 +152,7 @@
 </template>
 
 <script>
-  import DownloadStep from '../SyncStep'
+  import SyncStep from '../SyncStep'
   import CheckConnection from './substeps/CheckConnection'
   import AuthenticateDevice from './substeps/AuthenticateDevice'
   import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'
@@ -355,7 +355,7 @@
       CheckLatestSnapshot,
       CheckConnection,
       AuthenticateDevice,
-      DownloadStep,
+      SyncStep,
       EmptySnapshotsDirectory,
       CheckDownloadSize,
       DownloadSnapshot,
