@@ -2,7 +2,6 @@ import { DeviceService } from '../device/DeviceService'
 import SyncTable from './tables/SyncTable'
 import SyncMessage from './tables/SyncMessage'
 import Message from './tables/Message'
-import UpdatedRecords from './tables/UpdatedRecords'
 import Config from './tables/ConfigTable'
 
 export default class DatabaseServiceMock {
@@ -190,7 +189,7 @@ export default class DatabaseServiceMock {
 
   getUpdatedRecordsCount () {
     return new Promise((resolve, reject) => {
-      this.getConfigDatabase().then((db) => {
+      this.getDatabase().then((db) => {
         db.transaction((tx) => {
           tx.executeSql('SELECT count(*) AS urcount FROM updated_records', [],
             function (t, data) {
