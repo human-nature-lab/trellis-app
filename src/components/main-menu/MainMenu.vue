@@ -125,6 +125,16 @@
           <span v-else>{{$t('online')}}</span>
         </v-list-tile-content>
       </v-list-tile>
+      <v-list-tile
+        v-if="isCordovaBuild"
+        :to="{ name: 'ServiceTesting' }">
+        <v-list-tile-action>
+          <v-icon>build</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          Service Testing
+        </v-list-tile-content>
+      </v-list-tile>
     </v-list>
     <v-snackbar
       absolute

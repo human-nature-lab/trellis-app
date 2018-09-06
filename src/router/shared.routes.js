@@ -66,4 +66,8 @@ export default [{
   path: '/study',
   name: 'StudySelector',
   component: StudySelectorPage
+}, {
+  path: '/test/services',
+  name: 'ServiceTesting',
+  component: () => import(/* webpackChunkName: "service-testing" */'../components/ServiceTesting')
 }]
