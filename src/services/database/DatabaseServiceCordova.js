@@ -57,7 +57,6 @@ import User from '../../entities/trellis/User'
 import UserStudy from '../../entities/trellis/UserStudy'
 import Log from '../../entities/trellis-config/Log'
 import Sync from '../../entities/trellis-config/Sync'
-import UpdatedRecords from '../../entities/trellis-config/UpdatedRecords'
 import FileService from '../file/FileService'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 
@@ -69,8 +68,7 @@ const trellisConfigConnection = {
   entities: [
     Config,
     Log,
-    Sync,
-    UpdatedRecords
+    Sync
   ],
   logging: true,
   synchronize: true
@@ -326,8 +324,11 @@ export default class DatabaseServiceCordova {
   }
 
   async getUpdatedRecordsCount () {
-    const connection = await this.getConfigDatabase()
-    const repository = await connection.getRepository(UpdatedRecords)
-    return await repository.count({ uploadedAt: null })
+    const connection = await this.getDatabase()
+    const totalRowResults = await connection.query(
+      `select count(*) as total_rows 
+        from updated_records 
+        where uploaded_at is null;`)
+    return totalRowResults[0]['total_rows']
   }
 }
