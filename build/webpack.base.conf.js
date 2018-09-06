@@ -21,14 +21,15 @@ module.exports = {
     filename: '[name].js',
     publicPath: process.env.NODE_ENV === 'production'
       ? config.build.assetsPublicPath
-      : config.dev.assetsPublicPath
+      : config.dev.assetsPublicPath,
+    chunkFilename: '[id].[hash:8].js'
   },
   optimization: {
     // usedExports: true,
     // concatenateModules: true,
     // minimize: true,
     splitChunks: {
-      chunks: 'initial',
+      chunks: 'all',
       cacheGroups: {
         commons: {
           test: /[\\/]node_modules[\\/]/,
