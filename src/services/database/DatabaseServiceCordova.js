@@ -137,8 +137,8 @@ const trellisConnection = {
     UserStudy
   ],
   namingStrategy: new SnakeCaseNamingStrategy(),
-  logging: ['warning', 'error'] // reduced logging
-  // logging: true // verbose logging
+  // logging: ['warning', 'error'] // reduced logging
+  logging: true // verbose logging
 }
 
 export default class DatabaseServiceCordova {
@@ -171,6 +171,31 @@ export default class DatabaseServiceCordova {
   async getConfigDatabase () {
     await this.configDatabaseCreated
     return getConnection('trellis-config')
+  }
+
+  async createUpdatedRecordsTable (connection) {
+    await connection.query(`drop table if exists updated_records;`)
+    await connection.query(`create table if not exists updated_records (table_name text, updated_record_id text, uploaded_at datetime);`)
+  }
+
+  async addTriggers (connection) {
+    const operations = ['update', 'insert']
+    const tableNameResults = await connection.query('select tbl_name from SQLite_master where type = "table"')
+    const tableNames = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] })
+    console.log('tableNames', tableNames)
+    tableNames.forEach(async (tableName) => {
+      if (tableName !== 'updated_records') {
+        operations.forEach(async (operation) => {
+          await connection.query(
+            `create trigger if not exists trigger__updated_records__${tableName} 
+               after ${operation} on ${tableName} 
+                 BEGIN 
+                   insert into updated_records (table_name, updated_record_id) values ('${tableName}',NEW.id);
+                 END;`
+          )
+        })
+      }
+    })
   }
 
   async removeDatabase (status) {

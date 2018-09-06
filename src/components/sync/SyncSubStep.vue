@@ -17,15 +17,15 @@
     <v-btn
       v-if="retry !== undefined && !working && !success"
       color="primary"
-      @click.native="retry">Retry</v-btn>
+      @click="retry">Retry</v-btn>
     <v-btn
       v-if="ignore !== undefined && !working && isWarning()"
       color="amber"
-      @click.native="ignore">Ignore</v-btn>
+      @click="ignore">Ignore</v-btn>
     <v-btn
       v-if="cancel !== undefined && working"
       flat
-      @click.native="cancel">Stop</v-btn>
+      @click="cancel">Stop</v-btn>
   </div>
 </template>
 

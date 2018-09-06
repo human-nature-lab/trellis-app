@@ -3,14 +3,14 @@ import {Serializable} from '../decorators/WebOrmDecorators'
 
 @Entity("updated_records")
 export default class UpdatedRecords {
-  @PrimaryGeneratedColumn('uuid') @Serializable
-  id: string;
+  @PrimaryGeneratedColumn() @Serializable
+  id: number;
 
   @Column({ name: "updated_record_id" }) @Serializable
   updatedRecordId: string;
 
-  @Column({ name: "table" }) @Serializable
-  table: string;
+  @Column({ name: "table_name" }) @Serializable
+  tableName: string;
 
   @Column({ name: "is_insert", nullable: false, 'default': false }) @Serializable
   isInsert: boolean;

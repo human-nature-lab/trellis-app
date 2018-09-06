@@ -1,5 +1,5 @@
 <template>
-  <div class="download">
+  <div class="upload">
     <trellis-alert v-if="showLog()" :current-log="currentLog"></trellis-alert>
     <div>
       <v-stepper v-model="uploadStep">
@@ -44,23 +44,19 @@
 
 <script>
   import TrellisAlert from '../../TrellisAlert.vue'
-  import SyncStep from '../SyncStep'
+  import SyncStep from '../SyncStep.vue'
   import CreateUpload from './substeps/CreateUpload.vue'
   import UploadSnapshot from './substeps/UploadSnapshot.vue'
-  import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
+  import { BUTTON_STATUS } from '../../../static/constants'
   import SyncService from '../../../services/sync/SyncService'
   import DeviceService from '../../../services/device/DeviceService'
   import Log from '../../../entities/trellis-config/Log'
   import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
-  const DOWNLOAD_STATUS = {
-    CHECKING_CONNECTION: 'Establishing connection with the server...',
-    CHECKING_LAST_SNAPSHOT: 'Checking latest available snapshot on the server...'
-  }
+
   export default {
     name: 'upload',
     data () {
       return {
-        status: DOWNLOAD_STATUS.CHECKING_CONNECTION,
         uploadStep: 1,
         uploadSubStep: 0,
         continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
@@ -140,10 +136,10 @@
     computed: {
       continueStatus: {
         get: function () {
-          return this.continueStatusArray[this.downloadStep - 1]
+          return this.continueStatusArray[this.uploadStep - 1]
         },
         set: function (status) {
-          this.continueStatusArray.splice(this.downloadStep - 1, 1, status)
+          this.continueStatusArray.splice(this.uploadStep - 1, 1, status)
         }
       }
     },

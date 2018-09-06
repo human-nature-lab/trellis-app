@@ -1,10 +1,12 @@
 <template>
   <sync-sub-step
+    :indeterminate="indeterminate"
+    :progress="progress"
     :working="working"
-    :success="success"
-    :success-message="DONE"
-    :current-log="currentLog"
     :cancel="stopWorking"
+    :success="success"
+    success-message="DONE"
+    :current-log="currentLog"
     :retry="retry">
     Creating upload...
   </sync-sub-step>
@@ -13,6 +15,9 @@
 <script>
   import SyncSubStep from '../../SyncSubStep.vue'
   import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+  import FileService from '../../../../services/file/FileService'
+  import SyncService from '../../../../services/sync/SyncService'
+  import uuid from 'uuid/v4'
 
   export default {
     name: 'create-upload',
@@ -20,7 +25,9 @@
       return {
         success: false,
         working: true,
-        currentLog: undefined
+        currentLog: undefined,
+        indeterminate: true,
+        progress: 0
       }
     },
     created () {
@@ -34,16 +41,40 @@
       }
     },
     methods: {
-      doWork: function () {
-        this.working = true
-        setTimeout(() => {
+      doWork: async function () {
+         this.working = true
+        try {
+          const syncId = uuid()
+          const fileName = syncId + '.json'
+          const fileSystem = await FileService.requestFileSystem()
+          const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'uploads')
+          const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
+          await SyncService.createUploadFile(fileEntry, this.trackProgress, this.isCancelled)
+          if (this.working) {
+            // TODO
+            //this.working = false
+            //this.success = true
+            //this.$emit('create-upload-done')
+          }
+        } catch (err) {
+          console.error(err)
           this.working = false
-          this.success = true
-          this.$emit('create-upload-done')
-        }, 2000)
+        }
+      },
+      trackProgress: function (progress) {
+        this.indeterminate = false
+        this.progress = (progress.created / progress.total) * 100
+      },
+      isCancelled: function () {
+        console.log('isCancelled -> this.working', this.working)
+        return (! this.working)
       },
       stopWorking: function () {
         this.working = false
+        this.loggingService.log({
+          severity: 'info',
+          message: 'Operation cancelled by the user.'
+        }).then((result) => { this.currentLog = result })
       },
       retry: function () {
         this.currentLog = undefined
