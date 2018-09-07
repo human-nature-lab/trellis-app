@@ -16,10 +16,24 @@
               v-bind:continue-status="continueStatusArray[0]"
               v-on:continue-clicked="onContinue"
               v-on:cancel-clicked="onCancel">
-              <create-upload
+              <empty-uploads-directory
                 v-if="uploadSubStep > 0"
                 :logging-service="loggingService"
+                v-on:empty-uploads-directory-done="emptyUploadsDirectoryDone"></empty-uploads-directory>
+              <create-upload
+                v-if="uploadSubStep > 1"
+                :logging-service="loggingService"
                 v-on:create-upload-done="createUploadDone"></create-upload>
+              <compress-upload
+                v-if="uploadSubStep > 2"
+                :logging-service="loggingService"
+                :file-entry="uploadFile"
+                v-on:compress-upload-done="compressUploadDone"></compress-upload>
+              <calculate-hash
+                v-if="uploadSubStep > 3"
+                :logging-service="loggingService"
+                :file-entry="compressedUploadFile"
+                v-on:calculate-hash-done="calculateHashDone"></calculate-hash>
             </sync-step>
           </v-stepper-content>
           <v-stepper-content step="2">
@@ -32,6 +46,8 @@
               <upload-snapshot
                 v-if="uploadStep > 1"
                 :logging-service="loggingService"
+                :md5hash="compressedUploadFileHash"
+                :file-entry="compressedUploadFile"
                 v-on:upload-snapshot-done="uploadSnapshotDone">
               </upload-snapshot>
             </sync-step>
@@ -45,7 +61,10 @@
 <script>
   import TrellisAlert from '../../TrellisAlert.vue'
   import SyncStep from '../SyncStep.vue'
+  import EmptyUploadsDirectory from './substeps/EmptyUploadsDirectory.vue'
   import CreateUpload from './substeps/CreateUpload.vue'
+  import CompressUpload from './substeps/CompressUpload.vue'
+  import CalculateHash from './substeps/CalculateHash.vue'
   import UploadSnapshot from './substeps/UploadSnapshot.vue'
   import { BUTTON_STATUS } from '../../../static/constants'
   import SyncService from '../../../services/sync/SyncService'
@@ -63,7 +82,10 @@
         sync: undefined,
         currentLog: undefined,
         loggingService: undefined,
-        deviceId: ''
+        deviceId: '',
+        uploadFile: undefined,
+        compressedUploadFile: undefined,
+        compressedUploadFileHash: undefined
       }
     },
     created () {
@@ -124,8 +146,23 @@
           }
         }
       },
-      createUploadDone: function () {
-        console.log('createUploadDone')
+      emptyUploadsDirectoryDone: function () {
+        console.log('emptyUploadsDirectoryDone')
+        this.uploadSubStep = 2
+      },
+      createUploadDone: function (fileEntry) {
+        console.log('createUploadDone', fileEntry)
+        this.uploadFile = fileEntry
+        this.uploadSubStep = 3
+      },
+      compressUploadDone: function (fileEntry) {
+        console.log('compressUploadDone', fileEntry)
+        this.compressedUploadFile = fileEntry
+        this.uploadSubStep = 4
+      },
+      calculateHashDone: function (md5hash) {
+        console.log('calculateHashDone', md5hash)
+        this.compressedUploadFileHash = md5hash
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
       uploadSnapshotDone: function () {
@@ -146,7 +183,10 @@
     components: {
       TrellisAlert,
       SyncStep,
+      EmptyUploadsDirectory,
       CreateUpload,
+      CompressUpload,
+      CalculateHash,
       UploadSnapshot
     }
   }

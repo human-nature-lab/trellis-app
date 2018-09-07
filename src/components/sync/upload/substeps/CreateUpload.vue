@@ -8,7 +8,7 @@
     success-message="DONE"
     :current-log="currentLog"
     :retry="retry">
-    Creating upload...
+    Creating upload file...
   </sync-sub-step>
 </template>
 
@@ -47,17 +47,17 @@
           const syncId = uuid()
           const fileName = syncId + '.json'
           const fileSystem = await FileService.requestFileSystem()
-          const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'uploads')
+          const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'upload_temp')
           const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
           await SyncService.createUploadFile(fileEntry, this.trackProgress, this.isCancelled)
           if (this.working) {
-            // TODO
-            //this.working = false
-            //this.success = true
-            //this.$emit('create-upload-done')
+            this.working = false
+            this.success = true
+            this.$emit('create-upload-done', fileEntry)
           }
         } catch (err) {
           console.error(err)
+          this.loggingService.log(err).then((result) => { this.currentLog = result })
           this.working = false
         }
       },
@@ -66,7 +66,6 @@
         this.progress = (progress.created / progress.total) * 100
       },
       isCancelled: function () {
-        console.log('isCancelled -> this.working', this.working)
         return (! this.working)
       },
       stopWorking: function () {

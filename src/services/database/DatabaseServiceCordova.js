@@ -145,9 +145,11 @@ export default class DatabaseServiceCordova {
     this.configDatabaseCreated = DatabaseServiceCordova.createConfigDatabase()
   }
 
-  static createDatabase () {
-    return DeviceService.isDeviceReady()
-      .then(() => createConnection(trellisConnection))
+  static async createDatabase () {
+    await DeviceService.isDeviceReady()
+    const connection = await createConnection(trellisConnection)
+    await DatabaseServiceCordova.createUpdatedRecordsTable(connection)
+    await DatabaseServiceCordova.addTriggers(connection)
   }
 
   async getDatabase () {
@@ -171,12 +173,11 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis-config')
   }
 
-  async createUpdatedRecordsTable (connection) {
-    await connection.query(`drop table if exists updated_records;`)
+  static async createUpdatedRecordsTable (connection) {
     await connection.query(`create table if not exists updated_records (table_name text, updated_record_id text, uploaded_at datetime);`)
   }
 
-  async addTriggers (connection) {
+  static async addTriggers (connection) {
     const operations = ['update', 'insert']
     const tableNameResults = await connection.query('select tbl_name from SQLite_master where type = "table"')
     const tableNames = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] })
@@ -326,8 +327,8 @@ export default class DatabaseServiceCordova {
   async getUpdatedRecordsCount () {
     const connection = await this.getDatabase()
     const totalRowResults = await connection.query(
-      `select count(*) as total_rows 
-        from updated_records 
+      `select count(*) as total_rows
+        from updated_records
         where uploaded_at is null;`)
     return totalRowResults[0]['total_rows']
   }

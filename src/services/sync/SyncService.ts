@@ -5,6 +5,7 @@ import { DeviceService } from '../device/DeviceService'
 import { syncInstance as http } from '../http/AxiosInstance'
 import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
 import {Connection} from 'typeorm'
+import Geo from '../../entities/trellis/Geo'
 
 /**
  * Max number of rows to write to upload file at a time.
@@ -146,7 +147,7 @@ class SyncService {
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     await repository.update({id: _sync.id}, {completedAt: new Date(), status: 'success'})
-    /* For debug purposes only */
+    /* TODO: For debug purposes only */
     const syncs = await repository.find()
     console.debug('syncs', syncs)
     /* For debug purposes only */
@@ -157,25 +158,19 @@ class SyncService {
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     await repository.update({id: _sync.id}, {status: 'cancelled'})
-    /* For debug purposes only */
+    /* TODO: For debug purposes only */
     const syncs = await repository.find()
     console.debug('syncs', syncs)
     /* For debug purposes only */
   }
 
   async writeUpdatedRows (fileWriter, updatedRows, isCancelled) {
-    console.log('writeUpdatedRows')
     return new Promise((resolve, reject) => {
       let curRow = 0
 
       fileWriter.onwriteend = function() {
-        console.log('fileWriter.onwriteend')
         curRow++
-        console.log('curRow', curRow)
-        console.log('updatedRows.length', updatedRows.length)
-        console.log('isCancelled()', isCancelled())
         if (curRow < updatedRows.length && (! isCancelled()) ) {
-          console.log('seeking end of file')
           fileWriter.seek(fileWriter.length)
           fileWriter.write(JSON.stringify(updatedRows[curRow]) + '\n')
         } else {
@@ -186,7 +181,6 @@ class SyncService {
       fileWriter.onerror = function (err) { reject(err) }
 
       fileWriter.write(JSON.stringify(updatedRows[curRow]) + '\n')
-      console.log('got here')
     })
   }
 
@@ -211,61 +205,36 @@ class SyncService {
   async createUploadFile (fileEntry, trackProgress, isCancelled) {
     const connection = await DatabaseService.getDatabase()
 
-    //await DatabaseService.createUpdatedRecordsTable(connection)
-    //await DatabaseService.addTriggers(connection)
-
-    /*
-    const respondentRepository = await connection.getRepository(Respondent)
-    const respondents = await respondentRepository.find({ take: 100 })
-    respondents.forEach((respondent) => {
-      respondentRepository.update({ id: respondent.id }, { geoNotes: 'Bar' })
+    /* For testing:
+    const repository = await connection.getRepository(Geo)
+    const entities = await repository.find({ take: 100 })
+    entities.forEach((entity) => {
+      repository.update({ id: entity.id }, { updatedAt: new Date() })
     })
     */
 
-    /*
-    const repository = await configConnection.getRepository(UpdatedRecords)
-    const updatedRecords = await repository.find()
-    console.log('updatedRecords', updatedRecords)
-    const queryBuilder = await repository.createQueryBuilder('updated_records')
-    const totalRows = await queryBuilder.select('count(*)', 'updatedRecordCount')
-      .where('uploaded_at is null')
-      .getRawOne()
-    const totalRows = await
-    console.log('totalRows', totalRows)
-    const tables = await queryBuilder.select('table_name', 'tableName')
-      .addSelect('count(*)', 'rowCount')
-      .where('uploaded_at is null')
-      .groupBy('updated_records.table_name')
-      .getRawMany()
-    console.log('tables', tables)
-    */
     const totalRowResults = await connection.query('select count(*) as total_rows from updated_records where uploaded_at is null;')
     const totalRows = totalRowResults[0]['total_rows']
-    console.log('totalRows', totalRows)
     const tables = await connection.query(
       'select table_name as tableName, count(*) as rowCount ' +
       'from updated_records ' +
       'where uploaded_at is null ' +
       'group by table_name;')
 
-    console.log('tables', tables)
-
     const fileWriter = await this.createFileWriter(fileEntry)
     let writtenRows = 0
 
-    tables.forEach(async (table) => {
+    for (const table of tables) {
       let offset = 0
       while (offset < table.rowCount) {
         const rowIds = await this.getRowsToUpdate(connection, table.tableName, UPLOAD_NUM_ROWS_WRITE, offset)
-        console.log('rowIds', rowIds)
         const updatedRows = await this.getUpdatedRows(connection, table.tableName, rowIds)
-        console.log('updatedRows', updatedRows)
         await this.writeUpdatedRows(fileWriter, updatedRows, isCancelled)
         offset += UPLOAD_NUM_ROWS_WRITE
         writtenRows += updatedRows.length
         trackProgress({created: writtenRows, total: totalRows})
       }
-    })
+    }
   }
 
 }
