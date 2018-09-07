@@ -141,7 +141,6 @@ export default class DatabaseServiceMock {
       tx.executeSql(SyncMessage.getCreateTableStatement(), [])
       tx.executeSql(Message.getCreateTableStatement(), [])
       tx.executeSql(Config.getCreateTableStatement(), [])
-      tx.executeSql(UpdatedRecords.getCreateTableStatement(), [])
     }, function (error) {
       console.error('initDatabase error: ', error)
     }, function () {

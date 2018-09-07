@@ -167,6 +167,40 @@ class FileServiceCordova {
     return promise
   }
 
+  upload (uri, fileEntry, onUploadProgress) {
+    const promise = new Promise((resolve, reject) => {
+      DeviceService.isDeviceReady()
+        .then(() => {
+          try {
+            const fileTransfer = new FileTransfer()
+            const encodedUri = encodeURI(uri)
+            promise.cancelUpload = fileTransfer.abort.bind(fileTransfer)
+            fileTransfer.onprogress = onUploadProgress
+            const fileURL = fileEntry.toURL()
+            fileTransfer.upload(fileURL, encodedUri,
+              (success) => {
+                resolve()
+              },
+              (err) => {
+                if (err.hasOwnProperty('code') && err.code === 4) {
+                  let errorObject = {
+                    message: 'Operation cancelled by user.'
+                  }
+                  merge(errorObject, err)
+                  reject(errorObject)
+                } else {
+                  reject(err)
+                }
+              },
+              { params: { fileName: fileEntry.name }, headers: { 'X-Key': config.xKey } })
+          } catch (err) {
+            reject(err)
+          }
+        })
+    })
+    return promise
+  }
+
   fileFromFileEntry (fileEntry) {
     return new Promise((resolve, reject) => {
       try {
