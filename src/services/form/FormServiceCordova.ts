@@ -4,13 +4,17 @@ import StudyForm from '../../entities/trellis/StudyForm'
 import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'
 import QuestionGroup from '../../entities/trellis/QuestionGroup'
+import {IsNull} from 'typeorm';
 
 export default class FormServiceCordova implements FormServiceInterface {
 
   async getStudyForms (studyId: string): Promise<StudyForm[]> {
     const repo = await DatabaseService.getRepository(StudyForm)
     let studyForms = await repo.find({
-      studyId,
+      where: {
+        studyId,
+        deletedAt: IsNull()
+      },
       deletedAt: null
     })
     return studyForms
@@ -22,7 +26,9 @@ export default class FormServiceCordova implements FormServiceInterface {
 
     // Questions relationship has been removed from
     const form = await repo.findOne({
-      id,
+      where: {
+        id
+      },
       relations: ['sections']
     })
     const groups: QuestionGroup[] = []
@@ -41,10 +47,6 @@ export default class FormServiceCordova implements FormServiceInterface {
       })
     })
     await Promise.all(promises)
-    // const form = await repo.findOne({
-    //   id,
-    //   relations: ['sections']
-    // })
     return form
   }
 
