@@ -1,9 +1,8 @@
-import UserServiceWeb from '../user/UserServiceWeb'
+import {webService as userService} from '../user/UserService'
 import http, {setToken, removeToken} from '../http/AxiosInstance'
 import LoginServiceInterface from './LoginServiceInterface'
 import singleton from '../../static/singleton'
 
-let userService = new UserServiceWeb()
 export default class LoginServiceWeb implements LoginServiceInterface {
 
   async login (username, password) {

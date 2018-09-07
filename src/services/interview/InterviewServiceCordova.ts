@@ -9,7 +9,7 @@ import UserService from '../user/UserService'
 import SurveyConditionTag from "../../entities/trellis/SurveyConditionTag";
 import SectionConditionTag from "../../entities/trellis/SectionConditionTag";
 import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag";
-import {QueryRunner, SelectQueryBuilder} from "typeorm";
+import {IsNull, QueryRunner, SelectQueryBuilder} from "typeorm";
 import Survey from "../../entities/trellis/Survey";
 import Datum from "../../entities/trellis/Datum";
 
@@ -18,8 +18,10 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
   async getInterview (interviewId: string) {
     const repo = await DatabaseService.getRepository(Interview)
     const interview = await repo.findOne({
-      id: interviewId,
-      deletedAt: null,
+      where: {
+        id: interviewId,
+        deletedAt: IsNull()
+      },
       relations: ['survey', 'user', 'survey.respondent']
     })
     return interview
@@ -46,7 +48,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return interview
   }
 
-  async getActions (interviewId: string) {
+  async getActions (interviewId: string): Promise<Action[]> {
     const repo = await DatabaseService.getRepository(Action)
     let actions = await repo.createQueryBuilder('action')
       .where(qb => {
