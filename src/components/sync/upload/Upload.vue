@@ -50,6 +50,19 @@
                 :file-entry="compressedUploadFile"
                 v-on:upload-snapshot-done="uploadSnapshotDone">
               </upload-snapshot>
+              <verify-upload
+                v-if="uploadStep > 1 && uploadSubStep > 1"
+                :logging-service="loggingService"
+                :md5hash="compressedUploadFileHash"
+                :file-entry="compressedUploadFile"
+                v-on:verify-upload-done="verifyUploadDone">
+              </verify-upload>
+              <register-upload
+                v-if="uploadStep > 1 && uploadSubStep > 2"
+                :logging-service="loggingService"
+                :sync="sync"
+                v-on:register-upload-done="registerUploadDone">
+              </register-upload>
             </sync-step>
           </v-stepper-content>
         </v-stepper-items>
@@ -66,6 +79,8 @@
   import CompressUpload from './substeps/CompressUpload.vue'
   import CalculateHash from './substeps/CalculateHash.vue'
   import UploadSnapshot from './substeps/UploadSnapshot.vue'
+  import VerifyUpload from './substeps/VerifyUpload.vue'
+  import RegisterUpload from './substeps/RegisterUpload.vue'
   import { BUTTON_STATUS } from '../../../static/constants'
   import SyncService from '../../../services/sync/SyncService'
   import DeviceService from '../../../services/device/DeviceService'
@@ -166,7 +181,15 @@
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
       uploadSnapshotDone: function () {
-        console.log('uploadsnapshotDone')
+        console.log('uploadSnapshotDone')
+        this.uploadSubStep = 2
+      },
+      verifyUploadDone: function () {
+        console.log('verifyUploadDone')
+        this.uploadSubStep = 3
+      },
+      registerUploadDone: function () {
+        console.log('registerUploadDone')
         this.continueStatus = BUTTON_STATUS.DONE
       }
     },
@@ -187,7 +210,9 @@
       CreateUpload,
       CompressUpload,
       CalculateHash,
-      UploadSnapshot
+      UploadSnapshot,
+      VerifyUpload,
+      RegisterUpload
     }
   }
 </script>

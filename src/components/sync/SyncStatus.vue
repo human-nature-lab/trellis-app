@@ -28,6 +28,7 @@
 </template>
 
 <script>
+  /* TODO: Consider adding information about the last upload here. */
   import DatabaseService from '../../services/database/DatabaseService'
   import DateService from '../../services/DateService'
   export default {
@@ -62,7 +63,7 @@
       },
       snapshotDownloadedAt: function () {
         if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('createdAt')) {
-          return DateService.parseDate(this.localLatestSnapshot['createdAt']).format('llll')
+          return DateService.parseDate(this.localLatestSnapshot['createdAt']).local().format('llll')
         } else {
           return ''
         }
