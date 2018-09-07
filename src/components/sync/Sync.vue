@@ -21,7 +21,7 @@
           </v-layout>
           <v-layout row class="mt-2 sync-footer" justify-space-between>
             <v-flex class="xs3 text-xs-left">
-              <v-btn :disabled="!enableUpload()"
+              <v-btn :disabled="!enableUpload"
                      @click="onUpload">
                 <v-icon>cloud_upload</v-icon>
               </v-btn>
@@ -29,12 +29,12 @@
             <v-flex class="xs6 text-xs-right">
               <v-btn @click="onDownload"
                      :loading="downloading"
-                     :disabled="!enableDownload()">
+                     :disabled="!enableDownload">
                 <v-icon>cloud_download</v-icon>
               </v-btn>
               <v-btn @click="onDownloadPhotos"
                      :loading="downloadingPhotos"
-                     :disabled="!enablePhotoDownload()">
+                     :disabled="!enablePhotoDownload">
                 <v-icon>portrait</v-icon>
               </v-btn>
             </v-flex>
@@ -67,21 +67,15 @@
       }
     },
     created () {
-      Promise.all([
-        DatabaseService.getLatestDownload(),
-        DatabaseService.getUpdatedRecordsCount()
-      ]).then(results => {
-        this.localLatestSnapshot = results[0]
-        this.updatedRecordsCount = results[1]
-        this.loading = false
-      }, errors => {
-        console.error(errors)
-      })
+      this.initComponent()
     },
     props: {},
     methods: {
-      heartbeat: function () {
-        return SyncService.getHeartbeat()
+      initComponent: async function() {
+        this.loading = true
+        this.localLatestSnapshot = await DatabaseService.getLatestDownload()
+        this.updatedRecordsCount = await DatabaseService.getUpdatedRecordsCount()
+        this.loading = false
       },
       onDownload: function () {
         this.downloadStep = 1
@@ -100,27 +94,30 @@
       },
       downloadDone: function () {
         this.downloading = false
+        this.initComponent()
       },
       uploadCancelled: function () {
         this.uploading = false
       },
       uploadDone: function () {
         this.uploading = false
-      },
+        this.initComponent()
+      }
+    },
+    computed: {
       enableDownload: function () {
-        return ( (this.updatedRecordsCount === 0) && this.enableAll() )
+        return ( (this.updatedRecordsCount === 0) && this.enableAll )
       },
       enableUpload: function () {
-        return ( (this.updatedRecordsCount > 0) && this.enableAll() )
+        return ( (this.updatedRecordsCount > 0) && this.enableAll )
       },
       enablePhotoDownload: function () {
-        return ( (this.localLatestSnapshot !== null) && this.enableAll() )
+        return ( (this.localLatestSnapshot !== null) && this.enableAll )
       },
       enableAll: function () {
         return ( !this.loading && !this.downloading && !this.downloadingPhotos && !this.uploading )
       }
     },
-    computed: {},
     components: {
       Download,
       Upload,

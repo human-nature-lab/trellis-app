@@ -2,13 +2,11 @@
   <sync-sub-step
     :working="working"
     :success="success"
-    success-message="DONE"
+    success-message="OK"
     :current-log="currentLog"
     :cancel="stopWorking"
-    :retry="retry"
-    :indeterminate="false"
-    :progress="progress">
-    Uploading file...
+    :retry="retry">
+    Verifying upload...
   </sync-sub-step>
 </template>
 
@@ -18,9 +16,10 @@
   import FileService from '../../../../services/file/FileService'
   import config from '../../../../config'
   import DeviceService from '../../../../services/device/DeviceService'
+  import SyncService from '../../../../services/sync/SyncService'
 
   export default {
-    name: 'upload-snapshot',
+    name: 'verify-upload',
     data () {
       return {
         success: false,
@@ -50,26 +49,14 @@
     methods: {
       doWork: async function () {
         this.working = true
-        console.log('fileEntry', this.fileEntry)
-        console.log('md5hash', this.md5hash)
-        const deviceId = await DeviceService.getUUID()
-        const uri = config.apiRoot + `/sync/device/${deviceId}/upload`
         try {
-          await FileService.upload(uri, this.fileEntry, this.onUploadProgress)
+          await SyncService.verifyUpload(this.fileEntry, this.md5hash)
           this.working = false
           this.success = true
-          this.$emit('upload-snapshot-done')
+          this.$emit('verify-upload-done')
         } catch (err) {
           this.loggingService.log(err).then((result) => { this.currentLog = result })
           this.working = false
-        }
-      },
-      onUploadProgress: function (progressEvent) {
-        console.log(progressEvent)
-        let curProgress = (progressEvent.loaded / progressEvent.total) * 100
-        // Only update at 5% increments, without this the progress bar does not update
-        if ((curProgress - this.progress) > 5) {
-          this.progress = curProgress
         }
       },
       stopWorking: function () {

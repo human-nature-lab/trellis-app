@@ -1,11 +1,11 @@
 import Sync from '../../entities/trellis-config/Sync'
 import uuid from 'uuid/v4'
 import DatabaseService from '../database/DatabaseService'
-import { DeviceService } from '../device/DeviceService'
+import DeviceService from '../device/DeviceService'
 import { syncInstance as http } from '../http/AxiosInstance'
 import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
 import {Connection} from 'typeorm'
-import Geo from '../../entities/trellis/Geo'
+import config from '../../../config'
 
 /**
  * Max number of rows to write to upload file at a time.
@@ -164,6 +164,15 @@ class SyncService {
     /* For debug purposes only */
   }
 
+  async verifyUpload (fileEntry, md5hash) {
+    const deviceId = await DeviceService.getUUID()
+    const uri = `/device/${deviceId}/verify-upload`
+    return http().post(uri, {
+      fileName: fileEntry.name,
+      md5hash: md5hash
+    })
+  }
+
   async writeUpdatedRows (fileWriter, updatedRows, isCancelled) {
     return new Promise((resolve, reject) => {
       let curRow = 0
@@ -200,6 +209,11 @@ class SyncService {
 
   async getUpdatedRows (connection:Connection, tableName:string, rowIds:string[]): Promise<object[]> {
     return await connection.query(`select *, "${tableName}" as table_name from ${tableName} where id in (${rowIds});`)
+  }
+
+  async markUpdatedRowsAsUploaded () {
+    const connection = await DatabaseService.getDatabase()
+    return await connection.query(`update updated_records set uploaded_at = date('now') where uploaded_at is null;`)
   }
 
   async createUploadFile (fileEntry, trackProgress, isCancelled) {

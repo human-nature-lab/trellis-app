@@ -186,7 +186,7 @@ export default class DatabaseServiceCordova {
       if (tableName !== 'updated_records') {
         operations.forEach(async (operation) => {
           await connection.query(
-            `create trigger if not exists trigger__updated_records__${tableName} 
+            `create trigger if not exists trigger__updated_records__${operation}__${tableName} 
                after ${operation} on ${tableName} 
                  BEGIN 
                    insert into updated_records (table_name, updated_record_id) values ('${tableName}',NEW.id);
@@ -306,7 +306,7 @@ export default class DatabaseServiceCordova {
     const queryBuilder = await repository.createQueryBuilder('sync')
     return queryBuilder
       .where('type = :type', {type: 'download'})
-      .where('status = :status', {status: 'success'})
+      .andWhere('status = :status', {status: 'success'})
       .orderBy('sync.createdAt', 'DESC')
       .limit(1)
       .getOne()
@@ -326,6 +326,11 @@ export default class DatabaseServiceCordova {
 
   async getUpdatedRecordsCount () {
     const connection = await this.getDatabase()
+    const updatedRecords = await connection.query(
+      `select *
+        from updated_records
+        where uploaded_at is null;`)
+    console.log('updatedRecords', updatedRecords)
     const totalRowResults = await connection.query(
       `select count(*) as total_rows
         from updated_records
