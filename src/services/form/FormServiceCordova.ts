@@ -12,12 +12,13 @@ export default class FormServiceCordova implements FormServiceInterface {
     const repo = await DatabaseService.getRepository(StudyForm)
     let studyForms = await repo.find({
       where: {
-        studyId,
+        studyId: studyId,
+        censusTypeId: IsNull(),
         deletedAt: IsNull()
       },
       deletedAt: null
     })
-    return studyForms
+    return studyForms.filter(s => s.form.isPublished)
   }
 
   async getForm (id: string, bareBones: boolean = false): Promise<Form> {
@@ -27,7 +28,7 @@ export default class FormServiceCordova implements FormServiceInterface {
     // Questions relationship has been removed from
     const form = await repo.findOne({
       where: {
-        id
+        id: id
       },
       relations: ['sections']
     })
@@ -39,8 +40,10 @@ export default class FormServiceCordova implements FormServiceInterface {
         promises.push(new Promise(async (resolve) => {
           const r = await DatabaseService.getRepository(Question)
           qg.questions = await r.find({
-            questionGroupId: qg.id,
-            deletedAt: null
+            where: {
+              questionGroupId: qg.id,
+              deletedAt: IsNull()
+            }
           })
           resolve(true)
         }))

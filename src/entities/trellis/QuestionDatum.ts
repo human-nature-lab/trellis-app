@@ -1,7 +1,7 @@
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Datum from './Datum'
 import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import {AsDate, Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'
 import {PrimaryColumn} from "typeorm/browser";
@@ -18,9 +18,9 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   public followUpDatumId: string
   @Column() @Serializable
   public sectionRepetition: number
-  @Column({type: 'datetime'}) @Serializable
+  @Column({type: 'datetime'}) @Serializable @AsDate
   public answeredAt: Date
-  @Column({type: 'datetime'}) @Serializable
+  @Column({type: 'datetime'}) @Serializable @AsDate
   public skippedAt: Date
   @Column() @Serializable
   public dkRf: boolean

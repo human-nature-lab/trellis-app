@@ -12,6 +12,7 @@ import RespondentConditionTag from "../../entities/trellis/RespondentConditionTa
 import {IsNull, QueryRunner, SelectQueryBuilder} from "typeorm";
 import Survey from "../../entities/trellis/Survey";
 import Datum from "../../entities/trellis/Datum";
+import ConditionTag from "../../entities/trellis/ConditionTag";
 
 export default class InterviewServiceCordova implements InterviewServiceInterface {
 
@@ -104,25 +105,25 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return await (await DatabaseService.getRepository(SurveyConditionTag)).createQueryBuilder('section_condition_tag')
       .where(qb => {
         return `section_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`
-      }).getMany()
+      })
+      .leftJoinAndSelect('section_condition_tag', 'section_condition_tag.conditionTag')
+      .getMany()
   }
 
   private async getRespondentConditionTags (interviewId: string): Promise<RespondentConditionTag[]> {
     return await (await DatabaseService.getRepository(RespondentConditionTag)).createQueryBuilder('respondent_condition_tag')
       .where(qb => {
         return `respondent_condition_tag.respondentId = ${this.respondentIdSubQuery(interviewId, qb)}`
-      }).getMany()
+      })
+      .leftJoinAndSelect('respondent_condition_tag.conditionTag', 'conditionTag')
+      .getMany()
   }
 
   async getData (interviewId: string) {
-    let data = []
-    let survey = []
-    let section = []
-    let respondent = []
-    data = await this.getQuestionDatum(interviewId)
-    survey = await this.getSurveyConditionTags(interviewId)
-    section = await this.getSectionConditionTags(interviewId)
-    respondent = await this.getRespondentConditionTags(interviewId)
+    const data = await this.getQuestionDatum(interviewId)
+    const survey = await this.getSurveyConditionTags(interviewId)
+    const section = await this.getSectionConditionTags(interviewId)
+    const respondent = await this.getRespondentConditionTags(interviewId)
     return {
       data,
       conditionTags: {
