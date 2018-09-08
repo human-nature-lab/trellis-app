@@ -15,6 +15,7 @@ import QuestionType from "../../src/entities/trellis/QuestionType";
 import Choice from '../../src/entities/trellis/Choice';
 import ConditionTag from "../../src/entities/trellis/ConditionTag";
 import Parameter from "../../src/entities/trellis/Parameter";
+import StudyForm from "../../src/entities/trellis/StudyForm";
 
 let cordovaService = new FormServiceCordova()
 let webService = new FormServiceWeb()
@@ -25,6 +26,26 @@ const studyId = '6a08c96a-fb80-4eae-9b2b-4d03d4b3235d'
 function expectToHaveProperties(obj, props, errMsg = null) {
   for (let key of props) {
     expect(obj, `expected ${obj.constructor.name} to have ${key} defined`).to.have.property(key)
+  }
+}
+
+function compareWhitelist (a: object|object[], b: object|object[], props, sortProp = 'id') {
+  function strip (obj) {
+    let d = {}
+    for (let key in props) {
+      d[key] = obj[key]
+    }
+    return d
+  }
+  if (Array.isArray(a) && Array.isArray(b)) {
+    let aa = a.map(strip)
+    let ab = b.map(strip)
+    const sort = (a, b) => (''+a[sortProp]).localeCompare(''+b[sortProp])
+    aa.sort(sort)
+    ab.sort(sort)
+    expect(aa).to.deep.equal(ab)
+  } else {
+    expect(strip(a)).to.deep.equal(strip(b))
   }
 }
 
@@ -140,7 +161,7 @@ export default function () {
           res.forEach(form => {
             expect(form).to.not.be.undefined
           })
-          expect(JSON.parse(JSON.stringify(res[0]))).to.deep.equal(JSON.parse(JSON.stringify(res[1])), 'The forms are not the same')
+          compareWhitelist(res[0], res[1], ['id', 'sections', 'nameTranslation'])
         })
       })
       it('geStudyForms: should return the same forms', () => {
@@ -149,7 +170,9 @@ export default function () {
             expect(forms.length).to.be.greaterThan(0, 'No forms were returned for this study')
           })
           expect(res[0].length).to.equal(res[1].length, `The same number of forms weren't returned for both`)
-          expect(JSON.parse(JSON.stringify(res[0]))).to.deep.include(JSON.parse(JSON.stringify(res[1])), `The forms weren't all the same`)
+          expect(res[0][0]).to.be.an.instanceOf(StudyForm)
+          compareWhitelist(res[0], res[1], ['id', 'form', 'censusTypeId', 'sortOrder', 'formMasterId'])
+          // expect(JSON.parse(JSON.stringify(res[0]))).to.deep.include(JSON.parse(JSON.stringify(res[1])), `The forms weren't all the same`)
         })
       })
     })

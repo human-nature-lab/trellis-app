@@ -1,4 +1,4 @@
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
@@ -21,6 +21,8 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
     constructor: () => ConditionTag,
     jsonKey: 'condition'
   })
+  @OneToOne(type => ConditionTag, { eager: true })
+  @JoinColumn({ name: 'condition_id' })
   conditionTag: ConditionTag
 
   /**
