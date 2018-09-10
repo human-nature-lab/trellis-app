@@ -1,5 +1,10 @@
 <template>
-  <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :cancel="stopChecking" :retry="retry">
+  <sync-sub-step
+    :working="checking"
+    :success="success"
+    :current-log="currentLog"
+    :cancel="stopChecking"
+    :retry="retry">
     Checking latest available snapshot on the server...
   </sync-sub-step>
 </template>
@@ -57,7 +62,6 @@
             this.source.cancel('Operation cancelled by the user.')
           }
           this.loggingService.log({
-            severity: 'warn',
             message: 'Operation cancelled by the user.'
           }).then((result) => { this.currentLog = result })
           this.checking = false

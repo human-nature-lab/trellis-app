@@ -54,6 +54,7 @@ class SyncService {
         return response.data
       })
       .catch(err => {
+        console.error(err)
         throw err
       })
   }
@@ -65,6 +66,23 @@ class SyncService {
           let options = {} as AxiosRequestConfig
           if (source) { options.cancelToken = source.token }
           http().get(`device/${deviceId}/syncv2/snapshot`, options)
+            .then(response => {
+              resolve(response.data)
+            })
+            .catch((error) => {
+              reject(error)
+            })
+        })
+    })
+  }
+
+  getPendingUploads (source: CancelTokenSource) {
+    return new Promise((resolve, reject) => {
+      DeviceService.getUUID()
+        .then((deviceId) => {
+          let options = {} as AxiosRequestConfig
+          if (source) { options.cancelToken = source.token }
+          http().get(`device/${deviceId}/uploads`, options)
             .then(response => {
               resolve(response.data)
             })

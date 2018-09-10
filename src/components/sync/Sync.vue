@@ -5,7 +5,11 @@
         <v-container>
           <v-layout row class="sync-content">
             <v-flex class="xs12">
-              <sync-status v-if="!downloading && !uploading && !downloadingPhotos"></sync-status>
+              <sync-status
+                v-if="!downloading && !uploading && !downloadingPhotos"
+                :local-latest-snapshot="localLatestSnapshot">
+                :updated-records-count="updatedRecordsCount">
+              </sync-status>
               <upload
                 v-if="uploading"
                 v-on:upload-done="uploadDone"
@@ -46,6 +50,7 @@
 </template>
 
 <script>
+  import AlertService from '../../services/AlertService'
   import SyncStatus from './SyncStatus'
   import SyncService from '../../services/sync/SyncService'
   import DatabaseService from '../../services/database/DatabaseService'
@@ -73,9 +78,13 @@
     methods: {
       initComponent: async function() {
         this.loading = true
-        this.localLatestSnapshot = await DatabaseService.getLatestDownload()
-        this.updatedRecordsCount = await DatabaseService.getUpdatedRecordsCount()
-        this.loading = false
+        try {
+          this.localLatestSnapshot = await DatabaseService.getLatestDownload()
+          this.updatedRecordsCount = await DatabaseService.getUpdatedRecordsCount()
+          this.loading = false
+        } catch (err) {
+          AlertService.addAlert(err)
+        }
       },
       onDownload: function () {
         this.downloadStep = 1

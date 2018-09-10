@@ -29,31 +29,24 @@
 
 <script>
   /* TODO: Consider adding information about the last upload here. */
-  import DatabaseService from '../../services/database/DatabaseService'
   import DateService from '../../services/DateService'
   export default {
     name: 'sync-status',
     data () {
       return {
-        serverLatestSnapshot: null,
-        localLatestSnapshot: null,
-        updatedRecordsCount: null
       }
     },
     created () {
-      Promise.all([
-        DatabaseService.getLatestDownload(),
-        DatabaseService.getUpdatedRecordsCount()
-      ]).then(results => {
-        this.localLatestSnapshot = results[0]
-        this.updatedRecordsCount = results[1]
-        console.log('localLatestSnapshot', this.localLatestSnapshot)
-        console.log('updatedRecordsCount', this.updatedRecordsCount)
-      }, errors => {
-        console.error(errors)
-      })
     },
     props: {
+      localLatestSnapshot: {
+        type: Object,
+        'default': null
+      },
+      updatedRecordsCount: {
+        type: Number,
+        'default': null
+      }
     },
     methods: {
     },
