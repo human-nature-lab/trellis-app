@@ -173,7 +173,9 @@
   import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
   import SyncService from '../../../services/sync/SyncService'
   import DeviceService from '../../../services/device/DeviceService'
+  import DatabaseService from '../../../services/database/DatabaseService'
   import Log from '../../../entities/trellis-config/Log'
+  import Sync from '../../../entities/trellis-config/Sync'
   import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
   import TrellisAlert from '../../TrellisAlert.vue'
   const DOWNLOAD_STATUS = {
@@ -269,22 +271,25 @@
           }
         }
       },
-      checkLatestSnapshotDone: function (serverSnapshot) {
+      checkLatestSnapshotDone: async function (serverSnapshot) {
         this.serverSnapshot = serverSnapshot
+        const connection = await DatabaseService.getConfigDatabase()
+        const repository = await connection.getRepository(Sync)
+        await repository.update({id: this.sync.id}, {
+          snapshotCreatedAt: this.serverSnapshot['snapshot_created_at'],
+          snapshotId: this.serverSnapshot['id']
+        })
         this.downloadSubStep = 4
       },
       compareDownloadDone: function (result) {
-        console.log('compareDownloadDone', result)
         this.compareDownloadResult = result
         this.downloadSubStep = 5
       },
       compareUploadDone: function (result) {
-        console.log('compareUploadDone', result)
         this.compareUploadResult = result
         if ((this.compareDownloadResult === COMPARE_DOWNLOAD_RESULTS.NO_DOWNLOAD ||
              this.compareDownloadResult === COMPARE_DOWNLOAD_RESULTS.DOWNLOAD_OLDER) &&
-            (this.compareUploadResult === COMPARE_UPLOAD_RESULTS.NO_UPLOAD ||
-             this.compareUploadResult === COMPARE_UPLOAD_RESULTS.UPLOAD_OLDER)) {
+            (this.compareUploadResult === COMPARE_UPLOAD_RESULTS.NONE_PENDING)) {
           this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
         } else {
           this.continueStatus = BUTTON_STATUS.ENABLED
