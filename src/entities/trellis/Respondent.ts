@@ -14,7 +14,7 @@ import Survey from "./Survey";
 
 @Entity()
 export default class Respondent extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column({ nullable: true }) @Serializable
   assignedId: string

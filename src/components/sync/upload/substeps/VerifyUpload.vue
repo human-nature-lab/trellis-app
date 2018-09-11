@@ -1,14 +1,12 @@
 <template>
   <sync-sub-step
-    :indeterminate="indeterminate"
-    :progress="progress"
     :working="working"
-    :cancel="stopWorking"
     :success="success"
-    success-message="DONE"
+    success-message="OK"
     :current-log="currentLog"
+    :cancel="stopWorking"
     :retry="retry">
-    Creating upload file...
+    Verifying upload...
   </sync-sub-step>
 </template>
 
@@ -16,17 +14,17 @@
   import SyncSubStep from '../../SyncSubStep.vue'
   import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
   import FileService from '../../../../services/file/FileService'
+  import config from '../../../../config'
+  import DeviceService from '../../../../services/device/DeviceService'
   import SyncService from '../../../../services/SyncService'
-  import uuid from 'uuid/v4'
 
   export default {
-    name: 'create-upload',
+    name: 'verify-upload',
     data () {
       return {
         success: false,
         working: true,
         currentLog: undefined,
-        indeterminate: true,
         progress: 0
       }
     },
@@ -38,42 +36,31 @@
         type: LoggingService,
         required: false,
         'default': function () { return defaultLoggingService }
+      },
+      fileEntry: {
+        type: Object,
+        required: true
+      },
+      md5hash: {
+        type: String,
+        required: true
       }
     },
     methods: {
       doWork: async function () {
-         this.working = true
+        this.working = true
         try {
-          const syncId = uuid()
-          const fileName = syncId + '.json'
-          const fileSystem = await FileService.requestFileSystem()
-          const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'upload_temp')
-          const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
-          await SyncService.createUploadFile(fileEntry, this.trackProgress, this.isCancelled)
-          if (this.working) {
-            this.working = false
-            this.success = true
-            this.$emit('create-upload-done', fileEntry)
-          }
+          await SyncService.verifyUpload(this.fileEntry, this.md5hash)
+          this.working = false
+          this.success = true
+          this.$emit('verify-upload-done')
         } catch (err) {
-          console.error(err)
           this.loggingService.log(err).then((result) => { this.currentLog = result })
           this.working = false
         }
       },
-      trackProgress: function (progress) {
-        this.indeterminate = false
-        this.progress = (progress.created / progress.total) * 100
-      },
-      isCancelled: function () {
-        return (! this.working)
-      },
       stopWorking: function () {
         this.working = false
-        this.loggingService.log({
-          severity: 'info',
-          message: 'Operation cancelled by the user.'
-        }).then((result) => { this.currentLog = result })
       },
       retry: function () {
         this.currentLog = undefined

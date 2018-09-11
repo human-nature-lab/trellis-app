@@ -87,10 +87,7 @@
                 this.result = RESULTS.NO_DOWNLOAD
               } else {
                 this.localDownload = localDownload
-                console.log('localDownload', localDownload)
-                console.log('serverSnapshot', this.serverSnapshot)
-                this.localDownloadedAt = new Date(this.localDownload['createdAt'])
-                console.log('localDownloadedAt', this.localDownloadedAt)
+                this.localDownloadedAt = this.localDownload['snapshotCreatedAt']
                 this.serverCreatedAt = new Date(this.serverSnapshot['created_at'])
                 if (this.localDownloadedAt.getTime() > this.serverCreatedAt.getTime()) {
                   this.result = RESULTS.DOWNLOAD_NEWER
@@ -103,6 +100,7 @@
               this.emitResults(this.result)
             })
             .catch((err) => {
+              this.checking = false
               this.loggingService.log(err).then((result) => { this.currentLog = result })
             })
         }

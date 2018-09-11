@@ -1,5 +1,5 @@
 <template>
-  <div class="download">
+  <div class="upload">
     <trellis-alert v-if="showLog()" :current-log="currentLog"></trellis-alert>
     <div>
       <v-stepper v-model="uploadStep">
@@ -16,10 +16,24 @@
               v-bind:continue-status="continueStatusArray[0]"
               v-on:continue-clicked="onContinue"
               v-on:cancel-clicked="onCancel">
-              <create-upload
+              <empty-uploads-directory
                 v-if="uploadSubStep > 0"
                 :logging-service="loggingService"
+                v-on:empty-uploads-directory-done="emptyUploadsDirectoryDone"></empty-uploads-directory>
+              <create-upload
+                v-if="uploadSubStep > 1"
+                :logging-service="loggingService"
                 v-on:create-upload-done="createUploadDone"></create-upload>
+              <compress-upload
+                v-if="uploadSubStep > 2"
+                :logging-service="loggingService"
+                :file-entry="uploadFile"
+                v-on:compress-upload-done="compressUploadDone"></compress-upload>
+              <calculate-hash
+                v-if="uploadSubStep > 3"
+                :logging-service="loggingService"
+                :file-entry="compressedUploadFile"
+                v-on:calculate-hash-done="calculateHashDone"></calculate-hash>
             </sync-step>
           </v-stepper-content>
           <v-stepper-content step="2">
@@ -32,8 +46,23 @@
               <upload-snapshot
                 v-if="uploadStep > 1"
                 :logging-service="loggingService"
+                :md5hash="compressedUploadFileHash"
+                :file-entry="compressedUploadFile"
                 v-on:upload-snapshot-done="uploadSnapshotDone">
               </upload-snapshot>
+              <verify-upload
+                v-if="uploadStep > 1 && uploadSubStep > 1"
+                :logging-service="loggingService"
+                :md5hash="compressedUploadFileHash"
+                :file-entry="compressedUploadFile"
+                v-on:verify-upload-done="verifyUploadDone">
+              </verify-upload>
+              <register-upload
+                v-if="uploadStep > 1 && uploadSubStep > 2"
+                :logging-service="loggingService"
+                :sync="sync"
+                v-on:register-upload-done="registerUploadDone">
+              </register-upload>
             </sync-step>
           </v-stepper-content>
         </v-stepper-items>
@@ -44,30 +73,34 @@
 
 <script>
   import TrellisAlert from '../../TrellisAlert.vue'
-  import SyncStep from '../SyncStep'
+  import SyncStep from '../SyncStep.vue'
+  import EmptyUploadsDirectory from './substeps/EmptyUploadsDirectory.vue'
   import CreateUpload from './substeps/CreateUpload.vue'
+  import CompressUpload from './substeps/CompressUpload.vue'
+  import CalculateHash from './substeps/CalculateHash.vue'
   import UploadSnapshot from './substeps/UploadSnapshot.vue'
-  import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
-  import SyncService from '../../../services/sync/SyncService'
+  import VerifyUpload from './substeps/VerifyUpload.vue'
+  import RegisterUpload from './substeps/RegisterUpload.vue'
+  import { BUTTON_STATUS } from '../../../static/constants'
+  import SyncService from '../../../services/SyncService'
   import DeviceService from '../../../services/device/DeviceService'
   import Log from '../../../entities/trellis-config/Log'
   import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
-  const DOWNLOAD_STATUS = {
-    CHECKING_CONNECTION: 'Establishing connection with the server...',
-    CHECKING_LAST_SNAPSHOT: 'Checking latest available snapshot on the server...'
-  }
+
   export default {
     name: 'upload',
     data () {
       return {
-        status: DOWNLOAD_STATUS.CHECKING_CONNECTION,
         uploadStep: 1,
         uploadSubStep: 0,
         continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
         sync: undefined,
         currentLog: undefined,
         loggingService: undefined,
-        deviceId: ''
+        deviceId: '',
+        uploadFile: undefined,
+        compressedUploadFile: undefined,
+        compressedUploadFileHash: undefined
       }
     },
     created () {
@@ -128,30 +161,58 @@
           }
         }
       },
-      createUploadDone: function () {
-        console.log('createUploadDone')
+      emptyUploadsDirectoryDone: function () {
+        console.log('emptyUploadsDirectoryDone')
+        this.uploadSubStep = 2
+      },
+      createUploadDone: function (fileEntry) {
+        console.log('createUploadDone', fileEntry)
+        this.uploadFile = fileEntry
+        this.uploadSubStep = 3
+      },
+      compressUploadDone: function (fileEntry) {
+        console.log('compressUploadDone', fileEntry)
+        this.compressedUploadFile = fileEntry
+        this.uploadSubStep = 4
+      },
+      calculateHashDone: function (md5hash) {
+        console.log('calculateHashDone', md5hash)
+        this.compressedUploadFileHash = md5hash
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
       uploadSnapshotDone: function () {
-        console.log('uploadsnapshotDone')
+        console.log('uploadSnapshotDone')
+        this.uploadSubStep = 2
+      },
+      verifyUploadDone: function () {
+        console.log('verifyUploadDone')
+        this.uploadSubStep = 3
+      },
+      registerUploadDone: function () {
+        console.log('registerUploadDone')
         this.continueStatus = BUTTON_STATUS.DONE
       }
     },
     computed: {
       continueStatus: {
         get: function () {
-          return this.continueStatusArray[this.downloadStep - 1]
+          return this.continueStatusArray[this.uploadStep - 1]
         },
         set: function (status) {
-          this.continueStatusArray.splice(this.downloadStep - 1, 1, status)
+          this.continueStatusArray.splice(this.uploadStep - 1, 1, status)
         }
       }
     },
     components: {
       TrellisAlert,
       SyncStep,
+      EmptyUploadsDirectory,
       CreateUpload,
-      UploadSnapshot
+      CompressUpload,
+      CalculateHash,
+      UploadSnapshot,
+      VerifyUpload,
+      RegisterUpload
     }
   }
 </script>
