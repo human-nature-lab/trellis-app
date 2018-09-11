@@ -7,4 +7,5 @@ export default {
   'RosterService': require('./roster.test'),
   'GeoService': require('./geo.test'),
   'EdgeService': require('./edge.test'),
+  'StudyService': require('./study.test'),
 }

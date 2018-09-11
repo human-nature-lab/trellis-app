@@ -4,26 +4,32 @@ import moment from 'moment'
 
 const timestamps = ['createdAt', 'updatedAt', 'deletedAt']
 export const modifiers = {
-  Interview: function (interview) {
+  Interview (interview) {
     return strip(interview, timestamps)
   },
-  User: function (user) {
-    return strip(user, timestamps)
+  User (user) {
+    return strip(user, timestamps.concat(['password']))
   },
-  Form: function (form) {
+  Form (form) {
     return strip(form, timestamps.concat(['formMasterId', 'nameTranslationId']))
   },
-  Translation: function (translation) {
+  Translation (translation) {
     return strip(translation, timestamps)
   },
-  TranslationText: function (tt) {
+  TranslationText (tt) {
     return strip(tt, timestamps.concat(['translationId', 'locale']))
   },
-  Survey: function (s) {
+  Survey (s) {
     return strip(s, ['password'])
   },
-  Roster: function (r) {
+  Roster (r) {
     return strip(r, timestamps)
+  },
+  RespondentGeo (g) {
+    return strip(g, timestamps.concat(['id']))
+  },
+  ConditionTag (c) {
+    return strip(c, timestamps)
   }
 }
 

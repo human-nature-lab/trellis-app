@@ -8,6 +8,11 @@ class StudyServiceWeb extends StudyServiceAbstract {
     return new Study().fromSnakeJSON(res.data.study)
   }
 
+  async getUserStudies (userId: string): Promise<Study[]> {
+    // TODO: implement this correctly for web
+    return this.getMyStudies()
+  }
+
   async getMyStudies (): Promise<Study[]> {
     const res = await http().get(`me/studies`)
     return res.data.studies.map( s => new Study().fromSnakeJSON(s) )
