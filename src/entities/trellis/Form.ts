@@ -34,6 +34,10 @@ export default class Form extends SparseTimestampedSoftDelete {
   @JoinColumn()
   nameTranslation: Translation
 
+  // Inverse relationships
+  @OneToOne(type => Form)
+  form: Form
+
   fromSnakeJSON(json: any) {
     super.fromSnakeJSON(json)
     // Simple way to convert into an integer and then to a boolean. Possible values for this are '1', '0', 1, 0, true, false

@@ -10,6 +10,7 @@ import SnakeSerializable from '../interfaces/SnakeSerializable'
 import Photo from './Photo'
 import {LazyQuery} from '../decorators/QueryDecorator'
 import Survey from "./Survey";
+import Edge from "./Edge";
 
 
 @Entity()
@@ -30,15 +31,15 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   associatedRespondentId: string
 
   @Relationship({ generator: geoGenerator })
-  @OneToMany(type => RespondentGeo, respondentGeo => respondentGeo.respondent, { eager: true })
+  @OneToMany(type => RespondentGeo, respondentGeo => respondentGeo.respondent)
   geos: RespondentGeo[]
 
   @Relationship(type => RespondentName)
-  @OneToMany(type => RespondentName, respondentName => respondentName.respondent, { eager: true })
+  @OneToMany(type => RespondentName, respondentName => respondentName.respondent)
   names: RespondentName[]
 
   @Relationship(type => Photo)
-  @ManyToMany(type => Photo, photo => photo.respondents, { eager: true })
+  @ManyToMany(type => Photo, photo => photo.respondents)
   @JoinTable({ name: 'respondent_photo' })
   photos: Photo[]
 
@@ -67,6 +68,11 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   // Inverse relationships
   @OneToMany(type => Survey, survey => survey.respondent)
   surveys: Survey[]
+
+  @OneToMany(type => Edge, edge => edge.sourceRespondent)
+  sourceEdges: Edge[]
+  @OneToMany(type => Edge, edge => edge.targetRespondent)
+  targetEdges: Edge[]
 
 
 }

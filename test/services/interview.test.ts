@@ -1,4 +1,4 @@
-import './mocha.globals'
+import './globals'
 import {expect} from 'chai'
 
 import InterviewServiceWeb from '../../src/services/interview/InterviewServiceWeb'
@@ -15,8 +15,8 @@ import RespondentConditionTag from "../../src/entities/trellis/RespondentConditi
 import SectionConditionTag from "../../src/entities/trellis/SectionConditionTag";
 import ConditionTag from "../../src/entities/trellis/ConditionTag";
 import SurveyConditionTag from "../../src/entities/trellis/SurveyConditionTag";
-
-const interviewId: string = '8d032e56-25a5-4f85-8a88-f015d059ff08'
+import {deepCompareEntities} from "./helpers";
+import {interviewId} from "./testing-ids";
 
 function j (w) {
   return JSON.parse(JSON.stringify(w))
@@ -78,30 +78,17 @@ export default function () {
     describe('COMPARE', () => {
       it(`.getInterview: Should have the same interview instance`, () => {
         return Promise.all(services.map(s => s.getInterview(interviewId))).then(res => {
-          for (let interview of res) {
-            expect(interview).to.not.be.undefined
-          }
-          expect(res[0].id).to.equal(res[1].id, `ids didn't match`)
-          expect(res[0].userId).to.equal(res[1].userId, `userIds didn't match`)
+          deepCompareEntities(res[0], res[1])
         })
       })
       it('.getActions: Should get the same array of actions', () => {
         return Promise.all(services.map(s => s.getActions(interviewId))).then(res => {
-          for (let actions of res) {
-            expect(actions.length).to.be.greaterThan(0)
-          }
-          let webActions = res[0].map(a => j(a))
-          let corActions = res[1].map(a => j(a))
-          webActions.sort((a, b) => a.id.localeCompare(b.id))
-          corActions.sort((a, b) => a.id.localeCompare(b.id))
-          expect(webActions).to.deep.equal(corActions, 'all actions were are not the same')
+          deepCompareEntities(res[0], res[1])
         })
       })
       it('.getData: should get the same InterviewDataInterface', () => {
         return Promise.all(services.map(s => s.getData(interviewId))).then(res => {
-          let webData = res[0]
-          let corData = res[1]
-          expect(j(webData.data)).to.deep.equal(j(corData.data), 'all question datum are not the same')
+          deepCompareEntities(res[0], res[1])
         })
       })
       it('.getPreload: should get the same preload data')

@@ -22,8 +22,8 @@ export default class Survey extends TimestampedSoftDelete {
   completedAt: Date
 
   @Relationship(type => Form)
-  // @OneToOne(type => Form, { eager: true })
-  // @JoinColumn()
+  @OneToOne(type => Form)
+  @JoinColumn()
   form: Form
 
   @Relationship(type => Respondent)
@@ -31,7 +31,7 @@ export default class Survey extends TimestampedSoftDelete {
   respondent: Respondent
 
   // @Relationship(type => Interview)
-  @OneToMany(type => Interview, interview => interview.survey, { eager: true })
+  @OneToMany(type => Interview, interview => interview.survey)
   interviews?: Interview[]
 
   fromSnakeJSON (json) {
