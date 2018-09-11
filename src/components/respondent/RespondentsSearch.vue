@@ -325,7 +325,6 @@
       },
       addRespondentClose (respondent) {
         // TODO: Maybe add this to cache (if there is one)
-        debugger
         if (!this.query.length) {
           this.results.push(respondent)
         }
