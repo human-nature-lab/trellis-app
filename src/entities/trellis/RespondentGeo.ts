@@ -6,7 +6,7 @@ import Respondent from './Respondent'
 
 @Entity()
 export default class RespondentGeo extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable
   geoId: string
