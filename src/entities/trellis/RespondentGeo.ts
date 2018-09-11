@@ -16,15 +16,15 @@ export default class RespondentGeo extends TimestampedSoftDelete {
   previousRespondentGeoId: string
   @Column({ nullable: true }) @Serializable
   notes: string
-  @Column() @Serializable
+  @Column({ type: Boolean }) @Serializable
   isCurrent: boolean
 
   @ManyToOne(type => Respondent, respondent => respondent.geos)
   respondent: Respondent
 
   @Relationship(type =>Geo)
-  @OneToOne(type => Geo, { eager: true })
-  @JoinColumn({ name: 'geo_id' })
+  @OneToOne(type => Geo)
+  @JoinColumn()
   geo: Geo
 
   fromSnakeJSON(json: any) {
@@ -38,6 +38,7 @@ export default class RespondentGeo extends TimestampedSoftDelete {
     } else {
       super.fromSnakeJSON(json)
     }
+    this.isCurrent = !!this.isCurrent
     return this
  }
 }

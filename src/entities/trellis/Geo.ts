@@ -24,16 +24,17 @@ export default class Geo extends TimestampedSoftDelete {
   nameTranslationId: string
 
   @Relationship(type => GeoType)
-  @OneToOne(type => GeoType, { eager: true })
-  @JoinColumn({ name: 'geo_type_id' })
+  @OneToOne(type => GeoType)
+  @JoinColumn()
   geoType: GeoType
 
   @Relationship(type => Translation)
-  @OneToOne(type => Translation, { eager: true })
-  @JoinColumn({ name: 'name_translation_id' })
+  @OneToOne(type => Translation)
+  @JoinColumn()
   nameTranslation: Translation
 
-  @ManyToMany(type => Photo, photo => photo.geos, { eager: true })
+  @Relationship(type => Photo)
+  @ManyToMany(type => Photo, photo => photo.geos)
   @JoinTable({ name: 'geo_photo' })
   photos: Photo[]
 

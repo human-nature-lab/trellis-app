@@ -18,4 +18,12 @@ export default class GeoType extends TimestampedSoftDelete {
   canUserAddChild: boolean
   @Column() @Serializable
   canContainRespondent: boolean
+
+  fromSnakeJSON (json) {
+    super.fromSnakeJSON(json)
+    this.canUserAdd = !!this.canUserAdd
+    this.canUserAddChild = !!this.canUserAddChild
+    this.canContainRespondent = !!this.canContainRespondent
+    return this
+  }
 }

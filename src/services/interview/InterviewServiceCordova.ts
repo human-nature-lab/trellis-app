@@ -23,7 +23,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
         id: interviewId,
         deletedAt: IsNull()
       },
-      relations: ['survey', 'user', 'survey.respondent']
+      relations: ['survey', 'user', 'survey.respondent', 'survey.form']
     })
     return interview
   }

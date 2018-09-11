@@ -1,7 +1,8 @@
 import http from '../http/AxiosInstance'
 import GeoServiceInterface from './GeoServiceInterface'
 import Geo from '../../entities/trellis/Geo'
-export class GeoServiceWeb implements GeoServiceInterface {
+
+export default class GeoServiceWeb implements GeoServiceInterface {
 
   getGeoById (geoId) {
     return this.getGeosById([geoId]).then(geoIds => geoIds[0])
@@ -35,6 +36,3 @@ export class GeoServiceWeb implements GeoServiceInterface {
     })
   }
 }
-
-
-export default new GeoServiceWeb()

@@ -1,4 +1,4 @@
-import './mocha.globals'
+import './globals'
 import {expect} from 'chai'
 
 import User from '../../src/entities/trellis/User'
@@ -15,10 +15,8 @@ export default function () {
       let cUser = await userCordova.getCurrentUser()
       let wUser = await userWeb.getCurrentUser()
 
-      debugger
-
-      expect(cUser).to.not.equal(undefined, 'cordova user should not be undefined')
-      expect(wUser).to.not.equal(undefined, 'web user should not be undefined')
+      expect(cUser).to.be.instanceOf(User, 'cordova user should be an instance of User')
+      expect(wUser).to.be.instanceOf(User, 'web user should be an instance of User')
 
       expect(cUser).to.deep.equal(wUser, 'The returned users are not the same')
     }
