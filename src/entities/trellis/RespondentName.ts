@@ -5,7 +5,7 @@ import Respondent from './Respondent'
 
 @Entity()
 export default class RespondentName extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable
   isDisplayName: boolean
