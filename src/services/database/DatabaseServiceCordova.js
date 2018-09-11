@@ -145,11 +145,9 @@ export default class DatabaseServiceCordova {
     this.configDatabaseCreated = DatabaseServiceCordova.createConfigDatabase()
   }
 
-  static async createDatabase () {
-    await DeviceService.isDeviceReady()
-    const connection = await createConnection(trellisConnection)
-    await DatabaseServiceCordova.createUpdatedRecordsTable(connection)
-    await DatabaseServiceCordova.addTriggers(connection)
+  static createDatabase () {
+    return DeviceService.isDeviceReady()
+      .then(() => createConnection(trellisConnection))
   }
 
   async getDatabase () {
@@ -173,28 +171,40 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis-config')
   }
 
-  static async createUpdatedRecordsTable (connection) {
-    await connection.query(`create table if not exists updated_records (table_name text, updated_record_id text, uploaded_at datetime);`)
+  async createUpdatedRecordsTable (queryRunner, status) {
+    try {
+      await queryRunner.query(`create table if not exists updated_records (table_name text, updated_record_id text, uploaded_at datetime);`)
+    } catch (err) {
+      status.message = 'Rolling back transaction...'
+      await queryRunner.rollbackTransaction()
+      throw err
+    }
   }
 
-  static async addTriggers (connection) {
-    const operations = ['update', 'insert']
-    const tableNameResults = await connection.query('select tbl_name from SQLite_master where type = "table"')
-    const tableNames = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] })
-    console.log('tableNames', tableNames)
-    tableNames.forEach(async (tableName) => {
-      if (tableName !== 'updated_records') {
-        operations.forEach(async (operation) => {
-          await connection.query(
-            `create trigger if not exists trigger__updated_records__${operation}__${tableName} 
+  async addTriggers (queryRunner, status) {
+    try {
+      const operations = ['update', 'insert']
+      const tableNameResults = await queryRunner.query('select tbl_name from SQLite_master where type = "table"')
+      const tableNames = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] })
+      console.log('tableNames', tableNames)
+      tableNames.forEach(async (tableName) => {
+        if (tableName !== 'updated_records') {
+          operations.forEach(async (operation) => {
+            await queryRunner.query(
+              `create trigger if not exists trigger__updated_records__${operation}__${tableName} 
                after ${operation} on ${tableName} 
                  BEGIN 
                    insert into updated_records (table_name, updated_record_id) values ('${tableName}',NEW.id);
                  END;`
-          )
-        })
-      }
-    })
+            )
+          })
+        }
+      })
+    } catch (err) {
+      status.message = 'Rolling back transaction...'
+      await queryRunner.rollbackTransaction()
+      throw err
+    }
   }
 
   async removeDatabase (status) {

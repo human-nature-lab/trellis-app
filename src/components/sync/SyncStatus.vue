@@ -9,12 +9,12 @@
           <v-alert
             v-bind:value="!wasSnapshotDownloaded"
             type="info">
-            No download found. Click the download button below.
+            No snapshot found. Click the download button below.
           </v-alert>
           <v-alert
             v-bind:value="wasSnapshotDownloaded"
             type="info">
-            The last snapshot was downloaded on: <span style="white-space:nowrap">{{ snapshotDownloadedAt }}</span>.
+            The current snapshot was created on: <span style="white-space:nowrap">{{ snapshotDownloadedAt }}</span>.
           </v-alert>
           <v-alert
             v-bind:value="areUpdatedRecords"
@@ -55,8 +55,8 @@
         return (this.localLatestSnapshot)
       },
       snapshotDownloadedAt: function () {
-        if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('createdAt')) {
-          return DateService.parseDate(this.localLatestSnapshot['createdAt']).local().format('llll')
+        if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('snapshotCreatedAt')) {
+          return DateService.parseDate(this.localLatestSnapshot['snapshotCreatedAt']).local().format('llll')
         } else {
           return ''
         }

@@ -104,14 +104,20 @@
                   v-on:insert-rows-done="insertRowsDone"
                   v-bind:extracted-snapshot="extractedSnapshot">
                 </insert-rows>
-                <check-foreign-keys
+                <configure-database
                   v-if="downloadStep > 2 && downloadSubStep > 2"
+                  :logging-service="loggingService"
+                  :query-runner="queryRunner"
+                  v-on:configure-database-done="configureDatabaseDone">
+                </configure-database>
+                <check-foreign-keys
+                  v-if="downloadStep > 2 && downloadSubStep > 3"
                   :logging-service="loggingService"
                   :query-runner="queryRunner"
                   v-on:check-foreign-keys-done="checkForeignKeysDone">
                 </check-foreign-keys>
                 <register-download
-                  v-if="downloadStep > 2 && downloadSubStep > 3"
+                  v-if="downloadStep > 2 && downloadSubStep > 4"
                   :logging-service="loggingService"
                   :sync="sync"
                   v-on:register-download-done="registerDownloadDone">
@@ -165,6 +171,7 @@
   import ExtractSnapshot from './substeps/ExtractSnapshot.vue'
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import InsertRows from './substeps/InsertRows.vue'
+  import ConfigureDatabase from './substeps/ConfigureDatabase.vue'
   import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
   import RegisterDownload from './substeps/RegisterDownload.vue'
   import GenerateImageList from './substeps/GenerateImageList.vue'
@@ -254,7 +261,8 @@
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         } else {
-          if (this.sync !== undefined) {
+          // Cancelling from the download images step should still register a successful sync
+          if (this.sync !== undefined && this.downloadStep < 4) {
             SyncService.registerCancelledSync(this.sync)
               .then(() => {
                 this.$emit('download-cancelled')
@@ -276,7 +284,7 @@
         const connection = await DatabaseService.getConfigDatabase()
         const repository = await connection.getRepository(Sync)
         await repository.update({id: this.sync.id}, {
-          snapshotCreatedAt: this.serverSnapshot['snapshot_created_at'],
+          snapshotCreatedAt: this.serverSnapshot['created_at'] + 'Z',
           snapshotId: this.serverSnapshot['id']
         })
         this.downloadSubStep = 4
@@ -321,8 +329,12 @@
         this.queryRunner = queryRunner
         this.downloadSubStep = 3
       },
-      checkForeignKeysDone: function () {
+      configureDatabaseDone: function (queryRunner) {
+        this.queryRunner = queryRunner
         this.downloadSubStep = 4
+      },
+      checkForeignKeysDone: function () {
+        this.downloadSubStep = 5
       },
       registerDownloadDone: function () {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
@@ -368,6 +380,7 @@
       VerifyDownload,
       RemoveDatabase,
       InsertRows,
+      ConfigureDatabase,
       CheckForeignKeys,
       RegisterDownload,
       GenerateImageList,
