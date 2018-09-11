@@ -7,7 +7,7 @@
             <v-flex class="xs12">
               <sync-status
                 v-if="!downloading && !uploading && !downloadingPhotos"
-                :local-latest-snapshot="localLatestSnapshot">
+                :local-latest-snapshot="localLatestSnapshot"
                 :updated-records-count="updatedRecordsCount">
               </sync-status>
               <upload
