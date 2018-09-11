@@ -6,14 +6,6 @@ import {AfterInsert, AfterLoad, AfterRemove, AfterUpdate} from 'typeorm'
 import UpdatedRecords from '../trellis-config/UpdatedRecords'
 
 export default class BaseEntity implements SnakeSerializable {
-  /**
-   * After the entity loads parse the dates into Moment objects
-   */
-  @AfterLoad()
-  whenLoad() {
-    this.parseDates()
-  }
-
   @AfterUpdate()
   async whenUpdate() {
     console.log('whenUpdate', this)
@@ -63,6 +55,8 @@ export default class BaseEntity implements SnakeSerializable {
   /**
    * Just parse all of the dates defined in the model's __dates__ array
    */
+  @AfterLoad()
+  @AfterInsert()
   protected parseDates () {
     for (let key of getColumnMeta(this).dates) {
       if (key in this && this[key]) {
