@@ -1,4 +1,5 @@
 /* global zip */
+/* global Zeep */
 import { FileService } from '@/services/file/FileService'
 
 class ZipServiceCordova {
@@ -27,6 +28,24 @@ class ZipServiceCordova {
                 })
             }
           }, progressCallback)
+        })
+    })
+  }
+
+  zipFile (fromDirectoryEntry, toDirectoryEntry, toFileName) {
+    console.log('zipFile')
+    return new Promise((resolve, reject) => {
+      let fromUrl = fromDirectoryEntry.toURL()
+      let toUrl = toDirectoryEntry.toURL() + '/' + toFileName
+      console.log('fromUrl', fromUrl)
+      console.log('toUrl', toUrl)
+      Zeep.zip({from: fromUrl, to: toUrl},
+        function () {
+          console.log('zipFile done')
+          resolve()
+        }, function (err) {
+          console.error(err)
+          reject(err)
         })
     })
   }
