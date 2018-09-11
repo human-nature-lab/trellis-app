@@ -7,17 +7,17 @@
         </v-card-title>
         <v-card-text>
           <v-alert
-            v-bind:value="!wasSnapshotDownloaded"
+            :value="!wasSnapshotDownloaded"
             type="info">
             No snapshot found. Click the download button below.
           </v-alert>
           <v-alert
-            v-bind:value="wasSnapshotDownloaded"
+            :value="wasSnapshotDownloaded"
             type="info">
             The current snapshot was created on: <span style="white-space:nowrap">{{ snapshotDownloadedAt }}</span>.
           </v-alert>
           <v-alert
-            v-bind:value="areUpdatedRecords"
+            :value="areUpdatedRecords"
             type="info">
             There are {{ updatedRecordsCount }} unsynced rows in the database. Click the upload button below.
           </v-alert>
@@ -40,12 +40,10 @@
     },
     props: {
       localLatestSnapshot: {
-        type: Object,
-        'default': null
+        type: Object
       },
       updatedRecordsCount: {
-        type: Number,
-        'default': null
+        type: Number
       }
     },
     methods: {
