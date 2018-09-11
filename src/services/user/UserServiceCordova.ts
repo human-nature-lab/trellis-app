@@ -8,7 +8,6 @@ export class UserServiceCordova extends UserServiceAbstract {
   loadCurrentUser (): Promise<User|null> {
     if (this._currentUserRequest) return this._currentUserRequest
     this._currentUserRequest = new Promise(resolve => {
-      debugger
       if (this.user) {
         return resolve(this.user)
       } else {

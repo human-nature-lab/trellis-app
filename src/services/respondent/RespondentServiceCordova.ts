@@ -5,7 +5,7 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
-import {Brackets} from 'typeorm'
+import {Brackets, IsNull} from 'typeorm'
 import uuid from 'uuid/v4'
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
@@ -19,8 +19,19 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   async getRespondentById (respondentId) {
     const repository = await DatabaseService.getRepository(Respondent)
     return await repository.findOne({
-      where: { deletedAt: null, id: respondentId },
-      relations: ['photos', 'geos', 'names']
+      where: {
+        deletedAt: IsNull(),
+        id: respondentId
+      },
+      relations: [
+        'photos',
+        'geos',
+        'names',
+        'geos.geo',
+        'geos.geo.photos',
+        'geos.geo.geoType',
+        'geos.geo.nameTranslation'
+      ]
     })
   }
 
@@ -154,19 +165,27 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return respondent
   }
 
-  async addRespondentGeo (respondentId, geoId) {
-    const connection = await DatabaseService.getDatabase()
-
+  async addRespondentGeo (respondentId: string, geoId: string): Promise<RespondentGeo> {
+    const repo = await DatabaseService.getRepository(RespondentGeo)
     const respondentGeo = new RespondentGeo()
-    respondentGeo.id = uuid()
     respondentGeo.geoId = geoId
     respondentGeo.respondentId = respondentId
     respondentGeo.previousRespondentGeoId = null
-    respondentGeo.notes = ''
+    respondentGeo.notes = null
     respondentGeo.isCurrent = false
-    await connection.manager.save(respondentGeo)
-
-    return respondentGeo
+    let rGeo = await repo.save(respondentGeo)
+    rGeo = await repo.findOne({
+      where: {
+        id: rGeo.id
+      },
+      relations: [
+        'geo',
+        'geo.photos',
+        'geo.geoType',
+        'geo.nameTranslation'
+      ]
+    })
+    return rGeo
   }
 
   async editRespondentGeo (respondentId, respondentGeoId, isCurrent) {

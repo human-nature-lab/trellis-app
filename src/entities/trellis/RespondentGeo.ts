@@ -6,7 +6,7 @@ import Respondent from './Respondent'
 
 @Entity()
 export default class RespondentGeo extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable
   geoId: string
@@ -23,8 +23,8 @@ export default class RespondentGeo extends TimestampedSoftDelete {
   respondent: Respondent
 
   @Relationship(type =>Geo)
-  @OneToOne(type => Geo, { eager: true })
-  @JoinColumn({ name: 'geo_id' })
+  @OneToOne(type => Geo)
+  @JoinColumn()
   geo: Geo
 
   fromSnakeJSON(json: any) {
