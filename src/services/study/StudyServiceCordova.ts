@@ -1,19 +1,46 @@
 import StudyServiceAbstract from './StudyServiceAbstract'
 import DatabaseService from '../database/DatabaseService'
 import Study from '../../entities/trellis/Study'
+import UserService from '../user/UserService'
+import UserStudy from "../../entities/trellis/UserStudy";
+import User from "../../entities/trellis/User";
+import {IsNull} from "typeorm";
 
 class StudyServiceCordova extends StudyServiceAbstract {
   async getStudy (studyId: string): Promise<Study> {
-    const connection = await DatabaseService.getDatabase()
-    const repository = await connection.getRepository(Study)
-    return repository.findOne({ id: studyId, deletedAt: null })
+    const repo = await DatabaseService.getRepository(Study)
+    return repo.findOne({
+      where: {
+        id: studyId,
+        deletedAt: IsNull()
+      },
+      relations: ['locales']
+    })
+  }
+
+  async getUserStudies (userId: string): Promise<Study[]> {
+    const repo = await DatabaseService.getRepository(Study)
+    return await repo.createQueryBuilder('study')
+      .where(qb => 'study.id in ' + qb.subQuery()
+        .select('user_study.studyId')
+        .from(UserStudy, 'user_study')
+        .where('user_study.userId = :userId', {userId})
+        .getQuery()
+      ).getMany()
   }
 
   async getMyStudies (): Promise<Study[]> {
-    // TODO: get logged in user and restrict returned studies based on user
-    const connection = await DatabaseService.getDatabase()
-    const repository = await connection.getRepository(Study)
-    return repository.find({ deletedAt: null })
+    let user: User = UserService.getCurrentUser()
+    if (user.role.toLowerCase() === 'admin') {
+      let repo = await DatabaseService.getRepository(Study)
+      return await repo.find({
+        where: {
+          deletedAt: IsNull()
+        }
+      })
+    } else {
+      return await this.getUserStudies(user.id)
+    }
   }
 }
 

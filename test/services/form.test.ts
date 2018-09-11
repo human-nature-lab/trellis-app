@@ -1,4 +1,4 @@
-import './mocha.globals'
+import './globals'
 import {expect} from 'chai'
 import FormServiceCordova from '../../src/services/form/FormServiceCordova'
 import FormServiceWeb from '../../src/services/form/FormServiceWeb'
@@ -16,18 +16,11 @@ import Choice from '../../src/entities/trellis/Choice';
 import ConditionTag from "../../src/entities/trellis/ConditionTag";
 import Parameter from "../../src/entities/trellis/Parameter";
 import StudyForm from "../../src/entities/trellis/StudyForm";
+import {expectToHaveProperties} from "./helpers";
+import {formId, studyId} from "./testing-ids";
 
 let cordovaService = new FormServiceCordova()
 let webService = new FormServiceWeb()
-
-const testFormId = 'c98e78f8-1bcc-4afc-8e68-530374940213'
-const studyId = '6a08c96a-fb80-4eae-9b2b-4d03d4b3235d'
-
-function expectToHaveProperties(obj, props, errMsg = null) {
-  for (let key of props) {
-    expect(obj, `expected ${obj.constructor.name} to have ${key} defined`).to.have.property(key)
-  }
-}
 
 function compareWhitelist (a: object|object[], b: object|object[], props, sortProp = 'id') {
   function strip (obj) {
@@ -91,7 +84,7 @@ export default function () {
           // TODO: Validate the forms
         })
         it(`${service.constructor.name}.getForm: should return a form`, async () => {
-          let form = await service.getForm(testFormId)
+          let form = await service.getForm(formId)
           expect(form).to.be.an.instanceOf(Form)
           expectToHaveProperties(form, ['id', 'version', 'isPublished', 'sections', 'nameTranslation'])
           expect(form.sections, 'sections were empty or not defined').to.be.an('array').and.not.be.empty
@@ -157,7 +150,7 @@ export default function () {
     describe('COMPARE', () => {
       // TODO: Compare these correctly
       it('getForm: should return identical versions of the form', function () {
-        return Promise.all(services.map(s => s.getForm(testFormId))).then(res => {
+        return Promise.all(services.map(s => s.getForm(formId))).then(res => {
           res.forEach(form => {
             expect(form).to.not.be.undefined
           })

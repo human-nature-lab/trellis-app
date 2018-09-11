@@ -72,22 +72,21 @@
             return
           }
           try {
-            let questionDatum = interview.getSingleDatumByQuestionVarName(varName, this.location.sectionFollowUpDatumRepetition)
-            let question = interview.questionIndex.get(questionDatum.question_id)
-            // let datum = this.sectionFollowUpRepetition ? questionDatum.data.find(d => d.id === this.location) : questionDatum.data[0]
-            let datum = questionDatum.data.find(d => d.event_order === this.location.sectionFollowUpDatumRepetition)
+            let questionDatum = interview.getSingleDatumByQuestionVarName(varName, this.location.sectionFollowUpRepetition)
+            let question = interview.questionIndex.get(questionDatum.questionId)
+            let datum = questionDatum.data.find(d => d.eventOrder === this.location.sectionFollowUpRepetition)
             console.log('datumId:', datum.id)
-            switch (question.question_type.name) {
+            switch (question.questionType.name) {
               case 'relationship':
-                return promises.push(EdgeService.getEdges([datum.edge_id]).then(edges => {
+                return promises.push(EdgeService.getEdges([datum.edgeId]).then(edges => {
                   return {
                     key: varName,
-                    name: edges[0].target_respondent.name
+                    name: edges[0].targetRespondent.name
                   }
                 }))
               case 'roster':
-                return promises.push(RosterService.getRosterRows(questionDatum.data.map(d => d.roster_id)).then(rosters => {
-                  let roster = rosters.find(r => r.id === datum.roster_id)
+                return promises.push(RosterService.getRosterRows(questionDatum.data.map(d => d.rosterId)).then(rosters => {
+                  let roster = rosters.find(r => r.id === datum.rosterId)
                   return {
                     key: varName,
                     name: roster.val
