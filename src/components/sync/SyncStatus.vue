@@ -7,17 +7,17 @@
         </v-card-title>
         <v-card-text>
           <v-alert
-            v-bind:value="!wasSnapshotDownloaded"
+            :value="!wasSnapshotDownloaded"
             type="info">
-            No download found. Click the download button below.
+            No snapshot found. Click the download button below.
           </v-alert>
           <v-alert
-            v-bind:value="wasSnapshotDownloaded"
+            :value="wasSnapshotDownloaded"
             type="info">
-            The last snapshot was downloaded on: <span style="white-space:nowrap">{{ snapshotDownloadedAt }}</span>.
+            The current snapshot was created on: <span style="white-space:nowrap">{{ snapshotDownloadedAt }}</span>.
           </v-alert>
           <v-alert
-            v-bind:value="areUpdatedRecords"
+            :value="areUpdatedRecords"
             type="info">
             There are {{ updatedRecordsCount }} unsynced rows in the database. Click the upload button below.
           </v-alert>
@@ -28,31 +28,23 @@
 </template>
 
 <script>
-  import DatabaseService from '../../services/database/DatabaseService'
+  /* TODO: Consider adding information about the last upload here. */
   import DateService from '../../services/DateService'
   export default {
     name: 'sync-status',
     data () {
       return {
-        serverLatestSnapshot: null,
-        localLatestSnapshot: null,
-        updatedRecordsCount: null
       }
     },
     created () {
-      Promise.all([
-        DatabaseService.getLatestDownload(),
-        DatabaseService.getUpdatedRecordsCount()
-      ]).then(results => {
-        this.localLatestSnapshot = results[0]
-        this.updatedRecordsCount = results[1]
-        console.log('localLatestSnapshot', this.localLatestSnapshot)
-        console.log('updatedRecordsCount', this.updatedRecordsCount)
-      }, errors => {
-        console.error(errors)
-      })
     },
     props: {
+      localLatestSnapshot: {
+        type: Object
+      },
+      updatedRecordsCount: {
+        type: Number
+      }
     },
     methods: {
     },
@@ -61,8 +53,8 @@
         return (this.localLatestSnapshot)
       },
       snapshotDownloadedAt: function () {
-        if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('createdAt')) {
-          return DateService.parseDate(this.localLatestSnapshot['createdAt']).format('llll')
+        if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('snapshotCreatedAt')) {
+          return DateService.parseDate(this.localLatestSnapshot['snapshotCreatedAt']).local().format('llll')
         } else {
           return ''
         }

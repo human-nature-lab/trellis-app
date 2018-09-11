@@ -1,0 +1,89 @@
+<template>
+  <sync-sub-step
+    :working="working"
+    :success="success"
+    success-message="DONE"
+    :current-log="currentLog"
+    :cancel="stopWorking"
+    :retry="retry"
+    :indeterminate="false"
+    :progress="progress">
+    Uploading file...
+  </sync-sub-step>
+</template>
+
+<script>
+  import SyncSubStep from '../../SyncSubStep.vue'
+  import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+  import FileService from '../../../../services/file/FileService'
+  import config from '../../../../config'
+  import DeviceService from '../../../../services/device/DeviceService'
+
+  export default {
+    name: 'upload-snapshot',
+    data () {
+      return {
+        success: false,
+        working: true,
+        currentLog: undefined,
+        progress: 0
+      }
+    },
+    created () {
+      this.doWork()
+    },
+    props: {
+      loggingService: {
+        type: LoggingService,
+        required: false,
+        'default': function () { return defaultLoggingService }
+      },
+      fileEntry: {
+        type: Object,
+        required: true
+      },
+      md5hash: {
+        type: String,
+        required: true
+      }
+    },
+    methods: {
+      doWork: async function () {
+        this.working = true
+        console.log('fileEntry', this.fileEntry)
+        console.log('md5hash', this.md5hash)
+        const deviceId = await DeviceService.getUUID()
+        const uri = config.apiRoot + `/sync/device/${deviceId}/upload`
+        try {
+          await FileService.upload(uri, this.fileEntry, this.onUploadProgress)
+          this.working = false
+          this.success = true
+          this.$emit('upload-snapshot-done')
+        } catch (err) {
+          this.loggingService.log(err).then((result) => { this.currentLog = result })
+          this.working = false
+        }
+      },
+      onUploadProgress: function (progressEvent) {
+        console.log(progressEvent)
+        let curProgress = (progressEvent.loaded / progressEvent.total) * 100
+        // Only update at 5% increments, without this the progress bar does not update
+        if ((curProgress - this.progress) > 5) {
+          this.progress = curProgress
+        }
+      },
+      stopWorking: function () {
+        this.working = false
+      },
+      retry: function () {
+        this.currentLog = undefined
+        this.doWork()
+      }
+    },
+    computed: {
+    },
+    components: {
+      SyncSubStep
+    }
+  }
+</script>
