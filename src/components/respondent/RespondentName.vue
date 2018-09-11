@@ -50,8 +50,8 @@
   import censusTypes from '../../static/census.types'
   import singleton from '../../static/singleton'
   import { pushRouteAndQueueCurrent } from '../../router'
-  import Respondent from "../../entities/trellis/Respondent"
-  import RespondentName from "../../entities/trellis/RespondentName"
+  import Respondent from '../../entities/trellis/Respondent'
+  import RespondentName from '../../entities/trellis/RespondentName'
   import Vue from 'vue'
   export default Vue.extend({
     name: 'respondent-name',

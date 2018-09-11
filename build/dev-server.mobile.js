@@ -51,29 +51,35 @@ Object.keys(proxyTable).forEach(function (context) {
 
 app.get('/cordova.js', function (req, res) {
   if (req.hostname.includes('localhost')) {
-    res.send(new Error('Not a device.'))
+    res.send('Error: Not a device.')
   } else {
-    fs.readFile('platforms/android/platform_www/cordova.js', function (err, data) {
-      if (err) {
-        res.send(err)
-        console.error(err)
-      } else {
-        res.send(data)
-      }
+    res.sendFile(path.join(__dirname, '../platforms/android/platform_www/cordova.js'), function (err) {
+      if (!err) return
+      console.log(err)
+      res.status(500).send({ error: err })
     })
+    // fs.readFile('platforms/android/platform_www/cordova.js', function (err, data) {
+    //   if (err) {
+    //     res.send(err)
+    //     console.error(err)
+    //   } else {
+    //     res.send(data)
+    //   }
+    // })
   }
 })
 
 app.get('/cordova_plugins.js', function (req, res) {
-  fs.readFile('platforms/android/platform_www/cordova_plugins.js', function (err, data) {
-    if (err) {
-      res.send(err)
-      console.error(err)
-    } else {
-      res.send(data)
-    }
+  // var data = fs.readFileSync('platforms/android/platform_www/cordova_plugins.js')
+  // res.send(data)
+  res.sendFile(path.join(__dirname, '../platforms/android/platform_www/cordova_plugins.js'), function (err) {
+    if (!err) return
+    console.log(err)
+    res.status(500).send({ error: err })
   })
 })
+
+app.use('/plugins', express.static('./platforms/android/platform_www/plugins'))
 
 // handle fallback for HTML5 history API
 app.use(require('connect-history-api-fallback')())
@@ -88,8 +94,6 @@ app.use(hotMiddleware)
 // serve pure static assets
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
-
-app.use('/plugins', express.static('./platforms/android/platform_www/plugins'))
 
 var uri = 'http://localhost:' + port
 

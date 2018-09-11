@@ -95,8 +95,11 @@
           if (this.$route.query.to) {
             router.push({path: this.$route.query.to})
           } else {
-            router.push({name: 'home'})
+            router.push({name: 'Home'})
           }
+        }).catch(err => {
+          console.error(err)
+          debugger
         })
       }
     }

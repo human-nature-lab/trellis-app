@@ -1,10 +1,10 @@
 import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
 import {now} from '../../../../services/DateService'
-import RespondentConditionTag from "../../../../entities/trellis/RespondentConditionTag";
-import AssignConditionTag from "../../../../entities/trellis/AssignConditionTag";
-import InterviewManager from "../../classes/InterviewManager";
-import Interview from "../../../../entities/trellis/Interview";
+import RespondentConditionTag from '../../../../entities/trellis/RespondentConditionTag'
+import AssignConditionTag from '../../../../entities/trellis/AssignConditionTag'
+import InterviewManager from '../../classes/InterviewManager'
+import Interview from '../../../../entities/trellis/Interview'
 
 class RespondentConditionTagRecycler extends Recycler<RespondentConditionTag> {
   /**

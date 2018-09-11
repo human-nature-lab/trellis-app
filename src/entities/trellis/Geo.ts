@@ -23,12 +23,12 @@ export default class Geo extends TimestampedSoftDelete {
   @Column() @Serializable
   nameTranslationId: string
 
-  @Relationship(GeoType)
+  @Relationship(type => GeoType)
   @OneToOne(type => GeoType, { eager: true })
   @JoinColumn({ name: 'geo_type_id' })
   geoType: GeoType
 
-  @Relationship(Translation)
+  @Relationship(type => Translation)
   @OneToOne(type => Translation, { eager: true })
   @JoinColumn({ name: 'name_translation_id' })
   nameTranslation: Translation

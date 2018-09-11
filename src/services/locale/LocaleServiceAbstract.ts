@@ -1,4 +1,4 @@
-import SingletonService from '../singleton/SingletonService'
+import SingletonService from '../SingletonService'
 import i18n from '../../i18n'
 import moment from 'moment'
 import Locale from '../../entities/trellis/Locale'

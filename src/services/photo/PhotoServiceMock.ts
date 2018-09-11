@@ -1,6 +1,6 @@
 import MockService from '../mock/MockService'
 import GeneratorService from '../mock/GeneratorService'
-import PhotoServiceInterface from "./PhotoServiceInterface";
+import PhotoServiceInterface from './PhotoServiceInterface'
 
 const photoProviderUrl = 'https://source.unsplash.com/random'
 const WORDS = ['woman', 'man', 'cat']

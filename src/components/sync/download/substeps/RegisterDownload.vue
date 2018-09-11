@@ -10,7 +10,7 @@
 </template>
 
 <script>
-    import SyncService from '../../../../services/sync/SyncService'
+    import SyncService from '../../../../services/SyncService'
     import Sync from '../../../../entities/trellis-config/Sync'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'

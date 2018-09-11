@@ -1,11 +1,11 @@
 import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import Parameter from "./Parameter";
-import Question from "./Question";
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
+import Parameter from './Parameter'
+import Question from './Question'
 
 @Entity()
-export default class QuestionParameter extends TimestampedSoftDelete {
+export default class QuestionParameter extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column() @Serializable
@@ -15,7 +15,7 @@ export default class QuestionParameter extends TimestampedSoftDelete {
   @Column() @Serializable
   val: string
 
-  @Relationship(Parameter)
+  @Relationship(type => Parameter)
   @OneToOne(type => Parameter, { eager: true })
   @JoinColumn()
   parameter: Parameter

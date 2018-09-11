@@ -1,13 +1,14 @@
-import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
-import Datum from "./Datum";
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import SnakeSerializable from "../interfaces/SnakeSerializable";
+import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import Datum from './Datum'
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm'
+import {AsDate, Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'
+import {PrimaryColumn} from "typeorm/browser";
 
 @Entity()
 export default class QuestionDatum extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryColumn() @Serializable
   public id: string
   @Column() @Serializable
   public questionId: string
@@ -17,9 +18,9 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   public followUpDatumId: string
   @Column() @Serializable
   public sectionRepetition: number
-  @Column({type: 'datetime'}) @Serializable
+  @Column({type: 'datetime'}) @Serializable @AsDate
   public answeredAt: Date
-  @Column({type: 'datetime'}) @Serializable
+  @Column({type: 'datetime'}) @Serializable @AsDate
   public skippedAt: Date
   @Column() @Serializable
   public dkRf: boolean
@@ -28,7 +29,8 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   // @Column() @Serializable
   // public interviewId: string
 
-  @Relationship(Datum)
+  @Relationship(type => Datum)
+  @OneToMany(type => Datum, datum => datum.questionDatum)
   data: Datum[]
 
   /**

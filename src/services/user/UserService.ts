@@ -2,9 +2,12 @@ import {switchByModeEnv} from '../util'
 import UserServiceWeb from './UserServiceWeb'
 import UserServiceCordova from './UserServiceCordova'
 
+export const webService = new UserServiceWeb()
+export const cordovaService = new UserServiceCordova()
+
 export const UserService = switchByModeEnv({
-  WEB: UserServiceWeb,
-  CORDOVA: UserServiceCordova
+  WEB: webService,
+  CORDOVA: cordovaService
 })
 
-export default new UserService()
+export default UserService

@@ -14,13 +14,13 @@ export default class Study extends TimestampedSoftDelete {
   @Column() @Serializable
   defaultLocaleId: string
 
-  @Relationship(Locale)
+  @Relationship(type => Locale)
   @ManyToMany(type => Locale)
   @JoinTable({ name: 'study_locale' })
   locales: Promise<Locale[]>
 
   @OneToOne(type => Locale)
   @JoinColumn()
-  @Relationship(Locale)
+  @Relationship(type => Locale)
   defaultLocale: Locale
 }

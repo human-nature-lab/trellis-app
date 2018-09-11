@@ -1,7 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import Form from "./Form";
+import Form from './Form'
 
 @Entity()
 export default class StudyForm extends TimestampedSoftDelete {
@@ -18,7 +18,7 @@ export default class StudyForm extends TimestampedSoftDelete {
   @Column({ nullable: true }) @Serializable
   censusTypeId: string
 
-  @Relationship(Form)
+  @Relationship(type => Form)
   @OneToOne(type => Form, { eager: true })
   @JoinColumn({ name : 'form_master_id' })
   form: Form

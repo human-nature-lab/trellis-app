@@ -1,11 +1,10 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm'
 import {enumerable, Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapPropsFromJSON, mapFromSnakeJSON} from "../../services/JSONUtil";
-import TranslationText from "./TranslationText";
+import TranslationText from './TranslationText'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
 @Entity()
-export default class Translation extends TimestampedSoftDelete {
+export default class Translation extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
 
@@ -14,7 +13,7 @@ export default class Translation extends TimestampedSoftDelete {
     return this.translationText
   }
 
-  @Relationship(TranslationText)
+  @Relationship(type => TranslationText)
   @OneToMany(type => TranslationText, translationText => translationText.translation, { eager: true })
   translationText: Array<TranslationText>
 

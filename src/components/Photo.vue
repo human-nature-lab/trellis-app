@@ -24,7 +24,7 @@
   })
 
   function handleIntersections (entries) {
-    entries.sort((a, b) => b.boundingClientRect.top - a.boundingClientRect.top)
+    entries.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
     for (let entry of entries) {
       let vm = entry.target.__vue__
       if (vm) {

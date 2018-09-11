@@ -1,5 +1,5 @@
 import {pushRouteAndQueueCurrent} from '../../router'
-import Form from "../../entities/trellis/Form";
+import Form from '../../entities/trellis/Form'
 export default abstract class CensusServiceAbstract {
   /**
    * Redirect to the census form of the type supplied

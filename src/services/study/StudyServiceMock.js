@@ -1,5 +1,5 @@
 import MockService from '../mock/MockService'
-import storage from '../storage/StorageService'
+import storage from '../StorageService'
 import singleton from '../../static/singleton'
 export default class StudyServiceMock {
   static getCurrentStudy () {

@@ -1,4 +1,4 @@
-import { DeviceService } from '../device/DeviceService'
+import DeviceService from '../device/DeviceService'
 import SyncTable from './tables/SyncTable'
 import SyncMessage from './tables/SyncMessage'
 import Message from './tables/Message'

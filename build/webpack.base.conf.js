@@ -3,6 +3,7 @@ var utils = require('./utils')
 var config = require('../config')
 var vueLoaderConfig = require('./vue-loader.conf')
 var FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
+var webpack = require('webpack')
 
 const { VueLoaderPlugin } = require('vue-loader')
 
@@ -21,12 +22,14 @@ module.exports = {
     publicPath: process.env.NODE_ENV === 'production'
       ? config.build.assetsPublicPath
       : config.dev.assetsPublicPath,
-    chunkFilename: '[name].[chunkhash:15].js'
+    chunkFilename: '[id].[hash:8].js'
   },
   optimization: {
-    usedExports: true,
-    concatenateModules: true,
+    // usedExports: true,
+    // concatenateModules: true,
+    // minimize: true,
     splitChunks: {
+      chunks: 'all',
       cacheGroups: {
         commons: {
           test: /[\\/]node_modules[\\/]/,
@@ -122,6 +125,9 @@ module.exports = {
     new FilterWarningsPlugin({
       exclude: [/Critical dependency/, /mongodb/, /mssql/, /mysql/, /mysql2/, /oracledb/, /pg/, /pg-native/, /pg-query-stream/, /redis/, /react-native-sqlite-storage/, /sqlite3/]
     }),
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new webpack.NormalModuleReplacementPlugin(/typeorm$/, function (result) {
+      result.request = result.request.replace(/typeorm/, "typeorm/browser");
+    })
   ]
 }

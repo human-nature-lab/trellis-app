@@ -1,9 +1,9 @@
 import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
 import {now} from '../../../../services/DateService'
-import SectionConditionTag from "../../../../entities/trellis/SectionConditionTag";
-import AssignConditionTag from "../../../../entities/trellis/AssignConditionTag";
-import InterviewManager from "../../classes/InterviewManager";
+import SectionConditionTag from '../../../../entities/trellis/SectionConditionTag'
+import AssignConditionTag from '../../../../entities/trellis/AssignConditionTag'
+import InterviewManager from '../../classes/InterviewManager'
 
 class SectionConditionTagRecycler extends Recycler<SectionConditionTag> {
   /**

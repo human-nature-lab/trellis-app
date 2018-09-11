@@ -1,9 +1,9 @@
 import Emitter from '../../../classes/Emitter'
 import SortedArray from '../../../classes/SortedArray'
 import {now, parseDate} from '../../../services/DateService'
-import Action from "../../../entities/trellis/Action";
-import Form from "../../../entities/trellis/Form";
-import {InterviewLocation} from "../services/InterviewNavigator";
+import Action from '../../../entities/trellis/Action'
+import Form from '../../../entities/trellis/Form'
+import {InterviewLocation} from '../services/InterviewNavigator'
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -162,7 +162,7 @@ export default class ActionStore extends Emitter {
    */
   load (actions: Action[]) {
     for (let action of actions) {
-      if (typeof action.payload === 'string') {
+      if (action.payload && typeof action.payload === 'string') {
         action.payload = JSON.parse(action.payload)
       }
       this.insertIntoStore(action)

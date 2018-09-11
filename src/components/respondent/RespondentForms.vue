@@ -28,10 +28,10 @@
   import global from '../../static/singleton'
   import router from '../../router'
   import Vue from 'vue'
-  import Survey from "../../entities/trellis/Survey"
-  import StudyForm from "../../entities/trellis/StudyForm"
-  import Respondent from "../../entities/trellis/Respondent"
-  import Translation from "../../entities/trellis/Translation"
+  import Survey from '../../entities/trellis/Survey'
+  import StudyForm from '../../entities/trellis/StudyForm'
+  import Respondent from '../../entities/trellis/Respondent'
+  import Translation from '../../entities/trellis/Translation'
 
   export class DisplayForm {
     constructor (
@@ -71,13 +71,13 @@
         error: ''
       }
     },
-    // head: {
-    //     title () {
-    //       return {
-    //         inner: `${this.respondent.name} Forms`
-    //       }
-    //     }
-    // },
+/*    head: {
+        title () {
+          return {
+            inner: `${this.respondent.name} Forms`
+          }
+        }
+    },*/
     components: {
       FormsView
     },
@@ -89,6 +89,7 @@
           if (form.isStarted) {
             interview = await InterviewService.create(form.surveys[0].id)
           } else {
+            debugger
             let survey = await SurveyService.create(this.global.study.id, this.respondent.id, form.id)
             interview = await InterviewService.create(survey.id)
           }

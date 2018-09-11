@@ -91,8 +91,8 @@
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusFormService from '../../services/census/index'
   import CensusTypes from '../../static/census.types'
-  import Respondent from "../../entities/trellis/Respondent"
-  import RespondentGeo from "../../entities/trellis/RespondentGeo"
+  import Respondent from '../../entities/trellis/Respondent'
+  import RespondentGeo from '../../entities/trellis/RespondentGeo'
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
   import singleton from '../../static/singleton'

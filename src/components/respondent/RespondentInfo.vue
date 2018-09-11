@@ -239,7 +239,7 @@
         this.respondentConditionTags = await respondent.respondentConditionTags
       },
       leaving () {
-        this.respondentConditionTags = null
+        this.respondentConditionTags = []
       },
       photoFromCamera () {},
       photoFromFile () {},

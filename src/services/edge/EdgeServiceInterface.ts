@@ -1,4 +1,4 @@
-import Edge from "../../entities/trellis/Edge";
+import Edge from '../../entities/trellis/Edge'
 
 export interface SourceTarget {
   sourceId: string
