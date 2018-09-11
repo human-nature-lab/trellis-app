@@ -145,7 +145,8 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     studyRespondent.respondentId = respondent.id
     await connection.manager.save(studyRespondent)
 
-    return respondent
+    const repository = connection.getRepository(Respondent)
+    return repository.findOne(respondent.id)
   }
 
   async addRespondentGeo (respondentId, geoId) {
