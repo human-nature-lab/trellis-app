@@ -38,18 +38,18 @@
         }
       },
       methods: {
-        registerDownload: function () {
+        registerDownload: async function () {
           this.working = true
-          SyncService.registerSuccessfulSync(this.sync)
-            .then(() => {
-              this.working = false
-              this.success = true
-              this.$emit('register-download-done')
-            })
-            .catch((err) => {
-              this.working = false
-              this.loggingService.log(err).then((result) => { this.currentLog = result })
-            })
+          try {
+            // Register the sync as successful
+            await SyncService.registerSuccessfulSync(this.sync)
+            this.working = false
+            this.success = true
+            this.$emit('register-download-done')
+          } catch (err) {
+            this.working = false
+            this.loggingService.log(err).then((result) => { this.currentLog = result })
+          }
         },
         retry: function () {
           this.currentLog = undefined
