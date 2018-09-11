@@ -17,9 +17,11 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   }
 
   async getRespondentById (respondentId) {
-    const connection = await DatabaseService.getDatabase()
-    const repository = await connection.getRepository(Respondent)
-    return await repository.findOne({ deletedAt: null, id: respondentId })
+    const repository = await DatabaseService.getRepository(Respondent)
+    return await repository.findOne({
+      where: { deletedAt: null, id: respondentId },
+      relations: ['photos', 'geos', 'names']
+    })
   }
 
   async getSearchPage (studyId, query, filters, page = 0, size = 50, respondentId = null) {

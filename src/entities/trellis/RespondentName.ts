@@ -1,5 +1,5 @@
 import {Serializable} from '../decorators/WebOrmDecorators'
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, AfterLoad} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Respondent from './Respondent'
 
@@ -7,7 +7,7 @@ import Respondent from './Respondent'
 export default class RespondentName extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+  @Column({ type: Boolean }) @Serializable
   isDisplayName: boolean
   @Column() @Serializable
   name: string
@@ -20,4 +20,10 @@ export default class RespondentName extends TimestampedSoftDelete {
 
   @ManyToOne(type => Respondent, respondent => respondent.names)
   respondent: Respondent
+
+  fromSnakeJSON (json) {
+    super.fromSnakeJSON(json)
+    this.isDisplayName = !!this.isDisplayName
+    return this
+  }
 }
