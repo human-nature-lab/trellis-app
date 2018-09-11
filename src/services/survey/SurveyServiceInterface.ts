@@ -1,4 +1,4 @@
-import Survey from "../../entities/trellis/Survey";
+import Survey from '../../entities/trellis/Survey'
 
 export default interface SurveyServiceInterface {
 

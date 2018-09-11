@@ -1,6 +1,6 @@
 import http from '../http/AxiosInstance'
-import RosterServiceInterface from "./RosterServiceInterface";
-import Roster from "../../entities/trellis/Roster";
+import RosterServiceInterface from './RosterServiceInterface'
+import Roster from '../../entities/trellis/Roster'
 
 
 export default class RosterServiceWeb implements RosterServiceInterface {

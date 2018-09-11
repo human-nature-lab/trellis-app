@@ -23,9 +23,9 @@ import Question from '../../../entities/trellis/Question'
 import Page from '../../../entities/trellis/QuestionGroup'
 import Section from '../../../entities/trellis/Section'
 import PersistSlave from '../../../classes/PersistSlave'
-import Interview from "../../../entities/trellis/Interview";
-import AssignConditionTag from "../../../entities/trellis/AssignConditionTag";
-import Datum from "../../../entities/trellis/Datum";
+import Interview from '../../../entities/trellis/Interview'
+import AssignConditionTag from '../../../entities/trellis/AssignConditionTag'
+import Datum from '../../../entities/trellis/Datum'
 
 
 export default class InterviewManager extends Emitter {

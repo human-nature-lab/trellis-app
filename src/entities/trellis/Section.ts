@@ -10,31 +10,33 @@ import {
   JoinColumn
 } from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
-import Translation from "./Translation";
-import FormSection from "./FormSection";
-import QuestionGroup from "./QuestionGroup";
-import Form from "./Form";
+import Translation from './Translation'
+import FormSection from './FormSection'
+import QuestionGroup from './QuestionGroup'
+import Form from './Form'
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
+
+console.log(QuestionGroup)
 
 @Entity()
-export default class Section extends TimestampedSoftDelete {
+export default class Section extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column({select: false}) @Serializable
   nameTranslationId: string
 
-  @Relationship(Translation)
+  @Relationship(type => Translation)
   @OneToOne(type => Translation, { eager: true })
   @JoinColumn()
   nameTranslation: Translation
 
-  @Relationship(QuestionGroup)
   @ManyToMany(type => QuestionGroup, qg => qg.section, { eager: true })
   @JoinTable({ name: 'section_question_group' })
+  @Relationship(type => QuestionGroup)
   questionGroups: QuestionGroup[]
 
-  @Relationship(FormSection)
+  @Relationship(type => FormSection)
   @OneToMany(type => FormSection, formSection => formSection.section, { eager: true })
   formSections: FormSection[]
 

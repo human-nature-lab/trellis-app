@@ -1,12 +1,11 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
-import Translation from "./Translation";
-import Question from "./Question";
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
+import Translation from './Translation'
+import Question from './Question'
 
 @Entity()
-export default class Choice extends TimestampedSoftDelete {
+export default class Choice extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column() @Serializable
@@ -14,7 +13,9 @@ export default class Choice extends TimestampedSoftDelete {
   @Column() @Serializable
   val: string
 
-  @Relationship(Translation)
+  @Relationship(type => Translation)
+  @OneToOne(type => Translation, { eager: true })
+  @JoinColumn()
   choiceTranslation: Translation
 
   parameters?: object // Assigned and used by InterviewManager

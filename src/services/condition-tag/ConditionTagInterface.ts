@@ -1,5 +1,5 @@
-import ConditionTag from "../../entities/trellis/ConditionTag";
-import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag";
+import ConditionTag from '../../entities/trellis/ConditionTag'
+import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
 
 export default interface ConditionTagInterface {
   /**

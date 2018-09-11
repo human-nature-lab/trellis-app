@@ -1,5 +1,5 @@
 import LocaleService from '../../services/locale/LocaleService'
-import SingletonService from '../../services/singleton/SingletonService'
+import SingletonService from '../../services/SingletonService'
 
 export default async function (to, from, next) {
   await SingletonService.hasLoaded()

@@ -1,7 +1,7 @@
 import Recycler from '../../../../classes/Recycler'
 import Datum from '../../../../entities/trellis/Datum'
 import {now} from '../../../../services/DateService';
-import QuestionDatum from "../../../../entities/trellis/QuestionDatum";
+import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 
 export interface DatumPayload {
   name?: string
@@ -42,7 +42,8 @@ class DatumRecycler extends Recycler<Datum> {
       payload.edge_id,
       payload.geo_id,
       payload.photo_id,
-      payload.roster_id
+      payload.roster_id,
+      payload.choice_id
     )
   }
 }

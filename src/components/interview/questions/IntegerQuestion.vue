@@ -24,7 +24,7 @@
       }
     },
     mixins: [QuestionDisabledMixin, VuetifyValidationRules, ActionMixin],
-    data: function () {
+    data () {
       return {
         _value: null
       }

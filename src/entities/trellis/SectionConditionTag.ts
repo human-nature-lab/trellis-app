@@ -1,8 +1,8 @@
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
-import TimestampedSoftDelete from "../base/TimestampedSoftDelete";
-import SnakeSerializable from "../interfaces/SnakeSerializable";
-import ConditionTag from "./ConditionTag";
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm'
+import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import SnakeSerializable from '../interfaces/SnakeSerializable'
+import ConditionTag from './ConditionTag'
 import {now} from '../../services/DateService'
 
 @Entity()
@@ -19,13 +19,17 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
   repetition: number
   @Column() @Serializable
   followUpDatumId: string
-  @Column() @Serializable
-  interviewId: string
+
+  //Future
+  // @Column() @Serializable
+  // interviewId: string
 
   @Relationship({
-    constructor: ConditionTag,
+    constructor: () => ConditionTag,
     jsonKey: 'condition'
   })
+  @OneToOne(type => ConditionTag, { eager: true })
+  @JoinColumn({ name: 'condition_id' })
   conditionTag: ConditionTag
 
   fromRecycler (id: string, sectionId: string, conditionId: string, repetition: number, followUpDatumId: string, interviewId: string, surveyId: string) {
@@ -34,7 +38,7 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
     this.conditionId = conditionId
     this.repetition = repetition
     this.followUpDatumId = followUpDatumId
-    this.interviewId = interviewId
+    // this.interviewId = interviewId
     this.surveyId = surveyId
     this.createdAt = now()
     this.updatedAt = now()

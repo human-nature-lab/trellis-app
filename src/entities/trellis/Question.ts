@@ -1,49 +1,60 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, OneToMany, JoinTable} from 'typeorm'
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToOne,
+  OneToMany,
+  JoinTable,
+  ManyToMany,
+  JoinColumn
+} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
-import QuestionType from "./QuestionType";
-import Translation from "./Translation";
-import Choice from "./Choice";
-import AssignConditionTag from "./AssignConditionTag";
-import QuestionParameter from "./QuestionParameter";
-import QuestionChoice from "./QuestionChoice";
-import QuestionDatum from "./QuestionDatum";
-import QuestionGroup from "./QuestionGroup";
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
+import {mapFromSnakeJSON} from '../../services/JSONUtil'
+import QuestionType from './QuestionType'
+import Translation from './Translation'
+import Choice from './Choice'
+import AssignConditionTag from './AssignConditionTag'
+import QuestionParameter from './QuestionParameter'
+import QuestionChoice from './QuestionChoice'
+import QuestionDatum from './QuestionDatum'
+import QuestionGroup from './QuestionGroup'
 
 @Entity()
-export default class Question extends TimestampedSoftDelete {
+export default class Question extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
   @Column() @Serializable
   questionTypeId: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   questionTranslationId: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   questionGroupId: string
   @Column({ type: 'tinyint' }) @Serializable
   sortOrder: number
   @Column() @Serializable
   varName: string
 
-  @Relationship(QuestionType)
-  // @ManyToOne(type => QuestionType, qt => qt.questions, {eager: true})
+  @Relationship(type => QuestionType)
+  @ManyToOne(type => QuestionType, qt => qt.questions, {eager: true})
   questionType: QuestionType
 
-  @Relationship(Translation)
-  // @OneToOne(type => Translation, { eager: true })
+  @Relationship(type => Translation)
+  @OneToOne(type => Translation, { eager: true })
+  @JoinColumn()
   questionTranslation: Translation
 
-  @Relationship(QuestionChoice)
+  @Relationship(type => QuestionChoice)
   @OneToMany(type => QuestionChoice, choice => choice.question, { eager: true })
   choices: QuestionChoice[]
 
-  @Relationship(AssignConditionTag)
-  // @ManyToMany(type => AssignConditionTag, act => act.question, { eager: true })
-  // @JoinTable({ name: 'question_assign_condition_tag' })
+  @Relationship(type => AssignConditionTag)
+  @ManyToMany(type => AssignConditionTag, act => act.questions, { eager: true })
+  @JoinTable({ name: 'question_assign_condition_tag' })
   assignConditionTags: AssignConditionTag[]
 
-  @Relationship(QuestionParameter)
+  @Relationship(type => QuestionParameter)
   @OneToMany(type => QuestionParameter, qp => qp.question, { eager: true })
   questionParameters: QuestionParameter[]
 

@@ -1,14 +1,15 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, JoinTable, ManyToMany} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import RespondentName from "./RespondentName";
-import RespondentGeo from "./RespondentGeo";
-import RespondentConditionTag from "./RespondentConditionTag";
-import RespondentPhoto from "./RespondentPhoto";
-import Geo from "./Geo";
-import ConditionTag from "./ConditionTag";
-import SnakeSerializable from "../interfaces/SnakeSerializable";
-import Photo from "./Photo";
+import RespondentName from './RespondentName'
+import RespondentGeo from './RespondentGeo'
+import RespondentConditionTag from './RespondentConditionTag'
+import Geo from './Geo'
+import ConditionTag from './ConditionTag'
+import SnakeSerializable from '../interfaces/SnakeSerializable'
+import Photo from './Photo'
+import {LazyQuery} from '../decorators/QueryDecorator'
+import Survey from "./Survey";
 
 
 @Entity()
@@ -32,29 +33,40 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   @OneToMany(type => RespondentGeo, respondentGeo => respondentGeo.respondent, { eager: true })
   geos: RespondentGeo[]
 
-  @Relationship(RespondentName)
+  @Relationship(type => RespondentName)
   @OneToMany(type => RespondentName, respondentName => respondentName.respondent, { eager: true })
   names: RespondentName[]
 
-  @Relationship(Photo)
+  @Relationship(type => Photo)
   @ManyToMany(type => Photo, photo => photo.respondents, { eager: true })
   @JoinTable({ name: 'respondent_photo' })
   photos: Photo[]
 
-  @Relationship({ generator: rctGenerator })
+  @Relationship({ generator: rctGenerator, async: true })
   // @OneToMany(type => RespondentConditionTag, respondentConditionTag => respondentConditionTag.respondent, { eager: true })
-  get respondentConditionTags (): Promise<RespondentConditionTag[]> {
-    let _respondentConditionTags
-    if (_respondentConditionTags !== undefined) {
-      return new Promise(resolve => { resolve(_respondentConditionTags) })
-    } else {
-      const DatabaseService = require('../../services/database/DatabaseService').default
-      return DatabaseService.getRepository(RespondentConditionTag).then((repository) => repository.find({
-        respondentId: this.id,
-        deletedAt: null
-      }))
-    }
-  }
+  @LazyQuery(RespondentConditionTag, (repo, respondent) => {
+    return repo.find({
+      respondentId: respondent.id,
+      deletedAt: null
+    })
+  }, { cached: false })
+  respondentConditionTags: Promise<RespondentConditionTag[]>
+  // get respondentConditionTags (): Promise<RespondentConditionTag[]> {
+  //   let _respondentConditionTags
+  //   if (_respondentConditionTags !== undefined) {
+  //     return new Promise(resolve => { resolve(_respondentConditionTags) })
+  //   } else {
+  //     const DatabaseService = require('../../services/database/DatabaseService').default
+  //     return DatabaseService.getRepository(RespondentConditionTag).then((repository) => repository.find({
+  //       respondentId: this.id,
+  //       deletedAt: null
+  //     }))
+  //   }
+  // }
+
+  // Inverse relationships
+  @OneToMany(type => Survey, survey => survey.respondent)
+  surveys: Survey[]
 
 
 }

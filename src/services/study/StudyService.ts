@@ -1,12 +1,12 @@
 import {switchByModeEnv} from '../util'
 import StudyServiceWeb from './StudyServiceWeb'
 import StudyServiceCordova from './StudyServiceCordova'
-import StudyServiceMock from './StudyServiceMock'
+// import StudyServiceMock from './StudyServiceMock'
 
 const StudyService = switchByModeEnv({
   WEB: {
     PROD: StudyServiceWeb,
-    TEST: StudyServiceMock
+    TEST: StudyServiceWeb
   },
   CORDOVA: StudyServiceCordova
 })

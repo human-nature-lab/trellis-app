@@ -17,7 +17,7 @@ export default class InterviewServiceWeb implements InterviewServiceInterface {
     return new Interview().fromSnakeJSON(res.data.interview)
   }
 
-  async getActions (interviewId) {
+  async getActions (interviewId: string): Promise<Action[]> {
     interviewId = encodeURI(interviewId)
     let res = await http().get(`interview/${interviewId}/actions`)
     return res.data.actions.map(a => new Action().fromSnakeJSON(a))

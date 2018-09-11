@@ -2,14 +2,14 @@ import FormService from '../../../services/form/FormService'
 import InterviewService from '../../../services/interview/InterviewService'
 import LocaleService from '../../../services/locale/LocaleService'
 import RespondentService from '../../../services/respondent/RespondentService'
-import {Route} from "vue-router";
-import RespondentFill from "../../../entities/trellis/RespondentFill";
-import Locale from "../../../entities/trellis/Locale";
-import Interview from "../../../entities/trellis/Interview";
-import Action from "../../../entities/trellis/Action";
-import Form from "../../../entities/trellis/Form";
-import InterviewDataInterface, {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
-import QuestionDatum from "../../../entities/trellis/QuestionDatum";
+import {Route} from 'vue-router'
+import RespondentFill from '../../../entities/trellis/RespondentFill'
+import Locale from '../../../entities/trellis/Locale'
+import Interview from '../../../entities/trellis/Interview'
+import Action from '../../../entities/trellis/Action'
+import Form from '../../../entities/trellis/Form'
+import InterviewDataInterface, {ConditionTagInterface} from '../../../services/interview/InterviewDataInterface'
+import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 
 export interface InterviewData {
   respondentFills?: RespondentFill[]
@@ -66,7 +66,7 @@ export default class InterviewLoader {
    * @returns {Promise<Object>}
    */
   static loadPreview (formId: string): Promise<{form: Form}> {
-    return FormService.getForm(formId).then(form => {
+    return FormService.getForm(formId, true).then(form => {
       return {
         form
       }
@@ -90,7 +90,7 @@ export default class InterviewLoader {
     return {
       actions: await InterviewService.getActions(interviewId),
       data: await InterviewService.getData(interviewId),
-      form: await FormService.getForm(interview.survey.formId),
+      form: await FormService.getForm(interview.survey.formId, true),
       respondentFills: await RespondentService.getRespondentFillsById(interview.survey.respondentId),
       interview
     }

@@ -1,8 +1,8 @@
 import http from '../http/AxiosInstance'
 import formTypes from '../../static/form.types'
-import FormServiceInterface from "./FormServiceInterface";
-import StudyForm from "../../entities/trellis/StudyForm";
-import Form from "../../entities/trellis/Form";
+import FormServiceInterface from './FormServiceInterface'
+import StudyForm from '../../entities/trellis/StudyForm'
+import Form from '../../entities/trellis/Form'
 export class FormServiceWeb implements FormServiceInterface {
 
   getStudyForms (studyId: string): Promise<StudyForm[]> {
@@ -20,7 +20,7 @@ export class FormServiceWeb implements FormServiceInterface {
     })
   }
 
-  getForm (formId: string): Promise<Form> {
+  getForm (formId: string, bareBones: boolean = false): Promise<Form> {
     return http().get(`form/${formId}`)
       .then(res => {
         if (res.data.form) {

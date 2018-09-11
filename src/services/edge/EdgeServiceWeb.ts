@@ -1,6 +1,6 @@
 import http from '../http/AxiosInstance'
 import EdgeServiceInterface from './EdgeServiceInterface'
-import Edge from "../../entities/trellis/Edge";
+import Edge from '../../entities/trellis/Edge'
 export default class EdgeServiceWeb implements EdgeServiceInterface {
   async getEdges (edgeIds) {
     let res = await http().get(`edges/${edgeIds.join(',')}`)

@@ -1,5 +1,5 @@
 import Study from '../../entities/trellis/Study'
-import SingletonService from '../singleton/SingletonService'
+import SingletonService from '../SingletonService'
 
 export default abstract class StudyServiceAbstract {
   /**

@@ -1,14 +1,14 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToOne, JoinColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import ConditionTag from "./ConditionTag";
-import {mapFromSnakeJSON} from "../../services/JSONUtil";
+import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
+import ConditionTag from './ConditionTag'
+import Question from './Question'
 
 @Entity()
-export default class AssignConditionTag extends TimestampedSoftDelete {
+export default class AssignConditionTag extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column() @Serializable
+  @Column({ select: false }) @Serializable
   conditionTagId: string
   @Column({ type: 'text' }) @Serializable
   logic: string
@@ -16,8 +16,13 @@ export default class AssignConditionTag extends TimestampedSoftDelete {
   scope: string
 
   @Relationship({
-    constructor: ConditionTag,
+    constructor: () => ConditionTag,
     jsonKey: 'condition'
   })
+  @OneToOne(type => ConditionTag, {eager: true})
+  @JoinColumn()
   conditionTag: ConditionTag
+
+  @ManyToMany(type => Question, q => q.assignConditionTags)
+  questions: Question[]
 }

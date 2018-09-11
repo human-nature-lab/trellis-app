@@ -3,7 +3,7 @@ import axios from 'axios'
 import SizeLimitedMap from '../../classes/SizeLimitedMap'
 const cache = new SizeLimitedMap(1024 * 10000)
 import CancellablePromise from '../../classes/CancellablePromise'
-import PhotoServiceInterface from "./PhotoServiceInterface";
+import PhotoServiceInterface from './PhotoServiceInterface'
 
 export default class PhotoServiceWeb implements PhotoServiceInterface {
 

@@ -1,4 +1,4 @@
-import { DeviceService } from '../device/DeviceService'
+import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
 import config from '../../config'
 import merge from 'lodash/merge'

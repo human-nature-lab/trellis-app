@@ -2,7 +2,7 @@
   <v-app light dense class="cordova">
     <v-toolbar fixed>
       <v-toolbar-title class="deep-orange--text logo">
-        <router-link :to="{name: 'home'}">
+        <router-link :to="{name: 'Home'}">
           <img src="../static/img/trellis-logo.png" alt="trellis">
         </router-link>
       </v-toolbar-title>
@@ -94,7 +94,7 @@
 <script>
   import Vue from 'vue'
   import DeviceService from './services/device/DeviceService'
-  import storage from './services/storage/StorageService'
+  import storage from './services/StorageService'
   import DataService from './services/data/DataService'
   // TODO: This should be set by the app instead of being hardcoded
   storage.set('studyId', 'ad9a9086-8f15-4830-941d-416b59639c41')

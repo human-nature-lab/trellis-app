@@ -47,7 +47,7 @@
   import router from '../../router'
   import {Route} from 'vue-router'
   import Geo from '../../entities/trellis/Geo'
-  import Translation from "../../entities/trellis/Translation"
+  import Translation from '../../entities/trellis/Translation'
   import Vue from 'vue'
 
   export default Vue.extend({

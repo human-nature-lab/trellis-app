@@ -1,6 +1,6 @@
 import http from '../http/AxiosInstance'
-import GeoServiceInterface from "./GeoServiceInterface";
-import Geo from "../../entities/trellis/Geo";
+import GeoServiceInterface from './GeoServiceInterface'
+import Geo from '../../entities/trellis/Geo'
 export class GeoServiceWeb implements GeoServiceInterface {
 
   getGeoById (geoId) {

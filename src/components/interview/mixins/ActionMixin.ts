@@ -1,6 +1,7 @@
 import actionBus from '../services/actions/ActionBus'
 import Action from '../../../entities/trellis/Action'
 import uuidv4 from 'uuid/v4'
+import {ActionPayload} from "../services/actions/DatumOperations";
 export default {
   methods: {
     /**
@@ -8,7 +9,7 @@ export default {
      * @param {string} type
      * @param [payload]
      */
-    action (type: string, payload?: any) {
+    action (type: string, payload?: ActionPayload) {
       if (!this['question'] || !this['question'].id) {
         throw new Error('Unable to use action method without defining the question. Use actionWithoutQuestion instead.')
       }

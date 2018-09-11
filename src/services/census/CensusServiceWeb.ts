@@ -1,5 +1,5 @@
 import http from '../http/AxiosInstance'
-import CensusServiceAbstract from "./CensusServiceAbstract";
+import CensusServiceAbstract from './CensusServiceAbstract'
 
 export default class CensusServiceWeb extends CensusServiceAbstract {
 

@@ -12,7 +12,7 @@
 
 <script>
     import axios from 'axios'
-    import SyncService from '../../../../services/sync/SyncService'
+    import SyncService from '../../../../services/SyncService'
     import DeviceService from '../../../../services/device/DeviceService'
     import formatBytesFilter from '../../../../filters/format-bytes.filter'
     import SyncSubStep from '../../SyncSubStep.vue'

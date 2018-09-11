@@ -1,7 +1,7 @@
 import v18n from '../../../i18n'
-import QuestionDatum from "../../../entities/trellis/QuestionDatum";
-import Question from "../../../entities/trellis/Question";
-import QuestionParameter from "../../../entities/trellis/QuestionParameter";
+import QuestionDatum from '../../../entities/trellis/QuestionDatum'
+import Question from '../../../entities/trellis/Question'
+import QuestionParameter from '../../../entities/trellis/QuestionParameter'
 // All of the validation errors that will be displayed when validation fails
 export const validationErrors = {
   min: min => v18n.t('value_must_be_greater_than_min', min),
