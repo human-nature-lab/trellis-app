@@ -1,5 +1,10 @@
 <template>
-  <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :cancel="stopChecking" :retry="retry">
+  <sync-sub-step
+    :working="checking"
+    :success="success"
+    :current-log="currentLog"
+    :cancel="stopChecking"
+    :retry="retry">
     Establishing a connection with the server...
   </sync-sub-step>
 </template>
@@ -17,7 +22,6 @@
         return {
           currentLog: undefined,
           success: false,
-          error: false,
           checking: false,
           apiRoot: config.apiRoot,
           source: null
@@ -47,7 +51,6 @@
               severity: 'warn',
               message: `Unable to establish a connection with the server at ${this.apiRoot}`
             }).then((result) => { this.currentLog = result })
-            this.error = true
             this.checking = false
           })
         },
@@ -62,7 +65,7 @@
           this.checking = false
         },
         retry: function () {
-          this.error = false
+          this.currentLog = undefined
           this.checkConnection()
         }
       },

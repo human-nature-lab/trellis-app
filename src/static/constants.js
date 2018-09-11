@@ -28,9 +28,9 @@ export const COMPARE_DOWNLOAD_RESULTS = {
 
 export const COMPARE_UPLOAD_RESULTS = {
   NONE: 0, // Not run yet
-  NO_UPLOAD: 1, // No local upload found
-  UPLOAD_OLDER: 2, // Local upload older than server snapshot
-  UPLOAD_NEWER: 3 // Upload newer than server snapshot, stop and warn
+  NONE_PENDING: 1, // No pending uploads
+  PENDING_THIS_DEVICE: 2, // Pending uploads from this device
+  PENDING_OTHER: 3 // Pending uploads not from this device
 }
 
 export const BUTTON_STATUS = {

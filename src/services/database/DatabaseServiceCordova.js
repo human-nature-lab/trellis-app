@@ -57,7 +57,6 @@ import User from '../../entities/trellis/User'
 import UserStudy from '../../entities/trellis/UserStudy'
 import Log from '../../entities/trellis-config/Log'
 import Sync from '../../entities/trellis-config/Sync'
-import UpdatedRecords from '../../entities/trellis-config/UpdatedRecords'
 import FileService from '../file/FileService'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 
@@ -69,8 +68,7 @@ const trellisConfigConnection = {
   entities: [
     Config,
     Log,
-    Sync,
-    UpdatedRecords
+    Sync
   ],
   logging: true,
   synchronize: true
@@ -171,6 +169,42 @@ export default class DatabaseServiceCordova {
   async getConfigDatabase () {
     await this.configDatabaseCreated
     return getConnection('trellis-config')
+  }
+
+  async createUpdatedRecordsTable (queryRunner, status) {
+    try {
+      await queryRunner.query(`create table if not exists updated_records (table_name text, updated_record_id text, uploaded_at datetime);`)
+    } catch (err) {
+      status.message = 'Rolling back transaction...'
+      await queryRunner.rollbackTransaction()
+      throw err
+    }
+  }
+
+  async addTriggers (queryRunner, status) {
+    try {
+      const operations = ['update', 'insert']
+      const tableNameResults = await queryRunner.query('select tbl_name from SQLite_master where type = "table"')
+      const tableNames = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] })
+      console.log('tableNames', tableNames)
+      tableNames.forEach(async (tableName) => {
+        if (tableName !== 'updated_records') {
+          operations.forEach(async (operation) => {
+            await queryRunner.query(
+              `create trigger if not exists trigger__updated_records__${operation}__${tableName} 
+               after ${operation} on ${tableName} 
+                 BEGIN 
+                   insert into updated_records (table_name, updated_record_id) values ('${tableName}',NEW.id);
+                 END;`
+            )
+          })
+        }
+      })
+    } catch (err) {
+      status.message = 'Rolling back transaction...'
+      await queryRunner.rollbackTransaction()
+      throw err
+    }
   }
 
   async removeDatabase (status) {
@@ -282,7 +316,7 @@ export default class DatabaseServiceCordova {
     const queryBuilder = await repository.createQueryBuilder('sync')
     return queryBuilder
       .where('type = :type', {type: 'download'})
-      .where('status = :status', {status: 'success'})
+      .andWhere('status = :status', {status: 'success'})
       .orderBy('sync.createdAt', 'DESC')
       .limit(1)
       .getOne()
@@ -301,8 +335,16 @@ export default class DatabaseServiceCordova {
   }
 
   async getUpdatedRecordsCount () {
-    const connection = await this.getConfigDatabase()
-    const repository = await connection.getRepository(UpdatedRecords)
-    return await repository.count({ uploadedAt: null })
+    const connection = await this.getDatabase()
+    const updatedRecords = await connection.query(
+      `select *
+        from updated_records
+        where uploaded_at is null;`)
+    console.log('updatedRecords', updatedRecords)
+    const totalRowResults = await connection.query(
+      `select count(*) as total_rows
+        from updated_records
+        where uploaded_at is null;`)
+    return totalRowResults[0]['total_rows']
   }
 }

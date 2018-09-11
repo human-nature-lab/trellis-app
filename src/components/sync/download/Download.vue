@@ -14,7 +14,7 @@
           </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content step="1">
-              <download-step
+              <sync-step
                 title="Connecting"
                 v-if="downloadStep === 1"
                 v-bind:continue-status="continueStatusArray[0]"
@@ -42,10 +42,10 @@
                   :logging-service="loggingService"
                   v-bind:server-snapshot="serverSnapshot"
                   v-on:compare-upload-done="compareUploadDone"></compare-upload>
-              </download-step>
+              </sync-step>
             </v-stepper-content>
             <v-stepper-content step="2">
-              <download-step
+              <sync-step
                 title="Downloading"
                 v-if="downloadStep === 2"
                 v-bind:continue-status="continueStatusArray[1]"
@@ -83,10 +83,10 @@
                   v-bind:fileEntry="downloadedSnapshotFileEntry"
                   v-on:extract-snapshot-done="extractSnapshotDone">
                 </extract-snapshot>
-              </download-step>
+              </sync-step>
             </v-stepper-content>
             <v-stepper-content step="3">
-              <download-step
+              <sync-step
                 title="Inserting"
                 v-if="downloadStep === 3"
                 v-bind:continue-status="continueStatusArray[2]"
@@ -104,22 +104,28 @@
                   v-on:insert-rows-done="insertRowsDone"
                   v-bind:extracted-snapshot="extractedSnapshot">
                 </insert-rows>
-                <check-foreign-keys
+                <configure-database
                   v-if="downloadStep > 2 && downloadSubStep > 2"
+                  :logging-service="loggingService"
+                  :query-runner="queryRunner"
+                  v-on:configure-database-done="configureDatabaseDone">
+                </configure-database>
+                <check-foreign-keys
+                  v-if="downloadStep > 2 && downloadSubStep > 3"
                   :logging-service="loggingService"
                   :query-runner="queryRunner"
                   v-on:check-foreign-keys-done="checkForeignKeysDone">
                 </check-foreign-keys>
                 <register-download
-                  v-if="downloadStep > 2 && downloadSubStep > 3"
+                  v-if="downloadStep > 2 && downloadSubStep > 4"
                   :logging-service="loggingService"
                   :sync="sync"
                   v-on:register-download-done="registerDownloadDone">
                 </register-download>
-              </download-step>
+              </sync-step>
             </v-stepper-content>
             <v-stepper-content step="4">
-              <download-step
+              <sync-step
                 title="Downloading images"
                 v-if="downloadStep === 4"
                 v-bind:continue-status="continueStatusArray[3]"
@@ -143,7 +149,7 @@
                   :logging-service="loggingService"
                   v-on:download-images-done="downloadImagesDone">
                 </download-images>
-              </download-step>
+              </sync-step>
             </v-stepper-content>
           </v-stepper-items>
         </v-stepper>
@@ -152,7 +158,7 @@
 </template>
 
 <script>
-  import DownloadStep from './DownloadStep'
+  import SyncStep from '../SyncStep'
   import CheckConnection from './substeps/CheckConnection'
   import AuthenticateDevice from './substeps/AuthenticateDevice'
   import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'
@@ -165,6 +171,7 @@
   import ExtractSnapshot from './substeps/ExtractSnapshot.vue'
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
   import InsertRows from './substeps/InsertRows.vue'
+  import ConfigureDatabase from './substeps/ConfigureDatabase.vue'
   import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
   import RegisterDownload from './substeps/RegisterDownload.vue'
   import GenerateImageList from './substeps/GenerateImageList.vue'
@@ -173,7 +180,9 @@
   import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
   import SyncService from '../../../services/SyncService'
   import DeviceService from '../../../services/device/DeviceService'
+  import DatabaseService from '../../../services/database/DatabaseService'
   import Log from '../../../entities/trellis-config/Log'
+  import Sync from '../../../entities/trellis-config/Sync'
   import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
   import TrellisAlert from '../../TrellisAlert.vue'
   const DOWNLOAD_STATUS = {
@@ -252,7 +261,8 @@
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         } else {
-          if (this.sync !== undefined) {
+          // Cancelling from the download images step should still register a successful sync
+          if (this.sync !== undefined && this.downloadStep < 4) {
             SyncService.registerCancelledSync(this.sync)
               .then(() => {
                 this.$emit('download-cancelled')
@@ -269,22 +279,25 @@
           }
         }
       },
-      checkLatestSnapshotDone: function (serverSnapshot) {
+      checkLatestSnapshotDone: async function (serverSnapshot) {
         this.serverSnapshot = serverSnapshot
+        const connection = await DatabaseService.getConfigDatabase()
+        const repository = await connection.getRepository(Sync)
+        await repository.update({id: this.sync.id}, {
+          snapshotCreatedAt: this.serverSnapshot['created_at'] + 'Z',
+          snapshotId: this.serverSnapshot['id']
+        })
         this.downloadSubStep = 4
       },
       compareDownloadDone: function (result) {
-        console.log('compareDownloadDone', result)
         this.compareDownloadResult = result
         this.downloadSubStep = 5
       },
       compareUploadDone: function (result) {
-        console.log('compareUploadDone', result)
         this.compareUploadResult = result
         if ((this.compareDownloadResult === COMPARE_DOWNLOAD_RESULTS.NO_DOWNLOAD ||
              this.compareDownloadResult === COMPARE_DOWNLOAD_RESULTS.DOWNLOAD_OLDER) &&
-            (this.compareUploadResult === COMPARE_UPLOAD_RESULTS.NO_UPLOAD ||
-             this.compareUploadResult === COMPARE_UPLOAD_RESULTS.UPLOAD_OLDER)) {
+            (this.compareUploadResult === COMPARE_UPLOAD_RESULTS.NONE_PENDING)) {
           this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
         } else {
           this.continueStatus = BUTTON_STATUS.ENABLED
@@ -316,8 +329,12 @@
         this.queryRunner = queryRunner
         this.downloadSubStep = 3
       },
-      checkForeignKeysDone: function () {
+      configureDatabaseDone: function (queryRunner) {
+        this.queryRunner = queryRunner
         this.downloadSubStep = 4
+      },
+      checkForeignKeysDone: function () {
+        this.downloadSubStep = 5
       },
       registerDownloadDone: function () {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
@@ -355,7 +372,7 @@
       CheckLatestSnapshot,
       CheckConnection,
       AuthenticateDevice,
-      DownloadStep,
+      SyncStep,
       EmptySnapshotsDirectory,
       CheckDownloadSize,
       DownloadSnapshot,
@@ -363,6 +380,7 @@
       VerifyDownload,
       RemoveDatabase,
       InsertRows,
+      ConfigureDatabase,
       CheckForeignKeys,
       RegisterDownload,
       GenerateImageList,

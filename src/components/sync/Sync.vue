@@ -5,7 +5,16 @@
         <v-container>
           <v-layout row class="sync-content">
             <v-flex class="xs12">
-              <sync-status v-if="!downloading && !uploading && !downloadingPhotos"></sync-status>
+              <sync-status
+                v-if="!downloading && !uploading && !downloadingPhotos"
+                :local-latest-snapshot="localLatestSnapshot"
+                :updated-records-count="updatedRecordsCount">
+              </sync-status>
+              <upload
+                v-if="uploading"
+                v-on:upload-done="uploadDone"
+                v-on:upload-cancelled="uploadCancelled">
+              </upload>
               <download
                 v-if="downloading || downloadingPhotos"
                 :init-download-step="downloadStep"
@@ -16,19 +25,20 @@
           </v-layout>
           <v-layout row class="mt-2 sync-footer" justify-space-between>
             <v-flex class="xs3 text-xs-left">
-              <v-btn :disabled="!enableUpload()">
+              <v-btn :disabled="!enableUpload"
+                     @click="onUpload">
                 <v-icon>cloud_upload</v-icon>
               </v-btn>
             </v-flex>
             <v-flex class="xs6 text-xs-right">
               <v-btn @click="onDownload"
                      :loading="downloading"
-                     :disabled="!enableDownload()">
+                     :disabled="!enableDownload">
                 <v-icon>cloud_download</v-icon>
               </v-btn>
               <v-btn @click="onDownloadPhotos"
                      :loading="downloadingPhotos"
-                     :disabled="!enablePhotoDownload()">
+                     :disabled="!enablePhotoDownload">
                 <v-icon>portrait</v-icon>
               </v-btn>
             </v-flex>
@@ -40,10 +50,12 @@
 </template>
 
 <script>
+  import AlertService from '../../services/AlertService'
   import SyncStatus from './SyncStatus'
   import SyncService from '../../services/SyncService'
   import DatabaseService from '../../services/database/DatabaseService'
   import Download from './download/Download'
+  import Upload from './upload/Upload'
 
   export default {
     name: 'sync',
@@ -60,54 +72,64 @@
       }
     },
     created () {
-      Promise.all([
-        DatabaseService.getLatestDownload(),
-        DatabaseService.getUpdatedRecordsCount()
-      ]).then(results => {
-        this.localLatestSnapshot = results[0]
-        this.updatedRecordsCount = results[1]
-        this.loading = false
-      }, errors => {
-        console.error(errors)
-      })
+      this.initComponent()
     },
     props: {},
     methods: {
-      heartbeat: function () {
-        return SyncService.getHeartbeat()
+      initComponent: async function() {
+        this.loading = true
+        try {
+          this.localLatestSnapshot = await DatabaseService.getLatestDownload()
+          this.updatedRecordsCount = await DatabaseService.getUpdatedRecordsCount()
+          this.loading = false
+        } catch (err) {
+          AlertService.addAlert(err)
+        }
       },
       onDownload: function () {
         this.downloadStep = 1
         this.downloading = true
+      },
+      onUpload: function () {
+        this.uploading = true
       },
       onDownloadPhotos: function () {
         this.downloadStep = 4
         this.downloadingPhotos = true;
       },
       downloadCancelled: function () {
-        console.log('foo')
         this.downloading = false
         this.downloadingPhotos = false
       },
       downloadDone: function () {
         this.downloading = false
+        this.initComponent()
       },
+      uploadCancelled: function () {
+        this.uploading = false
+      },
+      uploadDone: function () {
+        this.uploading = false
+        this.initComponent()
+      }
+    },
+    computed: {
       enableDownload: function () {
-        return ( (this.updatedRecordsCount === 0) && this.enableAll() )
+        return ( (this.updatedRecordsCount === 0) && this.enableAll )
       },
       enableUpload: function () {
-        return ( (this.updatedRecordsCount > 0) && this.enableAll() )
+        return ( (this.updatedRecordsCount > 0) && this.enableAll )
       },
       enablePhotoDownload: function () {
-        return ( (this.localLatestSnapshot !== null) && this.enableAll() )
+        return ( (this.localLatestSnapshot !== null) && this.enableAll )
       },
       enableAll: function () {
         return ( !this.loading && !this.downloading && !this.downloadingPhotos && !this.uploading )
       }
     },
-    computed: {},
     components: {
       Download,
+      Upload,
       SyncStatus
     }
   }

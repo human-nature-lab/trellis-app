@@ -4,7 +4,7 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class StudyRespondent extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable
   studyId: string

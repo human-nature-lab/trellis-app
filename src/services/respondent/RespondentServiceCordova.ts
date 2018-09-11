@@ -6,7 +6,6 @@ import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
 import {Brackets, IsNull} from 'typeorm'
-import uuid from 'uuid/v4'
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
 
@@ -90,7 +89,6 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
   async addName (respondentId, name, isDisplayName = null, localeId = null) {
     const respondentName = new RespondentName()
-    respondentName.id = uuid()
     respondentName.isDisplayName = isDisplayName
     respondentName.name = name
     respondentName.respondentId = respondentId
@@ -106,7 +104,6 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     const repository = await connection.getRepository(RespondentName)
     const oldRespondentName = await repository.findOne(respondentNameId)
     const editedRespondentName = new RespondentName()
-    editedRespondentName.id = uuid()
     editedRespondentName.isDisplayName = (isDisplayName === null) ? oldRespondentName.isDisplayName : isDisplayName
     editedRespondentName.name = newName
     editedRespondentName.respondentId = respondentId
@@ -128,8 +125,8 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   async createRespondent (studyId, name, geoId = null, associatedRespondentId = null) {
     const connection = await DatabaseService.getDatabase()
 
+    // TODO: Put this in a transaction
     const respondent = new Respondent()
-    respondent.id = uuid()
     respondent.assignedId = null
     respondent.geoId = geoId
     respondent.notes = ''
@@ -139,7 +136,6 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     await connection.manager.save(respondent)
 
     const respondentName = new RespondentName()
-    respondentName.id = uuid()
     respondentName.isDisplayName = true
     respondentName.name = name
     respondentName.respondentId = respondent.id
@@ -147,17 +143,17 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     respondentName.previousRespondentNameId = null
     await connection.manager.save(respondentName)
 
-    const respondentGeo = new RespondentGeo()
-    respondentGeo.id = uuid()
-    respondentGeo.geoId = geoId
-    respondentGeo.respondentId = respondent.id
-    respondentGeo.previousRespondentGeoId = null
-    respondentGeo.notes = ''
-    respondentGeo.isCurrent = true
-    await connection.manager.save(respondentGeo)
+    if (geoId !== null) {
+      const respondentGeo = new RespondentGeo()
+      respondentGeo.geoId = geoId
+      respondentGeo.respondentId = respondent.id
+      respondentGeo.previousRespondentGeoId = null
+      respondentGeo.notes = ''
+      respondentGeo.isCurrent = true
+      await connection.manager.save(respondentGeo)
+    }
 
     const studyRespondent = new StudyRespondent()
-    studyRespondent.id = uuid()
     studyRespondent.studyId = studyId
     studyRespondent.respondentId = respondent.id
     await connection.manager.save(studyRespondent)
@@ -201,7 +197,6 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     const oldRespondentGeo = await repository.findOne(respondentGeoId)
 
     const newRespondentGeo = new RespondentGeo()
-    newRespondentGeo.id = uuid()
     newRespondentGeo.geoId = newGeoId
     newRespondentGeo.respondentId = respondentId
     newRespondentGeo.previousRespondentGeoId = respondentGeoId

@@ -40,6 +40,7 @@
             :append-icon-cb="() => (e1 = !e1)"
             :type="e1 ? 'password' : 'text'"
             v-model="password"/>
+          <v-alert :value="showError()">{{ errorMessage }}</v-alert>
           <v-btn
             @click="login()"
             :disabled="!valid">
@@ -55,6 +56,7 @@
   import LoginService from '../../services/login'
   import UserService from '../../services/user/UserService'
   import router from '../../router'
+
   export default {
     name: 'web-login',
     head: {
@@ -64,6 +66,7 @@
     },
     data: function () {
       return {
+        errorMessage: undefined,
         username: null,
         password: null,
         e1: true,
@@ -80,27 +83,27 @@
       }
     },
     methods: {
-      login: function () {
+      login: async function () {
+        this.errorMessage = undefined
         if (!this.$refs.form.validate()) return
         let params = {
           form: this.$route.query.form
         }
-        LoginService.login(this.username, this.password, params).catch(err => {
-          this.error = this.$t('failed_login')
-          console.error('Login error:')
-          console.error(err)
-        }).then(res => {
-          return UserService.loadCurrentUser()
-        }).then(() => {
+        try {
+          await LoginService.login(this.username, this.password, params)
+          await UserService.loadCurrentUser()
           if (this.$route.query.to) {
             router.push({path: this.$route.query.to})
           } else {
             router.push({name: 'Home'})
           }
-        }).catch(err => {
+        } catch (err) {
           console.error(err)
-          debugger
-        })
+          this.errorMessage = err.message
+        }
+      },
+      showError: function () {
+        return (this.errorMessage !== undefined)
       }
     }
   }
