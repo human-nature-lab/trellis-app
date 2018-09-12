@@ -4,7 +4,7 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class Roster extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column({ type: 'text' }) @Serializable
   val: string

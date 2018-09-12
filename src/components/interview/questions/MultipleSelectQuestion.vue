@@ -7,6 +7,7 @@
         v-if="question.type.name==='multiple_select'"
         :disabled="isQuestionDisabled"
         v-model="selected[choice.id]"
+        :class="choiceClasses(choice)"
         @change="onChange(choice, selected[choice.id])">
         <ChoiceText :translation="choice.choiceTranslation" :location="location" slot="label"/>
       </v-checkbox>
@@ -14,10 +15,15 @@
         v-else
         :disabled="isQuestionDisabled"
         v-model="selected[choice.id]"
+        :class="choiceClasses(choice)"
         @change="onChange(choice, selected[choice.id])">
         <ChoiceText :translation="choice.choiceTranslation" :location="location" slot="label"/>
       </radio-checkbox>
       <v-text-field
+        solo
+        single-line
+        autofocus
+        :placeholder="$t('other')"
         v-if="showOtherText(choice)"
         v-model="otherText[choice.id]"
         @change="onOtherChange(choice, otherText[choice.id])"/>
@@ -81,6 +87,9 @@
       },
       showOtherText (choice) {
         return this.selected[choice.id] && choice.parameters && choice.parameters.other
+      },
+      choiceClasses (choice) {
+       return { other: this.showOtherText(choice) }
       }
     },
     components: {
@@ -91,6 +100,14 @@
 </script>
 
 <style lang="sass">
-  .input-group label
-    line-height: 26px
+  .input-group
+    label
+      line-height: 26px
+    &.other
+      .input-group__details
+        display: none
+  .checkbox-group
+    .input-group--text-field
+      margin-top: 0
+      margin-bottom: 10px
 </style>

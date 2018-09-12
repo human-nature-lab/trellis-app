@@ -28,7 +28,7 @@
               <v-icon v-else-if="test.state === FAILED" color="error">error</v-icon>
             </v-flex>
             <v-layout column>
-              <v-flex>{{test.parentTitle}}: {{test.title}}</v-flex>
+              <v-flex>{{test.title}}</v-flex>
               <v-flex>{{ test.err }}</v-flex>
             </v-layout>
           </v-layout>
@@ -81,11 +81,21 @@
       // if (runner) runner.teardown('bdd')
     },
     methods: {
+      getNestedTitle (test) {
+        let title = test.title
+        let t = test.parent
+        while(t.parent) {
+          if (t.title) {
+            title = t.title + ' > ' + title
+          }
+          t = t.parent
+        }
+        return title
+      },
       testToDisplay (test) {
         return {
           state: test.state,
-          title: test.title,
-          parentTitle: test.parent.title,
+          title: this.getNestedTitle(test),
           err: test.err ? test.err.message : null
         }
       },
@@ -100,6 +110,7 @@
         return true
       },
       async start () {
+        if (!this.modulesToRun.length) return
         this.tests = []
         this.state = this.WORKING
         this.testSelectorOpen = false
@@ -123,6 +134,9 @@
             debugger
           }
           this.tests.push(this.testToDisplay(test))
+        })
+        runner.on('error', err => {
+          debugger
         })
         runner.on('end', () => {
           this.state = this.WAITING

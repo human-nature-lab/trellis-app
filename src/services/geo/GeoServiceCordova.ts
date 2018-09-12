@@ -1,22 +1,29 @@
 import DatabaseService from '../database/DatabaseService'
 import GeoServiceInterface from './GeoServiceInterface'
 import Geo from '../../entities/trellis/Geo'
-import { In } from 'typeorm'
+import {In, IsNull} from 'typeorm'
 
-export class GeoServiceCordova implements GeoServiceInterface {
+export default class GeoServiceCordova implements GeoServiceInterface {
 
   async getGeoById (geoId) {
-    const connection = await DatabaseService.getDatabase()
-    const repository = await connection.getRepository(Geo)
-    return await repository.findOne({ deletedAt: null, id: geoId })
+    const repository = await DatabaseService.getRepository(Geo)
+    return await repository.findOne({
+      where: {
+        deletedAt: null,
+        id: geoId
+      },
+      relations: ['geoType', 'photos', 'nameTranslation']
+    })
   }
 
   async getGeosById (geoIds) {
-    const connection = await DatabaseService.getDatabase()
-    const repository = await connection.getRepository(Geo)
+    const repository = await DatabaseService.getRepository(Geo)
     return await repository.find({
-      deletedAt: null,
-      id: In(geoIds)
+      where: {
+        deletedAt: IsNull(),
+        id: In(geoIds)
+      },
+      relations: ['geoType', 'photos', 'nameTranslation']
     })
   }
 
@@ -80,12 +87,10 @@ export class GeoServiceCordova implements GeoServiceInterface {
     }
 
     q = q.limit(limit).offset(offset)
-    q = q.leftJoinAndSelect('geo.geoType', 'geo_type')
-    q = q.leftJoinAndSelect('geo.nameTranslation', 'translation')
-    q = q.leftJoinAndSelect('translation.translationText', 'translation_text')
+      .leftJoinAndSelect('geo.geoType', 'geo_type')
+      .leftJoinAndSelect('geo.photos', 'photos')
+      .leftJoinAndSelect('geo.nameTranslation', 'translation')
+      .leftJoinAndSelect('translation.translationText', 'translation_text')
     return await q.getMany()
   }
 }
-
-
-export default new GeoServiceCordova()
