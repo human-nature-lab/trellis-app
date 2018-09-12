@@ -39,7 +39,6 @@ export default class Action extends BaseEntity implements SnakeSerializable {
 
   toSnakeJSON () {
     let d = super.toSnakeJSON()
-    debugger
     if (typeof d['payload'] !== 'string') {
       d['payload'] = JSON.stringify(d['payload'])
     }

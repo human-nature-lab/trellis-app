@@ -5,7 +5,7 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
-import {Brackets} from 'typeorm'
+import {Brackets, IsNull} from 'typeorm'
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
 
@@ -16,9 +16,22 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   }
 
   async getRespondentById (respondentId) {
-    const connection = await DatabaseService.getDatabase()
-    const repository = await connection.getRepository(Respondent)
-    return await repository.findOne({ deletedAt: null, id: respondentId })
+    const repository = await DatabaseService.getRepository(Respondent)
+    return await repository.findOne({
+      where: {
+        deletedAt: IsNull(),
+        id: respondentId
+      },
+      relations: [
+        'photos',
+        'geos',
+        'names',
+        'geos.geo',
+        'geos.geo.photos',
+        'geos.geo.geoType',
+        'geos.geo.nameTranslation'
+      ]
+    })
   }
 
   async getSearchPage (studyId, query, filters, page = 0, size = 50, respondentId = null) {
@@ -149,18 +162,27 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return repository.findOne(respondent.id)
   }
 
-  async addRespondentGeo (respondentId, geoId) {
-    const connection = await DatabaseService.getDatabase()
-
+  async addRespondentGeo (respondentId: string, geoId: string): Promise<RespondentGeo> {
+    const repo = await DatabaseService.getRepository(RespondentGeo)
     const respondentGeo = new RespondentGeo()
     respondentGeo.geoId = geoId
     respondentGeo.respondentId = respondentId
     respondentGeo.previousRespondentGeoId = null
-    respondentGeo.notes = ''
+    respondentGeo.notes = null
     respondentGeo.isCurrent = false
-    await connection.manager.save(respondentGeo)
-
-    return respondentGeo
+    let rGeo = await repo.save(respondentGeo)
+    rGeo = await repo.findOne({
+      where: {
+        id: rGeo.id
+      },
+      relations: [
+        'geo',
+        'geo.photos',
+        'geo.geoType',
+        'geo.nameTranslation'
+      ]
+    })
+    return rGeo
   }
 
   async editRespondentGeo (respondentId, respondentGeoId, isCurrent) {

@@ -37,15 +37,21 @@ actionManager.add(AT.select_choice, function (interview: InterviewManager, paylo
   }
 
   // Remove any other exclusive choices that are currently selected
-  let exclusiveParameter = questionBlueprint.questionParameters.find(p => parseInt(p.parameterId, 10) === parameterTypes.exclusive)
+  let exclusiveParameter = questionBlueprint.questionParameters.find(p => {
+    return parseInt(p.parameterId, 10) === parameterTypes.exclusive
+  })
   if (exclusiveParameter) {
-    let choice = questionBlueprint.choices.find(c => c.choice.val === exclusiveParameter.val)
-    for (let i = 0; i < questionDatum.data.length; i++) {
-      let datum = questionDatum.data[i]
-      if (datum.choiceId === choice.id) {
-        questionDatum.data.splice(i, 1)
-        break
+    let cChoice = questionBlueprint.choices.find(c => c.choice.val === exclusiveParameter.val)
+    if (cChoice) {
+      for (let i = 0; i < questionDatum.data.length; i++) {
+        let datum = questionDatum.data[i]
+        if (datum.choiceId === cChoice.id) {
+          questionDatum.data.splice(i, 1)
+          break
+        }
       }
+    } else {
+      debugger
     }
   }
 

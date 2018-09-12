@@ -375,7 +375,7 @@ export default class InterviewManager extends Emitter {
   /**
    * Assign the current condition tags
    */
-  _evaluateConditionAssignment () {
+  _evaluateConditionAssignment (): void {
     // TODO: This should probably be every question in the survey so far
     let questionsWithData = this.getPageQuestions(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)
     let vars = questionsWithData.reduce((vars, question) => {
@@ -674,6 +674,7 @@ export default class InterviewManager extends Emitter {
     }
     console.log('Getting question by varname', varName, sectionFollowUpRepetition)
     let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
+    debugger
     for (let qD of questionDatum) {
       if (qD.data.findIndex(d => d.eventOrder === sectionFollowUpRepetition) > -1) {
         return qD

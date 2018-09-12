@@ -1,8 +1,8 @@
 import Edge from '../../entities/trellis/Edge'
 
 export interface SourceTarget {
-  sourceId: string
-  targetId: string
+  source_respondent_id: string
+  target_respondent_id: string
 }
 
 export default interface EdgeServiceInterface {

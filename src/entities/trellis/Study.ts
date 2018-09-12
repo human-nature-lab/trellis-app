@@ -1,4 +1,4 @@
-import {OneToOne, ManyToMany, JoinTable, JoinColumn, Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
+import {OneToOne, ManyToMany, JoinTable, JoinColumn, Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Locale from './Locale'
@@ -17,10 +17,10 @@ export default class Study extends TimestampedSoftDelete {
   @Relationship(type => Locale)
   @ManyToMany(type => Locale)
   @JoinTable({ name: 'study_locale' })
-  locales: Promise<Locale[]>
+  locales: Locale[]
 
-  @OneToOne(type => Locale)
-  @JoinColumn()
   @Relationship(type => Locale)
+  @ManyToOne(type => Locale, locale => locale.studyDefaults)
+  @JoinColumn()
   defaultLocale: Locale
 }
