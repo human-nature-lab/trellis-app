@@ -5,6 +5,7 @@ import InterviewServiceInterface from './InterviewServiceInterface'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import QuestionDatum from '../../entities/trellis/QuestionDatum'
+import PreloadAction from '../../entities/trellis/PreloadAction'
 import UserService from '../user/UserService'
 import SurveyConditionTag from "../../entities/trellis/SurveyConditionTag";
 import SectionConditionTag from "../../entities/trellis/SectionConditionTag";
@@ -50,6 +51,32 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
   }
 
   async getActions (interviewId: string): Promise<Action[]> {
+    // Get preload actions for this respondent_id and question_id (via form_id)
+    // that have not already been copied into the action table
+    const repository = await DatabaseService.getRepository(PreloadAction)
+    const queryBuilder = await repository.createQueryBuilder('preload_action')
+    let q = queryBuilder.where( ` 
+    select * from preload_action where respondent_id = (
+      select respondent_id from survey where id = (select survey_id from interview where id = :interviewId)
+    ) 
+    and question_id in (
+      select id from question where question_group_id in (
+        select question_group_id from section_question_group where section_id in (
+          select section_id from section_form where form_id = (
+            select form_id from survey where id = (select survey_id from interview where id = :interviewId)
+          )
+        )
+      )
+    )
+    and not exists (
+      select * from action where interview_id = :interviewId and preload_action_id = preload_action.id
+    )`, {
+      interviewId: interviewId
+    })
+
+    // TODO
+    console.log('q.getQuery()', q.getQuery())
+
     const repo = await DatabaseService.getRepository(Action)
     let actions = await repo.createQueryBuilder('action')
       .where(qb => {
