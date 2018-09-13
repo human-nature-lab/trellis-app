@@ -15,7 +15,7 @@
           bottom
           right
           @click="openGeoSearch()">
-          <v-icon>add</v-icon>
+          <v-icon style="height:auto;">add</v-icon>
         </v-btn>
       </v-card>
       <!--we need the geo-search-dialog class for geo search to work correctly in the dialog-->
