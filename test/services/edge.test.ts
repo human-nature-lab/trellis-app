@@ -3,7 +3,7 @@ import EdgeServiceWeb from '../../src/services/edge/EdgeServiceWeb'
 import EdgeServiceCordova from '../../src/services/edge/EdgeServiceCordova'
 
 import {expect} from 'chai'
-import {edgeIds, respondentId, respondentId2, respondentId3} from "./testing-ids";
+import {edgeIds, respondentId, respondentId2, respondentId3} from "../testing-ids";
 import Respondent from "../../src/entities/trellis/Respondent";
 import Edge from "../../src/entities/trellis/Edge";
 import {deepCompareEntities} from "./helpers";

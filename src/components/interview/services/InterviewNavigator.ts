@@ -1,6 +1,6 @@
 import Emitter from '../../../classes/Emitter'
 import Clock from '../../../classes/Clock'
-import InterviewManager from '../classes/InterviewManager'
+import InterviewManagerOld from '../classes/InterviewManager'
 import Form from '../../../entities/trellis/Form'
 import Survey from '../../../entities/trellis/Survey'
 
@@ -30,7 +30,7 @@ export default class InterviewNavigator extends Emitter {
   private blueprint: Form
   public clock: Clock
 
-  constructor (private interview: InterviewManager) {
+  constructor (private interview: InterviewManagerOld) {
     super()
     // Section, sectionFollowUpRepetition, sectionRepetition, page
     this.location = {} as InterviewLocation

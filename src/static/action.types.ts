@@ -1,4 +1,4 @@
-export default {
+const ActionTypes = {
   select_choice: 'select-choice',
   deselect_choice: 'deselect-choice',
   other_choice_text: 'other-choice-text',
@@ -23,3 +23,5 @@ export default {
   respondent_remove_geo: 'respondent-remove-geo',
   other_respondent_added: 'other-respondent-added'
 }
+
+export default ActionTypes

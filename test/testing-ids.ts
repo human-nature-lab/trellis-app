@@ -10,3 +10,10 @@ export const editRosterId = '1c257b6b-688b-4ec6-9804-12b0472eff59'
 export const interviewId = '8d032e56-25a5-4f85-8a88-f015d059ff08'
 export const geoId = '3a1dc8cb-b49a-459b-b023-68240597ed4e'
 export const edgeIds = ['15177bdd-b5cf-11e8-8fd7-0800271047e3', '151785da-b5cf-11e8-8fd7-0800271047e3']
+
+
+export const forms = {
+  firstQuestionSkipped: 'cb801404-806f-4ed1-b5bd-88997ad81f80',
+  repeatedSections: '',
+  conditionAssignment: '00be5ff5-f49b-4bd4-af0c-eae392819a69'
+}

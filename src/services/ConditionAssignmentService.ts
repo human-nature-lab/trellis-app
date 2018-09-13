@@ -1,24 +1,22 @@
 export default class ConditionAssignmentService {
-  constructor () {
-    this.conditionAssignmentMethods = {}
-  }
+  public conditionAssignmentMethods: Map<string, Function> = new Map()
 
   /**
    * Register an eval function with a unique name
    * @param id
    * @param functionString
    */
-  register (id, functionString) {
+  register (id: string, functionString: string): void {
     // TODO: Do this safely instead. Maybe consider using -> https://github.com/andywer/threads.js/tree/master
-    this.conditionAssignmentMethods[id] = self.eval('(function() {return ' + functionString + '})()')
+    this.conditionAssignmentMethods.set(id, eval(`(function() {'use strict'; return ${functionString}})()`))
   }
 
   /**
    * Unregister an eval function with a unique id
    * @param id
    */
-  unregister (id) {
-    delete this.conditionAssignmentMethods[id]
+  unregister (id: string): void {
+    this.conditionAssignmentMethods.delete(id)
   }
 
   /**
@@ -27,9 +25,9 @@ export default class ConditionAssignmentService {
    * @param args
    * @returns {*}
    */
-  run (id, ...args) {
-    if (this.conditionAssignmentMethods[id]) {
-      return this.conditionAssignmentMethods[id].call(null, ...args)
+  run (id: string, ...args): boolean {
+    if (this.conditionAssignmentMethods.get(id)) {
+      return this.conditionAssignmentMethods.get(id).call(null, ...args)
     } else {
       return false
     }
@@ -39,6 +37,6 @@ export default class ConditionAssignmentService {
    * Remove all registered functions
    */
   clear () {
-    this.conditionAssignmentMethods = {}
+    this.conditionAssignmentMethods.clear()
   }
 }
