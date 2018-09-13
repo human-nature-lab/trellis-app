@@ -58,7 +58,6 @@ export default class DataStore extends Emitter {
    * @MOVE_TO_SERVICE_LAYER
    */
   loadData (data) {
-    debugger
     // data = JSON.parse(JSON.stringify(data))
     let oData = data
     data = data.map(c => c.copy())
@@ -93,19 +92,14 @@ export default class DataStore extends Emitter {
       }
     }
     this.conditionTags.respondent = this.conditionTags.respondent.map(tag => {
-      if (tag.conditionTagId) {
-        tag.conditionId = tag.conditionTagId
-        delete tag.conditionTagId
-      }
       if (tag.conditionTag) {
         ConditionTagStore.add(tag.conditionTag)
-        delete tag.conditionTag
       }
       return tag
     })
-    RespondentConditionTagRecycler.fill(this.conditionTags.respondent.map(t => new RespondentConditionTag().fromSnakeJSON(t)))
-    SectionConditionTagRecycler.fill(this.conditionTags.section.map(t => new SectionConditionTag().fromSnakeJSON(t)))
-    FormConditionTagRecycler.fill(this.conditionTags.survey.map(t => new SurveyConditionTag().fromSnakeJSON(t)))
+    RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
+    SectionConditionTagRecycler.fill(this.conditionTags.section)
+    FormConditionTagRecycler.fill(this.conditionTags.survey)
   }
 
   /**
