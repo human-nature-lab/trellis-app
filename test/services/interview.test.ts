@@ -16,7 +16,7 @@ import SectionConditionTag from "../../src/entities/trellis/SectionConditionTag"
 import ConditionTag from "../../src/entities/trellis/ConditionTag";
 import SurveyConditionTag from "../../src/entities/trellis/SurveyConditionTag";
 import {deepCompareEntities} from "./helpers";
-import {interviewId} from "./testing-ids";
+import {interviewId} from "../testing-ids";
 
 function j (w) {
   return JSON.parse(JSON.stringify(w))

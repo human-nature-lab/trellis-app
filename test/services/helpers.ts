@@ -48,6 +48,24 @@ export function j (o) {
   return JSON.parse(JSON.stringify(o))
 }
 
+export function isSorted (vals, sortValueExtractor, ascending = true) {
+  if (vals.length <= 1) return true
+  for (let i = 1; i < vals.length; i++) {
+    let prevSortVal = sortValueExtractor(vals[i - 1])
+    let sortVal = sortValueExtractor(vals[i])
+    if (ascending) {
+      if (sortVal < prevSortVal) {
+        return false
+      }
+    } else {
+      if (sortVal > prevSortVal) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
 function dateToStringIfDate (a) {
   if (moment.isMoment(a) || moment.isDate(a)) {
     return moment.utc(a).toISOString()

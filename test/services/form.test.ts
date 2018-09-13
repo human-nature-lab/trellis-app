@@ -17,7 +17,7 @@ import ConditionTag from "../../src/entities/trellis/ConditionTag";
 import Parameter from "../../src/entities/trellis/Parameter";
 import StudyForm from "../../src/entities/trellis/StudyForm";
 import {expectToHaveProperties} from "./helpers";
-import {formId, studyId} from "./testing-ids";
+import {formId, studyId} from "../testing-ids";
 
 let cordovaService = new FormServiceCordova()
 let webService = new FormServiceWeb()
