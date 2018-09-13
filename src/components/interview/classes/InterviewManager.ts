@@ -169,7 +169,6 @@ export default class InterviewManager extends Emitter {
             this.performAction(action)
           } else {
             console.warn('action order does not line up with order of the form')
-            // debugger
           }
         }
       }
@@ -674,7 +673,6 @@ export default class InterviewManager extends Emitter {
     }
     console.log('Getting question by varname', varName, sectionFollowUpRepetition)
     let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
-    debugger
     for (let qD of questionDatum) {
       if (qD.data.findIndex(d => d.eventOrder === sectionFollowUpRepetition) > -1) {
         return qD
