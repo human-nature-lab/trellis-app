@@ -130,7 +130,6 @@ export default class InterviewManager extends InterviewManagerBase {
             this.performAction(action)
           } else {
             console.warn('action order does not line up with order of the form')
-            // debugger
           }
         }
       }
