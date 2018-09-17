@@ -179,7 +179,7 @@ export function deepCopy (obj: any, copySelf: boolean = false): any {
     return obj
   } else if (Array.isArray(obj)) {
     return obj.map(o => deepCopy(o, true))
-  } else if (obj instanceof Date || moment.isMoment(obj)) {
+  } else if (moment.isMoment(obj) || moment.isDate(obj)) {
     return moment(obj)
   } else if (typeof obj === 'object') {
     if (obj.copy && copySelf) {

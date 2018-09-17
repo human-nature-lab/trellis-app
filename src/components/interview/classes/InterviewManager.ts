@@ -4,8 +4,9 @@ import ActionStore from './ActionStore'
 import DataStore from './DataStore'
 import dataPersistSlave from '../services/DataPersistSlave'
 import actionsPersistSlave from '../services/ActionsPersistSlave'
+import AT from '../../../static/action.types'
 
-import InterviewNavigator from '../services/InterviewNavigator'
+import InterviewNavigator, {InterviewLocation} from '../services/InterviewNavigator'
 import Form from '../../../entities/trellis/Form'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import Action from '../../../entities/trellis/Action'
@@ -13,6 +14,7 @@ import ConditionTagInterface from '../../../services/condition-tag/ConditionTagI
 import RespondentFill from '../../../entities/trellis/RespondentFill'
 import Interview from '../../../entities/trellis/Interview'
 import InterviewManagerBase from "./InterviewManagerBase";
+import ImmutableQueue from "../../../classes/ImmutableQueue";
 
 
 export default class InterviewManager extends InterviewManagerBase {
@@ -57,13 +59,12 @@ export default class InterviewManager extends InterviewManagerBase {
    * Run anything that needs to wait until other stuff is initialized before being run
    */
   initialize () {
-    debugger
     this.actions.initialize() // This emits an initial state event to any subscribers (the actionsPersistSlave)
     this.data.initialize()    // This emits an initial state event to any subscribers (the dataPersistSlave)
     this.data.reset()
     this.initializeConditionAssignment()
     this.onFirstPage()
-    this.playActions(this.actions.actions)
+    debugger
   }
 
   /**
@@ -118,20 +119,14 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param {Action[]} actions - The array of actions to play
    */
   playActions (actions: Action[]) {
-    const locationMatches = action => {
-      return this.actions.getActionSection(action) === this.location.section &&
-        this.actions.getActionPage(action) === this.location.page &&
-        action.sectionRepetition === this.location.sectionRepetition &&
-        action.sectionFollowUpRepetition === this.location.sectionFollowUpRepetition
-    }
     for (let action of actions) {
       if (action.actionType !== 'next' && action.actionType !== 'previous') {
-        let matches = locationMatches(action)
+        let matches = this.actions.matchesLocation(action, this.location)
         if (matches) {
           this.performAction(action)
         } else {
           this.next()
-          if (locationMatches(action)) {
+          if (this.actions.matchesLocation(action, this.location)) {
             this.performAction(action)
           } else {
             console.warn('action order does not line up with order of the form')
@@ -178,8 +173,7 @@ export default class InterviewManager extends InterviewManagerBase {
   private onFirstPage (): void {
     this.onPageEnter()
     if (this.shouldSkipPage(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)) {
-      debugger
-      this.next()
+      this.stepForward()
     }
   }
 
@@ -215,14 +209,14 @@ export default class InterviewManager extends InterviewManagerBase {
     return SkipService.shouldSkipPage(page.skips, conditionTagNames)
   }
 
-  nextAndReplay () {
-    this.next()
-    // this.replayToCurrent()
+  next () {
+    this.stepForward()
+    this.replayToCurrent()
   }
 
-  previousAndReplay () {
-    this.previous()
-    // this.replayToCurrent()
+  previous () {
+    this.stepBackward()
+    this.replayToCurrent()
   }
 
   /**
@@ -230,7 +224,7 @@ export default class InterviewManager extends InterviewManagerBase {
    * an abstraction on this type of incremental movement that is similar to a clock
    * @returns undefined
    */
-  next () {
+  stepForward () {
     // Don't increment if we're already at the end
     if (this.navigator.isAtEnd) {
       return this.atEnd()
@@ -242,42 +236,53 @@ export default class InterviewManager extends InterviewManagerBase {
     // Skip any question that's in a follow up section with no data to follow up on
     if (this.currentSection.followUpQuestionId && this.navigator.clock.clockMax[2] < 0) {
       console.log('skipping question in empty follow up section', JSON.stringify(this.location))
-      return this.next()
+      return this.stepForward()
     }
 
     if (this.shouldSkipPage(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)) {
-      console.log('skipping location', JSON.stringify(this.location))
       this._markAsSkipped()
-      return this.next()
+      return this.stepForward()
     }
     console.log('next done location', JSON.stringify(this.location))
   }
 
-  previous () {
+  stepBackward () {
     // Don't decrement if we're already at the beginning
     if (this.navigator.isAtStart) {
       return this.atBeginning()
     }
-    this.onPageExit()
+    // this.onPageExit() // Don't assign conditions on the way backward
     this.navigator.previous()
     this.onPageEnter()
 
     // Skip any question that's in a follow up section with no data to follow up on
     if (this.currentSection.followUpQuestionId && this.navigator.clock.clockMax[2] < 0) {
       console.log('skipping question in empty follow up section', JSON.stringify(this.location))
-      return this.previous()
+      return this.stepBackward()
     }
 
     if (this.shouldSkipPage(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)) {
-      console.log('skipping location', JSON.stringify(this.location))
       this._markAsSkipped()
-      return this.previous()
+      return this.stepBackward()
     }
     console.log('previous done location', JSON.stringify(this.location))
   }
 
-  replayToCurrent () {
+  replayToCurrent (): void {
     this.replayTo(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpRepetition)
+  }
+
+  locToNumber (loc: InterviewLocation): number {
+    return Math.pow(100, 4) * (loc.section || 0) + Math.pow(100, 3) * (loc.sectionRepetition || 0) + Math.pow(100, 2) * (loc.sectionFollowUpRepetition || 0) + (loc.page || 0)
+  }
+
+  actionToLocationNumber (action: Action): number {
+    return this.locToNumber({
+      section: this.questionIdToSectionNum.get(action.questionId),
+      sectionRepetition: action.sectionRepetition,
+      sectionFollowUpRepetition: action.sectionFollowUpRepetition,
+      page: this.questionIdToPageNum.get(action.questionId)
+    })
   }
 
   /**
@@ -291,11 +296,84 @@ export default class InterviewManager extends InterviewManagerBase {
    */
   replayTo (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
     this._isReplaying = true
+    // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
+    // TODO: Check that state is reset correctly
     this._resetState()
-    this.playActions(this.actions.actions)
+    // TODO: Verify that actions are ordered correctly
+    const actionQueue = new ImmutableQueue(this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous))
+    let action = actionQueue.next()
+    const nextActionCount = this.actions.actions.reduce((c, a) => a.actionType === AT.next ? c + 1 : c, 0)
+    let numPagesReplayed = 0
+    function currentLocationHasValidResponses (): boolean {
+      // TODO
+      return true
+    }
+    while (action) {
+      // console.log('action', action)
+      // Check if we have a valid question id and skip it the action if we don't
+      if (!this.questionIndex.has(action.questionId)) continue
 
-    this.seekTo(section, page, sectionRepetition, sectionFollowUpRepetition)
+      let actionLocation = this.actionToLocationNumber(action)
+      let currentLocation = this.locToNumber(this.location)
+      if (actionLocation === currentLocation) {
+        this.performAction(action)
+      } else {
+        actionLocation = this.actionToLocationNumber(action)
+        let currentLocation = this.locToNumber(this.location)
+        let c = 0
+        // TODO: Double check for invalid action location???
+        while (currentLocation < actionLocation && currentLocationHasValidResponses() && c < 100) {
+          this.stepForward()
+          numPagesReplayed++
+          currentLocation = this.locToNumber(this.location)
+          if (actionLocation === currentLocation) {
+            try {
+              this.performAction(action)
+            } catch (err) {
+              console.error(err)
+              debugger
+            }
+          }
+          c++
+        }
+        if (c > 3) {
+          console.log('Skipped through more than 3 pages of questions')
+          debugger
+        }
+      }
+      action = actionQueue.next()
+    }
+    if (nextActionCount > numPagesReplayed) {
+      this.stepForward()
+    }
+    let currentLocNumber = this.locToNumber(this.location)
+    const desiredLocNumber = this.locToNumber({section, sectionRepetition, sectionFollowUpRepetition, page})
+    if (desiredLocNumber === currentLocNumber) {
+      // Do nothing here if we're already there
+    } else if (desiredLocNumber > currentLocNumber) {
+      // Iterate forward through optional and readOnly pages until we hit the page we want to reach
+      let c = 0
+      do {
+        this.stepForward()
+        currentLocNumber = this.locToNumber(this.location)
+        c++
+      } while(desiredLocNumber > currentLocNumber && currentLocationHasValidResponses() && c < 100)
+      if (c > 10) {
+        console.log(`moved forward ${c} steps`)
+        debugger
+      }
+      // this.seekTo(section, sectionRepetition, sectionFollowUpRepetition, page)
+      console.log('post seek', JSON.parse(JSON.stringify(this.data.data)))
+    } else {
+      let c = 0
+      do {
+        this.stepBackward()
+        currentLocNumber = this.locToNumber(this.location)
+        c++
+      } while (desiredLocNumber < currentLocNumber && currentLocationHasValidResponses() && c < 100)
+      // this.navigator.setLocationNumber(section, sectionRepetition, sectionFollowUpRepetition, page)
+    }
     this._isReplaying = false
   }
 
@@ -310,12 +388,12 @@ export default class InterviewManager extends InterviewManagerBase {
     let count = 1
     let DIRS = {FORWARD: 0, BACKWARD: 1}
     // Cast the current location and desired location into a 4 digit number with this structure {section}{sectionRepetition}{sectionFollowUpRepetition}{page}
-    let desiredLocNumber = section * 1000000 + sectionRepetition * 10000 + sectionFollowUpRepetition * 100 + page
+    let desiredLocNumber = this.locToNumber({section, sectionRepetition, sectionFollowUpRepetition, page})
     let curLocNumber
     let previousDirection
     let currentDirection
     do {
-      curLocNumber = this.location.section * 1000000 + this.location.sectionRepetition * 10000 + this.location.sectionFollowUpRepetition * 100 + this.location.page
+      curLocNumber = this.locToNumber(this.location)
       if (curLocNumber < desiredLocNumber) {
         currentDirection = DIRS.FORWARD
       } else if (curLocNumber > desiredLocNumber) {
@@ -336,10 +414,10 @@ export default class InterviewManager extends InterviewManagerBase {
       // Actually move in the specified direction
       switch (currentDirection) {
         case DIRS.FORWARD:
-          this.next()
+          this.stepForward()
           break
         case DIRS.BACKWARD:
-          this.previous()
+          this.stepBackward()
           break
         default:
           return
@@ -358,7 +436,7 @@ export default class InterviewManager extends InterviewManagerBase {
    */
   _markAsSkipped () {
     // TODO: Mark all questions on the current page as skipped
-    console.log('Skipped ', this.location)
+    // console.log('Skipped ', JSON.stringify(this.location))
   }
 
   /**
@@ -406,7 +484,6 @@ export default class InterviewManager extends InterviewManagerBase {
     }
     console.log('Getting question by varname', varName, sectionFollowUpRepetition)
     let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
-    debugger
     for (let qD of questionDatum) {
       if (qD.data.findIndex(d => d.eventOrder === sectionFollowUpRepetition) > -1) {
         return qD
@@ -415,7 +492,13 @@ export default class InterviewManager extends InterviewManagerBase {
     throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
   }
 
-
+  /**
+   * Return the questions for teh current location
+   * @returns {Question[]}
+   */
+  getCurrentPageQuestions () {
+    return this.getPageQuestions(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)
+  }
 
 
   /**

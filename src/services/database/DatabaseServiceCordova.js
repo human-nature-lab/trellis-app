@@ -135,8 +135,8 @@ const trellisConnection = {
     UserStudy
   ],
   namingStrategy: new SnakeCaseNamingStrategy(),
-  // logging: ['warning', 'error'] // reduced logging
-  logging: true // verbose logging
+  logging: ['warning', 'error'] // reduced logging
+  // logging: true // verbose logging
 }
 
 export default class DatabaseServiceCordova {

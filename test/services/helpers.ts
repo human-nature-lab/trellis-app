@@ -2,8 +2,8 @@ import {isEqual} from 'lodash'
 import {expect} from 'chai'
 import moment from 'moment'
 
-const timestamps = ['createdAt', 'updatedAt', 'deletedAt']
-export const modifiers = {
+export const timestamps = ['createdAt', 'updatedAt', 'deletedAt']
+export const globalMutators = {
   Interview (interview) {
     return strip(interview, timestamps)
   },
@@ -74,15 +74,19 @@ function dateToStringIfDate (a) {
   }
 }
 
-function modifyIfCustomModifier (a) {
-  if (a && a.constructor && a.constructor.name && modifiers[a.constructor.name]) {
-    return modifiers[a.constructor.name](a)
+function modifyIfCustomModifier (a, mutators = {}) {
+  let mutator
+  if (a && a.constructor && a.constructor.name) {
+    mutator = mutators[a.constructor.name] || globalMutators[a.constructor.name] || null
+  }
+  if (mutator) {
+    return mutator(a)
   } else {
     return a
   }
 }
 
-export function deepCompareEntities (a, b, keyTree = []) {
+export function deepCompareEntities (a, b, localMutators = {}, localComparitors = {}, keyTree = []) {
   if (a === b) return true
   a = dateToStringIfDate(a)
   b = dateToStringIfDate(b)
@@ -94,29 +98,34 @@ export function deepCompareEntities (a, b, keyTree = []) {
     b.sort(idSort)
     expect(a.length).to.equal(b.length, `Arrays aren't the same length ${keyTree.join('.')}`)
     for (let i = 0; i < a.length; i++) {
-      deepCompareEntities(a[i], b[i], keyTree.concat(i))
+      deepCompareEntities(a[i], b[i], localMutators, localComparitors, keyTree.concat(i))
     }
   } else if (typeof a === 'object') {
-    a = modifyIfCustomModifier(a)
-    b = modifyIfCustomModifier(b)
+    a = modifyIfCustomModifier(a, localMutators)
+    b = modifyIfCustomModifier(b, localMutators)
     expect(b).to.be.an('object', `b is not an object: ${keyTree.join('.')}`)
-    if (a.constructor && a.constructor.name && comparitors[a.constructor.name]) {
-      let compare = comparitors[a.constructor.name]
-      compare(a, b)
+    let comparitor
+    if (a.constructor && a.constructor.name) {
+      comparitor = localComparitors[a.constructor.name] || comparitors[a.constructor.name] || null
+    }
+    if (comparitor) {
+      comparitor(a, b)
     } else {
       let aKeys = Object.keys(a)
       let bKeys = Object.keys(b)
       for (let prop of aKeys) {
         if (bKeys.indexOf(prop) === -1) {
+          debugger
           throw new Error(`${prop} doesn't exist at ${keyTree.join('.')} on b, ${b.constructor.name}`)
         }
-        deepCompareEntities(a[prop], b[prop], keyTree.concat(prop))
+        deepCompareEntities(a[prop], b[prop], localMutators, comparitors, keyTree.concat(prop))
       }
       for (let prop of bKeys) {
         if (aKeys.indexOf(prop) === -1) {
+          debugger
           throw new Error(`${prop} doesn't exist at ${keyTree.join('.')} on a, ${a.constructor.name}`)
         }
-        deepCompareEntities(a[prop], b[prop], keyTree.concat(prop))
+        deepCompareEntities(a[prop], b[prop], localMutators, comparitors, keyTree.concat(prop))
       }
     }
   } else {

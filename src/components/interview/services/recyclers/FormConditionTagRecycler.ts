@@ -12,7 +12,12 @@ class FormConditionTagRecycler extends Recycler<SurveyConditionTag> {
     ].join('-')
   }
   objectCreator (interview: InterviewManagerOld, act: SurveyConditionTag) {
-    return new SurveyConditionTag().fromRecycler(uuidv4(), interview.interview.surveyId, act.conditionTag.id, interview.interview.id)
+    return new SurveyConditionTag().fromRecycler({
+      id: uuidv4(),
+      surveyId: interview.interview.surveyId,
+      conditionId: act.conditionTag.id,
+      interviewId: interview.interview.id
+    })
   }
 }
 

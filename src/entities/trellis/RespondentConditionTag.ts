@@ -5,6 +5,12 @@ import ConditionTag from './ConditionTag'
 import {now} from '../../services/DateService'
 import Respondent from './Respondent'
 
+export interface RespondentConditionTagRecylerData {
+  id: string
+  respondentId: string
+  conditionTagId: string
+}
+
 @Entity()
 export default class RespondentConditionTag extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
@@ -33,10 +39,12 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
     this.conditionTagId = id
   }
 
-  fromRecycler (id, respondentId, conditionTagId) {
-    this.id = id
-    this.respondentId = respondentId
-    this.conditionTagId = conditionTagId
+  fromRecycler (data: RespondentConditionTagRecylerData) {
+    for (let key in data) {
+      if (data[key] !== undefined) {
+        this[key] = data[key]
+      }
+    }
     this.updatedAt = now()
     this.createdAt = now()
     return this

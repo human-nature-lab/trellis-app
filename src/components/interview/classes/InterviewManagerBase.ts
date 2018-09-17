@@ -2,7 +2,7 @@ import Emitter from "../../../classes/Emitter";
 import Form from "../../../entities/trellis/Form";
 import ConditionTagStore from "./ConditionTagStore";
 import Page from "../../../entities/trellis/QuestionGroup";
-import InterviewNavigator from "../services/InterviewNavigator";
+import InterviewNavigator, {InterviewLocation} from "../services/InterviewNavigator";
 import Section from "../../../entities/trellis/Section";
 import RespondentFillStore from "./RespondentFillStore";
 import Question from "../../../entities/trellis/Question";
@@ -32,6 +32,8 @@ export default class InterviewManagerBase extends Emitter {
   protected questionIndex: Map<string, Question> = new Map()
   protected questionIdToSectionIndex: Map<string, Section> = new Map()
   protected questionIdToPageIndex: Map<string, Page> = new Map()
+  protected questionIdToSectionNum: Map<string, number> = new Map()
+  protected questionIdToPageNum: Map<string, number> = new Map()
 
   protected data: DataStore
   protected actions: ActionStore
@@ -63,7 +65,8 @@ export default class InterviewManagerBase extends Emitter {
       section.questionGroups.sort((pageA, pageB) => {
         return pageA.sectionQuestionGroup.questionGroupOrder - pageB.sectionQuestionGroup.questionGroupOrder
       })
-      for (let page of section.questionGroups) {
+      for (let p = 0; p < section.questionGroups.length; p++) {
+        let page = section.questionGroups[p]
         page.skips.sort((skipA, skipB) => skipA.precedence - skipB.precedence)
         page.questions.sort((questionA, questionB) => {
           return questionA.sortOrder - questionB.sortOrder
@@ -76,6 +79,8 @@ export default class InterviewManagerBase extends Emitter {
               return cA.sortOrder - cB.sortOrder
             })
           }
+          this.questionIdToPageNum.set(question.id, p)
+          this.questionIdToSectionNum.set(question.id, s)
           this.questionIdToSectionIndex.set(question.id, section)
           this.questionIdToPageIndex.set(question.id, page)
         }
@@ -196,12 +201,12 @@ export default class InterviewManagerBase extends Emitter {
       }
       return vars
     }, {})
-    console.log('condition assignment vars', vars)
+    // console.log('condition assignment vars', vars)
     for (let question of questionsWithData) {
       for (let act of question.assignConditionTags) {
         try {
           if (this.conditionAssigner.run(act.id, vars)) {
-            console.log('assigning', act)
+            // console.log('assigning', act)
             this.assignConditionTag(act)
           }
         } catch (err) {
