@@ -127,7 +127,7 @@
           absolute
           bottom
           right>
-          <v-icon>add</v-icon>
+          <v-icon style="height:auto;">add</v-icon>
         </v-btn>
       </v-fab-transition>
     </v-card>

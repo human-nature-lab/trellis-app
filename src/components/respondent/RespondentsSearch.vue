@@ -81,7 +81,7 @@
             @click="showAssociatedRespondentDialog = true"
             :loading="isLoading"
             color="primary">
-            <v-icon>add</v-icon>
+            <v-icon style="height:auto;">add</v-icon>
           </v-btn>
           <span v-if="respondentId">
             {{ $t('add_other_respondent') }}
@@ -325,7 +325,6 @@
       },
       addRespondentClose (respondent) {
         // TODO: Maybe add this to cache (if there is one)
-        debugger
         if (!this.query.length) {
           this.results.push(respondent)
         }

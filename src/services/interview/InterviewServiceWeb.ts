@@ -26,7 +26,6 @@ export default class InterviewServiceWeb implements InterviewServiceInterface {
   async saveActions (interviewId: string, actions: Action[]) {
     interviewId = encodeURI(interviewId)
     let nActions = actions.map(a => a.toSnakeJSON())
-    debugger
     return http().post(`interview/${interviewId}/actions`, {
       'actions': nActions
     }).then(r => r.data)
