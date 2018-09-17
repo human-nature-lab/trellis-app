@@ -26,18 +26,18 @@ class QuestionDatumRecycler extends Recycler<QuestionDatum> implements Recyclabl
    * @returns {QuestionDatum}
    */
   objectCreator (interview: InterviewManagerOld, questionBlueprint: Question): QuestionDatum {
-    return new QuestionDatum().fromRecycler(
-      uuidv4(),
-      questionBlueprint.id,
-      interview.interview.surveyId,
-      interview.location.sectionFollowUpDatumId,
-      interview.location.sectionRepetition,
-      now(),
-      now(),
-      interview.interview.id,
-    null,
-    null,
-    )
+    return new QuestionDatum().fromRecycler({
+      id: uuidv4(),
+      questionId: questionBlueprint.id,
+      surveyId: interview.interview.surveyId,
+      followUpDatumId: interview.location.sectionFollowUpDatumId,
+      sectionRepetition: interview.location.sectionRepetition,
+      answeredAt: now(),
+      skippedAt: null,
+      interviewId: interview.interview.id,
+      dkRf: null,
+      dkRfVal: null
+    })
   }
 }
 

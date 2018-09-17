@@ -58,7 +58,6 @@ export default class DataStore extends Emitter {
    * @MOVE_TO_SERVICE_LAYER
    */
   loadData (data) {
-    debugger
     // data = JSON.parse(JSON.stringify(data))
     let oData = data
     data = data.map(c => c.copy())
@@ -209,7 +208,7 @@ export default class DataStore extends Emitter {
    * @param {String} sectionFollowUpDatumId
    * @returns {Array}
    */
-  getQuestionDataByIds (questionIds, sectionRepetition, sectionFollowUpDatumId) {
+  getQuestionDataByIds (questionIds: string[], sectionRepetition: number, sectionFollowUpDatumId: string): QuestionDatum[] {
     let data = []
     for (let id of questionIds) {
       if (this.questionDatumQuestionIdIndex.has(id)) {

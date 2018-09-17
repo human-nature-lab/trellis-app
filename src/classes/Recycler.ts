@@ -53,7 +53,12 @@ export default abstract class Recycler<T> {
       this.set(key, obj)
     }
     // return JSON.parse(JSON.stringify(obj))
-    return obj
+    if (obj && obj['copy']) {
+      return obj['copy']()
+    } else {
+      return obj
+    }
+    // return obj
   }
 
   /**

@@ -5,7 +5,7 @@ import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import actionManager from './ActionManager'
 import {addDatum, addDatumLimit, addOrUpdateSingleDatum, removeDatum, updateDatum, ActionPayload} from './DatumOperations'
 import Question from '../../../../entities/trellis/Question'
-import InterviewManagerOld from '../../classes/InterviewManager'
+import InterviewManagerOld, {default as InterviewManager} from '../../classes/InterviewManager'
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
@@ -51,7 +51,7 @@ actionManager.add(AT.select_choice, function (interview: InterviewManagerOld, pa
         }
       }
     } else {
-      debugger
+      // debugger
     }
   }
 
@@ -85,21 +85,23 @@ actionManager.add(AT.dk_rf_val, function (interview, payload: ActionPayload, que
     console.error('dk-rf-val', 'invalid input without a questionDatum', payload)
   }
 })
-actionManager.add(AT.next, function (interview, a, b, c?, actionWasInitiatedByHuman?) {
-  if (actionWasInitiatedByHuman) {
-    interview.nextAndReplay()
-  } else {
-    interview.next()
-  }
+actionManager.add(AT.next, function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): void {
+  // if (actionWasInitiatedByHuman) {
+  //   interview.nextAndReplay()
+  // } else {
+  //   interview.next()
+  // }
+  interview.next()
   // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
 })
-actionManager.add(AT.previous, function (interview, a, b, c?, actionWasInitiatedByHuman?) {
-  if (actionWasInitiatedByHuman) {
-    interview.previousAndReplay()
-  } else {
-    interview.previous()
-  }
-  // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
+actionManager.add(AT.previous, function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): void {
+  // if (actionWasInitiatedByHuman) {
+  //   interview.previousAndReplay()
+  // } else {
+  //   interview.previous()
+  // }
+  interview.previous()
+  // // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
 })
 actionManager.add(AT.number_change, addOrUpdateSingleDatum)
 actionManager.add(AT.add_edge, addDatum)

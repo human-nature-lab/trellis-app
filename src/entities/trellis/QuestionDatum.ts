@@ -6,6 +6,19 @@ import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'
 import {PrimaryColumn} from "typeorm/browser";
 
+export interface QuestionDatumRecyclerData {
+  id: string
+  questionId: string
+  surveyId: string
+  followUpDatumId: string
+  sectionRepetition: number
+  answeredAt: Date
+  skippedAt: Date
+  interviewId: string
+  dkRf: boolean
+  dkRfVal: string
+}
+
 @Entity()
 export default class QuestionDatum extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryColumn() @Serializable
@@ -35,41 +48,18 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
 
   /**
    * Called from the recycler
-   * @param {string} id
-   * @param {string} questionId
-   * @param {string} surveyId
-   * @param {string} followUpDatumId
-   * @param {number} sectionRepetition
-   * @param {Date} answeredAt
-   * @param {Date} skippedAt
-   * @param {string} interviewId
-   * @param {boolean} dkRf
-   * @param {string} dkRfVal
+   * @param {QuestionDatumRecyclerData} data
    * @returns {this}
    */
-  fromRecycler (id: string,
-                questionId: string,
-                surveyId: string,
-                followUpDatumId: string,
-                sectionRepetition: number,
-                answeredAt: Date,
-                skippedAt: Date,
-                interviewId: string,
-                dkRf: boolean = null,
-                dkRfVal: string = null) {
-    this.id = id
-    this.questionId = questionId
-    this.surveyId = surveyId
-    this.followUpDatumId = followUpDatumId
-    this.sectionRepetition = sectionRepetition
-    this.answeredAt = answeredAt
-    this.skippedAt = skippedAt
-    this.dkRfVal = dkRfVal
-    this.dkRf = dkRf
+  fromRecycler (data: QuestionDatumRecyclerData) {
+    for (let key in data) {
+      if (data[key] !== undefined) {
+        this[key] = data[key]
+      }
+    }
     this.createdAt = now()
     this.updatedAt = now()
     this.data = []
-    // this.interviewId = interviewId
     return this
   }
 

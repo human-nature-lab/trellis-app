@@ -27,15 +27,15 @@ class SectionConditionTagRecycler extends Recycler<SectionConditionTag> {
    * @returns {SectionConditionTag}
    */
   objectCreator (interview: InterviewManagerOld, act: AssignConditionTag) {
-    return new SectionConditionTag().fromRecycler(
-      uuidv4(),
-      interview.location.sectionId,
-      act.conditionTagId,
-      interview.location.sectionRepetition,
-      interview.location.sectionFollowUpDatumId,
-      interview.interview.id,
-      interview.interview.surveyId
-    )
+    return new SectionConditionTag().fromRecycler({
+        id: uuidv4(),
+        sectionId: interview.location.sectionId,
+        conditionId: act.conditionTagId,
+        repetition: interview.location.sectionRepetition,
+        followUpDatumId: interview.location.sectionFollowUpDatumId,
+        interviewId: interview.interview.id,
+        surveyId: interview.interview.surveyId
+    })
   }
 }
 
