@@ -9,11 +9,14 @@
       style="position: relative;">
     </v-flex>
     <div>
-      <debug name="Geo results">
-          <pre>
-            {{this.geoResults}}
-          </pre>
-      </debug>
+      <permission :role-whitelist="['admin']">
+        <geo-edit-panel
+          v-on:editing-done="editingDone"
+          v-on:remove-geo-done="removeGeoDone"
+          v-on:move-geo-done="moveGeoDone"
+          :selected-geo="selectedGeo"
+          :leaflet-map="trellisMap"></geo-edit-panel>
+      </permission>
     </div>
     <v-navigation-drawer
       fixed
@@ -42,11 +45,14 @@
 <script>
   /* global L */
   import 'leaflet'
+  import index from '../../router/index'
   import GeoSearch from './GeoSearch'
   import TranslationService from '../../services/TranslationService'
   import global from '../../static/singleton'
   import createGraph from 'ngraph.graph'
   import forceDirectedLayout from 'ngraph.forcelayout'
+  import GeoEditPanel from './GeoEditPanel.vue'
+  import Permission from '../Permission'
 
   const targetMapWidth = 600
 
@@ -94,7 +100,8 @@
         paths: [],
         tooltips: [],
         markerPositions: [],
-        minZoom: undefined
+        minZoom: undefined,
+        selectedGeo: null
       }
     },
     mounted () {
@@ -126,14 +133,12 @@
           this.repositionMarkers()
         })
       },
-      displayResults: async function (results) {
+      displayResults: function (results) {
         this.geoResults = results
         this.clearMarkers()
         this.addMarkers(results)
         this.centerMap()
-        if (this.findOverlappingTooltips()) {
-          this.repositionMarkers()
-        }
+        this.repositionMarkers()
         this.$nextTick(() => { this.global.searchDrawer.open = true })
       },
       clearMarkers: function () {
@@ -161,17 +166,49 @@
         })
         this.tooltipMarkers = []
       },
+      editingDone: function (editedGeo) {
+        this.selectedGeo = null
+        for (let i = 0; i < this.geoResults.length; i++) {
+          let geo = this.geoResults[i]
+          if (geo.id === editedGeo.id) {
+            this.geoResults.splice(i, 1, editedGeo)
+          }
+        }
+        this.displayResults(this.geoResults)
+      },
+      removeGeoDone: function (removedGeoId) {
+        this.selectedGeo = null
+        for (let i = 0; i < this.geoResults.length; i++) {
+          let geo = this.geoResults[i]
+          if (geo.id === removedGeoId) {
+            this.geoResults.splice(i, 1)
+          }
+        }
+        this.displayResults(this.geoResults)
+      },
+      moveGeoDone: function (movedGeo) {
+        this.selectedGeo = null
+        for (let i = 0; i < this.geoResults.length; i++) {
+          let geo = this.geoResults[i]
+          if (geo.id === movedGeo.id) {
+            this.geoResults.splice(i, 1, movedGeo)
+          }
+        }
+        this.displayResults(this.geoResults)
+      },
       addMarkers: async function (geoResults) {
         let tooltipsToDisplay = geoResults.length
         return new Promise((resolve) => {
           geoResults.forEach((geo) => {
             let markerCoords = [geo.latitude, geo.longitude]
             this.markerPositions.push(markerCoords)
-            let geoMarker = L.marker(markerCoords, {icon: defaultIcon})
+            let geoMarker = L.marker(markerCoords, {icon: defaultIcon, interactive: false})
             this.geoMarkers.push(geoMarker)
-            let tooltipMarker = L.marker(markerCoords, {icon: hiddenIcon})
+            let tooltipMarker = L.marker(markerCoords, {icon: hiddenIcon, interactive: false})
             let translation = TranslationService.getTranslated(geo.nameTranslation, this.global.locale)
             tooltipMarker.geoName = translation
+            tooltipMarker.geoId = geo.id
+            tooltipMarker.geo = geo
             tooltipMarker.origin = geoMarker
             this.tooltipMarkers.push(tooltipMarker)
             tooltipMarker.on('add', () => {
@@ -222,6 +259,11 @@
         for (let i = 0; i < ITERATIONS; i++) {
           layout.step()
         }
+        function selectGeo (vm) {
+          return function () {
+            vm.selectedGeo = this.geo
+          }
+        }
         graph.forEachNode((node) => {
           if (node.data) {
             let pos = layout.getNodePosition(node.id)
@@ -230,13 +272,14 @@
             let labelPoint = L.latLng(latLng[0], latLng[1])
             node.data.setLatLng(labelPoint)
             node.data.unbindTooltip()
-            let tooltip = node.data.bindTooltip(node.data.geoName, {permanent: true, direction: this.getTooltipDirection(node.data.origin._latlng, labelPoint)})
+            let tooltip = node.data.bindTooltip(node.data.geoName, {interactive: true, permanent: true, direction: this.getTooltipDirection(node.data.origin._latlng, labelPoint)})
+            tooltip.on('click', selectGeo(this))
             this.tooltips.push(tooltip)
             let pathCoords = [
               markerPoint,
               labelPoint
             ]
-            let path = L.polyline(pathCoords, {color: '#333', weight: 1})
+            let path = L.polyline(pathCoords, {color: '#333', weight: 1, interactive: false})
             this.labelMarkerLayer.addLayer(path)
             this.paths.push(path)
           }
@@ -278,7 +321,9 @@
       }
     },
     components: {
-      GeoSearch
+      GeoEditPanel,
+      GeoSearch,
+      Permission
     }
   }
 </script>

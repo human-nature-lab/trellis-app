@@ -27,6 +27,16 @@ export default class GeoServiceCordova implements GeoServiceInterface {
     })
   }
 
+  async removeGeo (geoId) {
+    const repository = await DatabaseService.getRepository(Geo)
+    return repository.update({id: geoId}, {deletedAt: new Date()})
+  }
+
+  async moveGeo (geoId, latitude, longitude, moveChildren) {
+    // TODO
+    throw new Error("Unimplemented!")
+  }
+
   async getGeoAncestors (geoId) {
     let currentGeoId = geoId
     let count = 0
