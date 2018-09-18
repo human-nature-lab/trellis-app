@@ -224,7 +224,7 @@ export default class InterviewManager extends InterviewManagerBase {
       this._markAsSkipped()
       return this.stepForward()
     }
-    console.log('next done location', JSON.stringify(this.location))
+    // console.log('next done location', JSON.stringify(this.location))
   }
 
   stepBackward () {
@@ -246,7 +246,7 @@ export default class InterviewManager extends InterviewManagerBase {
       this._markAsSkipped()
       return this.stepBackward()
     }
-    console.log('previous done location', JSON.stringify(this.location))
+    // console.log('previous done location', JSON.stringify(this.location))
   }
 
   replayToCurrent (): void {
@@ -424,7 +424,7 @@ export default class InterviewManager extends InterviewManagerBase {
         debugger
       }
     }
-    console.log('post seek', JSON.parse(JSON.stringify(this.data.data)))
+    // console.log('post seek', JSON.parse(JSON.stringify(this.data.data)))
   }
 
   /**

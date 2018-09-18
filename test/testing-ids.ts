@@ -14,10 +14,11 @@ export const edgeIds = ['15177bdd-b5cf-11e8-8fd7-0800271047e3', '151785da-b5cf-1
 
 
 export const forms = {
-  firstQuestionSkipped: 'cb801404-806f-4ed1-b5bd-88997ad81f80',
+  firstPageSkipped: 'cb801404-806f-4ed1-b5bd-88997ad81f80',
   repeatedSections: 'c98e78f8-1bcc-4afc-8e68-530374940213',
   conditionAssignment: '00be5ff5-f49b-4bd4-af0c-eae392819a69',
-  rosterPrefill: 'cea71d10-5423-4e87-ade6-5e4a4ce01090'
+  rosterPrefill: 'cea71d10-5423-4e87-ade6-5e4a4ce01090',
+  lastPageSkipped: 'ff41a341-ce05-406f-9644-557f3bc6e151'
 }
 
 export const firstPageRosterIds = ['5ca96a1d-e47f-4fcb-90ed-b9955798412c', 'fc8b035f-0b6e-4a6b-8c69-b69beabb7f76', 'ff7ac9ca-bf86-46ca-b2bc-53d7b721e20a']

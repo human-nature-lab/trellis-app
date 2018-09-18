@@ -265,6 +265,7 @@ export default class InterviewManagerBase extends Emitter {
       // question = JSON.parse(JSON.stringify(question)) // Dereference the question
       // TODO: this should take into account section repetition and follow ups as well
       question.datum = questionData.find(q => q.questionId === question.id)
+      // question.datum = question.datum.copy()
       return question
     })
   }

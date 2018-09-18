@@ -53,9 +53,7 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
    */
   fromRecycler (data: QuestionDatumRecyclerData) {
     for (let key in data) {
-      if (data[key] !== undefined) {
-        this[key] = data[key]
-      }
+      this[key] = data[key]
     }
     this.createdAt = now()
     this.updatedAt = now()

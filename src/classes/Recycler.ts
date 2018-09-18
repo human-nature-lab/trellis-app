@@ -21,7 +21,7 @@ export default abstract class Recycler<T> {
    * @param obj
    * @returns {string}
    */
-  abstract keyExtractor (obj): string
+  abstract keyExtractor (obj: T): string
 
   /**
    * Function that must be defined by parent class to use this class effectively
@@ -34,7 +34,7 @@ export default abstract class Recycler<T> {
    * Store a bunch of objects at once to
    * @param items
    */
-  fill (items) {
+  fill (items: T[]) {
     for (let item of items) {
       this.add(item)
     }
@@ -46,14 +46,14 @@ export default abstract class Recycler<T> {
    * @param {string} key
    * @param {..any} params
    */
-  get (key: string, ...params) {
+  get (key: string, ...params): T|null {
     let obj = this.cache.get(key)
     if (!obj) {
       obj = this.objectCreator(...params)
       this.set(key, obj)
     }
     // return JSON.parse(JSON.stringify(obj))
-    if (obj && obj['copy']) {
+    if (obj && 'copy' in obj) {
       return obj['copy']()
     } else {
       return obj
@@ -67,17 +67,17 @@ export default abstract class Recycler<T> {
    * of the object and key regardless of if another one already exists
    * @param {...any} params
    */
-  getNoKey (...params) {
+  getNoKey (...params): T {
     let key = this.keyExtractor(this.objectCreator(...params))
     return this.get(key, ...params)
   }
 
   /**
    * Set a single object by key
-   * @param key
-   * @param obj
+   * @param {string} key
+   * @param {T} obj
    */
-  set (key, obj) {
+  set (key: string, obj: T) {
     this.cache.set(key, obj)
   }
 
@@ -85,7 +85,7 @@ export default abstract class Recycler<T> {
    * Add a single item to recycler set using the keyExtractor
    * @param {any} item
    */
-  add (item) {
+  add (item: T) {
     let key = this.keyExtractor(item)
     this.set(key, item)
   }

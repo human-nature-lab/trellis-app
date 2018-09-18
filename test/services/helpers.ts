@@ -1,36 +1,25 @@
 import {isEqual} from 'lodash'
 import {expect} from 'chai'
 import moment from 'moment'
+import SparseTimestamped from "../../src/entities/base/SparseTimestamped";
+import SparseTimestampedSoftDelete from "../../src/entities/base/SparseTimestampedSoftDelete";
 
 export const timestamps = ['createdAt', 'updatedAt', 'deletedAt']
+
+function removeTimestampsIfSparse (o) {
+  return o instanceof SparseTimestamped || o instanceof SparseTimestampedSoftDelete ? strip(o, timestamps) : o
+}
+
+// These mutators are run anytime a matching entity is found with the deepCompareEntities method
 export const globalMutators = {
-  Interview (interview) {
-    return strip(interview, timestamps)
-  },
-  User (user) {
-    return strip(user, timestamps.concat(['password']))
-  },
-  Form (form) {
-    return strip(form, timestamps.concat(['formMasterId', 'nameTranslationId']))
-  },
-  Translation (translation) {
-    return strip(translation, timestamps)
-  },
-  TranslationText (tt) {
-    return strip(tt, timestamps.concat(['translationId', 'locale']))
-  },
-  Survey (s) {
-    return strip(s, ['password'])
-  },
-  Roster (r) {
-    return strip(r, timestamps)
-  },
-  RespondentGeo (g) {
-    return strip(g, timestamps.concat(['id']))
-  },
-  ConditionTag (c) {
-    return strip(c, timestamps)
-  }
+  User: user => strip(user, timestamps.concat(['password'])),
+  Form: form => strip(form, timestamps.concat(['formMasterId', 'nameTranslationId'])),
+  TranslationText: tt => strip(tt, timestamps.concat(['translationId', 'locale'])),
+  QuestionChoice: q => strip(q, ['questionId', 'choiceId']),
+  Survey: s => strip(s, ['password']),
+  RespondentGeo: g => strip(g, timestamps.concat(['id'])),
+  FormSection: f => strip(f, ['formId', 'sectionId']),
+  Section: s => strip(s, ['nameTranslationId'])
 }
 
 export const comparitors = {}
@@ -75,17 +64,28 @@ function dateToStringIfDate (a) {
 }
 
 function modifyIfCustomModifier (a, mutators = {}) {
-  let mutator
+  a = removeTimestampsIfSparse(a)
   if (a && a.constructor && a.constructor.name) {
-    mutator = mutators[a.constructor.name] || globalMutators[a.constructor.name] || null
+    let n = a.constructor.name
+    if (mutators[n]) {
+      a = mutators[n](a)
+    }
+    if (globalMutators[n]) {
+      a = globalMutators[n](a)
+    }
   }
-  if (mutator) {
-    return mutator(a)
-  } else {
-    return a
-  }
+  return a
 }
 
+/**
+ *
+ * @param a
+ * @param b
+ * @param {{}} localMutators
+ * @param {{}} localComparitors
+ * @param {any[]} keyTree
+ * @returns {any}
+ */
 export function deepCompareEntities (a, b, localMutators = {}, localComparitors = {}, keyTree = []) {
   if (a === b) return true
   a = dateToStringIfDate(a)
@@ -101,9 +101,9 @@ export function deepCompareEntities (a, b, localMutators = {}, localComparitors 
       deepCompareEntities(a[i], b[i], localMutators, localComparitors, keyTree.concat(i))
     }
   } else if (typeof a === 'object') {
+    expect(b).to.be.an('object', `b is not an object: ${keyTree.join('.')}`)
     a = modifyIfCustomModifier(a, localMutators)
     b = modifyIfCustomModifier(b, localMutators)
-    expect(b).to.be.an('object', `b is not an object: ${keyTree.join('.')}`)
     let comparitor
     if (a.constructor && a.constructor.name) {
       comparitor = localComparitors[a.constructor.name] || comparitors[a.constructor.name] || null
@@ -115,14 +115,12 @@ export function deepCompareEntities (a, b, localMutators = {}, localComparitors 
       let bKeys = Object.keys(b)
       for (let prop of aKeys) {
         if (bKeys.indexOf(prop) === -1) {
-          debugger
           throw new Error(`${prop} doesn't exist at ${keyTree.join('.')} on b, ${b.constructor.name}`)
         }
         deepCompareEntities(a[prop], b[prop], localMutators, comparitors, keyTree.concat(prop))
       }
       for (let prop of bKeys) {
         if (aKeys.indexOf(prop) === -1) {
-          debugger
           throw new Error(`${prop} doesn't exist at ${keyTree.join('.')} on a, ${a.constructor.name}`)
         }
         deepCompareEntities(a[prop], b[prop], localMutators, comparitors, keyTree.concat(prop))

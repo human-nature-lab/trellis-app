@@ -159,6 +159,7 @@
           end: false,
           conditionTag: false
         },
+        questions: [],
         loadingStep: 0
       }
     },
@@ -207,23 +208,45 @@
         this.form = formBlueprint
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
+        this.updateQuestions()
       },
-      actionHandler: function (action) {
+      actionHandler (action) {
         if (!interviewState) {
           throw Error('Trying to push actions before interview has been initialized')
         }
         interviewState.pushAction(action)
+        this.updateQuestions()
       },
-      showBeginningDialog: function () {
+      updateQuestions () {
+        console.log('recalculating page questions')
+        // The reference to this.location needs to be here so that we have a dependency on this.location
+        let questions = interviewState.getPageQuestions(
+          this.location.section,
+          this.location.sectionRepetition,
+          this.location.sectionFollowUpDatumId,
+          this.location.page
+        ).map(q => {
+          q.type = {
+            name: q.questionType.name
+          }
+          let validation = validateParametersWithError(q, q.questionParameters, q.datum)
+          q.allParametersSatisfied = validation === true // Makes non-boolean types falsey
+          q.validationError = typeof validation === 'string' ? validation : null
+          q.isAnswered = false
+          return q
+        })
+        this.questions = questions || []
+      },
+      showBeginningDialog () {
         this.dialog.beginning = true
       },
-      showEndDialog: function () {
+      showEndDialog () {
         this.dialog.end = true
       },
-      showConditionTags: function () {
+      showConditionTags () {
         this.dialog.conditionTag = true
       },
-      lockAndExit: function () {
+      lockAndExit () {
         console.log('TODO: Make sure everything is saved before marking the survey complete and exiting')
         console.log('TODO: Lock and exit the survey')
         this.saveData()
@@ -284,25 +307,6 @@
           return interviewState.navigator.isAtEnd
         }
         return false
-      },
-      questions: function () {
-        // The reference to this.location needs to be here so that we have a dependency on this.location
-        let questions = interviewState.getPageQuestions(
-            this.location.section,
-            this.location.sectionRepetition,
-            this.location.sectionFollowUpDatumId,
-            this.location.page
-          ).map(q => {
-            q.type = {
-              name: q.questionType.name
-            }
-            let validation = validateParametersWithError(q, q.questionParameters, q.datum)
-            q.allParametersSatisfied = validation === true // Makes non-boolean types falsey
-            q.validationError = typeof validation === 'string' ? validation : null
-            q.isAnswered = false
-            return q
-          })
-        return questions || []
       },
       formIsEmpty () {
         return !(this.form && this.form.sections && this.form.sections.length)
