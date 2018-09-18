@@ -18,6 +18,18 @@ export default class GeoServiceWeb implements GeoServiceInterface {
     })
   }
 
+  async removeGeo (geoId) {
+    return http().delete(`/geo/${geoId}`)
+  }
+
+  async moveGeo (geoId, latitude, longitude, moveChildren) {
+    return http().post(`/geo/${geoId}/move`, {
+      latitude: latitude,
+      longitude: longitude,
+      moveChildren: moveChildren
+    })
+  }
+
   getGeoAncestors (geoId) {
     geoId = encodeURIComponent(geoId)
     return http().get(`/geo/${geoId}/ancestors`).then(res => {
