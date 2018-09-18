@@ -114,7 +114,6 @@ export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpt
     let generator
     let sourceKey = camelToSnake(targetKey)
     if (typeof opts === 'object') {
-      if (targetKey === 'interviews') debugger
       generator = opts.hasOwnProperty('constructor') ? s => {
         let constructor = opts.constructor()
         // @ts-ignore

@@ -156,7 +156,7 @@ export default function () {
 
     describe('Loading', () => {
       it('should sort all sections of the form correctly', async () => {
-        for (let id of [forms.firstQuestionSkipped, formId]) {
+        for (let id of [forms.firstPageSkipped, formId]) {
           const manager = await setupInterviewManager(id)
           manager.initialize()
           const sections = manager.blueprint.sections
@@ -221,7 +221,7 @@ export default function () {
     })
 
     describe('Navigation', () => {
-      it('should handle moving backward a forward correctly', async ()  => {
+      it('should handle moving backward and forward correctly', async ()  => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
         manager.initialize()
         expect(manager.location.page).to.equal(0, 'We should start on the first page')
@@ -235,7 +235,7 @@ export default function () {
 
     describe('Skips', () => {
       it('should handle skips on the first question correctly', async () => {
-        const manager = await setupInterviewManager(forms.firstQuestionSkipped)
+        const manager = await setupInterviewManager(forms.firstPageSkipped)
         const firstLocation = j(manager.location)
         manager.initialize()
         expect(manager.blueprint).to.be.an.instanceOf(Form)
@@ -245,11 +245,21 @@ export default function () {
         expect(firstLocation).to.not.deep.equal(manager.location, 'The first page should have been skipped')
       })
       it('should handle skips in repeated sections')
-      it('should handle skipping the last question')
+      it('should handle skipping the last question', async () => {
+        const manager = await setupInterviewManager(forms.lastPageSkipped)
+        manager.initialize()
+        validateLocation(manager.location, {section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+        selectChoice(manager, 'skip')
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 0, page: 1, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 0, page: 1, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+      })
+      it('should handle skipping the last question in a repeated section')
     })
 
     describe('Lifecycle', () => {
-      it('should handle correctly assign conditions after changing responses and navigating', async () => {
+      it('should handle correctly assigning conditions after changing responses and navigating', async () => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
         manager.initialize()
         let questions = getCurrentQuestions(manager)

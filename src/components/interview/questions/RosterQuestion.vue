@@ -198,7 +198,7 @@
         this.isSavingNew = true
         RosterService.createRosterRows([this.newText]).then(rows => {
           for (let row of rows) {
-            this.$set(this.rosterCache, row.id, row)
+            this.rosterCache[row.id] = row
             this.$nextTick(() => this.action(AT.add_roster_row, {
               roster_id: row.id,
               name: ''

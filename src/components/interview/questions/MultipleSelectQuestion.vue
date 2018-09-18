@@ -38,11 +38,21 @@
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
   export default {
-    props: ['question', 'location'],
+    props: {
+      question: {
+        type: Object,
+        required: true
+      },
+      location: {
+        type: Object,
+        required: true
+      }
+    },
     name: 'multiple-select-question',
     mixins: [QuestionDisabledMixin, ActionMixin],
     computed: {
       otherText () {
+        console.log('recalculating other text')
         return this.choices.reduce((agg, choice) => {
           if (choice.parameters && choice.parameters.other) {
             let datum = this.question.datum.data.find(datum => datum.choiceId === choice.id)
@@ -54,6 +64,7 @@
         }, {})
       },
       selected () {
+        console.log('recalculating selected')
         let selected = this.choices.reduce((agg, choice) => {
           agg[choice.id] = this.question.datum.data.findIndex(datum => datum.choiceId === choice.id) > -1
           return agg
@@ -61,6 +72,7 @@
         return selected
       },
       choices () {
+        console.log('recalculating choices')
         return this.question.choices.map(c => c.choice)
       }
     },
@@ -69,12 +81,14 @@
         if (val) {
           this.action(AT.select_choice, {
             choice_id: choice.id,
-            val: choice.val
+            val: choice.val,
+            name: choice.val
           })
         } else {
           this.action(AT.deselect_choice, {
             choice_id: choice.id,
-            val: choice.val
+            val: choice.val,
+            name: choice.val
           })
         }
       },
@@ -82,7 +96,8 @@
         console.log(choice, text)
         this.action(AT.other_choice_text, {
           choice_id: choice.id,
-          val: text
+          val: text,
+          name: text
         })
       },
       showOtherText (choice) {

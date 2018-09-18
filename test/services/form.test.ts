@@ -16,11 +16,13 @@ import Choice from '../../src/entities/trellis/Choice';
 import ConditionTag from "../../src/entities/trellis/ConditionTag";
 import Parameter from "../../src/entities/trellis/Parameter";
 import StudyForm from "../../src/entities/trellis/StudyForm";
-import {expectToHaveProperties} from "./helpers";
-import {formId, studyId} from "../testing-ids";
+import {deepCompareEntities, expectToHaveProperties, strip, timestamps} from "./helpers";
+import {formId, forms, studyId} from "../testing-ids";
 
 let cordovaService = new FormServiceCordova()
 let webService = new FormServiceWeb()
+
+const formIds = [forms.repeatedSections, forms.conditionAssignment, forms.rosterPrefill, formId] // TODO: forms.lastPageSkipped,
 
 function compareWhitelist (a: object|object[], b: object|object[], props, sortProp = 'id') {
   function strip (obj) {
@@ -84,64 +86,66 @@ export default function () {
           // TODO: Validate the forms
         })
         it(`${service.constructor.name}.getForm: should return a form`, async () => {
-          let form = await service.getForm(formId)
-          expect(form).to.be.an.instanceOf(Form)
-          expectToHaveProperties(form, ['id', 'version', 'isPublished', 'sections', 'nameTranslation'])
-          expect(form.sections, 'sections were empty or not defined').to.be.an('array').and.not.be.empty
-          expect(form.nameTranslation).to.be.an.instanceOf(Translation)
-          for (let section of form.sections) {
-            expect(section).to.be.an.instanceOf(Section)
-            expectToHaveProperties(section, [
-              'id',
-              'questionGroups',
-              'nameTranslation',
-              'formSections'
-            ])
-            expect(section.nameTranslation).to.be.an.instanceOf(Translation)
-            expect(section.questionGroups, 'Empty question groups').to.not.be.empty
-            expect(section.formSections, 'Empty form sections').to.not.be.empty
-            for (let group of section.questionGroups) {
-              expect(group).to.be.an.instanceOf(QuestionGroup)
-              expectToHaveProperties(group,[
+          for (let formId of formIds) {
+            let form = await service.getForm(formId)
+            expect(form).to.be.an.instanceOf(Form)
+            expectToHaveProperties(form, ['id', 'version', 'isPublished', 'sections', 'nameTranslation'])
+            expect(form.sections, 'sections were empty or not defined').to.be.an('array').and.not.be.empty
+            expect(form.nameTranslation).to.be.an.instanceOf(Translation)
+            for (let section of form.sections) {
+              expect(section).to.be.an.instanceOf(Section)
+              expectToHaveProperties(section, [
                 'id',
-                'questions',
-                'sectionQuestionGroup',
-                'skips'
+                'questionGroups',
+                'nameTranslation',
+                'formSections'
               ])
-              expect(group.questions, 'empty questions').to.not.be.empty
-              expect(group.sectionQuestionGroup).to.be.an.instanceOf(SectionQuestionGroup)
-              for (let question of group.questions) {
-                // TODO: Continue this
-                validateQuestion(question)
-              }
-              for (let skip of group.skips) {
-                expect(skip).to.be.an.instanceOf(Skip)
-                expectToHaveProperties(skip, [
-                  'showHide',
-                  'anyAll',
-                  'precedence',
-                  'conditionTags'
+              expect(section.nameTranslation).to.be.an.instanceOf(Translation)
+              expect(section.questionGroups, 'Empty question groups').to.not.be.empty
+              expect(section.formSections, 'Empty form sections').to.not.be.empty
+              for (let group of section.questionGroups) {
+                expect(group).to.be.an.instanceOf(QuestionGroup)
+                expectToHaveProperties(group, [
+                  'id',
+                  'questions',
+                  'sectionQuestionGroup',
+                  'skips'
                 ])
-                expect(skip.conditionTags).to.not.be.empty
-                for (let cTag of skip.conditionTags) {
-                  expect(cTag).to.be.an.instanceOf(SkipConditionTag)
-                  expectToHaveProperties(cTag, [
-                    'skipId',
-                    'conditionTagName'
+                expect(group.questions, 'empty questions').to.not.be.empty
+                expect(group.sectionQuestionGroup).to.be.an.instanceOf(SectionQuestionGroup)
+                for (let question of group.questions) {
+                  // TODO: Continue this
+                  validateQuestion(question)
+                }
+                for (let skip of group.skips) {
+                  expect(skip).to.be.an.instanceOf(Skip)
+                  expectToHaveProperties(skip, [
+                    'showHide',
+                    'anyAll',
+                    'precedence',
+                    'conditionTags'
                   ])
+                  expect(skip.conditionTags).to.not.be.empty
+                  for (let cTag of skip.conditionTags) {
+                    expect(cTag).to.be.an.instanceOf(SkipConditionTag)
+                    expectToHaveProperties(cTag, [
+                      'skipId',
+                      'conditionTagName'
+                    ])
+                  }
                 }
               }
-            }
-            for (let formSection of section.formSections) {
-              expect(formSection).to.be.an.instanceOf(FormSection)
-              expectToHaveProperties(formSection, [
-                'id',
-                'sortOrder',
-                'isRepeatable',
-                'maxRepetitions',
-                'repeatPromptTranslationId',
-                'followUpQuestionId'
-              ])
+              for (let formSection of section.formSections) {
+                expect(formSection).to.be.an.instanceOf(FormSection)
+                expectToHaveProperties(formSection, [
+                  'id',
+                  'sortOrder',
+                  'isRepeatable',
+                  'maxRepetitions',
+                  'repeatPromptTranslationId',
+                  'followUpQuestionId'
+                ])
+              }
             }
           }
         })
@@ -149,15 +153,22 @@ export default function () {
     })
     describe('COMPARE', () => {
       // TODO: Compare these correctly
-      it('getForm: should return identical versions of the form', function () {
-        return Promise.all(services.map(s => s.getForm(formId))).then(res => {
-          res.forEach(form => {
-            expect(form).to.not.be.undefined
+      for (let formId of formIds) {
+        it(`getForm(${formId}): should return identical versions of the form`, () => {
+          return Promise.all(services.map(s => s.getForm(formId))).then(res => {
+            res.forEach(form => {
+              expect(form).to.not.be.undefined
+            })
+            deepCompareEntities(res[0], res[1], {
+              Form: f => strip(f, ['skips']),
+              SectionQuestionGroup: g => strip(g, ['id', 'sectionId', 'formId', 'questionGroupId']),
+              Question: q => strip(q, ['questionTranslationId', 'questionGroupId']),
+              AssignConditionTag: a => strip(a, ['conditionTagId'])
+            })
           })
-          compareWhitelist(res[0], res[1], ['id', 'sections', 'nameTranslation'])
         })
-      })
-      it('geStudyForms: should return the same forms', () => {
+      }
+      it('getStudyForms: should return the same forms', () => {
         return Promise.all(services.map(s => s.getStudyForms(studyId))).then(res => {
           res.forEach(forms => {
             expect(forms.length).to.be.greaterThan(0, 'No forms were returned for this study')
@@ -165,6 +176,7 @@ export default function () {
           expect(res[0].length).to.equal(res[1].length, `The same number of forms weren't returned for both`)
           expect(res[0][0]).to.be.an.instanceOf(StudyForm)
           compareWhitelist(res[0], res[1], ['id', 'form', 'censusTypeId', 'sortOrder', 'formMasterId'])
+          deepCompareEntities(res[0], res[1])
           // expect(JSON.parse(JSON.stringify(res[0]))).to.deep.include(JSON.parse(JSON.stringify(res[1])), `The forms weren't all the same`)
         })
       })
