@@ -15,7 +15,10 @@ import RespondentFill from '../../../entities/trellis/RespondentFill'
 import Interview from '../../../entities/trellis/Interview'
 import InterviewManagerBase from "./InterviewManagerBase";
 import ImmutableQueue from "../../../classes/ImmutableQueue";
-
+import Question from "../../../entities/trellis/Question";
+import QT from '../../../static/question.types'
+import PT from '../../../static/parameter.types'
+import {locToNumber} from "../services/LocationHelpers";
 
 export default class InterviewManager extends InterviewManagerBase {
 
@@ -64,7 +67,8 @@ export default class InterviewManager extends InterviewManagerBase {
     this.data.reset()
     this.initializeConditionAssignment()
     this.onFirstPage()
-    debugger
+    this.playAllActions()
+    this.seekToInitialLocation()
   }
 
   /**
@@ -112,28 +116,6 @@ export default class InterviewManager extends InterviewManagerBase {
   _resetState () {
     this.data.reset()
     this.makePageQuestionDatum(this.location.section, this.location.page)
-  }
-
-  /**
-   * Play an array of actions
-   * @param {Action[]} actions - The array of actions to play
-   */
-  playActions (actions: Action[]) {
-    for (let action of actions) {
-      if (action.actionType !== 'next' && action.actionType !== 'previous') {
-        let matches = this.actions.matchesLocation(action, this.location)
-        if (matches) {
-          this.performAction(action)
-        } else {
-          this.next()
-          if (this.actions.matchesLocation(action, this.location)) {
-            this.performAction(action)
-          } else {
-            console.warn('action order does not line up with order of the form')
-          }
-        }
-      }
-    }
   }
 
   /**
@@ -271,30 +253,53 @@ export default class InterviewManager extends InterviewManagerBase {
     this.replayTo(this.location.section, this.location.page, this.location.sectionRepetition, this.location.sectionFollowUpRepetition)
   }
 
-  locToNumber (loc: InterviewLocation): number {
-    return Math.pow(100, 4) * (loc.section || 0) + Math.pow(100, 3) * (loc.sectionRepetition || 0) + Math.pow(100, 2) * (loc.sectionFollowUpRepetition || 0) + (loc.page || 0)
-  }
-
-  actionToLocationNumber (action: Action): number {
-    return this.locToNumber({
-      section: this.questionIdToSectionNum.get(action.questionId),
-      sectionRepetition: action.sectionRepetition,
-      sectionFollowUpRepetition: action.sectionFollowUpRepetition,
-      page: this.questionIdToPageNum.get(action.questionId)
-    })
+  /**
+   * Returns true if the current location has all of the required responses
+   * @returns {boolean}
+   */
+  currentLocationHasValidResponses (): boolean {
+    const questions = this.getCurrentPageQuestions()
+    function toBoolean (val: string|boolean|number): boolean {
+      if (typeof val === 'boolean') {
+        return val
+      } else if (typeof val === 'number') {
+        return !!val
+      } else {
+        return val === '1' || val === 'true'
+      }
+    }
+    function isValid (question: Question): boolean {
+      let isIntro = question.questionTypeId === QT.intro
+      let isReadOnly = false
+      let isRequired = true
+      for (let parameter of question.questionParameters) {
+        if (parameter.parameterId === PT.read_only.toString(10) && toBoolean(parameter.val)) {
+          isReadOnly = true
+        } else if (parameter.parameterId === PT.is_required.toString(10) && !toBoolean(parameter.val)) {
+          isRequired = false
+        }
+      }
+      if (isIntro) {
+        return true
+      } else if (isReadOnly) {
+        return true
+      } else if (isRequired) {
+        // TODO: Maybe actually validate responses???
+        return question.datum.data.length > 0
+      }
+    }
+    for (let question of questions) {
+      if (!isValid(question)) {
+        return false
+      }
+    }
+    return true
   }
 
   /**
-   * Zero the state of the survey and replay all of the actions that have happened in the survey so far. The order of the
-   * action replay follows the order of the survey as opposed to the order that the actions happened in. Once all actions
-   * have been replayed we seek to the specified location in the survey
-   * @param section
-   * @param page
-   * @param sectionRepetition
-   * @param sectionFollowUpRepetition
+   * Rebuild the state of the survey by zeroing the location and resetting the data before replaying all actions
    */
-  replayTo (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
-    this._isReplaying = true
+  playAllActions () {
     // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
     // TODO: Check that state is reset correctly
@@ -304,28 +309,25 @@ export default class InterviewManager extends InterviewManagerBase {
     let action = actionQueue.next()
     const nextActionCount = this.actions.actions.reduce((c, a) => a.actionType === AT.next ? c + 1 : c, 0)
     let numPagesReplayed = 0
-    function currentLocationHasValidResponses (): boolean {
-      // TODO
-      return true
-    }
+
     while (action) {
       // console.log('action', action)
       // Check if we have a valid question id and skip it the action if we don't
       if (!this.questionIndex.has(action.questionId)) continue
 
-      let actionLocation = this.actionToLocationNumber(action)
-      let currentLocation = this.locToNumber(this.location)
+      let actionLocation = locToNumber(this.actions.actionToLocation(action))
+      let currentLocation = locToNumber(this.location)
       if (actionLocation === currentLocation) {
         this.performAction(action)
       } else {
-        actionLocation = this.actionToLocationNumber(action)
-        let currentLocation = this.locToNumber(this.location)
+        actionLocation = locToNumber(this.actions.actionToLocation(action))
+        let currentLocation = locToNumber(this.location)
         let c = 0
         // TODO: Double check for invalid action location???
-        while (currentLocation < actionLocation && currentLocationHasValidResponses() && c < 100) {
+        while (currentLocation < actionLocation && this.currentLocationHasValidResponses() && c < 100) {
           this.stepForward()
           numPagesReplayed++
-          currentLocation = this.locToNumber(this.location)
+          currentLocation = locToNumber(this.location)
           if (actionLocation === currentLocation) {
             try {
               this.performAction(action)
@@ -346,34 +348,35 @@ export default class InterviewManager extends InterviewManagerBase {
     if (nextActionCount > numPagesReplayed) {
       this.stepForward()
     }
-    let currentLocNumber = this.locToNumber(this.location)
-    const desiredLocNumber = this.locToNumber({section, sectionRepetition, sectionFollowUpRepetition, page})
-    if (desiredLocNumber === currentLocNumber) {
-      // Do nothing here if we're already there
-    } else if (desiredLocNumber > currentLocNumber) {
-      // Iterate forward through optional and readOnly pages until we hit the page we want to reach
-      let c = 0
-      do {
-        this.stepForward()
-        currentLocNumber = this.locToNumber(this.location)
-        c++
-      } while(desiredLocNumber > currentLocNumber && currentLocationHasValidResponses() && c < 100)
-      if (c > 10) {
-        console.log(`moved forward ${c} steps`)
-        debugger
-      }
-      // this.seekTo(section, sectionRepetition, sectionFollowUpRepetition, page)
-      console.log('post seek', JSON.parse(JSON.stringify(this.data.data)))
-    } else {
-      let c = 0
-      do {
-        this.stepBackward()
-        currentLocNumber = this.locToNumber(this.location)
-        c++
-      } while (desiredLocNumber < currentLocNumber && currentLocationHasValidResponses() && c < 100)
-      // this.navigator.setLocationNumber(section, sectionRepetition, sectionFollowUpRepetition, page)
-    }
+  }
+
+  /**
+   * Zero the state of the survey and replay all of the actions that have happened in the survey so far. The order of the
+   * action replay follows the order of the survey as opposed to the order that the actions happened in. Once all actions
+   * have been replayed we seek to the specified location in the survey
+   * @param section
+   * @param page
+   * @param sectionRepetition
+   * @param sectionFollowUpRepetition
+   */
+  replayTo (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
+    this._isReplaying = true
+    this.playAllActions()
+    this.seekTo(section, sectionRepetition, sectionFollowUpRepetition, page)
     this._isReplaying = false
+  }
+
+  /**
+   * Seek through the survey to the last recorded action
+   */
+  seekToInitialLocation (): void {
+    const lastRealAction = this.actions.lastRealAction
+    if (lastRealAction) {
+      const lastLocation = this.actions.actionToLocation(lastRealAction)
+      this.seekTo(lastLocation.section, lastLocation.sectionRepetition, lastLocation.sectionFollowUpRepetition, lastLocation.page)
+    } else {
+      this.seekTo(0, 0, 0, 0)
+    }
   }
 
   /**
@@ -384,49 +387,44 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param {number} page
    */
   seekTo (section: number, sectionRepetition: number, sectionFollowUpRepetition: number, page: number) {
-    let count = 1
-    let DIRS = {FORWARD: 0, BACKWARD: 1}
-    // Cast the current location and desired location into a 4 digit number with this structure {section}{sectionRepetition}{sectionFollowUpRepetition}{page}
-    let desiredLocNumber = this.locToNumber({section, sectionRepetition, sectionFollowUpRepetition, page})
-    let curLocNumber
-    let previousDirection
-    let currentDirection
-    do {
-      curLocNumber = this.locToNumber(this.location)
-      if (curLocNumber < desiredLocNumber) {
-        currentDirection = DIRS.FORWARD
-      } else if (curLocNumber > desiredLocNumber) {
-        currentDirection = DIRS.BACKWARD
-      } else {
-        console.log(`The desired survey location has been reached already`)
-        return
+    let currentLocNumber = locToNumber(this.location)
+    let desiredLocNumber = locToNumber({section, sectionRepetition, sectionFollowUpRepetition, page})
+    if (desiredLocNumber === currentLocNumber) {
+      // Check if we're at a skipped location. Pretty much just for the first location
+      let c = 0
+      while (this.shouldSkipPage(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page) && !this.navigator.isAtEnd && c < 10) {
+        this.stepForward()
+        c++
       }
-
-      // Detect if we're switching directions. This should never happen, but we should leave the loop if it does
-      if (previousDirection !== undefined && previousDirection !== null && currentDirection !== previousDirection) {
-        console.error(`We are switching directions during the seek. Unreachable seek location detected: 
-          section: ${section}, page: ${page}, sectionRepetition: ${sectionRepetition}, sectionFollowUpRepetition: ${sectionFollowUpRepetition}`)
-        return
+      if (c >= 10) {
+        console.log(`We skipped ${c} pages`)
+        debugger
       }
-      previousDirection = currentDirection
-
-      // Actually move in the specified direction
-      switch (currentDirection) {
-        case DIRS.FORWARD:
-          this.stepForward()
-          break
-        case DIRS.BACKWARD:
-          this.stepBackward()
-          break
-        default:
-          return
+    } else if (desiredLocNumber > currentLocNumber) {
+      // Iterate forward through optional and readOnly pages until we hit the page we want to reach
+      let c = 0
+      do {
+        this.stepForward()
+        currentLocNumber = locToNumber(this.location)
+        c++
+      } while(desiredLocNumber > currentLocNumber && this.currentLocationHasValidResponses() && c < 100)
+      if (c > 10) {
+        console.log(`moved forward ${c} steps`)
+        debugger
       }
-
-      if (count > 1000) {
-        throw Error('Infinite loop when trying to seek to survey location. Please check exit conditions')
+    } else {
+      let c = 0
+      do {
+        this.stepBackward()
+        currentLocNumber = locToNumber(this.location)
+        c++
+      } while (desiredLocNumber < currentLocNumber && this.currentLocationHasValidResponses() && c < 100)
+      if (c > 10) {
+        console.log(`moved backward ${c} steps`)
+        debugger
       }
-      count++
-    } while (curLocNumber !== desiredLocNumber)
+    }
+    console.log('post seek', JSON.parse(JSON.stringify(this.data.data)))
   }
 
   /**

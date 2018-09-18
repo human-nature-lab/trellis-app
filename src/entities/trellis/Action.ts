@@ -37,6 +37,8 @@ export default class Action extends BaseEntity implements SnakeSerializable {
   sectionFollowUpRepetition: number
   @Column({ type: 'integer' }) @Serializable
   sectionRepetition: number
+  @Column() @Serializable
+  preloadActionId: string
 
   toSnakeJSON () {
     let d = super.toSnakeJSON()
