@@ -4,6 +4,8 @@ import {now, parseDate} from '../../../services/DateService'
 import Action from '../../../entities/trellis/Action'
 import Form from '../../../entities/trellis/Form'
 import {InterviewLocation} from '../services/InterviewNavigator'
+import AT from '../../../static/action.types'
+import {locToNumber} from "../services/LocationHelpers";
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -12,6 +14,8 @@ import {InterviewLocation} from '../services/InterviewNavigator'
  */
 export default class ActionStore extends Emitter {
   public store: any[]
+  public lastRealAction: Action|null = null
+  private lastRealActionLocNum: number = -1
   private sortedStore: SortedArray<Action>
   private questionIndex: Map<string, Action[]> = new Map()
   private questionToPageIndex: Map<string, number>
@@ -109,23 +113,27 @@ export default class ActionStore extends Emitter {
   insertIntoStore (action: Action) {
     this.store.push(action)
     this.sortedStore.insertSorted(action)
+    if (action.preloadActionId === null && action.actionType !== AT.next && action.actionType !== AT.previous && action.questionId !== null) {
+      const actionLocNum = locToNumber(this.actionToLocation(action))
+      if (!this.lastRealAction || (this.lastRealAction && actionLocNum > this.lastRealActionLocNum)) {
+        this.lastRealAction = action
+        this.lastRealActionLocNum = actionLocNum
+      }
+    }
   }
 
   /**
-   * Convert an action into a sortable number based on the section, repetitions and pages. This conversion should work
-   * as long as there are fewer than 100 sections, less than 100 repetitions per sections, less than 100 follow up
-   * repetitions and less than 100 questions per page.
-   * @param {Action} a
-   * @returns {Number}
+   * Convert an action into a valid InterviewLocation
+   * @param {Action} action
+   * @returns {InterviewLocation}
    */
-  actionToNum (a: Action) {
-    // TODO: this has quite a few limitations, but it needs to be something that's comparable using > and < which is tough
-    // with a string representation of a number since reliable behaviour of string comparison depends on the strings being
-    // the same length.
-    const millisSortVal = +a.createdAt
-    const section = this.questionToSectionIndex.get(a.questionId)
-    const page = this.questionToPageIndex.get(a.questionId)
-    return section * 1000000 + a.sectionRepetition * 10000 + a.sectionFollowUpRepetition * 100 + page + millisSortVal / 10000000000000
+  actionToLocation (action: Action): InterviewLocation {
+    return {
+      section: this.questionToSectionIndex.get(action.questionId),
+      page: this.questionToPageIndex.get(action.questionId),
+      sectionRepetition: action.sectionRepetition,
+      sectionFollowUpRepetition: action.sectionFollowUpRepetition
+    }
   }
 
   /**
