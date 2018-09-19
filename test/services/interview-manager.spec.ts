@@ -195,6 +195,7 @@ export default function () {
         manager.initialize()
       })
       it('should handle prefill actions for the first question', () => {
+        debugger
         validateLocation(manager.location, {section: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0, page: 0})
         testRosters(manager, firstPageRosterIds)
         simpleActionPush(manager, AT.next)
