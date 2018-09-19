@@ -246,7 +246,7 @@
           for (let geo of results) {
             this.geoCache_[geo.id] = geo
           }
-          this.$emit('returned-geo-results', results)
+          this.$emit('returned-geo-results', results, this.userFilters.parent)
         }).catch(err => {
           console.error(err)
           this.error = `Unable to retrieve geos for the current filters`
