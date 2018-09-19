@@ -6,7 +6,7 @@ import Translation from './Translation'
 
 @Entity()
 export default class TranslationText extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column({ select: false }) @Serializable
   translationId: string

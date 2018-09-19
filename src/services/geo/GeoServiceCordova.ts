@@ -1,9 +1,10 @@
 import DatabaseService from '../database/DatabaseService'
-import GeoServiceInterface from './GeoServiceInterface'
+import GeoServiceAbstract from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import {In, IsNull} from 'typeorm'
+import GeoType from '../../entities/trellis/GeoType'
 
-export default class GeoServiceCordova implements GeoServiceInterface {
+export default class GeoServiceCordova extends GeoServiceAbstract {
 
   async getGeoById (geoId) {
     const repository = await DatabaseService.getRepository(Geo)
@@ -14,6 +15,16 @@ export default class GeoServiceCordova implements GeoServiceInterface {
       },
       relations: ['geoType', 'photos', 'nameTranslation']
     })
+  }
+
+  async createGeo (geo: Geo): Promise<Geo> {
+    // TODO
+    throw new Error('Unimplemented!')
+  }
+
+  async getGeoTypesByStudy (studyId: string, getUserAddable: boolean): Promise<GeoType[]> {
+    // TODO
+    throw new Error('Unimplemented!')
   }
 
   async getGeosById (geoIds) {
