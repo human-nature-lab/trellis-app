@@ -5,6 +5,7 @@ import BaseEntity from '../base/BaseEntity'
 import {ActionPayload} from "../../components/interview/services/actions/DatumOperations";
 import {ValueTransformer} from "typeorm/decorator/options/ValueTransformer";
 import {Moment} from "moment";
+import MomentTransformer from "../base/MomentTransformer";
 
 export class PayloadTransformer implements ValueTransformer {
   to (actionPayload: ActionPayload) {
@@ -19,9 +20,9 @@ export class PayloadTransformer implements ValueTransformer {
 export default class Action extends BaseEntity implements SnakeSerializable {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ type: 'datetime' }) @Serializable @AsDate
+  @Column({ type: 'datetime', transformer: MomentTransformer}) @Serializable @AsDate
   createdAt: Moment
-  @Column({ type: 'datetime' }) @Serializable @AsDate
+  @Column({ type: 'datetime', transformer: MomentTransformer}) @Serializable @AsDate
   deletedAt: Moment
   // @Column() @Serializable
   // surveyId: string

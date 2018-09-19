@@ -284,8 +284,13 @@ export default class InterviewManager extends InterviewManagerBase {
       } else if (isReadOnly) {
         return true
       } else if (isRequired) {
-        // TODO: Maybe actually validate responses???
-        return question.datum.data.length > 0
+        // TODO: Check if dkRf are allowed
+        if (question.datum.dkRf && question.datum.dkRfVal && question.datum.dkRfVal.length) {
+          return true
+        } else {
+          // TODO: Maybe actually validate responses as well???
+          return question.datum.data.length > 0
+        }
       }
     }
     for (let question of questions) {

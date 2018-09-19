@@ -1,4 +1,4 @@
-import Interview from '../components/interview/Interview'
+// import Interview from '../components/interview/Interview'
 import RespondentForms from '../components/respondent/RespondentForms'
 import RespondentsSearch from '../components/respondent/RespondentsSearch'
 import RespondentInfo from '../components/respondent/RespondentInfo'
@@ -13,6 +13,9 @@ import ValidateLocale from './guards/ValidateLocale'
 import ValidateCensusForm from './guards/ValidateCensusForm'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
 import WebLogin from '../components/login/WebLogin'
+
+const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
+const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../components/ServiceTesting')
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
@@ -69,5 +72,5 @@ export default [{
 }, {
   path: '/test/services',
   name: 'ServiceTesting',
-  component: () => import(/* webpackChunkName: "service-testing" */'../components/ServiceTesting')
+  component: ServiceTesting
 }]

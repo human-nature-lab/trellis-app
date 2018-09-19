@@ -10,8 +10,6 @@ export default class BaseEntity implements SnakeSerializable {
   /**
    * Just parse all of the dates defined in the model's __dates__ array
    */
-  @AfterLoad()
-  @AfterInsert()
   protected parseDates () {
     for (let key of getColumnMeta(this).dates) {
       if (key in this && this[key]) {
