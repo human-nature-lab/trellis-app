@@ -67,8 +67,8 @@
     data: function () {
       return {
         errorMessage: undefined,
-        username: 'admin',
-        password: '***REMOVED***',
+        username: '',
+        password: '',
         e1: true,
         error: null,
         valid: false,
