@@ -5,6 +5,16 @@ import SnakeSerializable from '../interfaces/SnakeSerializable'
 import ConditionTag from './ConditionTag'
 import {now} from '../../services/DateService'
 
+export interface SectionConditionTagRecylerData {
+  id: string
+  sectionId: string
+  conditionId: string
+  repetition: number
+  followUpDatumId: string
+  interviewId: string
+  surveyId: string
+}
+
 @Entity()
 export default class SectionConditionTag extends TimestampedSoftDelete implements SnakeSerializable{
   @PrimaryGeneratedColumn() @Serializable
@@ -32,14 +42,13 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
   @JoinColumn({ name: 'condition_id' })
   conditionTag: ConditionTag
 
-  fromRecycler (id: string, sectionId: string, conditionId: string, repetition: number, followUpDatumId: string, interviewId: string, surveyId: string) {
-    this.id = id
-    this.sectionId = sectionId
-    this.conditionId = conditionId
-    this.repetition = repetition
-    this.followUpDatumId = followUpDatumId
-    // this.interviewId = interviewId
-    this.surveyId = surveyId
+  fromRecycler (data: SectionConditionTagRecylerData) {
+    for (let key in data) {
+      if (data[key] !== undefined) {
+        this[key] = data[key]
+      }
+    }
+    this.deletedAt = null
     this.createdAt = now()
     this.updatedAt = now()
     return this

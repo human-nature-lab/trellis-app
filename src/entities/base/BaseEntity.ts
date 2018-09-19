@@ -3,14 +3,13 @@ import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {getColumnMeta} from '../decorators/WebOrmDecorators'
 import {deepCopy} from '../../services/JSONUtil'
 import {AfterLoad, AfterInsert} from 'typeorm'
+import moment from "moment";
 
 export default class BaseEntity implements SnakeSerializable {
 
   /**
    * Just parse all of the dates defined in the model's __dates__ array
    */
-  @AfterLoad()
-  @AfterInsert()
   protected parseDates () {
     for (let key of getColumnMeta(this).dates) {
       if (key in this && this[key]) {
@@ -83,8 +82,8 @@ export default class BaseEntity implements SnakeSerializable {
    * Map all camel case column names to the equivalent snake case name and return a plain object
    */
   toSnakeJSON (): object {
-    let colMeta = getColumnMeta(this)
-    let r = {}
+    const colMeta = getColumnMeta(this)
+    const r = {}
     for (let i = 0; i < colMeta.names.length; i++) {
       r[colMeta.snake[i]] = this[colMeta.names[i]]
     }
@@ -97,5 +96,26 @@ export default class BaseEntity implements SnakeSerializable {
   copy () {
     return deepCopy(this)
   }
+  // copy () {
+  //   const colMeta = getColumnMeta(this)
+  //   // @ts-ignore
+  //   const clone = new this.constructor()
+  //   for (let key of colMeta.names) {
+  //     if (this.hasOwnProperty(key)) {
+  //       if (Array.isArray(this[key])) {
+  //         clone[key] = this[key].map(o => o.copy())
+  //       } else if (moment.isMoment(this[key]) || moment.isDate(this[key])) {
+  //         clone[key] = moment(this[key])
+  //       } else if (typeof this[key] === 'object') {
+  //         if ('copy' in this[key]) {
+  //           clone[key] = this[key].copy()
+  //         } else {
+  //           clone[key] = deepCopy(this[key])
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return clone
+  // }
 
 }

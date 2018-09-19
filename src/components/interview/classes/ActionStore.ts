@@ -4,6 +4,8 @@ import {now, parseDate} from '../../../services/DateService'
 import Action from '../../../entities/trellis/Action'
 import Form from '../../../entities/trellis/Form'
 import {InterviewLocation} from '../services/InterviewNavigator'
+import AT from '../../../static/action.types'
+import {locToNumber} from "../services/LocationHelpers";
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -12,6 +14,8 @@ import {InterviewLocation} from '../services/InterviewNavigator'
  */
 export default class ActionStore extends Emitter {
   public store: any[]
+  public lastRealAction: Action|null = null
+  private lastRealActionLocNum: number = -1
   private sortedStore: SortedArray<Action>
   private questionIndex: Map<string, Action[]> = new Map()
   private questionToPageIndex: Map<string, number>
@@ -58,15 +62,16 @@ export default class ActionStore extends Emitter {
   /**
    * Emit the initial state to any subscribers
    */
-  initialize () {
+  initialize (): void {
     this.emit('initialState', this.store)
   }
 
   /**
    * Create indexes for both the form pages and sections. Improves sort performance.
-   * @param {Object} blueprint - A sorted blueprint
+   * @param {Form} blueprint
+   * @private
    */
-  _createPageAndSectionIndexes (blueprint: Form) {
+  _createPageAndSectionIndexes (blueprint: Form): void {
     this.questionToPageIndex = new Map()
     this.questionToSectionIndex = new Map()
     for (let s = 0; s < blueprint.sections.length; s++) {
@@ -83,8 +88,8 @@ export default class ActionStore extends Emitter {
 
   /**
    * Return the section number of an action
-   * @param {Object} action
-   * @returns {Number}
+   * @param {Action} action
+   * @returns {any}
    */
   getActionSection (action: Action) {
     if (!action.questionId) return -1
@@ -103,35 +108,39 @@ export default class ActionStore extends Emitter {
 
   /**
    * Insert an action while maintaining the actions in a sorted state based on the order of the survey
-   * @param {Object} action
+   * @param {Action} action
    */
   insertIntoStore (action: Action) {
     this.store.push(action)
     this.sortedStore.insertSorted(action)
+    if (action.preloadActionId === null && action.actionType !== AT.next && action.actionType !== AT.previous && action.questionId !== null) {
+      const actionLocNum = locToNumber(this.actionToLocation(action))
+      if (!this.lastRealAction || (this.lastRealAction && actionLocNum > this.lastRealActionLocNum)) {
+        this.lastRealAction = action
+        this.lastRealActionLocNum = actionLocNum
+      }
+    }
   }
 
   /**
-   * Convert an action into a sortable number based on the section, repetitions and pages. This conversion should work
-   * as long as there are fewer than 100 sections, less than 100 repetitions per sections, less than 100 follow up
-   * repetitions and less than 100 questions per page.
-   * @param {Object} action
-   * @returns {Number}
+   * Convert an action into a valid InterviewLocation
+   * @param {Action} action
+   * @returns {InterviewLocation}
    */
-  actionToNum (a: Action) {
-    // TODO: this has quite a few limitations, but it needs to be something that's comparable using > and < which is tough
-    // with a string representation of a number since reliable behaviour of string comparison depends on the strings being
-    // the same length.
-    const millisSortVal = +a.createdAt
-    const section = this.questionToSectionIndex.get(a.questionId)
-    const page = this.questionToPageIndex.get(a.questionId)
-    return section * 1000000 + a.sectionRepetition * 10000 + a.sectionFollowUpRepetition * 100 + page + millisSortVal / 10000000000000
+  actionToLocation (action: Action): InterviewLocation {
+    return {
+      section: this.questionToSectionIndex.get(action.questionId),
+      page: this.questionToPageIndex.get(action.questionId),
+      sectionRepetition: action.sectionRepetition,
+      sectionFollowUpRepetition: action.sectionFollowUpRepetition
+    }
   }
 
   /**
    * Getter for the actions. Defaults to the ordered store
-   * @returns {Array|*}
+   * @returns {Action[]}
    */
-  get actions () {
+  public get actions (): Action[] {
     return this.sortedStore
   }
 
@@ -142,7 +151,7 @@ export default class ActionStore extends Emitter {
    * @param sectionFollowUpRepetition
    * @returns {Array}
    */
-  getQuestionActions (questionIds: string[], sectionRepetition: number, sectionFollowUpRepetition: number) {
+  getQuestionActions (questionIds: string[], sectionRepetition: number, sectionFollowUpRepetition: number): Action[] {
     let actions = []
     for (let id of questionIds) {
       if (this.questionIndex.has(id)) {
@@ -160,7 +169,7 @@ export default class ActionStore extends Emitter {
    * Load the actions into the store without triggering the persist method
    * @param {array} actions
    */
-  load (actions: Action[]) {
+  load (actions: Action[]): void {
     for (let action of actions) {
       if (action.payload && typeof action.payload === 'string') {
         action.payload = JSON.parse(action.payload)
@@ -171,21 +180,22 @@ export default class ActionStore extends Emitter {
 
   /**
    * Add an action to the store. This will trigger the throttled persist method
-   * @param action
+   * @param {Action} action
+   * @param {InterviewLocation} location
    */
-  add (action: Action, location: InterviewLocation) {
+  add (action: Action, location: InterviewLocation): void {
     action.sectionRepetition = location.sectionRepetition
     action.sectionFollowUpRepetition = location.sectionFollowUpRepetition
-    action.createdAt = now()
+    action.createdAt = action.createdAt || now()
     this.insertIntoStore(action)
     this.emit('change', this.store)
   }
 
   /**
    * Save the action in the store and update any indexes
-   * @param action
+   * @param {Action} action
    */
-  save (action: Action) {
+  save (action: Action): void {
     this.store.push(action)
     if (action.questionId) {
       let questionActions = this.questionIndex.get(action.questionId)
@@ -198,9 +208,24 @@ export default class ActionStore extends Emitter {
   }
 
   /**
-   * Get all actions for a page
+   * Returns true if an action matches a location
+   * @param {Action} action
+   * @param {InterviewLocation} location
+   * @returns {boolean}
    */
-  getLocationActions (location: InterviewLocation) {
+  matchesLocation (action: Action, location: InterviewLocation): boolean {
+    return this.getActionSection(action) === location.section &&
+      this.getActionPage(action) === location.page &&
+      action.sectionRepetition === location.sectionRepetition &&
+      action.sectionFollowUpRepetition === location.sectionFollowUpRepetition
+  }
+
+  /**
+   * Get all actions for a page
+   * @param {InterviewLocation} location
+   * @returns {Action[]}
+   */
+  getLocationActions (location: InterviewLocation): Action[] {
     // TODO: Should handle sectionRepetition and sectionFollowUpRepetition too
     return this.store.filter(action => action.section === location.section && action.page === location.page)
   }

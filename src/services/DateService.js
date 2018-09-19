@@ -15,6 +15,19 @@ export function now () {
 }
 
 /**
+ * Returns a copy of a date with formatting preserved
+ * @param date
+ * @returns {*}
+ */
+export function copyDate (date) {
+  let newDate = moment(date)
+  newDate.toJSON = function () {
+    return dateFormat(this)
+  }
+  return newDate
+}
+
+/**
  * Returns the current datetime as a formatted string
  * @returns {string}
  */
@@ -28,7 +41,11 @@ export function nowStr () {
  * @returns {string} - The serialized datte
  */
 export function dateFormat (date) {
-  return moment(date).format(DATE_FORMAT)
+  if (!moment.isMoment(date)) {
+    return moment(date).format(DATE_FORMAT)
+  } else {
+    return date.format(DATE_FORMAT)
+  }
 }
 
 /**

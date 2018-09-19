@@ -30,15 +30,8 @@ export default class Survey extends TimestampedSoftDelete {
   @ManyToOne(type => Respondent, respondent => respondent.surveys)
   respondent: Respondent
 
-  // @Relationship(type => Interview)
+  @Relationship(type => Interview)
   @OneToMany(type => Interview, interview => interview.survey)
   interviews?: Interview[]
-
-  fromSnakeJSON (json) {
-    mapFromSnakeJSON(this, json, {
-      interviews: Interview
-    })
-    return super.fromSnakeJSON(json)
-  }
 
 }

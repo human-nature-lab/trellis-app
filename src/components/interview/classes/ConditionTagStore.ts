@@ -1,4 +1,9 @@
+import ConditionTag from "../../../entities/trellis/ConditionTag";
+
 export class ConditionTagStore {
+  private data: ConditionTag[]
+  private idToNameMap: Map<string, string>
+
   constructor () {
     this.data = []
     this.idToNameMap = new Map()
@@ -6,17 +11,17 @@ export class ConditionTagStore {
 
   /**
    * Add a single tag
-   * @param {Object} tag - Object repesentation of tag
+   * @param {ConditionTag} tag
    */
-  add (tag) {
+  add (tag: ConditionTag) {
     this.idToNameMap.set(tag.id, tag.name)
     this.data.push(tag)
   }
 
   /**
    * Return the name of the condition tag based on the name
-   * @param {String} id
-   * @returns {String | null}
+   * @param id
+   * @returns {any}
    */
   getNameFromId (id) {
     return this.idToNameMap.get(id)

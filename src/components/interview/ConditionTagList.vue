@@ -50,7 +50,7 @@
         for (let type of ['survey', 'respondent', 'section']) {
           for (let condition of this.conditions[type]) {
             let c = JSON.parse(JSON.stringify(condition))
-            c.name = conditionTagStore.getNameFromId(c.condition_id)
+            c.name = conditionTagStore.getNameFromId(c.conditionId)
             c.type = type
             conditions.push(c)
           }

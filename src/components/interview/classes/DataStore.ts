@@ -10,17 +10,18 @@ import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 import SectionConditionTag from '../../../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../../../entities/trellis/SurveyConditionTag'
+import {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
 
 export default class DataStore extends Emitter {
-  baseRespondentConditionTags: any[] = []
-  data: QuestionDatum[] = []
-  conditionTags: {
-    respondent: RespondentConditionTag[]
-    section: SectionConditionTag[]
-    survey: SurveyConditionTag[]
+  private baseRespondentConditionTags: any[] = []
+  public data: QuestionDatum[] = []
+  public conditionTags: ConditionTagInterface = {
+    respondent: [],
+    section: [],
+    survey: []
   }
-  questionDatumIdMap: Map<string, QuestionDatum>
-  questionDatumQuestionIdIndex: Map<string, QuestionDatum[]>
+  private questionDatumIdMap: Map<string, QuestionDatum> = new Map()
+  private questionDatumQuestionIdIndex: Map<string, QuestionDatum[]> = new Map()
   constructor (throttleRate = 10000) {
     super()
     this.reset()
@@ -42,14 +43,14 @@ export default class DataStore extends Emitter {
    * Reset the state of the data and conditionTags
    */
   reset () {
-    this.data = []
-    this.conditionTags = {
-      section: [],
-      respondent: this.baseRespondentConditionTags, // Used to prevent removal of existing respondent condition tags
-      survey: []
-    }
-    this.questionDatumIdMap = new Map()
-    this.questionDatumQuestionIdIndex = new Map()
+    // Clear all arrays without dereferencing
+    this.data.splice(0, this.data.length)
+    this.conditionTags.section.splice(0, this.conditionTags.section.length)
+    this.conditionTags.respondent.splice(0, this.conditionTags.respondent.length)
+    this.conditionTags.survey.splice(0, this.conditionTags.survey.length)
+    this.conditionTags.respondent.push(...this.baseRespondentConditionTags)
+    this.questionDatumIdMap.clear()
+    this.questionDatumQuestionIdIndex.clear()
   }
 
   /**
@@ -138,12 +139,13 @@ export default class DataStore extends Emitter {
 
   /**
    * Get a single questionDatum by its location within the survey
-   * @param {String} questionId
-   * @param {Number} sectionRepetition
-   * @param {String} sectionFollowUpDatumId
-   * @returns {Object | undefined}
+   * @param {string} questionId
+   * @param {number} sectionRepetition
+   * @param {string} sectionFollowUpDatumId
+   * @param args
+   * @returns {QuestionDatum | null}
    */
-  getSingleQuestionDatumByLocation (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string, ...args) {
+  getSingleQuestionDatumByLocation (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string, ...args): QuestionDatum|undefined {
     return this.questionDatumQuestionIdIndex.get(questionId).find(qD =>
       qD.sectionRepetition === sectionRepetition &&
       qD.followUpDatumId === sectionFollowUpDatumId)
@@ -203,7 +205,7 @@ export default class DataStore extends Emitter {
    * @param {String} sectionFollowUpDatumId
    * @returns {Array}
    */
-  getQuestionDataByIds (questionIds, sectionRepetition, sectionFollowUpDatumId) {
+  getQuestionDataByIds (questionIds: string[], sectionRepetition: number, sectionFollowUpDatumId: string): QuestionDatum[] {
     let data = []
     for (let id of questionIds) {
       if (this.questionDatumQuestionIdIndex.has(id)) {

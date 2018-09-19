@@ -5,7 +5,7 @@ import './globals'
 
 import {expect} from 'chai'
 import {deepCompareEntities} from "./helpers";
-import {formId, respondentId, studyId} from "./testing-ids";
+import {formId, respondentId, studyId} from "../testing-ids";
 
 function className (o) {
   if (o.constructor && o.constructor.name) {

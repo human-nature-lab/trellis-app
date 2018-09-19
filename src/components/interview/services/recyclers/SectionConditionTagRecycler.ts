@@ -3,7 +3,7 @@ import uuidv4 from 'uuid/v4'
 import {now} from '../../../../services/DateService'
 import SectionConditionTag from '../../../../entities/trellis/SectionConditionTag'
 import AssignConditionTag from '../../../../entities/trellis/AssignConditionTag'
-import InterviewManager from '../../classes/InterviewManager'
+import InterviewManagerOld from '../../classes/InterviewManager'
 
 class SectionConditionTagRecycler extends Recycler<SectionConditionTag> {
   /**
@@ -22,20 +22,20 @@ class SectionConditionTagRecycler extends Recycler<SectionConditionTag> {
 
   /**
    * Returns a new instance of SectionConditionTag
-   * @param {InterviewManager} interview
+   * @param {InterviewManagerOld} interview
    * @param {AssignConditionTag} act
    * @returns {SectionConditionTag}
    */
-  objectCreator (interview: InterviewManager, act: AssignConditionTag) {
-    return new SectionConditionTag().fromRecycler(
-      uuidv4(),
-      interview.location.sectionId,
-      act.conditionTagId,
-      interview.location.sectionRepetition,
-      interview.location.sectionFollowUpDatumId,
-      interview.interview.id,
-      interview.interview.surveyId
-    )
+  objectCreator (interview: InterviewManagerOld, act: AssignConditionTag) {
+    return new SectionConditionTag().fromRecycler({
+        id: uuidv4(),
+        sectionId: interview.location.sectionId,
+        conditionId: act.conditionTagId,
+        repetition: interview.location.sectionRepetition,
+        followUpDatumId: interview.location.sectionFollowUpDatumId,
+        interviewId: interview.interview.id,
+        surveyId: interview.interview.surveyId
+    })
   }
 }
 
