@@ -153,8 +153,9 @@ export default function () {
     })
     describe('COMPARE', () => {
       // TODO: Compare these correctly
-      for (let formId of formIds) {
-        it(`getForm(${formId}): should return identical versions of the form`, () => {
+      for (let i = 0; i < formIds.length; i++) {
+        let formId = formIds[i]
+        it(`getForm(${formId}.${i}): should return identical versions of the form`, () => {
           return Promise.all(services.map(s => s.getForm(formId))).then(res => {
             res.forEach(form => {
               expect(form).to.not.be.undefined

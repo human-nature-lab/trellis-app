@@ -1,4 +1,5 @@
 import {AssignerFunction, RelationshipOpts} from '../entities/decorators/WebOrmDecorators'
+import {copyDate} from './DateService'
 import moment from 'moment'
 
 /**
@@ -179,7 +180,7 @@ export function deepCopy (obj: any, copySelf: boolean = false): any {
   } else if (Array.isArray(obj)) {
     return obj.map(o => deepCopy(o, true))
   } else if (moment.isMoment(obj) || moment.isDate(obj)) {
-    return moment(obj)
+    return copyDate(obj)
   } else if (typeof obj === 'object') {
     if (obj.copy && copySelf) {
       return obj.copy()
