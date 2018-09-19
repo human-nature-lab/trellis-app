@@ -1,7 +1,7 @@
 <template>
   <v-container grid-list-xl fluid>
     <v-layout wrap>
-      <v-flex xs12 sm10>
+      <v-flex xs10>
         <v-text-field
           v-on:keyup="onChangeTranslation"
           v-model="textFieldValue"
@@ -9,7 +9,7 @@
           :disabled="saving">
         </v-text-field>
       </v-flex>
-      <v-flex xs12 sm2>
+      <v-flex xs2>
         <v-select
           v-on:change="onChangeLocale"
           :items="languageTags"
@@ -56,13 +56,16 @@
         // Save any changed translationText elements
         for (const translationText of this.translation.translationText) {
           if (translationText.translatedText !== this.textFieldValues[translationText.locale.languageTag]) {
-            await TranslationTextService.updateTranslatedTextById(translationText.id, this.textFieldValues[translationText.locale.languageTag])
+            translationText.translatedText = this.textFieldValues[translationText.locale.languageTag]
+            if (this.persist) {
+              await TranslationTextService.updateTranslatedTextById(translationText.id, this.textFieldValues[translationText.locale.languageTag])
+            }
           }
         }
-        this.$emit('editing-done')
+        this.$emit('editing-done', this.translation)
       },
       onCancel: async function () {
-        this.$emit('editing-done')
+        this.$emit('editing-cancelled')
       },
       onChangeLocale: function (locale) {
         // Persist any changes to the current translation
@@ -90,6 +93,11 @@
       translation: {
         type: Object,
         required: true
+      },
+      persist: {
+        type: Boolean,
+        required: false,
+        'default': true
       }
     }
   }

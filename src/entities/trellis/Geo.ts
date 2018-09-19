@@ -8,7 +8,7 @@ import Photo from './Photo'
 
 @Entity()
 export default class Geo extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable
   geoTypeId: string

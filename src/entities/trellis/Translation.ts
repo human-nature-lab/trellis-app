@@ -5,7 +5,7 @@ import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
 @Entity()
 export default class Translation extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
   @enumerable(false)

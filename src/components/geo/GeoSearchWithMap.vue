@@ -7,6 +7,19 @@
       ref="mapContainer"
       id="leafletMap"
       style="position: relative;">
+      <permission :role-whitelist="['admin']">
+        <v-btn
+          v-if="selectedGeo === null"
+          class="deep-orange floating-button"
+          @click.stop="addNewGeo"
+          fab
+          dark
+          absolute
+          bottom
+          right>
+          <v-icon style="height:auto;">add</v-icon>
+        </v-btn>
+      </permission>
     </v-flex>
     <div>
       <permission :role-whitelist="['admin']">
@@ -14,6 +27,8 @@
           v-on:editing-done="editingDone"
           v-on:remove-geo-done="removeGeoDone"
           v-on:move-geo-done="moveGeoDone"
+          v-on:position-geo-done="positionGeoDone"
+          v-on:editing-cancelled="editingCancelled"
           :selected-geo="selectedGeo"
           :leaflet-map="trellisMap"></geo-edit-panel>
       </permission>
@@ -46,6 +61,8 @@
   /* global L */
   import 'leaflet'
   import index from '../../router/index'
+  import Geo from '../../entities/trellis/Geo'
+  import GeoService from '../../services/geo/GeoService'
   import GeoSearch from './GeoSearch'
   import TranslationService from '../../services/TranslationService'
   import global from '../../static/singleton'
@@ -53,6 +70,7 @@
   import forceDirectedLayout from 'ngraph.forcelayout'
   import GeoEditPanel from './GeoEditPanel.vue'
   import Permission from '../Permission'
+  import StudyService from '../../services/study/StudyService'
 
   const targetMapWidth = 600
 
@@ -90,6 +108,7 @@
     data: function () {
       return {
         global: global,
+        parentGeo: null,
         geoResults: [],
         trellisMap: undefined,
         canvas: undefined,
@@ -133,8 +152,9 @@
           this.repositionMarkers()
         })
       },
-      displayResults: function (results) {
+      displayResults: function (results, parent) {
         this.geoResults = results
+        this.parentGeoId = parent
         this.clearMarkers()
         this.addMarkers(results)
         this.centerMap()
@@ -176,6 +196,10 @@
         }
         this.displayResults(this.geoResults)
       },
+      addNewGeo: async function () {
+        const study = await StudyService.getCurrentStudy()
+        this.selectedGeo = GeoService.createNewGeo(this.parentGeoId, study.locales)
+      },
       removeGeoDone: function (removedGeoId) {
         this.selectedGeo = null
         for (let i = 0; i < this.geoResults.length; i++) {
@@ -184,6 +208,10 @@
             this.geoResults.splice(i, 1)
           }
         }
+        this.displayResults(this.geoResults)
+      },
+      positionGeoDone: function (positionedGeo) {
+        this.geoResults.push(positionedGeo)
         this.displayResults(this.geoResults)
       },
       moveGeoDone: function (movedGeo) {
@@ -195,6 +223,21 @@
           }
         }
         this.displayResults(this.geoResults)
+      },
+      editingCancelled: function () {
+        // Remove geo elements with null IDs
+        let removed = false
+        for (let i = 0; i < this.geoResults.length; i++) {
+          let geo = this.geoResults[i]
+          if (geo.id === null) {
+            removed = true
+            this.geoResults.splice(i, 1)
+          }
+        }
+        if (removed) {
+          this.displayResults(this.geoResults)
+        }
+        this.selectedGeo = null
       },
       addMarkers: async function (geoResults) {
         let tooltipsToDisplay = geoResults.length
@@ -331,6 +374,9 @@
 <style lang="sass">
   @import "../../../node_modules/leaflet/dist/leaflet.css"
 
+  .floating-button
+    z-index: 3000 !important
+    margin-bottom: 50px
   #leafletMap
     height: 400px /* Temporary height, replaced by actual container height via javascript */
     width: 100%
