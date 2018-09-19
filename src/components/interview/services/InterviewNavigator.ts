@@ -1,6 +1,6 @@
 import Emitter from '../../../classes/Emitter'
 import Clock from '../../../classes/Clock'
-import InterviewManager from '../classes/InterviewManager'
+import InterviewManagerOld from '../classes/InterviewManager'
 import Form from '../../../entities/trellis/Form'
 import Survey from '../../../entities/trellis/Survey'
 
@@ -8,8 +8,8 @@ export interface InterviewLocation {
   section: number
   sectionRepetition: number
   sectionFollowUpRepetition: number
-  sectionFollowUpDatumId: string
   page: number
+  sectionFollowUpDatumId?: string
   sectionId?: string
   pageId?: string
 }
@@ -30,7 +30,7 @@ export default class InterviewNavigator extends Emitter {
   private blueprint: Form
   public clock: Clock
 
-  constructor (private interview: InterviewManager) {
+  constructor (private interview: InterviewManagerOld) {
     super()
     // Section, sectionFollowUpRepetition, sectionRepetition, page
     this.location = {} as InterviewLocation
@@ -112,6 +112,21 @@ export default class InterviewNavigator extends Emitter {
     this._location.sectionFollowUpRepetition = val
     this._location.sectionFollowUpDatumId = null
     this.clock.time[2] = val
+  }
+
+  /**
+   * Use numbers to update the location
+   * @param {number} section
+   * @param {number} sectionRepetition
+   * @param {number} sectionFollowUpRepetition
+   * @param {number} page
+   */
+  public setLocationNumber (section: number, sectionRepetition: number, sectionFollowUpRepetition: number, page: number): void {
+    this.section = section
+    this.sectionRepetition = sectionRepetition
+    this.sectionFollowUpDatumRepetition = sectionFollowUpRepetition
+    this.page = page
+    this.updateLocation()
   }
 
   /**

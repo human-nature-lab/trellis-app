@@ -2,7 +2,7 @@ import GeoServiceCordova from '../../src/services/geo/GeoServiceCordova'
 import GeoServiceWeb from '../../src/services/geo/GeoServiceWeb'
 
 import {expect} from 'chai'
-import {geoId} from "./testing-ids";
+import {geoId} from "../testing-ids";
 import {deepCompareEntities} from "./helpers";
 import Geo from "../../src/entities/trellis/Geo";
 

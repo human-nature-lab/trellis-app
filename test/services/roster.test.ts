@@ -2,7 +2,7 @@ import './globals'
 import {expect} from 'chai'
 import RosterServiceWeb from "../../src/services/roster/RosterServiceWeb";
 import RosterServiceCordova from "../../src/services/roster/RosterServiceCordova";
-import {editRosterId, rosterId} from "./testing-ids";
+import {editRosterId, rosterId} from "../testing-ids";
 import Roster from "../../src/entities/trellis/Roster";
 import {deepCompareEntities} from "./helpers";
 

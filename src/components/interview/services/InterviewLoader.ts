@@ -79,21 +79,32 @@ export default class InterviewLoader {
    * @param {Function} progressCb - Callback for progress updates
    * @returns {{data: <Array>}}
    */
-  static async loadInterview (interviewId: string): Promise<{
+  static loadInterview (interviewId: string): Promise<{
     interview: Interview,
     actions: Action[],
     data: InterviewDataInterface,
     form: Form,
     respondentFills: RespondentFill[]
   }> {
-    let interview = await InterviewService.getInterview(interviewId)
-    return {
-      actions: await InterviewService.getActions(interviewId),
-      data: await InterviewService.getData(interviewId),
-      form: await FormService.getForm(interview.survey.formId, true),
-      respondentFills: await RespondentService.getRespondentFillsById(interview.survey.respondentId),
-      interview
-    }
+    let interview
+    return InterviewService.getInterview(interviewId).then(int => {
+      interview = int
+      return Promise.all([
+        InterviewService.getActions(interviewId),
+        InterviewService.getData(interviewId),
+        FormService.getForm(interview.survey.formId, true),
+        RespondentService.getRespondentFillsById(interview.survey.respondentId),
+      ])
+    }).then(res => {
+      let [actions, data, form, respondentFills] = res
+      return {
+        interview,
+        actions,
+        data,
+        form,
+        respondentFills
+      }
+    })
   }
 
   /**

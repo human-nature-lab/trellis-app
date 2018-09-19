@@ -1,4 +1,5 @@
 import {AssignerFunction, RelationshipOpts} from '../entities/decorators/WebOrmDecorators'
+import {copyDate} from './DateService'
 import moment from 'moment'
 
 /**
@@ -114,7 +115,6 @@ export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpt
     let generator
     let sourceKey = camelToSnake(targetKey)
     if (typeof opts === 'object') {
-      if (targetKey === 'interviews') debugger
       generator = opts.hasOwnProperty('constructor') ? s => {
         let constructor = opts.constructor()
         // @ts-ignore
@@ -179,8 +179,8 @@ export function deepCopy (obj: any, copySelf: boolean = false): any {
     return obj
   } else if (Array.isArray(obj)) {
     return obj.map(o => deepCopy(o, true))
-  } else if (obj instanceof Date || moment.isMoment(obj)) {
-    return moment(obj)
+  } else if (moment.isMoment(obj) || moment.isDate(obj)) {
+    return copyDate(obj)
   } else if (typeof obj === 'object') {
     if (obj.copy && copySelf) {
       return obj.copy()
