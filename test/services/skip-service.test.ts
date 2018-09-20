@@ -61,6 +61,9 @@ function makeSkip (conditions: string[]): SkipHelper {
 
 export default function () {
   describe('SkipService', () => {
+    it('should show if there are no skips on the page', () => {
+      shouldShow([], new Set())
+    })
     describe('show', () => {
       describe('any', () => {
         it('should hide if no conditions are present', () => {

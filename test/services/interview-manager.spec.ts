@@ -222,6 +222,11 @@ export default function () {
     })
 
     describe('Navigation', () => {
+      it('should start on the first page of a form if there are no actions', async () => {
+        const manager = await setupInterviewManager(forms.conditionAssignment)
+        manager.initialize()
+        validateLocation(manager.location, {section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+      })
       it('should handle moving backward and forward correctly', async ()  => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
         manager.initialize()
