@@ -9,7 +9,7 @@ export default class SkipService {
    * @returns {boolean}
    */
   static shouldSkipPage (skips: Skip[], conditionTags: Set<string>): boolean {
-    let shouldShow = false
+    let shouldShow = true
     for (let skip of skips) {
       if (skip.showHide) {
         // Show
