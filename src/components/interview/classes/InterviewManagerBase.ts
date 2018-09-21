@@ -93,7 +93,6 @@ export default class InterviewManagerBase extends Emitter {
    * Register all condition assignment functions which will be executed when the respondent navigates between pages
    */
   protected initializeConditionAssignment (): void {
-    ConditionTagStore.clear()
     this.conditionAssigner.clear()
     this.blueprint.sections.forEach(section => {
       section.pages.forEach(page => {
@@ -168,14 +167,14 @@ export default class InterviewManagerBase extends Emitter {
     // that are being modified as opposed to being created for the first time
     switch (act.scope) {
       case 'section':
-        this.data.addTag('section', SectionConditionTagRecycler.getNoKey(this, act))
+        this.data.addTag('section', SectionConditionTagRecycler.getNoKey(this, act), act.conditionTag)
         break
       case 'form':
-        this.data.addTag('survey', FormConditionTagRecycler.getNoKey(this, act))
+        this.data.addTag('survey', FormConditionTagRecycler.getNoKey(this, act), act.conditionTag)
         break
       case 'respondent':
       default:
-        this.data.addTag('respondent', RespondentConditionTagRecycler.getNoKey(this.interview, act))
+        this.data.addTag('respondent', RespondentConditionTagRecycler.getNoKey(this.interview, act), act.conditionTag)
     }
   }
 

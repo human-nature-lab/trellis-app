@@ -25,6 +25,7 @@
   import FormService from '../../services/form/FormService'
   import RespondentService from '../../services/respondent/RespondentService'
   import InterviewService from '../../services/interview/InterviewService'
+  import GeoLocationService from '../../services/geolocation'
   import global from '../../static/singleton'
   import router from '../../router'
   import Vue from 'vue'
@@ -95,6 +96,8 @@
           router.push({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
         } catch (err) {
           this.error = err
+          console.error(err)
+          alert('Trellis requires access to your location before starting an interview')
         }
       },
       hydrate (data: RespondentFormsData) {
