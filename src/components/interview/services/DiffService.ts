@@ -1,6 +1,10 @@
 import isEqual from 'lodash/isEqual'
 import {AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta} from '../../../services/interview/InterviewDeltaInterface'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
+import SectionConditionTag from "../../../entities/trellis/SectionConditionTag";
+import SurveyConditionTag from "../../../entities/trellis/SurveyConditionTag";
+import RespondentConditionTag from "../../../entities/trellis/RespondentConditionTag";
+import {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
 export default class DiffService {
   /**
    * Take two maps and return their
@@ -9,7 +13,7 @@ export default class DiffService {
    * @param {Map<string:object>} comparisonKeys
    * @returns {{added: Array<object>, modified: Array<object>, removed: Array<object>}}
    */
-  static mapDiffByKey (newObjMap: Map<string, any>, oldObjMap: Map<string, any>, comparisonKeys?: string[]) {
+  static mapDiffByKey (newObjMap: Map<string, any>, oldObjMap: Map<string, any>, comparisonKeys?: string[]): ModifiedDelta<any> {
     let added = []
     let modified = []
     let removed = []
@@ -41,11 +45,11 @@ export default class DiffService {
   /**
    * Take two questionDatum structures as defined on the interview model and compute the added, removed and modified
    * objects for both the question datum and their datum
-   * @param {object<interview.data>} newData
-   * @param {object<interview.data>} oldData
-   * @returns {{questionDatum: {added, modified, removed}|*, datum: {added, modified, removed}|*}}
+   * @param {QuestionDatum[]} newData
+   * @param {QuestionDatum[]} oldData
+   * @returns {DataDelta}
    */
-  static dataDiff (newData: QuestionDatum[], oldData: QuestionDatum[]) {
+  static dataDiff (newData: QuestionDatum[], oldData: QuestionDatum[]): DataDelta {
     // newData = JSON.parse(JSON.stringify(newData))
     // oldData = JSON.parse(JSON.stringify(oldData))
 
@@ -86,18 +90,18 @@ export default class DiffService {
   /**
    * Take two sets of conditions tags as defined on interview.conditionTags and compute which tags were added and which
    * condition tags were removed
-   * @param {object} newTags
-   * @param {object} oldTags
-   * @returns {{respondent: {added, removed}, section: {added, removed}}
+   * @param {ConditionTagInterface} newTags
+   * @param {ConditionTagInterface} oldTags
+   * @returns {ConditionTagDelta}
    */
-  static conditionTagsDiff (newTags, oldTags) {
+  static conditionTagsDiff (newTags: ConditionTagInterface, oldTags: ConditionTagInterface): ConditionTagDelta {
     // newTags = JSON.parse(JSON.stringify(newTags))
     // oldTags = JSON.parse(JSON.stringify(oldTags))
 
     let res = new ConditionTagDelta()
     for (let type of ['respondent', 'section', 'survey']) {
-      let newConditionIds: Map<string, object> = new Map(newTags[type].map(tag => [tag.condition_id, tag]))
-      let oldConditionIds: Map<string, object> = new Map(oldTags[type].map(tag => [tag.condition_id, tag]))
+      let newConditionIds: Map<string, object> = new Map(newTags[type].map((tag: RespondentConditionTag|SurveyConditionTag|SectionConditionTag) => [tag.conditionId, tag]))
+      let oldConditionIds: Map<string, object> = new Map(oldTags[type].map((tag: RespondentConditionTag|SurveyConditionTag|SectionConditionTag) => [tag.conditionId, tag]))
 
       let diff = DiffService.mapDiffByKey(newConditionIds, oldConditionIds)
       res[type] = new AddedRemovedDelta(diff.added, diff.removed)
