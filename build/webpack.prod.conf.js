@@ -12,6 +12,7 @@ var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 var loadMinified = require('./load-minified')
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+var MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
@@ -22,7 +23,7 @@ var webpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({
       sourceMap: config.build.productionSourceMap,
-      extract: true
+      extract: false
     })
   },
   devtool: config.build.productionSourceMap ? '#source-map' : false,
@@ -52,10 +53,14 @@ var webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
+    // new MiniCssExtractPlugin({
+    //   filename: '[name].css',
+    //   chunkFileName: '[id].css'
+    // }),
     // extract css into its own file
-    new ExtractTextPlugin({
-      filename: utils.assetsPath('css/[name].[md5:contenthash:hex:15].css')
-    }),
+    // new ExtractTextPlugin({
+    //   filename: utils.assetsPath('css/[name].[md5:contenthash:hex:15].css')
+    // }),
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
     new OptimizeCSSPlugin({
