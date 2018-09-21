@@ -11,6 +11,7 @@ import RespondentConditionTag from '../../../entities/trellis/RespondentConditio
 import SectionConditionTag from '../../../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../../../entities/trellis/SurveyConditionTag'
 import {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
+import ConditionTag from "../../../entities/trellis/ConditionTag";
 
 export default class DataStore extends Emitter {
   private baseRespondentConditionTags: any[] = []
@@ -89,15 +90,11 @@ export default class DataStore extends Emitter {
     }
     for (let type of ['respondent', 'survey', 'section']) {
       if (this.conditionTags[type] && tags[type]) {
-        this.conditionTags[type] = this.conditionTags[type].concat(tags[type])
+        for (let tag of tags[type]) {
+          this.addTag(type, tag)
+        }
       }
     }
-    this.conditionTags.respondent = this.conditionTags.respondent.map(tag => {
-      if (tag.conditionTag) {
-        ConditionTagStore.add(tag.conditionTag)
-      }
-      return tag
-    })
     RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
     SectionConditionTagRecycler.fill(this.conditionTags.section)
     FormConditionTagRecycler.fill(this.conditionTags.survey)
@@ -129,8 +126,14 @@ export default class DataStore extends Emitter {
    * @param {string} type
    * @param {RespondentConditionTag|SectionConditionTag|SurveyConditionTag} tag
    */
-  addTag (type: string, tag:RespondentConditionTag|SectionConditionTag|SurveyConditionTag) {
+  addTag (type: string, tag: RespondentConditionTag|SectionConditionTag|SurveyConditionTag, conditionTag?: ConditionTag|null): void {
     this.conditionTags[type].push(tag)
+    if (tag.conditionTag) {
+      ConditionTagStore.add(tag.conditionTag)
+    }
+    if (conditionTag) {
+      ConditionTagStore.add(conditionTag)
+    }
     this.emit('change', {
       data: this.data,
       conditionTags: this.conditionTags
@@ -179,12 +182,20 @@ export default class DataStore extends Emitter {
    * @param sectionFollowUpDatumId
    * @returns {Array}
    */
-  getAllConditionTagsForLocation (sectionRepetition: number, sectionFollowUpDatumId: string) {
-    let tags = this.conditionTags.respondent.concat(<any>this.conditionTags.survey) // Cast to type any so they can be concatenated
-    tags = tags.concat(<any>this.conditionTags.section.filter(tag => {
-      return tag.repetition === sectionRepetition &&
-        tag.followUpDatumId === sectionFollowUpDatumId
-    }))
+  public getAllConditionTagsForLocation (sectionRepetition: number, sectionFollowUpDatumId: string): ConditionTag[] {
+    const tags = []
+    for (let rct of this.conditionTags.respondent) {
+      tags.push(ConditionTagStore.getTagById(rct.conditionTagId))
+    }
+    for (let sct of this.conditionTags.survey) {
+      tags.push(ConditionTagStore.getTagById(sct.conditionId))
+    }
+    for (let sct of this.conditionTags.section) {
+      if (sct.repetition === sectionRepetition &&
+        sct.followUpDatumId === sectionFollowUpDatumId) {
+        tags.push(ConditionTagStore.getTagById(sct.conditionId))
+      }
+    }
     return tags
   }
 
@@ -194,8 +205,8 @@ export default class DataStore extends Emitter {
    * @param sectionFollowUpDatumId
    * @returns {String[}
    */
-  getLocationConditionTagNames (sectionRepetition, sectionFollowUpDatumId) {
-    return this.getAllConditionTagsForLocation(sectionRepetition, sectionFollowUpDatumId).map(tag => ConditionTagStore.getNameFromId(tag.conditionId))
+  public getLocationConditionTagNames (sectionRepetition: number, sectionFollowUpDatumId: string): string[] {
+    return this.getAllConditionTagsForLocation(sectionRepetition, sectionFollowUpDatumId).map(tag => tag.name)
   }
 
   /**

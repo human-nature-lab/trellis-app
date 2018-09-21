@@ -14,11 +14,10 @@
 
 <script>
   import PhotoService from '../services/photo/PhotoService'
+  import URL_PLACEHOLDER from '../assets/Placeholder_person.jpg'
 
   // TODO: consider replacing this with a material design icon.
   // This can't be dynamically sized, so image is better
-  const URL_PLACEHOLDER = require('../assets/Placeholder_person.jpg')
-
   const observer = new IntersectionObserver(handleIntersections, {
     threshold: 0.5
   })
