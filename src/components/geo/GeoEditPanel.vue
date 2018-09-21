@@ -178,7 +178,8 @@
         if (this.selectedGeo === null) {
           return ''
         }
-        return TranslationService.getTranslated(this.selectedGeo.nameTranslation, this.global.locale)
+        const translation = TranslationService.getTranslated(this.selectedGeo.nameTranslation, this.global.locale)
+        return (translation) ? translation : '[No translation]'
       },
       showPanel: function () {
         return (this.selectedGeo !== null)
