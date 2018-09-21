@@ -5,7 +5,7 @@
     :success="success"
     :current-log="currentLog"
     :retry="retry">
-    Registering successful upload...
+    {{$t('registering_upload')}}
   </sync-sub-step>
 </template>
 
@@ -56,8 +56,6 @@
         this.currentLog = undefined
         this.registerUpload()
       }
-    },
-    computed: {
     },
     components: {
       SyncSubStep

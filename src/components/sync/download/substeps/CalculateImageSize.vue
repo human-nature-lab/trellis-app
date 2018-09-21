@@ -6,7 +6,7 @@
                  :ignore="ignore"
                  :stop="stopChecking"
                  :retry="retry">
-    Calculating total size of images...
+    {{$t('calculating_size')}}
   </sync-sub-step>
 </template>
 

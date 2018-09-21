@@ -1,6 +1,6 @@
 <template>
   <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :cancel="stopChecking" :ignore="ignore" :retry="retry">
-    Checking for available storage space...
+    {{$t('checking_space')}}
   </sync-sub-step>
 </template>
 

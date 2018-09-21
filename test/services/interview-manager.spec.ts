@@ -8,7 +8,7 @@ import {
   rosterId,
   editRosterId,
   firstPageRosterIds,
-  prefillRespondentId, middlePageRosterIds, lastPageRosterIds
+  prefillRespondentId, middlePageRosterIds, lastPageRosterIds, respondentId3
 } from "../testing-ids";
 import SurveyService from "../../src/services/survey/index";
 import InterviewService from "../../src/services/interview/InterviewService";
@@ -29,6 +29,7 @@ import QuestionDatum from "../../src/entities/trellis/QuestionDatum";
 import {ConditionTagInterface} from "../../src/services/interview/InterviewDataInterface";
 import moment from 'moment'
 import {locToNumber} from "../../src/components/interview/services/LocationHelpers";
+import RespondentConditionTag from "../../src/entities/trellis/RespondentConditionTag";
 
 interface SimpleLocation {
   section: number
@@ -99,22 +100,26 @@ function makeAction (questionId: string, actionType: string, payload: ActionPayl
   return action
 }
 
-function selectChoice (manager: InterviewManager, choiceVal: string): Action {
-  let questions = manager.getPageQuestions(manager.location.section, manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId, manager.location.page)
-  let question = questions.find(q => {
-    return !!q.choices.find(c => c.choice.val === choiceVal)
-  })
-  let choice = question.choices.find(c => c.choice.val === choiceVal).choice
-  if (question) {
-    let action = makeAction(question.id, AT.select_choice, {
-      name: choice.val,
-      val: choice.val,
-      choice_id: choice.id
+function selectChoice (manager: InterviewManager, choiceVal: string, isSelect: boolean = true): Action {
+  try {
+    let questions = manager.getPageQuestions(manager.location.section, manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId, manager.location.page)
+    let question = questions.find(q => {
+      return !!q.choices.find(c => c.choice.val === choiceVal)
     })
-    manager.pushAction(action)
-    return action
-  } else {
-    throw Error('No question with this choice found')
+    let choice = question.choices.find(c => c.choice.val === choiceVal).choice
+    if (question) {
+      let action = makeAction(question.id, isSelect ? AT.select_choice : AT.deselect_choice, {
+        name: choice.val,
+        val: choice.val,
+        choice_id: choice.id
+      })
+      manager.pushAction(action)
+      return action
+    } else {
+      throw Error('No question with this choice found')
+    }
+  } catch (err) {
+    throw Error(`Couldn't select choice, ${choiceVal}` + err)
   }
 }
 
@@ -134,7 +139,7 @@ function getCurrentQuestions (manager: InterviewManager): Question[] {
   return manager.getPageQuestions(manager.location.section, manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId, manager.location.page)
 }
 
-function setupInterviewManager (formId: string, rId?: string, sId?: string) {
+function setupInterviewManager (formId: string, rId?: string, sId?: string, customActions?: Action[]) {
   let interview
   return createNewSurvey(formId, rId, sId).then(int => {
     interview = int
@@ -145,7 +150,10 @@ function setupInterviewManager (formId: string, rId?: string, sId?: string) {
       RespondentService.getRespondentFillsById(interview.survey.respondentId)
     ])
   }).then(res => {
-    const [actions, data, form, fills] = res
+    let [actions, data, form, fills] = res
+    if (customActions) {
+      actions = customActions
+    }
     return new InterviewManager(interview, form, actions, data.data, data.conditionTags, fills)
   })
 }
@@ -195,7 +203,6 @@ export default function () {
         manager.initialize()
       })
       it('should handle prefill actions for the first question', () => {
-        debugger
         validateLocation(manager.location, {section: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0, page: 0})
         testRosters(manager, firstPageRosterIds)
         simpleActionPush(manager, AT.next)
@@ -227,6 +234,23 @@ export default function () {
         manager.initialize()
         validateLocation(manager.location, {section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
       })
+      it('should stop at the first invalid question when loading', async () => {
+        let manager = await setupInterviewManager(forms.conditionAssignment, respondentId3)
+        manager.initialize()
+        validateLocation(manager.location, {section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+        selectChoice(manager, '2')
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 0, page: 1, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+        selectChoice(manager, 'one')
+        simpleActionPush(manager, AT.previous)
+        validateLocation(manager.location, {section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+        selectChoice(manager, '2', false)
+        let actions = manager['actions'].actions.map(a => a.copy())
+        console.log('actions', JSON.stringify(actions))
+        const nManager = await setupInterviewManager(forms.conditionAssignment, respondentId3, studyId, actions)
+        nManager.initialize()
+        validateLocation(manager.location, {section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+      })
       it('should handle moving backward and forward correctly', async ()  => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
         manager.initialize()
@@ -238,7 +262,13 @@ export default function () {
         expect(manager.location.page).to.equal(0, 'We should be back on the first page')
       })
     })
-
+    it('should be able to move backward even if the current page has invalid responses', async () => {
+      const manager = await setupInterviewManager(forms.conditionAssignment)
+      manager.initialize()
+      validateLocation(manager.location, {section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+      throw new Error('TODO')
+      // TODO
+    })
     describe('Skips', () => {
       it('should handle skips on the first question correctly', async () => {
         const manager = await setupInterviewManager(forms.firstPageSkipped)
@@ -268,9 +298,7 @@ export default function () {
       it('should handle correctly assigning conditions after changing responses and navigating', async () => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
         manager.initialize()
-        let questions = getCurrentQuestions(manager)
-        let questionOne = questions[0]
-        let action = selectChoice(manager, '1')
+        selectChoice(manager, '1')
         simpleActionPush(manager, AT.next)
         let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('is_one', `condition tags should include condition, 'is_one'`).and.not.include('is_two', `condition tags should not include condition, 'is_two'`)
@@ -326,6 +354,35 @@ export default function () {
     })
 
     describe('Storage', () => {
+      describe('Condition tags', () => {
+        it('should store respondent level condition tags', async () => {
+          const tagName = 'resp_was_assigned'
+          const manager = await setupInterviewManager(forms.conditionAssignment)
+          manager.attachDataPersistSlave()
+          manager.initialize()
+          let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+          console.log('conditionTags', conditionTags)
+          expect(conditionTags).to.not.include(tagName, 'The RCT already exists. Please reset DB or delete')
+          validateLocation(manager.location, {section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+          selectNChoice(manager, 1)
+          simpleActionPush(manager, AT.next)
+          validateLocation(manager.location, {section: 0, page: 1, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          selectNChoice(manager, 0)
+          simpleActionPush(manager, AT.next)
+          validateLocation(manager.location, {section: 0, page: 2, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          selectNChoice(manager, 0)
+          simpleActionPush(manager, AT.next)
+          validateLocation(manager.location, {section: 0, page: 3, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+          expect(conditionTags).to.include(tagName, 'The respondent condition tag was not assigned in memory')
+          await manager.save()
+          let data = await InterviewService.getData(manager.interview.id)
+          expect(data.conditionTags.respondent.length).to.be.greaterThan(0, 'No respondent condition tags assigned')
+          let respondentConditionTags = data.conditionTags.respondent.map(rct => rct.conditionTag.name)
+          expect(respondentConditionTags).to.include(tagName, 'The respondent condition tag was not assigned in the database')
+          manager.destroy()
+        })
+      })
       it('should save actions when they happen')
       it('should save data eventually')
       it('should save data and actions before leaving')

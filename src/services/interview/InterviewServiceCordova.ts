@@ -13,11 +13,12 @@ import RespondentConditionTag from "../../entities/trellis/RespondentConditionTa
 import {IsNull, QueryRunner, Repository, SelectQueryBuilder} from "typeorm";
 import Survey from "../../entities/trellis/Survey";
 import Datum from "../../entities/trellis/Datum";
-import ConditionTag from "../../entities/trellis/ConditionTag";
+import InterviewDataInterface from "./InterviewDataInterface";
+import GeoLocationService from "../geolocation";
 
 export default class InterviewServiceCordova implements InterviewServiceInterface {
 
-  public async getInterview (interviewId: string) {
+  public async getInterview (interviewId: string): Promise<Interview> {
     const repo = await DatabaseService.getRepository(Interview)
     const interview = await repo.findOne({
       where: {
@@ -29,18 +30,25 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return interview
   }
 
-  public async create (surveyId: string) {
+  public async create (surveyId: string): Promise<Interview> {
+    const position = await GeoLocationService.getCurrentPosition()
+    if (!position) {
+      throw new Error('Location services are required to conduct interviews')
+    }
     const repo = await DatabaseService.getRepository(Interview)
     const user = await UserService.getCurrentUser()
     let interview = new Interview()
     interview.startTime = now()
     interview.surveyId = surveyId
     interview.userId = user.id
+    interview.latitude = position.coords.latitude.toString()
+    interview.longitude = position.coords.longitude.toString()
+    interview.altitude = position.coords.altitude.toString()
     interview = await repo.save(interview)
     return await this.getInterview(interview.id)
   }
 
-  public async complete (id: string) {
+  public async complete (id: string): Promise<void> {
     const repo = await DatabaseService.getRepository(Interview)
     let interview = await repo.createQueryBuilder()
       .update(Interview)
@@ -111,7 +119,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return actions
   }
 
-  public async saveActions (interviewId: string, actions: Action[]) {
+  public async saveActions (interviewId: string, actions: Action[]): Promise<any> {
     const repo = await DatabaseService.getRepository(Action)
     let res = await repo.insert(actions)
     return res
@@ -165,7 +173,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       .getMany()
   }
 
-  public async getData (interviewId: string) {
+  public async getData (interviewId: string): Promise<InterviewDataInterface> {
     const data = await this.getQuestionDatum(interviewId)
     const survey = await this.getSurveyConditionTags(interviewId)
     const section = await this.getSectionConditionTags(interviewId)
@@ -180,7 +188,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     }
   }
 
-  public async saveData (interviewId: string, diff: InterviewDeltaInterface) {
+  public async saveData (interviewId: string, diff: InterviewDeltaInterface): Promise<void> {
     const conn = await DatabaseService.getDatabase()
     const qr = conn.createQueryRunner()
 

@@ -5,7 +5,7 @@
     :current-log="currentLog"
     :cancel="stopChecking"
     :retry="retry">
-    Checking latest available snapshot on the server...
+    {{$t('checking_snapshot')}}
   </sync-sub-step>
 </template>
 
@@ -46,7 +46,7 @@
             if (Object.keys(serverLatestSnapshot).length === 0) {
               this.loggingService.log({
                 severity: 'warn',
-                message: 'No snapshot found on the server, contact the server administrator for a solution.'
+                message: this.$t('no_snapshot_found')
               }).then((result) => { this.currentLog = result })
             } else {
               this.$emit('check-latest-snapshot-done', serverLatestSnapshot)
@@ -59,10 +59,10 @@
         },
         stopChecking: function () {
           if (this.source) {
-            this.source.cancel('Operation cancelled by the user.')
+            this.source.cancel(this.$t('operation_cancelled'))
           }
           this.loggingService.log({
-            message: 'Operation cancelled by the user.'
+            message: this.$t('operation_cancelled')
           }).then((result) => { this.currentLog = result })
           this.checking = false
         },

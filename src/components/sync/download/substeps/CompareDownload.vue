@@ -1,6 +1,6 @@
 <template>
   <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :retry="retry" :ignore="ignore">
-    Comparing snapshot with last downloaded... {{ addMessage }}
+    {{$t('comparing_snapshot_download')}} {{ addMessage }}
   </sync-sub-step>
 </template>
 
@@ -41,23 +41,23 @@
           this.checking = false
           switch (result) {
             case RESULTS.NO_DOWNLOAD:
-              this.addMessage = 'no previous download found...'
+              this.addMessage = this.$t('no_previous_download')
               this.success = true
               break
             case RESULTS.DOWNLOAD_OLDER:
-              this.addMessage = `the last download on ${this.localDownloadCreatedAt} is older than the latest server snapshot...`
+              this.addMessage = this.$t('last_download_date', this.localDownloadCreatedAt)
               this.success = true
               break
             case RESULTS.DOWNLOAD_SAME:
               this.loggingService.log({
                 severity: 'warn',
-                message: `You have already downloaded the snapshot created at ${this.serverSnapshotCreatedAt}, no download is necessary.`
+                message: this.$t('last_snapshot_date', this.serverSnapshotCreatedAt)
               }).then((result) => { this.currentLog = result })
               break
             case RESULTS.DOWNLOAD_NEWER:
               this.loggingService.log({
                 severity: 'warn',
-                message: `The snapshot on the server, created at ${this.serverSnapshotCreatedAt}, is older than the last snapshot you downloaded (${this.localDownloadCreatedAt}). This is unexpected, proceed with caution.`
+                message: this.$t('older_snapshot', this.serverSnapshotCreatedAt, this.localDownloadCreatedAt)
               }).then((result) => { this.currentLog = result })
               break
           }
@@ -72,7 +72,7 @@
         ignore: function () {
           this.loggingService.log({
             severity: 'info',
-            message: 'Warning ignored by user.'
+            message: this.$t('warning_ignored')
           }).then((result) => {
             this.currentLog = result
             this.success = true

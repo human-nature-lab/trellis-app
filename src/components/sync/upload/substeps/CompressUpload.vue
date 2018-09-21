@@ -6,7 +6,7 @@
     success-message="DONE"
     :current-log="currentLog"
     :retry="retry">
-    Compressing upload...
+    {{$t('compressing_upload')}}
   </sync-sub-step>
 </template>
 
@@ -66,8 +66,6 @@
         this.currentLog = undefined
         this.doWork()
       }
-    },
-    computed: {
     },
     components: {
       SyncSubStep

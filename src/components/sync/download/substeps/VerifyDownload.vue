@@ -4,7 +4,7 @@
                  :current-log="currentLog"
                  :ignore="ignore"
                  :retry="retry">
-    Verifying the download...
+    {{$t('verifying_download')}}
   </sync-sub-step>
 </template>
 
@@ -53,7 +53,7 @@
                 this.verifying = false
                 this.loggingService.log({
                   severity: 'warn',
-                  message: 'Calculated hash does not match hash reported by the server.',
+                  message: this.$t('hash_dont_match'),
                   serverProvidedHash: this.fileHash,
                   calculatedMd5Hash: md5Hash
                 }).then((result) => { this.currentLog = result })
@@ -71,7 +71,7 @@
         ignore: function () {
           this.loggingService.log({
             severity: 'info',
-            message: 'Warning ignored by user.'
+            message: this.$t('warning_ignored')
           }).then((log) => {
             this.currentLog = log
             this.verificationDone()
@@ -81,8 +81,6 @@
           this.currentLog = undefined
           this.verifyDownload()
         }
-      },
-      computed: {
       },
       components: {
         SyncSubStep

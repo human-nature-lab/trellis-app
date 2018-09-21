@@ -4,14 +4,14 @@
     <div>
       <v-stepper v-model="uploadStep">
         <v-stepper-header>
-          <v-stepper-step step="1">Creating</v-stepper-step>
+          <v-stepper-step step="1">{{$t('creating')}}</v-stepper-step>
           <v-divider></v-divider>
-          <v-stepper-step step="2">Uploading</v-stepper-step>
+          <v-stepper-step step="2">{{$t('uploading')}}</v-stepper-step>
         </v-stepper-header>
         <v-stepper-items>
           <v-stepper-content step="1">
             <sync-step
-              title="Creating"
+              :title="$t('creating')"
               v-if="uploadStep === 1"
               v-bind:continue-status="continueStatusArray[0]"
               v-on:continue-clicked="onContinue"
@@ -38,7 +38,7 @@
           </v-stepper-content>
           <v-stepper-content step="2">
             <sync-step
-              title="Uploading"
+              :title="$('uploading')"
               v-if="uploadStep === 2"
               v-bind:continue-status="continueStatusArray[1]"
               v-on:continue-clicked="onContinue"

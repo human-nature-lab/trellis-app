@@ -21,7 +21,7 @@
           working: false,
           currentLog: undefined,
           status: {
-            message: 'Checking foreign key constraints...'
+            message: this.$t('checking_f_keys')
           }
         }
       },
