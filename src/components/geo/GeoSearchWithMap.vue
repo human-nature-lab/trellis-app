@@ -148,7 +148,7 @@
           accessToken: '***REMOVED***'
         }).addTo(this.trellisMap)
         this.labelMarkerLayer = L.layerGroup().addTo(this.trellisMap)
-        this.trellisMap.on('zoomend', () => {
+        this.trellisMap.on('zoomend resize moveend', () => {
           this.repositionMarkers()
         })
       },
@@ -243,13 +243,15 @@
         let tooltipsToDisplay = geoResults.length
         return new Promise((resolve) => {
           geoResults.forEach((geo) => {
-            let markerCoords = [geo.latitude, geo.longitude]
+            let latitude = (geo.latitude) ? geo.latitude : 0
+            let longitude = (geo.longitude) ? geo.longitude : 0
+            let markerCoords = [latitude, longitude]
             this.markerPositions.push(markerCoords)
             let geoMarker = L.marker(markerCoords, {icon: defaultIcon, interactive: false})
             this.geoMarkers.push(geoMarker)
             let tooltipMarker = L.marker(markerCoords, {icon: hiddenIcon, interactive: false})
             let translation = TranslationService.getTranslated(geo.nameTranslation, this.global.locale)
-            tooltipMarker.geoName = translation
+            tooltipMarker.geoName = (translation) ? translation : '[No translation]'
             tooltipMarker.geoId = geo.id
             tooltipMarker.geo = geo
             tooltipMarker.origin = geoMarker
@@ -287,17 +289,20 @@
         let layout = forceDirectedLayout(graph)
         for (let i = 0; i < this.tooltipMarkers.length; i++) {
           let marker = this.tooltipMarkers[i]
-          let labelId = `label_${i}`
-          let markerId = `marker_${i}`
-          let markerNode = graph.addNode(markerId)
-          let pos = this.latLngToPos(marker.origin._latlng.lat, marker.origin._latlng.lng, bounds)
-          graph.addNode(labelId, marker)
-          graph.addLink(labelId, markerId)
-          layout.pinNode(markerNode, true)
-          let x = pos[0]
-          let y = pos[1]
-          layout.setNodePosition(labelId, x, y)
-          layout.setNodePosition(markerId, x, y)
+          // Only reposition visible markers
+          if (bounds.contains(marker.origin._latlng)) {
+            let labelId = `label_${i}`
+            let markerId = `marker_${i}`
+            let markerNode = graph.addNode(markerId)
+            let pos = this.latLngToPos(marker.origin._latlng.lat, marker.origin._latlng.lng, bounds)
+            graph.addNode(labelId, marker)
+            graph.addLink(labelId, markerId)
+            layout.pinNode(markerNode, true)
+            let x = pos[0]
+            let y = pos[1]
+            layout.setNodePosition(labelId, x, y)
+            layout.setNodePosition(markerId, x, y)
+          }
         }
         for (let i = 0; i < ITERATIONS; i++) {
           layout.step()
