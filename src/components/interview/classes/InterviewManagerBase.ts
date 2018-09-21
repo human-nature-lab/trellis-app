@@ -205,7 +205,7 @@ export default class InterviewManagerBase extends Emitter {
       for (let act of question.assignConditionTags) {
         try {
           if (this.conditionAssigner.run(act.id, vars)) {
-            // console.log('assigning', act)
+            console.log('assigning condition tag', act)
             this.assignConditionTag(act)
           }
         } catch (err) {

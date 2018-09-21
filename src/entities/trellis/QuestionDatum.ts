@@ -55,6 +55,9 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     for (let key in data) {
       this[key] = data[key]
     }
+    if (this['interviewId']) {
+      delete this['interviewId']
+    }
     this.createdAt = now()
     this.updatedAt = now()
     this.data = []

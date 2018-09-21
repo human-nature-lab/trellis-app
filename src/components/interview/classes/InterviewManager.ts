@@ -76,6 +76,8 @@ export default class InterviewManager extends InterviewManagerBase {
    * @returns {Promise<[any]>}
    */
   save () {
+    // TODO: Replay all actions and assign all conditions here
+    this.playAllActions()
     let p = []
     if (this._dataPersistSlave) {
       p.push(this._dataPersistSlave.save())
@@ -99,7 +101,6 @@ export default class InterviewManager extends InterviewManagerBase {
       this._actionsPersistSlave = null
     }
     this.navigator.destroy()
-    this._resetState()
   }
 
   /**
@@ -313,6 +314,7 @@ export default class InterviewManager extends InterviewManagerBase {
    * Rebuild the state of the survey by zeroing the location and resetting the data before replaying all actions
    */
   playAllActions () {
+    this._isReplaying = true
     // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
     // TODO: Check that state is reset correctly
@@ -361,6 +363,7 @@ export default class InterviewManager extends InterviewManagerBase {
     if (nextActionCount > numPagesReplayed) {
       this.stepForward()
     }
+    this._isReplaying = false
   }
 
   /**
@@ -373,10 +376,8 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param sectionFollowUpRepetition
    */
   replayTo (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
-    this._isReplaying = true
     this.playAllActions()
     this.seekTo(section, sectionRepetition, sectionFollowUpRepetition, page)
-    this._isReplaying = false
   }
 
   /**
@@ -400,6 +401,7 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param {number} page
    */
   seekTo (section: number, sectionRepetition: number, sectionFollowUpRepetition: number, page: number) {
+    this._isReplaying = true
     let currentLocNumber = locToNumber(this.location)
     let desiredLocNumber = locToNumber({section, sectionRepetition, sectionFollowUpRepetition, page})
     if (desiredLocNumber === currentLocNumber) {
@@ -437,6 +439,7 @@ export default class InterviewManager extends InterviewManagerBase {
         debugger
       }
     }
+    this._isReplaying = false
     // console.log('post seek', JSON.parse(JSON.stringify(this.data.data)))
   }
 
@@ -463,8 +466,8 @@ export default class InterviewManager extends InterviewManagerBase {
    * Handle 'reached the end of survey' event
    */
   atEnd () {
+    this.onPageExit()
     if (!this._isReplaying) {
-      this.onPageExit()
       this.emit('atEnd', JSON.parse(JSON.stringify(this.location)))
     }
     console.log(`Reached the end of the survey`)
