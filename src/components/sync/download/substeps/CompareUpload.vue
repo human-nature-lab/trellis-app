@@ -6,7 +6,7 @@
     :cancel="stopChecking"
     :retry="retry"
     :ignore="ignore">
-    Comparing snapshot with last upload...
+    {{$t('comparing_snapshot_upload')}}
   </sync-sub-step>
 </template>
 
@@ -50,7 +50,7 @@
         ignore: function () {
           this.loggingService.log({
             severity: 'info',
-            message: 'Warning ignored by user.'
+            message: this.$t('warning_ignored')
           }).then((result) => {
             this.currentLog = result
             this.success = true
@@ -76,13 +76,13 @@
               this.result = RESULTS.PENDING_THIS_DEVICE
               this.loggingService.log({
                 severity: 'warn',
-                message: `There are ${pendingFromThisDevice} upload(s) from this device that the server has not processed yet. Downloading a new snapshot may result in lost data. Please try again in a few minutes.`
+                message: this.$t('pending_uploads_device', pendingFromThisDevice)
               }).then((result) => { this.currentLog = result })
             } else if (pendingUploads.length > 0) {
               this.result = RESULTS.PENDING_OTHER
               this.loggingService.log({
                 severity: 'warn',
-                message: `There are ${pendingUploads.length} upload(s) that the server has not processed yet. Please try again in a few minutes.`
+                message: this.$t('pending_uploads', pendingUploads.length)
               }).then((result) => { this.currentLog = result })
             } else {
               this.result = RESULTS.NONE_PENDING
@@ -96,10 +96,10 @@
         },
         stopChecking: function () {
           if (this.source) {
-            this.source.cancel('Operation cancelled by the user.')
+            this.source.cancel(this.$t('operation_cancelled'))
           }
           this.loggingService.log({
-            message: 'Operation cancelled by the user.'
+            message: this.$t('operation_cancelled')
           }).then((result) => { this.currentLog = result })
           this.checking = false
         }

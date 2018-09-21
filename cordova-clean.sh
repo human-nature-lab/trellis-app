@@ -8,11 +8,12 @@ cordova plugin rm cordova-plugin-whitelist
 cordova plugin rm cordova-sqlite-storage
 cordova plugin rm cordova-plugin-file-transfer
 cordova plugin rm cordova-plugin-geolocation
+cordova plugin rm cordova-plugin-zeep
 
 cordova platform rm android
 cordova platform rm ios
 
-cordova clean 
+cordova clean
 
 cordova platform add android
 
@@ -26,3 +27,4 @@ cordova plugin add cordova-plugin-whitelist
 cordova plugin add cordova-sqlite-storage
 cordova plugin add cordova-plugin-file-transfer
 cordova plugin add cordova-plugin-geolocation
+cordova plugin add cordova-plugin-zeep

@@ -3,7 +3,6 @@ import uuidv4 from 'uuid/v4'
 import {now} from '../../../../services/DateService'
 import RespondentConditionTag from '../../../../entities/trellis/RespondentConditionTag'
 import AssignConditionTag from '../../../../entities/trellis/AssignConditionTag'
-import InterviewManager from '../../classes/InterviewManager'
 import Interview from '../../../../entities/trellis/Interview'
 
 class RespondentConditionTagRecycler extends Recycler<RespondentConditionTag> {
@@ -26,7 +25,11 @@ class RespondentConditionTagRecycler extends Recycler<RespondentConditionTag> {
    * @returns {RespondentConditionTag}
    */
   objectCreator (interview: Interview, act: AssignConditionTag): RespondentConditionTag {
-    return new RespondentConditionTag().fromRecycler(uuidv4(), interview.survey.respondentId, act.conditionTagId)
+    return new RespondentConditionTag().fromRecycler({
+      id: uuidv4(),
+      respondentId: interview.survey.respondentId,
+      conditionTagId: act.conditionTagId
+    })
   }
 }
 

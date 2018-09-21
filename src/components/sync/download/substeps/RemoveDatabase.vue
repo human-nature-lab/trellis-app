@@ -20,7 +20,7 @@
           removing: false,
           currentLog: undefined,
           status: {
-            message: 'Removing previous database...'
+            message: this.$t('removing_db')
           }
         }
       },
@@ -52,8 +52,6 @@
           this.currentLog = undefined
           this.removeDatabase()
         }
-      },
-      computed: {
       },
       components: {
         SyncSubStep

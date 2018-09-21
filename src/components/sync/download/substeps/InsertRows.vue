@@ -28,7 +28,7 @@
           insertProgress: 0,
           currentLog: undefined,
           status: {
-            message: 'Importing database...'
+            message: this.$t('importing_database')
           }
         }
       },
@@ -56,14 +56,14 @@
       methods: {
         startWork: function () {
           this.working = true
-          this.status.message = 'Importing database...'
+          this.status.message = this.$t('importing_database')
           DatabaseService.importDatabase(this.queryRunner, this.extractedSnapshot, this.trackProgress, this.isCancelled, this.status)
             .then(() => {
               this.working = false
               if (this.cancelled) {
                 this.loggingService.log({
                   severity: 'warn',
-                  message: 'Importing database cancelled by user.'
+                  message: this.$t('operation_cancelled')
                 }).then((result) => { this.currentLog = result })
               } else {
                 this.onDone()
@@ -76,7 +76,7 @@
         },
         cancelImport: function () {
           this.cancelled = cancelled = true
-          this.status.message = 'Cancelling...'
+          this.status.message = this.$t('cancelling')
         },
         isCancelled: function () {
           return cancelled

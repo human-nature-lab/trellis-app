@@ -5,6 +5,14 @@ import SnakeSerializable from '../interfaces/SnakeSerializable'
 import ConditionTag from './ConditionTag'
 import {now} from '../../services/DateService'
 
+interface SurveyConditionTagRecyclerData {
+  id: string
+  surveyId: string
+  conditionId: string
+  interviewId: string
+  conditionTag?: ConditionTag
+}
+
 @Entity()
 export default class SurveyConditionTag extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryGeneratedColumn() @Serializable
@@ -27,24 +35,19 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
 
   /**
    * Used by recycler to generate an object
-   * @param {string} id
-   * @param {string} surveyId
-   * @param {string} conditionId
-   * @param {string} interviewId
-   * @param {ConditionTag} conditionTag
+   * @param {SurveyConditionTagRecyclerData} data
    * @returns {this}
    */
-  fromRecycler (id: string, surveyId: string, conditionId: string, interviewId: string, conditionTag?: ConditionTag) {
-    this.id = id
-    this.surveyId = surveyId
-    this.conditionId = conditionId
-    // this.interviewId = interviewId
+  fromRecycler (data: SurveyConditionTagRecyclerData) {
+    for (let key in data) {
+      if (data[key] !== undefined) {
+        this[key] = data[key]
+      }
+    }
     this.createdAt = now()
     this.updatedAt = now()
 
-    if (conditionTag) {
-      this.conditionTag = conditionTag
-    } else {
+    if (!data.conditionTag) {
       // TODO: Lookup and assign the condition tag
     }
     return this

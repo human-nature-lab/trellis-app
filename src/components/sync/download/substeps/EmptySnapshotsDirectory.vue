@@ -4,7 +4,7 @@
                  :success="success"
                  :current-log="currentLog"
                  :retry="retry">
-    Emptying the snapshots directory...
+    {{$t('emptying_snapshots')}}
   </sync-sub-step>
 </template>
 
@@ -56,8 +56,6 @@
           this.warning = false
           this.startWork()
         }
-      },
-      computed: {
       },
       components: {
         SyncSubStep

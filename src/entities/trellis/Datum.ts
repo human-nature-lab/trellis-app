@@ -6,6 +6,20 @@ import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {now} from '../../services/DateService'
 import QuestionDatum from "./QuestionDatum";
 
+export interface DatumRecyclerData {
+  surveyId: string
+  questionDatumId: string
+  eventOrder: number
+  val: string
+  sortOrder: number
+  name: string
+  edgeId: string
+  geoId: string
+  photoId: string
+  rosterId: string
+  choiceId: string
+}
+
 @Entity()
 export default class Datum extends TimestampedSoftDelete implements SnakeSerializable {
   @Column() @Serializable
@@ -38,33 +52,20 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   @ManyToOne(type => QuestionDatum, questionDatum => questionDatum.data)
   questionDatum: QuestionDatum
 
-  fromRecycler (
-    surveyId: string,
-    questionDatumId: string,
-    eventOrder: number,
-    val: string,
-    sortOrder: number,
-    name: string,
-    edgeId: string,
-    geoId: string,
-    photoId: string,
-    rosterId: string,
-    choiceId: string
-  ){
+  /**
+   * Called from the recycler when making a new instance of this
+   * @param {DatumRecyclerData} data
+   * @returns {this}
+   */
+  fromRecycler (data: DatumRecyclerData){
     this.id = uuidv4()
     this.updatedAt = now()
     this.createdAt = now()
-    this.surveyId = surveyId
-    this.questionDatumId = questionDatumId
-    this.eventOrder = eventOrder
-    this.val = val
-    this.sortOrder = sortOrder
-    this.name = name
-    this.edgeId = edgeId
-    this.geoId = geoId
-    this.photoId = photoId
-    this.rosterId = rosterId
-    this.choiceId = choiceId
+    for (let key in data) {
+      if (data[key] !== undefined) {
+        this[key] = data[key]
+      }
+    }
     return this
   }
 }

@@ -4,7 +4,7 @@
                  :success="success"
                  :current-log="currentLog"
                  :retry="retry">
-    Generating list of images to download...
+    {{$t('generating_image_list')}}
   </sync-sub-step>
 </template>
 
@@ -68,8 +68,6 @@
           this.currentLog = undefined
           this.generateImageList()
         }
-      },
-      computed: {
       },
       components: {
         SyncSubStep

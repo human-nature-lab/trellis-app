@@ -59,6 +59,7 @@ import Log from '../../entities/trellis-config/Log'
 import Sync from '../../entities/trellis-config/Sync'
 import FileService from '../file/FileService'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
+import PreloadAction from '../../entities/trellis/PreloadAction'
 
 const trellisConfigConnection = {
   type: 'cordova',
@@ -100,6 +101,7 @@ const trellisConnection = {
     Parameter,
     Photo,
     PhotoTag,
+    PreloadAction,
     Question,
     QuestionAssignConditionTag,
     QuestionChoice,
@@ -135,8 +137,8 @@ const trellisConnection = {
     UserStudy
   ],
   namingStrategy: new SnakeCaseNamingStrategy(),
-  // logging: ['warning', 'error'] // reduced logging
-  logging: true // verbose logging
+  logging: ['warning', 'error'] // reduced logging
+  // logging: true // verbose logging
 }
 
 export default class DatabaseServiceCordova {

@@ -10,14 +10,15 @@ import UserService from '../user/UserService'
 import SurveyConditionTag from "../../entities/trellis/SurveyConditionTag";
 import SectionConditionTag from "../../entities/trellis/SectionConditionTag";
 import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag";
-import {IsNull, QueryRunner, SelectQueryBuilder} from "typeorm";
+import {IsNull, QueryRunner, Repository, SelectQueryBuilder} from "typeorm";
 import Survey from "../../entities/trellis/Survey";
 import Datum from "../../entities/trellis/Datum";
-import ConditionTag from "../../entities/trellis/ConditionTag";
+import InterviewDataInterface from "./InterviewDataInterface";
+import GeoLocationService from "../geolocation";
 
 export default class InterviewServiceCordova implements InterviewServiceInterface {
 
-  async getInterview (interviewId: string) {
+  public async getInterview (interviewId: string): Promise<Interview> {
     const repo = await DatabaseService.getRepository(Interview)
     const interview = await repo.findOne({
       where: {
@@ -29,18 +30,25 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return interview
   }
 
-  async create (surveyId: string) {
+  public async create (surveyId: string): Promise<Interview> {
+    const position = await GeoLocationService.getCurrentPosition()
+    if (!position) {
+      throw new Error('Location services are required to conduct interviews')
+    }
     const repo = await DatabaseService.getRepository(Interview)
     const user = await UserService.getCurrentUser()
     let interview = new Interview()
     interview.startTime = now()
     interview.surveyId = surveyId
     interview.userId = user.id
+    interview.latitude = position.coords.latitude.toString()
+    interview.longitude = position.coords.longitude.toString()
+    interview.altitude = position.coords.altitude.toString()
     interview = await repo.save(interview)
     return await this.getInterview(interview.id)
   }
 
-  async complete (id: string) {
+  public async complete (id: string): Promise<void> {
     const repo = await DatabaseService.getRepository(Interview)
     let interview = await repo.createQueryBuilder()
       .update(Interview)
@@ -50,34 +58,53 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return interview
   }
 
-  async getActions (interviewId: string): Promise<Action[]> {
-    // Get preload actions for this respondent_id and question_id (via form_id)
-    // that have not already been copied into the action table
+  private async copyPreloadActions (interviewId: string): Promise<Repository<Action>> {
     const repository = await DatabaseService.getRepository(PreloadAction)
     const queryBuilder = await repository.createQueryBuilder('preload_action')
-    let q = queryBuilder.where( ` 
-    select * from preload_action where respondent_id = (
+    let q = queryBuilder.where(`preload_action.respondentId = (
       select respondent_id from survey where id = (select survey_id from interview where id = :interviewId)
-    ) 
-    and question_id in (
+    )`)
+      .andWhere(`preload_action.questionId in (
       select id from question where question_group_id in (
         select question_group_id from section_question_group where section_id in (
-          select section_id from section_form where form_id = (
+          select section_id from form_section where form_id = (
             select form_id from survey where id = (select survey_id from interview where id = :interviewId)
           )
         )
       )
-    )
-    and not exists (
-      select * from action where interview_id = :interviewId and preload_action_id = preload_action.id
+    )`).andWhere(`preload_action.id not in (
+      select preload_action_id from action where interview_id in (
+        select id from interview where survey_id = (select survey_id from interview where id = :interviewId)
+      )
     )`, {
-      interviewId: interviewId
-    })
-
-    // TODO
+        interviewId
+      })
     console.log('q.getQuery()', q.getQuery())
-
+    let preloadActions = await q.getMany()
+    const insertActions = preloadActions.map(p => {
+      let a = new Action()
+      a.preloadActionId = p.id
+      a.payload = p.payload
+      a.actionType = p.actionType
+      a.questionId = p.questionId
+      a.interviewId = interviewId
+      a.createdAt = now()
+      a.sectionFollowUpRepetition = 0
+      a.sectionRepetition = 0
+      return a
+    })
     const repo = await DatabaseService.getRepository(Action)
+    if (preloadActions.length) {
+      let res = await repo.insert(insertActions)
+      console.log('copied actions', res)
+    }
+    return repo
+  }
+
+  public async getActions (interviewId: string): Promise<Action[]> {
+    // Get preload actions for this respondent_id and question_id (via form_id)
+    // that have not already been copied into the action table
+    let repo = await this.copyPreloadActions(interviewId)
     let actions = await repo.createQueryBuilder('action')
       .where(qb => {
         return 'action.interviewId in ' +  qb.subQuery().select('interview.id')
@@ -92,7 +119,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return actions
   }
 
-  async saveActions (interviewId: string, actions: Action[]) {
+  public async saveActions (interviewId: string, actions: Action[]): Promise<any> {
     const repo = await DatabaseService.getRepository(Action)
     let res = await repo.insert(actions)
     return res
@@ -146,7 +173,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       .getMany()
   }
 
-  async getData (interviewId: string) {
+  public async getData (interviewId: string): Promise<InterviewDataInterface> {
     const data = await this.getQuestionDatum(interviewId)
     const survey = await this.getSurveyConditionTags(interviewId)
     const section = await this.getSectionConditionTags(interviewId)
@@ -161,7 +188,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     }
   }
 
-  async saveData (interviewId: string, diff: InterviewDeltaInterface) {
+  public async saveData (interviewId: string, diff: InterviewDeltaInterface): Promise<void> {
     const conn = await DatabaseService.getDatabase()
     const qr = conn.createQueryRunner()
 
@@ -203,7 +230,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
 
   }
 
-  async getPreload (interviewId: string) {
+  public async getPreload (interviewId: string) {
     return null
   }
 }

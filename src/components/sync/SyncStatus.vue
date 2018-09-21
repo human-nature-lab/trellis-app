@@ -9,17 +9,17 @@
           <v-alert
             :value="!wasSnapshotDownloaded"
             type="info">
-            No snapshot found. Click the download button below.
+            {{$t('no_snapshot_found')}} {{$t('click_download_button')}}
           </v-alert>
           <v-alert
             :value="wasSnapshotDownloaded"
             type="info">
-            The current snapshot was created on: <span style="white-space:nowrap">{{ snapshotDownloadedAt }}</span>.
+            {{$t('snapshot_created_at')}} <span style="white-space:nowrap">{{ snapshotDownloadedAt }}</span>.
           </v-alert>
           <v-alert
             :value="areUpdatedRecords"
             type="info">
-            There are {{ updatedRecordsCount }} unsynced rows in the database. Click the upload button below.
+            {{$t('unsynced_rows', [updatedRecordsCount])}}
           </v-alert>
         </v-card-text>
       </v-card>
@@ -32,12 +32,6 @@
   import DateService from '../../services/DateService'
   export default {
     name: 'sync-status',
-    data () {
-      return {
-      }
-    },
-    created () {
-    },
     props: {
       localLatestSnapshot: {
         type: Object
@@ -45,8 +39,6 @@
       updatedRecordsCount: {
         type: Number
       }
-    },
-    methods: {
     },
     computed: {
       wasSnapshotDownloaded: function () {
@@ -62,11 +54,6 @@
       areUpdatedRecords: function () {
         return (this.updatedRecordsCount !== null && this.updatedRecordsCount > 0)
       }
-    },
-    components: {
     }
   }
 </script>
-
-<style lang="sass" scoped>
-</style>

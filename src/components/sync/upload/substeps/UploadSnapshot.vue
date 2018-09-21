@@ -8,7 +8,7 @@
     :retry="retry"
     :indeterminate="false"
     :progress="progress">
-    Uploading file...
+    {{$t('uploading')}}
   </sync-sub-step>
 </template>
 
@@ -79,8 +79,6 @@
         this.currentLog = undefined
         this.doWork()
       }
-    },
-    computed: {
     },
     components: {
       SyncSubStep

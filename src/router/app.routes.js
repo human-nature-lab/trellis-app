@@ -1,5 +1,5 @@
+// const Sync = () => import(/* webpackChunkName: "sync" */'../components/sync/Sync')
 import Sync from '../components/sync/Sync'
-
 export default [{
   path: '/',
   name: 'Home',
