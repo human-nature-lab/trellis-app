@@ -90,15 +90,11 @@ export default class DataStore extends Emitter {
     }
     for (let type of ['respondent', 'survey', 'section']) {
       if (this.conditionTags[type] && tags[type]) {
-        this.conditionTags[type] = this.conditionTags[type].concat(tags[type])
+        for (let tag of tags[type]) {
+          this.addTag(type, tag)
+        }
       }
     }
-    this.conditionTags.respondent = this.conditionTags.respondent.map(tag => {
-      if (tag.conditionTag) {
-        ConditionTagStore.add(tag.conditionTag)
-      }
-      return tag
-    })
     RespondentConditionTagRecycler.fill(this.conditionTags.respondent)
     SectionConditionTagRecycler.fill(this.conditionTags.section)
     FormConditionTagRecycler.fill(this.conditionTags.survey)
@@ -130,10 +126,13 @@ export default class DataStore extends Emitter {
    * @param {string} type
    * @param {RespondentConditionTag|SectionConditionTag|SurveyConditionTag} tag
    */
-  addTag (type: string, tag:RespondentConditionTag|SectionConditionTag|SurveyConditionTag) {
+  addTag (type: string, tag: RespondentConditionTag|SectionConditionTag|SurveyConditionTag, conditionTag?: ConditionTag|null): void {
     this.conditionTags[type].push(tag)
     if (tag.conditionTag) {
       ConditionTagStore.add(tag.conditionTag)
+    }
+    if (conditionTag) {
+      ConditionTagStore.add(conditionTag)
     }
     this.emit('change', {
       data: this.data,

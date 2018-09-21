@@ -20,7 +20,7 @@
       <tr v-for="condition in allConditions">
         <td>{{condition.name}}</td>
         <td>{{condition.type}}</td>
-        <td>{{condition.created_at}}</td>
+        <td>{{condition.createdAt.fromNow()}}</td>
       </tr>
     </table>
   </v-flex>
@@ -49,7 +49,7 @@
         let conditions = []
         for (let type of ['survey', 'respondent', 'section']) {
           for (let condition of this.conditions[type]) {
-            let c = JSON.parse(JSON.stringify(condition))
+            let c = condition.copy()
             c.name = conditionTagStore.getNameFromId(c.conditionId)
             c.type = type
             conditions.push(c)
