@@ -40,7 +40,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         uglifyOptions: {
           compress: false,
           ecma: 6,
-          mangle: true
+          mangle: false
         },
         // sourceMap: true
       })
