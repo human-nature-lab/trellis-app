@@ -159,6 +159,7 @@
           end: false,
           conditionTag: false
         },
+        alreadyExited: false,
         questions: [],
         loadingStep: 0
       }
@@ -172,14 +173,16 @@
       window.onbeforeunload = null
       menuBus.$off('showConditionTags', this.showConditionTags)
       actionBus.$off('action', this.actionHandler)
-      this.leaving()
     },
     methods: {
       // Called by RoutePreloadMixin
       async leaving () {
-        interviewState.destroy()
-        await this.completeInterview()
-        return await this.saveData()
+        if (!this.alreadyExited) {
+          await this.saveData()
+          await this.completeInterview()
+          interviewState.destroy()
+        }
+        this.alreadyExited = false // For route updates
       },
       // Called by RoutePreloadMixin
       hydrate (data) {
@@ -247,8 +250,6 @@
         this.dialog.conditionTag = true
       },
       lockAndExit () {
-        console.log('TODO: Make sure everything is saved before marking the survey complete and exiting')
-        console.log('TODO: Lock and exit the survey')
         this.saveData()
           .then(() => {
             return Promise.all([
@@ -265,18 +266,19 @@
           })
       },
       exit () {
+        this.alreadyExited = true
         moveToNextOr(() => {
           router.go(-1)
         })
       },
-      saveData: function () {
+      async saveData () {
         if (this.formIsEmpty) {
-          return new Promise(resolve => resolve())
-        }
-        this.isSaving = true
-        return interviewState.save().then(() => {
+          return
+        } else {
+          this.isSaving = true
+          await interviewState.save()
           this.isSaving = false
-        })
+        }
       },
       async completeSurvey () {
         return await SurveyService.complete(this.interview.surveyId)
