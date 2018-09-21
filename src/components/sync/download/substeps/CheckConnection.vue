@@ -5,7 +5,7 @@
     :current-log="currentLog"
     :cancel="stopChecking"
     :retry="retry">
-    Establishing a connection with the server...
+    {{$t('establishing_connection')}}
   </sync-sub-step>
 </template>
 

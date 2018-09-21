@@ -1,6 +1,6 @@
 <template>
   <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :cancel="stopChecking" :retry="retry">
-    Authenticating device...
+    {{$t('device_authenticating')}}
   </sync-sub-step>
 </template>
 

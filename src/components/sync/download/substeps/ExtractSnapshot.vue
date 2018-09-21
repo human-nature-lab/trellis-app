@@ -6,7 +6,7 @@
                  :retry="retry"
                  :indeterminate="progressIndeterminate"
                  :progress="extractProgress">
-    Extracting the snapshot...
+    {{$t('extracting_snapshot')}}
   </sync-sub-step>
 </template>
 
@@ -64,8 +64,6 @@
           this.currentLog = undefined
           this.extractSnapshot()
         }
-      },
-      computed: {
       },
       components: {
         SyncSubStep

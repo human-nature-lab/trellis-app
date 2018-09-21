@@ -6,7 +6,7 @@
     :current-log="currentLog"
     :cancel="stopWorking"
     :retry="retry">
-    Verifying upload...
+    {{$t('verifying_upload')}}
   </sync-sub-step>
 </template>
 
@@ -66,8 +66,6 @@
         this.currentLog = undefined
         this.doWork()
       }
-    },
-    computed: {
     },
     components: {
       SyncSubStep

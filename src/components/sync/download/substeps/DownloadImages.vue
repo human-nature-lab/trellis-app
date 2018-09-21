@@ -8,7 +8,7 @@
                  :cancel="stopDownload"
                  :progress="downloadProgress"
                  :indeterminate="progressIndeterminate">
-    Downloading images... {{ numImagesDownloaded }}/{{ numImagesFound }}
+    {{$t('downloading_images', [numImagesDownloaded, numImagesFound])}}
   </sync-sub-step>
 </template>
 
@@ -97,15 +97,15 @@
           if (this.failedImages.length > 0) {
             this.loggingService.log({
               severity: 'warn',
-              message: `The server could not find ${this.failedImages.length} images that were requested.`
+              message: this.$t('server_cant_find_images', [this.failedImages.length])
               // fullMessage: JSON.stringify(this.failedImages, null, 2)
             }).then((result) => {
               console.warn('Failed images', this.failedImages)
               this.currentLog = result
-              this.$emit('download-images-done', this.numImagesDownloaded)
+              this.$emit('download-images-done', [this.numImagesDownloaded])
             })
           } else {
-            this.$emit('download-images-done', this.numImagesDownloaded)
+            this.$emit('download-images-done', [this.numImagesDownloaded])
           }
         },
         retry: function () {
@@ -118,16 +118,14 @@
         },
         stopDownload: function () {
           if (this.source) {
-            this.source.cancel('Operation cancelled by the user.')
+            this.source.cancel(this.$t('operation_cancelled'))
           }
           this.downloading = false
           this.loggingService.log({
             severity: 'info',
-            message: 'Operation cancelled by the user.'
+            message: this.$t('operation_cancelled')
           }).then((result) => { this.currentLog = result })
         }
-      },
-      computed: {
       },
       components: {
         SyncSubStep

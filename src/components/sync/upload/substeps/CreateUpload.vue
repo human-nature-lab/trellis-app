@@ -8,7 +8,7 @@
     success-message="DONE"
     :current-log="currentLog"
     :retry="retry">
-    Creating upload file...
+    {{$t('creating_upload')}}
   </sync-sub-step>
 </template>
 
@@ -72,15 +72,13 @@
         this.working = false
         this.loggingService.log({
           severity: 'info',
-          message: 'Operation cancelled by the user.'
+          message: this.$t('creating_upload')
         }).then((result) => { this.currentLog = result })
       },
       retry: function () {
         this.currentLog = undefined
         this.doWork()
       }
-    },
-    computed: {
     },
     components: {
       SyncSubStep
