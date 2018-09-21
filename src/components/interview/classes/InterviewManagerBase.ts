@@ -93,7 +93,6 @@ export default class InterviewManagerBase extends Emitter {
    * Register all condition assignment functions which will be executed when the respondent navigates between pages
    */
   protected initializeConditionAssignment (): void {
-    ConditionTagStore.clear()
     this.conditionAssigner.clear()
     this.blueprint.sections.forEach(section => {
       section.pages.forEach(page => {

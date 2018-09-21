@@ -19,6 +19,7 @@ export default function dataPersistSlave (interviewId: string, dataStore: DataSt
     }
   }
   function saveData (newState: InterviewDataInterface, prevState: InterviewDataInterface): Promise<any> {
+    debugger
     let dataDiff = DiffService.dataDiff(newState.data, prevState.data)
     let tagDiff = DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
     let diff = new InterviewDeltaInterface(dataDiff, tagDiff)

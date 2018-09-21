@@ -190,6 +190,14 @@ export default class InterviewManager extends InterviewManagerBase {
     return SkipService.shouldSkipPage(page.skips, conditionTagNames)
   }
 
+  /**
+   * Should we skip the current page
+   * @returns {boolean}
+   */
+  private shouldSkipCurrentPage () {
+    return this.shouldSkipPage(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)
+  }
+
   next () {
     this.stepForward()
     this.replayToCurrent()
@@ -405,7 +413,7 @@ export default class InterviewManager extends InterviewManagerBase {
         console.log(`We skipped ${c} pages`)
         debugger
       }
-    } else if (desiredLocNumber > currentLocNumber) {
+    } else if (desiredLocNumber > currentLocNumber && !this.shouldSkipCurrentPage()) {
       // Iterate forward through optional and readOnly pages until we hit the page we want to reach
       let c = 0
       do {
