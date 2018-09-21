@@ -21,7 +21,7 @@
           working: false,
           currentLog: undefined,
           status: {
-            message: 'Configuring database...'
+            message: this.$t('configuring_db')
           }
         }
       },
@@ -42,7 +42,7 @@
       methods: {
         startWork: async function () {
           this.working = true
-          this.status.message = 'Configuring database...'
+          this.status.message = this.$t('configuring_db')
           try {
             await DatabaseService.createUpdatedRecordsTable(this.queryRunner, this.status)
             await DatabaseService.addTriggers(this.queryRunner, this.status)

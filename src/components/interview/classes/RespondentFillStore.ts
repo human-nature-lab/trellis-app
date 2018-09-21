@@ -1,13 +1,13 @@
+import RespondentFill from "../../../entities/trellis/RespondentFill";
+
 export default class RespondentFillStore {
-  constructor () {
-    this.map = new Map()
-  }
+  private map: Map<string, string> = new Map()
 
   /**
    * Fill the store with an array of fills
-   * @param {Array} fills
+   * @param {RespondentFill[]} fills
    */
-  fill (fills) {
+  fill (fills: RespondentFill[]) {
     for (let fill of fills) {
       this.add(fill)
     }
@@ -15,18 +15,18 @@ export default class RespondentFillStore {
 
   /**
    * Add a respondent fill to the store. This indexes it by name
-   * @param {Object} fill - The fill with name and val properties
+   * @param {RespondentFill} fill - The fill with name and val properties
    */
-  add (fill) {
+  add (fill: RespondentFill) {
     this.map.set(fill.name, fill.val)
   }
 
   /**
    * Get a respondent fill by the name
-   * @param {String} name
-   * @returns {V | undefined}
+   * @param {string} name
+   * @returns {any}
    */
-  get (name) {
+  get (name: string) {
     return this.map.get(name)
   }
 }

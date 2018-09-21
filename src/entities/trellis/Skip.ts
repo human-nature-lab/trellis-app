@@ -29,4 +29,16 @@ export default class Skip extends SparseTimestampedSoftDelete {
   @ManyToMany(type => QuestionGroup, qg => qg.skips)
   questionGroups: QuestionGroup
 
+  fromSnakeJSON (json: any): this {
+    super.fromSnakeJSON(json)
+    for (let key of ['showHide', 'anyAll']) {
+      if (typeof this[key] === 'string') {
+        this[key] = this[key] === '1' || this[key] === 'true'
+      } else {
+        this[key] = !!this[key]
+      }
+    }
+    return this
+  }
+
 }

@@ -5,7 +5,7 @@
     :success="success"
     :current-log="currentLog"
     :retry="retry">
-    Registering successful download...
+    {{$t('registering_download')}}
   </sync-sub-step>
 </template>
 

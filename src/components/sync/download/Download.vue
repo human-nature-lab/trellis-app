@@ -185,15 +185,11 @@
   import Sync from '../../../entities/trellis-config/Sync'
   import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
   import TrellisAlert from '../../TrellisAlert.vue'
-  const DOWNLOAD_STATUS = {
-    CHECKING_CONNECTION: 'Establishing connection with the server...',
-    CHECKING_LAST_SNAPSHOT: 'Checking latest available snapshot on the server...'
-  }
   export default {
     name: 'download',
     data () {
       return {
-        status: DOWNLOAD_STATUS.CHECKING_CONNECTION,
+        status: this.$t('checking_connection'),
         downloadStep: this.initDownloadStep,
         downloadSubStep: 0,
         snapshotFileSize: null,

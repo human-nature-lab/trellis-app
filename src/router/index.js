@@ -41,7 +41,10 @@ router.afterEach((to) => console.log('after navigating to', to))
 
 router.onReady(() => console.log('router ready'))
 
-router.onError(err => console.error('Router error:', err))
+router.onError(err => {
+  console.error('Router error:', err)
+  alert('Unable to load route!')
+})
 
 /**
  * Add element to browser history and try to return to the current location

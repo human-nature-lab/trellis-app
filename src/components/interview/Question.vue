@@ -92,13 +92,13 @@
         required: true
       }
     },
-    data: function () {
+    data () {
       return {
         translation: this.question.questionTranslation,
         hasChanged: false
       }
     },
-    updated: function () {
+    update () {
       if (!this.hasChanged) {
         this.hasChanged = true
       }
@@ -107,7 +107,7 @@
       currentQuestionComponent () {
         return typeMap[this.question.questionTypeId]
       },
-      validationError: function () {
+      validationError () {
         if (!this.hasChanged || (this.question.dkRf !== null && this.question.dkRf !== undefined)) {
           return null
         }

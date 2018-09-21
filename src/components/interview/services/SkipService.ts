@@ -8,56 +8,57 @@ export default class SkipService {
    * @param {Set<string>} conditionTags - A Set of existing condition names
    * @returns {boolean}
    */
-  static shouldSkipPage (skips: Skip[], conditionTags: Set<string>) {
-    let shouldSkip = false
+  static shouldSkipPage (skips: Skip[], conditionTags: Set<string>): boolean {
+    let shouldShow = true
     for (let skip of skips) {
       if (skip.showHide) {
+        // Show
         if (!skip.anyAll) {
           // Show if any are true
-          shouldSkip = true
+          shouldShow = false
           for (let condition of skip.conditionTags) {
             if (conditionTags.has(condition.conditionTagName)) {
-              shouldSkip = false
+              shouldShow = true
               break
             }
           }
         } else {
           // Show if all are true
-          shouldSkip = skip.conditionTags.length === 0
+          shouldShow = true
           for (let condition of skip.conditionTags) {
             if (!conditionTags.has(condition.conditionTagName)) {
-              shouldSkip = true
+              shouldShow = false
+              break
             }
           }
         }
-        if (!shouldSkip) {
-          return shouldSkip
-        }
       } else {
+        // Hide
         if (!skip.anyAll) {
           // Hide if any are true
-          shouldSkip = false
+          shouldShow = true
           for (let condition of skip.conditionTags) {
             if (conditionTags.has(condition.conditionTagName)) {
-              shouldSkip = true
+              shouldShow = false
               break
             }
           }
         } else {
           // Hide if all are true
-          shouldSkip = skip.conditionTags.length !== 0
+          if (conditionTags.size === 0) {
+            shouldShow = true
+            break
+          }
+          shouldShow = false
           for (let condition of skip.conditionTags) {
             if (!conditionTags.has(condition.conditionTagName)) {
-              shouldSkip = false
+              shouldShow = true
               break
             }
           }
         }
-        if (shouldSkip) {
-          return shouldSkip
-        }
       }
     }
-    return shouldSkip
+    return !shouldShow
   }
 }

@@ -5,6 +5,8 @@ import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'
 import QuestionGroup from '../../entities/trellis/QuestionGroup'
 import {IsNull} from 'typeorm';
+import {removeSoftDeleted} from "../database/SoftDeleteHelper";
+import {isEqual} from 'lodash'
 
 export default class FormServiceCordova implements FormServiceInterface {
 
@@ -50,6 +52,7 @@ export default class FormServiceCordova implements FormServiceInterface {
       })
     })
     await Promise.all(promises)
+    removeSoftDeleted(form)
     return form
   }
 

@@ -7,7 +7,7 @@
                  :retry="retry"
                  :indeterminate="false"
                  :progress="downloadProgress">
-    Downloading the latest snapshot...
+    {{$t('downloading_snapshot')}}
   </sync-sub-step>
 </template>
 
@@ -91,8 +91,6 @@
           this.currentLog = undefined
           this.downloadSnapshot()
         }
-      },
-      computed: {
       },
       components: {
         SyncSubStep

@@ -1,8 +1,11 @@
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import Action from '../../../../entities/trellis/Action'
+import InterviewManager from "../../classes/InterviewManager";
+import {ActionPayload} from "./DatumOperations";
+import Question from "../../../../entities/trellis/Question";
 
 export interface ActionHandler {
-  (interview: any, payload?: any, questionDatum?: QuestionDatum, questionBlueprint?: any)
+  (interview: InterviewManager, payload?: ActionPayload, questionDatum?: QuestionDatum, questionBlueprint?: Question)
 }
 
 /**
@@ -14,8 +17,8 @@ export class ActionManager {
   /**
    * Add an action to the action manager
    * @param {string} name
-   * @param {ActionManager} cb
-   * @returns {ActionManager}
+   * @param {ActionHandler} cb
+   * @returns {this}
    */
   add (name: string, cb: ActionHandler) {
     if (this.actions[name]) throw Error('A handler for this action has already been registered')
@@ -25,14 +28,14 @@ export class ActionManager {
 
   /**
    * Perform an action
-   * @param {string} name
    * @param {Action} action
+   * @param {InterviewManager} interview
    * @param {QuestionDatum} questionDatum
-   * @param {object} questionBlueprint
+   * @param {Question} questionBlueprint
    * @param {boolean} actionWasInitiatedByAHuman
-   * @returns {ActionManager}
+   * @returns {any}
    */
-  do (action: Action, interview: any, questionDatum: QuestionDatum, questionBlueprint: any, actionWasInitiatedByAHuman: boolean) {
+  do (action: Action, interview: InterviewManager, questionDatum: QuestionDatum, questionBlueprint: Question, actionWasInitiatedByAHuman: boolean) {
     let type = action.actionType
     if (this.actions[type]) {
       return this.actions[type](interview, action.payload, questionDatum, questionBlueprint, actionWasInitiatedByAHuman)

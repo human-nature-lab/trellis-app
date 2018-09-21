@@ -1,36 +1,25 @@
 import {isEqual} from 'lodash'
 import {expect} from 'chai'
 import moment from 'moment'
+import SparseTimestamped from "../../src/entities/base/SparseTimestamped";
+import SparseTimestampedSoftDelete from "../../src/entities/base/SparseTimestampedSoftDelete";
 
-const timestamps = ['createdAt', 'updatedAt', 'deletedAt']
-export const modifiers = {
-  Interview (interview) {
-    return strip(interview, timestamps)
-  },
-  User (user) {
-    return strip(user, timestamps.concat(['password']))
-  },
-  Form (form) {
-    return strip(form, timestamps.concat(['formMasterId', 'nameTranslationId']))
-  },
-  Translation (translation) {
-    return strip(translation, timestamps)
-  },
-  TranslationText (tt) {
-    return strip(tt, timestamps.concat(['translationId', 'locale']))
-  },
-  Survey (s) {
-    return strip(s, ['password'])
-  },
-  Roster (r) {
-    return strip(r, timestamps)
-  },
-  RespondentGeo (g) {
-    return strip(g, timestamps.concat(['id']))
-  },
-  ConditionTag (c) {
-    return strip(c, timestamps)
-  }
+export const timestamps = ['createdAt', 'updatedAt', 'deletedAt']
+
+function removeTimestampsIfSparse (o) {
+  return o instanceof SparseTimestamped || o instanceof SparseTimestampedSoftDelete ? strip(o, timestamps) : o
+}
+
+// These mutators are run anytime a matching entity is found with the deepCompareEntities method
+export const globalMutators = {
+  User: user => strip(user, timestamps.concat(['password'])),
+  Form: form => strip(form, timestamps.concat(['formMasterId', 'nameTranslationId'])),
+  TranslationText: tt => strip(tt, timestamps.concat(['translationId', 'locale'])),
+  QuestionChoice: q => strip(q, ['questionId', 'choiceId']),
+  Survey: s => strip(s, ['password']),
+  RespondentGeo: g => strip(g, timestamps.concat(['id'])),
+  FormSection: f => strip(f, ['formId', 'sectionId']),
+  Section: s => strip(s, ['nameTranslationId'])
 }
 
 export const comparitors = {}
@@ -48,6 +37,24 @@ export function j (o) {
   return JSON.parse(JSON.stringify(o))
 }
 
+export function isSorted (vals, sortValueExtractor, ascending = true) {
+  if (vals.length <= 1) return true
+  for (let i = 1; i < vals.length; i++) {
+    let prevSortVal = sortValueExtractor(vals[i - 1])
+    let sortVal = sortValueExtractor(vals[i])
+    if (ascending) {
+      if (sortVal < prevSortVal) {
+        return false
+      }
+    } else {
+      if (sortVal > prevSortVal) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
 function dateToStringIfDate (a) {
   if (moment.isMoment(a) || moment.isDate(a)) {
     return moment.utc(a).toISOString()
@@ -56,15 +63,30 @@ function dateToStringIfDate (a) {
   }
 }
 
-function modifyIfCustomModifier (a) {
-  if (a && a.constructor && a.constructor.name && modifiers[a.constructor.name]) {
-    return modifiers[a.constructor.name](a)
-  } else {
-    return a
+function modifyIfCustomModifier (a, mutators = {}) {
+  a = removeTimestampsIfSparse(a)
+  if (a && a.constructor && a.constructor.name) {
+    let n = a.constructor.name
+    if (mutators[n]) {
+      a = mutators[n](a)
+    }
+    if (globalMutators[n]) {
+      a = globalMutators[n](a)
+    }
   }
+  return a
 }
 
-export function deepCompareEntities (a, b, keyTree = []) {
+/**
+ *
+ * @param a
+ * @param b
+ * @param {{}} localMutators
+ * @param {{}} localComparitors
+ * @param {any[]} keyTree
+ * @returns {any}
+ */
+export function deepCompareEntities (a, b, localMutators = {}, localComparitors = {}, keyTree = []) {
   if (a === b) return true
   a = dateToStringIfDate(a)
   b = dateToStringIfDate(b)
@@ -76,15 +98,18 @@ export function deepCompareEntities (a, b, keyTree = []) {
     b.sort(idSort)
     expect(a.length).to.equal(b.length, `Arrays aren't the same length ${keyTree.join('.')}`)
     for (let i = 0; i < a.length; i++) {
-      deepCompareEntities(a[i], b[i], keyTree.concat(i))
+      deepCompareEntities(a[i], b[i], localMutators, localComparitors, keyTree.concat(i))
     }
   } else if (typeof a === 'object') {
-    a = modifyIfCustomModifier(a)
-    b = modifyIfCustomModifier(b)
     expect(b).to.be.an('object', `b is not an object: ${keyTree.join('.')}`)
-    if (a.constructor && a.constructor.name && comparitors[a.constructor.name]) {
-      let compare = comparitors[a.constructor.name]
-      compare(a, b)
+    a = modifyIfCustomModifier(a, localMutators)
+    b = modifyIfCustomModifier(b, localMutators)
+    let comparitor
+    if (a.constructor && a.constructor.name) {
+      comparitor = localComparitors[a.constructor.name] || comparitors[a.constructor.name] || null
+    }
+    if (comparitor) {
+      comparitor(a, b)
     } else {
       let aKeys = Object.keys(a)
       let bKeys = Object.keys(b)
@@ -92,13 +117,13 @@ export function deepCompareEntities (a, b, keyTree = []) {
         if (bKeys.indexOf(prop) === -1) {
           throw new Error(`${prop} doesn't exist at ${keyTree.join('.')} on b, ${b.constructor.name}`)
         }
-        deepCompareEntities(a[prop], b[prop], keyTree.concat(prop))
+        deepCompareEntities(a[prop], b[prop], localMutators, comparitors, keyTree.concat(prop))
       }
       for (let prop of bKeys) {
         if (aKeys.indexOf(prop) === -1) {
           throw new Error(`${prop} doesn't exist at ${keyTree.join('.')} on a, ${a.constructor.name}`)
         }
-        deepCompareEntities(a[prop], b[prop], keyTree.concat(prop))
+        deepCompareEntities(a[prop], b[prop], localMutators, comparitors, keyTree.concat(prop))
       }
     }
   } else {

@@ -12,7 +12,7 @@
       v-bind:button-status="continueStatus"
       v-on:button-clicked="onClick"
       v-on:cancel-clicked="onCancel">
-      {{ (continueStatus === 3) ? 'Done' : 'Continue' }}
+      {{ (continueStatus === 3) ? $t('done') : $t('continue') }}
     </auto-click-button>
   </v-flex>
 </template>

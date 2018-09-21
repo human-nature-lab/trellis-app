@@ -6,7 +6,7 @@
     success-message="DONE"
     :current-log="currentLog"
     :retry="retry">
-    Calculating hash...
+    {{$t('calculating_hash')}}
   </sync-sub-step>
 </template>
 
@@ -56,8 +56,6 @@
         this.currentLog = undefined
         this.doWork()
       }
-    },
-    computed: {
     },
     components: {
       SyncSubStep

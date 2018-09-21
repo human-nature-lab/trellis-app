@@ -4,8 +4,8 @@
       <li>
         <slot></slot>
         <strong v-if="success" class="green--text">{{ successMessage }}.</strong>
-        <strong v-if="isWarning()" class="amber--text">WARNING.</strong>
-        <strong v-if="isError()" class="red--text">ERROR.</strong>
+        <strong v-if="isWarning()" class="amber--text">{{$t('warning_word').toUpperCase()}}</strong>
+        <strong v-if="isError()" class="red--text">{{$t('error').toUpperCase()}}</strong>
       </li>
     </ul>
     <trellis-alert v-if="showLog()" :current-log="currentLog"></trellis-alert>
@@ -17,15 +17,15 @@
     <v-btn
       v-if="retry !== undefined && !working && !success"
       color="primary"
-      @click="retry">Retry</v-btn>
+      @click="retry">{{$t('retry')}}</v-btn>
     <v-btn
       v-if="ignore !== undefined && !working && isWarning()"
       color="amber"
-      @click="ignore">Ignore</v-btn>
+      @click="ignore">{{$t('ignore')}}</v-btn>
     <v-btn
       v-if="cancel !== undefined && working"
       flat
-      @click="cancel">Stop</v-btn>
+      @click="cancel">{{$t('stop')}}</v-btn>
   </div>
 </template>
 
