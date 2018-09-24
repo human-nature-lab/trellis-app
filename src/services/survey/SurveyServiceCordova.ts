@@ -7,7 +7,7 @@ import {IsNull} from "typeorm";
 
 export default class SurveyServiceCordova implements SurveyServiceInterface {
 
-  async getSurvey (studyId: string, respondentId: string, formId: string) {
+  async getSurvey (studyId: string, respondentId: string, formId: string): Promise<Survey> {
     const repo = await DatabaseService.getRepository(Survey)
     return await repo.findOne({
       where: {
@@ -20,7 +20,7 @@ export default class SurveyServiceCordova implements SurveyServiceInterface {
     })
   }
 
-  async getRespondentSurveys (studyId, respondentId) {
+  async getRespondentSurveys (studyId: string, respondentId: string): Promise<Survey[]> {
     const repo = await DatabaseService.getRepository(Survey)
     let surveys = await repo.find({
       where: {
@@ -41,7 +41,7 @@ export default class SurveyServiceCordova implements SurveyServiceInterface {
     return surveys
   }
 
-  async create (studyId, respondentId, formId) {
+  async create (studyId: string, respondentId: string, formId: string): Promise<Survey> {
     const repo = await DatabaseService.getRepository(Survey)
     let survey = new Survey()
     survey.id = uuidv4()
@@ -54,7 +54,7 @@ export default class SurveyServiceCordova implements SurveyServiceInterface {
     return survey
   }
 
-  async complete (surveyId: string) {
+  async complete (surveyId: string): Promise<Survey> {
     const repo = await DatabaseService.getRepository(Survey)
     let survey = await repo.findOne({
       id: surveyId
