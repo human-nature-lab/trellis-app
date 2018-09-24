@@ -6,19 +6,19 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 export default class RespondentServiceWeb implements RespondentServiceInterface {
 
-  async getRespondentFillsById (respondentId) {
+  async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
     respondentId = encodeURIComponent(respondentId)
     let res = await http().get(`respondent/${respondentId}/fills`)
     return res.data.fills.map((f: object) => {
       return new RespondentFill().fromSnakeJSON(f)
     })
   }
-  async getRespondentById (respondentId) {
+  async getRespondentById (respondentId: string): Promise<Respondent> {
     respondentId = encodeURIComponent(respondentId)
     let res = await http().get(`respondent/${respondentId}`)
     return new Respondent().fromSnakeJSON(res.data.respondent)
   }
-  async getSearchPage (studyId, query, filters, page = 0, size = 50, respondentId = null) {
+  async getSearchPage (studyId: string, query: string, filters, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
     let params = {
       q: query,
       offset: page * size,
@@ -42,7 +42,7 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
       return new Respondent().fromSnakeJSON(r)
     })
   }
-  async addName (respondentId, name, isDisplayName = null, localeId = null) {
+  async addName (respondentId, name, isDisplayName = null, localeId = null): Promise<RespondentName> {
     respondentId = encodeURIComponent(respondentId)
     let res = await http().post(`respondent/${respondentId}/name`, {
       name: name,
@@ -51,7 +51,7 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     })
     return new RespondentName().fromSnakeJSON(res.data.name)
   }
-  editName (respondentId, respondentNameId, newName, isDisplayName = null, localeId = null) {
+  editName (respondentId, respondentNameId, newName, isDisplayName = null, localeId = null): Promise<RespondentName> {
     respondentId = encodeURIComponent(respondentId)
     respondentNameId = encodeURIComponent(respondentNameId)
     return http().put(`respondent/${respondentId}/name/${respondentNameId}`, {
@@ -60,7 +60,7 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
       locale_id: localeId
     }).then(res => new RespondentName().fromSnakeJSON(res.data.name))
   }
-  removeName (respondentId, respondentNameId) {
+  removeName (respondentId, respondentNameId): Promise<any> {
     respondentId = encodeURIComponent(respondentId)
     respondentNameId = encodeURIComponent(respondentNameId)
     return http().delete(`respondent/${respondentId}/name/${respondentNameId}`).then(r => r.data)
