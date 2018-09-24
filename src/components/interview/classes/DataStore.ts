@@ -21,6 +21,7 @@ export default class DataStore extends Emitter {
     section: [],
     survey: []
   }
+  private datumIdMap: Map<string, Datum> = new Map()
   private questionDatumIdMap: Map<string, QuestionDatum> = new Map()
   private questionDatumQuestionIdIndex: Map<string, QuestionDatum[]> = new Map()
   constructor (throttleRate = 10000) {
@@ -52,6 +53,7 @@ export default class DataStore extends Emitter {
     this.conditionTags.respondent.push(...this.baseRespondentConditionTags)
     this.questionDatumIdMap.clear()
     this.questionDatumQuestionIdIndex.clear()
+    this.datumIdMap.clear()
   }
 
   /**
@@ -59,18 +61,16 @@ export default class DataStore extends Emitter {
    * @param data
    * @MOVE_TO_SERVICE_LAYER
    */
-  loadData (data) {
-    // data = JSON.parse(JSON.stringify(data))
-    let oData = data
+  loadData (data: QuestionDatum[]) {
     data = data.map(c => c.copy())
     let datum = []
     let questionDatum = []
     for (let d of data) {
       for (let dat of d.data) {
+        this.datumIdMap.set(dat.id, dat)
         datum.push(dat)
       }
-      this.add(d, false)
-      // d = JSON.parse(JSON.stringify(d))
+      this.add(d)
       d = d.copy()
       d.data = []
       questionDatum.push(d)
@@ -105,7 +105,7 @@ export default class DataStore extends Emitter {
    * @param {QuestionDatum} questionDatum - A single questionDatum
    * @param {Boolean} [shouldPersist = false] - Whether the persist method should be called after adding the data
    */
-  add (questionDatum: QuestionDatum, shouldPersist = false) {
+  add (questionDatum: QuestionDatum) {
     this.data.push(questionDatum)
     this.questionDatumIdMap.set(questionDatum.id, questionDatum)
     let questionIdIndex = this.questionDatumQuestionIdIndex.get(questionDatum.questionId)
@@ -119,6 +119,22 @@ export default class DataStore extends Emitter {
       data: this.data,
       conditionTags: this.conditionTags
     })
+  }
+
+  getDatumById (datumId: string): Datum|null {
+    for (let j = 0; j < this.data.length; j++) {
+      for (let i = 0; i < this.data[j].data.length; i++) {
+        if (this.data[j].data[i].id === datumId) {
+          return this.data[j].data[i]
+        }
+      }
+    }
+  }
+
+  addDatum (questionDatum: QuestionDatum, ...args) {
+    const datum = DatumRecycler.getNoKey(...args)
+    this.datumIdMap.set(datum.id, datum)
+    questionDatum.data.push(datum)
   }
 
   /**

@@ -206,7 +206,7 @@
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
         this.interviewActions = interviewState.actions.store
-        this.location = interviewState.navigator.location
+        this.location = interviewState.navigator.loc
         this.interview = interview
         this.form = formBlueprint
         interviewState.on('atEnd', this.showEndDialog, this)
@@ -228,7 +228,8 @@
           this.location.sectionRepetition,
           this.location.sectionFollowUpDatumId,
           this.location.page
-        ).map(q => {
+        )
+        questions = questions.map(q => {
           q.type = {
             name: q.questionType.name
           }
