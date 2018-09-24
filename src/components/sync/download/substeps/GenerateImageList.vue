@@ -37,7 +37,7 @@
         generateImageList: function () {
           this.checking = true
           Promise.all([
-            PhotoService.getPhotos(),
+            PhotoService.getPhotoIdsAndFileNames(),
             FileService.listPhotos()])
             .then((results) => {
               this.checking = false
@@ -45,7 +45,7 @@
               const localList = results[1]
               for (let i = 0; i < photoList.length; i++) {
                 let photo = photoList[i]
-                this.imageList[photo.fileName] = photo.id
+                this.imageList[photo.file_name] = photo.id
               }
               for (let j = 0; j < localList.length; j++) {
                 let fileName = localList[j].name
