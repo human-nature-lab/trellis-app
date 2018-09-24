@@ -18,10 +18,11 @@ import FormConditionTagRecycler from "../services/recyclers/FormConditionTagRecy
 import SectionConditionTagRecycler from "../services/recyclers/SectionConditionTagRecycler";
 import Interview from "../../../entities/trellis/Interview";
 import Datum from "../../../entities/trellis/Datum";
+import InterviewAlligator from "../services/InterviewAlligator";
 
 export default class InterviewManagerBase extends Emitter {
 
-  protected navigator: InterviewNavigator
+  protected navigator: InterviewAlligator
   protected _dataPersistSlave: PersistSlave
   protected _actionsPersistSlave: PersistSlave
 
@@ -35,9 +36,8 @@ export default class InterviewManagerBase extends Emitter {
   public questionIdToSectionNum: Map<string, number> = new Map()
   public questionIdToPageNum: Map<string, number> = new Map()
 
-  protected data: DataStore
   protected actions: ActionStore
-
+  public data: DataStore
   public blueprint: Form
   public interview: Interview
 
@@ -150,8 +150,9 @@ export default class InterviewManagerBase extends Emitter {
    */
   protected makePageQuestionDatum (section: number, page: number): void {
     let currentPage = this.getPage(section, page)
+    const location = this.navigator.loc
     for (let questionBlueprint of currentPage.questions) {
-      if (!this.data.locationHasQuestionDatum(questionBlueprint.id, this.location.sectionRepetition, this.location.sectionFollowUpDatumId)) {
+      if (!this.data.locationHasQuestionDatum(questionBlueprint.id, location.sectionRepetition, location.sectionFollowUpDatumId)) {
         this.makeQuestionDatum(questionBlueprint)
       }
     }
@@ -178,15 +179,33 @@ export default class InterviewManagerBase extends Emitter {
     }
   }
 
+  questionsWithData () {
+    const questionDefinitions: Question[] = this.navigator.currentQuestions()
+    const location: InterviewLocation = this.navigator.loc
+    let questionData: QuestionDatum[] = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), location.sectionRepetition, location.sectionFollowUpDatumId)
+    // Copy and assign existing datum to each question
+    return questionDefinitions.map(question => {
+      question = question.copy() // Dereference the question
+      // question = JSON.parse(JSON.stringify(question)) // Dereference the question
+      // TODO: this might need to take into account section repetition and follow ups as well
+      question.datum = questionData.find(q => q.questionId === question.id)
+      // question.datum = question.datum.copy()
+      return question
+    })
+  }
+
   /**
    * Assign the current condition tags
    */
   _evaluateConditionAssignment (): void {
     // TODO: This should probably be every question in the survey so far
-    let questionsWithData = this.getPageQuestions(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)
+    const questionsWithData: Question[] = this.questionsWithData()
     let vars = questionsWithData.reduce((vars, question) => {
       if (!question.datum || !question.datum.data) {
-        throw Error('question datum and data should already exist!')
+        throw new Error('question datum and data should already exist!')
+      }
+      if (!question.datum.data.length) {
+        throw new Error('assigning question has not been answered yet')
       }
       switch (question.questionType.name) {
         case 'multiple_select':
@@ -200,7 +219,7 @@ export default class InterviewManagerBase extends Emitter {
       }
       return vars
     }, {})
-    // console.log('condition assignment vars', vars)
+    console.log('condition assignment vars', vars)
     for (let question of questionsWithData) {
       for (let act of question.assignConditionTags) {
         try {
@@ -255,8 +274,7 @@ export default class InterviewManagerBase extends Emitter {
    * @returns {Question[]}
    */
   public getPageQuestions (section: number, sectionRepetition: number, sectionFollowUpDatumId: string, page?: number): Question[] {
-    page = page != null ? page : this.location.page
-    let questionDefinitions: Question[] = this.getPage(section, page).questions
+    const questionDefinitions = this.navigator.currentQuestions()
     let questionData = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), sectionRepetition, sectionFollowUpDatumId)
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
@@ -307,16 +325,7 @@ export default class InterviewManagerBase extends Emitter {
     return qDatum.data
   }
 
-  public get location () {
-    return this.navigator.location
-  }
-
-  protected get currentPage () {
-    const l = this.location
-    return this.getPage(l.section, l.page)
-  }
-
   protected get currentSection () {
-    return this.getSection(this.location.section)
+    return this.navigator.currentSection()
   }
 }
