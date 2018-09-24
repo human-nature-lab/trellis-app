@@ -1,4 +1,4 @@
-import SkipService from '../../src/components/interview/services/SkipService'
+import SkipService from '../../src/services/SkipService'
 import {expect} from 'chai'
 import Skip from "../../src/entities/trellis/Skip";
 
@@ -11,11 +11,11 @@ function showHideString (val: boolean): string {
 }
 
 function shouldHide (skips: Skip[], conditions: Set<string>): void {
-  expect(SkipService.shouldSkipPage(skips, conditions)).to.equal(true, 'This page should hide')
+  expect(SkipService.shouldSkip(skips, conditions)).to.equal(true, 'This page should hide')
 }
 
 function shouldShow (skips: Skip[], conditions: Set<string>): void {
-  expect(SkipService.shouldSkipPage(skips, conditions)).to.equal(false, 'This page should show')
+  expect(SkipService.shouldSkip(skips, conditions)).to.equal(false, 'This page should show')
 }
 
 interface SkipHelper extends Skip {
