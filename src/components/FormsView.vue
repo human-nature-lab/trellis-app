@@ -4,6 +4,7 @@
       v-for="form in cForms"
       :key="form.id"
       :form="form"
+      v-if="showForm(form)"
       @click="$emit('click', form)"/>
   </v-flex>
 </template>
@@ -18,6 +19,27 @@
       forms: {
         type: Array,
         required: true
+      },
+      showHidden: {
+        type: Boolean,
+        default: false
+      },
+      showUnpublished: {
+        type: Boolean,
+        default: false
+      }
+    },
+    methods: {
+      showForm (form) {
+        if (form.isPublished && !form.isSkipped) {
+          return true
+        } else if (form.isPublished) {
+          return this.showHidden
+        } else if (form.isSkipped) {
+          return this.showUnpublished
+        } else {
+          return false
+        }
       }
     },
     computed: {
