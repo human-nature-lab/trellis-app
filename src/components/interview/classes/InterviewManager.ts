@@ -1,4 +1,4 @@
-import SkipService from '../services/SkipService'
+import SkipService from '../../../services/SkipService'
 import actionManager from '../services/actions/InterviewActionDefinitions'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
@@ -188,7 +188,7 @@ export default class InterviewManager extends InterviewManagerBase {
     // Get assigned condition tags and convert them into a set of condition ids
     const conditionTagNames = this.getConditionTagSet(sectionRepetition, sectionFollowUpDatumId)
     const page = this.getPage(section, pageIndex)
-    return SkipService.shouldSkipPage(page.skips, conditionTagNames)
+    return SkipService.shouldSkip(page.skips, conditionTagNames)
   }
 
   /**
