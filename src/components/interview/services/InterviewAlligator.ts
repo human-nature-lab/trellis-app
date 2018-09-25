@@ -86,7 +86,11 @@ export default class InterviewAlligator {
 
   private updatePages () {
     console.log('Updating navigation pages')
+    if (this.loc) {
+      console.log('pre update condition tags', Array.from(this.getConditionTagSet(this.loc.sectionRepetition, this.loc.sectionFollowUpDatumId)))
+    }
     this.pages.splice(0, this.pages.length)
+    this.skipped.splice(0, this.skipped.length)
     for (let section of this.form.sections) {
       // TODO: Check if the section is repeated
       if (section.followUpQuestionId) {
@@ -155,10 +159,15 @@ export default class InterviewAlligator {
 
   public zero (): void {
     this.index = 0
+    this.updatePages()
   }
 
   public get loc (): InterviewLocation {
     return this.pages[this.index]
+  }
+
+  public get nextLoc (): InterviewLocation {
+    return this.index < this.pages.length - 1 ? this.pages[this.index + 1] : undefined
   }
 
   public get isAtEnd (): boolean {
@@ -176,7 +185,7 @@ export default class InterviewAlligator {
 
   public previous (): void {
     this.index--
-    this.updatePages()
+    // this.updatePages()
   }
 
   public currentSection (): Section {

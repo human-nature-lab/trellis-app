@@ -48,9 +48,8 @@ export default class DataStore extends Emitter {
     // Clear all arrays without dereferencing
     this.data.splice(0, this.data.length)
     this.conditionTags.section.splice(0, this.conditionTags.section.length)
-    this.conditionTags.respondent.splice(0, this.conditionTags.respondent.length)
+    this.conditionTags.respondent.splice(0, this.conditionTags.respondent.length, ...this.baseRespondentConditionTags)
     this.conditionTags.survey.splice(0, this.conditionTags.survey.length)
-    this.conditionTags.respondent.push(...this.baseRespondentConditionTags)
     this.questionDatumIdMap.clear()
     this.questionDatumQuestionIdIndex.clear()
     this.datumIdMap.clear()

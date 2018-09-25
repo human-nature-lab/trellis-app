@@ -18,17 +18,17 @@ import AT from '../../src/static/action.types'
 
 import {expect} from 'chai'
 import './globals'
-import Form from "../../src/entities/trellis/Form";
 import {deepCompareEntities, isSorted, j, strip, timestamps} from "./helpers";
-import Skip from "../../src/entities/trellis/Skip";
 import Action from "../../src/entities/trellis/Action";
 import {ActionPayload} from "../../src/components/interview/services/actions/DatumOperations";
 import Question from "../../src/entities/trellis/Question";
 import {InterviewLocation} from "../../src/components/interview/services/InterviewNavigator";
 import QuestionDatum from "../../src/entities/trellis/QuestionDatum";
 import {ConditionTagInterface} from "../../src/services/interview/InterviewDataInterface";
-import moment from 'moment'
 import {locToNumber} from "../../src/components/interview/services/LocationHelpers";
+import moment from 'moment'
+import Form from "../../src/entities/trellis/Form";
+import Skip from "../../src/entities/trellis/Skip";
 
 interface SimpleLocation {
   section?: number
@@ -98,13 +98,14 @@ function stepThroughRandomly (nSteps: number, manager: InterviewManager, locatio
   }
 }
 
-const now = moment()
+let n = 0
 function makeAction (questionId: string, actionType: string, payload: ActionPayload) {
   let action = new Action()
   action.actionType = actionType
   action.payload = payload
   action.questionId = questionId
-  action.createdAt = moment(now).add(1, 's')
+  action.createdAt = moment().add(n, 'seconds')
+  n++
   return action
 }
 
@@ -177,169 +178,179 @@ export default function () {
   describe('InterviewManager', function (this:any) {
     this.timeout(60 * 1000)
 
-    // describe('Loading', () => {
-    //   it('should sort all sections of the form correctly', async () => {
-    //     for (let id of [forms.firstPageSkipped, formId]) {
-    //       const manager = await setupInterviewManager(id)
-    //       manager.initialize()
-    //       const sections = manager.blueprint.sections
-    //       const sectionSorted = isSorted(sections, s => s.formSections[0].sortOrder)
-    //       expect(sectionSorted, 'Sections are not sorted correctly').to.be.true
-    //       for (let section of sections) {
-    //         const questionGroupSorted = isSorted(section.questionGroups, g => g.sectionQuestionGroup.questionGroupOrder)
-    //         expect(questionGroupSorted, 'Question groups are not sorted correctly').to.be.true
-    //         for (let page of section.questionGroups) {
-    //           const questionsSorted = isSorted(page.questions, q => q.sortOrder)
-    //           expect(questionsSorted, 'Questions are not sorted correctly').to.be.true
-    //           for (let question of page.questions) {
-    //             let choicesSorted = isSorted(question.choices, c => c.sortOrder)
-    //             expect(choicesSorted, 'Choices are not sorted correctly').to.be.true
-    //           }
-    //         }
-    //       }
-    //     }
-    //   })
-    //   it('should load interview data correctly')
-    //   it('should handle loading correctly')
-    // })
-    //
-    // describe('Prefill', () => {
-    //   function testRosters (manager, rosterIds) {
-    //     let questions = manager.getCurrentPageQuestions()
-    //     expect(questions.length).to.equal(1, 'There are no questions here')
-    //     let q = questions[0]
-    //     expect(q.datum.data.length).to.equal(3, 'All roster rows are not present')
-    //     let foundRosterIds = q.datum.data.map(d => d.rosterId)
-    //     expect(foundRosterIds).to.include.members(rosterIds, 'All roster ids were not inclued on the first page')
-    //   }
-    //   let manager
-    //   beforeEach(async () => {
-    //     manager = await setupInterviewManager(forms.rosterPrefill, prefillRespondentId)
-    //     manager.initialize()
-    //   })
-    //   it('should handle prefill actions for the first question', () => {
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //     testRosters(manager, firstPageRosterIds)
-    //     next(manager)
-    //     next(manager)
-    //     prev(manager)
-    //     prev(manager)
-    //     testRosters(manager, firstPageRosterIds)
-    //   })
-    //   it('should handle prefill actions in the middle', () => {
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //     next(manager)
-    //     next(manager)
-    //     testRosters(manager, middlePageRosterIds)
-    //   })
-    //   it('should handle prefill actions at the end', () => {
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //     next(manager)
-    //     next(manager)
-    //     next(manager)
-    //     selectNChoice(manager, 0)
-    //     next(manager)
-    //     testRosters(manager, lastPageRosterIds)
-    //   })
-    // })
+    describe('Loading', () => {
+      it('should sort all sections of the form correctly', async () => {
+        for (let id of [forms.firstPageSkipped, formId]) {
+          const manager = await setupInterviewManager(id)
+          manager.initialize()
+          const sections = manager.blueprint.sections
+          const sectionSorted = isSorted(sections, s => s.formSections[0].sortOrder)
+          expect(sectionSorted, 'Sections are not sorted correctly').to.be.true
+          for (let section of sections) {
+            const questionGroupSorted = isSorted(section.questionGroups, g => g.sectionQuestionGroup.questionGroupOrder)
+            expect(questionGroupSorted, 'Question groups are not sorted correctly').to.be.true
+            for (let page of section.questionGroups) {
+              const questionsSorted = isSorted(page.questions, q => q.sortOrder)
+              expect(questionsSorted, 'Questions are not sorted correctly').to.be.true
+              for (let question of page.questions) {
+                let choicesSorted = isSorted(question.choices, c => c.sortOrder)
+                expect(choicesSorted, 'Choices are not sorted correctly').to.be.true
+              }
+            }
+          }
+        }
+      })
+      it('should load interview data correctly')
+      it('should handle loading correctly')
+    })
 
-    // describe('Navigation', () => {
-    //   it('should not require you to press the next button twice after changing a skip condition', async () => {
-    //     const manager = await setupInterviewManager(forms.conditionReassignment)
-    //     manager.initialize()
-    //     validateLocation(manager.location, {page: 0})
-    //     selectChoice(manager, 'c')
-    //     next(manager)
-    //     validateLocation(manager.location, {page: 1})
-    //     prev(manager)
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //     selectChoice(manager, 'c', false)
-    //     selectChoice(manager, 'd')
-    //     next(manager)
-    //     validateLocation(manager.location, {section: 0, page: 2})
-    //   })
-    //   it('should start on the first page of a form if there are no actions', async () => {
-    //     const manager = await setupInterviewManager(forms.conditionAssignment)
-    //     manager.initialize()
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //   })
-    //   it('should stop at the first invalid question when loading', async () => {
-    //     let manager = await setupInterviewManager(forms.conditionAssignment, respondentId3)
-    //     manager.initialize()
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //     selectChoice(manager, '2')
-    //     next(manager)
-    //     validateLocation(manager.location, {section: 0, page: 1})
-    //     selectChoice(manager, 'one')
-    //     prev(manager)
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //     selectChoice(manager, '2', false)
-    //     let actions = manager['actions'].actions.map(a => a.copy())
-    //     console.log('actions', JSON.stringify(actions))
-    //     const nManager = await setupInterviewManager(forms.conditionAssignment, respondentId3, studyId, actions)
-    //     nManager.initialize()
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //   })
-    //   it('should handle moving backward and forward correctly', async ()  => {
-    //     const manager = await setupInterviewManager(forms.conditionAssignment)
-    //     manager.initialize()
-    //     expect(manager.location.page).to.equal(0, 'We should start on the first page')
-    //     selectChoice(manager, '2')
-    //     next(manager)
-    //     expect(manager.location.page).to.equal(1, 'We should be on the second page')
-    //     prev(manager)
-    //     expect(manager.location.page).to.equal(0, 'We should be back on the first page')
-    //   })
-    // })
-    // it('should be able to move backward even if the current page has invalid responses', async () => {
-    //   const manager = await setupInterviewManager(forms.conditionAssignment)
-    //   manager.initialize()
-    //   validateLocation(manager.location, {section: 0, page: 0})
-    //   throw new Error('TODO')
-    //   // TODO
-    // })
-    // describe('Skips', () => {
-    //   it('should handle skips on the first question correctly', async () => {
-    //     const manager = await setupInterviewManager(forms.firstPageSkipped)
-    //     manager.initialize()
-    //     expect(manager.blueprint).to.be.an.instanceOf(Form)
-    //     expect(manager.blueprint.sections[0].questionGroups[0].skips.length).to.be.greaterThan(0, 'No skips defined on the first page')
-    //     const skip: Skip = manager.blueprint.sections[0].questionGroups[0].skips[0]
-    //     expect(skip.showHide).to.equal(true, 'First skip should be show')
-    //     validateLocation(manager.location, {section: 1, page: 0})
-    //   })
-    //   it('should handle skips in repeated sections')
-    //   it('should handle skipping the last question', async () => {
-    //     const manager = await setupInterviewManager(forms.lastPageSkipped)
-    //     manager.initialize()
-    //     validateLocation(manager.location, {section: 0, page: 0})
-    //     selectChoice(manager, 'skip')
-    //     next(manager)
-    //     validateLocation(manager.location, {section: 0, page: 1})
-    //     next(manager)
-    //     validateLocation(manager.location, {section: 0, page: 1})
-    //   })
-    //   it('should handle skipping the last question in a repeated section')
-    // })
+    describe('Prefill', () => {
+      function testRosters (manager, rosterIds) {
+        let questions = manager.getCurrentPageQuestions()
+        expect(questions.length).to.equal(1, 'There are no questions here')
+        let q = questions[0]
+        expect(q.datum.data.length).to.equal(3, 'All roster rows are not present')
+        let foundRosterIds = q.datum.data.map(d => d.rosterId)
+        expect(foundRosterIds).to.include.members(rosterIds, 'All roster ids were not inclued on the first page')
+      }
+      let manager
+      beforeEach(async () => {
+        manager = await setupInterviewManager(forms.rosterPrefill, prefillRespondentId)
+        manager.initialize()
+      })
+      it('should handle prefill actions for the first question', () => {
+        debugger
+        validateLocation(manager.location, {section: 0, page: 0})
+        testRosters(manager, firstPageRosterIds)
+        next(manager)
+        validateLocation(manager.location, {page: 1})
+        next(manager)
+        validateLocation(manager.location, {page: 2})
+        prev(manager)
+        validateLocation(manager.location, {page: 1})
+        prev(manager)
+        validateLocation(manager.location, {page: 0})
+        testRosters(manager, firstPageRosterIds)
+      })
+      it('should handle prefill actions in the middle', () => {
+        validateLocation(manager.location, {section: 0, page: 0})
+        next(manager)
+        next(manager)
+        testRosters(manager, middlePageRosterIds)
+      })
+      it('should handle prefill actions at the end', () => {
+        validateLocation(manager.location, {section: 0, page: 0})
+        next(manager)
+        next(manager)
+        next(manager)
+        selectNChoice(manager, 0)
+        next(manager)
+        testRosters(manager, lastPageRosterIds)
+      })
+    })
+
+    describe('Navigation', () => {
+      it('should not require you to press the next button twice after changing a skip condition', async () => {
+        const manager = await setupInterviewManager(forms.conditionReassignment)
+        manager.initialize()
+        validateLocation(manager.location, {page: 0})
+        selectChoice(manager, 'c')
+        next(manager)
+        validateLocation(manager.location, {page: 1})
+        prev(manager)
+        validateLocation(manager.location, {section: 0, page: 0})
+        selectChoice(manager, 'c', false)
+        selectChoice(manager, 'd')
+        next(manager)
+        validateLocation(manager.location, {section: 0, page: 2})
+      })
+      it('should start on the first page of a form if there are no actions', async () => {
+        const manager = await setupInterviewManager(forms.conditionAssignment)
+        manager.initialize()
+        validateLocation(manager.location, {section: 0, page: 0})
+      })
+      it('should stop at the first invalid question when loading', async () => {
+        let manager = await setupInterviewManager(forms.conditionAssignment, respondentId3)
+        manager.initialize()
+        validateLocation(manager.location, {section: 0, page: 0})
+        selectChoice(manager, '2')
+        next(manager)
+        validateLocation(manager.location, {section: 0, page: 1})
+        selectChoice(manager, 'one')
+        prev(manager)
+        validateLocation(manager.location, {section: 0, page: 0})
+        selectChoice(manager, '2', false)
+        let actions = manager['actions'].actions.map(a => a.copy())
+        console.log('actions', JSON.stringify(actions))
+        const nManager = await setupInterviewManager(forms.conditionAssignment, respondentId3, studyId, actions)
+        nManager.initialize()
+        validateLocation(manager.location, {section: 0, page: 0})
+        selectChoice(manager, '2')
+      })
+      it('should handle moving backward and forward correctly', async ()  => {
+        const manager = await setupInterviewManager(forms.conditionAssignment)
+        manager.initialize()
+        expect(manager.location.page).to.equal(0, 'We should start on the first page')
+        selectChoice(manager, '2')
+        next(manager)
+        expect(manager.location.page).to.equal(1, 'We should be on the second page')
+        prev(manager)
+        expect(manager.location.page).to.equal(0, 'We should be back on the first page')
+      })
+    })
+    it('should be able to move backward even if the current page has invalid responses', async () => {
+      const manager = await setupInterviewManager(forms.conditionAssignment)
+      manager.initialize()
+      validateLocation(manager.location, {section: 0, page: 0})
+      throw new Error('TODO')
+      // TODO
+    })
+    describe('Skips', () => {
+      it('should handle skips on the first question correctly', async () => {
+        const manager = await setupInterviewManager(forms.firstPageSkipped)
+        manager.initialize()
+        expect(manager.blueprint).to.be.an.instanceOf(Form)
+        expect(manager.blueprint.sections[0].questionGroups[0].skips.length).to.be.greaterThan(0, 'No skips defined on the first page')
+        const skip: Skip = manager.blueprint.sections[0].questionGroups[0].skips[0]
+        expect(skip.showHide).to.equal(true, 'First skip should be show')
+        validateLocation(manager.location, {section: 1, page: 0})
+      })
+      it('should handle skips in repeated sections')
+      it('should handle skipping the last question', async () => {
+        const manager = await setupInterviewManager(forms.lastPageSkipped)
+        manager.initialize()
+        validateLocation(manager.location, {section: 0, page: 0})
+        selectChoice(manager, 'skip')
+        next(manager)
+        validateLocation(manager.location, {section: 0, page: 1})
+        next(manager)
+        validateLocation(manager.location, {section: 0, page: 1})
+      })
+      it('should handle skipping the last question in a repeated section')
+    })
 
     describe('Lifecycle', () => {
       it('should handle correctly assigning conditions after changing responses and navigating', async () => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
         manager.initialize()
-        debugger
         selectChoice(manager, '1')
         next(manager)
         validateLocation(manager.location, {page: 2})
         let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('is_one', `condition tags should include condition, 'is_one'`).and.not.include('is_two', `condition tags should not include condition, 'is_two'`)
+        // manager._debugReplay = true
         prev(manager)
         validateLocation(manager.location, {page: 0})
         selectChoice(manager, '2')
         next(manager)
-          validateLocation(manager.location, {page: 1})
+        validateLocation(manager.location, {page: 1})
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('is_two', `condition tags should include condition, 'is_two'`).and.not.include('is_one', `condition tags should not include condition, 'is_one'`)
+        selectNChoice(manager, 0)
         next(manager)
+        validateLocation(manager.location, {page: 2})
+        conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+        expect(conditionTags).to.include('was_assigned', 'r_condition was not assigned correct')
       })
       it('should handle repeated sections', async () => {
         const manager = await setupInterviewManager(forms.repeatedSections)
@@ -385,46 +396,46 @@ export default function () {
       })
     })
     //
-    // describe('Storage', () => {
-    //   describe('Condition tags', () => {
-    //     it('should store respondent level condition tags', async () => {
-    //       const tagName = 'resp_was_assigned'
-    //       const manager = await setupInterviewManager(forms.conditionAssignment)
-    //       manager.attachDataPersistSlave()
-    //       manager.initialize()
-    //       let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
-    //       console.log('conditionTags', conditionTags)
-    //       expect(conditionTags).to.not.include(tagName, 'The RCT already exists. Please reset DB or delete')
-    //       validateLocation(manager.location, {section: 0, page: 0})
-    //       selectNChoice(manager, 1)
-    //       next(manager)
-    //       validateLocation(manager.location, {section: 0, page: 1, sectionFollowUpRepetition: 0, sectionRepetition: 0})
-    //       selectNChoice(manager, 0)
-    //       next(manager)
-    //       validateLocation(manager.location, {section: 0, page: 2, sectionFollowUpRepetition: 0, sectionRepetition: 0})
-    //       selectNChoice(manager, 0)
-    //       next(manager)
-    //       validateLocation(manager.location, {section: 0, page: 3, sectionFollowUpRepetition: 0, sectionRepetition: 0})
-    //       conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
-    //       expect(conditionTags).to.include(tagName, 'The respondent condition tag was not assigned in memory')
-    //       await manager.save()
-    //       let data = await InterviewService.getData(manager.interview.id)
-    //       expect(data.conditionTags.respondent.length).to.be.greaterThan(0, 'No respondent condition tags assigned')
-    //       let respondentConditionTags = data.conditionTags.respondent.map(rct => rct.conditionTag.name)
-    //       expect(respondentConditionTags).to.include(tagName, 'The respondent condition tag was not assigned in the database')
-    //       manager.destroy()
-    //     })
-    //   })
-    //   it('should assign conditions on the last page', async () => {
-    //     throw Error('TODO') // TODO
-    //   })
-    //   it('should only call save once when we exit', async () => {
-    //     throw Error('TODO') // TODO
-    //   })
-    //   it('should save actions when they happen')
-    //   it('should save data eventually')
-    //   it('should rebuild all the data and save before locking the survey')
-    //   it('should save data and actions before leaving')
-    // })
+    describe('Storage', () => {
+      describe('Condition tags', () => {
+        it('should store respondent level condition tags', async () => {
+          const tagName = 'resp_was_assigned'
+          const manager = await setupInterviewManager(forms.conditionAssignment)
+          manager.attachDataPersistSlave()
+          manager.initialize()
+          let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+          console.log('conditionTags', conditionTags)
+          expect(conditionTags).to.not.include(tagName, 'The RCT already exists. Please reset DB or delete')
+          validateLocation(manager.location, {section: 0, page: 0})
+          selectNChoice(manager, 1)
+          next(manager)
+          validateLocation(manager.location, {section: 0, page: 1, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          selectNChoice(manager, 0)
+          next(manager)
+          validateLocation(manager.location, {section: 0, page: 2, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          selectNChoice(manager, 0)
+          next(manager)
+          validateLocation(manager.location, {section: 0, page: 3, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+          expect(conditionTags).to.include(tagName, 'The respondent condition tag was not assigned in memory')
+          await manager.save()
+          let data = await InterviewService.getData(manager.interview.id)
+          expect(data.conditionTags.respondent.length).to.be.greaterThan(0, 'No respondent condition tags assigned')
+          let respondentConditionTags = data.conditionTags.respondent.map(rct => rct.conditionTag.name)
+          expect(respondentConditionTags).to.include(tagName, 'The respondent condition tag was not assigned in the database')
+          manager.destroy()
+        })
+      })
+      it('should assign conditions on the last page', async () => {
+        throw Error('TODO') // TODO
+      })
+      it('should only call save once when we exit', async () => {
+        throw Error('TODO') // TODO
+      })
+      it('should save actions when they happen')
+      it('should save data eventually')
+      it('should rebuild all the data and save before locking the survey')
+      it('should save data and actions before leaving')
+    })
   })
 }

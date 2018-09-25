@@ -204,15 +204,15 @@ export default class InterviewManagerBase extends Emitter {
       if (!question.datum || !question.datum.data) {
         throw new Error('question datum and data should already exist!')
       }
-      if (!question.datum.data.length) {
-        throw new Error('assigning question has not been answered yet')
-      }
       switch (question.questionType.name) {
         case 'multiple_select':
         case 'relationship':
         case 'geo':
         case 'photo':
           vars[question.varName] = question.datum.data.map(datum => datum.val)
+          break
+        case 'intro':
+          vars[question.varName] = true
           break
         default:
           vars[question.varName] = question.datum.data.length ? question.datum.data[0].val : undefined
