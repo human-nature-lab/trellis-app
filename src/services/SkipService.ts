@@ -1,4 +1,4 @@
-import Skip from '../../../entities/trellis/Skip'
+import Skip from '../entities/trellis/Skip'
 
 export default class SkipService {
   /**
@@ -8,7 +8,7 @@ export default class SkipService {
    * @param {Set<string>} conditionTags - A Set of existing condition names
    * @returns {boolean}
    */
-  static shouldSkipPage (skips: Skip[], conditionTags: Set<string>): boolean {
+  static shouldSkip (skips: Skip[], conditionTags: Set<string>): boolean {
     let shouldShow = true
     for (let skip of skips) {
       if (skip.showHide) {

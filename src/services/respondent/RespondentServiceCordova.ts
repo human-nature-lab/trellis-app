@@ -9,13 +9,13 @@ import {Brackets, IsNull} from 'typeorm'
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
 
-  async getRespondentFillsById (respondentId) {
+  async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentFill)
     return repository.find({ deletedAt: null, respondentId: respondentId })
   }
 
-  async getRespondentById (respondentId) {
+  async getRespondentById (respondentId: string): Promise<Respondent> {
     const repository = await DatabaseService.getRepository(Respondent)
     return await repository.findOne({
       where: {
@@ -34,7 +34,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     })
   }
 
-  async getSearchPage (studyId, query, filters, page = 0, size = 50, respondentId = null) {
+  async getSearchPage (studyId: string, query: string, filters, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
@@ -87,7 +87,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return await q.getMany()
   }
 
-  async addName (respondentId, name, isDisplayName = null, localeId = null) {
+  async addName (respondentId, name, isDisplayName = null, localeId = null): Promise<RespondentName> {
     const respondentName = new RespondentName()
     respondentName.isDisplayName = isDisplayName
     respondentName.name = name
