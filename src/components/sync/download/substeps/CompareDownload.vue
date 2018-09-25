@@ -88,7 +88,7 @@
               } else {
                 this.localDownload = localDownload
                 this.localDownloadedAt = this.localDownload['snapshotCreatedAt']
-                this.serverCreatedAt = new Date(this.serverSnapshot['created_at'])
+                this.serverCreatedAt = new Date(this.serverSnapshot['created_at'] + 'Z')
                 if (this.localDownloadedAt.getTime() > this.serverCreatedAt.getTime()) {
                   this.result = RESULTS.DOWNLOAD_NEWER
                 } else if (this.localDownloadedAt.getTime() === this.serverCreatedAt.getTime()) {
@@ -110,13 +110,13 @@
           if (!this.serverSnapshot || !this.serverSnapshot.hasOwnProperty('created_at')) {
             return 'NONE'
           }
-          return DateService.parseDate(this.serverSnapshot['created_at']).format('llll')
+          return DateService.parseDate(this.serverSnapshot['created_at'] + 'Z').local().format('llll')
         },
         localDownloadCreatedAt: function () {
           if (!this.localDownload || !this.localDownload.hasOwnProperty('createdAt')) {
             return 'NONE'
           }
-          return DateService.parseDate(this.localDownload['createdAt']).format('llll')
+          return DateService.parseDate(this.localDownload['createdAt']).local().format('llll')
         }
       },
       components: {
