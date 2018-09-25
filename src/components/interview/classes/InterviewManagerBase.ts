@@ -36,8 +36,8 @@ export default class InterviewManagerBase extends Emitter {
   public questionIdToSectionNum: Map<string, number> = new Map()
   public questionIdToPageNum: Map<string, number> = new Map()
 
-  protected actions: ActionStore
   public data: DataStore
+  public actions: ActionStore
   public blueprint: Form
   public interview: Interview
 
