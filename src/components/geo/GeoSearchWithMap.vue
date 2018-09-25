@@ -2,6 +2,25 @@
   <v-layout
     column
     fill-height>
+    <v-snackbar
+      v-model="snackbar"
+      bottom
+      absolute
+      :timeout="2000">
+      No child locations found.
+      <v-btn
+        icon
+        flat
+        @click="snackbar = false">
+        <v-icon>close</v-icon>
+      </v-btn>
+    </v-snackbar>
+    <v-toolbar>
+      <v-btn icon v-if="parentGeo !== null" @click.stop="upOneLevelDone">
+        <v-icon>arrow_back</v-icon>
+      </v-btn>
+      <v-toolbar-title>{{ parentGeoName }}</v-toolbar-title>
+    </v-toolbar>
     <v-flex
       fill-height
       ref="mapContainer"
@@ -24,6 +43,8 @@
     <div>
       <permission :role-whitelist="['admin']">
         <geo-edit-panel
+          v-on:select-geo-done="selectGeoDone"
+          v-on:up-one-level-done="upOneLevelDone"
           v-on:editing-done="editingDone"
           v-on:remove-geo-done="removeGeoDone"
           v-on:move-geo-done="moveGeoDone"
@@ -33,7 +54,7 @@
           :leaflet-map="trellisMap"></geo-edit-panel>
       </permission>
     </div>
-    <v-navigation-drawer
+    <!--v-navigation-drawer
       fixed
       clipped
       :disable-route-watcher="true"
@@ -50,10 +71,10 @@
         </v-list-tile>
         <v-divider></v-divider>
         <v-flex>
-          <geo-search v-on:returned-geo-results="displayResults"></geo-search>
+          <geo-search ref="geoSearch" v-on:returned-geo-results="displayResults"></geo-search>
         </v-flex>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer-->
   </v-layout>
 </template>
 
@@ -120,16 +141,27 @@
         tooltips: [],
         markerPositions: [],
         minZoom: undefined,
-        selectedGeo: null
+        selectedGeo: null,
+        snackbar: false
       }
     },
     mounted () {
-      this.setUpSearch()
+      // this.setUpSearch()
       this.setUpMap()
-      this.displayResults(this.geoResults)
-      this.$nextTick(() => { this.global.searchDrawer.open = true })
+      this.selectGeo(null)
     },
     methods: {
+      selectGeo: async function (geo) {
+        const geoId = (geo && geo.id) ? geo.id : null
+        const geoResults = await GeoService.getGeosByParentId(geoId)
+        if (geoResults.length > 0) {
+          this.parentGeo = geo
+          this.geoResults = geoResults
+          this.displayResults(this.geoResults)
+        } else {
+          this.snackbar = true
+        }
+      },
       setUpSearch: function () {
         global.searchDrawer.component = GeoSearch
       },
@@ -152,14 +184,12 @@
           this.repositionMarkers()
         })
       },
-      displayResults: function (results, parent) {
+      displayResults: function (results) {
         this.geoResults = results
-        this.parentGeoId = parent
         this.clearMarkers()
         this.addMarkers(results)
         this.centerMap()
         this.repositionMarkers()
-        this.$nextTick(() => { this.global.searchDrawer.open = true })
       },
       clearMarkers: function () {
         this.clearPaths()
@@ -186,6 +216,16 @@
         })
         this.tooltipMarkers = []
       },
+      upOneLevelDone: async function () {
+        const parentGeoId = (this.parentGeo) ? this.parentGeo.parentId : null
+        const parentGeo = (parentGeoId) ? await GeoService.getGeoById(parentGeoId) : null
+        this.selectedGeo = null
+        this.selectGeo(parentGeo)
+      },
+      selectGeoDone: function (newParentGeo) {
+        this.selectedGeo = null
+        this.selectGeo(newParentGeo)
+      },
       editingDone: function (editedGeo) {
         this.selectedGeo = null
         for (let i = 0; i < this.geoResults.length; i++) {
@@ -198,7 +238,7 @@
       },
       addNewGeo: async function () {
         const study = await StudyService.getCurrentStudy()
-        this.selectedGeo = GeoService.createNewGeo(this.parentGeoId, study.locales)
+        this.selectedGeo = GeoService.createNewGeo(this.parentGeo.id, study.locales)
       },
       removeGeoDone: function (removedGeoId) {
         this.selectedGeo = null
@@ -368,6 +408,15 @@
         this.trellisMap.fitBounds(L.latLngBounds(this.markerPositions))
       }
     },
+    computed: {
+      parentGeoName: function () {
+        if (this.parentGeo === null) {
+          return this.$t('locations')
+        }
+        const translation = TranslationService.getTranslated(this.parentGeo.nameTranslation, this.global.locale)
+        return (translation) ? translation : '[No translation]'
+      }
+    },
     components: {
       GeoEditPanel,
       GeoSearch,
@@ -379,6 +428,8 @@
 <style lang="sass">
   @import "../../../node_modules/leaflet/dist/leaflet.css"
 
+  .snack
+    z-index: 3000 !important
   .floating-button
     z-index: 3000 !important
     margin-bottom: 50px

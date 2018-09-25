@@ -29,6 +29,10 @@
           <p>Click on the map where you want to move this location.</p>
         </div>
       </v-card-title>
+      <v-card-actions v-if="curStatus === STATUS.SELECTED">
+        <v-btn flat @click="selectGeo">View children</v-btn>
+        <v-btn flat @click="showGeoInfo">More info</v-btn>
+      </v-card-actions>
       <v-card-actions>
         <geo-type-selector
           v-if="curStatus === STATUS.NEW_GEO_TYPE"
@@ -36,9 +40,9 @@
           v-on:geo-type-selected="geoTypeSelected">
         </geo-type-selector>
         <span v-if="curStatus === STATUS.SELECTED">
-          <v-btn flat @click="moveGeo">Move <v-icon right>my_location</v-icon></v-btn>
-          <v-btn flat @click="renameGeo">Rename <v-icon right>edit</v-icon></v-btn>
-          <v-btn flat @click="removeGeo">Delete <v-icon right>delete</v-icon></v-btn>
+          <v-btn small flat @click="moveGeo">Move <v-icon right>my_location</v-icon></v-btn>
+          <v-btn small flat @click="renameGeo">Rename <v-icon right>edit</v-icon></v-btn>
+          <v-btn small flat @click="removeGeo">Delete <v-icon right>delete</v-icon></v-btn>
         </span>
         <v-switch v-if="curStatus === STATUS.MOVING" label="Move child elements to the same position" v-model="moveChildren"></v-switch>
         <v-btn v-if="curStatus === STATUS.MOVING" flat @click="cancelMoveGeo">Cancel</v-btn>
@@ -56,6 +60,7 @@
   import global from '../../static/singleton'
   import TranslationTextField from '../TranslationTextField.vue'
   import GeoTypeSelector from './GeoTypeSelector.vue'
+  import index from '../../router/index'
 
   const STATUS = {
     NO_GEO: 0, // No geo, new or existing, selected
@@ -97,8 +102,15 @@
       }
     },
     methods: {
+      showGeoInfo () {
+        index.push({
+          name: 'Geo',
+          params: {
+            geoId: this.selectedGeo.id
+          }
+        })
+      },
       positionGeo: function (evt) {
-        console.log('addGeo', evt)
         this.selectedGeo.latitude = evt.latlng.lat
         this.selectedGeo.longitude = evt.latlng.lng
         this.cancelPositionGeo()
@@ -106,7 +118,6 @@
         this.curStatus = STATUS.NEW_GEO_TYPE
       },
       geoTypeSelected: function (geoType) {
-        console.log('geoTypeSelected', geoType)
         this.selectedGeo.geoType = geoType
         this.curStatus = STATUS.NEW_EDIT_NAME
       },
@@ -115,6 +126,9 @@
         await GeoService.moveGeo(this.selectedGeo.id, evt.latlng.lat, evt.latlng.lng, this.moveChildren)
         const movedGeo = await GeoService.getGeoById(this.selectedGeo.id)
         this.$emit('move-geo-done', movedGeo)
+      },
+      selectGeo: function () {
+        this.$emit('select-geo-done', this.selectedGeo)
       },
       moveGeo: function () {
         const map = document.getElementById('leafletMap')

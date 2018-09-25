@@ -3,28 +3,66 @@ import GeoServiceAbstract from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import {In, IsNull} from 'typeorm'
 import GeoType from '../../entities/trellis/GeoType'
+import uuid from 'uuid/v4'
 
 export default class GeoServiceCordova extends GeoServiceAbstract {
 
   async getGeoById (geoId) {
     const repository = await DatabaseService.getRepository(Geo)
-    return await repository.findOne({
+    return repository.findOne({
       where: {
-        deletedAt: null,
+        deletedAt: IsNull(),
         id: geoId
       },
       relations: ['geoType', 'photos', 'nameTranslation']
     })
   }
 
+  async getGeosByParentId (parentId) {
+    const repository = await DatabaseService.getRepository(Geo)
+    return repository.find({
+      where: {
+        deletedAt: IsNull(),
+        parentId: parentId
+      },
+      relations: ['geoType', 'photos', 'nameTranslation']
+    })
+  }
+
   async createGeo (geo: Geo): Promise<Geo> {
-    // TODO
-    throw new Error('Unimplemented!')
+    const connection = await DatabaseService.getDatabase()
+    geo.id = uuid()
+    await connection.transaction(async manager => {
+      geo.nameTranslation.id = uuid()
+      manager.save(geo.nameTranslation)
+
+      for (let i = 0; i < geo.nameTranslation.translationText.length; i++) {
+        let translationText = geo.nameTranslation.translationText[i]
+        translationText.id = uuid()
+        translationText.translation = geo.nameTranslation
+        await manager.save(translationText)
+      }
+
+      manager.save(geo)
+    })
+    return this.getGeoById(geo.id)
   }
 
   async getGeoTypesByStudy (studyId: string, getUserAddable: boolean): Promise<GeoType[]> {
-    // TODO
-    throw new Error('Unimplemented!')
+    const connection = await DatabaseService.getDatabase()
+    const repository = await connection.getRepository(GeoType)
+    const queryBuilder = await repository.createQueryBuilder('geo_type')
+    let q = queryBuilder.where('"geo_type"."deleted_at" is null')
+
+    if (studyId !== null) {
+      q = q.andWhere('"study_id" = :studyId', {studyId: studyId})
+    }
+
+    if (getUserAddable !== null) {
+      q = q.andWhere('"can_user_add" = 1')
+    }
+
+    return q.getMany()
   }
 
   async getGeosById (geoIds) {
@@ -44,8 +82,18 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
   }
 
   async moveGeo (geoId, latitude, longitude, moveChildren) {
-    // TODO
-    throw new Error("Unimplemented!")
+    const connection = await DatabaseService.getDatabase()
+    let q = await connection.createQueryBuilder()
+
+    q = q.update(Geo)
+      .set({ latitude: latitude, longitude: longitude })
+      .where("id = :id", { id: geoId })
+
+    if (moveChildren) {
+      q = q.orWhere("parent_id = :id", { id: geoId })
+    }
+
+    return q.execute()
   }
 
   async getGeoAncestors (geoId) {
@@ -70,9 +118,6 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     const studyId = (params.hasOwnProperty('study')) ? params.study : null
     const parentGeoId = (params.hasOwnProperty('parent')) ? params.parent : null
     const onlyNoParent = params.hasOwnProperty('no-parent')
-    if (onlyNoParent) {
-      console.log('no-parent', params['no-parent'])
-    }
     const geoTypeIds =  (params.hasOwnProperty('types')) ? params.types : null
 
     const connection = await DatabaseService.getDatabase()
@@ -89,7 +134,6 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     }
 
     if (parentGeoId === null && onlyNoParent) {
-      console.log('onlyNoParent', onlyNoParent)
       q = q.andWhere('"geo"."parent_id" is null')
     }
 
@@ -100,7 +144,6 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
 
     if (typeof query === 'string' && query.trim().length > 0) {
       const searchTerms = query.split(' ')
-      console.log('searchTerms', searchTerms)
       for (let i = 0; i < searchTerms.length; i++) {
         let searchTerm = '%' + searchTerms[i].trim() + '%'
         q = q.andWhere(`"geo"."name_translation_id" in (select translation_id from translation_text where translated_text like :searchTerm${i})`, {[`searchTerm${i}`]: searchTerm})
