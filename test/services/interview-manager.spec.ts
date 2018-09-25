@@ -8,7 +8,7 @@ import {
   rosterId,
   editRosterId,
   firstPageRosterIds,
-  prefillRespondentId, middlePageRosterIds, lastPageRosterIds, respondentId3
+  prefillRespondentId, middlePageRosterIds, lastPageRosterIds, respondentId3, edgeIds
 } from "../testing-ids";
 import SurveyService from "../../src/services/survey/index";
 import InterviewService from "../../src/services/interview/InterviewService";
@@ -32,9 +32,9 @@ import {locToNumber} from "../../src/components/interview/services/LocationHelpe
 import RespondentConditionTag from "../../src/entities/trellis/RespondentConditionTag";
 
 interface SimpleLocation {
-  section: number
-  sectionRepetition: number
-  sectionFollowUpRepetition: number
+  section?: number
+  sectionRepetition?: number
+  sectionFollowUpRepetition?: number
   page: number
 }
 
@@ -44,6 +44,10 @@ async function createNewSurvey (formId: string, rId: string, sId: string): Promi
 }
 
 function validateLocation (currentLoc: InterviewLocation, desiredLocation: SimpleLocation) {
+  desiredLocation.section = desiredLocation.section || 0
+  desiredLocation.sectionRepetition = desiredLocation.sectionRepetition || 0
+  desiredLocation.sectionFollowUpRepetition = desiredLocation.sectionFollowUpRepetition || 0
+
   expect(currentLoc.page).to.equal(desiredLocation.page, `We are't at the correct page`)
   expect(currentLoc.section).to.equal(desiredLocation.section, `We aren't at the correct section`)
   expect(currentLoc.sectionRepetition).to.equal(desiredLocation.sectionRepetition, `We aren't at the correct sectionRepetition`)
@@ -270,6 +274,32 @@ export default function () {
       // TODO
     })
     describe('Skips', () => {
+      it('should skip pages correctly even with backward movement', async () => {
+        let manager = await setupInterviewManager(forms.skipWithPrevious)
+        manager.initialize()
+        validateLocation(manager.location, {page: 0})
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 1, page: 0})
+        selectNChoice(manager, 0)
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 1, page: 1})
+        const action = makeAction(manager.getCurrentPageQuestions()[0].id, AT.add_edge, {
+          edge_id: edgeIds[0],
+          val: edgeIds[0],
+          name: 'edge'
+        })
+        manager.pushAction(action)
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 1, page: 2})
+        selectChoice(manager, '2')
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 1, page: 4})
+        simpleActionPush(manager, AT.previous)
+        validateLocation(manager.location, {section: 1, page: 2})
+        selectChoice(manager, '1')
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 1, page: 3})
+      })
       it('should handle skips on the first question correctly', async () => {
         const manager = await setupInterviewManager(forms.firstPageSkipped)
         const firstLocation = j(manager.location)
@@ -328,19 +358,23 @@ export default function () {
           name: question.varName,
           val: editRosterId
         })
+
         manager.pushAction(action)
         simpleActionPush(manager, AT.next)
-        expect(manager.location.section).to.equal(1, `We should be on the second section`)
-        expect(manager.location.page).to.equal(0, `We should be on the first page`)
-        expect(manager.location.sectionFollowUpRepetition).to.equal(0, `We should be on the first repetition`)
+        validateLocation(manager.location, {section: 1, page: 0, sectionFollowUpRepetition: 0})
         selectChoice(manager, 'cat')
         simpleActionPush(manager, AT.next)
-        expect(manager.location.sectionFollowUpRepetition).to.equal(1, `We should be on the second repetition`)
-        expect(manager.location.page).to.equal(0, `We should be at the first page of the section`)
+        validateLocation(manager.location, {section: 1, page: 0, sectionFollowUpRepetition: 1})
         selectChoice(manager, 'dog')
         simpleActionPush(manager, AT.next)
-        expect(manager.location.sectionFollowUpRepetition).to.equal(1, `We should still be on the second repetition`)
-        expect(manager.location.page).to.equal(1, `This page should not be skipped this time`)
+        validateLocation(manager.location, {section: 1, page: 1, sectionFollowUpRepetition: 1})
+        simpleActionPush(manager, AT.previous)
+        validateLocation(manager.location, {section: 1, page: 0, sectionFollowUpRepetition: 1})
+        expect(manager.data.conditionTags.section.length).to.equal(1, 'Too many condition tags were assigned to the section')
+        debugger
+        simpleActionPush(manager, AT.next)
+        validateLocation(manager.location, {section: 1, page: 1, sectionFollowUpRepetition: 1})
+        expect(manager.data.conditionTags.section.length).to.equal(1, 'Too many condition tags were assigned to the section')
         const repeatedLocationSequence = [
           [0, 0, 0, 0],
           [0, 0, 0, 1],

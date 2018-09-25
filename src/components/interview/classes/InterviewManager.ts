@@ -200,8 +200,8 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 
   next () {
-    this.stepForward()
     this.replayToCurrent()
+    this.stepForward()
   }
 
   previous () {
@@ -449,7 +449,7 @@ export default class InterviewManager extends InterviewManagerBase {
    */
   _markAsSkipped () {
     // TODO: Mark all questions on the current page as skipped
-    // console.log('Skipped ', JSON.stringify(this.location))
+    // console.log('Skipped ', JSON.parse(JSON.stringify(this.location)))
   }
 
   /**

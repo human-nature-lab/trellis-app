@@ -35,8 +35,8 @@ export default class InterviewManagerBase extends Emitter {
   public questionIdToSectionNum: Map<string, number> = new Map()
   public questionIdToPageNum: Map<string, number> = new Map()
 
-  protected data: DataStore
-  protected actions: ActionStore
+  public data: DataStore
+  public actions: ActionStore
 
   public blueprint: Form
   public interview: Interview
@@ -200,7 +200,7 @@ export default class InterviewManagerBase extends Emitter {
       }
       return vars
     }, {})
-    // console.log('condition assignment vars', vars)
+    console.log('condition assignment vars', vars)
     for (let question of questionsWithData) {
       for (let act of question.assignConditionTags) {
         try {
