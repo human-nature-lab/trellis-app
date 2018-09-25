@@ -76,13 +76,13 @@
               this.result = RESULTS.PENDING_THIS_DEVICE
               this.loggingService.log({
                 severity: 'warn',
-                message: this.$t('pending_uploads_device', pendingFromThisDevice)
+                message: this.$t('pending_uploads_device', [pendingFromThisDevice])
               }).then((result) => { this.currentLog = result })
             } else if (pendingUploads.length > 0) {
               this.result = RESULTS.PENDING_OTHER
               this.loggingService.log({
                 severity: 'warn',
-                message: this.$t('pending_uploads', pendingUploads.length)
+                message: this.$t('pending_uploads', [pendingUploads.length])
               }).then((result) => { this.currentLog = result })
             } else {
               this.result = RESULTS.NONE_PENDING

@@ -82,6 +82,8 @@
                   })
                 } else {
                   this.loggingService.log(err).then((result) => { this.currentLog = result })
+                  // Stop on unexpected, loggable, error, for instance a Network Error
+                  this.downloading = false
                 }
               })
               .finally(() => {

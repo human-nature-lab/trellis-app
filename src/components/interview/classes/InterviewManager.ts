@@ -1,3 +1,4 @@
+import SkipService from '../../../services/SkipService'
 import actionManager from '../services/actions/InterviewActionDefinitions'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
@@ -366,7 +367,7 @@ export default class InterviewManager extends InterviewManagerBase {
    */
   _markAsSkipped () {
     // TODO: Mark all questions on the current page as skipped
-    // console.log('Skipped ', JSON.stringify(this.location))
+    // console.log('Skipped ', JSON.parse(JSON.stringify(this.location)))
   }
 
   /**

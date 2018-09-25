@@ -11,7 +11,7 @@ export default class SurveyServiceWeb implements SurveyServiceInterface {
     return new Survey().fromSnakeJSON(res.data.survey)
   }
 
-  async getRespondentSurveys (studyId, respondentId) {
+  async getRespondentSurveys (studyId: string, respondentId: string): Promise<Survey[]> {
     studyId = encodeURIComponent(studyId)
     respondentId = encodeURIComponent(respondentId)
     let res = await http().get(`study/${studyId}/respondent/${respondentId}/surveys`)
