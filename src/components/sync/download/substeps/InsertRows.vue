@@ -33,7 +33,9 @@
         }
       },
       beforeDestroy () {
-        this.cancelImport()
+        if (!this.success) {
+          this.cancelImport()
+        }
       },
       created () {
         this.startWork()

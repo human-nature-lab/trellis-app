@@ -45,19 +45,19 @@
               this.success = true
               break
             case RESULTS.DOWNLOAD_OLDER:
-              this.addMessage = this.$t('last_download_date', this.localDownloadCreatedAt)
+              this.addMessage = this.$t('last_download_date', [this.localDownloadCreatedAt])
               this.success = true
               break
             case RESULTS.DOWNLOAD_SAME:
               this.loggingService.log({
                 severity: 'warn',
-                message: this.$t('last_snapshot_date', this.serverSnapshotCreatedAt)
+                message: this.$t('last_snapshot_date', [this.serverSnapshotCreatedAt])
               }).then((result) => { this.currentLog = result })
               break
             case RESULTS.DOWNLOAD_NEWER:
               this.loggingService.log({
                 severity: 'warn',
-                message: this.$t('older_snapshot', this.serverSnapshotCreatedAt, this.localDownloadCreatedAt)
+                message: this.$t('older_snapshot', [this.serverSnapshotCreatedAt, this.localDownloadCreatedAt])
               }).then((result) => { this.currentLog = result })
               break
           }
