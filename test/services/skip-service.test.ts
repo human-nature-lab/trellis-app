@@ -102,6 +102,7 @@ export default function () {
           shouldHide([makeSkip(['one']).hide().any()], new Set(['one']))
           shouldHide([makeSkip(['one', 'two']).hide().any()], new Set(['one']))
           shouldHide([makeSkip(['one', 'two']).hide().any()], new Set(['two']))
+          shouldHide([makeSkip(['one', 'two']).hide().any()], new Set(['two', 'three']))
         })
         it('should show if no conditions are present', () => {
           shouldShow([makeSkip(['one']).hide().any()], new Set(['two']))
