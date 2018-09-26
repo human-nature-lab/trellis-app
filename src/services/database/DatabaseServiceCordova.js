@@ -344,7 +344,7 @@ export default class DatabaseServiceCordova {
         where uploaded_at is null;`)
     console.log('updatedRecords', updatedRecords)
     const totalRowResults = await connection.query(
-      `select count(*) as total_rows
+      `select count(distinct updated_record_id) as total_rows
         from updated_records
         where uploaded_at is null;`)
     return totalRowResults[0]['total_rows']
