@@ -38,27 +38,35 @@
           </v-stepper-content>
           <v-stepper-content step="2">
             <sync-step
-              :title="$('uploading')"
+              :title="$t('uploading')"
               v-if="uploadStep === 2"
               v-bind:continue-status="continueStatusArray[1]"
               v-on:continue-clicked="onContinue"
               v-on:cancel-clicked="onCancel">
-              <upload-snapshot
+              <check-connection
                 v-if="uploadStep > 1"
+                :logging-service="loggingService"
+                v-on:connection-ok="uploadSubStep = 2"></check-connection>
+              <authenticate-device
+                v-if="uploadStep > 1 && uploadSubStep > 1"
+                :logging-service="loggingService"
+                v-on:authentication-ok="uploadSubStep = 3"></authenticate-device>
+              <upload-snapshot
+                v-if="uploadStep > 1 && uploadSubStep > 2"
                 :logging-service="loggingService"
                 :md5hash="compressedUploadFileHash"
                 :file-entry="compressedUploadFile"
                 v-on:upload-snapshot-done="uploadSnapshotDone">
               </upload-snapshot>
               <verify-upload
-                v-if="uploadStep > 1 && uploadSubStep > 1"
+                v-if="uploadStep > 1 && uploadSubStep > 3"
                 :logging-service="loggingService"
                 :md5hash="compressedUploadFileHash"
                 :file-entry="compressedUploadFile"
                 v-on:verify-upload-done="verifyUploadDone">
               </verify-upload>
               <register-upload
-                v-if="uploadStep > 1 && uploadSubStep > 2"
+                v-if="uploadStep > 1 && uploadSubStep > 4"
                 :logging-service="loggingService"
                 :sync="sync"
                 v-on:register-upload-done="registerUploadDone">
@@ -74,6 +82,8 @@
 <script>
   import TrellisAlert from '../../TrellisAlert.vue'
   import SyncStep from '../SyncStep.vue'
+  import CheckConnection from '../common/substeps/CheckConnection'
+  import AuthenticateDevice from '../common/substeps/AuthenticateDevice'
   import EmptyUploadsDirectory from './substeps/EmptyUploadsDirectory.vue'
   import CreateUpload from './substeps/CreateUpload.vue'
   import CompressUpload from './substeps/CompressUpload.vue'
@@ -182,11 +192,11 @@
       },
       uploadSnapshotDone: function () {
         console.log('uploadSnapshotDone')
-        this.uploadSubStep = 2
+        this.uploadSubStep = 4
       },
       verifyUploadDone: function () {
         console.log('verifyUploadDone')
-        this.uploadSubStep = 3
+        this.uploadSubStep = 5
       },
       registerUploadDone: function () {
         console.log('registerUploadDone')
@@ -206,6 +216,8 @@
     components: {
       TrellisAlert,
       SyncStep,
+      CheckConnection,
+      AuthenticateDevice,
       EmptyUploadsDirectory,
       CreateUpload,
       CompressUpload,
