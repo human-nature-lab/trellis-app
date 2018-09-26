@@ -17,7 +17,7 @@ export class MomentTransformer implements ValueTransformer {
     }
   }
   from (date: Date) {
-    console.log('date from db', date)
+    // console.log('date from db', date)
     return moment(date)
   }
 }
