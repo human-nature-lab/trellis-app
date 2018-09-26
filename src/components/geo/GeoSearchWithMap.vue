@@ -238,7 +238,8 @@
       },
       addNewGeo: async function () {
         const study = await StudyService.getCurrentStudy()
-        this.selectedGeo = GeoService.createNewGeo(this.parentGeo.id, study.locales)
+        const parentGeoId = (this.parentGeo === null) ? null : this.parentGeo.id
+        this.selectedGeo = GeoService.createNewGeo(parentGeoId, study.locales)
       },
       removeGeoDone: function (removedGeoId) {
         this.selectedGeo = null
