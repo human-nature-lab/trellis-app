@@ -64,63 +64,100 @@ export default function () {
     it('should show if there are no skips on the page', () => {
       shouldShow([], new Set())
     })
-    describe('show', () => {
-      describe('any', () => {
-        it('should hide if no conditions are present', () => {
-          shouldHide([makeSkip(['one']).show().any()], new Set([]))
+    describe('single skip', () => {
+      describe('show', () => {
+        describe('any', () => {
+          it('should hide if no conditions are present', () => {
+            shouldHide([makeSkip(['one']).show().any()], new Set([]))
+          })
+          it('should show if any condition is present', () => {
+            shouldShow([makeSkip(['one']).show().any()], new Set(['one']))
+            shouldShow([makeSkip(['one', 'two']).show().any()], new Set(['one']))
+            shouldShow([makeSkip(['one', 'two']).show().any()], new Set(['two']))
+          })
+          it('should hide if no conditions are present', () => {
+            shouldHide([makeSkip(['one']).show().any()], new Set(['two']))
+          })
         })
-        it('should show if any condition is present', () => {
-          shouldShow([makeSkip(['one']).show().any()], new Set(['one']))
-          shouldShow([makeSkip(['one', 'two']).show().any()], new Set(['one']))
-          shouldShow([makeSkip(['one', 'two']).show().any()], new Set(['two']))
-        })
-        it('should hide if no conditions are present', () => {
-          shouldHide([makeSkip(['one']).show().any()], new Set(['two']))
+        describe('all', () => {
+          it('should hide if no conditions are present', () => {
+            shouldHide([makeSkip(['one']).show().all()], new Set([]))
+          })
+          it('should show if all conditions are present', () => {
+            shouldShow([makeSkip(['one', 'two']).show().all()], new Set(['one', 'two']))
+            shouldShow([makeSkip(['one', 'two']).show().all()], new Set(['one', 'two', 'three']))
+          })
+          it('should hide if all conditions are not present', () => {
+            shouldHide([makeSkip(['one', 'two']).show().all()], new Set(['one']))
+            shouldHide([makeSkip(['one', 'two']).show().all()], new Set(['two']))
+            shouldHide([makeSkip(['one', 'two']).show().all()], new Set(['three']))
+          })
         })
       })
-      describe('all', () => {
-        it('should hide if no conditions are present', () => {
-          shouldHide([makeSkip(['one']).show().all()], new Set([]))
+      describe('hide', () => {
+        describe('any', () => {
+          it('should show if no conditions are present', () => {
+            shouldShow([makeSkip(['one']).hide().any()], new Set([]))
+          })
+          it('should hide if any conditions are present', () => {
+            shouldHide([makeSkip(['one']).hide().any()], new Set(['one']))
+            shouldHide([makeSkip(['one', 'two']).hide().any()], new Set(['one']))
+            shouldHide([makeSkip(['one', 'two']).hide().any()], new Set(['two']))
+            shouldHide([makeSkip(['one', 'two']).hide().any()], new Set(['two', 'three']))
+          })
+          it('should show if no conditions are present', () => {
+            shouldShow([makeSkip(['one']).hide().any()], new Set(['two']))
+            shouldShow([makeSkip(['one', 'two']).hide().any()], new Set(['three', 'four']))
+          })
         })
-        it('should show if all conditions are present', () => {
-          shouldShow([makeSkip(['one', 'two']).show().all()], new Set(['one', 'two']))
-          shouldShow([makeSkip(['one', 'two']).show().all()], new Set(['one', 'two', 'three']))
-        })
-        it('should hide if all conditions are not present', () => {
-          shouldHide([makeSkip(['one', 'two']).show().all()], new Set(['one']))
-          shouldHide([makeSkip(['one', 'two']).show().all()], new Set(['two']))
-          shouldHide([makeSkip(['one', 'two']).show().all()], new Set(['three']))
+        describe('all', () => {
+          it('should show if no conditions are present', () => {
+            shouldShow([makeSkip(['one']).hide().all()], new Set([]))
+          })
+          it('should hide if all conditions are present', () => {
+            shouldHide([makeSkip(['one']).hide().all()], new Set(['one']))
+            shouldHide([makeSkip(['one', 'two']).hide().all()], new Set(['one', 'two']))
+            shouldHide([makeSkip(['one', 'two', 'three']).hide().all()], new Set(['one', 'two', 'three', 'four', 'five']))
+          })
+          it('should show if all conditions are not present', () => {
+            shouldShow([makeSkip(['one']).hide().all()], new Set(['two']))
+            shouldShow([makeSkip(['one', 'two']).hide().all()], new Set(['two', 'three']))
+            shouldShow([makeSkip(['one', 'two']).hide().all()], new Set(['one', 'three']))
+          })
         })
       })
     })
-    describe('hide', () => {
-      describe('any', () => {
-        it('should show if no conditions are present', () => {
-          shouldShow([makeSkip(['one']).hide().any()], new Set([]))
+    describe('multiple skips', () => {
+      describe('show', () => {
+        it('should show at the first positive show result', () => {
+          shouldShow([
+            makeSkip(['one']).show().all(),
+            makeSkip(['two']).show().any()
+          ], new Set(['two']))
+          shouldShow([
+            makeSkip(['one']).hide().any(),
+            makeSkip(['two']).show().any(),
+            makeSkip(['three']).show().any()
+          ], new Set(['two']))
+          shouldShow([
+            makeSkip(['two']).show().any(),
+            makeSkip(['three']).show().any()
+          ], new Set(['two']))
         })
-        it('should hide if any conditions are present', () => {
-          shouldHide([makeSkip(['one']).hide().any()], new Set(['one']))
-          shouldHide([makeSkip(['one', 'two']).hide().any()], new Set(['one']))
-          shouldHide([makeSkip(['one', 'two']).hide().any()], new Set(['two']))
-        })
-        it('should show if no conditions are present', () => {
-          shouldShow([makeSkip(['one']).hide().any()], new Set(['two']))
-          shouldShow([makeSkip(['one', 'two']).hide().any()], new Set(['three', 'four']))
-        })
-      })
-      describe('all', () => {
-        it('should show if no conditions are present', () => {
-          shouldShow([makeSkip(['one']).hide().all()], new Set([]))
-        })
-        it('should hide if all conditions are present', () => {
-          shouldHide([makeSkip(['one']).hide().all()], new Set(['one']))
-          shouldHide([makeSkip(['one', 'two']).hide().all()], new Set(['one', 'two']))
-          shouldHide([makeSkip(['one', 'two', 'three']).hide().all()], new Set(['one', 'two', 'three', 'four', 'five']))
-        })
-        it('should show if all conditions are not present', () => {
-          shouldShow([makeSkip(['one']).hide().all()], new Set(['two']))
-          shouldShow([makeSkip(['one', 'two']).hide().all()], new Set(['two', 'three']))
-          shouldShow([makeSkip(['one', 'two']).hide().all()], new Set(['one', 'three']))
+        it('should hide at the first positive hide result', () => {
+          shouldHide([
+            makeSkip(['one']).hide().all(),
+            makeSkip(['two']).hide().any()
+          ], new Set(['two']))
+          shouldHide([
+            makeSkip(['one']).show().any(),
+            makeSkip(['two']).hide().any(),
+            makeSkip(['three']).hide().any()
+          ], new Set(['two']))
+          shouldHide([
+            makeSkip(['two']).hide().any(),
+            makeSkip(['three']).hide().any()
+          ], new Set(['two']))
         })
       })
     })
