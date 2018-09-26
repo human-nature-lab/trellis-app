@@ -374,6 +374,21 @@ export default function () {
         next(manager)
         validateLocation(manager.location, {section: 0, page: 1})
       })
+      it('should skip follow up sections without any data', async () => {
+        const manager = await setupInterviewManager(forms.repeatedSections)
+        manager.initialize()
+        validateLocation(manager.location, {page: 0})
+        next(manager)
+        validateLocation(manager.location, {page: 1})
+        selectChoice(manager, 'one')
+        next(manager)
+        validateLocation(manager.location, {page: 2})
+        prev(manager)
+        selectChoice(manager, 'skip')
+        next(manager)
+        expect(manager.navigator.isAtEnd).to.be.true
+        validateLocation(manager.location, {section: 0, page: 1})
+      })
       it('should handle skipping the last question in a repeated section')
     })
 
@@ -381,6 +396,7 @@ export default function () {
       it('should handle correctly assigning conditions after changing responses and navigating', async () => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
         manager.initialize()
+        debugger
         selectChoice(manager, '1')
         next(manager)
         validateLocation(manager.location, {page: 2})

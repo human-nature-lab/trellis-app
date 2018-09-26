@@ -260,7 +260,7 @@ export default class InterviewManager extends InterviewManagerBase {
         return true
       } else if (isRequired) {
         // TODO: Check if dkRf are allowed
-        if (question.datum.dkRf && question.datum.dkRfVal && question.datum.dkRfVal.length) {
+        if (question.datum.dkRf !== null && question.datum.dkRf !== undefined && question.datum.dkRfVal && question.datum.dkRfVal.length) {
           return true
         } else {
           // TODO: Maybe actually validate responses as well???
@@ -277,9 +277,10 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 
   /**
-   * Rebuild the state of the survey by zeroing the location and resetting the data before replaying all actions
+   * Rebuild the state of the survey by zeroing the location and resetting the data before replaying all actions.
+   * Returns an InterviewLocation if we found invalid sections of the survey
    */
-  playAllActions () {
+  playAllActions (): InterviewLocation {
     this._isReplaying = true
     // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
@@ -295,6 +296,7 @@ export default class InterviewManager extends InterviewManagerBase {
     const actionQueue = new ImmutableQueue(this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous))
     let action = actionQueue.next()
     const nextActionCount = this.actions.actions.reduce((c, a) => a.actionType === AT.next ? c + 1 : c, 0)
+    let foundInvalidActions = false
     let nPagesPassed = 1
     let c = 0
     while (action && c < 1000) {
@@ -315,7 +317,8 @@ export default class InterviewManager extends InterviewManagerBase {
         this.stepForward()
         nPagesPassed++
       } else {
-        console.log('skipping invalid action', action)
+        // console.log('skipping invalid action', action, this.currentLocationHasValidResponses())
+        foundInvalidActions = true
         action = actionQueue.next()
       }
     }
@@ -327,6 +330,7 @@ export default class InterviewManager extends InterviewManagerBase {
     // conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
     // console.log('postReplayState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
     this._isReplaying = false
+    return foundInvalidActions ? this.location : null
   }
 
   /**
@@ -340,7 +344,7 @@ export default class InterviewManager extends InterviewManagerBase {
    */
   replayTo (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
     this.playAllActions()
-    console.log('desired location', {section, page, sectionRepetition, sectionFollowUpRepetition})
+    // console.log('desired location', {section, page, sectionRepetition, sectionFollowUpRepetition})
     let currentLoc = locToNumber(this.navigator.loc)
     const desiredLoc = locToNumber({section, page, sectionRepetition, sectionFollowUpRepetition})
     if (currentLoc < desiredLoc) {
@@ -367,7 +371,7 @@ export default class InterviewManager extends InterviewManagerBase {
     const lastRealAction = this.actions.lastRealAction
     if (lastRealAction) {
       const lastLocation = this.actions.actionToLocation(lastRealAction)
-      this.navigator.seekTo(lastLocation)
+      while (this.currentLocationHasValidResponses() && this.navigator.locationIsAheadOfCurrent(lastLocation) && this.stepForward());
     } else {
       this.navigator.seekTo({section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
     }

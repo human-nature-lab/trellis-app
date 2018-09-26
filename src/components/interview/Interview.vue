@@ -1,6 +1,12 @@
 <template>
-  <v-container fluid fill-height>
+  <v-container fluid fill-height class="ma-0 pa-0">
     <v-layout column>
+      <v-toolbar flat>
+        <v-toolbar-title>
+          <TranslatedText :translation="sectionTranslation" :locale="global.locale" />
+          <span class="subheading light">(Page {{pageNum}})</span>
+        </v-toolbar-title>
+      </v-toolbar>
       <v-flex>
         <v-progress-linear
           v-if="isSaving"
@@ -107,7 +113,9 @@
   import RoutePreloadMixin from '../../mixins/RoutePreloadMixin'
   import Page from './Page'
   import ConditionTagList from './ConditionTagList'
+  import TranslatedText from '../TranslatedText'
   import menuBus from '../main-menu/MenuBus'
+  import global from '../../static/singleton'
 
   import {sharedInterview, clearSharedInterview} from './classes/InterviewManager'
   import InterviewService from '../../services/interview/InterviewService'
@@ -135,6 +143,7 @@
     },
     data () {
       return {
+        global,
         artificiallyExtendLoadTime: false,
         formId: null,
         surveyId: null,
@@ -161,7 +170,9 @@
         },
         alreadyExited: false,
         questions: [],
-        loadingStep: 0
+        loadingStep: 0,
+        sectionTranslation: null,
+        pageNum: null
       }
     },
     created () {
@@ -206,21 +217,23 @@
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
         this.interviewActions = interviewState.actions.store
-        this.location = interviewState.navigator.loc
         this.interview = interview
         this.form = formBlueprint
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
-        this.updateQuestions()
+        this.updateInterview()
       },
       actionHandler (action) {
         if (!interviewState) {
           throw Error('Trying to push actions before interview has been initialized')
         }
         interviewState.pushAction(action)
-        this.updateQuestions()
+        this.updateInterview()
       },
-      updateQuestions () {
+      updateInterview () {
+        this.location = interviewState.location
+        this.sectionTranslation = interviewState.navigator.currentSection().nameTranslation
+        this.pageNum = interviewState.location.page
         console.log('recalculating page questions')
         // The reference to this.location needs to be here so that we have a dependency on this.location
         let questions = interviewState.getPageQuestions(
@@ -317,12 +330,15 @@
     },
     components: {
       Page,
-      ConditionTagList
+      ConditionTagList,
+      TranslatedText
     }
   }
 </script>
 
 <style lang="sass">
+  .light
+    color: grey
   .condition-tag-dialog
     max-height: 80%
     min-height: 50%

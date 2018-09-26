@@ -109,7 +109,7 @@ export default class InterviewAlligator {
   }
 
   private updatePages () {
-    console.log('Updating navigation pages')
+    // console.log('Updating navigation pages')
     this.pages.splice(0, this.pages.length)
     this.skipped.splice(0, this.skipped.length)
     for (let section of this.form.sections) {
@@ -117,6 +117,20 @@ export default class InterviewAlligator {
       if (section.followUpQuestionId) {
         const data =  this.getFollowUpDatum(section.followUpQuestionId)
         // console.log('follow up data', data.length)
+        if (!data.length) {
+          // Marking skipped repeated section
+          for (let page of section.questionGroups) {
+            this.skipped.push({
+              pageId: page.id,
+              page: this.pageToNumIndex.get(page.id),
+              sectionId: section.id,
+              section: this.sectionToNumIndex.get(section.id),
+              sectionRepetition: 0,
+              sectionFollowUpDatumId: null,
+              sectionFollowUpRepetition: 0
+            } as InterviewLocation)
+          }
+        }
         for (let datum of data) {
           for (let page of section.questionGroups) {
             this.addLocation(page.id, section.id, datum.id, datum.eventOrder, 0)
