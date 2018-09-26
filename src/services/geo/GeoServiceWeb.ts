@@ -19,6 +19,12 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
     })
   }
 
+  async getGeosByParentId (parentId) {
+    return http().get(`/geos/parent/${parentId}`).then(res => {
+      return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
+    })
+  }
+
   async createGeo (geo: Geo): Promise<any> {
     console.log('createGeo', geo)
     return http().put('/geo', {
