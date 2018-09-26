@@ -6,9 +6,10 @@ import DataStore from "../classes/DataStore";
 import Datum from "../../../entities/trellis/Datum";
 import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 import Question from "../../../entities/trellis/Question";
-import SkipService from "./SkipService";
+import SkipService from "../../../services/SkipService";
 import {InterviewLocation} from "./InterviewNavigator";
 import Action from "../../../entities/trellis/Action";
+import {locToNumber} from "./LocationHelpers";
 
 interface Location {
   pageId: string
@@ -30,6 +31,8 @@ export default class InterviewAlligator {
   private sectionToNumIndex: Map<string, number> = new Map()
   private pageToNumIndex: Map<string, number> = new Map()
 
+  private hasDataChanges: boolean = true
+
   constructor (private manager: InterviewManager) {
     this.form = manager.blueprint
     this.data = manager.data
@@ -38,6 +41,26 @@ export default class InterviewAlligator {
     this.createIndexes()
     this.updatePages()
     this.goToFirstValidLocation()
+  }
+
+  public initialize () {
+    this.data.on('change', this.markHasDataChanges, this)
+  }
+
+  public destroy () {
+    this.data.off('change', this.markHasDataChanges)
+  }
+
+  private markHasDataChanges () {
+    this.hasDataChanges = true
+  }
+
+  private updateIfNecessary () {
+    if (this.hasDataChanges) {
+      this.updatePages()
+    } else {
+      console.log('no data updates found')
+    }
   }
 
   private createIndexes (): void {
@@ -64,6 +87,7 @@ export default class InterviewAlligator {
       sectionFollowUpRepetition: eventOrder
     } as InterviewLocation
     if (this.shouldSkipPage(loc)) {
+      // console.log('skipping', JSON.stringify(loc), JSON.stringify(this.data.conditionTags), Array.from(this.getConditionTagSet(loc.sectionRepetition, loc.sectionFollowUpDatumId)))
       this.skipped.push(loc)
     } else {
       this.pages.push(loc)
@@ -86,17 +110,16 @@ export default class InterviewAlligator {
 
   private updatePages () {
     console.log('Updating navigation pages')
-    if (this.loc) {
-      console.log('pre update condition tags', Array.from(this.getConditionTagSet(this.loc.sectionRepetition, this.loc.sectionFollowUpDatumId)))
-    }
     this.pages.splice(0, this.pages.length)
     this.skipped.splice(0, this.skipped.length)
     for (let section of this.form.sections) {
       // TODO: Check if the section is repeated
       if (section.followUpQuestionId) {
-        for (let datum of this.getFollowUpDatum(section.followUpQuestionId)) {
+        const data =  this.getFollowUpDatum(section.followUpQuestionId)
+        // console.log('follow up data', data.length, JSON.stringify(data, null, 1))
+        for (let datum of data) {
           for (let page of section.questionGroups) {
-            this.addLocation(page.id, section.id, datum.id, datum.eventOrder)
+            this.addLocation(page.id, section.id, datum.id, datum.eventOrder, 0)
           }
         }
       } else {
@@ -105,6 +128,7 @@ export default class InterviewAlligator {
         }
       }
     }
+    this.hasDataChanges = false
   }
 
   private goToFirstValidLocation () {
@@ -120,10 +144,11 @@ export default class InterviewAlligator {
   private shouldSkipPage (loc: InterviewLocation): boolean {
     const conditionTagNames = this.getConditionTagSet(loc.sectionRepetition, loc.sectionFollowUpDatumId)
     const page = this.pageIndex.get(loc.pageId)
-    return SkipService.shouldSkipPage(page.skips, conditionTagNames)
+    return SkipService.shouldSkip(page.skips, conditionTagNames)
   }
 
   public seekTo (loc: InterviewLocation): boolean {
+    this.updateIfNecessary()
     for (let i = 0; i < this.pages.length; i++) {
       if (this.locationsAreNumericallyTheSame(loc, this.pages[i])) {
         this.index = i
@@ -138,6 +163,10 @@ export default class InterviewAlligator {
       locA.page === locB.page &&
       locA.sectionRepetition === locB.sectionRepetition &&
       locA.sectionFollowUpRepetition === locB.sectionFollowUpRepetition
+  }
+
+  public locationIsAheadOfCurrent (location: InterviewLocation): boolean {
+    return locToNumber(location) > locToNumber(this.loc)
   }
 
   public getActionQuestionDatum (action: Action): QuestionDatum|null {
@@ -159,7 +188,7 @@ export default class InterviewAlligator {
 
   public zero (): void {
     this.index = 0
-    this.updatePages()
+    this.markHasDataChanges()
   }
 
   public get loc (): InterviewLocation {
@@ -171,6 +200,7 @@ export default class InterviewAlligator {
   }
 
   public get isAtEnd (): boolean {
+    this.updateIfNecessary()
     return this.index >= (this.pages.length - 1)
   }
 

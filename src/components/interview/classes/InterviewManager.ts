@@ -67,6 +67,7 @@ export default class InterviewManager extends InterviewManagerBase {
     this.actions.initialize() // This emits an initial state event to any subscribers (the actionsPersistSlave)
     this.data.initialize()    // This emits an initial state event to any subscribers (the dataPersistSlave)
     this.data.reset()
+    this.navigator.initialize()
     this.initializeConditionAssignment()
     this.onFirstPage()
     this.playAllActions()
@@ -153,6 +154,7 @@ export default class InterviewManager extends InterviewManagerBase {
       if (!questionDatum) {
         debugger
       }
+      this.data.emitChange()
     } else if (action.actionType !== 'next' && action.actionType !== 'previous') {
       console.error(action)
       throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
@@ -185,8 +187,12 @@ export default class InterviewManager extends InterviewManagerBase {
 
   next () {
     if (this._debugReplay) debugger
+    // console.log('pre replay location', this.location)
     this.replayToCurrent()
+    // this.data.emitChange()
+    // console.log('post replay location', this.location)
     this.stepForward()
+    // console.log('post step location', this.location)
   }
 
   previous () {
@@ -196,11 +202,11 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 
   stepForward (): boolean {
+    this.onPageExit()
     if (this.navigator.isAtEnd) {
       this.atEnd()
       return false
     }
-    this.onPageExit()
     this.navigator.next()
     this.onPageEnter()
     return true
@@ -278,21 +284,21 @@ export default class InterviewManager extends InterviewManagerBase {
     // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
     // TODO: Check that state is reset correctly
-    let conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-    console.log('initialState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
+    // let conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    // console.log('initialState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
     this._resetState()
-    conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-    console.log('resetState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
+    // conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    // console.log('resetState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
     // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
     // TODO: Verify that actions are ordered correctly
     const actionQueue = new ImmutableQueue(this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous))
     let action = actionQueue.next()
-    // const nextActionCount = this.actions.actions.reduce((c, a) => a.actionType === AT.next ? c + 1 : c, 0)
-    // let numPagesReplayed = 0
-
-    while (action) {
-      console.log('action', action)
+    const nextActionCount = this.actions.actions.reduce((c, a) => a.actionType === AT.next ? c + 1 : c, 0)
+    let nPagesPassed = 1
+    let c = 0
+    while (action && c < 1000) {
+      c++
       // Check if we have a valid question id and skip it the action if we don't
       if (!this.questionIndex.has(action.questionId)) {
         console.log('invalid action question id', action)
@@ -301,20 +307,25 @@ export default class InterviewManager extends InterviewManagerBase {
 
       let actionLocation = this.actions.actionToLocation(action)
       if (this.navigator.locationsAreNumericallyTheSame(actionLocation, this.navigator.loc)) {
-        console.log('performing action', action, this.navigator.loc)
+        // console.log('performing action', action, this.navigator.loc)
         this.performAction(action)
-      } else if (this.navigator.locationsAreNumericallyTheSame(actionLocation, this.navigator.nextLoc) && this.currentLocationHasValidResponses()) {
-        console.log('action moving forward', action, this.navigator.loc)
+        action = actionQueue.next()
+      } else if (this.navigator.locationIsAheadOfCurrent(actionLocation) && this.currentLocationHasValidResponses()) {
+        // console.log('action moving forward', action, this.navigator.loc)
         this.stepForward()
-        console.log('performing action 2', action, this.navigator.loc)
-        this.performAction(action)
+        nPagesPassed++
       } else {
         console.log('skipping invalid action', action)
+        action = actionQueue.next()
       }
-      action = actionQueue.next()
     }
-    conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-    console.log('postReplayState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
+    if (c >= 1000) {
+      debugger
+    }
+    // Go as far as possible through the survey
+    while (this.currentLocationHasValidResponses() && this.stepForward()) {}
+    // conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    // console.log('postReplayState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
     this._isReplaying = false
   }
 
@@ -330,12 +341,13 @@ export default class InterviewManager extends InterviewManagerBase {
   replayTo (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
     this.playAllActions()
     console.log('desired location', {section, page, sectionRepetition, sectionFollowUpRepetition})
-    const currentLoc = locToNumber(this.navigator.loc)
+    let currentLoc = locToNumber(this.navigator.loc)
     const desiredLoc = locToNumber({section, page, sectionRepetition, sectionFollowUpRepetition})
     if (currentLoc < desiredLoc) {
       let c
       for (c = 0; c < 100; c++) {
-        if (!this.currentLocationHasValidResponses() || !this.stepForward()) {
+        currentLoc = locToNumber(this.navigator.loc)
+        if (currentLoc >= desiredLoc || !this.currentLocationHasValidResponses() || !this.stepForward()) {
           break
         }
       }
