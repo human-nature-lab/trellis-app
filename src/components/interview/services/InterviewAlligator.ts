@@ -39,12 +39,12 @@ export default class InterviewAlligator {
     this.pages = []
     this.skipped = []
     this.createIndexes()
-    this.updatePages()
-    this.goToFirstValidLocation()
   }
 
   public initialize () {
     this.data.on('change', this.markHasDataChanges, this)
+    this.updatePages()
+    this.goToFirstValidLocation()
   }
 
   public destroy () {
@@ -116,7 +116,7 @@ export default class InterviewAlligator {
       // TODO: Check if the section is repeated
       if (section.followUpQuestionId) {
         const data =  this.getFollowUpDatum(section.followUpQuestionId)
-        // console.log('follow up data', data.length, JSON.stringify(data, null, 1))
+        // console.log('follow up data', data.length)
         for (let datum of data) {
           for (let page of section.questionGroups) {
             this.addLocation(page.id, section.id, datum.id, datum.eventOrder, 0)
