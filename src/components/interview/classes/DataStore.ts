@@ -53,6 +53,7 @@ export default class DataStore extends Emitter {
     this.questionDatumIdMap.clear()
     this.questionDatumQuestionIdIndex.clear()
     this.datumIdMap.clear()
+    this.emitChange()
   }
 
   /**
@@ -114,10 +115,7 @@ export default class DataStore extends Emitter {
     } else {
       questionIdIndex.push(questionDatum)
     }
-    this.emit('change', {
-      data: this.data,
-      conditionTags: this.conditionTags
-    })
+    this.emitChange()
   }
 
   getDatumById (datumId: string): Datum|null {
@@ -130,18 +128,27 @@ export default class DataStore extends Emitter {
     }
   }
 
-  addDatum (questionDatum: QuestionDatum, ...args) {
+  public emitChange () {
+    this.emit('change', {
+      data: this.data,
+      conditionTags: this.conditionTags
+    })
+  }
+
+  public addDatum (questionDatum: QuestionDatum, ...args) {
     const datum = DatumRecycler.getNoKey(...args)
     this.datumIdMap.set(datum.id, datum)
     questionDatum.data.push(datum)
+    this.emitChange()
   }
 
   /**
    * Add a conditionTag to the dataStore
    * @param {string} type
-   * @param {RespondentConditionTag|SectionConditionTag|SurveyConditionTag} tag
+   * @param {RespondentConditionTag | SectionConditionTag | SurveyConditionTag} tag
+   * @param {ConditionTag} conditionTag
    */
-  addTag (type: string, tag: RespondentConditionTag|SectionConditionTag|SurveyConditionTag, conditionTag?: ConditionTag|null): void {
+  addTag (type: string, tag: RespondentConditionTag|SectionConditionTag|SurveyConditionTag, conditionTag?: ConditionTag): void {
     this.conditionTags[type].push(tag)
     if (tag.conditionTag) {
       ConditionTagStore.add(tag.conditionTag)
@@ -149,10 +156,7 @@ export default class DataStore extends Emitter {
     if (conditionTag) {
       ConditionTagStore.add(conditionTag)
     }
-    this.emit('change', {
-      data: this.data,
-      conditionTags: this.conditionTags
-    })
+    this.emitChange()
   }
 
   /**

@@ -86,22 +86,10 @@ actionManager.add(AT.dk_rf_val, function (interview, payload: ActionPayload, que
   }
 })
 actionManager.add(AT.next, function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): void {
-  // if (actionWasInitiatedByHuman) {
-  //   interview.nextAndReplay()
-  // } else {
-  //   interview.next()
-  // }
   interview.next()
-  // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
 })
 actionManager.add(AT.previous, function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): void {
-  // if (actionWasInitiatedByHuman) {
-  //   interview.previousAndReplay()
-  // } else {
-  //   interview.previous()
-  // }
   interview.previous()
-  // // interview.replayTo(interview.location.section, interview.location.page, interview.location.sectionRepetition, interview.location.sectionFollowUpDatumId)
 })
 actionManager.add(AT.number_change, addOrUpdateSingleDatum)
 actionManager.add(AT.add_edge, addDatum)

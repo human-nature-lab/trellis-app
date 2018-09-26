@@ -22,7 +22,7 @@ import InterviewAlligator from "../services/InterviewAlligator";
 
 export default class InterviewManagerBase extends Emitter {
 
-  protected navigator: InterviewAlligator
+  public navigator: InterviewAlligator
   protected _dataPersistSlave: PersistSlave
   protected _actionsPersistSlave: PersistSlave
 
