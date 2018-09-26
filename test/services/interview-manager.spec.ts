@@ -436,15 +436,15 @@ export default function () {
         next(manager)
         validateLocation(manager.location, {section: 1, page: 1, sectionFollowUpRepetition: 1})
         expect(manager.data.conditionTags.section.length).to.equal(2, 'We should have 2 section condition tags assigned at this point')
-        // const repeatedLocationSequence = [
-        //   [0, 0, 0, 0],
-        //   [0, 0, 0, 1],
-        //   [0, 0, 0, 2],
-        //   [1, 0, 0, 0],
-        //   [1, 0, 1, 0],
-        //   [1, 0, 1, 1]
-        // ].map(s => ({section: s[0], sectionRepetition: s[1], sectionFollowUpRepetition: s[2], page: s[3]}))
-        // stepThroughRandomly(200, manager, repeatedLocationSequence, 5)
+        const repeatedLocationSequence = [
+          [0, 0, 0, 0],
+          [0, 0, 0, 1],
+          [0, 0, 0, 2],
+          [1, 0, 0, 0],
+          [1, 0, 1, 0],
+          [1, 0, 1, 1]
+        ].map(s => ({section: s[0], sectionRepetition: s[1], sectionFollowUpRepetition: s[2], page: s[3]}))
+        stepThroughRandomly(200, manager, repeatedLocationSequence, 5, false)
       })
     })
 
