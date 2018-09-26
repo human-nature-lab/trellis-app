@@ -16,9 +16,9 @@
         required: true
       }
     },
-    data: function () {
-      return {
-        text: TranslationService.getTranslated(this.translation, this.locale)
+    computed: {
+      text () {
+        return TranslationService.getTranslated(this.translation, this.locale)
       }
     }
   }
