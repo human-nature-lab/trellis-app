@@ -10,6 +10,7 @@
           label="Select a location type">
         </v-select>
         <v-btn
+          :disabled="curGeoType === null"
           flat
           right
           @click="selectGeoType">
