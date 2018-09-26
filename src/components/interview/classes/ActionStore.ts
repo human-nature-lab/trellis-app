@@ -25,6 +25,8 @@ export default class ActionStore extends Emitter {
     super()
     this._createPageAndSectionIndexes(blueprint)
     this.sortedStore = new SortedArray((a: Action, b: Action) => {
+      // const aNum = locToNumber(this.actionToLocation(a))
+      // const bNum = locToNumber(this.actionToLocation(b))
       if (a.questionId && b.questionId) {
         let sectionA = this.getActionSection(a)
         let sectionB = this.getActionSection(b)
@@ -113,6 +115,7 @@ export default class ActionStore extends Emitter {
   insertIntoStore (action: Action) {
     this.store.push(action)
     this.sortedStore.insertSorted(action)
+    console.log(this.actions.map(a => a.actionType))
     if (action.preloadActionId === null && action.actionType !== AT.next && action.actionType !== AT.previous && action.questionId !== null) {
       const actionLocNum = locToNumber(this.actionToLocation(action))
       if (!this.lastRealAction || (this.lastRealAction && actionLocNum > this.lastRealActionLocNum)) {

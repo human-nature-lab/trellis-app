@@ -58,6 +58,10 @@ export default class SkipService {
           }
         }
       }
+      if ((skip.showHide && shouldShow) || (!skip.showHide && !shouldShow)) {
+        // Positive show result or positive hide result
+        break
+      }
     }
     return !shouldShow
   }
