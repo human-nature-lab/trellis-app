@@ -79,7 +79,10 @@ export default class InterviewManager extends InterviewManagerBase {
    * @returns {Promise<[any]>}
    */
   save () {
-    // TODO: Replay all actions and assign all conditions here
+    if (!this.actions.actions.length || !this.data.data.length) {
+      console.log('nothing to save')
+      return new Promise(resolve => resolve())
+    }
     this.playAllActions()
     let p = []
     if (this._dataPersistSlave) {
