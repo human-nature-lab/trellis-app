@@ -49,11 +49,11 @@
           const fileSystem = await FileService.requestFileSystem()
           const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'upload_temp')
           const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
-          await SyncService.createUploadFile(fileEntry, this.trackProgress, this.isCancelled)
+          const updatedPhotos = await SyncService.createUploadFile(fileEntry, this.trackProgress, this.isCancelled)
           if (this.working) {
             this.working = false
             this.success = true
-            this.$emit('create-upload-done', fileEntry)
+            this.$emit('create-upload-done', fileEntry, updatedPhotos)
           }
         } catch (err) {
           console.error(err)
