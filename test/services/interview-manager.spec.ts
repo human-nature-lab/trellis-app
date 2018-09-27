@@ -410,11 +410,15 @@ export default function () {
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('is_two', `condition tags should include condition, 'is_two'`).and.not.include('is_one', `condition tags should not include condition, 'is_one'`)
         selectNChoice(manager, 0)
-        debugger
         next(manager)
         validateLocation(manager.location, {page: 2})
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
-        expect(conditionTags).to.include('was_assigned', '"was_assigned" was not assigned correctly')
+        expect(conditionTags).to.include('skipped_maybe_was_evaluated', `we don't have the correct conditions assigned now`)
+        selectNChoice(manager, 0)
+        next(manager)
+        validateLocation(manager.location, {page: 3})
+        conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+        expect(conditionTags).to.include('resp_was_assigned', '"resp_was_assigned" was not assigned correctly')
       })
       it('should handle repeated sections', async () => {
         const manager = await setupInterviewManager(forms.repeatedSections)
