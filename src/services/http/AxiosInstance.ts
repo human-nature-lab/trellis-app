@@ -28,7 +28,7 @@ export default function defaultInstance (): AxiosInstance {
   if (!defaultInst) {
     defaultInst = axios.create({
       baseURL: config.apiRoot + '/survey-view',
-      timeout: 20000,
+      timeout: 120000,
       headers: {'X-Key': config.xKey}
     })
 
