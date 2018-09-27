@@ -6,6 +6,7 @@ import Form from '../../../entities/trellis/Form'
 import {InterviewLocation} from '../services/InterviewNavigator'
 import AT from '../../../static/action.types'
 import {locToNumber} from "../services/LocationHelpers";
+import {ActionPayload} from "../services/actions/DatumOperations";
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -25,8 +26,6 @@ export default class ActionStore extends Emitter {
     super()
     this._createPageAndSectionIndexes(blueprint)
     this.sortedStore = new SortedArray((a: Action, b: Action) => {
-      // const aNum = locToNumber(this.actionToLocation(a))
-      // const bNum = locToNumber(this.actionToLocation(b))
       if (a.questionId && b.questionId) {
         let sectionA = this.getActionSection(a)
         let sectionB = this.getActionSection(b)
@@ -36,10 +35,20 @@ export default class ActionStore extends Emitter {
               let pageA = this.getActionPage(a)
               let pageB = this.getActionPage(b)
               if (pageA === pageB) {
-                if (a.createdAt === b.createdAt) {
-                  return 0
+                const aHasN = a.payload  && a.payload['n'] !== null && a.payload['n'] !== undefined
+                const bHasN = b.payload && b.payload['n'] !== null && b.payload['n'] !== undefined
+                if (aHasN && bHasN) {
+                  return a.payload['n'] - b.payload['n']
+                } else if (aHasN) {
+                  return 1
+                } else if (bHasN) {
+                  return -1
                 } else {
-                  return a.createdAt > b.createdAt ? 1 : -1
+                  if (a.createdAt === b.createdAt) {
+                    return 0
+                  } else {
+                    return a.createdAt > b.createdAt ? 1 : -1
+                  }
                 }
               } else {
                 return pageA - pageB
@@ -54,7 +63,17 @@ export default class ActionStore extends Emitter {
           return sectionA - sectionB
         }
       } else {
-        return <any>(b.questionId != null) - <any>(a.questionId != null)
+        const aHasN = a.payload  && a.payload['n'] !== null && a.payload['n'] !== undefined
+        const bHasN = b.payload && b.payload['n'] !== null && b.payload['n'] !== undefined
+        if (aHasN && bHasN) {
+          return a.payload['n'] - b.payload['n']
+        } else if (aHasN) {
+          return 1
+        } else if (bHasN) {
+          return -1
+        } else {
+          return <any>(b.questionId != null) - <any>(a.questionId != null)
+        }
       }
     })
     this.store = []
@@ -77,9 +96,9 @@ export default class ActionStore extends Emitter {
     this.questionToPageIndex = new Map()
     this.questionToSectionIndex = new Map()
     for (let s = 0; s < blueprint.sections.length; s++) {
-      console.log('action section sort order', blueprint.sections[s].formSections[0].sortOrder)
+      // console.log('action section sort order', blueprint.sections[s].formSections[0].sortOrder)
       for (let p = 0; p < blueprint.sections[s].pages.length; p++) {
-        console.log('action page sort order', blueprint.sections[s].pages[p].sectionQuestionGroup.questionGroupOrder)
+        // console.log('action page sort order', blueprint.sections[s].pages[p].sectionQuestionGroup.questionGroupOrder)
         for (let question of blueprint.sections[s].pages[p].questions) {
           this.questionToPageIndex.set(question.id, p)
           this.questionToSectionIndex.set(question.id, s)
@@ -115,6 +134,12 @@ export default class ActionStore extends Emitter {
   insertIntoStore (action: Action) {
     this.store.push(action)
     this.sortedStore.insertSorted(action)
+    if (!action.payload) {
+      action.payload = {} as ActionPayload
+    }
+    if (action.payload['n'] === undefined || action.payload['n'] === null) {
+      action.payload['n'] = this.store.length
+    }
     console.log(this.actions.map(a => a.actionType))
     if (action.preloadActionId === null && action.actionType !== AT.next && action.actionType !== AT.previous && action.questionId !== null) {
       const actionLocNum = locToNumber(this.actionToLocation(action))
