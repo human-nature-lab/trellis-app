@@ -279,14 +279,18 @@
             this.error = err
           })
       },
+      redirectToComplete (interviewId) {
+        router.replace({name: 'SurveyComplete', params: {surveyId: this.interview.surveyId}})
+      },
       exit () {
         this.alreadyExited = true
         moveToNextOr(() => {
-          router.go(-1)
+          debugger
+          this.redirectToComplete()
         })
       },
       async saveData () {
-        if (this.formIsEmpty) {
+        if (this.formIsEmpty || this.isSaving) {
           return
         } else {
           this.isSaving = true

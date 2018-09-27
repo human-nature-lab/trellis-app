@@ -51,6 +51,9 @@ router.onError(err => {
  * @param {Object} route
  */
 export function pushRouteAndQueueCurrent (route) {
+  if (!route.query) {
+    route.query = {}
+  }
   route.query.to = router.currentRoute.fullPath
   router.push(route)
 }
