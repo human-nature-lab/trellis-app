@@ -396,7 +396,6 @@ export default function () {
       it('should handle correctly assigning conditions after changing responses and navigating', async () => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
         manager.initialize()
-        debugger
         selectChoice(manager, '1')
         next(manager)
         validateLocation(manager.location, {page: 2})
@@ -411,10 +410,11 @@ export default function () {
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('is_two', `condition tags should include condition, 'is_two'`).and.not.include('is_one', `condition tags should not include condition, 'is_one'`)
         selectNChoice(manager, 0)
+        debugger
         next(manager)
         validateLocation(manager.location, {page: 2})
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
-        expect(conditionTags).to.include('was_assigned', 'r_condition was not assigned correct')
+        expect(conditionTags).to.include('was_assigned', '"was_assigned" was not assigned correctly')
       })
       it('should handle repeated sections', async () => {
         const manager = await setupInterviewManager(forms.repeatedSections)
