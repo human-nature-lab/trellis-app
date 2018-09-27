@@ -27,53 +27,29 @@ export default class ActionStore extends Emitter {
     this._createPageAndSectionIndexes(blueprint)
     this.sortedStore = new SortedArray((a: Action, b: Action) => {
       if (a.questionId && b.questionId) {
-        let sectionA = this.getActionSection(a)
-        let sectionB = this.getActionSection(b)
-        if (sectionA === sectionB) {
-          if (a.sectionRepetition === b.sectionRepetition) {
-            if (a.sectionFollowUpRepetition === b.sectionFollowUpRepetition) {
-              let pageA = this.getActionPage(a)
-              let pageB = this.getActionPage(b)
-              if (pageA === pageB) {
-                const aHasN = a.payload  && a.payload['n'] !== null && a.payload['n'] !== undefined
-                const bHasN = b.payload && b.payload['n'] !== null && b.payload['n'] !== undefined
-                if (aHasN && bHasN) {
-                  return a.payload['n'] - b.payload['n']
-                } else if (aHasN) {
-                  return 1
-                } else if (bHasN) {
-                  return -1
-                } else {
-                  if (a.createdAt === b.createdAt) {
-                    return 0
-                  } else {
-                    return a.createdAt > b.createdAt ? 1 : -1
-                  }
-                }
-              } else {
-                return pageA - pageB
-              }
-            } else {
-              return a.sectionFollowUpRepetition - b.sectionFollowUpRepetition
-            }
+        const aLocNum = locToNumber(this.actionToLocation(a))
+        const bLocNum = locToNumber(this.actionToLocation(b))
+        if (aLocNum === bLocNum) {
+          const aHasN = a.payload  && a.payload['n'] !== null && a.payload['n'] !== undefined
+          const bHasN = b.payload && b.payload['n'] !== null && b.payload['n'] !== undefined
+          if (aHasN && bHasN) {
+            return a.payload['n'] - b.payload['n']
+          } else if (aHasN) {
+            return 1
+          } else if (bHasN) {
+            return -1
           } else {
-            return a.sectionRepetition - b.sectionRepetition
+            if (a.createdAt === b.createdAt) {
+              return 0
+            } else {
+              return a.createdAt > b.createdAt ? 1 : -1
+            }
           }
         } else {
-          return sectionA - sectionB
+          return aLocNum - bLocNum
         }
       } else {
-        const aHasN = a.payload  && a.payload['n'] !== null && a.payload['n'] !== undefined
-        const bHasN = b.payload && b.payload['n'] !== null && b.payload['n'] !== undefined
-        if (aHasN && bHasN) {
-          return a.payload['n'] - b.payload['n']
-        } else if (aHasN) {
-          return 1
-        } else if (bHasN) {
-          return -1
-        } else {
-          return <any>(b.questionId != null) - <any>(a.questionId != null)
-        }
+        return <any>(b.questionId != null) - <any>(a.questionId != null)
       }
     })
     this.store = []
@@ -140,7 +116,7 @@ export default class ActionStore extends Emitter {
     if (action.payload['n'] === undefined || action.payload['n'] === null) {
       action.payload['n'] = this.store.length
     }
-    console.log(this.actions.map(a => a.actionType))
+    console.log('actions', JSON.stringify(this.actions.map(a => [a.actionType, a.payload['n']])))
     if (action.preloadActionId === null && action.actionType !== AT.next && action.actionType !== AT.previous && action.questionId !== null) {
       const actionLocNum = locToNumber(this.actionToLocation(action))
       if (!this.lastRealAction || (this.lastRealAction && actionLocNum > this.lastRealActionLocNum)) {
