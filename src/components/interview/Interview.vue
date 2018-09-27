@@ -144,6 +144,7 @@
     data () {
       return {
         global,
+        isAtEnd: false,
         artificiallyExtendLoadTime: false,
         formId: null,
         surveyId: null,
@@ -203,6 +204,9 @@
       },
       initializeInterview: function (interview, actions, data, conditionTags, formBlueprint) {
         clearSharedInterview()
+        this.dialog.end = false
+        this.dialog.beginning = false
+        this.dialog.conditionTag = false
         this.location = null
         this.interviewConditionTags = null
         this.interviewData = null
@@ -231,6 +235,7 @@
         this.updateInterview()
       },
       updateInterview () {
+        this.isAtEnd = interviewState.navigator.isAtEnd
         this.location = interviewState.location
         this.sectionTranslation = interviewState.navigator.currentSection().nameTranslation
         this.pageNum = interviewState.location.page
@@ -321,13 +326,6 @@
       }
     },
     computed: {
-      isAtEnd: function () {
-        // We do this just to have the dependency on this.location
-        if (this.location.section > 0) {
-          return interviewState.navigator.isAtEnd
-        }
-        return false
-      },
       formIsEmpty () {
         return !(this.form && this.form.sections && this.form.sections.length)
       }
