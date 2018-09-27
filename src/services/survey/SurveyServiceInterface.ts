@@ -3,6 +3,13 @@ import Survey from '../../entities/trellis/Survey'
 export default interface SurveyServiceInterface {
 
   /**
+   * Get an existing survey by id
+   * @param {string} surveyId
+   * @returns {Promise<Survey>}
+   */
+  getSurveyById (surveyId: string): Promise<Survey>
+
+  /**
    * Get an existing survey by form id
    * @param {string} studyId
    * @param {string} respondentId
