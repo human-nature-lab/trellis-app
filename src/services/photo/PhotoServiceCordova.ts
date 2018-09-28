@@ -3,8 +3,14 @@ import DatabaseService from '../database/DatabaseService'
 import Photo from '../../entities/trellis/Photo'
 import SizeLimitedMap from '../../classes/SizeLimitedMap'
 const cache = new SizeLimitedMap(1024 * 10000)
-import PhotoServiceInterface from './PhotoServiceInterface'
-export default class PhotoServiceCordova implements PhotoServiceInterface {
+import uuid from 'uuid/v4'
+import PhotoServiceAbstract from './PhotoServiceAbstract'
+
+declare global {
+  interface Window {ImageResizer: any}
+}
+
+export default class PhotoServiceCordova extends PhotoServiceAbstract {
 
    async getPhotoSrc (photoId: string): Promise<any> {
      if (cache.has(photoId)) {
@@ -61,5 +67,47 @@ export default class PhotoServiceCordova implements PhotoServiceInterface {
       `select id, file_name
         from photo 
         where deleted_at is null;`)
+  }
+
+  resize (uri: string, quality: number): Promise<string> {
+    return new Promise((resolve, reject) => {
+      window.ImageResizer.resize({uri, quality}, resolve, err => {
+        debugger
+        reject('Failed to resize the image ' + JSON.stringify(err))
+      })
+    })
+  }
+
+  takePhoto (): Promise<Photo> {
+    return new Promise((resolve, reject) => {
+      if (!navigator || !navigator.camera) {
+        return reject(new Error('Camera api not found'))
+      }
+      navigator.camera.getPicture((filePath) => {
+        const photo = new Photo()
+        photo.id = uuid()
+        FileService.getFullResPhotosDir().then(fullResDir => {
+          return FileService.move(filePath, fullResDir.nativeURL, `${photo.id}_hd.jpg`)
+        }).then((fullResEntry: FileEntry) => {
+          return FileService.getPhotosDir().then(photosDir => {
+            // TODO: Compress and copy the file into the respondent-photos
+            return this.resize(fullResEntry.nativeURL, 50).then(resizedFileName => {
+              return FileService.move(resizedFileName, photosDir.nativeURL, `${photo.id}.jpg`)
+            })
+          })
+        }).then(lowResEntry => {
+          photo.fileName = lowResEntry.name
+          return DatabaseService.getRepository(Photo)
+        }).then(repo => repo.save(photo))
+        .then(() => {
+          resolve(photo)
+        }).catch(err => {
+          debugger
+          reject(err)
+        })
+      }, reject, {
+        quality: 100
+      })
+    })
   }
 }
