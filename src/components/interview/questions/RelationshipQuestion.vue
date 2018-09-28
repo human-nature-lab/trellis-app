@@ -80,10 +80,11 @@
       }
     },
     computed: {
-      canAddRespondent: function () {
-        return this.question.questionParameters.findIndex(p => {
-          return p.parameter.name === 'can_add_respondent' && parseInt(p.val, 10) === 1
+      canAddRespondent () {
+        const hasFalseParam = this.question.questionParameters.findIndex(p => {
+          return p.parameter.name === 'can_add_respondent' && parseInt(p.val, 10) === 0
         }) > -1
+        return !hasFalseParam
       },
       currentGeo () {
         return this.respondent.geos.find(geo => geo.pivot.is_current)

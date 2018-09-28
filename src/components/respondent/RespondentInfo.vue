@@ -16,7 +16,7 @@
           {{ $t('photos') }}
         </v-toolbar-title>
         <v-spacer />
-        <permission :role-whitelist="['admin','manager']">
+        <permission :role-whitelist="['admin','supervisor','manager']">
           <v-btn
             icon
             @click="isAddingPhoto = true">
@@ -121,10 +121,10 @@
       lazy>
       <v-container>
         <v-card>
-          <v-btn @click="photoFromCamera">
+          <v-btn @click="photoFromCamera()">
             <v-icon>photo_camera</v-icon>
           </v-btn>
-          <v-btn @click="photoFromFile">
+          <v-btn @click="photoFromFile()">
             <v-icon>cloud_upload</v-icon>
           </v-btn>
         </v-card>
@@ -176,6 +176,7 @@
   import Vue from 'vue'
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
   import singleton from '../../static/singleton'
+  import PhotoService from "../../services/photo/PhotoService"
 
   /**
    * The respondent info router loader
@@ -241,7 +242,12 @@
       leaving () {
         this.respondentConditionTags = []
       },
-      photoFromCamera () {},
+      async photoFromCamera () {
+        const photo: Photo = await PhotoService.takePhoto()
+        await RespondentService.addPhoto(this.respondent.id, photo)
+        this.respondent.photos.push(photo)
+        this.isAddingPhoto = false
+      },
       photoFromFile () {},
       async removeName (nameId: string): Promise<void> {
         let name = this.respondent.names.find(name => name.id === nameId)

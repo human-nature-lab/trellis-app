@@ -2,12 +2,10 @@ import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from 'typ
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Photo from './Photo'
-import {mapFromSnakeJSON} from '../../services/JSONUtil'
-import Respondent from './Respondent'
 
 @Entity()
 export default class RespondentPhoto extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
   @Column() @Serializable
   respondentId: string
