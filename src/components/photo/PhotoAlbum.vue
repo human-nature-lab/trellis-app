@@ -8,18 +8,18 @@
       </permission>
     </v-toolbar>
     <v-layout row align-content-start wrap>
-      <v-flex xs3
-              v-if="photos.length"
-              v-for="photo in photos">
+      <v-flex
+        xs3
+        v-for="photo in photos"
+        :key="photo.id">
         <Photo
           @click="showAlbum(photo)"
           :is-contained="true"
           :height="height"
           :width="width"
-          :key="photo.id"
           :photo="photo"/>
       </v-flex>
-      <v-flex v-else>{{$t('no_photos')}}</v-flex>
+      <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     </v-layout>
     <v-dialog fullscreen lazy v-model="isAlbumOpen">
       <v-container class="photo-album-carousel-container">
