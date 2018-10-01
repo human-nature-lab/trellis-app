@@ -86,23 +86,22 @@ export default class PhotoServiceCordova extends PhotoServiceAbstract {
       navigator.camera.getPicture((filePath) => {
         const photo = new Photo()
         photo.id = uuid()
-        FileService.getFullResPhotosDir().then(fullResDir => {
-          return FileService.move(filePath, fullResDir.nativeURL, `${photo.id}_hd.jpg`)
-        }).then((fullResEntry: FileEntry) => {
+        FileService.getPhotosDir().then(fullResDir => {
+          return FileService.move(filePath, fullResDir.nativeURL, `${photo.id}.jpg`)
+        })/*.then((fullResEntry: FileEntry) => {
           return FileService.getPhotosDir().then(photosDir => {
             // TODO: Compress and copy the file into the respondent-photos
             return this.resize(fullResEntry.nativeURL, 50).then(resizedFileName => {
               return FileService.move(resizedFileName, photosDir.nativeURL, `${photo.id}.jpg`)
             })
           })
-        }).then(lowResEntry => {
-          photo.fileName = lowResEntry.name
+        })*/.then(photoEntry => {
+          photo.fileName = photoEntry.name
           return DatabaseService.getRepository(Photo)
         }).then(repo => repo.save(photo))
         .then(() => {
           resolve(photo)
         }).catch(err => {
-          debugger
           reject(err)
         })
       }, reject, {

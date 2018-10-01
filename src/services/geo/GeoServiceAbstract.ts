@@ -3,6 +3,8 @@ import Translation from '../../entities/trellis/Translation'
 import Locale from '../../entities/trellis/Locale'
 import TranslationText from '../../entities/trellis/TranslationText'
 import GeoType from '../../entities/trellis/GeoType'
+import GeoPhoto from "../../entities/trellis/GeoPhoto";
+import Photo from "../../entities/trellis/Photo";
 
 export abstract class GeoSearchParams {
   constructor (
@@ -39,6 +41,14 @@ export default abstract class GeoServiceInterface {
     }
     return geo
   }
+
+  /**
+   * Create a new GeoPhoto for this geo
+   * @param {string} geoId
+   * @param {Photo} photo
+   * @returns {Promise<GeoPhoto>}
+   */
+  abstract addPhoto (geoId: string, photo: Photo): Promise<GeoPhoto>
 
   /**
    * Persist a Geo object to the database

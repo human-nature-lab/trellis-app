@@ -52,7 +52,7 @@
   import ActionTypes from '../../../static/action.types'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import ActionMixin from '../mixins/ActionMixin'
-  import Photo from '../../Photo'
+  import Photo from '../../photo/Photo'
   import RespondentsSearch from '../../respondent/RespondentsSearch'
   import EdgeService from '../../../services/edge/EdgeService'
   import parameterTypes from '../../../static/parameter.types'

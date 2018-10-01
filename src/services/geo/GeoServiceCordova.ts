@@ -4,8 +4,20 @@ import Geo from '../../entities/trellis/Geo'
 import {In, IsNull} from 'typeorm'
 import GeoType from '../../entities/trellis/GeoType'
 import uuid from 'uuid/v4'
+import GeoPhoto from "../../entities/trellis/GeoPhoto";
+import Photo from "../../entities/trellis/Photo";
 
 export default class GeoServiceCordova extends GeoServiceAbstract {
+
+  async addPhoto (geoId: string, photo: Photo): Promise<GeoPhoto> {
+    const repo = await DatabaseService.getRepository(GeoPhoto)
+    let gPhoto = new GeoPhoto()
+    gPhoto.photoId = photo.id
+    gPhoto.geoId = geoId
+    gPhoto.sortOrder = await repo.createQueryBuilder('gp').where('gp.geoId = :geoId', {geoId}).getCount()
+    await repo.save(gPhoto)
+    return gPhoto
+  }
 
   async getGeoById (geoId) {
     const repository = await DatabaseService.getRepository(Geo)
