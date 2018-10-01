@@ -58,6 +58,7 @@
   import Translation from '../../entities/trellis/Translation'
   import SkipService from "../../services/SkipService"
   import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag"
+  import {pushRouteAndQueueCurrent} from '../../router'
 
   export class DisplayForm {
     public isComplete?: boolean
@@ -129,14 +130,16 @@
         if (form.isComplete) return
         let interview
         try {
+          this.global.loading.active = true
           if (form.isStarted) {
             interview = await InterviewService.create(form.surveys[0].id)
           } else {
             let survey = await SurveyService.create(this.global.study.id, this.respondent.id, form.id)
             interview = await InterviewService.create(survey.id)
           }
-          router.push({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
+          pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
         } catch (err) {
+          this.global.loading.active = false
           this.error = err
           console.error(err)
           alert('Trellis requires access to your location before starting an interview')

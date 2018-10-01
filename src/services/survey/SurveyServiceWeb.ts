@@ -3,6 +3,12 @@ import SurveyServiceInterface from './SurveyServiceInterface'
 import Survey from '../../entities/trellis/Survey'
 export default class SurveyServiceWeb implements SurveyServiceInterface {
 
+  async getSurveyById (surveyId: string): Promise<Survey> {
+    surveyId = encodeURIComponent(surveyId)
+    const res = await http().get(`/survey/${surveyId}/`)
+    return new Survey().fromSnakeJSON(res.data.survey)
+  }
+
   async getSurvey (studyId: string, respondentId: string, formId: string): Promise<Survey> {
     studyId = encodeURIComponent(studyId)
     respondentId = encodeURIComponent(respondentId)
