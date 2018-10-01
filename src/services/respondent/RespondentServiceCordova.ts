@@ -171,7 +171,12 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     await connection.manager.save(studyRespondent)
 
     const repository = connection.getRepository(Respondent)
-    return repository.findOne(respondent.id)
+    return repository.findOne({
+      where: {
+        id: respondent.id
+      },
+      relations: ['photos', 'names']
+    })
   }
 
   async addRespondentGeo (respondentId: string, geoId: string): Promise<RespondentGeo> {
