@@ -75,6 +75,10 @@ class SyncService {
     })
   }
 
+  listUploads () {
+    return http().get(`list-uploads`)
+  }
+
   getPendingUploads (source: CancelTokenSource) {
     return new Promise((resolve, reject) => {
       DeviceService.getUUID()

@@ -38,7 +38,7 @@
           </v-stepper-content>
           <v-stepper-content step="2">
             <sync-step
-              :title="$('uploading')"
+              :title="$t('uploading')"
               v-if="uploadStep === 2"
               v-bind:continue-status="continueStatusArray[1]"
               v-on:continue-clicked="onContinue"
