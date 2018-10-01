@@ -10,26 +10,12 @@
       </v-toolbar>
       <v-card-text>
         <v-alert v-show="error" color="error">{{error}}</v-alert>
-        <v-layout>
+        <v-layout class="pa-3">
           <GeoBreadcrumbs v-if="geo.parentId" :geo-id="geo.parentId"></GeoBreadcrumbs>
         </v-layout>
-        <v-toolbar flat>
-          <v-toolbar-title>
-            {{ $t('photos') }}
-          </v-toolbar-title>
-          <v-spacer />
-        </v-toolbar>
-        <v-container fluid grid-list-md>
-          <v-layout row wrap>
-            <Photo
-              v-for="photo in geo.photos"
-              :is-contained="true"
-              :height="250"
-              :width="250"
-              :key="photo.id"
-              :photo="photo"/>
-          </v-layout>
-        </v-container>
+        <v-layout>
+          <PhotoAlbum :photos="geo.photos" @photo="addPhoto"/>
+        </v-layout>
       </v-card-text>
     </v-card>
   </v-container>
@@ -39,15 +25,14 @@
   // @ts-ignore
   import GeoBreadcrumbs from './GeoBreadcrumbs'
   // @ts-ignore
-  import Photo from '../Photo'
-
+  import PhotoAlbum from '../photo/PhotoAlbum'
+  import Photo from '../../entities/trellis/Photo'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import GeoService from '../../services/geo/GeoService'
   import router from '../../router'
   import {Route} from 'vue-router'
   import Geo from '../../entities/trellis/Geo'
-  import Translation from '../../entities/trellis/Translation'
   import Vue from 'vue'
 
   export default Vue.extend({
@@ -56,11 +41,11 @@
       RouteMixinFactory((r: Route) => GeoService.getGeoById(r.params.geoId)),
       TranslationMixin
     ],
-    components: {GeoBreadcrumbs, Photo},
+    components: {GeoBreadcrumbs, PhotoAlbum},
     data () {
       return {
-        geo: new Geo(),
-        translation: new Translation(),
+        geo: null,
+        translation: null,
         error: null
       }
     },
@@ -80,6 +65,10 @@
             })
           }
         })
+      },
+      async addPhoto (photo: Photo) {
+        await GeoService.addPhoto(this.geo.id, photo)
+        this.geo.photos.push(photo)
       }
     }
   })

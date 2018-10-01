@@ -11,30 +11,7 @@
       <v-alert v-show="error" type="error">
         {{error}}
       </v-alert>
-      <v-toolbar flat>
-        <v-toolbar-title>
-          {{ $t('photos') }}
-        </v-toolbar-title>
-        <v-spacer />
-        <permission :role-whitelist="['admin','supervisor','manager']">
-          <v-btn
-            icon
-            @click="isAddingPhoto = true">
-            <v-icon>add</v-icon>
-          </v-btn>
-        </permission>
-      </v-toolbar>
-      <v-container fluid grid-list-md>
-        <v-layout row wrap>
-          <Photo
-            v-for="photo in respondent.photos"
-            :is-contained="true"
-            :height="250"
-            :width="250"
-            :key="photo.id"
-            :photo="photo"/>
-        </v-layout>
-      </v-container>
+      <PhotoAlbum :photos="respondent.photos" @photo="onNewPhoto" />
       <RespondentGeos
         :use-census-form="true"
         :study-id="global.study.id"
@@ -117,20 +94,6 @@
       </v-data-table>
     </v-card-text>
     <v-dialog
-      v-model="isAddingPhoto"
-      lazy>
-      <v-container>
-        <v-card>
-          <v-btn @click="photoFromCamera()">
-            <v-icon>photo_camera</v-icon>
-          </v-btn>
-          <v-btn @click="photoFromFile()">
-            <v-icon>cloud_upload</v-icon>
-          </v-btn>
-        </v-card>
-      </v-container>
-    </v-dialog>
-    <v-dialog
       v-model="modal.addName"
       lazy>
       <RespondentName
@@ -162,13 +125,13 @@
   // @ts-ignore
   import Permission from '../Permission'
   // @ts-ignore
-  import Photo from '../Photo'
-  // @ts-ignore
   import RespondentName from './RespondentName'
   // @ts-ignore
   import RespondentConditionTagForm from './RespondentConditionTagForm'
   // @ts-ignore
   import RespondentGeos from './RespondentGeos'
+  // @ts-ignore
+  import PhotoAlbum from '../photo/PhotoAlbum'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import RespondentService from '../../services/respondent/RespondentService'
   import ConditionTagService from '../../services/condition-tag'
@@ -242,13 +205,11 @@
       leaving () {
         this.respondentConditionTags = []
       },
-      async photoFromCamera () {
-        const photo: Photo = await PhotoService.takePhoto()
+      async onNewPhoto (photo) {
         await RespondentService.addPhoto(this.respondent.id, photo)
         this.respondent.photos.push(photo)
         this.isAddingPhoto = false
       },
-      photoFromFile () {},
       async removeName (nameId: string): Promise<void> {
         let name = this.respondent.names.find(name => name.id === nameId)
         if (name && name.isDisplayName) {
@@ -309,11 +270,11 @@
       }
     },
     components: {
-      Photo,
       RespondentName,
       Permission,
       RespondentConditionTagForm,
-      RespondentGeos
+      RespondentGeos,
+      PhotoAlbum
     }
   })
 </script>

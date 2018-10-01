@@ -1,6 +1,6 @@
 /* global zip */
 /* global Zeep */
-import { FileService } from '@/services/file/FileService'
+import FileService from '../file/FileService'
 
 class ZipServiceCordova {
 

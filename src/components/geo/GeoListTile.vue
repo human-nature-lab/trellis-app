@@ -27,7 +27,7 @@
 <script>
   import TranslationMixin from '../../mixins/TranslationMixin'
   import index from '../../router/index'
-  import Photo from '../Photo'
+  import Photo from '../photo/Photo'
   import Geo from '../../entities/trellis/Geo'
   export default {
     name: 'geo-list-tile',

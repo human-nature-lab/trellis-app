@@ -1,5 +1,5 @@
 <template>
-  <v-flex class="photo" :class="{contained: isContained}" ref="container" :style="{'width': width + 'px', 'min-height': height + 'px'}">
+  <v-flex class="photo" :class="{contained: isContained}" ref="container" :style="{'width': width + 'px', 'min-height': height + 'px'}" @click="$emit('click')">
     <v-progress-circular
       v-if="isLoading"
       indeterminate
@@ -13,8 +13,8 @@
 </template>
 
 <script>
-  import PhotoService from '../services/photo/PhotoService'
-  import URL_PLACEHOLDER from '../assets/Placeholder_person.jpg'
+  import PhotoService from '../../services/photo/PhotoService'
+  import URL_PLACEHOLDER from '../../assets/Placeholder_person.jpg'
 
   // TODO: consider replacing this with a material design icon.
   // This can't be dynamically sized, so image is better
