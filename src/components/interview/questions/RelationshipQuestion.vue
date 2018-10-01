@@ -52,7 +52,7 @@
   import ActionTypes from '../../../static/action.types'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import ActionMixin from '../mixins/ActionMixin'
-  import Photo from '../../Photo'
+  import Photo from '../../photo/Photo'
   import RespondentsSearch from '../../respondent/RespondentsSearch'
   import EdgeService from '../../../services/edge/EdgeService'
   import parameterTypes from '../../../static/parameter.types'
@@ -80,10 +80,11 @@
       }
     },
     computed: {
-      canAddRespondent: function () {
-        return this.question.questionParameters.findIndex(p => {
-          return p.parameter.name === 'can_add_respondent' && parseInt(p.val, 10) === 1
+      canAddRespondent () {
+        const hasFalseParam = this.question.questionParameters.findIndex(p => {
+          return p.parameter.name === 'can_add_respondent' && parseInt(p.val, 10) === 0
         }) > -1
+        return !hasFalseParam
       },
       currentGeo () {
         return this.respondent.geos.find(geo => geo.pivot.is_current)

@@ -11,7 +11,7 @@
 </template>
 
 <script>
-  import Photo from '../Photo'
+  import Photo from '../photo/Photo'
   export default {
     name: 'respondent-list-item',
     props: {

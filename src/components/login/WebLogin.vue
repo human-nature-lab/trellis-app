@@ -98,8 +98,12 @@
             router.push({name: 'Home'})
           }
         } catch (err) {
-          console.error(err)
-          this.errorMessage = err.message
+          if (err.response && err.response.status && err.response.status === 403) {
+            this.errorMessage = 'Invalid username or password'
+          } else {
+            console.error(err)
+            this.errorMessage = err.message
+          }
         }
       },
       showError: function () {

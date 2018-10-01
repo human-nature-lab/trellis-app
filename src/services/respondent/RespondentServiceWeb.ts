@@ -4,7 +4,14 @@ import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
+import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
+import Photo from "../../entities/trellis/Photo";
 export default class RespondentServiceWeb implements RespondentServiceInterface {
+
+  async addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto> {
+    throw new Error("Can't add respondent photo yet") // TODO: Respondent photo web
+    return new RespondentPhoto()
+  }
 
   async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
     respondentId = encodeURIComponent(respondentId)

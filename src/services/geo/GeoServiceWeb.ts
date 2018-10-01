@@ -2,8 +2,15 @@ import http from '../http/AxiosInstance'
 import GeoServiceAbstract from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import GeoType from '../../entities/trellis/GeoType'
+import GeoPhoto from "../../entities/trellis/GeoPhoto";
+import Photo from "../../entities/trellis/Photo";
 
 export default class GeoServiceWeb extends GeoServiceAbstract {
+
+  async addPhoto (geoId: string, photo: Photo): Promise<GeoPhoto> {
+    // TODO: Add geo photo on web side
+    return new GeoPhoto()
+  }
 
   getGeoById (geoId) {
     return this.getGeosById([geoId]).then(geoIds => geoIds[0])

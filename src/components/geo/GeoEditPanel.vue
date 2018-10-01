@@ -53,7 +53,7 @@
 
 <script>
   import Geo from '../../entities/trellis/Geo'
-  import Photo from '../Photo.vue'
+  import Photo from '../photo/Photo.vue'
   import AlertService from '../../services/AlertService'
   import TranslationService from '../../services/TranslationService'
   import GeoService from '../../services/geo/GeoService'

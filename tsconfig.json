@@ -19,7 +19,6 @@
     "typings/browser.d.ts",
     "typings/browser",
     "www/lib/typeorm",
-    "plugins",
     "platforms",
     "hooks"
   ]
