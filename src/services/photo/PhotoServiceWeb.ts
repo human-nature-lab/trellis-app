@@ -3,9 +3,10 @@ import axios from 'axios'
 import SizeLimitedMap from '../../classes/SizeLimitedMap'
 const cache = new SizeLimitedMap(1024 * 10000)
 import CancellablePromise from '../../classes/CancellablePromise'
-import PhotoServiceInterface from './PhotoServiceInterface'
+import PhotoServiceAbstract from './PhotoServiceAbstract'
+import Photo from "../../entities/trellis/Photo";
 
-export default class PhotoServiceWeb implements PhotoServiceInterface {
+export default class PhotoServiceWeb extends PhotoServiceAbstract {
 
   private existingCancelTokens = new Set()
 
@@ -45,5 +46,10 @@ export default class PhotoServiceWeb implements PhotoServiceInterface {
       }
     })
     return p
+  }
+
+  async takePhoto (): Promise<Photo> {
+    console.error('Need to implement this in WEB')
+    return new Photo()
   }
 }

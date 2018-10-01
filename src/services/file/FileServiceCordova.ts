@@ -2,53 +2,49 @@ import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
 import config from '../../config'
 import merge from 'lodash/merge'
+declare var md5chksum, FileTransfer, cordova
 /* global md5chksum, FileTransfer */
+
+const PHOTOS_DIR = 'photos'
+const FULL_RES_DIR = 'full-resolution-photos'
+
+enum StorageType {
+  PERSISTENT = window.PERSISTENT,
+  TEMPORARY = window.TEMPORARY
+}
+
+interface FileSystemOptions {
+  storageType: StorageType,
+  requestedBytes: number
+}
+
+interface FileEntryOptions {
+  create: boolean
+  exclusive: boolean
+}
 
 class FileServiceCordova {
 
-  requestFileSystem (_options) {
+  requestFileSystem (options?: FileSystemOptions): Promise<FileSystem> {
     return new Promise((resolve, reject) => {
-      let options = _options
-      if (!options) {
-        options = FileServiceCordova.getDefaultRequestFileSystemOptions()
-      }
-      DeviceService.isDeviceReady().then(
-        () => {
-          window.requestFileSystem(options.storageType, options.requestedBytes,
-            function (fileSystem) {
-              resolve(fileSystem)
-            },
-            function (error) {
-              reject(error)
-            })
-        }
+      options = merge(FileServiceCordova.getDefaultRequestFileSystemOptions(), options)
+      DeviceService.isDeviceReady().then(() =>
+        window.requestFileSystem(options.storageType as number, options.requestedBytes, resolve, reject)
       )
     })
   }
 
-  getDirectoryEntry (fileSystem, directory, _options) {
+  getDirectoryEntry (fileSystem: FileSystem, directory: string, options?: FileEntryOptions): Promise<DirectoryEntry> {
     return new Promise((resolve, reject) => {
-      let options = _options
-      if (!options) {
-        options = FileServiceCordova.getDefaultGetDirectoryEntryOptions()
-      }
-      fileSystem.root.getDirectory(directory, options,
-        (directoryEntry) => resolve(directoryEntry),
-        (error) => reject(error)
-      )
+      options = merge(FileServiceCordova.getDefaultGetDirectoryEntryOptions(), options)
+      fileSystem.root.getDirectory(directory, options, resolve, reject)
     })
   }
 
-  getFileEntry (directoryEntry, fileName, _options) {
+  getFileEntry (directoryEntry: DirectoryEntry, fileName: string, options?: FileEntryOptions) {
     return new Promise((resolve, reject) => {
-      let options = _options
-      if (!options) {
-        options = FileServiceCordova.getDefaultGetFileEntryOptions()
-      }
-      directoryEntry.getFile(fileName, options,
-        (fileEntry) => resolve(fileEntry),
-        (error) => reject(error)
-      )
+      options = merge(FileServiceCordova.getDefaultGetFileEntryOptions(), options)
+      directoryEntry.getFile(fileName, options, resolve, reject)
     })
   }
 
@@ -59,8 +55,8 @@ class FileServiceCordova {
     }
     return this.requestFileSystem(requestFileSystemOptions)
       .then((fileSystem) => this.getDirectoryEntry(fileSystem, directory))
-      .then((directoryEntry) => this.getFileEntry(directoryEntry, fileName))
-      .then((fileEntry) => new Promise((resolve, reject) => {
+      .then((directoryEntry: DirectoryEntry) => this.getFileEntry(directoryEntry, fileName))
+      .then((fileEntry: FileEntry) => new Promise((resolve, reject) => {
         fileEntry.createWriter(
           function (fileWriter) {
             fileWriter.onwriteend = function () {
@@ -78,44 +74,102 @@ class FileServiceCordova {
     )
   }
 
-  deleteFile (fileEntry) {
+  /**
+   * Copy a file and return the new file entry
+   * @param {string} filePath
+   * @param {string} dir
+   * @param {string} newName
+   * @returns {Promise<any>}
+   */
+  move (filePath: string, dir: string, newName?: string): Promise<FileEntry> {
     return new Promise((resolve, reject) => {
-      fileEntry.remove(() => {
-        resolve()
-      }, (err) => {
-        reject(err)
+      window.resolveLocalFileSystemURL(filePath, fileEntry => {
+        window.resolveLocalFileSystemURL(dir, (dirEntry: DirectoryEntry) => {
+          fileEntry.moveTo(dirEntry, newName, (newEntry: FileEntry) => {
+            resolve(newEntry)
+          }, err => {
+            reject('Unable to move file ' + JSON.stringify(err))
+          })
+        }, err => {
+          reject('Directory not found ' + JSON.stringify(err))
+        })
+      }, err => {
+        reject('File not found ' + JSON.stringify(err))
       })
     })
   }
 
-  listFiles () {
-    this.requestFileSystem()
-      .then((fs) => {
-        fs.root.getDirectory('/')
-          .readEntries((entries) => {
-            entries.forEach((entry) => {
-              console.log('entry', entry)
-            })
+  copy (filePath: string, dir: string, newName?: string): Promise<FileEntry> {
+    return new Promise((resolve, reject) => {
+      window.resolveLocalFileSystemURL(filePath, fileEntry => {
+        window.resolveLocalFileSystemURL(dir, (dirEntry: DirectoryEntry) => {
+          fileEntry.copyTo(dirEntry, newName, (newEntry: FileEntry) => {
+            resolve(newEntry)
+          }, err => {
+            reject('Unable to copy file ' + JSON.stringify(err))
           })
+        }, err => {
+          reject('Directory not found ' + JSON.stringify(err))
+        })
+      }, err => {
+        reject('File not found ' + JSON.stringify(err))
       })
+    })
+  }
+
+  getFile (filePath): Promise<FileEntry> {
+    return new Promise((resolve, reject) => {
+      window.resolveLocalFileSystemURL(filePath, entry => {
+        resolve(entry as FileEntry)
+      }, reject)
+    })
+  }
+
+  deleteFile (fileEntry) {
+    return new Promise((resolve, reject) => {
+      fileEntry.remove(resolve, reject)
+    })
+  }
+
+  // listFiles (): Promise<void> {
+  //   return this.requestFileSystem()
+  //     .then((fs) => {
+  //       return new Promise((resolve, reject) => {
+  //         fs.root.getDirectory('/', {create: false}, resolve, reject)
+  //       })
+  //     }).then((dir: DirectoryEntry) => {
+  //       dir.readEntries((entries) => {
+  //         entries.forEach((entry) => {
+  //           console.log('entry', entry)
+  //         })
+  //       })
+  //     })
+  // }
+
+  async getFullResPhotosDir (): Promise<DirectoryEntry> {
+    const fs = await this.requestFileSystem()
+    return await this.getDirectoryEntry(fs, FULL_RES_DIR)
+  }
+
+  async getPhotosDir (): Promise<DirectoryEntry> {
+    const fs = await this.requestFileSystem()
+    return await this.getDirectoryEntry(fs, PHOTOS_DIR)
   }
 
   listPhotos () {
     return this.requestFileSystem()
-      .then((fileSystem) => this.getDirectoryEntry(fileSystem, 'photos'))
-      .then((directoryEntry) => {
+      .then((fileSystem: FileSystem) => this.getDirectoryEntry(fileSystem, PHOTOS_DIR))
+      .then((directoryEntry: DirectoryEntry) => {
         return new Promise((resolve, reject) => {
-          let reader = directoryEntry.createReader()
-          reader.readEntries((results) => {
-            resolve(results)
-          }, reject)
+          let reader: DirectoryReader = directoryEntry.createReader()
+          reader.readEntries(resolve, reject)
         })
       })
   }
 
   getPhoto (fileName) {
     return this.requestFileSystem()
-      .then((fileSystem) => this.getDirectoryEntry(fileSystem, 'photos'))
+      .then((fileSystem) => this.getDirectoryEntry(fileSystem, PHOTOS_DIR))
       .then((directoryEntry) => this.getFileEntry(directoryEntry, fileName, {create: false, exclusive: false}))
   }
 
@@ -140,6 +194,7 @@ class FileServiceCordova {
         .then(() => {
           try {
             const fileTransfer = new FileTransfer()
+            // @ts-ignore
             promise.cancelDownload = fileTransfer.abort.bind(fileTransfer)
             fileTransfer.onprogress = onDownloadProgress
             const fileURL = fileEntry.toURL()
@@ -174,6 +229,7 @@ class FileServiceCordova {
           try {
             const fileTransfer = new FileTransfer()
             const encodedUri = encodeURI(uri)
+            // @ts-ignore
             promise.cancelUpload = fileTransfer.abort.bind(fileTransfer)
             fileTransfer.onprogress = onUploadProgress
             const fileURL = fileEntry.toURL()
@@ -203,13 +259,7 @@ class FileServiceCordova {
 
   fileFromFileEntry (fileEntry) {
     return new Promise((resolve, reject) => {
-      try {
-        fileEntry.file((file) => {
-          resolve(file)
-        })
-      } catch (err) {
-        reject(err)
-      }
+      fileEntry.file(resolve, reject)
     })
   }
 
@@ -242,21 +292,21 @@ class FileServiceCordova {
     })
   }
 
-  static getDefaultRequestFileSystemOptions () {
+  static getDefaultRequestFileSystemOptions (): FileSystemOptions {
     return {
-      storageType: window.PERSISTENT,
+      storageType: StorageType.PERSISTENT,
       requestedBytes: (1024 * 1024 * 10)
     }
   }
 
-  static getDefaultGetFileEntryOptions () {
+  static getDefaultGetFileEntryOptions (): FileEntryOptions {
     return {
       create: true,
       exclusive: false
     }
   }
 
-  static getDefaultGetDirectoryEntryOptions () {
+  static getDefaultGetDirectoryEntryOptions (): FileEntryOptions {
     return {
       create: true,
       exclusive: false

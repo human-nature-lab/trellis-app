@@ -2,7 +2,8 @@ import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
-import Geo from '../../entities/trellis/Geo'
+import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
+import Photo from "../../entities/trellis/Photo";
 
 export interface SearchFilter {
   conditionTags: string[], // Array of condition tag names
@@ -10,6 +11,14 @@ export interface SearchFilter {
 }
 
 export default interface RespondentServiceInterface {
+
+  /**
+   * Add a photo to this respondent
+   * @param {string} respondentId
+   * @param {Photo} photo
+   * @returns {Promise<RespondentPhoto>}
+   */
+  addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto>
 
   /**
    * Get the fills for this respondent by respondent id

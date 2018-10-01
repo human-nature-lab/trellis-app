@@ -1,4 +1,7 @@
 key,en,es,comment
+checking_census_form,Checking for census form...,,
+no_photos,There are no photos here...,,
+add_photos,Add photos,Añadir Fotos,
 device_authenticating,Authenticating device...,Autenticando dispositivo...,
 calculating_size,Calculating total size of images...,Calculando el tamaño total de las imágenes...,
 establishing_connection,Establishing a connection with the server...,Estableciendo conexión con el servidor...,

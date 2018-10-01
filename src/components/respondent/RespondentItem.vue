@@ -34,7 +34,7 @@
 
 <script lang="ts">
   // @ts-ignore
-  import Photo from '../Photo'
+  import Photo from '../photo/Photo'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
   export default Vue.extend({

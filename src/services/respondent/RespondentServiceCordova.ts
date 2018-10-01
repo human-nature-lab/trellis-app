@@ -6,13 +6,25 @@ import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
 import {Brackets, IsNull} from 'typeorm'
+import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
+import Photo from "../../entities/trellis/Photo";
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
+
+  async addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto> {
+    const repo = await DatabaseService.getRepository(RespondentPhoto)
+    let rPhoto = new RespondentPhoto()
+    rPhoto.photoId = photo.id
+    rPhoto.respondentId = respondentId
+    rPhoto.sortOrder = await repo.createQueryBuilder('rp').where('rp.respondentId = :respondentId', {respondentId}).getCount()
+    await repo.save(rPhoto)
+    return rPhoto
+  }
 
   async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentFill)
-    return repository.find({ deletedAt: null, respondentId: respondentId })
+    return await repository.find({ deletedAt: null, respondentId: respondentId })
   }
 
   async getRespondentById (respondentId: string): Promise<Respondent> {
@@ -159,7 +171,12 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     await connection.manager.save(studyRespondent)
 
     const repository = connection.getRepository(Respondent)
-    return repository.findOne(respondent.id)
+    return repository.findOne({
+      where: {
+        id: respondent.id
+      },
+      relations: ['photos', 'names']
+    })
   }
 
   async addRespondentGeo (respondentId: string, geoId: string): Promise<RespondentGeo> {

@@ -4,14 +4,8 @@ import RespondentServiceCordova from './RespondentServiceCordova'
 // import RespondentServiceMock from './RespondentServiceMock'
 
 export const RespondentService = switchByModeEnv({
-  WEB: {
-    PROD: RespondentServiceWeb,
-    TEST: RespondentServiceWeb
-  },
-  CORDOVA: {
-    PROD: RespondentServiceCordova,
-    TEST: RespondentServiceCordova
-  }
+  WEB: RespondentServiceWeb,
+  CORDOVA: RespondentServiceCordova
 })
 
 export default new RespondentService()
