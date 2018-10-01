@@ -7,6 +7,16 @@ import {IsNull} from "typeorm";
 
 export default class SurveyServiceCordova implements SurveyServiceInterface {
 
+  async getSurveyById (surveyId: string): Promise<Survey> {
+    const repo = await DatabaseService.getRepository(Survey)
+    return await repo.findOne({
+      where: {
+        id: surveyId,
+        deletedAt: IsNull()
+      }
+    })
+  }
+
   async getSurvey (studyId: string, respondentId: string, formId: string): Promise<Survey> {
     const repo = await DatabaseService.getRepository(Survey)
     return await repo.findOne({

@@ -7,6 +7,7 @@ import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
 import GeoInfo from '../components/geo/GeoInfo'
 import LocaleSelectorPage from '../components/LocaleSelectorPage'
 import StudySelectorPage from '../components/StudySelectorPage'
+import SurveyComplete from '../components/interview/SurveyComplete'
 import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
 import ValidateLocale from './guards/ValidateLocale'
@@ -73,4 +74,8 @@ export default [{
   path: '/test/services',
   name: 'ServiceTesting',
   component: ServiceTesting
+}, {
+  path: '/survey/:surveyId/completed',
+  name: 'SurveyComplete',
+  component: SurveyComplete
 }]

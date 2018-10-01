@@ -56,7 +56,10 @@ export default class PersistSlave {
    * @returns {Promise<any>} - A promise resolving to the results of the saveCallback
    */
   save () {
-    if (this.cancelAllRequests) return
+    if (this.cancelAllRequests) {
+      this.hasNewData = false
+      return
+    }
     console.log('saving something')
     if (this.existingRequest) {
       this.hasNewData = true

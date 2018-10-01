@@ -92,21 +92,21 @@
       }
     },
     methods: {
-      onNext: function () {
+      onNext () {
         this.actionWithoutQuestion(AT.next)
       },
-      onPrevious: function () {
+      onPrevious () {
         this.actionWithoutQuestion(AT.previous)
       },
-      datumRecyclerSize: function () {
+      datumRecyclerSize () {
         return datumRecycler.cache.size
       },
-      questionDatumRecyclerSize: function () {
+      questionDatumRecyclerSize () {
         return questionDatumRecycler.cache.size
       }
     },
     computed: {
-      isNavigationEnabled: function () {
+      isNavigationEnabled () {
         for (let question of this.questions) {
           if (!question.allParametersSatisfied) {
             return false
@@ -114,13 +114,13 @@
         }
         return true
       },
-      isFirstPage: function () {
+      isFirstPage () {
         return this.location.page === 0 &&
           this.location.section === 0 &&
           this.location.sectionRepetition === 0 &&
           this.location.sectionFollowUpDatumRepetition === 0
       },
-      datumLength: function () {
+      datumLength () {
         let l = 0
         for (let datum of this.data) {
           l += datum.data.length
