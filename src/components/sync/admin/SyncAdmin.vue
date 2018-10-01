@@ -8,7 +8,7 @@
           </v-card-title>
           <v-card-text>
             <v-data-table
-              :pagination.sync="pagination"
+              :pagination.sync="snapshotPagination"
               :loading="snapshotsLoading"
               :headers="snapshotColumns"
               :items="snapshots">
@@ -45,7 +45,7 @@
           </v-card-title>
           <v-card-text>
             <v-data-table
-              :pagination.sync="pagination"
+              :pagination.sync="uploadPagination"
               :loading="uploadsLoading"
               :headers="uploadColumns"
               :items="uploads">
@@ -88,7 +88,11 @@
     name: 'sync-admin',
     data () {
       return {
-        pagination: {
+        uploadPagination: {
+          sortBy: 'created_at',
+          descending: true
+        },
+        snapshotPagination: {
           sortBy: 'created_at',
           descending: true
         },
