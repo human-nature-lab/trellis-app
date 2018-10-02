@@ -28,7 +28,7 @@
       style="position: relative;">
       <permission :role-whitelist="['admin']">
         <v-btn
-          v-if="selectedGeo === null"
+          v-if="selectedGeo === null && parentGeo !== null && parentGeo.geoType.canUserAddChild"
           class="deep-orange floating-button"
           @click.stop="addNewGeo"
           fab
