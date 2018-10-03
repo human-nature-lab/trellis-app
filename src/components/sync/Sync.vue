@@ -26,6 +26,7 @@
           <v-layout row class="mt-2 sync-footer" justify-space-between>
             <v-flex class="xs3 text-xs-left">
               <v-btn :disabled="!enableUpload"
+                     :loading="uploading"
                      @click="onUpload">
                 <v-icon>cloud_upload</v-icon>
               </v-btn>
