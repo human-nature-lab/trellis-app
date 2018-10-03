@@ -143,13 +143,15 @@ const trellisConnection = {
 
 export default class DatabaseServiceCordova {
   constructor () {
-    this.databaseCreated = DatabaseServiceCordova.createDatabase()
-    this.configDatabaseCreated = DatabaseServiceCordova.createConfigDatabase()
+    this.databaseCreated = this.createDatabase()
+    this.configDatabaseCreated = this.createConfigDatabase()
   }
 
-  static createDatabase () {
+  createDatabase () {
     return DeviceService.isDeviceReady()
       .then(() => createConnection(trellisConnection))
+      .then((connection) => connection.createQueryRunner())
+      .then((queryRunner) => this.createUpdatedRecordsTable(queryRunner, {}))
   }
 
   async getDatabase () {
@@ -163,7 +165,7 @@ export default class DatabaseServiceCordova {
     return repo
   }
 
-  static createConfigDatabase () {
+  createConfigDatabase () {
     return DeviceService.isDeviceReady()
       .then(() => createConnection(trellisConfigConnection))
   }
