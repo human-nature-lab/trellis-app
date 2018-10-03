@@ -2,32 +2,42 @@
 import { NamingStrategyInterface, DefaultNamingStrategy } from 'typeorm'
 import { snakeCase } from 'typeorm/util/StringUtils'
 
+const cache: Map<string, string> = new Map()
+function snakeCaseCached (name) {
+  let result = cache.get(name)
+  if (result === null || result === undefined) {
+    result = snakeCase(name)
+    cache.set(name, result)
+  }
+  return result
+}
+
 export default class SnakeNamingStrategy extends DefaultNamingStrategy implements NamingStrategyInterface {
   tableName(className: string, customName: string): string {
-    return customName ? customName : snakeCase(className)
+    return customName ? customName : snakeCaseCached(className)
   }
 
   columnName(propertyName: string, customName: string, embeddedPrefixes: string[]): string {
-    return snakeCase(embeddedPrefixes.join('_')) + (customName ? customName : snakeCase(propertyName))
+    return snakeCaseCached(embeddedPrefixes.join('_')) + (customName ? customName : snakeCaseCached(propertyName))
   }
 
   relationName(propertyName: string): string {
-    return snakeCase(propertyName)
+    return snakeCaseCached(propertyName)
   }
 
   joinColumnName(relationName: string, referencedColumnName: string): string {
-    return snakeCase(relationName + "_" + referencedColumnName)
+    return snakeCaseCached(relationName + "_" + referencedColumnName)
   }
 
   joinTableName(firstTableName: string, secondTableName: string, firstPropertyName: string, secondPropertyName: string): string {
-    return snakeCase(firstTableName + "_" + firstPropertyName.replace(/\./gi, "_") + "_" + secondTableName)
+    return snakeCaseCached(firstTableName + "_" + firstPropertyName.replace(/\./gi, "_") + "_" + secondTableName)
   }
 
   joinTableColumnName(tableName: string, propertyName: string, columnName?: string): string {
-    return snakeCase(tableName + "_" + (columnName ? columnName : propertyName))
+    return snakeCaseCached(tableName + "_" + (columnName ? columnName : propertyName))
   }
 
   classTableInheritanceParentColumnName(parentTableName: any, parentTableIdPropertyName: any): string {
-    return snakeCase(parentTableName + "_" + parentTableIdPropertyName)
+    return snakeCaseCached(parentTableName + "_" + parentTableIdPropertyName)
   }
 }
