@@ -79,6 +79,25 @@ class SyncService {
     return http().get(`list-uploads`)
   }
 
+  getMissingPhotos (source: CancelTokenSource) {
+    let options = {} as AxiosRequestConfig
+    if (source) { options.cancelToken = source.token }
+    return new Promise ((resolve, reject) => {
+      DeviceService.getUUID()
+        .then((deviceId) => {
+          http().get(`device/${deviceId}/missing-images`, options)
+            .then(response => {
+              const missingImagesString = response.data
+              resolve(missingImagesString)
+            })
+        })
+        .catch(err => {
+          console.error(err)
+          reject(err)
+        })
+    })
+  }
+
   getPendingUploads (source: CancelTokenSource) {
     return new Promise((resolve, reject) => {
       DeviceService.getUUID()
@@ -100,7 +119,7 @@ class SyncService {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const deviceId = await DeviceService.getUUID()
-    return http().get(`device/${deviceId}snapshot/${snapshotId}/file_size`, options)
+    return http().get(`device/${deviceId}/snapshot/${snapshotId}/file_size`, options)
       .then(response => {
         return response.data
       })
@@ -166,7 +185,6 @@ class SyncService {
   }
 
   async registerSuccessfulSync (_sync: Sync): Promise<void> {
-    console.debug('sync', _sync)
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     await repository.update({id: _sync.id}, {completedAt: new Date(), status: 'success'})
@@ -177,7 +195,6 @@ class SyncService {
   }
 
   async registerCancelledSync (_sync: Sync): Promise<void> {
-    console.debug('sync', _sync)
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     await repository.update({id: _sync.id}, {status: 'cancelled'})
@@ -234,6 +251,10 @@ class SyncService {
     return await connection.query(`select *, "${tableName}" as table_name from ${tableName} where id in (${rowIds});`)
   }
 
+  async getUpdatedPhotos (connection:Connection, rowIds:string[]): Promise<object[]> {
+    return await connection.query(`select file_name from photo where id in (${rowIds});`)
+  }
+
   async markUpdatedRowsAsUploaded () {
     const connection = await DatabaseService.getDatabase()
     return await connection.query(`update updated_records set uploaded_at = date('now') where uploaded_at is null;`)
@@ -260,18 +281,24 @@ class SyncService {
 
     const fileWriter = await this.createFileWriter(fileEntry)
     let writtenRows = 0
+    let updatedPhotos = []
 
     for (const table of tables) {
       let offset = 0
       while (offset < table.rowCount) {
         const rowIds = await this.getRowsToUpdate(connection, table.tableName, UPLOAD_NUM_ROWS_WRITE, offset)
         const updatedRows = await this.getUpdatedRows(connection, table.tableName, rowIds)
+        if (table.tableName === 'photo') {
+          updatedPhotos = await this.getUpdatedPhotos(connection, rowIds)
+        }
         await this.writeUpdatedRows(fileWriter, updatedRows, isCancelled)
         offset += UPLOAD_NUM_ROWS_WRITE
         writtenRows += updatedRows.length
         trackProgress({created: writtenRows, total: totalRows})
       }
     }
+
+    return updatedPhotos
   }
 
 }

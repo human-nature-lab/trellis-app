@@ -4,8 +4,8 @@
       <li>
         <slot></slot>
         <strong v-if="success" class="green--text">{{ successMessage }}.</strong>
-        <strong v-if="isWarning()" class="amber--text">{{$t('warning_word').toUpperCase()}}</strong>
-        <strong v-if="isError()" class="red--text">{{$t('error').toUpperCase()}}</strong>
+        <strong v-if="isWarning()" class="amber--text">{{$t('warning_word').toUpperCase()}}.</strong>
+        <strong v-if="isError()" class="red--text">{{$t('error').toUpperCase()}}.</strong>
       </li>
     </ul>
     <trellis-alert v-if="showLog()" :current-log="currentLog"></trellis-alert>
