@@ -17,10 +17,9 @@ export default class FormServiceCordova implements FormServiceInterface {
         studyId: studyId,
         censusTypeId: IsNull(),
         deletedAt: IsNull()
-      },
-      deletedAt: null
+      }
     })
-    return studyForms.filter(s => s.form.isPublished)
+    return studyForms.filter(s => (s.form.isPublished && s.form.deletedAt === null))
   }
 
   async getForm (id: string, bareBones: boolean = false): Promise<Form> {
@@ -36,6 +35,7 @@ export default class FormServiceCordova implements FormServiceInterface {
     })
     const groups: QuestionGroup[] = []
     const promises: Promise<boolean>[] = []
+    //TODO: make this faster
     form.sections.forEach(section => {
       section.questionGroups.forEach(qg => {
         groups.push(qg)
