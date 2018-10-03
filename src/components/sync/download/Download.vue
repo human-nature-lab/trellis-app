@@ -159,8 +159,8 @@
 
 <script>
   import SyncStep from '../SyncStep'
-  import CheckConnection from './substeps/CheckConnection'
-  import AuthenticateDevice from './substeps/AuthenticateDevice'
+  import CheckConnection from '../common/substeps/CheckConnection'
+  import AuthenticateDevice from '../common/substeps/AuthenticateDevice'
   import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'
   import CompareDownload from './substeps/CompareDownload'
   import CompareUpload from './substeps/CompareUpload'
