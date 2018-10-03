@@ -146,24 +146,6 @@ class SyncService {
     })
   }
 
-  async downloadSnapshot (source: CancelTokenSource, onDownloadProgress, snapshotId: string): Promise<AxiosResponse> {
-    let options = {
-      timeout: 0,
-      responseType: 'blob'
-    } as AxiosRequestConfig
-    if (source) { options.cancelToken = source.token }
-    if (onDownloadProgress) { options.onDownloadProgress = onDownloadProgress }
-    const deviceId = await DeviceService.getUUID()
-    return http().get(`device/${deviceId}/snapshot/${snapshotId}/download`, options)
-      .then(response => {
-        return response
-      })
-      .catch(err => {
-        console.error(err)
-        throw err
-      })
-  }
-
   downloadImage (source: CancelTokenSource, fileName: string): Promise<any> {
     let options = {
       timeout: 0,

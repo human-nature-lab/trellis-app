@@ -14,6 +14,7 @@
 <script>
     import config from '../../../../config'
     import FileService from '../../../../services/file/FileService'
+    import DeviceService from '../../../../services/device/DeviceService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
@@ -53,26 +54,24 @@
         }
       },
       methods: {
-        downloadSnapshot: function () {
+        downloadSnapshot: async function () {
           this.downloading = true
           const fileName = this.snapshotId + '.sql.zip'
-          const uri = config.apiRoot + `/sync/snapshot/${this.snapshotId}/download`
-          FileService.requestFileSystem()
-            .then((fileSystem) => FileService.getDirectoryEntry(fileSystem, 'snapshots'))
-            .then((directoryEntry) => FileService.getFileEntry(directoryEntry, fileName))
-            .then((fileEntry) => {
-              this.fileServicePromise = FileService.download(uri, fileEntry, this.onDownloadProgress)
-              return this.fileServicePromise
-            })
-            .then((fileEntry) => {
-              this.success = true
-              this.$emit('download-snapshot-done', fileEntry)
-              this.downloading = false
-            })
-            .catch((err) => {
-              this.downloading = false
-              this.loggingService.log(err).then((result) => { this.currentLog = result })
-            })
+          try {
+            const deviceId = await DeviceService.getUUID()
+            const uri = config.apiRoot + `/sync/device/${deviceId}/snapshot/${this.snapshotId}/download`
+            const fileSystem = await FileService.requestFileSystem()
+            const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'snapshots')
+            const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
+            this.fileServicePromise = FileService.download(uri, fileEntry, this.onDownloadProgress)
+            await this.fileServicePromise
+            this.success = true
+            this.$emit('download-snapshot-done', fileEntry)
+            this.downloading = false
+          } catch (err) {
+            this.downloading = false
+            this.loggingService.log(err).then((result) => { this.currentLog = result })
+          }
         },
         onDownloadProgress: function (progressEvent) {
           let curProgress = (progressEvent.loaded / progressEvent.total) * 100
