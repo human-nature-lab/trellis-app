@@ -96,10 +96,11 @@ class SyncService {
     })
   }
 
-  getSnapshotFileSize (source: CancelTokenSource, snapshotId: string): Promise<number> {
+  async getSnapshotFileSize (source: CancelTokenSource, snapshotId: string): Promise<number> {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return http().get(`snapshot/${snapshotId}/file_size`, options)
+    const deviceId = await DeviceService.getUUID()
+    return http().get(`device/${deviceId}snapshot/${snapshotId}/file_size`, options)
       .then(response => {
         return response.data
       })
@@ -126,14 +127,15 @@ class SyncService {
     })
   }
 
-  downloadSnapshot (source: CancelTokenSource, onDownloadProgress, snapshotId: string): Promise<AxiosResponse> {
+  async downloadSnapshot (source: CancelTokenSource, onDownloadProgress, snapshotId: string): Promise<AxiosResponse> {
     let options = {
       timeout: 0,
       responseType: 'blob'
     } as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     if (onDownloadProgress) { options.onDownloadProgress = onDownloadProgress }
-    return http().get(`snapshot/${snapshotId}/download`, options)
+    const deviceId = await DeviceService.getUUID()
+    return http().get(`device/${deviceId}/snapshot/${snapshotId}/download`, options)
       .then(response => {
         return response
       })
