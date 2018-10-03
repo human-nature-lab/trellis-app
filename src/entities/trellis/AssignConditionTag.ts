@@ -8,7 +8,7 @@ import Question from './Question'
 export default class AssignConditionTag extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column({ select: false }) @Serializable
+  @Column() @Serializable
   conditionTagId: string
   @Column({ type: 'text' }) @Serializable
   logic: string

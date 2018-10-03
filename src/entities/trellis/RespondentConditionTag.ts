@@ -1,4 +1,4 @@
-import {Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import ConditionTag from './ConditionTag'
@@ -13,7 +13,7 @@ export interface RespondentConditionTagRecylerData {
 
 @Entity()
 export default class RespondentConditionTag extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn('uuid') @Serializable
+  @PrimaryColumn() @Serializable
   id: string
   @Column() @Serializable
   respondentId: string
