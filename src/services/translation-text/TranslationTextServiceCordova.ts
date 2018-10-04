@@ -1,6 +1,7 @@
 import DatabaseService from '../database/DatabaseService'
 import TranslationText from '../../entities/trellis/TranslationText'
 import TranslationTextServiceInterface from './TranslationTextServiceInterface'
+import {IsNull} from 'typeorm'
 
 export default class TranslationTextServiceCordova implements TranslationTextServiceInterface {
 
@@ -9,4 +10,13 @@ export default class TranslationTextServiceCordova implements TranslationTextSer
     return repository.update({id: translationTextId}, {translatedText: translatedText})
   }
 
+  async getTranslatedTextByTranslationId (translationId: string): Promise<TranslationText[]> {
+    const repo = await DatabaseService.getRepository(TranslationText)
+    return await repo.findAll({
+      where: {
+        translationId,
+        deletedAt: IsNull()
+      }
+    })
+  }
 }
