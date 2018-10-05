@@ -42,9 +42,9 @@
         <v-flex
           class="centered clickable"
           @click="$emit('click')">
-          <TranslatedText
-            :translation="form.nameTranslation"
-            :locale="global.locale"/>
+          <AsyncTranslationText
+            :translation="form.nameTranslation">
+          </AsyncTranslationText>
         </v-flex>
         <v-spacer />
         <v-flex class="icon-container">
@@ -119,7 +119,7 @@
 
 <script>
   // @ts-ignore
-  import TranslatedText from './TranslatedText'
+  import AsyncTranslationText from './AsyncTranslationText.vue'
   import global from '../static/singleton'
 
   export default {
@@ -158,7 +158,7 @@
       }
     },
     components: {
-      TranslatedText
+      AsyncTranslationText
     }
   }
 </script>

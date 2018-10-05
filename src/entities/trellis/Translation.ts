@@ -14,7 +14,7 @@ export default class Translation extends SparseTimestampedSoftDelete {
   }
 
   @Relationship(type => TranslationText)
-  @OneToMany(type => TranslationText, translationText => translationText.translation, { eager: true })
+  @OneToMany(type => TranslationText, translationText => translationText.translation)
   translationText: Array<TranslationText>
 
 }
