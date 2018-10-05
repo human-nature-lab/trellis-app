@@ -5,8 +5,7 @@ import router from '../../router'
 import singleton from '../../static/singleton'
 
 const TOKEN_KEY = 'x-token'
-let defaultInst
-let syncInst
+let defaultInst, syncInst
 
 /**
  * Set the token value. This stores it in local storage as well
@@ -63,7 +62,8 @@ export function syncInstance (): AxiosInstance  {
   if (syncInst === undefined) {
     syncInst = axios.create({
       baseURL: config.apiRoot + '/sync',
-      timeout: 0
+      timeout: 0,
+      headers: {'X-Key': config.xKey}
     })
   }
   return syncInst
