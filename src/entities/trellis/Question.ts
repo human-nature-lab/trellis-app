@@ -29,7 +29,7 @@ export default class Question extends SparseTimestampedSoftDelete {
   questionTypeId: string
   @Column({ select: false }) @Serializable
   questionTranslationId: string
-  @Column({ select: false }) @Serializable
+  @Column() @Serializable
   questionGroupId: string
   @Column({ type: 'tinyint' }) @Serializable
   sortOrder: number

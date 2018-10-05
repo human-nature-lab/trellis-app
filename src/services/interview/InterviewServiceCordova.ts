@@ -79,7 +79,6 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     )`, {
         interviewId
       })
-    console.log('q.getQuery()', q.getQuery())
     let preloadActions = await q.getMany()
     const insertActions = preloadActions.map(p => {
       let a = new Action()
@@ -96,7 +95,6 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     const repo = await DatabaseService.getRepository(Action)
     if (preloadActions.length) {
       let res = await repo.insert(insertActions)
-      console.log('copied actions', res)
     }
     return repo
   }
@@ -189,45 +187,27 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
   }
 
   public async saveData (interviewId: string, diff: InterviewDeltaInterface): Promise<void> {
-    const conn = await DatabaseService.getDatabase()
-    const qr = conn.createQueryRunner()
+    const connection = await DatabaseService.getDatabase()
 
-    async function update (qr: QueryRunner, model: any, values: Array<typeof model>) {
-      if (values.length) {
-        return await qr.manager.save(values)
-      }
-    }
-
-    async function insert (qr: QueryRunner, model: any, values: Array<typeof model>) {
-      if (values.length) {
-        return await qr.manager.insert(model, values)
-      }
-    }
-
-    await qr.startTransaction()
-    try {
+    connection.transaction(async manager => {
       // Remove stuff first
-      await update(qr, Datum, diff.data.datum.removed)
-      await update(qr, QuestionDatum, diff.data.questionDatum.removed)
+      for (let removedDatum of diff.data.datum.removed) {
+        await manager.update(Datum, { id: removedDatum.id }, { deletedAt: new Date() })
+      }
+      for (let removedQuestionDatum of diff.data.datum.removed) {
+        await manager.update(QuestionDatum, { id: removedQuestionDatum.id }, { deletedAt: new Date() })
+      }
 
       // Insert second
-      await insert(qr, QuestionDatum, diff.data.questionDatum.added)
-      await insert(qr, Datum, diff.data.datum.added)
+      await manager.save(diff.data.questionDatum.added)
+      await manager.save(diff.data.datum.added)
 
-      // Update last0
-      await update(qr, QuestionDatum, diff.data.questionDatum.modified)
-      await update(qr, Datum, diff.data.datum.modified)
+      // Update last
+      await manager.save(diff.data.questionDatum.modified)
+      await manager.save(diff.data.datum.modified)
+    })
 
-      // TODO: Save the condition tags as well
-
-      await qr.commitTransaction()
-    } catch (err) {
-      console.error('Unable to save data')
-      console.error(err)
-      await qr.rollbackTransaction()
-    }
-
-
+    // TODO: Save conditions here
   }
 
   public async getPreload (interviewId: string) {

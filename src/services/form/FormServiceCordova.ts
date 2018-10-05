@@ -4,9 +4,11 @@ import StudyForm from '../../entities/trellis/StudyForm'
 import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'
 import QuestionGroup from '../../entities/trellis/QuestionGroup'
-import {IsNull} from 'typeorm';
+import {In, IsNull} from 'typeorm'
 import {removeSoftDeleted} from "../database/SoftDeleteHelper";
 import {isEqual} from 'lodash'
+import Section from '../../entities/trellis/Section'
+import SectionQuestionGroup from '../../entities/trellis/SectionQuestionGroup'
 
 export default class FormServiceCordova implements FormServiceInterface {
 
@@ -24,35 +26,41 @@ export default class FormServiceCordova implements FormServiceInterface {
 
   async getForm (id: string, bareBones: boolean = false): Promise<Form> {
     console.log('getForm', id)
-    const repo = await DatabaseService.getRepository(Form)
+    const connection = await DatabaseService.getDatabase()
+    const formRepository = await connection.getRepository(Form)
 
-    // Questions relationship has been removed from
-    const form = await repo.findOne({
+    const form = await formRepository.findOne({
       where: {
         id: id
       },
       relations: ['sections']
     })
-    const groups: QuestionGroup[] = []
-    const promises: Promise<boolean>[] = []
-    //TODO: make this faster
-    form.sections.forEach(section => {
-      section.questionGroups.forEach(qg => {
-        groups.push(qg)
-        promises.push(new Promise(async (resolve) => {
-          const r = await DatabaseService.getRepository(Question)
-          qg.questions = await r.find({
-            where: {
-              questionGroupId: qg.id,
-              deletedAt: IsNull()
-            }
-          })
-          resolve(true)
-        }))
+
+    const questionGroupMap = {}
+    const questionGroupIds = []
+    form.sections.forEach((section) => {
+      section.questionGroups.forEach((questionGroup) => {
+        questionGroup.questions = []
+        questionGroupMap[questionGroup.id] = questionGroup
+        questionGroupIds.push(questionGroup.id)
       })
     })
-    await Promise.all(promises)
-    removeSoftDeleted(form)
+
+    const questionRepository = await connection.getRepository(Question)
+    const questions = await questionRepository.find({
+      where: {
+        questionGroupId: In(questionGroupIds),
+        deletedAt: IsNull()
+      }
+    })
+
+    questions.forEach((question) => {
+      const questionGroup = questionGroupMap[question.questionGroupId]
+      questionGroup.questions.push(question)
+    })
+
+    console.log('finished form', form)
+
     return form
   }
 
