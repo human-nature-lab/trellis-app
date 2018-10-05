@@ -468,7 +468,7 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 }
 
-let sharedInterviewInstance = null
+export let sharedInterviewInstance = null
 export function sharedInterview (interview: Interview,
                                  blueprint: Form,
                                  actions?: Action[],

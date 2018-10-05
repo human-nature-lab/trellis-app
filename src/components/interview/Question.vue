@@ -7,29 +7,26 @@
           {{question.varName}} : {{question.questionType.name}}
         </v-flex>
       </v-layout>
-      <!--<v-toolbar>-->
-        <!--<v-spacer></v-spacer>-->
-        <!--<v-toolbar-title class="white&#45;&#45;text">{{question.var_name}} : {{question.type.name}}</v-toolbar-title>-->
-      <!--</v-toolbar>-->
     </v-card-title>
     <v-alert v-show="validationError" transition="slide-y-transition">
       {{validationError}}
     </v-alert>
     <v-card-text class="question-content">
       <v-flex class="question-text title">
-        <InterpolatedText
-          :text="translated"
-          :location="location" />
+        <AsyncTranslationText
+          :translation="question.questionTranslation"
+          :location="location">
+        </AsyncTranslationText>
       </v-flex>
       <div
         :is="currentQuestionComponent"
         :question="question"
         :location="location"
-        :respondent="interview.survey.respondent" />
+        :respondent="interview.survey.respondent"></div>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
       <DontKnowRefused
-        :question="question" />
+        :question="question"></DontKnowRefused>
     </v-card-actions>
   </v-card>
 </template>
@@ -40,7 +37,7 @@
   // For example, question title and message fills will be applied here. The question header text will be applied here
   // import translationService from '../services/TranslationService'
   import DontKnowRefused from './DontKnowRefused.vue'
-  import InterpolatedText from './InterpolatedText'
+  import AsyncTranslationText from '../AsyncTranslationText'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import questionTypes from '../../static/question.types'
 
@@ -115,11 +112,11 @@
       }
     },
     components: {
+      AsyncTranslationText,
       DateQuestion,
       DecimalQuestion,
       DontKnowRefused,
       GeoQuestion,
-      InterpolatedText,
       IntegerQuestion,
       IntroQuestion,
       MultipleSelectQuestion,

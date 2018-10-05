@@ -12,7 +12,7 @@ export default class TranslationTextServiceCordova implements TranslationTextSer
 
   async getTranslatedTextByTranslationId (translationId: string): Promise<TranslationText[]> {
     const repo = await DatabaseService.getRepository(TranslationText)
-    return await repo.findAll({
+    return await repo.find({
       where: {
         translationId,
         deletedAt: IsNull()

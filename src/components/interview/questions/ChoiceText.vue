@@ -1,11 +1,12 @@
 <template>
-    <InterpolatedText
-      :text="translated"
-      :location="location" />
+  <AsyncTranslationText
+    :translation="translation"
+    :location="location">
+  </AsyncTranslationText>
 </template>
 
 <script>
-  import InterpolatedText from '../InterpolatedText'
+  import AsyncTranslationText from '../../AsyncTranslationText'
   import TranslationMixin from '../../../mixins/TranslationMixin'
   import Translation from '../../../entities/trellis/Translation'
   export default {
@@ -22,7 +23,7 @@
     },
     mixins: [TranslationMixin],
     components: {
-      InterpolatedText
+      AsyncTranslationText
     }
   }
 </script>

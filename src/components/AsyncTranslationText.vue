@@ -1,11 +1,15 @@
 <template>
     <span class="async-translation-text">
-      <span v-if="isLoading">{{$t('loading')}}</span>
-      <span v-else>{{translated}}</span>
+        {{ translated }}
     </span>
 </template>
 
 <script>
+  import TranslationTextService from '../services/translation-text/TranslationTextService'
+  import TranslationService from '../services/TranslationService'
+  import InterpolationService from '../services/InterpolationService'
+  import global from '../static/singleton'
+
   export default {
     name: 'AsyncTranslationText',
     props: {
@@ -15,11 +19,15 @@
       },
       modifier: {
         type: Function
+      },
+      location: {
+        type: Object
       }
     },
     data () {
       return {
-        isLoading: false
+        translated: this.$t('loading'),
+        localTranslation: this.translation
       }
     },
     created () {
@@ -27,29 +35,15 @@
     },
     methods: {
       async loadTranslation () {
-        if (this.isLoading || this.hasTranslationText) return
-        this.isLoading = true
-        let translationText = await TranslationTextService.getTranslatedTextByTranslationId(this.translation.id)
-        this.$set(this.translation, 'translationText', translationText)
-      }
-    },
-    watch: {
-      translation (newVal) {
-        if (newVal !== this.translation) {
-          this.loadTranslation()
+        this.localTranslation.translationText = await TranslationTextService.getTranslatedTextByTranslationId(this.localTranslation.id)
+        // If you are in an interview, interpolate any fills
+        if (this.location) {
+          this.localTranslation.translationText = await InterpolationService.getInterpolatedTranslationText(this.localTranslation.translationText, this.location)
         }
-      }
-    },
-    computed: {
-      hasTranslationText () {
-        return this.translation.translationText && this.translation.translationText.length
+        this.getTranslated()
       },
-      translated () {
-        let translated = TranslationService.getAny(this.translation)
-        if (this.modifier) {
-          translated = this.modifier(translated)
-        }
-        return translated
+      getTranslated () {
+        this.translated = TranslationService.getTranslated(this.localTranslation, global.locale)
       }
     }
   }
