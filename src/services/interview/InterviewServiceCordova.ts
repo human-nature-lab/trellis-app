@@ -203,6 +203,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       await manager.save(diff.data.datum.added)
 
       // Update last
+      // TODO: Error NOT NULL constraint thrown here
       await manager.save(diff.data.questionDatum.modified)
       await manager.save(diff.data.datum.modified)
     })
