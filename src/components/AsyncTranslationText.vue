@@ -43,7 +43,7 @@
         this.getTranslated()
       },
       getTranslated () {
-        this.translated = TranslationService.getTranslated(this.localTranslation, global.locale)
+        this.translated = TranslationService.getAny(this.localTranslation, global.locale)
       }
     }
   }
