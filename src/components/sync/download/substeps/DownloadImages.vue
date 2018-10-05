@@ -22,13 +22,15 @@
       name: 'download-images',
       data () {
         return {
+          numConcurrentDownloads: 4,
           downloadProgress: 0,
           progressIndeterminate: true,
           success: false,
           downloading: false,
           numImagesDownloaded: 0,
           failedImages: [],
-          currentLog: undefined
+          currentLog: undefined,
+          isCancelling: false
         }
       },
       created () {
@@ -56,46 +58,76 @@
             this.onDone()
           } else {
             this.downloading = true
-            const CancelToken = axios.CancelToken
-            this.source = CancelToken.source()
-            const fileName = this.imagesToDownload.pop()
-            SyncService.downloadImage(this.source, fileName)
-              .then((response) => {
-                let photo = response.data
-                let fileSize = Number(response.headers['content-length'])
-                return FileService.writeFile('photos', photo, fileName, fileSize)
-              })
-              .then(() => {
-                this.progressIndeterminate = false
-                this.numImagesDownloaded++
-                this.downloadProgress = (this.numImagesDownloaded / this.numImagesFound) * 100
-                if (this.downloadProgress > 0) {
+            this.isCancelling = false
+            this.sources = new Map()
+            const checkFinished = () => {
+              if (tokens.length === 0) {
+                this.downloading = false
+                this.onDone()
+              }
+            }
+            const downloadNextOrFinish = () => {
+              if (this.isCancelling || !this.downloading) {
+                checkFinished()
+                return
+              }
+              const fileName = this.imagesToDownload.pop()
+
+              // Stop and end when done with all remaining
+              if (!fileName) {
+                checkFinished()
+                return
+              }
+
+              // Download image
+              const CancelToken = axios.CancelToken
+              const source = CancelToken.source()
+              this.sources.set(fileName, source)
+              SyncService.downloadImage(source, fileName)
+                .then((response) => {
+                  let photo = response.data
+                  let fileSize = Number(response.headers['content-length'])
+                  return FileService.writeFile('photos', photo, fileName, fileSize)
+                })
+                .then(() => {
                   this.progressIndeterminate = false
-                }
-              })
-              .catch((err) => {
-                if (err.response) {
-                  // 404 Not Found is the expected result if the image isn't found
-                  this.failedImages.push({
-                    fileName: fileName,
-                    error: `${err.response.status} ${err.response.statusText}`
-                  })
-                } else {
-                  this.loggingService.log(err).then((result) => { this.currentLog = result })
-                  // Stop on unexpected, loggable, error, for instance a Network Error
-                  this.downloading = false
-                }
-              })
-              .finally(() => {
-                if (this.downloading) {
-                  this.downloadImages()
-                }
-              })
+                  this.numImagesDownloaded++
+                  this.downloadProgress = (this.numImagesDownloaded / this.numImagesFound) * 100
+                  if (this.downloadProgress > 0) {
+                    this.progressIndeterminate = false
+                  }
+                })
+                .catch((err) => {
+                  console.error(err)
+                  if (err.response) {
+                    // 404 Not Found is the expected result if the image isn't found
+                    this.failedImages.push({
+                      fileName: fileName,
+                      error: `${err.response.status} ${err.response.statusText}`
+                    })
+                  } else {
+                    this.loggingService.log(err).then((result) => { this.currentLog = result })
+                    // Stop on unexpected, loggable, error, for instance a Network Error
+                    this.downloading = false
+                    this.isCancelling = true
+                  }
+                })
+                .finally(() => {
+                  this.sources.delete(fileName)
+                  downloadNextOrFinish()
+                })
+            }
+
+            for (let i = 0; i < this.numConcurrentDownloads; i++) {
+              downloadNextOrFinish()
+            }
+
           }
         },
         onDone: function () {
           this.success = true
           this.downloading = false
+          console.log('donezo')
           if (this.failedImages.length > 0) {
             this.loggingService.log({
               severity: 'warn',
@@ -119,8 +151,12 @@
           this.onDone()
         },
         stopDownload: function () {
-          if (this.source) {
-            this.source.cancel(this.$t('operation_cancelled'))
+          this.isCancelling = true
+          if (this.sources) {
+            console.log('cancelling', this.sources)
+            this.sources.forEach((source) => {
+              source.cancel(this.$t('operation_cancelled'))
+            })
           }
           this.downloading = false
           this.loggingService.log({
