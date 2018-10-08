@@ -57,25 +57,18 @@ export default class InterviewServiceWeb implements InterviewServiceInterface {
     return http().post(`interview/${interviewId}/complete`)
   }
 
-  async create (surveyId: string): Promise<Interview> {
+  async create (surveyId: string, coordinates: Coordinates): Promise<Interview> {
     let data = {
       latitude: null,
       longitude: null,
       altitude: null,
       accuracy: null
     }
-    let position
-    try {
-      position = await GeoLocationService.getCurrentPosition()
-    } catch (err) {
-      console.error('This user did not provide access to their location')
-      console.error(err)
-    }
-    if (position) {
-      data.latitude = position.coords.latitude
-      data.longitude = position.coords.longitude
-      data.altitude = position.coords.altitude
-      data.accuracy = position.coords.accuracy
+    if (coordinates) {
+      data.latitude = coordinates.latitude
+      data.longitude = coordinates.longitude
+      data.altitude = coordinates.altitude
+      data.accuracy = coordinates.accuracy
     }
     let res = await http().post(`survey/${surveyId}/interview`, data)
     return new Interview().fromSnakeJSON(res.data.interview)

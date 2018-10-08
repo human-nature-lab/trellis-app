@@ -36,6 +36,11 @@
       created () {
         this.downloadImages()
       },
+      beforeDestroy () {
+        if (!this.isCancelling) {
+          this.stopDownload()
+        }
+      },
       props: {
         imagesToDownload: {
           type: Array,
@@ -61,7 +66,7 @@
             this.isCancelling = false
             this.sources = new Map()
             const checkFinished = () => {
-              if (tokens.length === 0) {
+              if (this.sources.size === 0) {
                 this.downloading = false
                 this.onDone()
               }
@@ -131,7 +136,7 @@
           if (this.failedImages.length > 0) {
             this.loggingService.log({
               severity: 'warn',
-              message: this.$t('server_cant_find_images', [this.failedImages.length])
+              message: this ? this.$t('server_cant_find_images', [this.failedImages.length]) : `Server cant find images ${this.failedImages.length}`
               // fullMessage: JSON.stringify(this.failedImages, null, 2)
             }).then((result) => {
               console.warn('Failed images', this.failedImages)

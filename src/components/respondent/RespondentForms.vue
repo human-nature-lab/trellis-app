@@ -132,10 +132,11 @@
         try {
           this.global.loading.active = true
           if (form.isStarted) {
-            interview = await InterviewService.create(form.surveys[0].id)
+            // TODO: Get the current device location
+            interview = await InterviewService.create(form.surveys[0].id, null)
           } else {
             let survey = await SurveyService.create(this.global.study.id, this.respondent.id, form.id)
-            interview = await InterviewService.create(survey.id)
+            interview = await InterviewService.create(survey.id, null)
           }
           pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
         } catch (err) {
