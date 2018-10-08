@@ -2,7 +2,7 @@ import Sync from '../entities/trellis-config/Sync'
 import uuid from 'uuid/v4'
 import DatabaseService from './database/DatabaseService'
 import DeviceService from './device/DeviceService'
-import { syncInstance as http } from './http/AxiosInstance'
+import { syncInstance } from './http/AxiosInstance'
 import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
 import {Connection} from 'typeorm'
 
@@ -32,128 +32,81 @@ class SyncService {
     return sync
   }
 
-  getHeartbeat (source: CancelTokenSource) {
+  async getHeartbeat (source: CancelTokenSource) {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return http().get(`heartbeat`, options)
-      .then(response => {
-        return response.data
-      })
-      .catch(err => {
-        console.error(err)
-        throw err
-      })
+    const http = await syncInstance()
+    const resp = await http.get(`heartbeat`, options)
+    return resp.data
   }
 
-  authenticate (source: CancelTokenSource, deviceId: string) {
+  async authenticate (source: CancelTokenSource, deviceId: string) {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return http().get(`device/${deviceId}/syncv2/authenticate`, options)
-      .then(response => {
-        return response.data
-      })
-      .catch(err => {
-        console.error(err)
-        throw err
-      })
+    const http = await syncInstance()
+    const resp = await http.get(`device/${deviceId}/syncv2/authenticate`, options)
+    return resp.data
   }
 
-  getLatestSnapshot (source: CancelTokenSource) {
-    return new Promise((resolve, reject) => {
-      DeviceService.getUUID()
-        .then((deviceId) => {
-          let options = {} as AxiosRequestConfig
-          if (source) { options.cancelToken = source.token }
-          http().get(`device/${deviceId}/syncv2/snapshot`, options)
-            .then(response => {
-              resolve(response.data)
-            })
-            .catch((error) => {
-              reject(error)
-            })
-        })
-    })
-  }
-
-  listUploads () {
-    return http().get(`list-uploads`)
-  }
-
-  getMissingPhotos (source: CancelTokenSource) {
+  async getLatestSnapshot (source: CancelTokenSource) {
+    const deviceId = await DeviceService.getUUID()
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return new Promise ((resolve, reject) => {
-      DeviceService.getUUID()
-        .then((deviceId) => {
-          http().get(`device/${deviceId}/missing-images`, options)
-            .then(response => {
-              const missingImagesString = response.data
-              resolve(missingImagesString)
-            })
-        })
-        .catch(err => {
-          console.error(err)
-          reject(err)
-        })
-    })
+    const http = await syncInstance()
+    const resp = await http.get(`device/${deviceId}/syncv2/snapshot`, options)
+    return resp.data
   }
 
-  getPendingUploads (source: CancelTokenSource) {
-    return new Promise((resolve, reject) => {
-      DeviceService.getUUID()
-        .then((deviceId) => {
-          let options = {} as AxiosRequestConfig
-          if (source) { options.cancelToken = source.token }
-          http().get(`device/${deviceId}/uploads`, options)
-            .then(response => {
-              resolve(response.data)
-            })
-            .catch((error) => {
-              reject(error)
-            })
-        })
-    })
+  async listUploads () {
+    const http = await syncInstance()
+    return http.get(`list-uploads`)
+  }
+
+  async getMissingPhotos (source: CancelTokenSource) {
+    let options = {} as AxiosRequestConfig
+    if (source) { options.cancelToken = source.token }
+    const deviceId = await DeviceService.getUUID()
+    const http = await syncInstance()
+    const resp = await http.get(`device/${deviceId}/missing-images`, options)
+    return resp.data
+  }
+
+  async getPendingUploads (source: CancelTokenSource) {
+    const deviceId = await DeviceService.getUUID()
+    const http = await syncInstance()
+    let options = {} as AxiosRequestConfig
+    if (source) { options.cancelToken = source.token }
+    const resp = await http.get(`device/${deviceId}/uploads`, options)
+    return resp.data
   }
 
   async getSnapshotFileSize (source: CancelTokenSource, snapshotId: string): Promise<number> {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const deviceId = await DeviceService.getUUID()
-    return http().get(`device/${deviceId}/snapshot/${snapshotId}/file_size`, options)
-      .then(response => {
-        return response.data
-      })
-      .catch(err => {
-        throw err
-      })
+    const http = await syncInstance()
+    const resp = await http.get(`device/${deviceId}/snapshot/${snapshotId}/file_size`, options)
+    return resp.data
   }
 
-  getImageFileList (source: CancelTokenSource, fileNames: string[]): Promise<string[]> {
+  async getImageFileList (source: CancelTokenSource, fileNames: string[]): Promise<string[]> {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return new Promise((resolve, reject) => {
-      DeviceService.getUUID()
-        .then((deviceId) => {
-          http().post(`device/${deviceId}/image_size`, fileNames, options)
-            .then(response => {
-              resolve(response.data)
-            })
-        })
-        .catch(err => {
-          console.error(err)
-          reject(err)
-        })
-    })
+    const deviceId = await DeviceService.getUUID()
+    const http = await syncInstance()
+    const resp = await http.post(`device/${deviceId}/image_size`, fileNames, options)
+    return resp.data
   }
 
-  downloadImage (source: CancelTokenSource, fileName: string): Promise<any> {
+  async downloadImage (source: CancelTokenSource, fileName: string): Promise<any> {
     let options = {
       timeout: 0,
       responseType: 'blob'
     } as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    return DeviceService.getUUID()
-      .then((deviceId) => http().get(`device/${deviceId}/image/${fileName}`, options))
+    const deviceId = await DeviceService.getUUID()
+    const http = await syncInstance()
+    return http.get(`device/${deviceId}/image/${fileName}`, options)
   }
 
   async hasSynced (): Promise<boolean> {
@@ -188,8 +141,9 @@ class SyncService {
 
   async verifyUpload (fileEntry, md5hash) {
     const deviceId = await DeviceService.getUUID()
+    const http = await syncInstance()
     const uri = `/device/${deviceId}/verify-upload`
-    return http().post(uri, {
+    return http.post(uri, {
       fileName: fileEntry.name,
       md5hash: md5hash
     })

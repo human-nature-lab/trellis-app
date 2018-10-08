@@ -1,5 +1,5 @@
-// const Sync = () => import(/* webpackChunkName: "sync" */'../components/sync/Sync')
-import Sync from '../components/sync/Sync'
+import Sync from '../components/sync/Sync.vue'
+
 export default [{
   path: '/',
   name: 'Home',
@@ -8,7 +8,4 @@ export default [{
   path: '/sync',
   name: 'Sync',
   component: Sync
-}, {
-  path: '*',
-  redirect: '/search/respondents'
 }]

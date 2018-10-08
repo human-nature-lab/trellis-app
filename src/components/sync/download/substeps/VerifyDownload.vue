@@ -9,7 +9,6 @@
 </template>
 
 <script>
-    import config from '../../../../config'
     import FileService from '../../../../services/file/FileService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
@@ -19,7 +18,6 @@
         return {
           success: false,
           verifying: false,
-          apiRoot: config.apiRoot,
           currentLog: undefined
         }
       },

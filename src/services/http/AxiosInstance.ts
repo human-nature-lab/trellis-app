@@ -3,6 +3,7 @@ import config from '../../config'
 import storage from '../StorageService'
 import router from '../../router'
 import singleton from '../../static/singleton'
+import DatabaseService from '../database/DatabaseService'
 
 const TOKEN_KEY = 'x-token'
 let defaultInst, syncInst
@@ -58,14 +59,14 @@ export default function defaultInstance (): AxiosInstance {
   return defaultInst
 }
 
-export function syncInstance (): AxiosInstance  {
+export async function syncInstance (): Promise<AxiosInstance>  {
   if (syncInst === undefined) {
+    const apiRoot = await DatabaseService.getServerIPAddress()
     syncInst = axios.create({
-      baseURL: config.apiRoot + '/sync',
+      baseURL: apiRoot + '/sync',
       timeout: 0,
       headers: {'X-Key': config.xKey}
     })
   }
   return syncInst
-
 }
