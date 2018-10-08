@@ -35,6 +35,10 @@
     },
     methods: {
       async loadTranslation () {
+        // Don't load if they already exist
+        if (this.localTranslation && this.localTranslation.translationText && this.localTranslation.translationText.length) {
+          return this.getTranslated()
+        }
         this.localTranslation.translationText = await TranslationTextService.getTranslatedTextByTranslationId(this.localTranslation.id)
         // If you are in an interview, interpolate any fills
         if (this.location) {

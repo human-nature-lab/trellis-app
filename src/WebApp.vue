@@ -66,6 +66,9 @@
         <router-view class="route-container fade-in" />
       </v-container>
     </v-content>
+
+    <LocationFinder />
+
   </v-app>
 </template>
 
@@ -75,6 +78,7 @@
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
+  import LocationFinder from './components/geo-location/LocationFinder'
   import router from './router'
   import singleton from './static/singleton'
 
@@ -107,7 +111,8 @@
     components: {
       VDivider,
       MainMenu,
-      TrellisAlert
+      TrellisAlert,
+      LocationFinder
     },
     computed: {
       withinCordova () {

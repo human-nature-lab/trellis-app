@@ -7,27 +7,16 @@ export default abstract class GeoLocationAbstract {
   }
 
   async getCurrentPosition () {
-    let position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(position => {
-        resolve(position)
-      }, err => {
+    return await new Promise((resolve, reject) => {
+      try {
+        navigator.geolocation.getCurrentPosition(position => {
+          resolve(position)
+        }, err => {
+          reject(err)
+        }, this.options)
+      } catch (err) {
         reject(err)
-      }, this.options)
-      /* Hack for Dev
-      resolve({
-        coords: {
-          latitude: 0,
-          longitude: 0,
-          altitude: 0,
-          accuracy: 0,
-          altitudeAccuracy: 0,
-          heading: 0,
-          speed: 0,
-        },
-        timestamp: 0
-      })
-      */
+      }
     })
-    return position as Position
   }
 }
