@@ -51,5 +51,5 @@ export default interface InterviewServiceInterface {
   /**
    * Resolves to the interview that has been created
    */
-  create (surveyId: string): Promise<Interview>
+  create (surveyId: string, coordinates: Coordinates): Promise<Interview>
 }

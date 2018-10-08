@@ -30,20 +30,18 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     return interview
   }
 
-  public async create (surveyId: string): Promise<Interview> {
-    const position = await GeoLocationService.getCurrentPosition()
-    if (!position) {
-      throw new Error('Location services are required to conduct interviews')
-    }
+  public async create (surveyId: string, coordinates: Coordinates): Promise<Interview> {
     const repo = await DatabaseService.getRepository(Interview)
     const user = await UserService.getCurrentUser()
     let interview = new Interview()
     interview.startTime = now()
     interview.surveyId = surveyId
     interview.userId = user.id
-    interview.latitude = position.coords.latitude.toString()
-    interview.longitude = position.coords.longitude.toString()
-    interview.altitude = position.coords.altitude.toString()
+    if (coordinates) {
+      interview.latitude = coordinates.latitude.toString()
+      interview.longitude = coordinates.longitude.toString()
+      interview.altitude = coordinates.altitude.toString()
+    }
     interview = await repo.save(interview)
     return await this.getInterview(interview.id)
   }
