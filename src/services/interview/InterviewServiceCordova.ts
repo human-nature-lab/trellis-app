@@ -203,9 +203,35 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       await manager.save(diff.data.datum.added)
 
       // Update last
-      // TODO: Error NOT NULL constraint thrown here
-      await manager.save(diff.data.questionDatum.modified)
-      await manager.save(diff.data.datum.modified)
+      for (let updatedQuestionDatum of diff.data.questionDatum.modified) {
+        await manager.update(QuestionDatum, { id: updatedQuestionDatum.id },
+          {
+            sectionRepetition: updatedQuestionDatum.sectionRepetition,
+            followUpDatumId: updatedQuestionDatum.followUpDatumId,
+            answeredAt: updatedQuestionDatum.answeredAt,
+            skippedAt: updatedQuestionDatum.skippedAt,
+            dkRf: updatedQuestionDatum.dkRf,
+            dkRfVal: updatedQuestionDatum.dkRfVal
+          })
+      }
+
+      for (let updatedDatum of diff.data.datum.modified) {
+        await manager.update(Datum, { id: updatedDatum.id },
+          {
+            name: updatedDatum.name,
+            val: updatedDatum.val,
+            choiceId: updatedDatum.choiceId,
+            parentDatumId: updatedDatum.parentDatumId,
+            datumTypeId: updatedDatum.datumTypeId,
+            sortOrder: updatedDatum.sortOrder,
+            rosterId: updatedDatum.rosterId,
+            eventOrder: updatedDatum.eventOrder,
+            questionDatumId: updatedDatum.questionDatumId,
+            geoId: updatedDatum.geoId,
+            edgeId: updatedDatum.edgeId,
+            photoId: updatedDatum.photoId
+          })
+      }
     })
 
     // TODO: Save conditions here
