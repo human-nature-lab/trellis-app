@@ -12,13 +12,14 @@
         :to="{name: 'Geo', params: {geoId: geo.id}}"
         v-for="geo in ancestors"
         :key="geo.id">
-        {{translate(geo)}}
+        <async-translation-text :translation="geo.nameTranslation"></async-translation-text>
       </router-link>
     </span>
   </span>
 </template>
 
 <script lang="ts">
+  import AsyncTranslationText from '../../components/AsyncTranslationText.vue'
   import GeoService from '../../services/geo/GeoService'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
@@ -53,9 +54,6 @@
       }
     },
     methods: {
-      translate (geo: Geo) {
-        return TranslationService.getAny(geo.nameTranslation, this.global.locale)
-      },
       load () {
         if (!this.geoId) return
         this.isLoading = true
@@ -68,7 +66,8 @@
           this.isLoading = false
         })
       }
-    }
+    },
+    components: {AsyncTranslationText}
   })
 </script>
 

@@ -1,4 +1,4 @@
-import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, JoinColumn, OneToOne, PrimaryColumn} from 'typeorm'
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
@@ -15,7 +15,7 @@ interface SurveyConditionTagRecyclerData {
 
 @Entity()
 export default class SurveyConditionTag extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryColumn() @Serializable
   id: string;
   @Column() @Serializable
   surveyId: string
