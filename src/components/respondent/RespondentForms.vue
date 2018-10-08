@@ -50,7 +50,6 @@
   import RespondentService from '../../services/respondent/RespondentService'
   import InterviewService from '../../services/interview/InterviewService'
   import global from '../../static/singleton'
-  import router from '../../router'
   import Vue from 'vue'
   import Survey from '../../entities/trellis/Survey'
   import StudyForm from '../../entities/trellis/StudyForm'
@@ -59,6 +58,8 @@
   import SkipService from "../../services/SkipService"
   import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag"
   import {pushRouteAndQueueCurrent} from '../../router'
+  // @ts-ignore
+  import {getCurrentPosition} from '../geo-location/LocationFinder'
 
   export class DisplayForm {
     public isComplete?: boolean
@@ -130,10 +131,11 @@
         if (form.isComplete) return
         let interview
         try {
+          const coords: Coordinates = await getCurrentPosition()
           this.global.loading.active = true
           if (form.isStarted) {
             // TODO: Get the current device location
-            interview = await InterviewService.create(form.surveys[0].id, null)
+            interview = await InterviewService.create(form.surveys[0].id, coords)
           } else {
             let survey = await SurveyService.create(this.global.study.id, this.respondent.id, form.id)
             interview = await InterviewService.create(survey.id, null)

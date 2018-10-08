@@ -81,7 +81,7 @@ export default class InterviewManager extends InterviewManagerBase {
   save () {
     if (!this.actions.actions.length || !this.data.data.length) {
       console.log('nothing to save')
-      return new Promise(resolve => resolve())
+      return new Promise(resolve => setTimeout(resolve))
     }
     this.playAllActions()
     let p = []
