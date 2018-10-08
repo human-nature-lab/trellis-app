@@ -187,6 +187,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
   }
 
   public async saveData (interviewId: string, diff: InterviewDeltaInterface): Promise<void> {
+    console.log('diff', diff)
     const connection = await DatabaseService.getDatabase()
 
     connection.transaction(async manager => {
@@ -232,9 +233,51 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
             photoId: updatedDatum.photoId
           })
       }
+
+      for (let addedRespondentConditionTag of diff.conditionTags.respondent.added) {
+        if (await manager.findOne(RespondentConditionTag, addedRespondentConditionTag.id) === undefined) {
+          // Doesn't exist, save it
+          await manager.save(addedRespondentConditionTag)
+        } else {
+          // Exists, set deleted_at to null
+          manager.update(RespondentConditionTag, { id: addedRespondentConditionTag.id }, { deletedAt: null })
+        }
+      }
+
+      for (let addedSectionConditionTag of diff.conditionTags.section.added) {
+        if (await manager.findOne(SectionConditionTag, addedSectionConditionTag.id) === undefined) {
+          // Doesn't exist, save it
+          await manager.save(addedSectionConditionTag)
+        } else {
+          // Exists, set deleted_at to null
+          manager.update(SectionConditionTag, { id: addedSectionConditionTag.id }, { deletedAt: null })
+        }
+      }
+
+      for (let addedSurveyConditionTag of diff.conditionTags.survey.added) {
+        if (await manager.findOne(SurveyConditionTag, addedSurveyConditionTag.id) === undefined) {
+          // Doesn't exist, save it
+          await manager.save(addedSurveyConditionTag)
+        } else {
+          // Exists, set deleted_at to null
+          manager.update(SurveyConditionTag, { id: addedSurveyConditionTag.id }, { deletedAt: null })
+        }
+      }
+
+      for (let removedRespondentConditionTag of diff.conditionTags.respondent.removed) {
+        manager.update(RespondentConditionTag, { id: removedRespondentConditionTag.id }, { deletedAt: new Date() })
+      }
+
+      for (let removedSectionConditionTag of diff.conditionTags.section.removed) {
+        manager.update(SectionConditionTag, { id: removedSectionConditionTag.id }, { deletedAt: new Date() })
+      }
+
+      for (let removedSurveyConditionTag of diff.conditionTags.survey.removed) {
+        manager.update(SurveyConditionTag, { id: removedSurveyConditionTag.id }, { deletedAt: new Date() })
+      }
+
     })
 
-    // TODO: Save conditions here
   }
 
   public async getPreload (interviewId: string) {

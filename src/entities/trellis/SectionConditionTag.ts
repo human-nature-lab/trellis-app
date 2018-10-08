@@ -1,5 +1,5 @@
 import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm'
+import {Column, Entity, JoinColumn, OneToOne, PrimaryColumn} from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import ConditionTag from './ConditionTag'
@@ -17,7 +17,7 @@ export interface SectionConditionTagRecylerData {
 
 @Entity()
 export default class SectionConditionTag extends TimestampedSoftDelete implements SnakeSerializable{
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryColumn() @Serializable
   id: string;
   @Column() @Serializable
   sectionId: string
