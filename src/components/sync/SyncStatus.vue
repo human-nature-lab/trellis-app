@@ -9,7 +9,7 @@
           <v-alert
             :value="!wasSnapshotDownloaded"
             type="info">
-            {{$t('no_snapshot_found')}} {{$t('click_download_button')}}
+            {{$t('no_snapshot_found_local')}} {{$t('click_download_button')}}
           </v-alert>
           <v-alert
             :value="wasSnapshotDownloaded"

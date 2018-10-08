@@ -6,10 +6,14 @@
           <v-layout row class="sync-content">
             <v-flex class="xs12">
               <sync-status
-                v-if="!downloading && !uploading && !downloadingPhotos"
+                v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos"
                 :local-latest-snapshot="localLatestSnapshot"
                 :updated-records-count="updatedRecordsCount">
               </sync-status>
+              <server-ip-config
+                v-if="needsServerConfig"
+                v-on:server-ip-config-done="onServerIPConfigDone">
+              </server-ip-config>
               <upload
                 v-if="uploading"
                 v-on:upload-done="uploadDone"
@@ -23,7 +27,11 @@
               </download>
             </v-flex>
           </v-layout>
-          <v-layout row class="mt-2 sync-footer" justify-space-between>
+          <v-layout
+            v-if="!needsServerConfig"
+            row
+            class="mt-2 sync-footer"
+            justify-space-between>
             <v-flex class="xs3 text-xs-left">
               <v-btn :disabled="!enableUpload"
                      :loading="uploading"
@@ -57,6 +65,7 @@
   import DatabaseService from '../../services/database/DatabaseService'
   import Download from './download/Download'
   import Upload from './upload/Upload'
+  import ServerIpConfig from './ServerIPConfig.vue'
 
   export default {
     name: 'sync',
@@ -67,6 +76,7 @@
         uploading: false,
         downloading: false,
         downloadingPhotos: false,
+        serverIPAddress: null,
         serverLatestSnapshot: null,
         localLatestSnapshot: null,
         updatedRecordsCount: null
@@ -80,12 +90,16 @@
       initComponent: async function() {
         this.loading = true
         try {
+          this.serverIPAddress = await DatabaseService.getServerIPAddress()
           this.localLatestSnapshot = await DatabaseService.getLatestDownload()
           this.updatedRecordsCount = await DatabaseService.getUpdatedRecordsCount()
           this.loading = false
         } catch (err) {
           AlertService.addAlert(err)
         }
+      },
+      onServerIPConfigDone: async function () {
+        this.serverIPAddress = await DatabaseService.getServerIPAddress()
       },
       onDownload: function () {
         this.downloadStep = 1
@@ -101,6 +115,8 @@
       downloadCancelled: function () {
         this.downloading = false
         this.downloadingPhotos = false
+        // Re-init in case download was successful
+        this.initComponent()
       },
       downloadDone: function () {
         this.downloading = false
@@ -108,6 +124,8 @@
       },
       uploadCancelled: function () {
         this.uploading = false
+        // Re-init in case upload was successful
+        this.initComponent()
       },
       uploadDone: function () {
         this.uploading = false
@@ -115,6 +133,9 @@
       }
     },
     computed: {
+      needsServerConfig: function () {
+        return this.serverIPAddress === undefined
+      },
       enableDownload: function () {
         return ( (this.updatedRecordsCount === 0) && this.enableAll )
       },
@@ -129,6 +150,7 @@
       }
     },
     components: {
+      ServerIpConfig,
       Download,
       Upload,
       SyncStatus

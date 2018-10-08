@@ -6,7 +6,6 @@
 
 <script>
     import axios from 'axios'
-    import config from '../../../../config'
     import SyncService from '../../../../services/SyncService'
     import DeviceService from '../../../../services/device/DeviceService'
     import formatBytesFilter from '../../../../filters/format-bytes.filter'
@@ -18,7 +17,6 @@
         return {
           success: false,
           checking: false,
-          apiRoot: config.apiRoot,
           source: null,
           snapshotFileSize: 0,
           currentLog: undefined

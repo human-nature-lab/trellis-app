@@ -6,7 +6,6 @@
 
 <script>
     import axios from 'axios'
-    import config from '@/config'
     import SyncService from '../../../../services/SyncService'
     import DeviceService from '../../../../services/device/DeviceService'
     import SyncSubStep from '../../SyncSubStep.vue'
@@ -17,7 +16,6 @@
         return {
           success: false,
           checking: true,
-          apiRoot: config.apiRoot,
           source: null,
           currentLog: undefined
         }

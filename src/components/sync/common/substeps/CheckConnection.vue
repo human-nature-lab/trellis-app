@@ -13,6 +13,7 @@
     import axios from 'axios'
     import config from '../../../../config'
     import SyncService from '../../../../services/SyncService'
+    import DatabaseService from '../../../../services/database/DatabaseService'
     import TrellisAlert from '../../../TrellisAlert.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     import SyncSubStep from '../../SyncSubStep.vue'
@@ -23,8 +24,8 @@
           currentLog: undefined,
           success: false,
           checking: false,
-          apiRoot: config.apiRoot,
-          source: null
+          source: null,
+          apiRoot: '[unknown]'
         }
       },
       created () {
@@ -38,21 +39,23 @@
         }
       },
       methods: {
-        checkConnection: function () {
-          const CancelToken = axios.CancelToken
-          this.source = CancelToken.source()
+        checkConnection: async function () {
           this.checking = true
-          SyncService.getHeartbeat(this.source).then(() => {
-            this.success = true
+          try {
+            const CancelToken = axios.CancelToken
+            this.source = CancelToken.source()
+            this.apiRoot = await DatabaseService.getServerIPAddress()
+            await SyncService.getHeartbeat(this.source)
             this.checking = false
+            this.success = true
             this.$emit('connection-ok')
-          }).catch(() => {
-            this.loggingService.log({
+          } catch (err) {
+            this.checking = false
+            this.currentLog = await this.loggingService.log({
               severity: 'warn',
               message: `Unable to establish a connection with the server at ${this.apiRoot}`
-            }).then((result) => { this.currentLog = result })
-            this.checking = false
-          })
+            })
+          }
         },
         stopChecking: function () {
           if (this.source) {
