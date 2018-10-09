@@ -1,5 +1,11 @@
 <template>
-  <sync-sub-step :working="checking" :success="success" :current-log="currentLog" :cancel="stopChecking" :ignore="ignore" :retry="retry">
+  <sync-sub-step
+    :working="checking"
+    :success="success"
+    :current-log="currentLog"
+    :cancel="stopChecking"
+    :ignore="ignore"
+    :retry="retry">
     {{$t('checking_space')}}
   </sync-sub-step>
 </template>
@@ -51,12 +57,12 @@
               if (snapshotFileSize > freeDiskSpace) {
                 this.loggingService.log({
                   severity: 'warn',
-                  message: `The snapshot is ${formatBytesFilter(snapshotFileSize)} and this device only has ${formatBytesFilter(freeDiskSpace)} free.`
+                  message: this.$t('snapshot_requires_space', [formatBytesFilter(snapshotFileSize), formatBytesFilter(freeDiskSpace)])
                 }).then((result) => { this.currentLog = result })
               } else if ((snapshotFileSize * 5) > freeDiskSpace) {
                 this.loggingService.log({
                   severity: 'warn',
-                  message: `The extracted snapshot requires ~${formatBytesFilter(snapshotFileSize * 5)} and this device only has ${formatBytesFilter(freeDiskSpace)} free.`
+                  message: this.$t('extracted_snapshot_requires_space', [formatBytesFilter(snapshotFileSize * 5), formatBytesFilter(freeDiskSpace)])
                 }).then((result) => { this.currentLog = result })
               } else {
                 this.onDone()
@@ -67,7 +73,7 @@
         },
         stopChecking: function () {
           if (this.source) {
-            this.source.cancel('Operation cancelled by the user.')
+            this.source.cancel(this.$t('operation_cancelled'))
           }
           this.checking = false
         },
@@ -82,7 +88,7 @@
         ignore: function () {
           this.loggingService.log({
             severity: 'info',
-            message: 'Warning ignored by user.'
+            message: this.$t('warning_ignored')
           }).then((log) => {
             this.currentLog = log
             this.onDone()
