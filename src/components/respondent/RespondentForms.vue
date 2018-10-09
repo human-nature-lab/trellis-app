@@ -59,7 +59,7 @@
   import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag"
   import {pushRouteAndQueueCurrent} from '../../router'
   // @ts-ignore
-  import {getCurrentPosition} from '../geo-location/LocationFinder'
+  import {getCurrentPosition} from '../LocationFinder'
 
   export class DisplayForm {
     public isComplete?: boolean
