@@ -3,7 +3,7 @@
     <v-flex xs12 sm12 md12>
       <v-card>
         <v-card-title>
-          <h3 class="headline mb-0">Sync Status</h3>
+          <h3 class="headline mb-0">{{ $t('sync_status') }}</h3>
         </v-card-title>
         <v-card-text>
           <v-alert
