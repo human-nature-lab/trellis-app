@@ -13,27 +13,41 @@
             <v-layout>
               <v-flex v-if="state === 'detecting'">
                 <v-progress-circular indeterminate />
-                Detecting location
+                {{$t('detecting_location')}}
               </v-flex>
               <v-flex v-else-if="['position-unavailable', 'timeout'].indexOf(state) > -1">
-                <span v-if="state === 'position-unavailable'">
-                  Current position is unavailable
-                </span>
-                <span v-else>
-                  Time out while retrieving position. Try moving near a window or going outdoors.
-                </span>
-                <v-btn v-if="lastKnownCoordinates" @click="useLastPosition">Use Last Position</v-btn>
-                <v-btn @click="retry">Retry</v-btn>
+                <v-layout>
+                  <v-flex v-if="state === 'position-unavailable'">
+                    {{$t('position_unavailable')}}
+                  </v-flex>
+                  <v-flex v-else>
+                    {{$t('position_timeout')}}
+                  </v-flex>
+                </v-layout>
+                <v-layout>
+                  <v-flex>
+                    {{$t('position_fail_hint')}}
+                  </v-flex>
+                </v-layout>
+                <v-layout>
+                  <v-spacer></v-spacer>
+                  <v-btn v-if="lastKnownCoordinates" @click="useLastPosition">
+                    {{$t('use_last_position')}}
+                  </v-btn>
+                  <v-btn @click="retry">
+                    {{$t('retry')}}}
+                  </v-btn>
+                </v-layout>
               </v-flex>
               <v-flex v-else-if="state === 'found-location'">
                 <v-icon color="success">check</v-icon>
-                Your location was accessed successfully. {{lastKnownCoordinates}}
+                {{$t('position_success')}} {{lastKnownCoordinates}}
               </v-flex>
               <v-flex v-else-if="state === 'use-last-location'">
-                Using last found location of: {{lastKnownCoordinates}}
+                {{$t('last_known_position', [lastKnownCoordinates])}}
               </v-flex>
               <v-flex v-else>
-                Position is unavailable. Please enable location services.
+                {{$t('update_location_denied')}}
               </v-flex>
             </v-layout>
           </v-container>
@@ -43,7 +57,7 @@
 </template>
 
 <script>
-  import GeoLocationService from '../../services/geolocation'
+  import GeoLocationService from '../services/geolocation/index'
 
   const PositionError = {
     PERMISSION_DENIED: 1,
