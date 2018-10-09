@@ -78,7 +78,7 @@
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
-  import LocationFinder from './components/geo-location/LocationFinder'
+  import LocationFinder from './components/LocationFinder'
   import router from './router'
   import singleton from './static/singleton'
 
