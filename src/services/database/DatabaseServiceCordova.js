@@ -281,6 +281,7 @@ export default class DatabaseServiceCordova {
             resolve()
           }
         } catch (err) {
+          console.error(err)
           reject(err)
         }
       }
@@ -311,6 +312,34 @@ export default class DatabaseServiceCordova {
       status.message = 'Rolling back transaction...'
       await queryRunner.rollbackTransaction()
       throw err
+    }
+  }
+
+  async getServerIPAddress () {
+    const connection = await this.getConfigDatabase()
+    const repository = await connection.getRepository(Config)
+    const config = await repository.findOne({name: 'serverIP'})
+    return (config === undefined) ? undefined : config.val
+  }
+
+  async setServerIPAddress (serverIP) {
+    let re = /(((http(s?)):(\/?)(\/?))?)(.*)/
+    let groups = serverIP.match(re)
+    console.log('groups', groups)
+    let protocol = groups[3]
+    let address = groups[7]
+    let combinedAddress = `https://${address}`
+    if (protocol === 'http') {
+      combinedAddress = `http://${address}`
+    }
+    console.log('combinedAddress', combinedAddress)
+    const connection = await this.getConfigDatabase()
+    const repository = await connection.getRepository(Config)
+    const config = await this.getServerIPAddress()
+    if (config === undefined) {
+      await repository.insert({ name: 'serverIP', val: combinedAddress })
+    } else {
+      await repository.update({ name: 'serverIP' }, { val: combinedAddress })
     }
   }
 
