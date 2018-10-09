@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-flex xs12>
     <v-card tile>
       <v-toolbar card prominent>
         <v-toolbar-title>{{ $t('geo') }}: {{translated}}</v-toolbar-title>
@@ -18,7 +18,7 @@
         </v-layout>
       </v-card-text>
     </v-card>
-  </v-container>
+  </v-flex>
 </template>
 
 <script lang="ts">
