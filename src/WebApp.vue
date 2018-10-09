@@ -75,6 +75,7 @@
         </v-card>
       </v-dialog>
       <v-container
+        justify-start
         fluid
         fill-height
         class="ma-0 pa-0 app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
@@ -161,6 +162,9 @@
 </script>
 
 <style lang="sass">
+  .container
+    &.fill-height
+      align-items: start
   html
     overflow-y: auto
   body
