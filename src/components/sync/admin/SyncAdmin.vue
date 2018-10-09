@@ -4,7 +4,9 @@
       <v-flex xs12 sm12 md6 lg6 xl6>
         <v-card>
           <v-card-title>
-            <h3 class="headline mb-0">Snapshots</h3>
+            <h3 class="headline mb-0">
+              {{ $t('snapshots') }}
+            </h3>
           </v-card-title>
           <v-card-text>
             <v-data-table
@@ -19,10 +21,10 @@
               </template>
               <template slot="no-data">
                 <v-alert :value="!snapshotsLoading" type="info">
-                  No snapshots found.
+                  {{ $t('no_results') }}
                 </v-alert>
                 <span v-if="snapshotsLoading">
-                  Loading...
+                  {{ $t('loading') }}
                 </span>
               </template>
             </v-data-table>
@@ -33,7 +35,7 @@
               :loading="generatingSnapshot"
               :disabled="generatingSnapshot"
               @click="generateSnapshot">
-              Generate snapshot
+              {{ $t('generate_snapshot') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -41,7 +43,9 @@
       <v-flex xs12 sm12 md6 lg6 xl6>
         <v-card>
           <v-card-title>
-            <h3 class="headline mb-0">Uploads</h3>
+            <h3 class="headline mb-0">
+              {{ $t('uploads') }}
+            </h3>
           </v-card-title>
           <v-card-text>
             <v-data-table
@@ -58,10 +62,10 @@
               </template>
               <template slot="no-data">
                 <v-alert :value="!uploadsLoading" type="info">
-                  No uploads found.
+                  {{ $t('no_results') }}
                 </v-alert>
                 <span v-if="uploadsLoading">
-                  Loading...
+                  {{ $t('loading') }}
                 </span>
               </template>
             </v-data-table>
@@ -72,7 +76,7 @@
               :loading="uploadsProcessing"
               :disabled="uploadsProcessing"
               @click="processUploads">
-              Process uploads
+              {{ $t('process_uploads') }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -143,13 +147,11 @@
     methods: {
       getUploads: async function () {
         const uploads = await SyncAdminService.listUploads()
-        console.log('uploads', uploads)
         this.uploads = uploads
         this.uploadsLoading = false;
       },
       getSnapshots: async function () {
         const snapshots = await SyncAdminService.listSnapshots()
-        console.log('snapshots', snapshots)
         this.snapshots = snapshots
         this.snapshotsLoading = false;
       },
