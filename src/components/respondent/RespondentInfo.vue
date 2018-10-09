@@ -153,7 +153,7 @@
 
   export default Vue.extend({
     name: 'respondent-info',
-    mixins: [RouteMixinFactory(preloadRespondent)],
+    mixins: [RouteMixinFactory(preloadRespondent, true)],
     data () {
       return {
         global: singleton,
