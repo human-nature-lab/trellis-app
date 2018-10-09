@@ -1,124 +1,130 @@
 <template>
-  <v-card tile>
-    <v-toolbar card prominent>
-      <v-toolbar-title>{{ $t('respondent') }}: {{name}}</v-toolbar-title>
-      <v-spacer />
-      <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
-        {{ $t('forms') }}
-      </v-btn>
-    </v-toolbar>
-    <v-card-text>
-      <v-alert v-show="error" type="error">
-        {{error}}
-      </v-alert>
-      <PhotoAlbum :photos="respondent.photos" @photo="onNewPhoto" />
-      <RespondentGeos
-        :use-census-form="true"
-        :study-id="global.study.id"
-        :respondent="respondent" />
-      <v-toolbar flat>
-        <v-toolbar-title>
-          {{ $t('condition_tags') }}
-        </v-toolbar-title>
+  <v-flex xs12>
+    <v-card tile>
+      <v-toolbar card prominent>
+        <v-toolbar-title>{{ $t('respondent') }}: {{name}}</v-toolbar-title>
         <v-spacer />
-        <permission :role-whitelist="['admin','manager']">
-          <v-btn
-            icon
-            class="mb-2"
-            @click="modal.conditionTag = true">
-            <v-icon>add</v-icon>
-          </v-btn>
-        </permission>
+        <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
+          {{ $t('forms') }}
+        </v-btn>
       </v-toolbar>
-      <v-data-table
-        class="mb-3"
-        hide-actions
-        :headers="conditionTagHeaders"
-        :items="respondentConditionTags">
-        <template slot="items" slot-scope="props">
-          <td>{{ props.item.conditionTag.name }}</td>
-          <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
-          <permission :role-whitelist="['admin', 'manager']">
-            <td>
-              <v-btn
-                icon
-                @click="deleteRespondentConditionTag(props.item.id)">
-                <v-progress-circular
-                  v-if="isDeleting(props.item.id)"
-                  indeterminate />
-                <v-icon v-else>delete</v-icon>
-              </v-btn>
-            </td>
-          </permission>
-        </template>
-      </v-data-table>
-      <v-toolbar flat>
-        <v-toolbar-title>
-          {{ $t('names') }}
-        </v-toolbar-title>
-        <v-spacer />
-        <permission :role-whitelist="['admin','manager']">
-          <v-btn
-            icon
-            @click="modal.addName = true">
-            <v-icon>add</v-icon>
-          </v-btn>
-        </permission>
-      </v-toolbar>
-      <v-data-table
-        class="mb-3"
-        :headers="nameHeaders"
-        :items="respondent.names"
-        hide-actions>
-        <template slot="items" slot-scope="props">
-          <td>{{props.item.name}}</td>
-          <td>
-            <v-icon v-if="props.item.isDisplayName">check</v-icon>
-          </td>
-          <td>
-            <permission :role-whitelist="['admin','manager']">
-              <v-btn
-                icon
-                @click="editing.name = props.item; modal.editName = true">
-                <v-icon>edit</v-icon>
-              </v-btn>
-              <v-btn
-                icon
-                @click="removeName(props.item.id)">
-                <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
-                <v-icon v-else>delete</v-icon>
-              </v-btn>
-            </permission>
-          </td>
-        </template>
-      </v-data-table>
-    </v-card-text>
-    <v-dialog
-      v-model="modal.addName"
-      lazy>
-      <RespondentName
-        :respondent="respondent"
-        @close="doneAddingName"/>
-    </v-dialog>
-    <v-dialog
-      v-model="modal.editName"
-      lazy>
-      <RespondentName
-        :name="editing.name"
-        :respondent="respondent"
-        @close="doneEditingName"/>
-    </v-dialog>
-    <v-dialog
-      lazy
-      v-model="modal.conditionTag">
-      <v-card>
-        <RespondentConditionTagForm
-          :respondentId="respondent.id"
-          :condition-tag="editing.conditionTag"
-          @close="doneAddingRespondentConditionTag"/>
-      </v-card>
-    </v-dialog>
-  </v-card>
+      <v-card-text>
+        <v-container fluid xs12>
+          <v-layout column>
+            <v-alert v-show="error" type="error">
+              {{error}}
+            </v-alert>
+            <PhotoAlbum :photos="respondent.photos" @photo="onNewPhoto" />
+            <RespondentGeos
+              :use-census-form="true"
+              :study-id="global.study.id"
+              :respondent="respondent" />
+            <v-toolbar flat>
+              <v-toolbar-title>
+                {{ $t('condition_tags') }}
+              </v-toolbar-title>
+              <v-spacer />
+              <permission :role-whitelist="['admin','manager']">
+                <v-btn
+                  icon
+                  class="mb-2"
+                  @click="modal.conditionTag = true">
+                  <v-icon>add</v-icon>
+                </v-btn>
+              </permission>
+            </v-toolbar>
+            <v-data-table
+              class="mb-3"
+              hide-actions
+              :headers="conditionTagHeaders"
+              :items="respondentConditionTags">
+              <template slot="items" slot-scope="props">
+                <td>{{ props.item.conditionTag.name }}</td>
+                <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
+                <permission :role-whitelist="['admin', 'manager']">
+                  <td>
+                    <v-btn
+                      icon
+                      @click="deleteRespondentConditionTag(props.item.id)">
+                      <v-progress-circular
+                        v-if="isDeleting(props.item.id)"
+                        indeterminate />
+                      <v-icon v-else>delete</v-icon>
+                    </v-btn>
+                  </td>
+                </permission>
+              </template>
+            </v-data-table>
+            <v-toolbar flat>
+              <v-toolbar-title>
+                {{ $t('names') }}
+              </v-toolbar-title>
+              <v-spacer />
+              <permission :role-whitelist="['admin','manager']">
+                <v-btn
+                  icon
+                  @click="modal.addName = true">
+                  <v-icon>add</v-icon>
+                </v-btn>
+              </permission>
+            </v-toolbar>
+            <v-data-table
+              class="mb-3"
+              :headers="nameHeaders"
+              :items="respondent.names"
+              hide-actions>
+              <template slot="items" slot-scope="props">
+                <td>{{props.item.name}}</td>
+                <td>
+                  <v-icon v-if="props.item.isDisplayName">check</v-icon>
+                </td>
+                <td>
+                  <permission :role-whitelist="['admin','manager']">
+                    <v-btn
+                      icon
+                      @click="editing.name = props.item; modal.editName = true">
+                      <v-icon>edit</v-icon>
+                    </v-btn>
+                    <v-btn
+                      icon
+                      @click="removeName(props.item.id)">
+                      <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
+                      <v-icon v-else>delete</v-icon>
+                    </v-btn>
+                  </permission>
+                </td>
+              </template>
+            </v-data-table>
+          </v-layout>
+        </v-container>
+      </v-card-text>
+      <v-dialog
+        v-model="modal.addName"
+        lazy>
+        <RespondentName
+          :respondent="respondent"
+          @close="doneAddingName"/>
+      </v-dialog>
+      <v-dialog
+        v-model="modal.editName"
+        lazy>
+        <RespondentName
+          :name="editing.name"
+          :respondent="respondent"
+          @close="doneEditingName"/>
+      </v-dialog>
+      <v-dialog
+        lazy
+        v-model="modal.conditionTag">
+        <v-card>
+          <RespondentConditionTagForm
+            :respondentId="respondent.id"
+            :condition-tag="editing.conditionTag"
+            @close="doneAddingRespondentConditionTag"/>
+        </v-card>
+      </v-dialog>
+    </v-card>
+  </v-flex>
 </template>
 
 <script lang="ts">
