@@ -2,7 +2,7 @@
   <sync-sub-step
     :working="working"
     :success="success"
-    success-message="DONE"
+    :success-message="$t('done')"
     :current-log="currentLog"
     :cancel="stopWorking"
     :retry="retry">
