@@ -63,14 +63,14 @@
                 warning = true
                 this.loggingService.log({
                   severity: 'warn',
-                  message: `Requested ${photosRequested} images and the server only found ${this.photosFound}.`
+                  message: this.$t('requested_images_found_images', [photosRequested, this.photosFound])
                 }).then((result) => { this.logs.push(result) })
               }
               if (totalImageSize > freeDiskSpace) {
                 warning = true
                 this.loggingService.log({
                   severity: 'warn',
-                  message: `The images require ${formatBytesFilter(totalImageSize)} to download and this device only has ${formatBytesFilter(freeDiskSpace)} free.`
+                  message: this.$t('images_require_space', [formatBytesFilter(totalImageSize), formatBytesFilter(freeDiskSpace)])
                 }).then((result) => { this.logs.push(result) })
               }
               if (!warning) {
@@ -83,7 +83,7 @@
         },
         stopChecking: function () {
           if (this.source) {
-            this.source.cancel('Operation cancelled by the user.')
+            this.source.cancel(this.$t('operation_cancelled'))
           }
           this.checking = false
         },
