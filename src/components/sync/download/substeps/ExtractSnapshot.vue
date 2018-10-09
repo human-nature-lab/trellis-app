@@ -1,5 +1,5 @@
 <template>
-  <sync-sub-step success-message="DONE"
+  <sync-sub-step :success-message="$t('done')"
                  :working="extracting"
                  :success="success"
                  :current-log="currentLog"

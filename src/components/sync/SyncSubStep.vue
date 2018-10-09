@@ -65,7 +65,7 @@
       successMessage: {
         type: String,
         required: false,
-        'default': 'OK'
+        'default': this.$t('ok')
       },
       currentLog: {
         required: false,

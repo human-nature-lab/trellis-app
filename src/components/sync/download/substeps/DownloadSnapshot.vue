@@ -1,6 +1,6 @@
 <template>
   <sync-sub-step :working="downloading"
-                 success-message="DONE"
+                 :success-message="$t('done')"
                  :success="success"
                  :current-log="currentLog"
                  :cancel="stopDownload"

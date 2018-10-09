@@ -1,6 +1,6 @@
 <template>
   <sync-sub-step :working="checking"
-                 success-message="DONE"
+                 :success-message="$t('done')"
                  :success="success"
                  :current-log="currentLog"
                  :ignore="ignore"

@@ -3,7 +3,7 @@
     :indeterminate="true"
     :working="working"
     :success="success"
-    success-message="DONE"
+    :success-message="$t('done')"
     :current-log="currentLog"
     :retry="retry">
     {{$t('emptying_uploads')}}
