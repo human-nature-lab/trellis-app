@@ -8,7 +8,7 @@
     :progress="progress"
     :indeterminate="progressIndeterminate"
     :retry="retry">
-    Finding images...
+    {{ $t('finding_images') }}
   </sync-sub-step>
 </template>
 
