@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import singleton from '../static/singleton'
 import ValidateSync from './guards/ValidateSync'
 import ValidateLogin from './guards/ValidateLogin'
-// import chain from './guards/ChainableGuards'
+import chain from './guards/ChainableGuards'
 
 import appRoutes from './app.routes'
 import webRoutes from './web.routes'
@@ -29,10 +29,7 @@ export const router = new Router({
 
 // If we're in offline mode, require that the application is synced
 if (singleton.offline) {
-  router.beforeEach((to, from, next) => {
-    const afterSync = ValidateSync.bind(this, to, from, next)
-    ValidateLogin(to, from, afterSync)
-  })
+  router.beforeEach(chain(ValidateSync, ValidateLogin))
 }
 
 router.beforeEach((to, from, next) => {

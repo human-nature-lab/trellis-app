@@ -4,6 +4,7 @@
  * @param {...Function} guards
  * @returns {guardChain}
  */
+import ImmutableQueue from '../../classes/ImmutableQueue'
 
 export function parallel (...guards) {
   let next
@@ -25,25 +26,28 @@ export function parallel (...guards) {
 }
 
 export default function chainableGuards (...guards) {
-  let to, from, next
+  let to, from, next, queue
+  function guardChain (...args) {
+    [to, from, next] = args
+    queue = new ImmutableQueue(guards)
+    callNextGuardOrFinish()
+  }
+
   function callNextGuardOrFinish () {
-    let guard = guards.shift()
+    let guard = queue.next()
     if (!guard) {
-      return next()
+      next()
     } else {
-      return guard(to, from, function (...args) {
+      guard(to, from, function (arg) {
         // Bail early if any arguments are present
-        if (args.length) {
-          return next(...args)
+        if (arg !== undefined && arg !== null) {
+          next(arg)
         } else {
-          return callNextGuardOrFinish()
+          callNextGuardOrFinish()
         }
       })
     }
   }
 
-  return function guardChain (...args) {
-    [to, from, next] = args
-    callNextGuardOrFinish()
-  }
+  return guardChain
 }
