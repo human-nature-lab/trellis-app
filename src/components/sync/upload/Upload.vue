@@ -8,7 +8,7 @@
           <v-divider></v-divider>
           <v-stepper-step step="2">{{$t('uploading')}}</v-stepper-step>
           <v-divider></v-divider>
-          <v-stepper-step step="3">Uploading images...</v-stepper-step>
+          <v-stepper-step step="3">{{$t('uploading_images')}}</v-stepper-step>
         </v-stepper-header>
         <v-stepper-items>
           <v-stepper-content step="1">
@@ -77,7 +77,7 @@
           </v-stepper-content>
           <v-stepper-content step="3">
             <sync-step
-              :title="'Uploading images...'"
+              :title="$t('uploading_images')"
               v-if="uploadStep === 3"
               v-bind:continue-status="continueStatusArray[2]"
               v-on:continue-clicked="onContinue"

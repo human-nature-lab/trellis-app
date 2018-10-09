@@ -15,7 +15,7 @@
           <v-stepper-items>
             <v-stepper-content step="1">
               <sync-step
-                :title="this.$t('connecting')"
+                :title="$t('connecting')"
                 v-if="downloadStep === 1"
                 v-bind:continue-status="continueStatusArray[0]"
                 v-on:continue-clicked="onContinue"
@@ -46,7 +46,7 @@
             </v-stepper-content>
             <v-stepper-content step="2">
               <sync-step
-                :title="this.$t('downloading')"
+                :title="$t('downloading')"
                 v-if="downloadStep === 2"
                 v-bind:continue-status="continueStatusArray[1]"
                 v-on:continue-clicked="onContinue"
@@ -87,7 +87,7 @@
             </v-stepper-content>
             <v-stepper-content step="3">
               <sync-step
-                :title="this.$t('inserting')"
+                :title="$t('inserting')"
                 v-if="downloadStep === 3"
                 v-bind:continue-status="continueStatusArray[2]"
                 v-on:continue-clicked="onContinue"
@@ -126,7 +126,7 @@
             </v-stepper-content>
             <v-stepper-content step="4">
               <sync-step
-                :title="this.$t('images')"
+                :title="$t('images')"
                 v-if="downloadStep === 4"
                 v-bind:continue-status="continueStatusArray[3]"
                 v-on:continue-clicked="onContinue"
