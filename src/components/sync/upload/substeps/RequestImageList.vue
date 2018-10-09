@@ -6,7 +6,7 @@
     :current-log="currentLog"
     :cancel="stopWorking"
     :retry="retry">
-    Requesting image list...
+    {{ $t('requesting_image_list') }}
   </sync-sub-step>
 </template>
 
