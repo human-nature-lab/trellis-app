@@ -5,10 +5,11 @@ import router from '../router'
  * Creates a mixin which takes a loadCallback and will call the hydrate method at the appropriate times. This mixin is
  * used to avoid repeating route based methods and it syncs with the app loading progress bar.
  * @param {Function} loadCallback - This is passed the route object to load
+ * @param {boolean} fullscreen - If this component may take a while to load, show a modal, full-screen, loading screen
  * @param {Function} [clearCallback] - This should clear the object
  * @returns {{beforeRouteEnter(*=, *, *): void, beforeRouteUpdate(*=, *, *): void, beforeRouteLeave(*, *, *): void}}
  */
-export default function RoutePreloadMixin (loadCallback) {
+export default function RoutePreloadMixin (loadCallback, fullscreen = false) {
   let data
   return {
     router,
@@ -19,6 +20,7 @@ export default function RoutePreloadMixin (loadCallback) {
     async beforeRouteEnter (to, from, next) {
       singleton.loading.indeterminate = true
       singleton.loading.active = true
+      singleton.loading.fullscreen = fullscreen
       try {
         data = await loadCallback(to)
         next()
@@ -50,8 +52,8 @@ export default function RoutePreloadMixin (loadCallback) {
       }
     },
     async beforeRouteLeave (to, from, next) {
-      singleton.loading.active = true
-      singleton.loading.message = 'Validating guards...'
+      // singleton.loading.active = true
+      // singleton.loading.message = 'Validating guards...'
       try {
         if (this.leaving) {
           await this.leaving()
