@@ -16,7 +16,7 @@
   import SyncSubStep from '../../SyncSubStep.vue'
   import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
   import FileService from '../../../../services/file/FileService'
-  import config from '../../../../config'
+  import DatabaseService from '../../../../services/database/DatabaseService'
   import DeviceService from '../../../../services/device/DeviceService'
 
   export default {
@@ -53,7 +53,8 @@
         console.log('fileEntry', this.fileEntry)
         console.log('md5hash', this.md5hash)
         const deviceId = await DeviceService.getUUID()
-        const uri = config.apiRoot + `/sync/device/${deviceId}/upload`
+        const apiRoot = await DatabaseService.getServerIPAddress()
+        const uri = apiRoot + `/sync/device/${deviceId}/upload`
         try {
           await FileService.upload(uri, this.fileEntry, this.onUploadProgress)
           this.working = false

@@ -11,7 +11,6 @@
 
 <script>
     import axios from 'axios'
-    import config from '../../../../config'
     import SyncService from '../../../../services/SyncService'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     import SyncSubStep from '../../SyncSubStep.vue'
@@ -22,7 +21,6 @@
           success: false,
           checking: false,
           currentLog: undefined,
-          apiRoot: config.apiRoot,
           source: null
         }
       },

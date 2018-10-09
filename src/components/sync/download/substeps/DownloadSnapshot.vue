@@ -12,9 +12,9 @@
 </template>
 
 <script>
-    import config from '../../../../config'
     import FileService from '../../../../services/file/FileService'
     import DeviceService from '../../../../services/device/DeviceService'
+    import DatabaseService from '../../../../services/database/DatabaseService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
@@ -26,7 +26,6 @@
           lastDownloadProgress: 0,
           success: false,
           downloading: false,
-          apiRoot: config.apiRoot,
           source: null,
           currentLog: undefined,
           fileServicePromise: undefined
@@ -59,7 +58,8 @@
           const fileName = this.snapshotId + '.sql.zip'
           try {
             const deviceId = await DeviceService.getUUID()
-            const uri = config.apiRoot + `/sync/device/${deviceId}/snapshot/${this.snapshotId}/download`
+            const apiRoot = await DatabaseService.getServerIPAddress()
+            const uri = apiRoot + `/sync/device/${deviceId}/snapshot/${this.snapshotId}/download`
             const fileSystem = await FileService.requestFileSystem()
             const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'snapshots')
             const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
@@ -70,7 +70,9 @@
             this.downloading = false
           } catch (err) {
             this.downloading = false
-            this.loggingService.log(err).then((result) => { this.currentLog = result })
+            this.loggingService.log(err).then((result) => {
+              this.currentLog = result
+            })
           }
         },
         onDownloadProgress: function (progressEvent) {
