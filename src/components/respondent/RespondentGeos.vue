@@ -23,39 +23,18 @@
       :items="locations"
       hide-actions>
       <template slot="items" slot-scope="props">
-        <td>
-          <GeoBreadcrumbs
-            :geo-id="props.item.geoId" />
-        </td>
-        <td>
-          {{props.item.geo.geoType.name}}
-        </td>
-        <td>
-          <v-icon v-if="props.item.isCurrent">check</v-icon>
-        </td>
-        <td>
-          <permission :role-whitelist="['admin', 'manager']">
-            <v-tooltip v-if="!props.item.isCurrent">
-              <v-btn
-                slot="activator"
-                icon
-                @click="remove(props.item.id)">
-                <v-icon>delete</v-icon>
-              </v-btn>
-              <span>{{ $t('remove_location') }}</span>
-            </v-tooltip>
-            <v-tooltip>
-              <v-btn
-                v-if="props.item.isCurrent"
-                icon
-                slot="activator"
-                @click="startMove(props.item)">
-                <v-icon>edit</v-icon>
-              </v-btn>
-              <span>{{ $t('move_respondent_location') }}</span>
-            </v-tooltip>
-          </permission>
-        </td>
+        <RespondentGeoRow :respondentGeo="props.item" @toggleHistory="props.expanded = !props.expanded"/>
+      </template>
+      <template slot="expand" slot-scope="props">
+        <v-data-table
+          disable-initial-sort
+          :headers="locationHeaders"
+          :items="props.item.history"
+          hide-actions>
+          <template slot="items" slot-scope="historyProps">
+            <RespondentGeoRow :respondentGeo="historyProps.item" />
+          </template>
+        </v-data-table>
       </template>
     </v-data-table>
     <v-dialog
@@ -83,11 +62,11 @@
 
 <script lang="ts">
   // @ts-ignore
-  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
-  // @ts-ignore
   import GeoSearch from '../geo/GeoSearch'
   // @ts-ignore
   import Permission from '../Permission'
+  // @ts-ignore
+  import RespondentGeoRow from './RespondentGeoRow'
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusFormService from '../../services/census/index'
   import CensusTypes from '../../static/census.types'
@@ -96,8 +75,9 @@
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
   import singleton from '../../static/singleton'
+  import {arrayToTree} from 'performant-array-to-tree'
   export default Vue.extend({
-    components: {GeoBreadcrumbs, GeoSearch, Permission},
+    components: {GeoSearch, Permission, RespondentGeoRow},
     name: 'respondent-geos',
     props: {
       studyId: {
@@ -206,6 +186,12 @@
     },
     computed: {
       locations (): RespondentGeo[] {
+        const geos = this.respondent.geos
+        debugger
+
+        const tree = arrayToTree(geos, 'id','previousRespondentGeoId')
+
+        // TODO: Group geos based on their move history
         return this.respondent.geos.map(rGeo => rGeo)
       }
     }

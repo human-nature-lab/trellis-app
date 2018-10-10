@@ -84,26 +84,6 @@ export default class ActionStore extends Emitter {
   }
 
   /**
-   * Return the section number of an action
-   * @param {Action} action
-   * @returns {any}
-   */
-  getActionSection (action: Action) {
-    if (!action.questionId) return -1
-    return this.questionToSectionIndex.get(action.questionId)
-  }
-
-  /**
-   * Return the page number of an action
-   * @param {Object} action
-   * @returns {Number}
-   */
-  getActionPage (action: Action) {
-    if (!action.questionId) return -1
-    return this.questionToPageIndex.get(action.questionId)
-  }
-
-  /**
    * Insert an action while maintaining the actions in a sorted state based on the order of the survey
    * @param {Action} action
    */
@@ -154,27 +134,6 @@ export default class ActionStore extends Emitter {
   }
 
   /**
-   * Get the actions for any number of question ids for a specific sectionRepetition and followUpRepetition
-   * @param questionIds
-   * @param sectionRepetition
-   * @param sectionFollowUpRepetition
-   * @returns {Array}
-   */
-  getQuestionActions (questionIds: string[], sectionRepetition: number, sectionFollowUpRepetition: number): Action[] {
-    let actions = []
-    for (let id of questionIds) {
-      if (this.questionIndex.has(id)) {
-        for (let action of this.questionIndex.get(id)) {
-          if (action.sectionRepetition === sectionRepetition && action.sectionFollowUpRepetition === sectionFollowUpRepetition) {
-            actions.push(action)
-          }
-        }
-      }
-    }
-    return actions
-  }
-
-  /**
    * Load the actions into the store without triggering the persist method
    * @param {array} actions
    */
@@ -216,26 +175,4 @@ export default class ActionStore extends Emitter {
     }
   }
 
-  /**
-   * Returns true if an action matches a location
-   * @param {Action} action
-   * @param {InterviewLocation} location
-   * @returns {boolean}
-   */
-  matchesLocation (action: Action, location: InterviewLocation): boolean {
-    return this.getActionSection(action) === location.section &&
-      this.getActionPage(action) === location.page &&
-      action.sectionRepetition === location.sectionRepetition &&
-      action.sectionFollowUpRepetition === location.sectionFollowUpRepetition
-  }
-
-  /**
-   * Get all actions for a page
-   * @param {InterviewLocation} location
-   * @returns {Action[]}
-   */
-  getLocationActions (location: InterviewLocation): Action[] {
-    // TODO: Should handle sectionRepetition and sectionFollowUpRepetition too
-    return this.store.filter(action => action.section === location.section && action.page === location.page)
-  }
 }
