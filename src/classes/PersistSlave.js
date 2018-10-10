@@ -47,7 +47,6 @@ export default class PersistSlave {
    * Fires when some data has changed
    */
   onChange () {
-    console.log('some data changed')
     this.persist()
   }
 
@@ -60,7 +59,6 @@ export default class PersistSlave {
       this.hasNewData = false
       return
     }
-    console.log('saving something')
     if (this.existingRequest) {
       this.hasNewData = true
       return this.existingRequest
