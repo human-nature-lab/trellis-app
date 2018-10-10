@@ -48,6 +48,7 @@
     "ngraph.forcelayout": "^0.5.0",
     "ngraph.graph": "0.0.14",
     "node-sass": "^4.9.2",
+    "performant-array-to-tree": "git+https://github.com/wyattis/performant-array-to-tree.git",
     "reflect-metadata": "^0.1.12",
     "typeface-roboto": "0.0.54",
     "typeorm": "^0.2.7",
