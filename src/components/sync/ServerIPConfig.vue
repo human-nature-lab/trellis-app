@@ -3,7 +3,7 @@
     <v-layout justify-space-around>
       <v-flex xs6>
         <h2>
-          Configuration
+          {{ $t('settings') }}
         </h2>
       </v-flex>
     </v-layout>
@@ -20,7 +20,7 @@
           @submit="setIpAddress()">
           <v-text-field
             name="ipAddress"
-            label="Server IP Address"
+            :label="$t('server_ip_address')"
             autocapitalize="off"
             autocorrect="off"
             required

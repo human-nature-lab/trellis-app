@@ -53,17 +53,17 @@
             this.checking = false
             this.currentLog = await this.loggingService.log({
               severity: 'warn',
-              message: `Unable to establish a connection with the server at ${this.apiRoot}`
+              message: this.$t('unable_to_establish_connection', [this.apiRoot])
             })
           }
         },
         stopChecking: function () {
           if (this.source) {
-            this.source.cancel('Operation cancelled by the user.')
+            this.source.cancel(this.$t('operation_cancelled'))
           }
           this.currentLog = this.loggingService.log({
             severity: 'warn',
-            message: 'Operation cancelled by the user.'
+            message: this.$t('operation_cancelled')
           })
           this.checking = false
         },

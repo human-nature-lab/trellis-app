@@ -4,18 +4,18 @@
     <div class="download-content">
         <v-stepper v-model="downloadStep">
           <v-stepper-header>
-            <v-stepper-step step="1">Connecting</v-stepper-step>
+            <v-stepper-step step="1">{{ $t('connecting') }}</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="2">Downloading</v-stepper-step>
+            <v-stepper-step step="2">{{ $t('downloading') }}</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="3">Inserting</v-stepper-step>
+            <v-stepper-step step="3">{{ $t('inserting') }}</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="4">Images</v-stepper-step>
+            <v-stepper-step step="4">{{ $t('images') }}</v-stepper-step>
           </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content step="1">
               <sync-step
-                title="Connecting"
+                :title="$t('connecting')"
                 v-if="downloadStep === 1"
                 v-bind:continue-status="continueStatusArray[0]"
                 v-on:continue-clicked="onContinue"
@@ -46,7 +46,7 @@
             </v-stepper-content>
             <v-stepper-content step="2">
               <sync-step
-                title="Downloading"
+                :title="$t('downloading')"
                 v-if="downloadStep === 2"
                 v-bind:continue-status="continueStatusArray[1]"
                 v-on:continue-clicked="onContinue"
@@ -87,7 +87,7 @@
             </v-stepper-content>
             <v-stepper-content step="3">
               <sync-step
-                title="Inserting"
+                :title="$t('inserting')"
                 v-if="downloadStep === 3"
                 v-bind:continue-status="continueStatusArray[2]"
                 v-on:continue-clicked="onContinue"
@@ -126,7 +126,7 @@
             </v-stepper-content>
             <v-stepper-content step="4">
               <sync-step
-                title="Downloading images"
+                :title="$t('images')"
                 v-if="downloadStep === 4"
                 v-bind:continue-status="continueStatusArray[3]"
                 v-on:continue-clicked="onContinue"

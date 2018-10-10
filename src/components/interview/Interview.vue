@@ -129,7 +129,7 @@
   let interviewState
   export default {
     name: 'interview',
-    mixins: [RoutePreloadMixin(InterviewLoader.load)],
+    mixins: [RoutePreloadMixin(InterviewLoader.load, true)],
     head: {
       title: function () {
         let d = {}
