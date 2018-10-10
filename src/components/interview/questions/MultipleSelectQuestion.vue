@@ -40,11 +40,9 @@
             this.otherValsSet_.add(this.question.questionParameters[i].val)
           }
         }
-        console.log('recalculating otherChoiceVals', this.otherValsSet_)
         return this.otherValsSet_
       },
       displayChoices () {
-        console.log('recalculating displayChoices')
         return this.choices.map(choice => {
           const datum = this.question.datum.data.find(d => d.choiceId === choice.id)
           return {
@@ -58,7 +56,6 @@
         })
       },
       choices () {
-        console.log('recalculating choices')
         return this.question.choices.map(c => c.choice)
       }
     }

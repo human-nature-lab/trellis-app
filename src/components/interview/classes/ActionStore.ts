@@ -116,7 +116,7 @@ export default class ActionStore extends Emitter {
     if (action.payload['n'] === undefined || action.payload['n'] === null) {
       action.payload['n'] = this.store.length
     }
-    console.log('actions', JSON.stringify(this.actions.map(a => [a.actionType, a.payload['n']])))
+    // console.log('actions', JSON.stringify(this.actions.map(a => [a.actionType, a.payload['n']])))
     if (action.preloadActionId === null && action.actionType !== AT.next && action.actionType !== AT.previous && action.questionId !== null) {
       const actionLocNum = locToNumber(this.actionToLocation(action))
       if (!this.lastRealAction || (this.lastRealAction && actionLocNum > this.lastRealActionLocNum)) {

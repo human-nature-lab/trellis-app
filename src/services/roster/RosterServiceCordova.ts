@@ -1,8 +1,6 @@
-import RosterServiceInterface from "./RosterServiceInterface";
-import Roster from "../../entities/trellis/Roster";
+import RosterServiceInterface from './RosterServiceInterface'
+import Roster from '../../entities/trellis/Roster'
 import DatabaseService from '../../services/database/DatabaseService'
-
-
 
 export default class RosterServiceCordova implements RosterServiceInterface {
   async getRosterRows (rosterIds: string[]): Promise<Roster[]> {
