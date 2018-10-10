@@ -1,5 +1,23 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme">
+    <v-dialog
+      max-width="300"
+      v-model="global.loading.fullscreen && global.loading.active"
+      persistent>
+      <v-card>
+        <v-card-title primary-title>
+          <h3>{{ $t('loading') }}</h3>
+        </v-card-title>
+        <v-card-text>
+          <v-layout row justify-center>
+            <v-progress-circular
+              :size="50"
+              indeterminate>
+            </v-progress-circular>
+          </v-layout>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <v-navigation-drawer
       v-model="global.menuDrawer.open"
       app>
@@ -156,6 +174,8 @@
     margin: 0
     margin-top: 2px
   .navigation-drawer
+    z-index: 1600
+  .dialog
     z-index: 1600
   .overlay
     z-index: 1500

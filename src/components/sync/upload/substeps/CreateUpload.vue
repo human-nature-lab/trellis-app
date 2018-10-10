@@ -5,7 +5,7 @@
     :working="working"
     :cancel="stopWorking"
     :success="success"
-    success-message="DONE"
+    :success-message="$t('done')"
     :current-log="currentLog"
     :retry="retry">
     {{$t('creating_upload')}}

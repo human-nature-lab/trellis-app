@@ -46,7 +46,7 @@
                 // Expected result if the device hasn't been added to the server
                 this.loggingService.log({
                   severity: 'warn',
-                  message: 'The device was not found on the server, please see an administrator for a resolution.'
+                  message: this.$t('server_device_not_found')
                 }).then((result) => { this.currentLog = result })
               } else {
                 this.loggingService.log(err).then((result) => { this.currentLog = result })
@@ -56,10 +56,10 @@
         },
         stopChecking: function () {
           if (this.source) {
-            this.source.cancel('Operation cancelled by the user.')
+            this.source.cancel(this.$t('operation_cancelled'))
             this.loggingService.log({
               severity: 'warn',
-              message: 'Operation cancelled by the user.'
+              message: this.$t('operation_cancelled')
             }).then((result) => { this.currentLog = result })
           }
           this.checking = false

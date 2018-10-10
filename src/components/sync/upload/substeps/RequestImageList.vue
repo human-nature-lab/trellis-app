@@ -2,11 +2,11 @@
   <sync-sub-step
     :working="working"
     :success="success"
-    success-message="DONE"
+    :success-message="$t('done')"
     :current-log="currentLog"
     :cancel="stopWorking"
     :retry="retry">
-    Requesting image list...
+    {{ $t('requesting_image_list') }}
   </sync-sub-step>
 </template>
 

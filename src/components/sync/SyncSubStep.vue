@@ -3,7 +3,7 @@
     <ul>
       <li>
         <slot></slot>
-        <strong v-if="success" class="green--text">{{ successMessage }}.</strong>
+        <strong v-if="success" class="green--text">{{ _successMessage }}.</strong>
         <strong v-if="isWarning()" class="amber--text">{{$t('warning_word').toUpperCase()}}.</strong>
         <strong v-if="isError()" class="red--text">{{$t('error').toUpperCase()}}.</strong>
       </li>
@@ -36,10 +36,16 @@
     name: 'sync-sub-step',
     data () {
       return {
-        curWarning: 0
+        curWarning: 0,
+        _successMessage: ''
       }
     },
     created () {
+      if (this.successMessage) {
+        this._successMessage = this.successMessage
+      } else {
+        this._successMessage = this.$t('ok')
+      }
     },
     props: {
       progress: {
@@ -64,8 +70,7 @@
       },
       successMessage: {
         type: String,
-        required: false,
-        'default': 'OK'
+        required: false
       },
       currentLog: {
         required: false,

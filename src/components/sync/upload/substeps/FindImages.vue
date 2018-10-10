@@ -2,13 +2,13 @@
   <sync-sub-step
     :working="working"
     :success="success"
-    success-message="DONE"
+    :success-message="$t('done')"
     :current-log="currentLog"
     :cancel="stopWorking"
     :progress="progress"
     :indeterminate="progressIndeterminate"
     :retry="retry">
-    Finding images...
+    {{ $t('finding_images') }}
   </sync-sub-step>
 </template>
 
