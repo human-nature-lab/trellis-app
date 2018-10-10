@@ -41,7 +41,8 @@
               </v-flex>
               <v-flex v-else-if="state === 'found-location'">
                 <v-icon color="success">check</v-icon>
-                {{$t('position_success')}} {{lastKnownCoordinates}}
+                <v-flex>{{$t('position_success')}}</v-flex>
+                <v-flex>{{lastKnownCoordinates}}</v-flex>
               </v-flex>
               <v-flex v-else-if="state === 'use-last-location'">
                 {{$t('last_known_position', [lastKnownCoordinates])}}
@@ -86,10 +87,8 @@
       vueInstance.tryForPosition(resolve, reject)
     }).then(coords => {
       data.isOpen = false
-      debugger
       return coords
     })
-
   }
 
   export default {
@@ -116,7 +115,6 @@
         this.getPosition().then(pos => {
           this.state = 'found-location'
           setTimeout(() => {
-            debugger
             this.resolve(pos)
           }, dialogCloseDelay)
         }).catch(err => {
