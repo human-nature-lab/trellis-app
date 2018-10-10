@@ -22,7 +22,7 @@ export default function dataPersistSlave (interviewId: string, dataStore: DataSt
     let dataDiff = DiffService.dataDiff(newState.data, prevState.data)
     let tagDiff = DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
     let diff = new InterviewDeltaInterface(dataDiff, tagDiff)
-    console.log('saving data', JSON.stringify(newState, null, 2))
+    // console.log('saving data', JSON.stringify(newState, null, 2))
     return InterviewService.saveData(interviewId, diff)
   }
   function shouldSave (newState: InterviewDataInterface, prevState: InterviewDataInterface) {

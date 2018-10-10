@@ -289,7 +289,7 @@ export default function () {
         validateLocation(manager.location, {section: 0, page: 0})
         selectChoice(manager, '2', false)
         let actions = manager['actions'].actions.map(a => a.copy())
-        console.log('actions', JSON.stringify(actions))
+        // console.log('actions', JSON.stringify(actions))
         const nManager = await setupInterviewManager(forms.conditionAssignment, respondentId3, studyId, actions)
         nManager.initialize()
         validateLocation(manager.location, {section: 0, page: 0})

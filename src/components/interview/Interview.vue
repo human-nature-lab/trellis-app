@@ -239,7 +239,6 @@
         this.location = interviewState.location
         this.sectionTranslation = interviewState.navigator.currentSection().nameTranslation
         this.pageNum = interviewState.location.page
-        console.log('recalculating page questions')
         // The reference to this.location needs to be here so that we have a dependency on this.location
         let questions = interviewState.getPageQuestions(
           this.location.section,

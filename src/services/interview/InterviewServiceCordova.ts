@@ -197,9 +197,45 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
         await manager.update(QuestionDatum, { id: removedQuestionDatum.id }, { deletedAt: new Date() })
       }
 
+      // TODO: Foreign key constraint issue when inserting QuestionDatum with followUpDatumId before referenced Datum is inserted
       // Insert second
-      await manager.save(diff.data.questionDatum.added)
-      await manager.save(diff.data.datum.added)
+      for (let addedQuestionDatum of diff.data.questionDatum.added) {
+        await manager.insert(QuestionDatum, {
+          id: addedQuestionDatum.id,
+          questionId: addedQuestionDatum.questionId,
+          surveyId: addedQuestionDatum.surveyId,
+          followUpDatumId: addedQuestionDatum.followUpDatumId,
+          sectionRepetition: addedQuestionDatum.sectionRepetition,
+          answeredAt: addedQuestionDatum.answeredAt,
+          skippedAt: addedQuestionDatum.skippedAt,
+          dkRf: addedQuestionDatum.dkRf,
+          dkRfVal: addedQuestionDatum.dkRfVal,
+          createdAt: addedQuestionDatum.createdAt,
+          updatedAt: addedQuestionDatum.updatedAt,
+          deletedAt: addedQuestionDatum.deletedAt
+        })
+      }
+
+      for (let addedDatum of diff.data.datum.added) {
+        await manager.insert(Datum, {
+          id: addedDatum.id,
+          choiceId: addedDatum.choiceId,
+          datumTypeId: addedDatum.datumTypeId,
+          edgeId: addedDatum.edgeId,
+          eventOrder: addedDatum.eventOrder,
+          geoId: addedDatum.geoId,
+          name: addedDatum.name,
+          photoId: addedDatum.photoId,
+          questionDatumId: addedDatum.questionDatumId,
+          rosterId: addedDatum.rosterId,
+          sortOrder: addedDatum.sortOrder,
+          surveyId: addedDatum.surveyId,
+          val: addedDatum.val,
+          createdAt: addedDatum.createdAt,
+          updatedAt: addedDatum.updatedAt,
+          deletedAt: addedDatum.deletedAt
+        })
+      }
 
       // Update last
       for (let updatedQuestionDatum of diff.data.questionDatum.modified) {

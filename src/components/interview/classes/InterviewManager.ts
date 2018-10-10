@@ -432,7 +432,6 @@ export default class InterviewManager extends InterviewManagerBase {
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
-    console.log('Getting question by varname', varName, sectionFollowUpRepetition)
     let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
     for (let qD of questionDatum) {
       if (qD.data.findIndex(d => d.eventOrder === sectionFollowUpRepetition) > -1) {

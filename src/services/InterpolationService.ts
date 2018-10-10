@@ -1,6 +1,6 @@
 import { sharedInterviewInstance } from '../components/interview/classes/InterviewManager'
-import { EdgeService } from './edge/EdgeService'
-import { RosterService } from './roster/RosterService'
+import EdgeService from './edge/EdgeService'
+import RosterService from './roster/RosterService'
 import StringInterpolationService from './StringInterpolationService'
 
 export default class InterpolationService {
@@ -26,14 +26,20 @@ export default class InterpolationService {
     try {
       let questionDatum = interviewManager.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpRepetition)
       let question = interviewManager.questionIndex.get(questionDatum.questionId)
+      let followUpDatum
+      if (location.sectionFollowUpDatumId) {
+        followUpDatum = questionDatum.data.find(d => d.id === location.sectionFollowUpDatumId)
+      }
       let datum = questionDatum.data.find(d => d.eventOrder === location.sectionFollowUpRepetition)
       switch (question.questionType.name) {
         case 'relationship':
-          const edges = await EdgeService.getEdges([datum.edgeId])
+          let edgeId = (followUpDatum) ? followUpDatum.edgeId : datum.edgeId
+          const edges = await EdgeService.getEdges([edgeId])
           return edges[0].targetRespondent.name
         case 'roster':
-          const roster = await RosterService.getRosterRows(questionDatum.data.map(d => d.rosterId))
-          return roster.val
+          let rosterId = (followUpDatum) ? followUpDatum.rosterId : datum.rosterId
+          const roster = await RosterService.getRosterRows([rosterId])
+          return roster[0].val
         default:
           return datum.val
       }
