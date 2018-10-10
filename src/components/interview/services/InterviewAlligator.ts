@@ -7,18 +7,19 @@ import Datum from "../../../entities/trellis/Datum";
 import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 import Question from "../../../entities/trellis/Question";
 import SkipService from "../../../services/SkipService";
-import {InterviewLocation} from "./InterviewNavigator";
 import Action from "../../../entities/trellis/Action";
 import {locToNumber} from "./LocationHelpers";
 
-interface Location {
-  pageId: string
-  sectionId: string
+export interface InterviewLocation {
   section: number
-  page: number
   sectionRepetition: number
-  followUpDatumId: string
+  sectionFollowUpRepetition: number
+  page: number
+  sectionFollowUpDatumId?: string
+  sectionId?: string
+  pageId?: string
 }
+
 
 export default class InterviewAlligator {
   private index = 0

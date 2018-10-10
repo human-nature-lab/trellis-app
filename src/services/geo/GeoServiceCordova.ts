@@ -120,7 +120,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       currentGeoId = geo.parentId
       count++
     }
-    return ancestors
+    return ancestors.reverse()
   }
 
   async search (params) {

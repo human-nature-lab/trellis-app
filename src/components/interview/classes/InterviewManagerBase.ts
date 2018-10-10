@@ -2,7 +2,7 @@ import Emitter from "../../../classes/Emitter";
 import Form from "../../../entities/trellis/Form";
 import ConditionTagStore from "./ConditionTagStore";
 import Page from "../../../entities/trellis/QuestionGroup";
-import InterviewNavigator, {InterviewLocation} from "../services/InterviewNavigator";
+import {InterviewLocation} from "../services/InterviewAlligator";
 import Section from "../../../entities/trellis/Section";
 import RespondentFillStore from "./RespondentFillStore";
 import Question from "../../../entities/trellis/Question";
