@@ -3,9 +3,7 @@
     <v-toolbar flat>
       <v-toolbar-title>{{title}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <permission :role-whitelist="['admin','supervisor','manager']">
-        <AddPhoto v-if="allowAdding" @photo="onAddPhoto"/>
-      </permission>
+      <AddPhoto v-if="allowAdding" @photo="onAddPhoto"/>
     </v-toolbar>
     <v-layout row align-content-start wrap>
       <v-flex
@@ -43,15 +41,13 @@
 
 <script>
   import Photo from './Photo'
-  import Permission from '../Permission'
   import AddPhoto from './AddPhoto'
   import PhotoService from '../../services/photo/PhotoService'
   import URL_PLACEHOLDER from '../../assets/Placeholder_person.jpg'
   export default {
     components: {
       Photo,
-      AddPhoto,
-      Permission
+      AddPhoto
     },
     data () {
       this._srcCache = {}
