@@ -28,7 +28,7 @@ export default interface ConditionTagInterface {
    * Get all of the available condition tags
    * @returns {Array} - An array of condition tags
    */
-  respondent (): Promise<RespondentConditionTag[]>
+  respondent (): Promise<ConditionTag[]>
 
   /**
    * Get all condition tags

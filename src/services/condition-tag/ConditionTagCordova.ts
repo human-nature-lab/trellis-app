@@ -3,19 +3,20 @@ import ConditionTagInterface from './ConditionTagInterface'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'
 import uuid from 'uuid/v4'
+import {IsNull} from "typeorm";
 
 export class ConditionTagCordova implements ConditionTagInterface {
 
-  async getRespondentConditionTagById (respondentConditionTagId) {
-    const repository = await DatabaseService.getRepository(RespondentConditionTag)
-    const respondentConditionTag = await repository.findOneOrFail({
+  async getRespondentConditionTagById (respondentConditionTagId: string): Promise<RespondentConditionTag> {
+    const repo = await DatabaseService.getRepository(RespondentConditionTag)
+    const respondentConditionTag: RespondentConditionTag = await repo.findOneOrFail({
       id: respondentConditionTagId,
-      deletedAt: null
+      deletedAt: IsNull()
     })
     return respondentConditionTag
   }
 
-  async createConditionTag (name) {
+  async createConditionTag (name: string): Promise<ConditionTag> {
     const connection = await DatabaseService.getDatabase()
     const conditionTag = new ConditionTag()
     conditionTag.id = uuid()
@@ -24,7 +25,7 @@ export class ConditionTagCordova implements ConditionTagInterface {
     return conditionTag
   }
 
-  async createRespondentConditionTag (respondentId, conditionTagId) {
+  async createRespondentConditionTag (respondentId: string, conditionTagId: string): Promise<RespondentConditionTag> {
     const connection = await DatabaseService.getDatabase()
     const respondentConditionTag = new RespondentConditionTag()
     respondentConditionTag.respondentId = respondentId
@@ -33,7 +34,7 @@ export class ConditionTagCordova implements ConditionTagInterface {
     return await this.getRespondentConditionTagById(returnConditionTag.id)
   }
 
-  async removeRespondentConditionTag (respondentId, conditionTagId) {
+  async removeRespondentConditionTag (respondentId: string, conditionTagId: string): Promise<void> {
     console.log('removeRespondentConditionTag', conditionTagId)
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentConditionTag)
@@ -42,18 +43,17 @@ export class ConditionTagCordova implements ConditionTagInterface {
     console.log('removedRCT', removedRCT)
   }
 
-  async respondent () {
-    const connection = await DatabaseService.getDatabase()
-    const repository = await connection.getRepository(ConditionTag)
-    const queryBuilder = await repository.createQueryBuilder('condition_tag')
+  async respondent (): Promise<ConditionTag[]>   {
+    const repo = await DatabaseService.getRepository(ConditionTag)
+    const queryBuilder = await repo.createQueryBuilder('condition_tag')
     let q = queryBuilder.where('id in (select condition_tag_id from respondent_condition_tag)')
+      .orWhere(`id in (select condition_tag_id from assign_condition_tag where scope='respondent')`)
     return await q.getMany()
   }
 
-  async all () {
-    const connection = await DatabaseService.getDatabase()
-    const repository = await connection.getRepository(ConditionTag)
-    return await repository.find()
+  async all (): Promise<ConditionTag[]> {
+    const repo = await DatabaseService.getRepository(ConditionTag)
+    return await repo.find()
   }
 }
 
