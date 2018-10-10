@@ -98,7 +98,7 @@
           if (!img) return
 
           // Handle images that are already loaded before the nextTick
-          if (img.complete) {
+          if (img.complete && img.naturalWidth !== 0) {
             this.imgLoading = false
             this.imgLoaded = true
             return

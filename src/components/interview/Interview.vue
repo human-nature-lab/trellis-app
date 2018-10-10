@@ -289,7 +289,6 @@
       exit () {
         this.alreadyExited = true
         moveToNextOr(() => {
-          debugger
           this.redirectToComplete()
         })
       },

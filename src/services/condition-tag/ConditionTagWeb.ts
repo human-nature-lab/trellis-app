@@ -24,9 +24,9 @@ export class ConditionTagWeb implements ConditionTagInterface {
       .then(res => res.data)
   }
 
-  respondent () {
-    return http().get('/condition-tags/respondent')
-      .then(res => res.data.conditions.map(r => new RespondentConditionTag().fromSnakeJSON(r)))
+  async respondent (): Promise<ConditionTag[]> {
+    const res = await http().get('/condition-tags/respondent')
+    return res.data.conditions.map(c => new ConditionTag().fromSnakeJSON(c))
   }
 
   all () {
