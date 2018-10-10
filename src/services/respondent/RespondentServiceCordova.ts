@@ -93,6 +93,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       q = q.andWhere('"respondent"."id" in (select distinct respondent_id from respondent_geo where geo_id in (:geoIds))', {geoIds: geoIds})
     }
 
+    q = q.andWhere('"respondent"."deleted_at" is null')
     q = q.limit(size).offset(page * size)
     q = q.leftJoinAndSelect('respondent.photos', 'photo')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
