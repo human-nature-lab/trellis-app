@@ -3,7 +3,7 @@ import SortedArray from '../../../classes/SortedArray'
 import {now, parseDate} from '../../../services/DateService'
 import Action from '../../../entities/trellis/Action'
 import Form from '../../../entities/trellis/Form'
-import {InterviewLocation} from '../services/InterviewNavigator'
+import {InterviewLocation} from '../services/InterviewAlligator'
 import AT from '../../../static/action.types'
 import {locToNumber} from "../services/LocationHelpers";
 import {ActionPayload} from "../services/actions/DatumOperations";

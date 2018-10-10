@@ -1,6 +1,5 @@
 /**
  * Simple storage that will persist things in localStorage and cache them in memory if they are still being used
- * TODO: Encode the data format with the stored values instead of requiring them as an argument
  */
 export class StorageService {
   constructor () {

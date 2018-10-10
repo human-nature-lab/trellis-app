@@ -4,6 +4,7 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import ConditionTag from './ConditionTag'
 import {now} from '../../services/DateService'
+import conditionTagStore from '../../components/interview/classes/ConditionTagStore'
 
 interface SurveyConditionTagRecyclerData {
   id: string
@@ -47,8 +48,8 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
     this.createdAt = now()
     this.updatedAt = now()
 
-    if (!data.conditionTag) {
-      // TODO: Lookup and assign the condition tag
+    if (!data.conditionTag && !this.conditionTag) {
+      this.conditionTag = conditionTagStore.getTagById(this.conditionId)
     }
     return this
   }

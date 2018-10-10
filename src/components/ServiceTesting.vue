@@ -100,7 +100,6 @@
         }
       },
       async validateLoggedIn () {
-        // TODO: Validate that both versions are logged in
         await (new LoginServiceCordova()).login(config.user.username, config.user.password)
         await (new LoginServiceWeb()).login(config.user.username, config.user.password)
         return true

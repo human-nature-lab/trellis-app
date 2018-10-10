@@ -276,10 +276,6 @@ export default class DataStore extends Emitter {
     return this.questionDatumIdMap.get(id)
   }
 
-  /**
-   * TODO: Copy the datastore into a new version
-   */
-  copy () {return []}
 }
 
 /**

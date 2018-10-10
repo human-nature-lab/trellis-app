@@ -6,7 +6,7 @@ import dataPersistSlave from '../services/DataPersistSlave'
 import actionsPersistSlave from '../services/ActionsPersistSlave'
 import AT from '../../../static/action.types'
 
-import {InterviewLocation} from '../services/InterviewNavigator'
+import {InterviewLocation} from '../services/InterviewAlligator'
 import Form from '../../../entities/trellis/Form'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import Action from '../../../entities/trellis/Action'
@@ -458,13 +458,6 @@ export default class InterviewManager extends InterviewManagerBase {
     return this.getFollowUpQuestionDatumData(this.location.sectionFollowUpDatumId)
   }
 
-  /**
-   * Make a copy of the current interview
-   * @returns {Interview}
-   */
-  copy () {
-    return new InterviewManager(this.interview.copy(), this.blueprint.copy(), [], this.data.copy())
-  }
 }
 
 export let sharedInterviewInstance = null

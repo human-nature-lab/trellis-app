@@ -25,7 +25,7 @@
         </v-card>
       </v-stepper-content>
 
-      <v-stepper-step step="2" :complete="step > 2">{{$t('add_photos')}}}</v-stepper-step>
+      <v-stepper-step step="2" :complete="step > 2">{{$t('add_photos')}}</v-stepper-step>
       <v-stepper-content step="2">
         <v-card v-if="respondent">
           <v-card-text>
@@ -99,6 +99,7 @@
           this.respondentExists = true
           this.respondent = respondent
         } catch (err) {
+          debugger
           this.error = err
         } finally {
           this.isSaving = false

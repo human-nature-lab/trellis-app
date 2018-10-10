@@ -21,8 +21,6 @@
   import PhotoService from '../../services/photo/PhotoService'
   import URL_PLACEHOLDER from '../../assets/Placeholder_person.jpg'
 
-  // TODO: consider replacing this with a material design icon.
-  // Material design icons can't be dynamically sized very well, so image is better. SVG would work though....
   const observer = new IntersectionObserver(handleIntersections, {
     threshold: 0.5
   })

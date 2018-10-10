@@ -137,47 +137,56 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
   async createRespondent (studyId, name, geoId = null, associatedRespondentId = null) {
     const connection = await DatabaseService.getDatabase()
+    const queryRunner = connection.createQueryRunner()
+    await queryRunner.startTransaction()
+    try {
+      const respondent = new Respondent()
+      respondent.assignedId = null
+      respondent.geoId = geoId
+      respondent.notes = ''
+      respondent.geoNotes = ''
+      respondent.name = name
+      respondent.associatedRespondentId = associatedRespondentId
+      await queryRunner.manager.save(respondent)
 
-    // TODO: Put this in a transaction
-    const respondent = new Respondent()
-    respondent.assignedId = null
-    respondent.geoId = geoId
-    respondent.notes = ''
-    respondent.geoNotes = ''
-    respondent.name = name
-    respondent.associatedRespondentId = associatedRespondentId
-    await connection.manager.save(respondent)
+      const respondentName = new RespondentName()
+      respondentName.isDisplayName = true
+      respondentName.name = name
+      respondentName.respondentId = respondent.id
+      respondentName.localeId = null
+      respondentName.previousRespondentNameId = null
+      await queryRunner.manager.save(respondentName)
 
-    const respondentName = new RespondentName()
-    respondentName.isDisplayName = true
-    respondentName.name = name
-    respondentName.respondentId = respondent.id
-    respondentName.localeId = null
-    respondentName.previousRespondentNameId = null
-    await connection.manager.save(respondentName)
+      if (geoId !== null) {
+        const respondentGeo = new RespondentGeo()
+        respondentGeo.geoId = geoId
+        respondentGeo.respondentId = respondent.id
+        respondentGeo.previousRespondentGeoId = null
+        respondentGeo.notes = ''
+        respondentGeo.isCurrent = true
+        await queryRunner.manager.save(respondentGeo)
+      }
 
-    if (geoId !== null) {
-      const respondentGeo = new RespondentGeo()
-      respondentGeo.geoId = geoId
-      respondentGeo.respondentId = respondent.id
-      respondentGeo.previousRespondentGeoId = null
-      respondentGeo.notes = ''
-      respondentGeo.isCurrent = true
-      await connection.manager.save(respondentGeo)
+      const studyRespondent = new StudyRespondent()
+      studyRespondent.studyId = studyId
+      studyRespondent.respondentId = respondent.id
+      await queryRunner.manager.save(studyRespondent)
+
+      await queryRunner.commitTransaction()
+
+      const repository = connection.getRepository(Respondent)
+      return await repository.findOne({
+        where: {
+          id: respondent.id
+        },
+        relations: ['photos', 'names']
+      })
+    } catch (err) {
+      console.error(err)
+      await queryRunner.rollbackTransaction()
+      throw err
     }
 
-    const studyRespondent = new StudyRespondent()
-    studyRespondent.studyId = studyId
-    studyRespondent.respondentId = respondent.id
-    await connection.manager.save(studyRespondent)
-
-    const repository = connection.getRepository(Respondent)
-    return repository.findOne({
-      where: {
-        id: respondent.id
-      },
-      relations: ['photos', 'names']
-    })
   }
 
   async addRespondentGeo (respondentId: string, geoId: string): Promise<RespondentGeo> {

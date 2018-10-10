@@ -22,7 +22,7 @@ import {deepCompareEntities, isSorted, j, strip, timestamps} from "./helpers";
 import Action from "../../src/entities/trellis/Action";
 import {ActionPayload} from "../../src/components/interview/services/actions/DatumOperations";
 import Question from "../../src/entities/trellis/Question";
-import {InterviewLocation} from "../../src/components/interview/services/InterviewNavigator";
+import {InterviewLocation} from "../../src/components/interview/services/InterviewAlligator";
 import QuestionDatum from "../../src/entities/trellis/QuestionDatum";
 import {ConditionTagInterface} from "../../src/services/interview/InterviewDataInterface";
 import {locToNumber} from "../../src/components/interview/services/LocationHelpers";
