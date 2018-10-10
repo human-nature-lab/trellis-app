@@ -8,7 +8,7 @@
       ref="img"
       :src="src"
       :alt="alt"
-      v-if="srcLoaded"/>
+      v-if="srcLoaded" />
   </v-flex>
 </template>
 
@@ -17,7 +17,7 @@
   import URL_PLACEHOLDER from '../../assets/Placeholder_person.jpg'
 
   // TODO: consider replacing this with a material design icon.
-  // This can't be dynamically sized, so image is better
+  // Material design icons can't be dynamically sized very well, so image is better. SVG would work though....
   const observer = new IntersectionObserver(handleIntersections, {
     threshold: 0.5
   })
@@ -96,6 +96,14 @@
           let _this = this
           let img = this.$refs.img
           if (!img) return
+
+          // Handle images that are already loaded before the nextTick
+          if (img.complete) {
+            this.imgLoading = false
+            this.imgLoaded = true
+            return
+          }
+
           img.addEventListener('load', function () {
             _this.imgLoading = false
             _this.imgLoaded = true
@@ -132,9 +140,9 @@
         }
       },
       cancelLoad () {
-        if (this.srcLoaded && this.imgLoaded) return
         this.imgLoading = false
         this.srcLoading = false
+        if (this.srcLoaded && this.imgLoaded) return
         if (this.loadingPromise && this.loadingPromise.cancel) {
           this.srcLoading = false
           this.srcLoaded = false
