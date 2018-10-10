@@ -128,25 +128,37 @@
     },
     methods: {
       async startInterview (form: DisplayForm) {
-        if (form.isComplete) return
-        let interview
-        try {
-          const coords: Coordinates = await getCurrentPosition()
-          this.global.loading.active = true
-          if (form.isStarted) {
-            // TODO: Get the current device location
-            interview = await InterviewService.create(form.surveys[0].id, coords)
-          } else {
-            let survey = await SurveyService.create(this.global.study.id, this.respondent.id, form.id)
-            interview = await InterviewService.create(survey.id, null)
-          }
-          pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
-        } catch (err) {
-          this.global.loading.active = false
-          this.error = err
-          console.error(err)
-          alert('Trellis requires access to your location before starting an interview')
+        if (form.isComplete) {
+          alert(`Can't reopen a form that has already been completed`)
+          return
         }
+        let interview
+        this.global.loading.active = true
+        let surveyId
+        if (form.isStarted) {
+          surveyId = form.surveys[0].id
+        } else {
+          try {
+            let survey = await SurveyService.create(this.global.study.id, this.respondent.id, form.id)
+            surveyId = survey.id
+          } catch (err) {
+            console.error(err)
+            alert('Unable to create new survey')
+          }
+        }
+        if (surveyId) {
+          try {
+            const coords: Coordinates = await getCurrentPosition()
+            interview = await InterviewService.create(surveyId, coords)
+            pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
+          } catch (err) {
+            this.error = err
+            console.error(err)
+            alert('Unable to create new interview on survey: ' + surveyId)
+            alert(err)
+          }
+        }
+        this.global.loading.active = false
       },
       hydrate (data: RespondentFormsData) {
           // Join any surveys that have been created with the possible forms
