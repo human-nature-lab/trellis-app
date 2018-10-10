@@ -59,7 +59,7 @@ export default class InterviewAlligator {
     if (this.hasDataChanges) {
       this.updatePages()
     } else {
-      console.log('no data updates found')
+      // console.log('no data updates found')
     }
   }
 

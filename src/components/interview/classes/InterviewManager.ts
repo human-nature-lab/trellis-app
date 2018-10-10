@@ -189,17 +189,15 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 
   next () {
-    if (this._debugReplay) debugger
-    // console.log('pre replay location', this.location)
+    // console.log('pre replay location', this.location, this.navigator.isAtEnd)
     this.replayToCurrent()
     // this.data.emitChange()
-    // console.log('post replay location', this.location)
+    // console.log('post replay location', this.location, this.navigator.isAtEnd)
     this.stepForward()
-    // console.log('post step location', this.location)
+    // console.log('post step location', this.location, this.navigator.isAtEnd)
   }
 
   previous () {
-    if (this._debugReplay) debugger
     this.stepBackward()
     this.replayToCurrent()
   }
@@ -257,9 +255,7 @@ export default class InterviewManager extends InterviewManagerBase {
           isRequired = false
         }
       }
-      if (isIntro) {
-        return true
-      } else if (isReadOnly) {
+      if (isIntro || isReadOnly || !isRequired) {
         return true
       } else if (isRequired) {
         // TODO: Check if dkRf are allowed
@@ -350,6 +346,7 @@ export default class InterviewManager extends InterviewManagerBase {
     // console.log('desired location', {section, page, sectionRepetition, sectionFollowUpRepetition})
     let currentLoc = locToNumber(this.navigator.loc)
     const desiredLoc = locToNumber({section, page, sectionRepetition, sectionFollowUpRepetition})
+    // console.log('current location', currentLoc, desiredLoc)
     if (currentLoc < desiredLoc) {
       let c
       for (c = 0; c < 100; c++) {
@@ -432,7 +429,7 @@ export default class InterviewManager extends InterviewManagerBase {
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
-    console.log('Getting question by varname', varName, sectionFollowUpRepetition)
+    // console.log('Getting question by varname', varName, sectionFollowUpRepetition)
     let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
     for (let qD of questionDatum) {
       if (qD.data.findIndex(d => d.eventOrder === sectionFollowUpRepetition) > -1) {
