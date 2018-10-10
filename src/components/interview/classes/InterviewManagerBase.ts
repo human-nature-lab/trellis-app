@@ -72,6 +72,7 @@ export default class InterviewManagerBase extends Emitter {
           return questionA.sortOrder - questionB.sortOrder
         })
         for (let question of page.questions) {
+          question.varName = question.varName.trim()
           this.varNameIndex.set(question.varName, question.id)
           this.questionIndex.set(question.id, question)
           if (question.choices) {
