@@ -99,8 +99,29 @@ export default class InterviewLoader {
       ])
     }).then(res => {
       let [actions, data, form, respondentFills] = res
-      // TODO: return base respondent condition tags
-      let baseRespondentConditionTags: RespondentConditionTag[] = []
+
+      // Base respondent condition tags start with all respondent scope condition tags
+      let baseRespondentConditionTags: RespondentConditionTag[] = data.conditionTags.respondent
+
+      // Then we need to loop through questions and find all assigned condition tags in this form
+      // We'll store the condition tag IDs in this object
+      let conditionTagIds = {}
+      form.sections.forEach((section) => {
+        section.questionGroups.forEach((questionGroup) => {
+          questionGroup.questions.forEach((question) => {
+            question.assignConditionTags.forEach((act) => {
+              console.log('act', act)
+              conditionTagIds[act.conditionTagId] = true
+            })
+          })
+        })
+      })
+
+      // Now let's filter out any condition tags that may be assigned by the current form
+      baseRespondentConditionTags = baseRespondentConditionTags.filter((rct) => {
+        return (! conditionTagIds.hasOwnProperty(rct.conditionTagId))
+      })
+      // We're left by condition tags that were assigned outside of the scope of this form
 
       return {
         interview,
