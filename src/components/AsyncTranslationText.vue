@@ -11,7 +11,7 @@
   import global from '../static/singleton'
 
   export default {
-    name: 'AsyncTranslationText',
+    name: 'async-translation-text',
     props: {
       translation: {
         type: Object,
