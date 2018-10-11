@@ -471,9 +471,10 @@ export function sharedInterview (interview: Interview,
                                  actions?: Action[],
                                  data?: QuestionDatum[],
                                  conditionTags?: ConditionTagInterface,
-                                 respondentFills?: RespondentFill[]) {
+                                 respondentFills?: RespondentFill[],
+                                 baseRespondentConditionTags?: RespondentCondtionTag[]) {
   if (!sharedInterviewInstance) {
-    sharedInterviewInstance = new InterviewManager(interview, blueprint, actions, data, conditionTags, respondentFills)
+    sharedInterviewInstance = new InterviewManager(interview, blueprint, actions, data, conditionTags, respondentFills, baseRespondentConditionTags)
   }
   return sharedInterviewInstance
 }
