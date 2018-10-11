@@ -30,6 +30,12 @@
         localTranslation: this.translation
       }
     },
+    watch: {
+      translation (newTranslation) {
+        this.localTranslation = newTranslation
+        this.loadTranslation()
+      }
+    },
     created () {
       this.loadTranslation()
     },
@@ -39,6 +45,7 @@
         if (this.localTranslation && this.localTranslation.translationText && this.localTranslation.translationText.length) {
           return this.getTranslated()
         }
+        this.translated = this.$t('loading')
         this.localTranslation.translationText = await TranslationTextService.getTranslatedTextByTranslationId(this.localTranslation.id)
         // If you are in an interview, interpolate any fills
         if (this.location) {
