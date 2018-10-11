@@ -20,6 +20,7 @@ import QT from '../../../static/question.types'
 import PT from '../../../static/parameter.types'
 import {locToNumber} from "../services/LocationHelpers";
 import InterviewAlligator from "../services/InterviewAlligator";
+import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 
 export default class InterviewManager extends InterviewManagerBase {
 
@@ -32,7 +33,8 @@ export default class InterviewManager extends InterviewManagerBase {
     actions?: Action[],
     data?: QuestionDatum[],
     conditionTags?: ConditionTagInterface,
-    respondentFills?: RespondentFill[]
+    respondentFills?: RespondentFill[],
+    baseRespondentConditionTags?: RespondentConditionTag[]
   ) {
     super()
 
@@ -472,7 +474,7 @@ export function sharedInterview (interview: Interview,
                                  data?: QuestionDatum[],
                                  conditionTags?: ConditionTagInterface,
                                  respondentFills?: RespondentFill[],
-                                 baseRespondentConditionTags?: RespondentCondtionTag[]) {
+                                 baseRespondentConditionTags?: RespondentConditionTag[]) {
   if (!sharedInterviewInstance) {
     sharedInterviewInstance = new InterviewManager(interview, blueprint, actions, data, conditionTags, respondentFills, baseRespondentConditionTags)
   }
