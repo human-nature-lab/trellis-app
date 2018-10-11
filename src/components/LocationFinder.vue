@@ -34,15 +34,20 @@
                   <v-btn v-if="lastKnownCoordinates" @click="useLastPosition">
                     {{$t('use_last_position')}}
                   </v-btn>
+                  <v-btn @click="skip">
+                    {{$t('skip')}}
+                  </v-btn>
                   <v-btn @click="retry">
-                    {{$t('retry')}}}
+                    {{$t('retry')}}
                   </v-btn>
                 </v-layout>
               </v-flex>
               <v-flex v-else-if="state === 'found-location'">
                 <v-icon color="success">check</v-icon>
                 <v-flex>{{$t('position_success')}}</v-flex>
-                <v-flex>{{lastKnownCoordinates}}</v-flex>
+                <v-layout>
+                  Lat: {{lastKnownCoordinates.latitude}} Long: {{lastKnownCoordinates.longitude}}
+                </v-layout>
               </v-flex>
               <v-flex v-else-if="state === 'use-last-location'">
                 {{$t('last_known_position', [lastKnownCoordinates])}}
@@ -108,10 +113,14 @@
         this.reject = reject
         this.retry()
       },
+      skip () {
+        this.resolve(null)
+      },
       useLastPosition () {
         this.resolve(this.lastKnownCoordinates)
       },
       retry () {
+        this.state = 'detecting'
         this.getPosition().then(pos => {
           this.state = 'found-location'
           setTimeout(() => {

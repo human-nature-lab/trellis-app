@@ -37,10 +37,10 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     interview.startTime = now()
     interview.surveyId = surveyId
     interview.userId = user.id
-    if (coordinates) {
-      interview.latitude = coordinates.latitude.toString()
-      interview.longitude = coordinates.longitude.toString()
-      interview.altitude = coordinates.altitude.toString()
+    if (coordinates && coordinates.latitude) {
+      interview.latitude = coordinates.latitude ? coordinates.latitude.toString(): null
+      interview.longitude = coordinates.longitude ? coordinates.longitude.toString(): null
+      interview.altitude = coordinates.altitude ? coordinates.altitude.toString(): null
     }
     interview = await repo.save(interview)
     return await this.getInterview(interview.id)
