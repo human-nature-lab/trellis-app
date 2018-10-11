@@ -3,12 +3,9 @@ import DatabaseService from '../database/DatabaseService'
 import StudyForm from '../../entities/trellis/StudyForm'
 import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'
-import QuestionGroup from '../../entities/trellis/QuestionGroup'
 import {In, IsNull} from 'typeorm'
 import {removeSoftDeleted} from "../database/SoftDeleteHelper";
 import {isEqual} from 'lodash'
-import Section from '../../entities/trellis/Section'
-import SectionQuestionGroup from '../../entities/trellis/SectionQuestionGroup'
 
 export default class FormServiceCordova implements FormServiceInterface {
 
@@ -60,6 +57,8 @@ export default class FormServiceCordova implements FormServiceInterface {
     })
 
     console.log('finished form', form)
+
+    removeSoftDeleted(form)
 
     return form
   }
