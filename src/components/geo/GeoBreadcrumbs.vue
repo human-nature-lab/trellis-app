@@ -12,20 +12,17 @@
         :to="{name: 'Geo', params: {geoId: geo.id}}"
         v-for="geo in ancestors"
         :key="geo.id">
-        <async-translation-text :translation="geo.nameTranslation"></async-translation-text>
+        <AsyncTranslationText :translation="geo.nameTranslation"></AsyncTranslationText>
       </router-link>
     </span>
   </span>
 </template>
 
-<script lang="ts">
-  import AsyncTranslationText from '../../components/AsyncTranslationText.vue'
+<script>
+  import AsyncTranslationText from '../AsyncTranslationText'
   import GeoService from '../../services/geo/GeoService'
-  import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
-  import Vue from 'vue'
-  import Geo from '../../entities/trellis/Geo'
-  export default Vue.extend({
+  export default {
     name: 'geo-breadcrumbs',
     props: {
       geoId: {
@@ -68,7 +65,7 @@
       }
     },
     components: {AsyncTranslationText}
-  })
+  }
 </script>
 
 <style lang="sass" scoped>
