@@ -10,6 +10,7 @@ import Action from '../../../entities/trellis/Action'
 import Form from '../../../entities/trellis/Form'
 import InterviewDataInterface, {ConditionTagInterface} from '../../../services/interview/InterviewDataInterface'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
+import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 
 export interface InterviewData {
   respondentFills?: RespondentFill[]
@@ -84,7 +85,8 @@ export default class InterviewLoader {
     actions: Action[],
     data: InterviewDataInterface,
     form: Form,
-    respondentFills: RespondentFill[]
+    respondentFills: RespondentFill[],
+    baseRespondentConditionTags: RespondentConditionTag[]
   }> {
     let interview
     return InterviewService.getInterview(interviewId).then(int => {
@@ -93,16 +95,20 @@ export default class InterviewLoader {
         InterviewService.getActions(interviewId),
         InterviewService.getData(interviewId),
         FormService.getForm(interview.survey.formId, true),
-        RespondentService.getRespondentFillsById(interview.survey.respondentId),
+        RespondentService.getRespondentFillsById(interview.survey.respondentId)
       ])
     }).then(res => {
       let [actions, data, form, respondentFills] = res
+      // TODO: return base respondent condition tags
+      let baseRespondentConditionTags: RespondentConditionTag[] = []
+
       return {
         interview,
         actions,
         data,
         form,
-        respondentFills
+        respondentFills,
+        baseRespondentConditionTags
       }
     })
   }
