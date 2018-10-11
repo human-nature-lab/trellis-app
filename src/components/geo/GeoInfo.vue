@@ -2,7 +2,7 @@
   <v-flex xs12>
     <v-card tile>
       <v-toolbar card prominent>
-        <v-toolbar-title>{{ $t('geo') }}: {{translated}}</v-toolbar-title>
+        <v-toolbar-title>{{ $t('geo') }}: <AsyncTranslationText :translation="geo.nameTranslation"></AsyncTranslationText></v-toolbar-title>
         <v-spacer />
         <v-btn @click="viewRespondents">
           {{ $t('respondents') }}
@@ -26,6 +26,8 @@
   import GeoBreadcrumbs from './GeoBreadcrumbs'
   // @ts-ignore
   import PhotoAlbum from '../photo/PhotoAlbum'
+  // @ts-ignore
+  import AsyncTranslationText from '../AsyncTranslationText'
   import Photo from '../../entities/trellis/Photo'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
@@ -41,7 +43,7 @@
       RouteMixinFactory((r: Route) => GeoService.getGeoById(r.params.geoId)),
       TranslationMixin
     ],
-    components: {GeoBreadcrumbs, PhotoAlbum},
+    components: {GeoBreadcrumbs, PhotoAlbum, AsyncTranslationText},
     data () {
       return {
         geo: null,

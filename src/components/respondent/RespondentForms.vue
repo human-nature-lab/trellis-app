@@ -116,13 +116,13 @@
         error: ''
       }
     },
-/*    head: {
-        title () {
-          return {
-            inner: `${this.respondent.name} Forms`
-          }
-        }
-    },*/
+    // head: {
+    //     title () {
+    //       return {
+    //         inner: `${this.respondent.name} Forms`
+    //       }
+    //     }
+    // },
     components: {
       FormsView
     },
@@ -147,8 +147,14 @@
           }
         }
         if (surveyId) {
+          let coords: Coordinates
           try {
-            const coords: Coordinates = await getCurrentPosition()
+            coords = await getCurrentPosition()
+          } catch (err) {
+            console.error(err)
+            alert('Error getting position: ' + err)
+          }
+          try {
             interview = await InterviewService.create(surveyId, coords)
             pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
           } catch (err) {
