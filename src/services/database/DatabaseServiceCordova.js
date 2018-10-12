@@ -221,6 +221,7 @@ export default class DatabaseServiceCordova {
       const selectDropsQuery = `SELECT 'DROP TABLE "' || name || '";' as query FROM "sqlite_master" WHERE "type" = 'table' AND "name" != 'sqlite_sequence'`
       const dropQueries = await queryRunner.query(selectDropsQuery)
       await Promise.all(dropQueries.map(q => queryRunner.query(q['query'])))
+      await queryRunner.query('PRAGMA foreign_keys = ON;')
       return queryRunner
     } catch (err) {
       status.message = 'Rolling back transaction...'

@@ -1,52 +1,64 @@
 <template>
-  <v-container fluid>
-    <v-alert v-if="error">
-      {{error}}
-    </v-alert>
-    <v-layout row>
-      <v-select
-        autofocus
-        autocomplete
-        v-model="conditionTag"
-        :loading="isLoading"
-        item-text="name"
-        append-icon="add"
-        :append-icon-cb="newConditionTag"
-        :items="conditions" />
-      <v-btn @click="save">
-        <v-progress-circular v-if="isSaving" indeterminate />
-        <span v-else>
-          {{ $t('save') }}
-        </span>
-      </v-btn>
-    </v-layout>
-    <v-dialog v-model="showNewConditionTag" max-width="300">
-      <v-card>
-        <v-container>
-          <v-layout row>
-            <v-text-field
-              autofocus
-              :loading="isSavingNew"
-              v-model="newConditionTagName"
-              :label="$t('condition_tag')" />
-            <v-btn @click="createNewConditionTag">
-              <v-progress-circular
-                v-if="isSavingNew"
-                indeterminate />
-              <span v-else>
-                {{ $t('save') }}
-              </span>
-            </v-btn>
-          </v-layout>
-        </v-container>
-      </v-card>
-    </v-dialog>
-  </v-container>
+  <v-dialog
+    lazy
+    :value="value"
+    @input="$emit('input', $event)">
+    <v-card>
+      <ModalTitle
+        :title="$t('add_condition_tag')"
+        @close="$emit('input', false)" />
+      <v-card-text>
+        <v-alert v-if="error">
+          {{error}}
+        </v-alert>
+        <v-layout row>
+          <v-select
+            autofocus
+            autocomplete
+            v-model="conditionTag"
+            :loading="isLoading"
+            item-text="name"
+            append-icon="add"
+            :append-icon-cb="newConditionTag"
+            :items="conditions" />
+          <v-btn @click="save">
+            <v-progress-circular v-if="isSaving" indeterminate />
+            <span v-else>
+            {{ $t('save') }}
+          </span>
+          </v-btn>
+        </v-layout>
+      </v-card-text>
+      <v-dialog lazy v-model="showNewConditionTag" max-width="300">
+        <v-card>
+          <v-container>
+            <v-layout row>
+              <v-text-field
+                autofocus
+                :loading="isSavingNew"
+                v-model="newConditionTagName"
+                :label="$t('condition_tag')" />
+              <v-btn @click="createNewConditionTag">
+                <v-progress-circular
+                  v-if="isSavingNew"
+                  indeterminate />
+                <span v-else>
+                  {{ $t('save') }}
+                </span>
+              </v-btn>
+            </v-layout>
+          </v-container>
+        </v-card>
+      </v-dialog>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
+  import ModalTitle from '../ModalTitle'
   import ConditionTagService from '../../services/condition-tag'
   export default {
+    components: {ModalTitle},
     name: 'respondent-condition-form',
     data: () => ({
       conditionTag: null,
@@ -62,6 +74,10 @@
       this.load()
     },
     props: {
+      value: {
+        type: Boolean,
+        required: true
+      },
       respondentId: {
         type: String,
         required: true

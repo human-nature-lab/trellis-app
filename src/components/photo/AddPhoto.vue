@@ -17,10 +17,15 @@
       <!--</v-list-tile>-->
     <!--</v-list>-->
   <!--</v-menu>-->
-  <v-btn @click="photoFromCamera" icon>
-    <v-progress-circular v-if="isAddingPhoto" indeterminate />
-    <v-icon v-else>add</v-icon>
-  </v-btn>
+  <span>
+    <v-tooltip lazy left>
+      <v-btn slot="activator" @click="photoFromCamera" icon>
+        <v-progress-circular v-if="isAddingPhoto" indeterminate />
+        <v-icon v-else>add</v-icon>
+      </v-btn>
+      <span>{{$t('add_photos')}}</span>
+    </v-tooltip>
+  </span>
 </template>
 
 <script>

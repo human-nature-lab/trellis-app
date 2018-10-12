@@ -4,11 +4,11 @@
       <v-toolbar-title>{{ $t('locations') }}</v-toolbar-title>
       <v-spacer />
       <permission :role-whitelist="['admin','manager']">
-        <v-tooltip>
+        <v-tooltip left>
           <v-btn
             slot="activator"
             icon
-            @click="geoSearchModal = true">
+            @click="isAddingGeo = true">
             <v-icon>add</v-icon>
           </v-btn>
           <span>{{ $t('add_locations') }}</span>
@@ -23,7 +23,13 @@
       :items="locations"
       hide-actions>
       <template slot="items" slot-scope="props">
-        <RespondentGeoRow :respondentGeo="props.item" @toggleHistory="props.expanded = !props.expanded"/>
+        <RespondentGeoRow
+          @remove="remove"
+          @move="startMove"
+          :showHistory="!!props.item.history && !!props.item.history.length"
+          :showControls="true"
+          v-model="props.expanded"
+          :respondentGeo="props.item" />
       </template>
       <template slot="expand" slot-scope="props">
         <v-data-table
@@ -37,26 +43,10 @@
         </v-data-table>
       </template>
     </v-data-table>
-    <v-dialog
-      :value="showProgressDialog"
-      lazy>
-      <v-card>
-        <v-container fluid>
-          <h4>{{progressMessage}}</h4>
-          <v-progress-linear indeterminate />
-        </v-container>
-      </v-card>
-    </v-dialog>
-    <v-dialog
-      content-class="geo-search-dialog"
-      lazy
-      v-model="geoSearchModal">
-      <GeoSearch
-        :limit="1"
-        :is-selectable="geoIsSelectable"
-        :should-update-route="false"
-        @doneSelecting="geoSelected" />
-    </v-dialog>
+    <AddRespondentGeoForm
+      v-model="isAddingGeo"
+      @added="doneAddingGeo"
+      :respondent="respondent"/>
   </v-flex>
 </template>
 
@@ -67,6 +57,8 @@
   import Permission from '../Permission'
   // @ts-ignore
   import RespondentGeoRow from './RespondentGeoRow'
+  // @ts-ignore
+  import AddRespondentGeoForm from './AddRespondentGeoForm'
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusFormService from '../../services/census/index'
   import CensusTypes from '../../static/census.types'
@@ -77,7 +69,7 @@
   import singleton from '../../static/singleton'
   import {arrayToTree} from 'performant-array-to-tree'
   export default Vue.extend({
-    components: {GeoSearch, Permission, RespondentGeoRow},
+    components: {GeoSearch, Permission, RespondentGeoRow, AddRespondentGeoForm},
     name: 'respondent-geos',
     props: {
       studyId: {
@@ -101,8 +93,14 @@
       movingRespondentGeo: null,
       error: null,
       locationHeaders: [{
+        text: ' ',
+        value: 'history',
+        class: 'actions',
+        sortable: false,
+      }, {
         text: 'Name',
-        value: 'translated'
+        value: 'translated',
+        class: 'main-column'
       }, {
         text: 'Type',
         value: 'type'
@@ -111,7 +109,9 @@
         value: 'isCurrent'
       }, {
         text: '',
-        value: 'edit'
+        value: 'edit',
+        class: 'actions',
+        sortable: false
       }]
     }),
     methods: {
@@ -120,31 +120,7 @@
         return geo.geoType.canContainRespondent == <any>1 // eslint-disable-line
       },
       startMove (respondentGeo: RespondentGeo): Promise<void> {
-        let p: any = null
-        if (this.useCensusForm) {
-          this.showProgressDialog = true
-          this.progressMessage = 'Checking if move respondent census form exists...'
-          p = CensusFormService.hasCensusForm(this.studyId, CensusTypes.move_respondent)
-        } else {
-          p = new Promise(resolve => {
-            setTimeout(() => {
-              resolve(false)
-            }, 500)
-          })
-        }
-        return p.then(hasMoveRespondentCensus => {
-          if (hasMoveRespondentCensus) {
-            this.progressMessage = 'Redirecting to move respondent census form...'
-            setTimeout(() => {
-              CensusFormService.redirectToCensusForm(this.studyId, CensusTypes.move_respondent, this.respondent.id)
-            }, 1000)
-          } else {
-            this.movingRespondentGeo = respondentGeo
-            this.geoSearchModal = true
-          }
-        }).finally(() => {
-          this.showProgressDialog = false
-        })
+
       },
       moveGeo (respondentGeo: RespondentGeo, geo: Geo): Promise<void> {
         return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.id, geo.id).then(resGeo => {
@@ -153,51 +129,34 @@
           this.$emit('after-move', resGeo)
         })
       },
-      addGeo (geo: Geo): Promise<void> {
-        return RespondentService.addRespondentGeo(this.respondent.id, geo.id).then(resGeo => {
-          this.respondent.geos.push(resGeo)
-          this.$emit('after-add', resGeo)
-        })
+      doneAddingGeo (rGeo: RespondentGeo) {
+        this.respondent.geos.push(rGeo)
+        this.$emit('after-add', rGeo)
       },
       remove (respondentGeoId: string): Promise<void> {
+        if (!confirm('Are you sure you want to delete this respondent geo?')) return
         return RespondentService.removeRespondentGeo(this.respondent.id, respondentGeoId).then(() => {
           let index = this.respondent.geos.findIndex(g => g.id === respondentGeoId)
           let rm = this.respondent.geos.splice(index, 1)
           this.$emit('after-remove', rm[0])
         })
-      },
-      async geoSelected (geos: Geo[]): Promise<void> {
-        if (geos.length > 1) this.error = 'Unable to add more than one respondent geo at a time'
-        this.isAddingGeo = true
-        try {
-          if (this.movingRespondentGeo) {
-            await this.moveGeo(this.movingRespondentGeo, geos[0])
-          } else {
-            await this.addGeo(geos[0])
-          }
-        } catch (err) {
-          this.error = 'Unable to add or move respondent geo'
-        } finally {
-          this.isAddingGeo = false
-          this.movingRespondentGeo = null
-          this.geoSearchModal = false
-        }
       }
     },
     computed: {
       locations (): RespondentGeo[] {
-        const geos = this.respondent.geos
-        debugger
-
-        const tree = arrayToTree(geos, 'id','previousRespondentGeoId')
-
-        // TODO: Group geos based on their move history
-        return this.respondent.geos.map(rGeo => rGeo)
+        const tree = arrayToTree(this.respondent.geos, 'id','previousRespondentGeoId')
+        return tree.map(item => {
+          item.data.history = item.children.map(d => d.data)
+          return item.data
+        })
       }
     }
   })
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  .main-column
+    width: 50%
+  td
+    white-space: nowrap
 </style>

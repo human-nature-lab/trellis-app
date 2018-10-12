@@ -27,6 +27,8 @@ export default class RespondentGeo extends TimestampedSoftDelete {
   @JoinColumn()
   geo: Geo
 
+  history?: RespondentGeo[]
+
   fromSnakeJSON(json: any) {
     // I hate that this is necessary, but the json comes in two different forms
     if (json.pivot) {

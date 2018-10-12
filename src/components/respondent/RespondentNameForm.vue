@@ -1,49 +1,56 @@
 <template>
-  <v-card>
-    <v-card-text>
-      <v-container>
-        <v-layout>
-          <v-alert v-show="error">
-            {{error}}
-          </v-alert>
-          <v-flex>
-            <v-text-field
-              :label="$t('name')"
-              v-model="name.name"/>
-          </v-flex>
-          <v-flex>
-            <v-checkbox
-              v-model="name.isDisplayName"
-              :label="$t('set_primary')"
-              hide-details
-            ></v-checkbox>
-          </v-flex>
-          <v-flex>
-            <v-select
-              :label="`${$t('locale')} (${$t('optional')})`"
-              :items="locales"
-              :loading="localesAreLoading"
-              item-text="language_native"
-              item-value="id"
-              v-model="name.localeId" />
-          </v-flex>
-        </v-layout>
-        <v-layout>
-          <v-flex>
-            <v-btn @click="save()">
-              <v-progress-circular v-if="isSaving"/>
-              <span v-else>
+  <v-dialog
+    lazy
+    :value="value"
+    @input="$emit('input', $event)">
+    <v-card>
+      <ModalTitle :title="$t('add_respondent_name')" @close="$emit('input', false)"/>
+      <v-card-text>
+        <v-container fluid>
+          <v-layout column>
+            <v-alert v-show="error">
+              {{error}}
+            </v-alert>
+            <v-flex>
+              <v-text-field
+                :label="$t('name')"
+                v-model="name.name"/>
+            </v-flex>
+            <v-flex>
+              <v-checkbox
+                v-model="name.isDisplayName"
+                :label="$t('set_primary')"
+                hide-details
+              ></v-checkbox>
+            </v-flex>
+            <v-flex>
+              <v-select
+                :label="`${$t('locale')} (${$t('optional')})`"
+                :items="locales"
+                :loading="localesAreLoading"
+                item-text="languageNative"
+                item-value="id"
+                v-model="name.localeId" />
+            </v-flex>
+          </v-layout>
+          <v-layout>
+            <v-flex>
+              <v-btn @click="save()">
+                <v-progress-circular v-if="isSaving"/>
+                <span v-else>
                 {{ $t('save') }}
               </span>
-            </v-btn>
-          </v-flex>
-        </v-layout>
-      </v-container>
-    </v-card-text>
-  </v-card>
+              </v-btn>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
+  import ModalTitle from '../ModalTitle'
   import LocaleService from '../../services/locale/LocaleService'
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusFormService from '../../services/census/index'
@@ -54,9 +61,17 @@
   import RespondentName from '../../entities/trellis/RespondentName'
   import Vue from 'vue'
   export default Vue.extend({
-    name: 'respondent-name',
+    name: 'respondent-name-form',
+    components: {ModalTitle},
     props: {
-      respondent: Respondent,
+      value: {
+        type: Boolean,
+        required: true
+      },
+      respondent: {
+        type: Respondent,
+        required: true
+      },
       name: {
         type: RespondentName,
         default: () => new RespondentName()

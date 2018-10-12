@@ -14,115 +14,21 @@
             <v-alert v-show="error" type="error">
               {{error}}
             </v-alert>
-            <PhotoAlbum :photos="respondent.photos" @photo="onNewPhoto" />
+            <PhotoAlbum
+              :photos="respondent.photos"
+              @photo="onNewPhoto" />
             <RespondentGeos
               :use-census-form="true"
               :study-id="global.study.id"
               :respondent="respondent" />
-            <v-toolbar flat>
-              <v-toolbar-title>
-                {{ $t('condition_tags') }}
-              </v-toolbar-title>
-              <v-spacer />
-              <permission :role-whitelist="['admin','manager']">
-                <v-btn
-                  icon
-                  class="mb-2"
-                  @click="modal.conditionTag = true">
-                  <v-icon>add</v-icon>
-                </v-btn>
-              </permission>
-            </v-toolbar>
-            <v-data-table
-              class="mb-3"
-              hide-actions
-              :headers="conditionTagHeaders"
-              :items="respondentConditionTags">
-              <template slot="items" slot-scope="props">
-                <td>{{ props.item.conditionTag.name }}</td>
-                <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
-                <permission :role-whitelist="['admin', 'manager']">
-                  <td>
-                    <v-btn
-                      icon
-                      @click="deleteRespondentConditionTag(props.item.id)">
-                      <v-progress-circular
-                        v-if="isDeleting(props.item.id)"
-                        indeterminate />
-                      <v-icon v-else>delete</v-icon>
-                    </v-btn>
-                  </td>
-                </permission>
-              </template>
-            </v-data-table>
-            <v-toolbar flat>
-              <v-toolbar-title>
-                {{ $t('names') }}
-              </v-toolbar-title>
-              <v-spacer />
-              <permission :role-whitelist="['admin','manager']">
-                <v-btn
-                  icon
-                  @click="modal.addName = true">
-                  <v-icon>add</v-icon>
-                </v-btn>
-              </permission>
-            </v-toolbar>
-            <v-data-table
-              class="mb-3"
-              :headers="nameHeaders"
-              :items="respondent.names"
-              hide-actions>
-              <template slot="items" slot-scope="props">
-                <td>{{props.item.name}}</td>
-                <td>
-                  <v-icon v-if="props.item.isDisplayName">check</v-icon>
-                </td>
-                <td>
-                  <permission :role-whitelist="['admin','manager']">
-                    <v-btn
-                      icon
-                      @click="editing.name = props.item; modal.editName = true">
-                      <v-icon>edit</v-icon>
-                    </v-btn>
-                    <v-btn
-                      icon
-                      @click="removeName(props.item.id)">
-                      <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
-                      <v-icon v-else>delete</v-icon>
-                    </v-btn>
-                  </permission>
-                </td>
-              </template>
-            </v-data-table>
+            <RespondentConditionTags
+              :respondent="respondent"
+              :conditionTags="respondentConditionTags" />
+            <RespondentNames
+              :respondent="respondent" />
           </v-layout>
         </v-container>
       </v-card-text>
-      <v-dialog
-        v-model="modal.addName"
-        lazy>
-        <RespondentName
-          :respondent="respondent"
-          @close="doneAddingName"/>
-      </v-dialog>
-      <v-dialog
-        v-model="modal.editName"
-        lazy>
-        <RespondentName
-          :name="editing.name"
-          :respondent="respondent"
-          @close="doneEditingName"/>
-      </v-dialog>
-      <v-dialog
-        lazy
-        v-model="modal.conditionTag">
-        <v-card>
-          <RespondentConditionTagForm
-            :respondentId="respondent.id"
-            :condition-tag="editing.conditionTag"
-            @close="doneAddingRespondentConditionTag"/>
-        </v-card>
-      </v-dialog>
     </v-card>
   </v-flex>
 </template>
@@ -131,21 +37,21 @@
   // @ts-ignore
   import Permission from '../Permission'
   // @ts-ignore
-  import RespondentName from './RespondentName'
-  // @ts-ignore
-  import RespondentConditionTagForm from './RespondentConditionTagForm'
+  import RespondentNames from './RespondentNames'
   // @ts-ignore
   import RespondentGeos from './RespondentGeos'
   // @ts-ignore
   import PhotoAlbum from '../photo/PhotoAlbum'
+  // @ts-ignore
+  import RespondentConditionTags from './RespondentConditionTags'
+
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import RespondentService from '../../services/respondent/RespondentService'
-  import ConditionTagService from '../../services/condition-tag'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
   import singleton from '../../static/singleton'
-  import PhotoService from "../../services/photo/PhotoService"
+  import RespondentName from "../../entities/trellis/RespondentName"
 
   /**
    * The respondent info router loader
@@ -177,29 +83,7 @@
           geoSearch: false,
           conditionTag: false
         },
-        isAddingPhoto: false,
-        conditionTagHeaders: [{
-          text: 'Tag name',
-          value: 'name'
-        }, {
-          text: 'Date added',
-          value: 'created_at',
-          width: '15%'
-        }, {
-          text: '',
-          value: 'remove',
-          width: '10%'
-        }],
-        nameHeaders: [{
-          text: 'Name',
-          value: 'name'
-        }, {
-          text: 'Current',
-          value: 'is_current'
-        }, {
-          text: '',
-          value: 'actions'
-        }]
+        isAddingPhoto: false
       }
     },
     methods: {
@@ -215,58 +99,6 @@
         await RespondentService.addPhoto(this.respondent.id, photo)
         this.respondent.photos.push(photo)
         this.isAddingPhoto = false
-      },
-      async removeName (nameId: string): Promise<void> {
-        let name = this.respondent.names.find(name => name.id === nameId)
-        if (name && name.isDisplayName) {
-          this.error = `Cannot delete the display name for a respondent`
-          return
-        }
-        this.deleting[nameId] = true
-        try {
-          await RespondentService.removeName(this.respondent.id, nameId)
-          let index = this.respondent.names.findIndex(name => name.id === nameId)
-          this.respondent.names.splice(index, 1)
-        } catch (err) {
-          console.error(err)
-          this.error = `Failed to delete the respondent name -> ${name.name}`
-        } finally {
-          this.deleting[nameId] = false
-          this.$forceUpdate()
-        }
-      },
-      doneAddingName (name: RespondentName): void {
-        if (name) {
-          this.respondent.names.push(name)
-        }
-        this.modal.addName = false
-      },
-      doneEditingName (name: RespondentName): void {
-        let oldIndex = this.respondent.names.findIndex(n => name.previousRespondentNameId === n.id)
-        this.respondent.names.splice(oldIndex, 1, name)
-        this.modal.editName = false
-      },
-      doneAddingRespondentConditionTag (tag: RespondentConditionTag): void {
-        this.respondentConditionTags.push(tag)
-        this.modal.conditionTag = false
-      },
-      async deleteRespondentConditionTag (respondentConditionTagId: string): Promise<void> {
-        console.log('deleteRespondentConditionTag', respondentConditionTagId)
-        // TODO: Finish UI for removing respondent condition tags
-        if (!window.confirm(`Are you sure you want to delete this respondent condition tag?`)) return
-        this.deleting[respondentConditionTagId] = true
-        try {
-          await ConditionTagService.removeRespondentConditionTag(this.respondent.id, respondentConditionTagId)
-          let index = this.respondentConditionTags.findIndex(t => t.id === respondentConditionTagId)
-          this.respondentConditionTags.splice(index, 1)
-        } catch (err) {
-          this.error = err
-        } finally {
-          this.deleting[respondentConditionTagId] = false
-        }
-      },
-      isDeleting (id: string): boolean {
-        return this.deleting[id]
       }
     },
     computed: {
@@ -276,9 +108,9 @@
       }
     },
     components: {
-      RespondentName,
+      RespondentNames,
+      RespondentConditionTags,
       Permission,
-      RespondentConditionTagForm,
       RespondentGeos,
       PhotoAlbum
     }
