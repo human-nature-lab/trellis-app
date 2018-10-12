@@ -122,7 +122,7 @@
   import actionBus from './services/actions/ActionBus'
 
   import {validateParametersWithError} from './services/ValidatorService'
-  import router, {moveToNextOr} from '../../router'
+  import router, {replaceWithNextOr} from '../../router'
   import InterviewLoader from './services/InterviewLoader'
   import SurveyService from '../../services/survey'
 
@@ -288,7 +288,7 @@
       },
       exit () {
         this.alreadyExited = true
-        moveToNextOr(() => {
+        replaceWithNextOr(() => {
           this.redirectToComplete()
         })
       },
