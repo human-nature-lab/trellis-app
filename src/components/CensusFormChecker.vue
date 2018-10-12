@@ -11,26 +11,26 @@
     </v-dialog>
 </template>
 
-<script lang="ts">
-  import Vue from 'vue'
+<script >
   import CensusFormService from '../services/census'
 
   let vm
-  export function checkForCensusForm (censusTypeId: string, studyId: string, respondentId: string): Promise<any> {
+  export function checkForCensusForm (censusTypeId, studyId, respondentId) {
     return new Promise((resolve, reject) => {
       vm.resolve = resolve
       vm.reject = reject
       if (!vm) {
         throw new Error('Component must be registered in DOM before using this function')
       }
-      vm.cenusTypeId = censusTypeId
+      vm.censusTypeId = censusTypeId
       vm.studyId = studyId
+      vm.respondentId = respondentId
       vm.isOpen = true
       return vm.check()
     })
   }
 
-  export default Vue.extend({
+  export default {
     name: 'CensusFormChecker',
     data () {
       return {
@@ -38,7 +38,9 @@
         censusTypeId: null,
         studyId: null,
         respondentId: null,
-        message: ''
+        message: '',
+        resolve: null,
+        reject: null
       }
     },
     created () {
@@ -61,10 +63,12 @@
           }
         } catch (err) {
           this.reject(err)
+        } finally {
+          this.isOpen = false
         }
       }
     }
-  })
+  }
 </script>
 
 <style scoped>

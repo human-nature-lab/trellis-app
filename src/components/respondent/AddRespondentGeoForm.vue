@@ -4,7 +4,9 @@
     :value="value"
     @input="close">
     <v-card>
-      <ModalTitle :title="$t('add_location')" @close="close"/>
+      <ModalTitle
+        :title="$t('add_location')"
+        @close="close" />
       <v-card-text>
           <v-layout>
             <v-flex>Location</v-flex>
@@ -14,7 +16,9 @@
               </v-chip>
             </v-flex>
             <v-flex>
-              <v-btn @click="showGeoSearch=true">{{selectedGeo ? $t('change_location') : $t('add_location')}}</v-btn>
+              <v-btn @click="showGeoSearch=true">
+                {{selectedGeo ? $t('change_location') : $t('add_location')}}
+              </v-btn>
             </v-flex>
           </v-layout>
           <v-layout>

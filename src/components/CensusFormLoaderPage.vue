@@ -37,7 +37,7 @@
     methods: {
       // We are misusing the hydrate method to redirect to the interview here
       hydrate (data) {
-        router.push({
+        router.replace({
           name: 'Interview',
           params: {
             studyId: data.studyId,

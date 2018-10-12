@@ -1,5 +1,7 @@
 key,en,es,comment
-location_search,Location Search,,
+unknown_location,Unknown location,,
+select_location,Select location,,
+location_search,Location search,,
 add_respondent_name,Add respondent name,,
 add_condition_tag,Add condition tag,,
 skip,Skip,,

@@ -98,7 +98,9 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     respondentGeoId = encodeURIComponent(respondentGeoId)
     return http().post(`respondent/${respondentId}/geo/${respondentGeoId}/move`, {
       new_geo_id: newGeoId
-    }).then(res => new RespondentGeo().fromSnakeJSON(res.data.geo))
+    }).then(res => {
+      return new RespondentGeo().fromSnakeJSON(res.data.respondentGeo)
+    })
   }
   removeRespondentGeo (respondentId, respondentGeoId) {
     respondentId = encodeURIComponent(respondentId)

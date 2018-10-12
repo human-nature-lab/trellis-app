@@ -233,7 +233,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     await connection.manager.save(newRespondentGeo)
 
     // Soft delete the previous respondent geo
-    await repository.update({id: respondentGeoId}, {deletedAt: new Date()})
+    // await repository.update({id: respondentGeoId}, {deletedAt: new Date()})
 
     return newRespondentGeo
   }

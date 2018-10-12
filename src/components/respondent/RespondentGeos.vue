@@ -47,6 +47,11 @@
       v-model="isAddingGeo"
       @added="doneAddingGeo"
       :respondent="respondent"/>
+    <MoveRespondentGeoForm
+      v-model="isMovingGeo"
+      @done="doneMovingGeo"
+      :respondentGeo="movingRespondentGeo"
+      :respondent="respondent"/>
   </v-flex>
 </template>
 
@@ -59,8 +64,12 @@
   import RespondentGeoRow from './RespondentGeoRow'
   // @ts-ignore
   import AddRespondentGeoForm from './AddRespondentGeoForm'
+  // @ts-ignore
+  import MoveRespondentGeoForm from './MoveRespondentGeoForm'
+  // @ts-ignore
+  import {checkForCensusForm} from '../CensusFormChecker'
+
   import RespondentService from '../../services/respondent/RespondentService'
-  import CensusFormService from '../../services/census/index'
   import CensusTypes from '../../static/census.types'
   import Respondent from '../../entities/trellis/Respondent'
   import RespondentGeo from '../../entities/trellis/RespondentGeo'
@@ -68,8 +77,10 @@
   import Vue from 'vue'
   import singleton from '../../static/singleton'
   import {arrayToTree} from 'performant-array-to-tree'
+  import {getBottomLevelOfTree} from '../../classes/M'
+
   export default Vue.extend({
-    components: {GeoSearch, Permission, RespondentGeoRow, AddRespondentGeoForm},
+    components: {GeoSearch, Permission, RespondentGeoRow, AddRespondentGeoForm, MoveRespondentGeoForm},
     name: 'respondent-geos',
     props: {
       studyId: {
@@ -87,6 +98,7 @@
     data: () => ({
       global: singleton,
       isAddingGeo: false as boolean,
+      isMovingGeo: false as boolean,
       showProgressDialog: false as boolean,
       progressMessage: '' as string,
       geoSearchModal: false as boolean,
@@ -120,14 +132,24 @@
         return geo.geoType.canContainRespondent == <any>1 // eslint-disable-line
       },
       startMove (respondentGeo: RespondentGeo): Promise<void> {
-
+        return checkForCensusForm(CensusTypes.move_respondent, this.global.study.id, this.respondent.id).then(hasCensusForm => {
+          if (!hasCensusForm) {
+            this.movingRespondentGeo = respondentGeo
+            this.isMovingGeo = true
+          }
+        })
       },
       moveGeo (respondentGeo: RespondentGeo, geo: Geo): Promise<void> {
         return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.id, geo.id).then(resGeo => {
           let index = this.respondent.geos.findIndex(rg => rg.id === respondentGeo.id)
-          this.respondent.geos.splice(index, 1, resGeo)
+          this.respondent.geos.push(resGeo)
           this.$emit('after-move', resGeo)
         })
+      },
+      doneMovingGeo (oldGeo: RespondentGeo, newGeo: RespondentGeo) {
+        this.respondent.geos.push(newGeo)
+        this.$emit('afterMove', newGeo)
+        this.isMovingGeo = false
       },
       doneAddingGeo (rGeo: RespondentGeo) {
         this.respondent.geos.push(rGeo)
@@ -144,11 +166,27 @@
     },
     computed: {
       locations (): RespondentGeo[] {
-        const tree = arrayToTree(this.respondent.geos, 'id','previousRespondentGeoId')
-        return tree.map(item => {
-          item.data.history = item.children.map(d => d.data)
-          return item.data
-        })
+        // TODO: Build the inverted tree structure correctly
+        // let tree = arrayToTree(this.respondent.geos, 'id','previousRespondentGeoId')
+        // tree = invertTree(tree)
+        let relationShipCounts: {[id: string]: number} = {}
+        for (let rGeo of this.respondent.geos) {
+          if (!relationShipCounts.hasOwnProperty(rGeo.previousRespondentGeoId)) {
+            relationShipCounts[rGeo.previousRespondentGeoId] = 0
+          }
+          relationShipCounts[rGeo.previousRespondentGeoId]++
+        }
+        let tree = []
+        for (let rGeo of this.respondent.geos) {
+          if (!relationShipCounts[rGeo.id]) {
+            rGeo.history = []
+            tree.push(rGeo)
+            console.log(rGeo.id, rGeo.geoId)
+            // console.log(rGeo.geo.nameTranslation.translationText[0])
+          }
+        }
+        console.log('tree', JSON.stringify(tree, null, 2))
+        return tree
       }
     }
   })
@@ -157,6 +195,6 @@
 <style lang="sass">
   .main-column
     width: 50%
-  td
+  td:not(:first-child)
     white-space: nowrap
 </style>
