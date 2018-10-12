@@ -30,7 +30,7 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   @Column({ nullable: true }) @Serializable
   associatedRespondentId: string
 
-  @Relationship({ generator: geoGenerator })
+  @Relationship(type => RespondentGeo)
   @OneToMany(type => RespondentGeo, respondentGeo => respondentGeo.respondent)
   geos: RespondentGeo[]
 

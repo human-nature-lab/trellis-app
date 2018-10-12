@@ -11,10 +11,19 @@
     </td>
     <td>
       <GeoBreadcrumbs
+        v-if="respondentGeo.geoId"
         :geo-id="respondentGeo.geoId" />
+      <span v-else>
+        {{$t('unknown_location')}}
+      </span>
     </td>
     <td>
-      {{respondentGeo.geo.geoType.name}}
+      <span v-if="respondentGeo.geo">
+        {{respondentGeo.geo.geoType.name}}
+      </span>
+      <span v-else>
+        {{$t('unknown_location')}}
+      </span>
     </td>
     <td>
       <v-icon v-if="respondentGeo.isCurrent">check</v-icon>

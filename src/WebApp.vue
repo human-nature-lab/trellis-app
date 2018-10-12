@@ -87,6 +87,7 @@
     </v-content>
 
     <LocationFinder />
+    <CensusFormChecker />
 
   </v-app>
 </template>
@@ -94,6 +95,7 @@
 <script>
   // import SingletonService from './services/singleton/SingletonService'
   import MainMenu from './components/main-menu/MainMenu'
+  import CensusFormChecker from './components/CensusFormChecker'
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
@@ -131,7 +133,8 @@
       VDivider,
       MainMenu,
       TrellisAlert,
-      LocationFinder
+      LocationFinder,
+      CensusFormChecker
     },
     computed: {
       withinCordova () {
