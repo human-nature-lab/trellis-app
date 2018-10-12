@@ -71,4 +71,17 @@ export function moveToNextOr (cb) {
   }
 }
 
+/**
+ * Replace the current route with the next route if one is queued. Otherwise, run the callback.
+ * @param {Function} cb
+ */
+export function replaceWithNextOr (cb) {
+  let current = router.currentRoute
+  if (current.query.to) {
+    router.replace(current.query.to)
+  } else {
+    cb()
+  }
+}
+
 export default router
