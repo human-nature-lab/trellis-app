@@ -1,0 +1,129 @@
+<template>
+  <v-flex>
+    <v-toolbar flat>
+      <v-toolbar-title>
+        {{ $t('condition_tags') }}
+      </v-toolbar-title>
+      <v-spacer />
+      <permission :role-whitelist="['admin','manager']">
+        <v-tooltip left>
+          <v-btn
+            slot="activator"
+            icon
+            class="mb-2"
+            @click="showForm = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+          <span>{{$t('add_condition_tag')}}</span>
+        </v-tooltip>
+      </permission>
+    </v-toolbar>
+    <v-data-table
+      class="mb-3"
+      hide-actions
+      :headers="conditionTagHeaders"
+      :items="conditionTags">
+      <template slot="items" slot-scope="props">
+        <td>{{ props.item.conditionTag.name }}</td>
+        <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
+        <permission :role-whitelist="['admin', 'manager']">
+          <td>
+            <v-btn
+              icon
+              @click="deleteRespondentConditionTag(props.item.id)">
+              <v-progress-circular
+                v-if="isDeleting(props.item.id)"
+                indeterminate />
+              <v-icon v-else>delete</v-icon>
+            </v-btn>
+          </td>
+        </permission>
+      </template>
+    </v-data-table>
+    <RespondentConditionTagForm
+      v-model="showForm"
+      :respondentId="respondent.id"
+      :conditionTag="editingConditionTag"
+      @close="doneAddingRespondentConditionTag" />
+  </v-flex>
+</template>
+
+<script lang="ts">
+  // @ts-ignore
+  import Permission from '../Permission'
+  // @ts-ignore
+  import RespondentConditionTagForm from './RespondentConditionTagForm'
+  import Vue from 'vue'
+
+  import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag"
+  import ConditionTagService from '../../services/condition-tag'
+
+  export default Vue.extend({
+    components: {
+      Permission,
+      RespondentConditionTagForm
+    },
+    data () {
+      return {
+        showForm: false,
+        editingConditionTag: null,
+        error: null,
+        deleting: {},
+        conditionTagHeaders: [{
+          text: 'Tag name',
+          value: 'name'
+        }, {
+          text: 'Date added',
+          value: 'created_at',
+          width: '15%'
+        }, {
+          text: '',
+          value: 'remove',
+          width: '10%'
+        }],
+      }
+    },
+    props: {
+      respondent: {
+        type: Object,
+        required: true
+      },
+      conditionTags: {
+        type: Array,
+        default: [] as RespondentConditionTag[]
+      }
+    },
+    created () {
+      // TODO: Load respondent condition tags if they aren't passed in
+    },
+    name: 'RespondentConditionTags',
+    methods: {
+      doneAddingRespondentConditionTag (tag: RespondentConditionTag): void {
+        this.conditionTags.push(tag)
+        this.showForm = false
+      },
+      async deleteRespondentConditionTag (respondentConditionTagId: string): Promise<void> {
+        console.log('deleteRespondentConditionTag', respondentConditionTagId)
+        // TODO: Finish UI for removing respondent condition tags
+        if (!window.confirm(`Are you sure you want to delete this respondent condition tag?`)) return
+        this.deleting[respondentConditionTagId] = true
+        try {
+          await ConditionTagService.removeRespondentConditionTag(this.respondent.id, respondentConditionTagId)
+          let index = this.conditionTags.findIndex((t: RespondentConditionTag) => t.id === respondentConditionTagId)
+          this.conditionTags.splice(index, 1)
+        } catch (err) {
+          this.error = err
+        } finally {
+          this.deleting[respondentConditionTagId] = false
+        }
+      },
+      isDeleting (id: string): boolean {
+        return this.deleting[id]
+      }
+    }
+  })
+</script>
+
+<style scoped>
+
+</style>

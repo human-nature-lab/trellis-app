@@ -1,5 +1,14 @@
 <template>
   <tr>
+    <td class="actions">
+      <v-btn
+        icon
+        v-if="showHistory"
+        @click="$emit('input', !value)">
+        <v-icon v-if="value">keyboard_arrow_down</v-icon>
+        <v-icon v-else>chevron_right</v-icon>
+      </v-btn>
+    </td>
     <td>
       <GeoBreadcrumbs
         :geo-id="respondentGeo.geoId" />
@@ -10,53 +19,62 @@
     <td>
       <v-icon v-if="respondentGeo.isCurrent">check</v-icon>
     </td>
-    <td>
-      <permission :role-whitelist="['admin', 'manager']">
-        <v-tooltip v-if="!respondentGeo.isCurrent">
-          <v-btn
-            slot="activator"
-            icon
-            @click="remove(respondentGeo.id)">
-            <v-icon>delete</v-icon>
-          </v-btn>
-          <span>{{ $t('remove_location') }}</span>
-        </v-tooltip>
-        <v-tooltip>
-          <v-btn
-            v-if="respondentGeo.isCurrent"
-            icon
-            slot="activator"
-            @click="startMove(respondentGeo)">
-            <v-icon>edit</v-icon>
-          </v-btn>
-          <span>{{ $t('move_respondent_location') }}</span>
-        </v-tooltip>
-      </permission>
+    <td
+      class="actions"
+      v-show="showControls">
+      <v-tooltip
+        bottom
+        v-if="!respondentGeo.isCurrent">
+        <v-btn
+          slot="activator"
+          icon
+          @click="$emit('remove', respondentGeo.id)">
+          <v-icon>delete</v-icon>
+        </v-btn>
+        <span>{{ $t('remove_location') }}</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <v-btn
+          icon
+          slot="activator"
+          @click="$emit('move', respondentGeo)">
+          <v-icon>edit</v-icon>
+        </v-btn>
+        <span>{{ $t('move_respondent_location') }}</span>
+      </v-tooltip>
     </td>
   </tr>
 </template>
 
 <script>
-  import {randomInt} from '../../classes/M'
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
   import Permission from '../Permission'
   export default {
     props: {
+      showControls: {
+        type: Boolean,
+        default: false
+      },
+      showHistory: {
+        type: Boolean,
+        default: false
+      },
+      value: {
+        type: Boolean,
+        default: false
+      },
       respondentGeo: {
         type: Object,
         required: true
       }
     },
     name: 'RespondentGeoRow',
-    components: {Permission, GeoBreadcrumbs},
-    created () {
-      setInterval(() => {
-        this.$emit('toggleHistory')
-      }, randomInt(0, 10000))
-    }
+    components: {Permission, GeoBreadcrumbs}
   }
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  td, th
+    &.actions
+      padding: 0 !important
 </style>

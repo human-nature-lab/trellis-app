@@ -84,7 +84,7 @@
   import singleton from '../../static/singleton'
   import router from '../../router'
   import Vue from 'vue'
-  export default Vue.extend({
+  export default {
     router,
     name: 'geo-search',
     props: {
@@ -224,7 +224,7 @@
         }
       },
       onDone: function () {
-        this.$emit('doneSelecting', JSON.parse(JSON.stringify(this.selectedGeos)))
+        this.$emit('doneSelecting', this.selectedGeos.map(s => s.copy()))
         // Empty the array without breaking references
         while (this.selectedGeos.length) {
           this.selectedGeos.pop()
@@ -263,7 +263,7 @@
       GeoListTile,
       Cart
     }
-  })
+  }
 </script>
 
 <style lang="sass">

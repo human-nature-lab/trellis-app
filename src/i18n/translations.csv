@@ -1,4 +1,8 @@
 key,en,es,comment
+location_search,Location Search,,
+add_respondent_name,Add respondent name,,
+add_condition_tag,Add condition tag,,
+skip,Skip,,
 detecting_location,Detecting location...,Detectando la ubicación...,
 add_photos,Add photos,Añadir Fotos,
 device_authenticating,Authenticating device...,Autenticando dispositivo...,
@@ -357,3 +361,4 @@ position_fail_hint,Make sure location services are on and try moving near a wind
 position_success,Your location was accessed successfully,Su ubicacion fue accedida exitosamente,
 use_last_position,Use last known position,Usar la ultima ubicacion conocida,
 last_known_position,Using last known location of: {0},Usando la ultima ubicacion conocida de: {0},
+no_translation,No translation,,
