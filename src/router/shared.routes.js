@@ -12,6 +12,7 @@ import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
 import ValidateLocale from './guards/ValidateLocale'
 import ValidateCensusForm from './guards/ValidateCensusForm'
+import ValidateCompletedSurvey from './guards/ValidateCompletedSurvey'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
 import WebLogin from '../components/login/WebLogin'
 
@@ -22,7 +23,7 @@ export default [{
   path: '/study/:studyId/interview/:interviewId',
   name: 'Interview',
   component: Interview,
-  beforeEnter: ValidateStudy
+  beforeEnter: chain(ValidateStudy, ValidateCompletedSurvey)
 }, {
   path: '/study/:studyId/respondent/:respondentId/forms',
   name: 'RespondentForms',
