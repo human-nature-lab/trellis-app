@@ -48,6 +48,7 @@
       @added="doneAddingGeo"
       :respondent="respondent"/>
     <MoveRespondentGeoForm
+      v-if="isMovingGeo"
       v-model="isMovingGeo"
       @done="doneMovingGeo"
       :respondentGeo="movingRespondentGeo"
@@ -76,8 +77,6 @@
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
   import singleton from '../../static/singleton'
-  import {arrayToTree} from 'performant-array-to-tree'
-  import {getBottomLevelOfTree} from '../../classes/M'
 
   export default Vue.extend({
     components: {GeoSearch, Permission, RespondentGeoRow, AddRespondentGeoForm, MoveRespondentGeoForm},
