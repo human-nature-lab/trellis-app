@@ -36,13 +36,13 @@
           <v-layout row
                     justify-space-between>
             <v-btn @click="onPrevious"
-                   :disabled="isFirstPage"
+                   :disabled="isFirstPage || prevWorking"
                    justify-left>
               <v-icon left>chevron_left</v-icon>
               {{ $t('previous') }}
             </v-btn>
             <v-btn @click="onNext"
-                   :disabled="!isNavigationEnabled"
+                   :disabled="!isNavigationEnabled || nextWorking"
                    justify-right>
               {{isAtEnd ? $t('finish') : $t('next')}} <v-icon right>chevron_right</v-icon>
             </v-btn>
@@ -61,6 +61,12 @@
   export default {
     name: 'page',
     mixins: [ActionMixin],
+    data () {
+      return {
+        nextWorking: false,
+        prevWorking: false
+      }
+    },
     props: {
       questions: {
         type: Array,
@@ -93,10 +99,30 @@
     },
     methods: {
       onNext () {
-        this.actionWithoutQuestion(AT.next)
+        if (this.nextWorking) {
+          console.log('double press next')
+          return
+        }
+        console.log('next click')
+        this.nextWorking = true
+        setTimeout(() => {
+          console.log('next eval', this.nextWorking)
+          this.actionWithoutQuestion(AT.next)
+          setTimeout(() => {
+            this.nextWorking = false
+            console.log('resetting next', this.nextWorking)
+          })
+        })
       },
       onPrevious () {
-        this.actionWithoutQuestion(AT.previous)
+        if (this.prevWorking) return
+        this.prevWorking = true
+        setTimeout(() => {
+          this.actionWithoutQuestion(AT.previous)
+          setTimeout(() => {
+            this.prevWorking = false
+          })
+        })
       },
       datumRecyclerSize () {
         return datumRecycler.cache.size
