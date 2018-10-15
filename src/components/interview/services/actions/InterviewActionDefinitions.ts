@@ -94,6 +94,8 @@ actionManager.add(AT.previous, function (interview: InterviewManager, a, b, c?, 
 actionManager.add(AT.number_change, addOrUpdateSingleDatum)
 actionManager.add(AT.add_edge, addDatum)
 actionManager.add(AT.remove_edge, removeDatum((datum, payload) => datum.edgeId === payload.edge_id))
+actionManager.add(AT.add_photo, addDatum)
+actionManager.add(AT.remove_photo, removeDatum((datum, payload) => datum.photoId === payload.photo_id))
 actionManager.add(AT.add_roster_row, addDatum)
 actionManager.add(AT.remove_roster_row, removeDatum((datum, payload) => datum.rosterId === payload.roster_id))
 actionManager.add(AT.change_sort_order, function (interview, payload, questionDatum: QuestionDatum) {

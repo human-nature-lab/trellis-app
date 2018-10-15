@@ -1,7 +1,13 @@
 import debounce from 'lodash/debounce'
+
+interface SizeMeta {
+  touched: number,
+  size: number
+}
+
 export default class SizeLimitedMap<T> {
   private map: Map<any, T> = new Map()
-  private meta: object = {}
+  private meta: Map<any, SizeMeta> = new Map()
   public byteSize: number = 0
   public entries: Function = this.map.entries.bind(this.map)
   public forEach: Function = this.map.forEach.bind(this.map)
@@ -27,9 +33,10 @@ export default class SizeLimitedMap<T> {
    * @returns {any}
    */
   get (key: any) {
-    let val = this.map.get(key)
-    if (val && this.meta[key]) {
-      this.meta[key].touched = Date.now()
+    const val = this.map.get(key)
+    const meta = this.meta.get(key)
+    if (val && meta) {
+      meta.touched = Date.now()
     }
     return val
   }
@@ -41,8 +48,9 @@ export default class SizeLimitedMap<T> {
    */
   has (key: any) {
     if (this.map.has(key)) {
-      if (this.meta[key]) {
-        this.meta[key].touched = Date.now()
+      const meta = this.meta.get(key)
+      if (meta) {
+        meta.touched = Date.now()
       }
       return true
     } else {
@@ -56,14 +64,18 @@ export default class SizeLimitedMap<T> {
    * @param {T} val
    */
   set (key: any, val: T) {
+    const existingMeta = this.meta.get(key)
     this.map.set(key, val)
     let size = SizeLimitedMap.roughSizeOfObject(key) + SizeLimitedMap.roughSizeOfObject(val)
-    this.meta[key] = {
+    this.meta.set(key, {
       touched: Date.now(),
       size: size
+    })
+    if (existingMeta) {
+      this.byteSize -= existingMeta.size
     }
     this.byteSize += size
-    if (this.byteSize > this.maxByteSize) {
+    if (this.byteSize > this.maxByteSize && this.size > 1) {
       this.evict()
     }
   }
@@ -72,10 +84,10 @@ export default class SizeLimitedMap<T> {
    * Remove an item from the map
    * @param key
    */
-  delete (key) {
-    let meta = this.meta[key]
+  delete (key: any) {
+    let meta = this.meta.get(key)
     this.map.delete(key)
-    delete this.meta[key]
+    this.meta.delete(key)
     this.byteSize -= meta.size
   }
 
@@ -84,14 +96,14 @@ export default class SizeLimitedMap<T> {
    * @private
    */
   private _evict () {
-    let keyOrder = Object.keys(this.meta).map(key => ({
+    const keyOrder = Array.from(this.meta.keys()).map(key => ({
       key: key,
-      date: this.meta[key].touched
+      date: this.meta.get(key).touched
     })).sort(function (a, b) {
       return b.date - a.date
     })
     let count = 0
-    while ((this.byteSize - (this.maxByteSize / 10)) > this.maxByteSize) {
+    while ((this.byteSize - (this.maxByteSize / 10)) > this.maxByteSize && this.size > 1) {
       let next = keyOrder.pop()
       this.delete(next.key)
       count++

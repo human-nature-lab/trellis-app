@@ -44,6 +44,10 @@
   import AddPhoto from './AddPhoto'
   import PhotoService from '../../services/photo/PhotoService'
   import URL_PLACEHOLDER from '../../assets/Placeholder_person.jpg'
+
+  // TODO: Make it possible to remove photos. What should the UI look like for this?
+  // TODO: Make it possible to reorder photos
+  // TODO: Get rid of image carousel and instead click on a single image to expand full screen. Image carousel is taking up too much cpu and memory
   export default {
     components: {
       Photo,
@@ -84,9 +88,13 @@
       }
     },
     methods: {
-      showAlbum () {
+      rightClick (photo) {
+        debugger
+        photo.showMenu = true
+      },
+      async showAlbum () {
+        await this.updateSrcs()
         this.isAlbumOpen = true
-        this.updateSrcs()
       },
       async updateSrcs () {
         this.numTimesLoaded++
@@ -99,6 +107,7 @@
           srcs.push(this._srcCache[photo.id] || URL_PLACEHOLDER)
         }
         this.imageSources = srcs
+        console.log('sources', this.imageSources.length, toLoad.length)
         if (toLoad.length && this.numTimesLoaded < 10) {
           await Promise.all(toLoad.map(p => this.loadPhotoSrc(p)))
           this.updateSrcs()
@@ -107,10 +116,10 @@
         }
       },
       onAddPhoto (photo) {
-        let val = this.$emit('photo', photo)
+        this.$emit('photo', photo)
       },
       async loadPhotoSrc (photo) {
-        PhotoService.getPhotoSrc(photo.id).then(src => {
+        return PhotoService.getPhotoSrc(photo.id).then(src => {
           this._srcCache[photo.id] = src
         })
       }
@@ -125,11 +134,14 @@
   }
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
   .photo-album-carousel-container
     height: 100%
     .photo-album-carousel-card
       height: 100% !important
       .photo-album-carousel
         height: 100%
+    img
+      max-width: 100%
+      max-height: 100%
 </style>
