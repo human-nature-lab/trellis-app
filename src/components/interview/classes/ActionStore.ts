@@ -113,6 +113,9 @@ export default class ActionStore extends Emitter {
     if (!action.payload) {
       action.payload = {} as ActionPayload
     }
+    if (!action.payload.val) {
+      action.payload.val = ''
+    }
     if (action.payload['n'] === undefined || action.payload['n'] === null) {
       action.payload['n'] = this.store.length
     }
