@@ -6,7 +6,10 @@
       :class="{selected: selected === true, respondent: true}">
       <v-card-media class="respondent-photo"
                     @click="onClick()">
-        <Photo :photo="photo" width="150" height="150"></Photo>
+        <Photo
+          :photo="photo"
+          width="150"
+          height="150" />
       </v-card-media>
       <v-card-text class="respondent-name"
                    @click="onClick()">
