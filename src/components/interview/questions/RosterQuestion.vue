@@ -201,7 +201,8 @@
             this.rosterCache[row.id] = row
             this.$nextTick(() => this.action(AT.add_roster_row, {
               roster_id: row.id,
-              name: ''
+              name: '',
+              val: row.id
             }))
           }
         }).catch(err => {
