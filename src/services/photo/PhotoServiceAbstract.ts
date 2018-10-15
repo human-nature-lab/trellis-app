@@ -1,6 +1,14 @@
 import Photo from "../../entities/trellis/Photo";
 
 export default abstract class PhotoServiceAbstract {
+
+  /**
+   * Return an array of photos from an array of photo ids
+   * @param {string[]} photoIds
+   * @returns {Promise<Photo[]>}
+   */
+  abstract getPhotosByIds (photoIds: string[]): Promise<Photo[]>
+
   /**
    * Load the image source as as string
    * @param photoId
@@ -13,5 +21,9 @@ export default abstract class PhotoServiceAbstract {
    */
   abstract cancelAllOutstanding (): void
 
+  /**
+   * Take a photo
+   * @returns {Promise<Photo>}
+   */
   abstract takePhoto (): Promise<Photo>
 }

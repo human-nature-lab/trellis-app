@@ -1,10 +1,9 @@
 import FileService from '../file/FileService'
 import DatabaseService from '../database/DatabaseService'
 import Photo from '../../entities/trellis/Photo'
-import SizeLimitedMap from '../../classes/SizeLimitedMap'
-const cache = new SizeLimitedMap(1024 * 10000)
 import uuid from 'uuid/v4'
 import PhotoServiceAbstract from './PhotoServiceAbstract'
+import {In} from "typeorm";
 
 declare global {
   interface Window {ImageResizer: any}
@@ -12,10 +11,20 @@ declare global {
 
 export default class PhotoServiceCordova extends PhotoServiceAbstract {
 
+  async getPhotosByIds (photoIds: string[]): Promise<Photo[]> {
+    if (!photoIds.length) return []
+    const repo = await DatabaseService.getRepository(Photo)
+    return repo.find({
+      where: {
+        id: In(photoIds)
+      }
+    })
+  }
+
    async getPhotoSrc (photoId: string): Promise<any> {
-     if (cache.has(photoId)) {
-       return cache.get(photoId)
-     }
+     // if (cache.has(photoId)) {
+     //   return cache.get(photoId)
+     // }
 
      const connection = await DatabaseService.getDatabase()
      const repository = await connection.getRepository(Photo)
@@ -31,7 +40,7 @@ export default class PhotoServiceCordova extends PhotoServiceAbstract {
          const reader = new FileReader()
          reader.onloadend = function () {
            let src = reader.result
-           cache.set(photoId, src)
+           // cache.set(photoId, src)
            resolve(src)
          }
 

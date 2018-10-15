@@ -1,5 +1,10 @@
 <template>
-  <v-flex class="photo" :class="{contained: isContained}" ref="container" :style="{'width': width + 'px', 'min-height': height + 'px'}" @click="$emit('click')">
+  <v-flex
+    class="photo"
+    :class="{contained: isContained}"
+    ref="container"
+    :style="{'width': width + 'px', 'min-height': height + 'px'}"
+    @click="$emit('click', $event)">
     <v-progress-circular
       v-if="isLoading"
       indeterminate

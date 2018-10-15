@@ -10,6 +10,15 @@ export default class PhotoServiceWeb extends PhotoServiceAbstract {
 
   private existingCancelTokens = new Set()
 
+  async getPhotosByIds (photoIds: string[]): Promise<Photo[]> {
+    if (!photoIds.length) return []
+    const idStr = photoIds.map(id => encodeURIComponent(id)).join(',')
+    const res = await http().get(`photos/${idStr}`)
+    return res.data.photos.map(p => {
+      return new Photo().fromSnakeJSON(p)
+    })
+  }
+
   cancelAllOutstanding () {
     let count = 0
     for (let source of this.existingCancelTokens) {

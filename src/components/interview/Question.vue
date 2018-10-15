@@ -45,7 +45,8 @@
   import DecimalQuestion from './questions/DecimalQuestion'
   import GeoQuestion from './questions/GeoQuestion'
   import IntegerQuestion from './questions/IntegerQuestion'
-  import IntroQuestion from './questions/IntroQuestion.vue'
+  import IntroQuestion from './questions/IntroQuestion'
+  import ImageQuestion from './questions/ImageQuestion'
   import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
   import RelationshipQuestion from './questions/RelationshipQuestion'
   import RespondentGeoQuestion from './questions/RespondentGeoQuestion'
@@ -69,7 +70,8 @@
     [questionTypes.roster]: RosterQuestion,
     [questionTypes.text]: TextQuestion,
     [questionTypes.text_area]: TextQuestion,
-    [questionTypes.time]: TimeQuestion
+    [questionTypes.time]: TimeQuestion,
+    [questionTypes.image]: ImageQuestion
   }
 
   export default {
@@ -119,6 +121,7 @@
       GeoQuestion,
       IntegerQuestion,
       IntroQuestion,
+      ImageQuestion,
       MultipleSelectQuestion,
       RelationshipQuestion,
       RosterQuestion,

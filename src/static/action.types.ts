@@ -15,6 +15,8 @@ const ActionTypes = {
   set_val: 'set-val',
   add_geo: 'add-geo',
   remove_geo: 'remove-geo',
+  add_photo: 'add-photo',
+  remove_photo: 'remove-photo',
   set_date: 'set-date',
   set_text: 'set-text',
   set_time: 'set-time',
