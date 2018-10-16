@@ -10,6 +10,7 @@ import Action from '../../../entities/trellis/Action'
 import Form from '../../../entities/trellis/Form'
 import InterviewDataInterface, {ConditionTagInterface} from '../../../services/interview/InterviewDataInterface'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
+import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 
 export interface InterviewData {
   respondentFills?: RespondentFill[]
@@ -84,7 +85,8 @@ export default class InterviewLoader {
     actions: Action[],
     data: InterviewDataInterface,
     form: Form,
-    respondentFills: RespondentFill[]
+    respondentFills: RespondentFill[],
+    baseRespondentConditionTags: RespondentConditionTag[]
   }> {
     let interview
     return InterviewService.getInterview(interviewId).then(int => {
@@ -93,16 +95,41 @@ export default class InterviewLoader {
         InterviewService.getActions(interviewId),
         InterviewService.getData(interviewId),
         FormService.getForm(interview.survey.formId, true),
-        RespondentService.getRespondentFillsById(interview.survey.respondentId),
+        RespondentService.getRespondentFillsById(interview.survey.respondentId)
       ])
     }).then(res => {
       let [actions, data, form, respondentFills] = res
+
+      // Base respondent condition tags start with all respondent scope condition tags
+      let baseRespondentConditionTags: RespondentConditionTag[] = data.conditionTags.respondent
+
+      // Then we need to loop through questions and find all assigned condition tags in this form
+      // We'll store the condition tag IDs in this object
+      let conditionTagIds = {}
+      form.sections.forEach((section) => {
+        section.questionGroups.forEach((questionGroup) => {
+          questionGroup.questions.forEach((question) => {
+            question.assignConditionTags.forEach((act) => {
+              console.log('act', act)
+              conditionTagIds[act.conditionTagId] = true
+            })
+          })
+        })
+      })
+
+      // Now let's filter out any condition tags that may be assigned by the current form
+      baseRespondentConditionTags = baseRespondentConditionTags.filter((rct) => {
+        return (! conditionTagIds.hasOwnProperty(rct.conditionTagId))
+      })
+      // We're left by condition tags that were assigned outside of the scope of this form
+
       return {
         interview,
         actions,
         data,
         form,
-        respondentFills
+        respondentFills,
+        baseRespondentConditionTags
       }
     })
   }

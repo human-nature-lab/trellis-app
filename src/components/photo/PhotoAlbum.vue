@@ -11,55 +11,39 @@
         v-for="photo in photos"
         :key="photo.id">
         <Photo
-          @click="showAlbum(photo)"
-          :is-contained="true"
-          :height="height"
-          :width="width"
+          @click="showFull(photo)"
+          :isCentered="true"
+          height="height"
           :photo="photo"/>
       </v-flex>
       <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     </v-layout>
-    <v-dialog fullscreen lazy v-model="isAlbumOpen">
-      <v-container class="photo-album-carousel-container">
-        <v-card class="photo-album-carousel-card">
-          <v-toolbar color="primary">
-            <v-spacer />
-            <v-btn icon @click="isAlbumOpen=false">
-              <v-icon>close</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <v-carousel :cycle="false" class="photo-album-carousel">
-            <v-carousel-item
-              :src="src"
-              v-for="src in imageSources" />
-          </v-carousel>
-        </v-card>
-      </v-container>
-    </v-dialog>
+    <FullscreenPhoto :photo="fullPhoto" v-model="isFullOpen"/>
   </v-container>
 </template>
 
 <script>
   import Photo from './Photo'
   import AddPhoto from './AddPhoto'
-  import PhotoService from '../../services/photo/PhotoService'
-  import URL_PLACEHOLDER from '../../assets/Placeholder_person.jpg'
+  import FullscreenPhoto from './FullscreenPhoto'
+  // import ModalTitle from '../ModalTitle'
 
   // TODO: Make it possible to remove photos. What should the UI look like for this?
   // TODO: Make it possible to reorder photos
-  // TODO: Get rid of image carousel and instead click on a single image to expand full screen. Image carousel is taking up too much cpu and memory
   export default {
     components: {
       Photo,
-      AddPhoto
+      AddPhoto,
+      FullscreenPhoto
     },
     data () {
       this._srcCache = {}
       return {
         isAddingPhoto: false,
-        isAlbumOpen: false,
         imageSources: () => [],
-        numTimesLoaded: 0
+        numTimesLoaded: 0,
+        fullPhoto: null,
+        isFullOpen: false
       }
     },
     name: 'PhotoAlbum',
@@ -69,12 +53,12 @@
         default: () => []
       },
       width: {
-        type: Number,
-        default: 250
+        type: String,
+        default: '250'
       },
       height: {
-        type: Number,
-        default: 250
+        type: String,
+        default: '250'
       },
       title: {
         type: String,
@@ -88,47 +72,12 @@
       }
     },
     methods: {
-      rightClick (photo) {
-        debugger
-        photo.showMenu = true
-      },
-      async showAlbum () {
-        await this.updateSrcs()
-        this.isAlbumOpen = true
-      },
-      async updateSrcs () {
-        this.numTimesLoaded++
-        const srcs = []
-        const toLoad = []
-        for (let photo of this.photos) {
-          if (!this._srcCache[photo.id]) {
-            toLoad.push(photo)
-          }
-          srcs.push(this._srcCache[photo.id] || URL_PLACEHOLDER)
-        }
-        this.imageSources = srcs
-        console.log('sources', this.imageSources.length, toLoad.length)
-        if (toLoad.length && this.numTimesLoaded < 10) {
-          await Promise.all(toLoad.map(p => this.loadPhotoSrc(p)))
-          this.updateSrcs()
-        } else {
-          console.log('done loading photos', toLoad)
-        }
+      showFull (photo) {
+        this.fullPhoto = photo
+        this.isFullOpen = true
       },
       onAddPhoto (photo) {
         this.$emit('photo', photo)
-      },
-      async loadPhotoSrc (photo) {
-        return PhotoService.getPhotoSrc(photo.id).then(src => {
-          this._srcCache[photo.id] = src
-        })
-      }
-    },
-    watch: {
-      photos () {
-        if (this.isAlbumOpen) {
-          this.updateSrcs()
-        }
       }
     }
   }

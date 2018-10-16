@@ -1,9 +1,9 @@
 <template>
   <v-flex
-    class="photo"
-    :class="{contained: isContained}"
+    class="photo grey lighten-4"
+    :class="{contained: isContained, centered: isCentered}"
     ref="container"
-    :style="{'width': width + 'px', 'min-height': height + 'px'}"
+    :style="photoStyles"
     @click="$emit('click', $event)">
     <v-progress-circular
       v-if="isLoading"
@@ -54,15 +54,19 @@
         type: Boolean,
         default: false
       },
+      isCentered: {
+        type: Boolean,
+        default: false
+      },
       showAlt: {
         type: Boolean,
         default: true
       },
       width: {
-        required: true
+        type: String
       },
       height: {
-        required: true
+        type: String
       }
     },
     data: function () {
@@ -81,9 +85,14 @@
     },
     mounted () {
       observer.observe(this.$refs.container)
-      this.id = this.photo ? this.photo.id : this.photoId
-      if (this.showAlt && this.photo && this.photo.alt) {
-        this.alt = this.photo.alt
+      this.resetPhoto()
+    },
+    watch: {
+      photo () {
+        this.resetPhoto()
+      },
+      photoId () {
+        this.resetPhoto()
       }
     },
     beforeDestroy: function () {
@@ -92,6 +101,17 @@
       this.cancelLoad()
     },
     methods: {
+      resetPhoto () {
+        this.id = this.photo ? this.photo.id : this.photoId
+        if (this.showAlt && this.photo && this.photo.alt) {
+          this.alt = this.photo.alt
+        }
+        this.cancelLoad()
+        this.srcLoading = false
+        this.srcLoaded = false
+        this.imgLoading = false
+        this.imgLoaded = false
+      },
       setSrc (src) {
         this.src = src
         this.srcLoaded = true
@@ -169,17 +189,42 @@
       },
       hasError () {
         return !!this.loadingError
+      },
+      photoStyles () {
+        let styles = {}
+        if (this.width) {
+          styles.width = this.width + 'px'
+        }
+        if (this.isCentered && this.height) {
+          styles.height = this.height + 'px'
+        } else if (this.height) {
+          styles.minHeight = this.height + 'px'
+        }
+        return styles
       }
     }
   }
 </script>
 
 <style lang="sass">
-.photo.contained
-  max-height: 100%
-  max-width: 100%
-  flex-grow: 0
-  img
-   max-height: 100%
-   max-width: 100%
+.photo
+  &.centered
+    display: block
+    overflow: hidden
+    position: relative
+    /*background: black*/
+    img
+      display: block
+      margin: auto
+      width: auto
+      height: auto
+      max-width: 100%
+      max-height: 100%
+  &.contained
+    max-height: 100%
+    max-width: 100%
+    flex-grow: 0
+    img
+     max-height: 100%
+     max-width: 100%
 </style>
