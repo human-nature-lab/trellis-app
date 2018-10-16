@@ -115,6 +115,8 @@ export default class ActionStore extends Emitter {
     }
     if (!action.payload.val) {
       action.payload.val = ''
+    } else if (typeof action.payload.val !== 'string') {
+      action.payload.val = action.payload.val + ''
     }
     if (action.payload['n'] === undefined || action.payload['n'] === null) {
       action.payload['n'] = this.store.length
