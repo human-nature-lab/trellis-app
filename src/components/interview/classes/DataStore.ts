@@ -82,10 +82,13 @@ export default class DataStore extends Emitter {
   /**
    * Load existing condition tags
    * @param {Object} tags - has respondent, survey and section arrays
+   * @param {RespondentConditionTag[]} baseRespondentConditionTags - respondent condition tags that were not assigned by this form and should not be removed
    * @MOVE_TO_SERVICE_LAYER
    */
-  loadConditionTags (tags: any) {
-    if (tags && tags.respondent) {
+  loadConditionTags (tags: any, baseRespondentConditionTags?: RespondentConditionTag[]) {
+    if (baseRespondentConditionTags) {
+      this.baseRespondentConditionTags = baseRespondentConditionTags
+    } else if (tags && tags.respondent) {
       this.baseRespondentConditionTags = tags.respondent
     }
     for (let type of ['respondent', 'survey', 'section']) {
