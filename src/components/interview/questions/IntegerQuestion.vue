@@ -37,7 +37,7 @@
         set (val) {
           this._value = val
           this.action(AT.number_change, {
-            val
+            val: val
           })
         }
       }
