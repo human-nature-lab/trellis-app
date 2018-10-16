@@ -176,6 +176,7 @@ class SyncService {
   }
 
   async getRowsToUpdate (connection:Connection, tableName:string, limit:number, offset:number): Promise<string[]> {
+    // TODO: should this be select distinct
     const rowIdObjects = await connection.query('select updated_record_id from updated_records ' +
       'where table_name = ? ' +
       'and uploaded_at is null ' +
