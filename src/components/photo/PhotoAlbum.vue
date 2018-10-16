@@ -18,26 +18,14 @@
       </v-flex>
       <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     </v-layout>
-    <v-dialog
-      fullscreen
-      lazy
-      :hide-overlay="false"
-      v-model="isFullOpen">
-      <!--<ModalTitle title="" @close="isFullOpen = false"/>-->
-      <v-container
-        fluid
-        fill-height
-        class="full-photo grey lighten-4"
-        @click="isFullOpen = false">
-        <Photo :photo="fullPhoto" :isContained="true" />
-      </v-container>
-    </v-dialog>
+    <FullscreenPhoto :photo="fullPhoto" v-model="isFullOpen"/>
   </v-container>
 </template>
 
 <script>
   import Photo from './Photo'
   import AddPhoto from './AddPhoto'
+  import FullscreenPhoto from './FullscreenPhoto'
   // import ModalTitle from '../ModalTitle'
 
   // TODO: Make it possible to remove photos. What should the UI look like for this?
@@ -45,7 +33,8 @@
   export default {
     components: {
       Photo,
-      AddPhoto
+      AddPhoto,
+      FullscreenPhoto
     },
     data () {
       this._srcCache = {}
