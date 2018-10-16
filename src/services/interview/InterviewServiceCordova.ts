@@ -7,14 +7,13 @@ import InterviewDeltaInterface from './InterviewDeltaInterface'
 import QuestionDatum from '../../entities/trellis/QuestionDatum'
 import PreloadAction from '../../entities/trellis/PreloadAction'
 import UserService from '../user/UserService'
-import SurveyConditionTag from "../../entities/trellis/SurveyConditionTag";
-import SectionConditionTag from "../../entities/trellis/SectionConditionTag";
-import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag";
-import {IsNull, QueryRunner, Repository, SelectQueryBuilder} from "typeorm";
-import Survey from "../../entities/trellis/Survey";
-import Datum from "../../entities/trellis/Datum";
-import InterviewDataInterface from "./InterviewDataInterface";
-import GeoLocationService from "../geolocation";
+import SurveyConditionTag from '../../entities/trellis/SurveyConditionTag'
+import SectionConditionTag from '../../entities/trellis/SectionConditionTag'
+import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
+import {IsNull, Repository, SelectQueryBuilder} from 'typeorm'
+import Survey from '../../entities/trellis/Survey'
+import Datum from '../../entities/trellis/Datum'
+import InterviewDataInterface from './InterviewDataInterface'
 
 export default class InterviewServiceCordova implements InterviewServiceInterface {
 
@@ -138,11 +137,12 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
   }
 
   private async getQuestionDatum (interviewId: string): Promise<QuestionDatum[]> {
-    return await (await DatabaseService.getRepository(QuestionDatum)).createQueryBuilder('question_datum')
+    return (await DatabaseService.getRepository(QuestionDatum)).createQueryBuilder('question_datum')
       .where(qb => {
         return `question_datum.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`
       })
-      .leftJoinAndSelect('question_datum.data', 'datum')
+      .andWhere('question_datum.deleted_at is null')
+      .leftJoinAndSelect('question_datum.data', 'datum', 'datum.deleted_at is null')
       .getMany()
   }
 
@@ -189,52 +189,70 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     const connection = await DatabaseService.getDatabase()
 
     connection.transaction(async manager => {
+      manager.query(`PRAGMA defer_foreign_keys = true;`)
+
       // Remove stuff first
       for (let removedDatum of diff.data.datum.removed) {
         await manager.update(Datum, { id: removedDatum.id }, { deletedAt: new Date() })
       }
-      for (let removedQuestionDatum of diff.data.datum.removed) {
+      for (let removedQuestionDatum of diff.data.questionDatum.removed) {
         await manager.update(QuestionDatum, { id: removedQuestionDatum.id }, { deletedAt: new Date() })
       }
 
-      // TODO: Foreign key constraint issue when inserting QuestionDatum with followUpDatumId before referenced Datum is inserted
-      // Insert second
+      // Insert 2nd
       for (let addedQuestionDatum of diff.data.questionDatum.added) {
-        await manager.insert(QuestionDatum, {
-          id: addedQuestionDatum.id,
-          questionId: addedQuestionDatum.questionId,
-          surveyId: addedQuestionDatum.surveyId,
-          followUpDatumId: addedQuestionDatum.followUpDatumId,
-          sectionRepetition: addedQuestionDatum.sectionRepetition,
-          answeredAt: addedQuestionDatum.answeredAt,
-          skippedAt: addedQuestionDatum.skippedAt,
-          dkRf: addedQuestionDatum.dkRf,
-          dkRfVal: addedQuestionDatum.dkRfVal,
-          createdAt: addedQuestionDatum.createdAt,
-          updatedAt: addedQuestionDatum.updatedAt,
-          deletedAt: addedQuestionDatum.deletedAt
-        })
+        let questionDatumExists = await manager.findOne(QuestionDatum, {id: addedQuestionDatum.id})
+        if (questionDatumExists instanceof QuestionDatum) {
+          // Just undelete it
+          await manager.update(QuestionDatum, { id: addedQuestionDatum.id }, { deletedAt: null })
+        } else {
+          await manager.insert(QuestionDatum,
+            {
+              id: addedQuestionDatum.id,
+              questionId: addedQuestionDatum.questionId,
+              surveyId: addedQuestionDatum.surveyId,
+              followUpDatumId: addedQuestionDatum.followUpDatumId,
+              sectionRepetition: addedQuestionDatum.sectionRepetition,
+              answeredAt: addedQuestionDatum.answeredAt,
+              skippedAt: addedQuestionDatum.skippedAt,
+              dkRf: addedQuestionDatum.dkRf,
+              dkRfVal: addedQuestionDatum.dkRfVal,
+              createdAt: addedQuestionDatum.createdAt,
+              updatedAt: addedQuestionDatum.updatedAt,
+              deletedAt: addedQuestionDatum.deletedAt
+            })
+        }
       }
 
       for (let addedDatum of diff.data.datum.added) {
-        await manager.insert(Datum, {
-          id: addedDatum.id,
-          choiceId: addedDatum.choiceId,
-          datumTypeId: addedDatum.datumTypeId,
-          edgeId: addedDatum.edgeId,
-          eventOrder: addedDatum.eventOrder,
-          geoId: addedDatum.geoId,
-          name: addedDatum.name,
-          photoId: addedDatum.photoId,
-          questionDatumId: addedDatum.questionDatumId,
-          rosterId: addedDatum.rosterId,
-          sortOrder: addedDatum.sortOrder,
-          surveyId: addedDatum.surveyId,
-          val: addedDatum.val,
-          createdAt: addedDatum.createdAt,
-          updatedAt: addedDatum.updatedAt,
-          deletedAt: addedDatum.deletedAt
-        })
+        let datumExists = await manager.findOne(Datum, {id: addedDatum.id})
+        if (datumExists instanceof Datum) {
+          // Just undelete it
+          await manager.update(Datum, {id: addedDatum.id}, {deletedAt: null})
+        } else {
+          if (addedDatum.val === null) {
+            console.log('addedDatum.val === null', addedDatum)
+          }
+          await manager.insert(Datum,
+            {
+              id: addedDatum.id,
+              choiceId: addedDatum.choiceId,
+              datumTypeId: addedDatum.datumTypeId,
+              edgeId: addedDatum.edgeId,
+              eventOrder: addedDatum.eventOrder,
+              geoId: addedDatum.geoId,
+              name: addedDatum.name,
+              photoId: addedDatum.photoId,
+              questionDatumId: addedDatum.questionDatumId,
+              rosterId: addedDatum.rosterId,
+              sortOrder: addedDatum.sortOrder,
+              surveyId: addedDatum.surveyId,
+              val: addedDatum.val,
+              createdAt: addedDatum.createdAt,
+              updatedAt: addedDatum.updatedAt,
+              deletedAt: addedDatum.deletedAt
+            })
+        }
       }
 
       // Update last
