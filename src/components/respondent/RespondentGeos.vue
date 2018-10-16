@@ -132,6 +132,7 @@
       },
       startMove (respondentGeo: RespondentGeo): Promise<void> {
         return checkForCensusForm(CensusTypes.move_respondent, this.global.study.id, this.respondent.id).then(hasCensusForm => {
+          // Implicit redirect to existing census form so we don't redirect here... This is a dumb way to do this.
           if (!hasCensusForm) {
             this.movingRespondentGeo = respondentGeo
             this.isMovingGeo = true

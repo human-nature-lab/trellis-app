@@ -10,13 +10,24 @@
       <v-card-text>
         <v-container fluid v-if="respondentGeo">
           <v-layout>
-            Moving Respondent Geo:
-            <AsyncTranslationText v-if="respondentGeo.geo" :translation="respondentGeo.geo.nameTranslation" />
-            <span v-else>{{$t('unknown_location')}}</span>
+            Moving from:
+            <v-chip
+              color="primary"
+              outline
+              label>
+              <AsyncTranslationText v-if="respondentGeo.geo" :translation="respondentGeo.geo.nameTranslation" />
+              <span v-else>{{$t('unknown_location')}}</span>
+            </v-chip>
           </v-layout>
           <v-layout>
             <v-flex v-if="newGeo">
-              Moving to: <AsyncTranslationText :translation="newGeo.nameTranslation" />
+              Moving to:
+              <v-chip
+                color="primary"
+                outline
+                label>
+                <AsyncTranslationText :translation="newGeo.nameTranslation" />
+              </v-chip>
             </v-flex>
             <v-flex>
               <v-btn
@@ -93,10 +104,11 @@
       async save () {
         try {
           let rGeo
-          if (this.newGeo && this.newGeo.id === this.respondentGeo.geoId) {
-            return
-          } else if (this.moveToUnknown) {
+          if (this.moveToUnknown) {
             rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, null)
+            debugger
+          } else if (this.newGeo && this.newGeo.id === this.respondentGeo.geoId) {
+            return
           } else {
             rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, this.newGeo.id)
           }

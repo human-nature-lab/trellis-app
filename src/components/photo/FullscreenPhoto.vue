@@ -5,7 +5,7 @@
     :hide-overlay="false"
     :value="value"
     @input="$emit('input', $event)">
-    <!--<ModalTitle title="" @close="isFullOpen = false"/>-->
+    <ModalTitle title="" @close="$emit('input', false)"/>
     <v-container
       fluid
       fill-height
@@ -17,9 +17,10 @@
 </template>
 
 <script>
+  import ModalTitle from '../ModalTitle'
   import Photo from './Photo'
   export default {
-    components: {Photo},
+    components: {Photo, ModalTitle},
     props: {
       value: {
         type: Boolean,
