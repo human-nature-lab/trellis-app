@@ -1,10 +1,11 @@
-import isEqual from 'lodash/isEqual'
 import {AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta} from '../../../services/interview/InterviewDeltaInterface'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import SectionConditionTag from "../../../entities/trellis/SectionConditionTag";
 import SurveyConditionTag from "../../../entities/trellis/SurveyConditionTag";
 import RespondentConditionTag from "../../../entities/trellis/RespondentConditionTag";
 import {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
+import * as Moment from 'moment'
+import union from 'lodash/union'
 export default class DiffService {
   /**
    * Take two maps and return their
@@ -27,11 +28,8 @@ export default class DiffService {
         } else {
           a = newObjMap.get(key)
           b = oldObjMap.get(key)
-          if (comparisonKeys) {
-            if (!DiffService.isEqualKeys(a, b, comparisonKeys)) {
-              modified.push(a)
-            }
-          } else if (!isEqual(a, b)) {
+
+          if (!DiffService.isEqualKeys(a, b, comparisonKeys)) {
             modified.push(a)
           }
         }
@@ -71,16 +69,7 @@ export default class DiffService {
       oldQDatumMap.set(q.id, q)
     }
 
-    const questionDatum = DiffService.mapDiffByKey(newQDatumMap, oldQDatumMap, [
-      'questionId',
-      'surveyId',
-      'followUpDatumId',
-      'sectionRepetition',
-      'answeredAt',
-      'skippedAt',
-      'dkRf',
-      'dkRfVal'
-    ])
+    const questionDatum = DiffService.mapDiffByKey(newQDatumMap, oldQDatumMap)
     const datum = DiffService.mapDiffByKey(newDatum, oldDatum)
 
     return new DataDelta(datum, questionDatum)
@@ -116,8 +105,14 @@ export default class DiffService {
    * @param {string[]} keys
    * @returns {boolean}
    */
-  static isEqualKeys (one: object, two: object, keys: string[]) {
+  static isEqualKeys (one: object, two: object, keys?: string[]) {
+    if (!keys) {
+      keys = union(Object.keys(one), Object.keys(two))
+    }
     for (let key of keys) {
+      if (Moment.isMoment(one[key])) {
+        return one[key].isSame(two[key])
+      }
       if (one[key] !== two[key]) {
         return false
       }
