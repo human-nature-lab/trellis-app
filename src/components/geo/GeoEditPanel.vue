@@ -8,7 +8,6 @@
         top
         right
         mt-5
-        small
         style="top: 0"
         @click="closePanel"><v-icon>clear</v-icon></v-btn>
       <v-card-title>
@@ -20,32 +19,33 @@
           v-on:editing-done="onEditingDone">
         </translation-text-field>
         <div slot="header" v-if="curStatus === STATUS.NEW_POSITION">
-          <h2>New Location</h2>
-          <p>Click on the map where you want to add this location.</p>
+          <h2>{{ $t('new_location') }}</h2>
+          <p>{{ $t('click_on_the_map') }}</p>
         </div>
         <div slot="header" v-if="curStatus === STATUS.SELECTED"><h2>{{ geoTranslation }}</h2></div>
         <div slot="header" v-if="curStatus === STATUS.MOVING">
-          <h2>Moving {{ geoTranslation }}</h2>
-          <p>Click on the map where you want to move this location.</p>
+          <h2>{{ $t('moving') }} {{ geoTranslation }}</h2>
+          <p>{{ $t('click_on_the_map') }}</p>
         </div>
       </v-card-title>
       <v-card-actions v-if="curStatus === STATUS.SELECTED">
-        <v-btn flat @click="selectGeo">View children</v-btn>
-        <v-btn flat @click="showGeoInfo">More info</v-btn>
+        <v-btn large @click="selectGeo">{{ $t('view_children') }}</v-btn>
+        <v-btn large @click="showGeoInfo">{{ $t('more_info') }}</v-btn>
       </v-card-actions>
       <v-card-actions>
+        <v-spacer></v-spacer>
         <geo-type-selector
           v-if="curStatus === STATUS.NEW_GEO_TYPE"
           :show-user-addable="true"
           v-on:geo-type-selected="geoTypeSelected">
         </geo-type-selector>
         <span v-if="curStatus === STATUS.SELECTED">
-          <v-btn small flat @click="moveGeo">Move <v-icon right>my_location</v-icon></v-btn>
-          <v-btn small flat @click="renameGeo">Rename <v-icon right>edit</v-icon></v-btn>
-          <v-btn small flat @click="removeGeo">Delete <v-icon right>delete</v-icon></v-btn>
+          <v-btn small flat @click="moveGeo">{{ $t('move') }} <v-icon right>my_location</v-icon></v-btn>
+          <v-btn small flat @click="renameGeo">{{ $t('rename') }} <v-icon right>edit</v-icon></v-btn>
+          <v-btn small flat @click="removeGeo">{{ $t('delete') }} <v-icon right>delete</v-icon></v-btn>
         </span>
-        <v-switch v-if="curStatus === STATUS.MOVING" label="Move child elements to the same position" v-model="moveChildren"></v-switch>
-        <v-btn v-if="curStatus === STATUS.MOVING" flat @click="cancelMoveGeo">Cancel</v-btn>
+        <v-switch v-if="curStatus === STATUS.MOVING" :label="$t('move_child_elements')" v-model="moveChildren"></v-switch>
+        <v-btn v-if="curStatus === STATUS.MOVING" flat @click="cancelMoveGeo">{{ $t('cancel') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-flex>
@@ -151,7 +151,7 @@
         this.curStatus = STATUS.EDIT_NAME
       },
       removeGeo: async function () {
-        if (!window.confirm(`Are you sure you want to delete this geo element?`)) return
+        if (!window.confirm(this.$t('confirm_delete_geo'))) return
         try {
           await GeoService.removeGeo(this.selectedGeo.id)
           this.$emit('remove-geo-done', this.selectedGeo.id)
@@ -193,7 +193,7 @@
           return ''
         }
         const translation = TranslationService.getTranslated(this.selectedGeo.nameTranslation, this.global.locale)
-        return (translation) ? translation : '[No translation]'
+        return (translation) ? translation : `[${this.$t('no_translation')}]`
       },
       showPanel: function () {
         return (this.selectedGeo !== null)
