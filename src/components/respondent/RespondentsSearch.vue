@@ -55,7 +55,7 @@
     <v-alert v-if="error">
       {{error}}
     </v-alert>
-    <v-card class="respondents" fluid grid-list-sm>
+    <v-container class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
         <RespondentItem
           v-for="respondent in respondentResults"
@@ -91,7 +91,7 @@
           </span>
         </v-tooltip>
       </v-layout>
-    </v-card>
+    </v-container>
     <v-dialog
       v-model="showAssociatedRespondentDialog">
       <v-card>
