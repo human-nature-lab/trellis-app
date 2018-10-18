@@ -103,8 +103,8 @@
                       :data-interview-id="interview.id"
                       :key="interview.id">
                       <td>{{getName(interview.user)}} <span class="light">({{getUsername(interview.user)}})</span></td>
-                      <td>{{interview.startTime}}</td>
-                      <td>{{interview.endTime}}</td>
+                      <td>{{interview.startTime.local().format('llll')}}</td>
+                      <td>{{interview.endTime.local().format('llll')}}</td>
                     </tr>
                   </table>
                 </td>
