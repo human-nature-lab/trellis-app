@@ -81,7 +81,10 @@
 <style lang="sass">
   .input-group
     label
-      line-height: 26px
+      position: static
+      height: auto
+      white-space: normal
+      display: block
     &.other
       .input-group__details
         display: none
