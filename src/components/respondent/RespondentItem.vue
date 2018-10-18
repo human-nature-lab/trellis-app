@@ -3,7 +3,7 @@
     <v-card
       :raised="selected === true"
       tile
-      :class="{selected: selected === true, respondent: true}">
+      :class="{selected: selected === true, respondent: true, 'ma-1': true}">
       <v-card-media class="respondent-photo"
                     @click="onClick()">
         <Photo

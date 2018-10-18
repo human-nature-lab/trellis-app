@@ -1,6 +1,6 @@
 <template>
   <v-flex
-    class="photo grey lighten-4"
+    class="photo"
     :class="{contained: isContained, centered: isCentered}"
     ref="container"
     :style="photoStyles"
