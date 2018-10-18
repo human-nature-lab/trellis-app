@@ -26,7 +26,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
         deletedAt: IsNull(),
         id: geoId
       },
-      relations: ['geoType', 'photos', 'nameTranslation']
+      relations: ['geoType', 'photos', 'nameTranslation', 'nameTranslation.translationText']
     })
   }
 
