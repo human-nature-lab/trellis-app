@@ -21,6 +21,7 @@ class StudyServiceCordova extends StudyServiceAbstract {
   async getUserStudies (userId: string): Promise<Study[]> {
     const repo = await DatabaseService.getRepository(Study)
     return await repo.createQueryBuilder('study')
+      .leftJoinAndSelect('study.locales', 'locale')
       .where(qb => 'study.id in ' + qb.subQuery()
         .select('user_study.studyId')
         .from(UserStudy, 'user_study')
@@ -36,7 +37,8 @@ class StudyServiceCordova extends StudyServiceAbstract {
       return await repo.find({
         where: {
           deletedAt: IsNull()
-        }
+        },
+        relations: ['locales']
       })
     } else {
       return await this.getUserStudies(user.id)
