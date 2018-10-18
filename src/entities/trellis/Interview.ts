@@ -3,6 +3,7 @@ import {AsDate, Relationship, Serializable} from '../decorators/WebOrmDecorators
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Survey from './Survey'
 import User from './User'
+import MomentTransformer from '../base/MomentTransformer'
 
 @Entity()
 export class Interview extends TimestampedSoftDelete {
@@ -12,9 +13,9 @@ export class Interview extends TimestampedSoftDelete {
   surveyId: string
   @Column({ nullable: true }) @Serializable
   userId: string
-  @Column({ type: 'datetime' }) @Serializable @AsDate
+  @Column({ type: 'datetime', transformer: MomentTransformer }) @Serializable @AsDate
   startTime: Date
-  @Column({ type: 'datetime', nullable: true }) @Serializable @AsDate
+  @Column({ type: 'datetime', nullable: true, transformer: MomentTransformer }) @Serializable @AsDate
   endTime: Date
   @Column({ nullable: true }) @Serializable
   latitude: string
