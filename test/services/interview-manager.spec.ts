@@ -29,6 +29,7 @@ import {locToNumber} from "../../src/components/interview/services/LocationHelpe
 import moment from 'moment'
 import Form from "../../src/entities/trellis/Form";
 import Skip from "../../src/entities/trellis/Skip";
+import Measurement from "../../src/classes/Measurement";
 
 interface SimpleLocation {
   section?: number
@@ -304,6 +305,70 @@ export default function () {
         validateLocation(manager.location, {page: 1})
         prev(manager)
         validateLocation(manager.location, {page: 0})
+      })
+
+      describe('PERFORMANCE', () => {
+        let manager
+        before(async () => {
+          manager = await setupInterviewManager(forms.largeRepeated)
+          manager.initialize()
+        })
+
+        it('should run quickly with repeated sections', () => {
+          validateLocation(manager.location, {page: 0, section: 0})
+          for (let n = 0; n < 10; n++) {
+            const a = makeAction(manager.getCurrentPageQuestions()[0].id, AT.add_roster_row, {
+              roster_id: rosterId,
+              val: rosterId,
+              name: rosterId
+            })
+            manager.pushAction(a)
+          }
+          next(manager)
+          let c = 0
+          while (c < 1000) {
+            selectNChoice(manager)
+            next(manager)
+            if (manager.navigator.isAtEnd) {
+              break
+            }
+            c++
+          }
+          let dir = 0
+          const nextMeasurement = new Measurement('NextTiming')
+          const prevMeasurement = new Measurement('PrevTiming')
+          function prevM () {
+            prevMeasurement.startTick()
+            prev(manager)
+            prevMeasurement.stopTick()
+          }
+          function nextM () {
+            nextMeasurement.startTick()
+            next(manager)
+            nextMeasurement.stopTick()
+          }
+          for (let i = 0; i < 1000; i++) {
+            if (dir === 0) {
+              // forward
+              if (manager.navigator.isAtEnd) {
+                dir = 1
+                prevM()
+              } else {
+                nextM()
+              }
+            } else {
+              // backward
+              if (manager.navigator.isAtStart) {
+                dir = 0
+                nextM()
+              } else {
+                prevM()
+              }
+            }
+          }
+          nextMeasurement.end()
+          prevMeasurement.end()
+        })
       })
     })
     it('should be able to move backward even if the current page has invalid responses', async () => {
