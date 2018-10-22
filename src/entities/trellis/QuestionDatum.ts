@@ -66,4 +66,19 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     return this
   }
 
+  copy () {
+    const q = new QuestionDatum()
+    q.id = this.id
+    q.questionId = this.questionId
+    q.surveyId = this.surveyId
+    q.followUpDatumId = this.followUpDatumId
+    q.sectionRepetition = this.sectionRepetition
+    q.answeredAt = this.answeredAt
+    q.skippedAt = this.skippedAt
+    q.dkRf = this.dkRf
+    q.dkRfVal = this.dkRfVal
+    q.data = []
+    return q
+  }
+
 }

@@ -68,4 +68,22 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
     }
     return this
   }
+
+  copy () {
+    let d = new Datum()
+    d.choiceId = this.choiceId
+    d.datumTypeId = this.datumTypeId
+    d.edgeId = this.edgeId
+    d.eventOrder = this.eventOrder
+    d.geoId = this.geoId
+    d.id = this.id
+    d.name = this.name
+    d.photoId = this.photoId
+    d.questionDatumId = this.questionDatumId
+    d.rosterId = this.rosterId
+    d.sortOrder = this.sortOrder
+    d.surveyId = this.surveyId
+    d.val = this.val
+    return d
+  }
 }
