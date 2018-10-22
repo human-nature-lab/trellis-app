@@ -326,8 +326,11 @@ export default function () {
           }
           next(manager)
           let c = 0
+          const nActions = 21
           while (c < 1000) {
-            selectNChoice(manager)
+            for (let i = 0; i < nActions; i++) {
+              selectNChoice(manager)
+            }
             next(manager)
             if (manager.navigator.isAtEnd) {
               break
