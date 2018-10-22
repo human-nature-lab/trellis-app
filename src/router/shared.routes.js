@@ -3,7 +3,7 @@ import RespondentForms from '../components/respondent/RespondentForms'
 import RespondentsSearch from '../components/respondent/RespondentsSearch'
 import RespondentInfo from '../components/respondent/RespondentInfo'
 import CameraTest from '../components/CameraTest'
-import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
+import Geo from '../components/geo/Geo'
 import GeoInfo from '../components/geo/GeoInfo'
 import LocaleSelectorPage from '../components/LocaleSelectorPage'
 import StudySelectorPage from '../components/StudySelectorPage'
@@ -46,7 +46,7 @@ export default [{
 }, {
   path: '/search/locations',
   name: 'GeoSearch',
-  component: GeoSearchWithMap,
+  component: Geo,
   beforeEnter: chain(ValidateStudy, ValidateLocale)
 }, {
   path: '/geo/:geoId',
