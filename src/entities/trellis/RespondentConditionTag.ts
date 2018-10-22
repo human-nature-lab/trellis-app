@@ -50,4 +50,12 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
     return this
   }
 
+  copy () {
+    const r = new RespondentConditionTag()
+    r.id = this.id
+    r.respondentId = this.respondentId
+    r.conditionTagId = this.conditionTagId
+    return r
+  }
+
 }

@@ -54,4 +54,15 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
     return this
   }
 
+  copy () {
+    let s = new SectionConditionTag()
+    s.id = this.id
+    s.sectionId = this.sectionId
+    s.conditionId = this.conditionId
+    s.surveyId = this.surveyId
+    s.repetition = this.repetition
+    s.followUpDatumId = this.followUpDatumId
+    return s
+  }
+
 }

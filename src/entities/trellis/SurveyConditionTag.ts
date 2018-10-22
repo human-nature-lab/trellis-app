@@ -53,4 +53,13 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
     }
     return this
   }
+
+  copy () {
+    let s = new SurveyConditionTag()
+    s.id = this.id
+    s.surveyId = this.surveyId
+    s.conditionId = this.conditionId
+    return s
+  }
+
 }
