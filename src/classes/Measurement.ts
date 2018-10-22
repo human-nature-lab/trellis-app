@@ -1,5 +1,6 @@
 export default class Measurement {
-  private ticks: number[] = []
+  private min: number = Number.POSITIVE_INFINITY
+  private max: number = Number.NEGATIVE_INFINITY
   private sum: number = 0
   private n: number = 0
   private startTime: number
@@ -7,7 +8,8 @@ export default class Measurement {
   constructor (public name: string) {}
 
   public reset () {
-    this.ticks = []
+    this.min = Number.POSITIVE_INFINITY
+    this.max = Number.NEGATIVE_INFINITY
     this.sum = 0
     this.n = 0
     this.startTime = null
@@ -22,8 +24,13 @@ export default class Measurement {
       throw new Error('Must start a tick before stopping one')
     }
     const val = performance.now() - this.startTime
+    if (val < this.min) {
+      this.min = val
+    }
+    if (val > this.max) {
+      this.max = val
+    }
     this.startTime = null
-    this.ticks.push(val)
     this.sum += val
     this.n++
   }
@@ -33,6 +40,6 @@ export default class Measurement {
   }
 
   public end () {
-    console.log(`${this.name} - Average: ${this.average.toFixed(2)}  Total: ${this.sum.toFixed(2)}  Count: ${this.n}`)
+    console.log(`${this.name} - Average: ${this.average.toFixed(2)}  Total: ${this.sum.toFixed(2)}  Count: ${this.n}  Min: ${this.min}  Max: ${this.max}`)
   }
 }
