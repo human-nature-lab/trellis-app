@@ -159,7 +159,7 @@ export default class InterviewManager extends InterviewManagerBase {
       if (!questionDatum) {
         debugger
       }
-      this.data.emitChange()
+      // this.data.emitChange()
     } else if (action.actionType !== 'next' && action.actionType !== 'previous') {
       console.error(action)
       throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')

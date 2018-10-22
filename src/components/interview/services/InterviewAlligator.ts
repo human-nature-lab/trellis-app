@@ -43,16 +43,16 @@ export default class InterviewAlligator {
   }
 
   public initialize () {
-    this.data.on('change', this.markHasDataChanges, this)
+    this.data.on('change', this.indicateThatDataHasChanged, this)
     this.updatePages()
     this.goToFirstValidLocation()
   }
 
   public destroy () {
-    this.data.off('change', this.markHasDataChanges)
+    this.data.off('change', this.indicateThatDataHasChanged)
   }
 
-  private markHasDataChanges () {
+  private indicateThatDataHasChanged () {
     this.hasDataChanges = true
   }
 
@@ -89,7 +89,7 @@ export default class InterviewAlligator {
     } as InterviewLocation
     if (this.shouldSkipPage(loc)) {
       // console.log('skipping', JSON.stringify(loc), JSON.stringify(this.data.conditionTags), Array.from(this.getConditionTagSet(loc.sectionRepetition, loc.sectionFollowUpDatumId)))
-      this.skipped.push(loc)
+      // this.skipped.push(loc)
     } else {
       this.pages.push(loc)
     }
@@ -110,39 +110,58 @@ export default class InterviewAlligator {
   }
 
   private updatePages () {
-    // console.log('Updating navigation pages')
-    this.pages.splice(0, this.pages.length)
-    this.skipped.splice(0, this.skipped.length)
-    for (let section of this.form.sections) {
+    const initLocation: InterviewLocation = this.loc ? JSON.parse(JSON.stringify(this.loc)) : {
+      page: 0,
+      section: 0,
+      sectionRepetition: 0,
+      sectionFollowUpRepetition: 0
+    }
+    let actuallyUpdated = 0
+    const prevPages = this.pages.length
+    const expectedUpdate = this.pages.length - this.index
+    this.pages.splice(this.index)
+    for (let s = initLocation.section; s < this.form.sections.length; s++) {
+      const section = this.form.sections[s]
+      const isInitialSection = initLocation.section === s
       // TODO: Check if the section is repeated
       if (section.followUpQuestionId) {
         const data =  this.getFollowUpDatum(section.followUpQuestionId)
         // console.log('follow up data', data.length)
-        if (!data.length) {
-          // Marking skipped repeated section
-          for (let page of section.questionGroups) {
-            this.skipped.push({
-              pageId: page.id,
-              page: this.pageToNumIndex.get(page.id),
-              sectionId: section.id,
-              section: this.sectionToNumIndex.get(section.id),
-              sectionRepetition: 0,
-              sectionFollowUpDatumId: null,
-              sectionFollowUpRepetition: 0
-            } as InterviewLocation)
-          }
-        }
-        for (let datum of data) {
-          for (let page of section.questionGroups) {
+        // if (!data.length) {
+        //   // Marking skipped repeated section
+        //   for (let page of section.questionGroups) {
+        //     this.skipped.push({
+        //       pageId: page.id,
+        //       page: this.pageToNumIndex.get(page.id),
+        //       sectionId: section.id,
+        //       section: this.sectionToNumIndex.get(section.id),
+        //       sectionRepetition: 0,
+        //       sectionFollowUpDatumId: null,
+        //       sectionFollowUpRepetition: 0
+        //     } as InterviewLocation)
+        //   }
+        // }
+        const initFollowUpRepetition = isInitialSection ? initLocation.sectionFollowUpRepetition : 0
+        for (let d = initFollowUpRepetition; d < data.length; d++) {
+          const datum = data[d]
+          const isSameRepetitionAsInitial = isInitialSection && d === initLocation.sectionFollowUpRepetition
+          const initPage =  isSameRepetitionAsInitial ? initLocation.page : 0
+          for (let p = initPage; p < section.questionGroups.length; p++) {
+            const page = section.questionGroups[p]
             this.addLocation(page.id, section.id, datum.id, datum.eventOrder, 0)
+            actuallyUpdated++
           }
         }
       } else {
-        for (let page of section.questionGroups) {
+        const initPage = isInitialSection ? initLocation.page : 0
+        for (let p = initPage; p < section.questionGroups.length; p++) {
+          const page = section.questionGroups[p]
           this.addLocation(page.id, section.id, null, 0, 0)
+          actuallyUpdated++
         }
       }
     }
+    // console.log(`updated ${actuallyUpdated} pages. expected to update ~${expectedUpdate} / ${prevPages}`)
     this.hasDataChanges = false
   }
 
@@ -203,7 +222,7 @@ export default class InterviewAlligator {
 
   public zero (): void {
     this.index = 0
-    this.markHasDataChanges()
+    // this.indicateThatDataHasChanged()
   }
 
   public get loc (): InterviewLocation {
@@ -224,7 +243,8 @@ export default class InterviewAlligator {
   }
 
   public next (): void {
-    this.updatePages()
+    // this.updatePages()
+    this.updateIfNecessary()
     this.index++
   }
 
