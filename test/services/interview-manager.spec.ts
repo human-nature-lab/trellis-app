@@ -347,7 +347,7 @@ export default function () {
             next(manager)
             nextMeasurement.stopTick()
           }
-          for (let i = 0; i < 1000; i++) {
+          for (let i = 0; i < 300; i++) {
             if (dir === 0) {
               // forward
               if (manager.navigator.isAtEnd) {
