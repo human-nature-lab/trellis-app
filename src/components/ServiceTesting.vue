@@ -28,7 +28,7 @@
               <v-icon v-else-if="test.state === FAILED" color="error">error</v-icon>
             </v-flex>
             <v-layout column>
-              <v-flex>{{test.title}}</v-flex>
+              <v-flex>{{test.title}} - {{test.duration}}</v-flex>
               <v-flex>{{ test.err }}</v-flex>
             </v-layout>
           </v-layout>
@@ -96,7 +96,8 @@
         return {
           state: test.state,
           title: this.getNestedTitle(test),
-          err: test.err ? test.err.message : null
+          err: test.err ? test.err.message : null,
+          duration: test.duration
         }
       },
       async validateLoggedIn () {
