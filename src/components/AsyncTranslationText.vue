@@ -32,8 +32,10 @@
     },
     watch: {
       translation (newTranslation) {
-        this.localTranslation = newTranslation
-        this.loadTranslation()
+        if (newTranslation.id !== this.localTranslation.id) {
+          this.localTranslation = newTranslation
+          this.loadTranslation()
+        }
       }
     },
     created () {
