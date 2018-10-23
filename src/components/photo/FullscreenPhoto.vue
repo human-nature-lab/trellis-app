@@ -11,7 +11,7 @@
       fill-height
       class="full-photo grey lighten-4"
       @click="$emit('input', false)">
-      <Photo :photo="photo" :isContained="true" />
+      <photo :photo="photo" :isContained="true"></photo>
     </v-container>
   </v-dialog>
 </template>

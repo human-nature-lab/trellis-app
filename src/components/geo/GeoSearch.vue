@@ -1,5 +1,5 @@
 <template>
-  <v-card height="100%" class="geo-search h100" :class="{'cart-spacing': selectedGeos.length}">
+  <v-card class="geo-search h100" :class="{'cart-spacing': selectedGeos.length}">
     <v-layout column class="h100">
       <div class="search-header">
         <v-container fluid class="pb-0">
@@ -7,19 +7,20 @@
             <v-text-field
               v-model="query"
               :placeholder="$t('search')"
-              :loading="isSearching_"
-              @input="queryChange"/>
+              :loading="isSearching"
+              @input="queryChange">
+            </v-text-field>
           </v-layout>
           <v-layout class="geo-breadcrumbs">
             <span
               v-for="geo in ancestors"
               v-if="geo"
               class="geo-name">
-              {{translate(geo)}}
+              {{ translate(geo) }}
             </span>
           </v-layout>
           <v-alert v-show="error" color="error">
-            {{this.error}}
+            {{ error }}
           </v-alert>
           <v-container
             class="move-up"
@@ -29,7 +30,7 @@
               <v-flex xs1>
                 <v-icon>arrow_upward</v-icon>
               </v-flex>
-              <v-spacer />
+              <v-spacer></v-spacer>
               <v-flex xs1 class="text-lg-right">
                 <v-icon>arrow_upward</v-icon>
               </v-flex>
@@ -39,18 +40,19 @@
       </div>
       <div class="geo-list">
         <v-list v-if="results.length">
-          <GeoListTile
+          <geo-list-tile
             v-for="geo in results"
             :isSelectable="geoIsSelectable(geo)"
             :selected="isGeoSelected(geo)"
             @click="onGeoClick(geo)"
             @geo-select="onGeoSelect(geo)"
             :key="geo.id"
-            :geo="geo" />
+            :geo="geo">
+          </geo-list-tile>
         </v-list>
         <v-flex v-else>
-          <span v-if="query">No locations match this query...</span>
-          <span v-else>It appears that no locations have been added to the database</span>
+          <span v-if="isSearching">{{ $t('searching') }}</span>
+          <span v-else>{{ $t('no_locations_found') }}</span>
         </v-flex>
       </div>
       <div v-if="selectedGeos.length">
@@ -90,7 +92,7 @@
     props: {
       selectedGeos: {
         type: Array,
-        default: () => []
+        'default': () => []
       },
       baseFilters: {
         type: Object,
@@ -104,20 +106,20 @@
       },
       allowedTypes: {
         type: Array,
-        default: function () {
+        'default': function () {
           return []
         }
       },
       showRespondentsLink: {
         type: Boolean,
-        default: true
+        'default': true
       },
       isSelectable: {
-        default: false
+        'default': false
       },
       shouldUpdateRoute: {
         type: Boolean,
-        default: true
+        'default': true
       },
       limit: {
         type: Number
@@ -134,7 +136,7 @@
         geoCache_: {},
         results: [],
         error: null,
-        isSearching_: false,
+        isSearching: false,
         lastParentIds: [],
         queryChange: debounce(this.search, 300)
       }
@@ -160,7 +162,7 @@
         return typeof this.isSelectable === 'boolean' ? this.isSelectable : this.isSelectable(geo)
       },
       translate (geo) {
-        if (!geo || !geo.nameTranslation) return 'No translation'
+        if (!geo || !geo.nameTranslation) return this.$t('no_translation')
         return TranslationService.getAny(geo.nameTranslation, this.global.locale)
       },
       loadAncestors () {
@@ -231,18 +233,19 @@
         }
       },
       search: function () {
-        this.isSearching_ = true
+        this.isSearching = true
         let filters = {}
         if (this.query) {
           filters.query = this.query
         }
         for (let key in this.filters) {
-          if (this.filters[key]) {
+          if (this.filters.hasOwnProperty(key) && this.filters[key]) {
             filters[key] = this.filters[key]
           }
         }
         return GeoService.search(filters).then(results => {
           this.results = results
+          console.log('this.results', this.results)
           for (let geo of results) {
             this.geoCache_[geo.id] = geo
           }
@@ -251,7 +254,7 @@
           console.error(err)
           this.error = `Unable to retrieve geos for the current filters`
         }).then(() => {
-          this.isSearching_ = false
+          this.isSearching = false
           this.updateRoute()
         })
       },
@@ -267,6 +270,8 @@
 </script>
 
 <style lang="sass">
+  .geo-search
+    margin-bottom: 60px
   .move-up
     cursor: pointer
     &:hover

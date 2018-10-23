@@ -71,6 +71,7 @@
   import GeoEditPanel from './GeoEditPanel.vue'
   import Permission from '../Permission'
   import StudyService from '../../services/study/StudyService'
+  import {Route} from 'vue-router'
 
   const targetMapWidth = 600
 
@@ -119,9 +120,13 @@
         snackbar: false
       }
     },
+    async created () {
+      console.log('this.$router', this.$router)
+      let curGeo = (this.$router.currentRoute.params.geoId) ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
+      this.selectGeo(curGeo)
+    },
     mounted () {
       this.setUpMap()
-      this.selectGeo(null)
     },
     methods: {
       selectGeo: async function (geo) {
