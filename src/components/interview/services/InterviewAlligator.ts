@@ -34,6 +34,8 @@ export default class InterviewAlligator {
 
   private hasDataChanges: boolean = true
 
+  public updatePagesCalled: number = 0
+
   constructor (private manager: InterviewManager) {
     this.form = manager.blueprint
     this.data = manager.data
@@ -110,6 +112,7 @@ export default class InterviewAlligator {
   }
 
   private updatePages () {
+    this.updatePagesCalled++
     const initLocation: InterviewLocation = this.loc ? JSON.parse(JSON.stringify(this.loc)) : {
       page: 0,
       section: 0,
@@ -243,7 +246,6 @@ export default class InterviewAlligator {
   }
 
   public next (): void {
-    // this.updatePages()
     this.updateIfNecessary()
     this.index++
   }
