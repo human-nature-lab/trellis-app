@@ -138,11 +138,30 @@ export default class DataStore extends Emitter {
     })
   }
 
-  public addDatum (questionDatum: QuestionDatum, ...args) {
+  /**
+   * An accessor function to add a datum to a questionDatum. This will notify any subscribers of the change.
+   * @param {QuestionDatum} questionDatum
+   * @param args
+   */
+  public addDatum (questionDatum: QuestionDatum, ...args): Datum {
     const datum = DatumRecycler.getNoKey(...args)
     this.datumIdMap.set(datum.id, datum)
     questionDatum.data.push(datum)
     this.emitChange()
+    return datum
+  }
+
+  /**
+   * TODO: Do this and then use this anywhere we're removing datum from questionDatum
+   * An accessor function to remove datum from a questionDatum. This will notify any subscribers of the change.
+   * @param {QuestionDatum} questionDatum
+   * @param {Function} findFunc
+   * @returns {boolean}
+   */
+  public removeDatum (questionDatum: QuestionDatum, findFunc: Function): boolean {
+    // const datumIndex = questionDatum.data.find()
+    this.emitChange()
+    return true
   }
 
   /**

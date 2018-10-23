@@ -25,7 +25,10 @@ import RespondentConditionTag from '../../../entities/trellis/RespondentConditio
 export default class InterviewManager extends InterviewManagerBase {
 
   private _isReplaying: boolean
-  public _debugReplay: boolean = false
+  private hasAddedActions: boolean = false
+  private lastActionHasChanged: boolean = false
+  private lastAction: Action = null
+  private highWaterMark: number = 0       // A record of the furthest point reached in the survey so far
 
   constructor (
     interview: Interview,
@@ -140,6 +143,11 @@ export default class InterviewManager extends InterviewManagerBase {
     action.interviewId = this.interview.id
     this.actions.add(action, this.navigator.loc)
     this.performAction(action, true)
+    if (action.actionType !== AT.next && action.actionType !== AT.previous) {
+      this.hasAddedActions = true
+      this.lastAction = action
+      this.lastActionHasChanged = true
+    }
   }
 
   /**
@@ -190,18 +198,52 @@ export default class InterviewManager extends InterviewManagerBase {
     this.makePageQuestionDatum(this.navigator.loc.section, this.navigator.loc.page)
   }
 
+  private get isAtHighWaterMark (): boolean {
+    return locToNumber(this.navigator.loc) === this.highWaterMark
+  }
+
   next () {
     // console.log('pre replay location', this.location, this.navigator.isAtEnd)
-    this.replayToCurrent()
+
+    // Old way
+    // this.replayToCurrent()
+    // this.stepForward()
+    this.navigator.updatePagesCalled = 0
+    if (this.hasAddedActions && !this.isAtHighWaterMark) {
+      this.replayToCurrent()
+      this.stepForward()
+    } else if (this.lastAction && this.lastActionHasChanged) {
+      this.stepForward()
+      console.log('only playing future actions')
+      const actions = this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous)
+      const n = actions.indexOf(this.lastAction)
+      if (n < 0) throw new Error(`this.lastAction must already be in the action queue`)
+      const futureActions = actions.slice(n + 1, actions.length)
+      this.playActions(futureActions)
+      this.lastActionHasChanged = false
+    } else {
+      this.stepForward()
+    }
+    console.log(`next(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
     // this.data.emitChange()
     // console.log('post replay location', this.location, this.navigator.isAtEnd)
-    this.stepForward()
+    this.hasAddedActions = false
     // console.log('post step location', this.location, this.navigator.isAtEnd)
   }
 
   previous () {
+    // Old way
+    // this.stepBackward()
+    // this.replayToCurrent()
+
+    this.navigator.updatePagesCalled = 0
     this.stepBackward()
-    this.replayToCurrent()
+    if (this.hasAddedActions) {
+      this.replayToCurrent()
+    } else {
+      console.log('skipping replay')
+    }
+    console.log(`next(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
   }
 
   stepForward (): boolean {
@@ -212,6 +254,10 @@ export default class InterviewManager extends InterviewManagerBase {
     }
     this.navigator.next()
     this.onPageEnter()
+    const locNum = locToNumber(this.navigator.loc)
+    if (locNum > this.highWaterMark) {
+      this.highWaterMark = locNum
+    }
     return true
   }
 
@@ -278,25 +324,15 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 
   /**
-   * Rebuild the state of the survey by zeroing the location and resetting the data before replaying all actions.
-   * Returns an InterviewLocation if we found invalid sections of the survey
+   * Play an array of actions in order
+   * @param {Action[]} actions
+   * @returns {InterviewLocation}
    */
-  playAllActions (): InterviewLocation {
+  playActions (actions: Action[]): InterviewLocation {
+    if (!actions.length) return this.location
     this._isReplaying = true
-    // TODO: Verify that location is zeroed correctly
-    this._zeroLocation()
-    // TODO: Check that state is reset correctly
-    // let conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-    // console.log('initialState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
-    this._resetState()
-    // conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-    // console.log('resetState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
-    // TODO: Verify that location is zeroed correctly
-    this._zeroLocation()
-    // TODO: Verify that actions are ordered correctly
-    const actionQueue = new ImmutableQueue(this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous))
+    const actionQueue = new ImmutableQueue(actions)
     let action = actionQueue.next()
-    const nextActionCount = this.actions.actions.reduce((c, a) => a.actionType === AT.next ? c + 1 : c, 0)
     let foundInvalidActions = false
     let nPagesPassed = 1
     let c = 0
@@ -332,6 +368,25 @@ export default class InterviewManager extends InterviewManagerBase {
     // console.log('postReplayState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
     this._isReplaying = false
     return foundInvalidActions ? this.location : null
+  }
+
+  /**
+   * Rebuild the state of the survey by zeroing the location and resetting the data before replaying all actions.
+   * Returns an InterviewLocation if we found invalid sections of the survey
+   */
+  playAllActions (): InterviewLocation {
+    // TODO: Verify that location is zeroed correctly
+    this._zeroLocation()
+    // TODO: Check that state is reset correctly
+    // let conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    // console.log('initialState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
+    this._resetState()
+    // conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
+    // console.log('resetState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
+    // TODO: Verify that location is zeroed correctly
+    this._zeroLocation()
+    // TODO: Verify that actions are ordered correctly
+    return this.playActions(this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous))
   }
 
   /**

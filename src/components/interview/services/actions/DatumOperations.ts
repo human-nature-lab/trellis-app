@@ -107,9 +107,7 @@ export function addDatum (interview: InterviewManager, payload: ActionPayload, q
       photoId: payload.photo_id,
       rosterId: payload.roster_id
   } as Datum)
-  const datum = DatumRecycler.get(key, questionDatum, payload)
-  // let datum = DatumRecycler.getNoKey(questionDatum, payload)
-  questionDatum.data.push(datum)
+  const datum = interview.data.addDatum(questionDatum, questionDatum, payload)
   return datum
 }
 
