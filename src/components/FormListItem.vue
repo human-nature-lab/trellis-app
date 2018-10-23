@@ -60,7 +60,7 @@
       <v-layout
         column
         class="ml-5"
-        v-show="isOpen">
+        v-if="isOpen">
         <v-flex
           v-for="survey in form.surveys"
           :data-survey-id="survey.id"
@@ -103,8 +103,8 @@
                       :data-interview-id="interview.id"
                       :key="interview.id">
                       <td>{{getName(interview.user)}} <span class="light">({{getUsername(interview.user)}})</span></td>
-                      <td>{{interview.startTime.local().format('llll')}}</td>
-                      <td>{{interview.endTime.local().format('llll')}}</td>
+                      <td>{{interview.startTime && interview.startTime.local().format('llll')}}</td>
+                      <td>{{interview.endTime && interview.endTime.local().format('llll')}}</td>
                     </tr>
                   </table>
                 </td>

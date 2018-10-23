@@ -129,6 +129,7 @@ export default class InterviewAlligator {
       // TODO: Check if the section is repeated
       if (section.followUpQuestionId) {
         const data =  this.getFollowUpDatum(section.followUpQuestionId)
+        // debugger
         // console.log('follow up data', data.length)
         // if (!data.length) {
         //   // Marking skipped repeated section
