@@ -316,7 +316,8 @@ export default function () {
 
         it('should run quickly with repeated sections', () => {
           validateLocation(manager.location, {page: 0, section: 0})
-          for (let n = 0; n < 10; n++) {
+          const rosterIds = firstPageRosterIds.concat(middlePageRosterIds.concat(lastPageRosterIds))
+          for (let rosterId of rosterIds) {
             const a = makeAction(manager.getCurrentPageQuestions()[0].id, AT.add_roster_row, {
               roster_id: rosterId,
               val: rosterId,
@@ -327,16 +328,20 @@ export default function () {
           next(manager)
           let c = 0
           const nActions = 21
+          const initialMeasurement = new Measurement('FillTiming')
           while (c < 1000) {
+            initialMeasurement.startTick()
             for (let i = 0; i < nActions; i++) {
               selectNChoice(manager)
             }
             next(manager)
+            initialMeasurement.stopTick()
             if (manager.navigator.isAtEnd) {
               break
             }
             c++
           }
+          initialMeasurement.end()
           let dir = 0
           const nextMeasurement = new Measurement('NextTiming')
           const prevMeasurement = new Measurement('PrevTiming')
@@ -373,6 +378,28 @@ export default function () {
           prevMeasurement.end()
         })
       })
+    })
+    it('should handle basic navigation', async () => {
+      const manager = await setupInterviewManager(forms.basicNavigation)
+      manager.initialize()
+      validateLocation(manager.location, {page: 0})
+      next(manager)
+      validateLocation(manager.location, {page: 1})
+      selectNChoice(manager)
+      next(manager)
+      validateLocation(manager.location, {section: 1, page: 0})
+      next(manager)
+      validateLocation(manager.location, {section: 1, page: 1})
+      prev(manager)
+      prev(manager)
+      validateLocation(manager.location, {page: 1})
+      selectNChoice(manager)
+      selectNChoice(manager)
+      next(manager)
+      validateLocation(manager.location, {section: 1, page: 0})
+      next(manager)
+      validateLocation(manager.location, {section: 1, page: 1})
+
     })
     it('should be able to move backward even if the current page has invalid responses', async () => {
       const manager = await setupInterviewManager(forms.conditionAssignment)

@@ -21,6 +21,10 @@ import PT from '../../../static/parameter.types'
 import {locToNumber} from "../services/LocationHelpers";
 import InterviewAlligator from "../services/InterviewAlligator";
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
+import Measurement from "../../../classes/Measurement";
+
+const nextTiming = new Measurement('NextTiming')
+const prevTiming = new Measurement('PrevTiming')
 
 export default class InterviewManager extends InterviewManagerBase {
 
@@ -202,29 +206,40 @@ export default class InterviewManager extends InterviewManagerBase {
     return locToNumber(this.navigator.loc) === this.highWaterMark
   }
 
-  next () {
-    // console.log('pre replay location', this.location, this.navigator.isAtEnd)
+  private updateHighWaterMark () {
+    const locNum = locToNumber(this.navigator.loc)
+    if (locNum > this.highWaterMark) {
+      this.highWaterMark = locNum
+    }
+  }
 
-    // Old way
-    // this.replayToCurrent()
-    // this.stepForward()
+  private resetHighWaterMark () {
+    this.highWaterMark = 0
+  }
+
+  next () {
+    // nextTiming.startTick()
     this.navigator.updatePagesCalled = 0
     if (this.hasAddedActions && !this.isAtHighWaterMark) {
+      this.resetHighWaterMark()
       this.replayToCurrent()
       this.stepForward()
-    } else if (this.lastAction && this.lastActionHasChanged) {
+    } else if (this.isAtHighWaterMark && this.lastAction) {
       this.stepForward()
-      console.log('only playing future actions')
+      const loc = JSON.parse(JSON.stringify(this.location))
       const actions = this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous)
       const n = actions.indexOf(this.lastAction)
       if (n < 0) throw new Error(`this.lastAction must already be in the action queue`)
       const futureActions = actions.slice(n + 1, actions.length)
       this.playActions(futureActions)
+      this.seek(loc.section, loc.page, loc.sectionRepetition, loc.sectionFollowUpRepetition)
       this.lastActionHasChanged = false
     } else {
       this.stepForward()
     }
-    console.log(`next(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
+    // console.log(nextTiming.stopTick())
+    // console.log(`next(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
+    // console.log(`highWaterMark; ${this.highWaterMark}`)
     // this.data.emitChange()
     // console.log('post replay location', this.location, this.navigator.isAtEnd)
     this.hasAddedActions = false
@@ -235,15 +250,16 @@ export default class InterviewManager extends InterviewManagerBase {
     // Old way
     // this.stepBackward()
     // this.replayToCurrent()
-
+    // prevTiming.startTick()
     this.navigator.updatePagesCalled = 0
     this.stepBackward()
-    if (this.hasAddedActions) {
-      this.replayToCurrent()
-    } else {
-      // console.log('skipping replay')
-    }
-    console.log(`next(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
+    // if (this.hasAddedActions) {
+    //   this.replayToCurrent()
+    // } else {
+    //   // console.log('skipping replay')
+    // }
+    // console.log(prevTiming.stopTick())
+    // console.log(`prev(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
   }
 
   stepForward (): boolean {
@@ -254,10 +270,7 @@ export default class InterviewManager extends InterviewManagerBase {
     }
     this.navigator.next()
     this.onPageEnter()
-    const locNum = locToNumber(this.navigator.loc)
-    if (locNum > this.highWaterMark) {
-      this.highWaterMark = locNum
-    }
+    this.updateHighWaterMark()
     return true
   }
 
@@ -336,7 +349,6 @@ export default class InterviewManager extends InterviewManagerBase {
     let foundInvalidActions = false
     let nPagesPassed = 1
     let c = 0
-    this.highWaterMark = 0
     while (action && c < 1000) {
       c++
       // Check if we have a valid question id and skip it the action if we don't
@@ -408,6 +420,10 @@ export default class InterviewManager extends InterviewManagerBase {
    */
   replayTo (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
     this.playAllActions()
+    this.seek(section, page, sectionRepetition, sectionFollowUpRepetition)
+  }
+
+  seek (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
     // console.log('desired location', {section, page, sectionRepetition, sectionFollowUpRepetition})
     let currentLoc = locToNumber(this.navigator.loc)
     const desiredLoc = locToNumber({section, page, sectionRepetition, sectionFollowUpRepetition})
