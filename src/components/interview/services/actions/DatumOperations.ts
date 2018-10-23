@@ -96,7 +96,19 @@ export function addOrUpdateSingleDatum (interview: InterviewManager, payload: Ac
  * @returns {Datum}
  */
 export function addDatum (interview: InterviewManager, payload: ActionPayload, questionDatum: QuestionDatum) {
-  let datum = DatumRecycler.getNoKey(questionDatum, payload)
+  const key = DatumRecycler.keyExtractor({
+      val: payload.val,
+      name: payload.name,
+      questionDatumId: questionDatum.id,
+      surveyId: questionDatum.surveyId,
+      choiceId: payload.choice_id,
+      edgeId: payload.edge_id,
+      geoId: payload.geo_id,
+      photoId: payload.photo_id,
+      rosterId: payload.roster_id
+  } as Datum)
+  const datum = DatumRecycler.get(key, questionDatum, payload)
+  // let datum = DatumRecycler.getNoKey(questionDatum, payload)
   questionDatum.data.push(datum)
   return datum
 }
