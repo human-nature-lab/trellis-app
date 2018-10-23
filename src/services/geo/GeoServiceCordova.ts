@@ -162,7 +162,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       }
     }
 
-    q = q.limit(limit).offset(offset)
+    q = q.take(limit).skip(offset)
       .leftJoinAndSelect('geo.geoType', 'geo_type')
       .leftJoinAndSelect('geo.photos', 'photos')
       .leftJoinAndSelect('geo.nameTranslation', 'translation')

@@ -10,7 +10,7 @@
           label="Select a location type">
         </v-select>
         <v-btn
-          :disabled="curGeoType === null"
+          :disabled="curGeoType === null || geoTypeSelected"
           flat
           right
           @click="selectGeoType">
@@ -44,11 +44,13 @@
     data: function () {
       return {
         geoTypes: [],
-        curGeoType: null
+        curGeoType: null,
+        geoTypeSelected: false
       }
     },
     methods: {
       selectGeoType: function () {
+        this.geoTypeSelected = true
         this.$emit('geo-type-selected', this.curGeoType)
       }
     }
