@@ -99,23 +99,23 @@
     },
     methods: {
       onNext () {
+        // This is setup like this to prevent double presses of the next button
         if (this.nextWorking) {
-          console.log('double press next')
           return
         }
-        console.log('next click')
         this.nextWorking = true
         setTimeout(() => {
-          console.log('next eval', this.nextWorking)
           this.actionWithoutQuestion(AT.next)
           setTimeout(() => {
             this.nextWorking = false
-            console.log('resetting next', this.nextWorking)
           })
         })
       },
       onPrevious () {
-        if (this.prevWorking) return
+        // See above
+        if (this.prevWorking) {
+          return
+        }
         this.prevWorking = true
         setTimeout(() => {
           this.actionWithoutQuestion(AT.previous)
