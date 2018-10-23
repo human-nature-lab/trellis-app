@@ -189,7 +189,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     const connection = await DatabaseService.getDatabase()
 
     connection.transaction(async manager => {
-      manager.query(`PRAGMA defer_foreign_keys = true;`)
+      await manager.query(`PRAGMA defer_foreign_keys = true;`)
 
       // Remove stuff first
       for (let removedDatum of diff.data.datum.removed) {
@@ -292,7 +292,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
           await manager.save(addedRespondentConditionTag)
         } else {
           // Exists, set deleted_at to null
-          manager.update(RespondentConditionTag, { id: addedRespondentConditionTag.id }, { deletedAt: null })
+          await manager.update(RespondentConditionTag, { id: addedRespondentConditionTag.id }, { deletedAt: null })
         }
       }
 
@@ -302,7 +302,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
           await manager.save(addedSectionConditionTag)
         } else {
           // Exists, set deleted_at to null
-          manager.update(SectionConditionTag, { id: addedSectionConditionTag.id }, { deletedAt: null })
+          await manager.update(SectionConditionTag, { id: addedSectionConditionTag.id }, { deletedAt: null })
         }
       }
 
@@ -312,20 +312,20 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
           await manager.save(addedSurveyConditionTag)
         } else {
           // Exists, set deleted_at to null
-          manager.update(SurveyConditionTag, { id: addedSurveyConditionTag.id }, { deletedAt: null })
+          await manager.update(SurveyConditionTag, { id: addedSurveyConditionTag.id }, { deletedAt: null })
         }
       }
 
       for (let removedRespondentConditionTag of diff.conditionTags.respondent.removed) {
-        manager.update(RespondentConditionTag, { id: removedRespondentConditionTag.id }, { deletedAt: new Date() })
+        await manager.update(RespondentConditionTag, { id: removedRespondentConditionTag.id }, { deletedAt: new Date() })
       }
 
       for (let removedSectionConditionTag of diff.conditionTags.section.removed) {
-        manager.update(SectionConditionTag, { id: removedSectionConditionTag.id }, { deletedAt: new Date() })
+        await manager.update(SectionConditionTag, { id: removedSectionConditionTag.id }, { deletedAt: new Date() })
       }
 
       for (let removedSurveyConditionTag of diff.conditionTags.survey.removed) {
-        manager.update(SurveyConditionTag, { id: removedSurveyConditionTag.id }, { deletedAt: new Date() })
+        await manager.update(SurveyConditionTag, { id: removedSurveyConditionTag.id }, { deletedAt: new Date() })
       }
 
     })
