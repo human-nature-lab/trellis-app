@@ -241,7 +241,7 @@ export default class InterviewManager extends InterviewManagerBase {
     if (this.hasAddedActions) {
       this.replayToCurrent()
     } else {
-      console.log('skipping replay')
+      // console.log('skipping replay')
     }
     console.log(`next(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
   }
@@ -336,6 +336,7 @@ export default class InterviewManager extends InterviewManagerBase {
     let foundInvalidActions = false
     let nPagesPassed = 1
     let c = 0
+    this.highWaterMark = 0
     while (action && c < 1000) {
       c++
       // Check if we have a valid question id and skip it the action if we don't
@@ -363,7 +364,14 @@ export default class InterviewManager extends InterviewManagerBase {
       debugger
     }
     // Go as far as possible through the survey
-    while (this.currentLocationHasValidResponses() && this.stepForward()) {}
+    c = 0
+    while (this.currentLocationHasValidResponses() && this.stepForward() && c < 1000) {
+      c++
+      console.log(this.location.section, this.location.sectionFollowUpRepetition, this.location.page)
+    }
+    if (c >= 1000) {
+      debugger
+    }
     // conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
     // console.log('postReplayState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
     this._isReplaying = false
