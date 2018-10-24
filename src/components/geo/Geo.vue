@@ -4,13 +4,13 @@
       <v-flex>
         <geo-search
           :show-add-location-button="true"
-          v-on:parent-geo-changed="onParentGeoChanged">
+          v-on:parent-geo-id-changed="onParentGeoChanged">
         </geo-search>
       </v-flex>
     </v-layout>
     <v-fab-transition>
       <v-btn
-        v-show="!adding"
+        v-show="!adding && canUserAddChild"
         class="deep-orange"
         @click="addLocation"
         fab
@@ -32,18 +32,21 @@
 <script>
   import GeoSearch from './GeoSearch.vue'
   import AddGeoForm from './AddGeoForm.vue'
+  import GeoService from '../../services/geo/GeoService'
 
   export default {
     name: 'geo',
     data () {
       return {
         parentGeoId: null,
-        adding: false
+        adding: false,
+        canUserAddChild: false
       }
     },
     created () {
       if (this.$route.query.filters) {
         this.parentGeoId = JSON.parse(this.$route.query.filters).parent
+        this.setCanUserAddChild()
       }
     },
     components: {
@@ -59,6 +62,11 @@
       },
       onParentGeoChanged (parentGeoId) {
         this.parentGeoId = parentGeoId
+        this.setCanUserAddChild()
+      },
+      async setCanUserAddChild () {
+        let parentGeo = await GeoService.getGeoById(this.parentGeoId)
+        this.canUserAddChild = parentGeo.geoType.canUserAddChild
       }
     }
   }
