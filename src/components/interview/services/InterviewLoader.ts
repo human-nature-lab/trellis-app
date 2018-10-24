@@ -110,7 +110,6 @@ export default class InterviewLoader {
         section.questionGroups.forEach((questionGroup) => {
           questionGroup.questions.forEach((question) => {
             question.assignConditionTags.forEach((act) => {
-              console.log('act', act)
               conditionTagIds[act.conditionTagId] = true
             })
           })
