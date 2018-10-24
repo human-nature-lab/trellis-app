@@ -40,6 +40,7 @@
     name: 'geo',
     data () {
       return {
+        // TODO
         selectedGeoId: null,
         adding: false
       }
