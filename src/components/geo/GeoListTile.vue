@@ -1,6 +1,6 @@
 <template>
     <v-list-tile @click="$emit('click')">
-      <v-list-tile-avatar>
+      <v-list-tile-avatar :tile="true">
         <Photo :photo="primaryPhoto" :is-building="true" height="50" width="50"></Photo>
       </v-list-tile-avatar>
       <v-list-tile-action v-if="isSelectable">

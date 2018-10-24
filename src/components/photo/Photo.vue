@@ -14,6 +14,7 @@
       ref="img"
       :src="src"
       :alt="alt"
+      :style="imgStyles"
       v-if="srcLoaded" />
   </v-flex>
 </template>
@@ -193,6 +194,19 @@
       },
       hasError () {
         return !!this.loadingError
+      },
+      imgStyles () {
+        let styles = {}
+        if (this.width && this.height) {
+          if (this.width > this.height) {
+            styles.width = this.width + 'px'
+            styles.height = 'auto'
+          } else {
+            styles.height = this.height + 'px'
+            styles.width = 'auto'
+          }
+        }
+        return styles
       },
       photoStyles () {
         let styles = {}
