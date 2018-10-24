@@ -46,8 +46,10 @@
       this.load()
     },
     watch: {
-      geoId () {
-        this.load()
+      geoId (newId, oldId) {
+        if (newId !== oldId) {
+          this.load()
+        }
       }
     },
     methods: {
@@ -56,7 +58,6 @@
         this.isLoading = true
         GeoService.getGeoAncestors(this.geoId).then(ancestors => {
           this.ancestors = ancestors
-          console.log('ancestors', ancestors)
         }).catch(err => {
           this.error = err
         }).finally(() => {

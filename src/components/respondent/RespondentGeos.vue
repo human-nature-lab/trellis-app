@@ -111,10 +111,11 @@
       }, {
         text: 'Name',
         value: 'translated',
-        class: 'main-column'
+        class: 'main-column',
+        sortable: false
       }, {
         text: 'Type',
-        value: 'type'
+        value: 'geoType'
       }, {
         text: 'Current',
         value: 'isCurrent'
@@ -194,7 +195,7 @@
 
 <style lang="sass">
   .main-column
-    width: 50%
+    width: 90%
   td:not(:first-child)
     white-space: nowrap
 </style>

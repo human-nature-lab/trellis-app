@@ -75,10 +75,11 @@
         currentName: null,
         nameHeaders: [{
           text: 'Name',
-          value: 'name'
+          value: 'name',
+          class: 'main-column'
         }, {
           text: 'Current',
-          value: 'is_current'
+          value: 'isCurrent'
         }, {
           text: '',
           value: 'actions'
@@ -118,6 +119,11 @@
       },
       doneAddingName (name: RespondentName): void {
         if (name) {
+          if (name.isDisplayName) {
+            this.respondent.names.forEach(name => {
+              name.isDisplayName = false
+            })
+          }
           this.respondent.names.push(name)
         }
         this.isAdding = false

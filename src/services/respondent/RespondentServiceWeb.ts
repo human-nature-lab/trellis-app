@@ -79,11 +79,12 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
       associated_respondent_id: associatedRespondentId
     }).then(res => new Respondent().fromSnakeJSON(res.data.respondent))
   }
-  addRespondentGeo (respondentId: string, geoId: string): Promise<RespondentGeo> {
+  addRespondentGeo (respondentId: string, geoId: string, isCurrent: boolean): Promise<RespondentGeo> {
     respondentId = encodeURIComponent(respondentId)
     geoId = encodeURIComponent(geoId)
     return http().post(`respondent/${respondentId}/geo`, {
-      geo_id: geoId
+      geo_id: geoId,
+      is_current: isCurrent // TODO: Handle this on the web side
     }).then(res => new RespondentGeo().fromSnakeJSON(res.data.geo))
   }
   editRespondentGeo (respondentId, respondentGeoId, isCurrent) {
