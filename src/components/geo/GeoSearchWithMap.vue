@@ -54,27 +54,6 @@
           :leaflet-map="trellisMap"></geo-edit-panel>
       </permission>
     </div>
-    <!--v-navigation-drawer
-      fixed
-      clipped
-      :disable-route-watcher="true"
-      v-model="global.searchDrawer.open"
-      right
-      app>
-      <v-list dense>
-        <v-list-tile :dark="global.darkTheme">
-          <v-list-tile-action @click="global.searchDrawer.open = false" class="text-right">
-            <v-icon>arrow_forward</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-divider></v-divider>
-        <v-flex>
-          <geo-search ref="geoSearch" v-on:returned-geo-results="displayResults"></geo-search>
-        </v-flex>
-      </v-list>
-    </v-navigation-drawer-->
   </v-layout>
 </template>
 
@@ -92,6 +71,7 @@
   import GeoEditPanel from './GeoEditPanel.vue'
   import Permission from '../Permission'
   import StudyService from '../../services/study/StudyService'
+  import {Route} from 'vue-router'
 
   const targetMapWidth = 600
 
@@ -121,11 +101,6 @@
         default: () => []
       }
     },
-    head: {
-      title: {
-        inner: 'Geo Search'
-      }
-    },
     data: function () {
       return {
         global: global,
@@ -145,13 +120,17 @@
         snackbar: false
       }
     },
+    async created () {
+      console.log('this.$router', this.$router)
+      let curGeo = (this.$router.currentRoute.params.geoId) ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
+      this.selectGeo(curGeo)
+    },
     mounted () {
-      // this.setUpSearch()
       this.setUpMap()
-      this.selectGeo(null)
     },
     methods: {
       selectGeo: async function (geo) {
+        console.log('selectGeo')
         const geoId = (geo && geo.id) ? geo.id : null
         const geoResults = await GeoService.getGeosByParentId(geoId)
         if (geoResults.length > 0) {
@@ -162,10 +141,8 @@
           this.snackbar = true
         }
       },
-      setUpSearch: function () {
-        global.searchDrawer.component = GeoSearch
-      },
       setUpMap: function () {
+        console.log('setUpMap')
         this.trellisMap = L.map('leafletMap').setView([0.0, 0.0], 1)
         delete L.Icon.Default.prototype._getIconUrl
         L.Icon.Default.mergeOptions({
@@ -185,6 +162,7 @@
         })
       },
       displayResults: function (results) {
+        console.log('displayResults')
         this.geoResults = results
         this.clearMarkers()
         this.addMarkers(results)
@@ -327,6 +305,7 @@
         this.clearPaths()
         let graph = createGraph()
         let bounds = this.trellisMap.getBounds()
+        console.log('bounds', bounds)
         let layout = forceDirectedLayout(graph)
         for (let i = 0; i < this.tooltipMarkers.length; i++) {
           let marker = this.tooltipMarkers[i]
