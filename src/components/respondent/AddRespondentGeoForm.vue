@@ -81,7 +81,7 @@
       },
       async done () {
         if (this.respondent && this.selectedGeo) {
-          const rGeo: RespondentGeo = await RespondentService.addRespondentGeo(this.respondent.id, this.selectedGeo.id)
+          const rGeo: RespondentGeo = await RespondentService.addRespondentGeo(this.respondent.id, this.selectedGeo.id, this.isCurrent)
           this.$emit('added', rGeo)
           this.close()
         }

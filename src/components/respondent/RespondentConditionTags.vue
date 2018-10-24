@@ -71,15 +71,19 @@
         deleting: {},
         conditionTagHeaders: [{
           text: 'Tag name',
-          value: 'name'
+          value: 'name',
+          class: 'main-column',
+          sortable: false
         }, {
           text: 'Date added',
-          value: 'created_at',
-          width: '15%'
+          value: 'createdAt',
+          width: '15%',
+          sortable: false
         }, {
           text: '',
           value: 'remove',
-          width: '10%'
+          width: '10%',
+          sortable: false
         }],
       }
     },

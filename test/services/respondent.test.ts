@@ -40,7 +40,7 @@ export default function () {
         it(`${service.constructor.name}.removeName should delete a respondent name`)
         it(`${service.constructor.name}.createRespondent should create a new respondent`)
         it(`${service.constructor.name}.addRespondentGeo should create a new respondent geo`, async () => {
-          let respondentGeo = await service.addRespondentGeo(respondentId, geoId)
+          let respondentGeo = await service.addRespondentGeo(respondentId, geoId, true)
           expect(respondentGeo).to.be.an.instanceOf(RespondentGeo)
           expect(respondentGeo.geo).to.be.an.instanceof(Geo)
           expect(respondentGeo.geo.nameTranslation).to.be.an.instanceOf(Translation)

@@ -5,7 +5,7 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
-import {Brackets, IsNull} from 'typeorm'
+import {Brackets, Connection, ConnectionManager, EntityManager, IsNull, QueryBuilder} from 'typeorm'
 import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
 
@@ -94,21 +94,29 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     }
 
     q = q.andWhere('"respondent"."deleted_at" is null')
-    q = q.limit(size).offset(page * size)
+    q = q.take(size).skip(page * size)
     q = q.leftJoinAndSelect('respondent.photos', 'photo')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     return await q.getMany()
   }
 
-  async addName (respondentId, name, isDisplayName = null, localeId = null): Promise<RespondentName> {
-    const respondentName = new RespondentName()
-    respondentName.isDisplayName = isDisplayName
-    respondentName.name = name
-    respondentName.respondentId = respondentId
-    respondentName.localeId = localeId
-    respondentName.previousRespondentNameId = null
-    const connection = await DatabaseService.getDatabase()
-    await connection.manager.save(respondentName)
+  async addName (respondentId, name, isDisplayName = false, localeId = null): Promise<RespondentName> {
+    const conn: Connection = await DatabaseService.getDatabase()
+    let respondentName: RespondentName
+    await conn.transaction(async manager  => {
+      respondentName = new RespondentName()
+      respondentName.isDisplayName = isDisplayName
+      respondentName.name = name
+      respondentName.respondentId = respondentId
+      respondentName.localeId = localeId
+      respondentName.previousRespondentNameId = null
+
+      if (isDisplayName) {
+        await this.clearRespondentNameIsDisplay(manager, respondentId)
+      }
+
+      await manager.save(respondentName)
+    })
     return respondentName
   }
 
@@ -136,7 +144,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   }
 
   async createRespondent (studyId, name, geoId = null, associatedRespondentId = null) {
-    const connection = await DatabaseService.getDatabase()
+    const connection: Connection = await DatabaseService.getDatabase()
     const queryRunner = connection.createQueryRunner()
     await queryRunner.startTransaction()
     try {
@@ -189,25 +197,39 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
   }
 
-  async addRespondentGeo (respondentId: string, geoId: string): Promise<RespondentGeo> {
-    const repo = await DatabaseService.getRepository(RespondentGeo)
-    const respondentGeo = new RespondentGeo()
-    respondentGeo.geoId = geoId
-    respondentGeo.respondentId = respondentId
-    respondentGeo.previousRespondentGeoId = null
-    respondentGeo.notes = null
-    respondentGeo.isCurrent = false
-    let rGeo = await repo.save(respondentGeo)
-    rGeo = await repo.findOne({
-      where: {
-        id: rGeo.id
-      },
-      relations: [
-        'geo',
-        'geo.photos',
-        'geo.geoType',
-        'geo.nameTranslation'
-      ]
+  async clearRespondentNameIsDisplay (manager: EntityManager, respondentId: string) {
+    await manager.update(RespondentName, {respondentId}, {isDisplayName: false})
+  }
+
+  async clearRespondentGeoIsCurrent (manager: EntityManager, respondentId: string) {
+    await manager.update(RespondentGeo, {respondentId}, {isCurrent: false})
+  }
+
+  async addRespondentGeo (respondentId: string, geoId: string, isCurrent: boolean): Promise<RespondentGeo> {
+    const conn: Connection = await DatabaseService.getDatabase()
+    let rGeo: RespondentGeo
+    await conn.transaction(async manager => {
+      const respondentGeo = new RespondentGeo()
+      respondentGeo.geoId = geoId
+      respondentGeo.respondentId = respondentId
+      respondentGeo.previousRespondentGeoId = null
+      respondentGeo.notes = null
+      respondentGeo.isCurrent = isCurrent
+      if (respondentGeo.isCurrent) {
+        await this.clearRespondentGeoIsCurrent(manager, respondentId)
+      }
+      rGeo = await manager.save(respondentGeo)
+      rGeo = await manager.findOne(RespondentGeo, {
+        where: {
+          id: rGeo.id
+        },
+        relations: [
+          'geo',
+          'geo.photos',
+          'geo.geoType',
+          'geo.nameTranslation'
+        ]
+      })
     })
     return rGeo
   }

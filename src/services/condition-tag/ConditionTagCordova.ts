@@ -28,6 +28,7 @@ export class ConditionTagCordova implements ConditionTagInterface {
   async createRespondentConditionTag (respondentId: string, conditionTagId: string): Promise<RespondentConditionTag> {
     const connection = await DatabaseService.getDatabase()
     const respondentConditionTag = new RespondentConditionTag()
+    respondentConditionTag.id = uuid()
     respondentConditionTag.respondentId = respondentId
     respondentConditionTag.conditionTagId = conditionTagId
     const returnConditionTag = await connection.manager.save(respondentConditionTag)

@@ -114,7 +114,7 @@ export default interface RespondentServiceInterface {
    * @param {String} geoId
    * @returns {Promise<Object>}
    */
-  addRespondentGeo (respondentId: string, geoId: string): Promise<RespondentGeo>
+  addRespondentGeo (respondentId: string, geoId: string, isCurrent: boolean): Promise<RespondentGeo>
 
   /**
    * Edit the respondent geo (change is current)
