@@ -13,7 +13,7 @@ export default class CensusServiceCordova extends CensusServiceAbstract {
   async hasCensusForm (studyId, censusTypeId) {
     const repository = await DatabaseService.getRepository(StudyForm)
     const studyForm = await repository.findOne({ deletedAt: null, studyId: studyId, censusTypeId: censusTypeId })
-    return (studyForm instanceof StudyForm)
+    return (studyForm instanceof StudyForm && studyForm.form.isPublished && studyForm.form.deletedAt === null)
   }
 
 }

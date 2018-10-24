@@ -51,14 +51,30 @@
       <v-stepper-step step="3" :complete="step > 3">{{$t('position_location')}}</v-stepper-step>
       <v-stepper-content step="3">
         <v-card>
+          <v-card-title class="subheading">{{ $t('current_position') }}</v-card-title>
           <v-card-text>
-            How do you want to position this location?
-            <v-btn>{{$t('use_your_current_location')}}</v-btn>
-            <v-btn>{{$t('use_parent_location')}}</v-btn>
+            <v-list dense>
+              <v-list-tile>
+                <v-list-tile-content>{{ $t('latitude') }}</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ latitude }}</v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-content>{{ $t('longitude') }}</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ longitude }}</v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-content>{{ $t('altitude') }}</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ altitude }}</v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+            <v-btn @click="getPosition">{{$t('use_your_current_position')}}</v-btn>
+            <v-btn v-if="this.parentGeoId !== null" @click="useParentPosition">{{$t('use_parent_position')}}</v-btn>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="onPositioningDone">
+            <v-btn
+              @click="onPositioningDone"
+              :disabled="!positionSelected">
               <v-progress-circular v-if="isSaving"></v-progress-circular>
               <span v-else>{{$t('continue')}}</span>
             </v-btn>
@@ -111,6 +127,8 @@
   import TranslationTextField from '../TranslationTextField.vue'
   import GeoTypeSelector from './GeoTypeSelector.vue'
   import {pushRouteAndQueueCurrent} from '../../router'
+  import {getCurrentPosition} from '../LocationFinder'
+
   export default {
     components: {
       PhotoAlbum,
@@ -134,13 +152,25 @@
         geo: null,
         checkingForCensus: false,
         geoCreated: false,
-        geoTypeSelected: false
+        geoTypeSelected: false,
+        positionSelected: false
       }
     },
     async created () {
       const study = await StudyService.getCurrentStudy()
       this.geo = GeoService.createNewGeo(this.parentGeoId, study.locales)
       console.log('created', this.geo)
+    },
+    computed: {
+      latitude () {
+        return (this.geo && this.geo.hasOwnProperty('latitude') && this.geo.latitude !== undefined) ? this.geo.latitude : this.$t('none')
+      },
+      longitude () {
+        return (this.geo && this.geo.hasOwnProperty('longitude') && this.geo.longitude !== undefined) ? this.geo.longitude : this.$t('none')
+      },
+      altitude () {
+        return (this.geo && this.geo.hasOwnProperty('altitude') && this.geo.altitude !== undefined) ? this.geo.altitude : this.$t('none')
+      }
     },
     methods: {
       nextStep () {
@@ -164,6 +194,27 @@
         this.geo.geoType = geoType
         this.geoTypeSelected = true
         console.log('onGeoTypeSelected', this.geo)
+      },
+      async getPosition () {
+        try {
+          let coords = await getCurrentPosition()
+          this.geo.latitude = coords.latitude
+          this.geo.longitude = coords.longitude
+          this.geo.altitude = coords.altitude
+          this.positionSelected = true
+          console.log('getPosition', this.geo)
+        } catch (err) {
+          console.error(err)
+          this.error = 'Error getting position: ' + err
+        }
+      },
+      async useParentPosition () {
+        const parentGeo = await GeoService.getGeoById(this.parentGeoId)
+        console.log('parentGeo', parentGeo)
+        this.geo.latitude = parentGeo.latitude
+        this.geo.longitude = parentGeo.longitude
+        this.geo.altitude = parentGeo.altitude
+        this.positionSelected = true
       },
       onPositioningDone () {
         // TODO
