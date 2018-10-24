@@ -128,7 +128,7 @@
     data: function () {
       return {
         global: singleton,
-        userFilters: this.$route.query.filters ? JSON.parse(this.$route.query.filters) : {
+        userFilters: {
           parent: null,
           types: null
         },
@@ -142,6 +142,10 @@
       }
     },
     created () {
+      if (this.$route.query.filters) {
+        this.userFilters = JSON.parse(this.$route.query.filters)
+        this.$emit('parent-geo-id-changed', this.userFilters.parent)
+      }
       this.search().then(this.loadAncestors)
     },
     computed: {
@@ -245,7 +249,6 @@
         }
         return GeoService.search(filters).then(results => {
           this.results = results
-          console.log('this.results', this.results)
           for (let geo of results) {
             this.geoCache_[geo.id] = geo
           }
@@ -265,6 +268,13 @@
     components: {
       GeoListTile,
       Cart
+    },
+    watch : {
+      'userFilters.parent': function (newParentId, oldParentId) {
+        if (newParentId !== oldParentId) {
+          this.$emit('parent-geo-id-changed', newParentId)
+        }
+      }
     }
   })
 </script>

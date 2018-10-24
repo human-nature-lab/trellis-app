@@ -3,7 +3,8 @@
     <v-layout>
       <v-flex>
         <geo-search
-          :show-add-location-button="true">
+          :show-add-location-button="true"
+          v-on:parent-geo-changed="onParentGeoChanged">
         </geo-search>
       </v-flex>
     </v-layout>
@@ -20,15 +21,11 @@
         <v-icon style="height:auto;">add</v-icon>
       </v-btn>
     </v-fab-transition>
-    <v-dialog
-      v-model="adding">
-      <v-card>
-        <add-geo-form
-          @close="addLocationClose"
-          :parentGeoId="selectedGeoId">
-        </add-geo-form>
-      </v-card>
-    </v-dialog>
+    <add-geo-form
+      @close="addLocationClose"
+      :adding="adding"
+      :parentGeoId="parentGeoId">
+    </add-geo-form>
   </v-container>
 </template>
 
@@ -40,9 +37,13 @@
     name: 'geo',
     data () {
       return {
-        // TODO
-        selectedGeoId: null,
+        parentGeoId: null,
         adding: false
+      }
+    },
+    created () {
+      if (this.$route.query.filters) {
+        this.parentGeoId = JSON.parse(this.$route.query.filters).parent
       }
     },
     components: {
@@ -51,12 +52,13 @@
     },
     methods: {
       addLocationClose (addedLocation) {
-        console.log('addLocationClose -> addedLocation', addedLocation)
         this.adding = false
       },
       addLocation () {
         this.adding = true
-        console.log('addLocation')
+      },
+      onParentGeoChanged (parentGeoId) {
+        this.parentGeoId = parentGeoId
       }
     }
   }
