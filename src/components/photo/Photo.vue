@@ -21,7 +21,8 @@
 
 <script>
   import PhotoService from '../../services/photo/PhotoService'
-  import URL_PLACEHOLDER from '../../assets/baseline-person-24px.svg'
+  import URL_PLACEHOLDER from '../../assets/baseline-image-24px.svg'
+  import PERSON_URL_PLACEHOLDER from '../../assets/baseline-person-24px.svg'
   import BUILDING_URL_PLACEHOLDER from '../../assets/baseline-place-24px.svg'
 
   const observer = new IntersectionObserver(handleIntersections, {
@@ -150,7 +151,7 @@
         this.srcLoading = false
         this.imgLoading = false
         this.loadingError = err
-        this.setSrc((this.isBuilding) ? BUILDING_URL_PLACEHOLDER : URL_PLACEHOLDER)
+        this.setSrc(URL_PLACEHOLDER)
       },
       load () {
         if (this.isLoaded) return
@@ -197,8 +198,8 @@
       },
       imgStyles () {
         let styles = {}
-        if (this.width && this.height) {
-          if (this.width > this.height) {
+        if (this.width || this.height) {
+          if (this.width && (this.width > this.height)) {
             styles.width = this.width + 'px'
             styles.height = 'auto'
           } else {

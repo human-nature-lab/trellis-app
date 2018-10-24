@@ -13,13 +13,14 @@
         <photo
           @click="showFull(photo)"
           :isCentered="true"
-          height="height"
+          :height="height"
+          :width="width"
           :photo="photo">
         </photo>
       </v-flex>
       <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     </v-layout>
-    <FullscreenPhoto v-if="fullPhoto !== null" :photo="fullPhoto" v-model="isFullOpen"></FullscreenPhoto>
+    <fullscreen-photo v-if="fullPhoto !== null" :photo="fullPhoto" v-model="isFullOpen"></fullscreen-photo>
   </v-container>
 </template>
 
