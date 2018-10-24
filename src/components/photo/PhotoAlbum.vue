@@ -3,22 +3,23 @@
     <v-toolbar flat>
       <v-toolbar-title>{{title}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <AddPhoto v-if="allowAdding" @photo="onAddPhoto"/>
+      <AddPhoto v-if="allowAdding" @photo="onAddPhoto"></AddPhoto>
     </v-toolbar>
     <v-layout row align-content-start wrap>
       <v-flex
         xs3
         v-for="photo in photos"
         :key="photo.id">
-        <Photo
+        <photo
           @click="showFull(photo)"
           :isCentered="true"
           height="height"
-          :photo="photo"/>
+          :photo="photo">
+        </photo>
       </v-flex>
       <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     </v-layout>
-    <FullscreenPhoto :photo="fullPhoto" v-model="isFullOpen"/>
+    <FullscreenPhoto v-if="fullPhoto !== null" :photo="fullPhoto" v-model="isFullOpen"></FullscreenPhoto>
   </v-container>
 </template>
 

@@ -8,7 +8,8 @@
     <v-progress-circular
       v-if="isLoading"
       indeterminate
-      color="primary" />
+      color="primary">
+    </v-progress-circular>
     <img
       ref="img"
       :src="src"
@@ -19,7 +20,8 @@
 
 <script>
   import PhotoService from '../../services/photo/PhotoService'
-  import URL_PLACEHOLDER from '../../assets/Placeholder_person.jpg'
+  import URL_PLACEHOLDER from '../../assets/baseline-person-24px.svg'
+  import BUILDING_URL_PLACEHOLDER from '../../assets/baseline-place-24px.svg'
 
   const observer = new IntersectionObserver(handleIntersections, {
     threshold: 0.5
@@ -48,17 +50,21 @@
       photoId: {
         type: String
       },
+      isBuilding: {
+        type: Boolean,
+        'default': false
+      },
       isContained: {
         type: Boolean,
-        default: false
+        'default': false
       },
       isCentered: {
         type: Boolean,
-        default: false
+        'default': false
       },
       showAlt: {
         type: Boolean,
-        default: true
+        'default': true
       },
       width: {
         type: String
@@ -143,7 +149,7 @@
         this.srcLoading = false
         this.imgLoading = false
         this.loadingError = err
-        this.setSrc(URL_PLACEHOLDER)
+        this.setSrc((this.isBuilding) ? BUILDING_URL_PLACEHOLDER : URL_PLACEHOLDER)
       },
       load () {
         if (this.isLoaded) return
