@@ -59,6 +59,22 @@ export function pushRouteAndQueueCurrent (route) {
 }
 
 /**
+ * Add a route object and queue the next one avoiding duplicates
+ * @param route
+ * @param queued
+ */
+export function pushRoute (route, queued) {
+  // TODO: Avoid duplicate queued routes
+  if (queued) {
+    if (!route.query) {
+      route.query = {}
+    }
+    route.query.to = queued
+  }
+  router.push(route)
+}
+
+/**
  * Navigate to the next route if one is queued. Otherwise, run the callback.
  * @param {Function} cb
  */
