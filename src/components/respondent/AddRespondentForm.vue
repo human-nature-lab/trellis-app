@@ -51,11 +51,11 @@
             </v-flex>
             <v-flex v-else-if="hasCensusForm" >
               <v-icon color="success">check</v-icon>
-              Census form found. Redirecting...
+              {{$t('census_form_found')}}
             </v-flex>
             <v-flex v-else>
               <v-icon color="error">clear</v-icon>
-              Census form not found
+              {{$t('census_form_not_found')}}
             </v-flex>
           </v-card-text>
           <!--<v-card-actions>-->
