@@ -21,7 +21,7 @@ export default class CensusServiceCordova extends CensusServiceAbstract {
 
   async hasCensusForm (studyId: string, censusTypeId: string): Promise<boolean> {
     const repo = await DatabaseService.getRepository(StudyForm)
-    const studyForm: StudyForm = repo.createQueryBuilder('sf')
+    const studyForm: StudyForm = await repo.createQueryBuilder('sf')
       .where('sf.deletedAt is NULL')
       .andWhere('sf.studyId = :studyId', {studyId})
       .andWhere('sf.censusTypeId = :censusTypeId', {censusTypeId})
@@ -33,7 +33,6 @@ export default class CensusServiceCordova extends CensusServiceAbstract {
           .andWhere('form.deletedAt is NULL')
           .getQuery()
       ).getOne()
-
     return (studyForm instanceof StudyForm)
   }
 

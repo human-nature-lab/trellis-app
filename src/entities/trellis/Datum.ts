@@ -84,6 +84,9 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
     d.sortOrder = this.sortOrder
     d.surveyId = this.surveyId
     d.val = this.val
+    d.createdAt = this.createdAt
+    d.updatedAt = this.updatedAt
+    d.deletedAt = this.deletedAt
     return d
   }
 }

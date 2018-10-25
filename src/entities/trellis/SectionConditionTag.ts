@@ -62,6 +62,9 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
     s.surveyId = this.surveyId
     s.repetition = this.repetition
     s.followUpDatumId = this.followUpDatumId
+    s.updatedAt = this.updatedAt
+    s.createdAt = this.createdAt
+    s.deletedAt = this.deletedAt
     return s
   }
 

@@ -45,14 +45,26 @@
       <v-stepper-content step="3">
         <v-card>
           <v-card-text>
-            <v-progress-circular indeterminate v-if="checkingForCensus" />
-            <v-icon v-else color="success">check</v-icon>
-            {{$t('checking_census_form')}}
+            <v-flex v-if="checkingForCensus">
+              <v-progress-circular indeterminate />
+              {{$t('checking_census_form')}}
+            </v-flex>
+            <v-flex v-else-if="hasCensusForm" >
+              <v-icon color="success">check</v-icon>
+              Census form found. Redirecting...
+            </v-flex>
+            <v-flex v-else>
+              <v-icon color="error">clear</v-icon>
+              Census form not found
+            </v-flex>
           </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="step++">{{$t('continue')}}</v-btn>
-          </v-card-actions>
+          <!--<v-card-actions>-->
+            <!--<v-spacer></v-spacer>-->
+            <!--<v-btn @click="step++" :disabled="checkingForCensus">-->
+              <!--<v-progress-circular indeterminate v-if="checkingForCensus || hasCensusForm" />-->
+              <!--<span v-else>{{$t('continue')}}</span>-->
+            <!--</v-btn>-->
+          <!--</v-card-actions>-->
         </v-card>
       </v-stepper-content>
 
@@ -65,7 +77,7 @@
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum'
-  import {pushRouteAndQueueCurrent} from '../../router'
+  import {pushRoute} from '../../router'
   export default {
     components: {PhotoAlbum},
     name: 'add-respondent-form',
@@ -81,6 +93,7 @@
         geoId: null,
         respondentExists: false,
         checkingForCensus: false,
+        hasCensusForm: false,
         isSaving: false,
         respondent: null
       }
@@ -107,27 +120,36 @@
         }
       },
       async checkCensus () {
+        const censusDelay = 1500
         this.step++
         this.checkingForCensus = true
         const censusTypeId = this.associatedRespondentId ? censusTypes.add_associated_respondent : censusTypes.add_respondent
-        const hasCensus = await CensusFormService.hasCensusForm(this.studyId, censusTypeId)
-        if (hasCensus) {
-          pushRouteAndQueueCurrent({
-            name: 'StartCensusForm',
-            params: {
-              studyId: this.studyId,
-              censusTypeId: censusTypeId
-            },
-            query: {
-              respondentId: this.respondent.id
-            }
-          })
+        this.hasCensusForm = await CensusFormService.hasCensusForm(this.studyId, censusTypeId)
+        this.checkingForCensus = false
+        if (this.hasCensusForm) {
+          setTimeout(() => {
+            pushRoute({
+              name: 'StartCensusForm',
+              params: {
+                studyId: this.studyId,
+                censusTypeId: censusTypeId
+              },
+              query: {
+                respondentId: this.respondent.id
+              }
+            }, {
+              name: 'Respondent',
+              params: {
+                studyId: this.studyId,
+                respondentId: this.respondent.id
+              },
+              replace: true
+            })
+          }, censusDelay)
         } else {
-          this.checkingForCensus = false
-          console.log('no census form found')
           setTimeout(() => {
             this.$emit('close', this.respondent)
-          }, 1500)
+          }, censusDelay)
         }
       }
     }

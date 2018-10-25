@@ -55,6 +55,9 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
     r.id = this.id
     r.respondentId = this.respondentId
     r.conditionTagId = this.conditionTagId
+    r.deletedAt = this.deletedAt
+    r.createdAt = this.createdAt
+    r.updatedAt = this.updatedAt
     return r
   }
 
