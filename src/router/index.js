@@ -69,7 +69,7 @@ export function pushRoute (route, queued) {
     if (!route.query) {
       route.query = {}
     }
-    route.query.to = queued
+    route.query.to = JSON.stringify(queued)
   }
   router.push(route)
 }
@@ -81,7 +81,13 @@ export function pushRoute (route, queued) {
 export function moveToNextOr (cb) {
   let current = router.currentRoute
   if (current.query.to) {
-    router.push(current.query.to)
+    let to
+    try {
+      to = JSON.parse(current.query.to)
+    } catch (err) {
+      to = current.query.to
+    }
+    router.push(to)
   } else {
     cb()
   }
@@ -94,7 +100,13 @@ export function moveToNextOr (cb) {
 export function replaceWithNextOr (cb) {
   let current = router.currentRoute
   if (current.query.to) {
-    router.replace(current.query.to)
+    let to
+    try {
+      to = JSON.parse(current.query.to)
+    } catch (err) {
+      to = current.query.to
+    }
+    router.replace(to)
   } else {
     cb()
   }
