@@ -14,7 +14,6 @@
       ref="img"
       :src="src"
       :alt="alt"
-      :style="imgStyles"
       v-if="srcLoaded" />
   </v-flex>
 </template>
