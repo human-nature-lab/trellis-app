@@ -85,6 +85,7 @@
       height: auto
       white-space: normal
       display: block
+      line-height: 20px
     &.other
       .input-group__details
         display: none
