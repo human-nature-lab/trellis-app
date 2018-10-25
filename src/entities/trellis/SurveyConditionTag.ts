@@ -59,6 +59,9 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
     s.id = this.id
     s.surveyId = this.surveyId
     s.conditionId = this.conditionId
+    s.createdAt = this.createdAt
+    s.updatedAt = this.updatedAt
+    s.deletedAt = this.deletedAt
     return s
   }
 

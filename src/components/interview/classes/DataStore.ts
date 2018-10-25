@@ -13,6 +13,10 @@ import SurveyConditionTag from '../../../entities/trellis/SurveyConditionTag'
 import {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
 import ConditionTag from "../../../entities/trellis/ConditionTag";
 
+export interface FindFunction<T> {
+  (o: T, i: number, a: T[]): boolean
+}
+
 export default class DataStore extends Emitter {
   private baseRespondentConditionTags: any[] = []
   public data: QuestionDatum[] = []
@@ -146,6 +150,7 @@ export default class DataStore extends Emitter {
   public addDatum (questionDatum: QuestionDatum, ...args): Datum {
     const datum = DatumRecycler.getNoKey(...args)
     this.datumIdMap.set(datum.id, datum)
+    datum.sortOrder = questionDatum.data.length
     questionDatum.data.push(datum)
     this.emitChange()
     return datum
@@ -158,8 +163,15 @@ export default class DataStore extends Emitter {
    * @param {Function} findFunc
    * @returns {boolean}
    */
-  public removeDatum (questionDatum: QuestionDatum, findFunc: Function): boolean {
-    // const datumIndex = questionDatum.data.find()
+  public removeDatum (questionDatum: QuestionDatum, findFunc: FindFunction<Datum>): boolean {
+    const datumIndex = questionDatum.data.findIndex(findFunc)
+    if (datumIndex > -1) {
+      questionDatum.data.splice(datumIndex, 1)
+    }
+    // Update the sort order for remaining datum
+    for (let i = datumIndex; i < questionDatum.data.length; i++) {
+      questionDatum.data[i].sortOrder = i;
+    }
     this.emitChange()
     return true
   }

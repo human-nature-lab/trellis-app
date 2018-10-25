@@ -32,7 +32,6 @@ class DatumRecycler extends Recycler<Datum> {
     ].join('-')
   }
   objectCreator (questionDatum: QuestionDatum, payload: DatumPayload) {
-    if (!questionDatum) debugger
     let maxEventOrder = Math.max(-1, ...questionDatum.data.map(d => d.eventOrder))
     return new Datum().fromRecycler({
       surveyId: questionDatum.surveyId,
