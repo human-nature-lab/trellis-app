@@ -132,13 +132,18 @@
         return geo.geoType.canContainRespondent == <any>1 // eslint-disable-line
       },
       startMove (respondentGeo: RespondentGeo): Promise<void> {
-        return checkForCensusForm(CensusTypes.move_respondent, this.global.study.id, this.respondent.id).then(hasCensusForm => {
-          // Implicit redirect to existing census form so we don't redirect here... This is a dumb way to do this.
-          if (!hasCensusForm) {
-            this.movingRespondentGeo = respondentGeo
-            this.isMovingGeo = true
-          }
-        })
+        if (this.useCensusForm) {
+          return checkForCensusForm(CensusTypes.move_respondent, this.global.study.id, this.respondent.id).then(hasCensusForm => {
+            // Implicit redirect to existing census form so we don't redirect here... This is a dumb way to do this.
+            if (!hasCensusForm) {
+              this.movingRespondentGeo = respondentGeo
+              this.isMovingGeo = true
+            }
+          })
+        } else {
+          this.movingRespondentGeo = respondentGeo
+          this.isMovingGeo = true
+        }
       },
       moveGeo (respondentGeo: RespondentGeo, geo: Geo): Promise<void> {
         return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.id, geo.id).then(resGeo => {
