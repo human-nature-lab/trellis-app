@@ -37,6 +37,22 @@
             </v-layout>
           </v-container>
         </v-container>
+        <v-container v-if="selectedGeos.length">
+          <v-card>
+            <v-container fluid>
+              <Cart
+                @done="onDone"
+                @remove="removeGeo"
+                :items="selectedGeos">
+                <template slot-scope="props">
+                  <v-chip close @input="removeGeo(props.item)">
+                    {{translate(props.item)}}
+                  </v-chip>
+                </template>
+              </Cart>
+            </v-container>
+          </v-card>
+        </v-container>
       </div>
       <div class="geo-list">
         <v-list v-if="results.length">
@@ -56,22 +72,6 @@
         </v-flex>
       </div>
     </v-layout>
-    <div v-if="selectedGeos.length" class="div-fixed-bottom">
-      <v-card>
-        <v-container fluid>
-          <Cart
-            @done="onDone"
-            @remove="removeGeo"
-            :items="selectedGeos">
-            <template slot-scope="props">
-              <v-chip close @input="removeGeo(props.item)">
-                {{translate(props.item)}}
-              </v-chip>
-            </template>
-          </Cart>
-        </v-container>
-      </v-card>
-    </div>
   </v-card>
 </template>
 
@@ -280,11 +280,6 @@
 </script>
 
 <style lang="sass">
-  .div-fixed-bottom
-    position: fixed
-    margin-bottom: 45px
-    width: 100%
-    bottom: 0
   .geo-search
     margin-bottom: 60px
   .move-up
