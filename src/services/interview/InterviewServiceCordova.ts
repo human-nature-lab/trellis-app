@@ -188,7 +188,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     console.log('diff', diff)
     const connection = await DatabaseService.getDatabase()
 
-    connection.transaction(async manager => {
+    return connection.transaction(async manager => {
       await manager.query(`PRAGMA defer_foreign_keys = true;`)
 
       // Remove stuff first
