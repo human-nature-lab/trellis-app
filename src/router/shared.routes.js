@@ -3,8 +3,9 @@ import RespondentForms from '../components/respondent/RespondentForms'
 import RespondentsSearch from '../components/respondent/RespondentsSearch'
 import RespondentInfo from '../components/respondent/RespondentInfo'
 import CameraTest from '../components/CameraTest'
-import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
+import Geo from '../components/geo/Geo'
 import GeoInfo from '../components/geo/GeoInfo'
+import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
 import LocaleSelectorPage from '../components/LocaleSelectorPage'
 import StudySelectorPage from '../components/StudySelectorPage'
 import SurveyComplete from '../components/interview/SurveyComplete'
@@ -46,6 +47,11 @@ export default [{
 }, {
   path: '/search/locations',
   name: 'GeoSearch',
+  component: Geo,
+  beforeEnter: chain(ValidateStudy, ValidateLocale)
+}, {
+  path: '/search/locations/map/:geoId',
+  name: 'GeoSearchWithMap',
   component: GeoSearchWithMap,
   beforeEnter: chain(ValidateStudy, ValidateLocale)
 }, {

@@ -8,6 +8,7 @@ import DatabaseService from '../../services/database/DatabaseService'
 import {Brackets, Connection, ConnectionManager, EntityManager, IsNull, QueryBuilder} from 'typeorm'
 import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
+import {removeSoftDeleted} from "../database/SoftDeleteHelper";
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
 
@@ -29,7 +30,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
   async getRespondentById (respondentId: string): Promise<Respondent> {
     const repository = await DatabaseService.getRepository(Respondent)
-    return await repository.findOne({
+    let respondent = await repository.findOne({
       where: {
         deletedAt: IsNull(),
         id: respondentId
@@ -44,6 +45,9 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
         'geos.geo.nameTranslation'
       ]
     })
+
+    removeSoftDeleted(respondent)
+    return respondent
   }
 
   async getSearchPage (studyId: string, query: string, filters, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {

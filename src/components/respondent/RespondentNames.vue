@@ -49,6 +49,7 @@
       :respondent="respondent"
       @close="doneAddingName"/>
     <RespondentNameForm
+      v-if="currentName !== null"
       v-model="isEditing"
       :name="currentName"
       :respondent="respondent"
