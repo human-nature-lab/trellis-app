@@ -13,8 +13,8 @@
         <Photo
           :photo="edge.targetRespondent.photos.length ? edge.targetRespondent.photos[0] : null"
           :showAlt="false"
-          :width="20"
-          :height="20"/>
+          width="20"
+          height="20"/>
       </v-avatar>
       <v-avatar v-if="edge.isLoading">
         <v-progress-circular indeterminate color="primary" />
