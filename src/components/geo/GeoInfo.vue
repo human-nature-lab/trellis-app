@@ -11,10 +11,10 @@
       <v-card-text>
         <v-alert v-show="error" color="error">{{error}}</v-alert>
         <v-layout class="pa-3">
-          <GeoBreadcrumbs v-if="geo.parentId" :geo-id="geo.parentId"></GeoBreadcrumbs>
+          <geo-breadcrumbs v-if="geo.parentId" :geo-id="geo.parentId"></geo-breadcrumbs>
         </v-layout>
         <v-layout>
-          <PhotoAlbum :photos="geo.photos" @photo="addPhoto"/>
+          <photo-album :photos="geo.photos" @photo="addPhoto"></photo-album>
         </v-layout>
       </v-card-text>
     </v-card>

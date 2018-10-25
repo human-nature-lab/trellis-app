@@ -8,18 +8,22 @@
     <v-progress-circular
       v-if="isLoading"
       indeterminate
-      color="primary" />
+      color="primary">
+    </v-progress-circular>
     <img
       ref="img"
       :src="src"
       :alt="alt"
+      :style="imgStyles"
       v-if="srcLoaded" />
   </v-flex>
 </template>
 
 <script>
   import PhotoService from '../../services/photo/PhotoService'
-  import URL_PLACEHOLDER from '../../assets/Placeholder_person.jpg'
+  import URL_PLACEHOLDER from '../../assets/baseline-image-24px.svg'
+  import PERSON_URL_PLACEHOLDER from '../../assets/baseline-person-24px.svg'
+  import BUILDING_URL_PLACEHOLDER from '../../assets/baseline-place-24px.svg'
 
   const observer = new IntersectionObserver(handleIntersections, {
     threshold: 0.5
@@ -48,17 +52,21 @@
       photoId: {
         type: String
       },
+      isBuilding: {
+        type: Boolean,
+        'default': false
+      },
       isContained: {
         type: Boolean,
-        default: false
+        'default': false
       },
       isCentered: {
         type: Boolean,
-        default: false
+        'default': false
       },
       showAlt: {
         type: Boolean,
-        default: true
+        'default': true
       },
       width: {
         type: String
@@ -187,6 +195,19 @@
       },
       hasError () {
         return !!this.loadingError
+      },
+      imgStyles () {
+        let styles = {}
+        if (this.width || this.height) {
+          if (this.width && (this.width > this.height)) {
+            styles.width = this.width + 'px'
+            styles.height = 'auto'
+          } else {
+            styles.height = this.height + 'px'
+            styles.width = 'auto'
+          }
+        }
+        return styles
       },
       photoStyles () {
         let styles = {}

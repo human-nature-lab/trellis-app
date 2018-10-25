@@ -30,6 +30,7 @@ export default abstract class GeoServiceInterface {
     geo.latitude = null
     geo.longitude = null
     geo.altitude = 0
+    geo.photos = []
     geo.nameTranslation = new Translation()
     geo.nameTranslation.translationText = []
     for (let i = 0; i < locales.length; i++) {

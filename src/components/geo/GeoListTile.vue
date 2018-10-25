@@ -1,8 +1,8 @@
 <template>
     <v-list-tile @click="$emit('click')">
-      <!--<v-list-tile-avatar>-->
-        <!--<Photo :photo="primaryPhoto" height="50" width="50" />-->
-      <!--</v-list-tile-avatar>-->
+      <v-list-tile-avatar :tile="true">
+        <Photo :photo="primaryPhoto" :is-building="true" height="50" width="50"></Photo>
+      </v-list-tile-avatar>
       <v-list-tile-action v-if="isSelectable">
         <v-btn
           icon
@@ -14,6 +14,13 @@
       <v-list-tile-content>
         {{this.translated}}
       </v-list-tile-content>
+      <v-list-tile-action>
+        <v-btn
+          @click.stop="showGeoMap"
+          icon>
+          <v-icon>map</v-icon>
+        </v-btn>
+      </v-list-tile-action>
       <v-list-tile-action>
         <v-btn
           @click.stop="showGeoInfo"
@@ -29,6 +36,7 @@
   import index from '../../router/index'
   import Photo from '../photo/Photo'
   import Geo from '../../entities/trellis/Geo'
+  import VListTileAction from 'vuetify/src/components/VList/VListTileAction'
   export default {
     name: 'geo-list-tile',
     props: {
@@ -38,15 +46,15 @@
       },
       selected: {
         type: Boolean,
-        default: false
+        'default': false
       },
       isSelectable: {
         type: Boolean,
-        default: false
+        'default': false
       },
       showInfoView: {
         type: Boolean,
-        default: true
+        'default': true
       }
     },
     computed: {
@@ -58,6 +66,14 @@
       }
     },
     methods: {
+      showGeoMap () {
+        index.push({
+          name: 'GeoSearchWithMap',
+          params: {
+            geoId: this.geo.id
+          }
+        })
+      },
       showGeoInfo () {
         index.push({
           name: 'Geo',
@@ -69,6 +85,7 @@
     },
     mixins: [TranslationMixin],
     components: {
+      VListTileAction,
       Photo
     }
   }

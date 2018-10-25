@@ -1,4 +1,3 @@
-import {isEqual} from 'lodash'
 import {expect} from 'chai'
 import moment from 'moment'
 import SparseTimestamped from "../../src/entities/base/SparseTimestamped";
