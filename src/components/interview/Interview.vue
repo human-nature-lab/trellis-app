@@ -267,21 +267,16 @@
       showConditionTags () {
         this.dialog.conditionTag = true
       },
-      lockAndExit () {
-        this.saveData()
-          .then(() => {
-            return Promise.all([
-              this.completeInterview(),
-              this.completeSurvey()
-            ])
-          })
-          .then(() => {
-            this.dialog.end = false
-            this.exit()
-          })
-          .catch(err => {
-            this.error = err
-          })
+      async lockAndExit () {
+        try {
+          await this.saveData()
+          await this.completeInterview()
+          await this.completeSurvey()
+          this.dialog.end = false
+          this.exit()
+        } catch (err) {
+          this.error = err
+        }
       },
       redirectToComplete (interviewId) {
         router.replace({name: 'SurveyComplete', params: {surveyId: this.interview.surveyId}})
