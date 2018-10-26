@@ -16,6 +16,12 @@ export class ConditionTagCordova implements ConditionTagInterface {
     return respondentConditionTag
   }
 
+  async getRespondentConditionTagNames (): Promise<String[]> {
+    const connection = await DatabaseService.getDatabase()
+    const conditionTagNames = await connection.query(`select distinct name from condition_tag;`)
+    return conditionTagNames.map((c) => c.name)
+  }
+
   async createConditionTag (name: string): Promise<ConditionTag> {
     const connection = await DatabaseService.getDatabase()
     const conditionTag = new ConditionTag()
@@ -32,7 +38,7 @@ export class ConditionTagCordova implements ConditionTagInterface {
     respondentConditionTag.respondentId = respondentId
     respondentConditionTag.conditionTagId = conditionTagId
     const returnConditionTag = await connection.manager.save(respondentConditionTag)
-    return await this.getRespondentConditionTagById(returnConditionTag.id)
+    return this.getRespondentConditionTagById(returnConditionTag.id)
   }
 
   async removeRespondentConditionTag (respondentId: string, conditionTagId: string): Promise<void> {
