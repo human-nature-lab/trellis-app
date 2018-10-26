@@ -3,17 +3,15 @@
     <v-toolbar flat>
       <v-toolbar-title>{{ $t('locations') }}</v-toolbar-title>
       <v-spacer />
-      <permission :role-whitelist="['admin','manager']">
-        <v-tooltip left>
-          <v-btn
-            slot="activator"
-            icon
-            @click="isAddingGeo = true">
-            <v-icon>add</v-icon>
-          </v-btn>
-          <span>{{ $t('add_locations') }}</span>
-        </v-tooltip>
-      </permission>
+      <v-tooltip left>
+        <v-btn
+          slot="activator"
+          icon
+          @click="isAddingGeo = true">
+          <v-icon>add</v-icon>
+        </v-btn>
+        <span>{{ $t('add_locations') }}</span>
+      </v-tooltip>
     </v-toolbar>
     <v-alert v-show="error" color="error">{{error}}</v-alert>
     <v-data-table
