@@ -2,7 +2,14 @@
   <v-flex xs12>
     <v-card tile>
       <v-toolbar card prominent>
-        <v-toolbar-title>{{ $t('respondent') }}: {{name}}</v-toolbar-title>
+        <v-toolbar-title>
+          {{name}}
+          <v-chip
+            v-if="respondent.associatedRespondentId"
+            label
+            color="error"
+            outline>({{$t('other_respondent')}})</v-chip>
+        </v-toolbar-title>
         <v-spacer />
         <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
           {{ $t('forms') }}
