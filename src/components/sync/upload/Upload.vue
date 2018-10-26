@@ -213,20 +213,6 @@
       createUploadDone: async function (fileEntry, updatedPhotos) {
         // At this point updatedPhotos is a list of fileNames and
         // needs to be converted to FileEntries
-        /* For testing
-        let testPhotos = [
-          'fff1a527-1779-4ba9-956f-1480008af10c.jpg',
-          'fff48b10-c666-4d88-a673-55c2e38f80e5.jpg',
-          'fff5e5a9-4c81-4e4a-877e-4bbdf13cfb28.jpg',
-          'fff9230e-31ed-4bbf-acdd-ed8326b2720a.jpg',
-          'fffc859e-01a4-4e12-99c8-c7265adcf5c6.jpg',
-          'fffd286b-e848-41c9-ab23-adf4a5b4510f.jpg',
-          'ffff484a-b96c-43ac-8ddf-924b6cf59e01.jpg',
-          'ffff501b-41e4-4bdd-89a2-8d135495c239.jpg',
-          'ffff5e17-70d1-4e6e-8c8e-454f828fc926.jpg',
-          'ffffc27a-48e3-49fc-9294-7dbc0b0f77b4.jpg'
-        ]
-        */
         for (let i = 0; i < updatedPhotos.length; i++) {
           try {
             let fileEntry = await FileService.getPhoto(updatedPhotos[i])

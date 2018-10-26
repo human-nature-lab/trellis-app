@@ -370,11 +370,13 @@ export default class DatabaseServiceCordova {
 
   async getUpdatedRecordsCount () {
     const connection = await this.getDatabase()
+    /*
     const updatedRecords = await connection.query(
       `select *
         from updated_records
         where uploaded_at is null;`)
     console.log('updatedRecords', updatedRecords)
+    */
     const totalRowResults = await connection.query(
       `select count(distinct updated_record_id) as total_rows
         from updated_records

@@ -189,7 +189,8 @@ class SyncService {
   }
 
   async getUpdatedPhotos (connection:Connection, rowIds:string[]): Promise<object[]> {
-    return await connection.query(`select file_name from photo where id in (${rowIds});`)
+    const results = await connection.query(`select file_name from photo where id in (${rowIds});`)
+    return results.map((row) => row.file_name)
   }
 
   async markUpdatedRowsAsUploaded () {
@@ -208,12 +209,16 @@ class SyncService {
     })
     */
 
-    const totalRowResults = await connection.query('select count(*) as total_rows from updated_records where uploaded_at is null;')
+    const totalRowResults = await connection.query(`
+      select count(*) as total_rows from (
+        select distinct updated_record_id, table_name from updated_records where uploaded_at is null
+      );`)
+
     const totalRows = totalRowResults[0]['total_rows']
     const tables = await connection.query(
       'select table_name as tableName, count(*) as rowCount ' +
-      'from updated_records ' +
-      'where uploaded_at is null ' +
+      'from (select distinct updated_record_id, table_name from updated_records ' +
+      'where uploaded_at is null) ' +
       'group by table_name;')
 
     const fileWriter = await this.createFileWriter(fileEntry)
@@ -221,15 +226,18 @@ class SyncService {
     let updatedPhotos = []
 
     for (const table of tables) {
-      let offset = 0
-      while (offset < table.rowCount) {
-        const rowIds = await this.getRowsToUpdate(connection, table.tableName, UPLOAD_NUM_ROWS_WRITE, offset)
-        const updatedRows = await this.getUpdatedRows(connection, table.tableName, rowIds)
+      let rowIds = await connection.query(`
+        select distinct updated_record_id from updated_records where table_name = ? and uploaded_at is null
+      `,[table.tableName])
+      rowIds = rowIds.map((row) => row.updated_record_id)
+      while (rowIds.length > 0) {
+        let subsetRowIds = rowIds.splice(0, UPLOAD_NUM_ROWS_WRITE)
+        subsetRowIds = subsetRowIds.map((rowId) => { return '"' + rowId + '"' }).join(',')
+        const updatedRows = await this.getUpdatedRows(connection, table.tableName, subsetRowIds)
         if (table.tableName === 'photo') {
-          updatedPhotos = await this.getUpdatedPhotos(connection, rowIds)
+          updatedPhotos = await this.getUpdatedPhotos(connection, subsetRowIds)
         }
         await this.writeUpdatedRows(fileWriter, updatedRows, isCancelled)
-        offset += UPLOAD_NUM_ROWS_WRITE
         writtenRows += updatedRows.length
         trackProgress({created: writtenRows, total: totalRows})
       }
