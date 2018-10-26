@@ -10,6 +10,11 @@ export class ConditionTagWeb implements ConditionTagInterface {
     }).then(res => new ConditionTag().fromSnakeJSON(res.data.condition_tag))
   }
 
+  async getRespondentConditionTagNames (): Promise<String[]> {
+    return http().get(`/condition-tag-names`)
+      .then(res => res.data['condition_tag_names'])
+  }
+
   createRespondentConditionTag (respondentId, conditionTagId) {
     respondentId = encodeURIComponent(respondentId)
     conditionTagId = encodeURIComponent(conditionTagId)

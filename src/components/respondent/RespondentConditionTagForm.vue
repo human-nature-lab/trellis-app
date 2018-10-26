@@ -4,9 +4,9 @@
     :value="value"
     @input="$emit('input', $event)">
     <v-card>
-      <ModalTitle
+      <modal-title
         :title="$t('add_condition_tag')"
-        @close="$emit('input', false)" />
+        @close="$emit('input', false)"></modal-title>
       <v-card-text>
         <v-alert v-if="error">
           {{error}}
@@ -15,41 +15,19 @@
           <v-select
             autofocus
             autocomplete
-            v-model="conditionTag"
+            combobox
+            v-model="conditionTagName"
             :loading="isLoading"
-            item-text="name"
-            append-icon="add"
-            :append-icon-cb="newConditionTag"
-            :items="conditions" />
-          <v-btn @click="save">
-            <v-progress-circular v-if="isSaving" indeterminate />
+            :items="conditions"></v-select>
+          <v-btn
+            @click="save">
+            <v-progress-circular v-if="isSaving" indeterminate></v-progress-circular>
             <span v-else>
             {{ $t('save') }}
           </span>
           </v-btn>
         </v-layout>
       </v-card-text>
-      <v-dialog lazy v-model="showNewConditionTag" max-width="300">
-        <v-card>
-          <v-container>
-            <v-layout row>
-              <v-text-field
-                autofocus
-                :loading="isSavingNew"
-                v-model="newConditionTagName"
-                :label="$t('condition_tag')" />
-              <v-btn @click="createNewConditionTag">
-                <v-progress-circular
-                  v-if="isSavingNew"
-                  indeterminate />
-                <span v-else>
-                  {{ $t('save') }}
-                </span>
-              </v-btn>
-            </v-layout>
-          </v-container>
-        </v-card>
-      </v-dialog>
     </v-card>
   </v-dialog>
 </template>
@@ -61,13 +39,10 @@
     components: {ModalTitle},
     name: 'respondent-condition-form',
     data: () => ({
-      conditionTag: null,
+      conditionTagName: '',
       conditions: [],
       isLoading: false,
       isSaving: false,
-      isSavingNew: false,
-      newConditionTagName: null,
-      showNewConditionTag: false,
       error: null
     }),
     created () {
@@ -84,43 +59,31 @@
       }
     },
     methods: {
-      load () {
+      async load () {
         this.isLoading = true
-        ConditionTagService.all().then(conditions => {
-          this.conditions = conditions
-        }).catch(err => {
+        try {
+          this.conditions = await ConditionTagService.getRespondentConditionTagNames()
+        } catch (err) {
           this.error = err
-        }).finally(() => {
+        } finally {
           this.isLoading = false
-        })
+        }
       },
-      save () {
+      async save () {
+        if (this.conditionTagName.trim() === '') return
         this.isSaving = true
-        ConditionTagService.createRespondentConditionTag(this.respondentId, this.conditionTag.id).then(tag => {
-          tag.conditionTag = this.conditionTag.copy()
-          this.$emit('close', tag)
-          this.conditionTag = null
-        }).catch(err => {
+        try {
+          const newConditionTag = await ConditionTagService.createConditionTag(this.conditionTagName.trim())
+          const respondentConditionTag = await ConditionTagService.createRespondentConditionTag(this.respondentId, newConditionTag.id)
+          respondentConditionTag.conditionTag = newConditionTag.copy()
+          this.$emit('close', respondentConditionTag)
+          this.conditionTagName = ''
+        } catch (err) {
           this.error = err
-        }).finally(() => {
+        } finally {
           this.isSaving = false
-        })
+        }
       },
-      createNewConditionTag () {
-        this.isSavingNew = true
-        ConditionTagService.createConditionTag(this.newConditionTagName).then(tag => {
-          this.conditions.push(tag)
-          this.conditionTag = tag
-        }).catch(err => {
-          this.error = err
-        }).finally(() => {
-          this.isSavingNew = false
-          this.showNewConditionTag = false
-        })
-      },
-      newConditionTag () {
-        this.showNewConditionTag = true
-      }
     }
   }
 </script>
