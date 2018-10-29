@@ -1,6 +1,4 @@
 import SingletonService from '../SingletonService'
-import i18n from '../../i18n'
-import moment from 'moment'
 import Locale from '../../entities/trellis/Locale'
 import Study from '../../entities/trellis/Study'
 import StudyService from '../study/StudyService'
@@ -57,8 +55,6 @@ export default abstract class LocaleServiceAbstract {
    * @param {Locale} locale
    */
   setCurrentLocale (locale: Locale): void {
-    moment.locale(locale.languageTag)
-    i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
     SingletonService.setCurrentLocale(locale)
   }
 

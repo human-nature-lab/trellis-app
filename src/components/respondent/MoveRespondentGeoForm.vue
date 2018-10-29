@@ -19,24 +19,25 @@
               <span v-else>{{$t('unknown_location')}}</span>
             </v-chip>
           </v-layout>
-          <v-layout>
-            <v-flex v-if="newGeo">
+          <v-layout wrap>
+            <v-flex v-if="newGeo" sm6 md3>
               Moving to:
               <v-chip
+                :disabled="moveToUnknown"
                 color="primary"
                 outline
                 label>
                 <AsyncTranslationText :translation="newGeo.nameTranslation" />
               </v-chip>
             </v-flex>
-            <v-flex>
+            <v-flex sm6 md3>
               <v-btn
                 :disabled="moveToUnknown"
                 @click="isSearchOpen = true">
                 {{$t('select_location')}}
               </v-btn>
             </v-flex>
-            <v-flex>
+            <v-flex sm6 md3>
               <v-checkbox
                 v-model="moveToUnknown"
                 :label="$t('unknown_location')" />
