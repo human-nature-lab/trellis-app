@@ -1,6 +1,6 @@
 {
   "name": "trellis",
-  "version": "1.0.0",
+  "version": "3.0.10",
   "description": "The form view component of the Trellis platform.",
   "author": "wyattis <wyattisrael@gmail.com>",
   "private": true,
