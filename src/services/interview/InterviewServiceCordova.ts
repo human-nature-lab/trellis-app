@@ -148,7 +148,9 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
 
   private async getSurveyConditionTags (interviewId: string): Promise<SurveyConditionTag[]> {
     return await (await DatabaseService.getRepository(SurveyConditionTag)).createQueryBuilder('survey_condition_tag')
-      .where(qb => `survey_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`).getMany()
+      .where(qb => `survey_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`)
+      .andWhere('survey_condition_tag.deletedAt is null')
+      .getMany()
   }
 
   private async getSectionConditionTags (interviewId: string): Promise<SectionConditionTag[]> {
@@ -156,6 +158,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       .where(qb => {
         return `section_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`
       })
+      .andWhere('section_condition_tag.deletedAt is null')
       .leftJoinAndSelect('section_condition_tag', 'section_condition_tag.conditionTag')
       .getMany()
   }
@@ -165,6 +168,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       .where(qb => {
         return `respondent_condition_tag.respondentId = ${this.respondentIdSubQuery(interviewId, qb)}`
       })
+      .andWhere('respondent_condition_tag.deletedAt is null')
       .leftJoinAndSelect('respondent_condition_tag.conditionTag', 'conditionTag')
       .getMany()
   }
