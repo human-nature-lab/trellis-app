@@ -2,6 +2,15 @@ import singleton from '../static/singleton'
 import storage from './StorageService'
 import LocaleService from './locale/LocaleService'
 import StudyService from './study/StudyService'
+import i18n from '../i18n'
+import moment from 'moment'
+
+enum StorageKey {
+  theme = 'dark-theme',
+  study = 'current-study',
+  locale = 'current-locale',
+  offline = 'offline'
+}
 
 class SingletonService {
   loadPromise: Promise<void>
@@ -15,38 +24,44 @@ class SingletonService {
   }
 
   async loadFromLocalStorage () {
-    if (storage.get('dark-theme')) {
-      singleton.darkTheme = storage.get('dark-theme')
+    if (storage.get(StorageKey.theme)) {
+      singleton.darkTheme = storage.get(StorageKey.theme)
     }
-    if (storage.get('current-study')) {
-      const studyId = storage.get('current-study')
+    if (storage.get(StorageKey.study)) {
+      const studyId = storage.get(StorageKey.study)
       if (!studyId) return
       singleton.study = await StudyService.getStudy(studyId)
     }
-    if (storage.get('current-locale')) {
-      const localeId = storage.get('current-locale')
+    if (storage.get(StorageKey.locale)) {
+      const localeId = storage.get(StorageKey.locale)
       if (!localeId) return
-      singleton.locale = await LocaleService.getLocaleById(localeId)
+      const locale = await LocaleService.getLocaleById(localeId)
+      if (locale) {
+        this.setCurrentLocale(locale)
+      }
+      console.log('loaded locale', singleton.locale)
     }
   }
 
   setCurrentStudy (study) {
     singleton.study = study
-    storage.set('current-study', study.id)
+    storage.set(StorageKey.study, study.id)
   }
 
   setCurrentLocale (locale) {
+    moment.locale(locale.languageTag)
+    i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
     singleton.locale = locale
-    storage.set('current-locale', locale.id)
+    storage.set(StorageKey.locale, locale.id)
   }
 
   setDarkTheme (useDarkTheme) {
     singleton.darkTheme = useDarkTheme
-    storage.set('dark-theme', useDarkTheme)
+    storage.set(StorageKey.theme, useDarkTheme)
   }
 
   setOnlineOffline (isOffline) {
-    storage.set('offline', isOffline)
+    storage.set(StorageKey.offline, isOffline)
     singleton.offline = isOffline
   }
 
@@ -62,6 +77,7 @@ class SingletonService {
   }
 
   set (key, value) {
+    singleton[key] = value
     storage.set(key, value)
   }
 }
