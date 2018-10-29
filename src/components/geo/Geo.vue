@@ -30,9 +30,11 @@
 </template>
 
 <script>
+  import Geo from '../../entities/trellis/Geo'
   import GeoSearch from './GeoSearch.vue'
   import AddGeoForm from './AddGeoForm.vue'
   import GeoService from '../../services/geo/GeoService'
+  import global from '../../static/singleton'
 
   export default {
     name: 'geo',
@@ -56,6 +58,9 @@
     methods: {
       addLocationClose (addedLocation) {
         this.adding = false
+        if (addedLocation instanceof Geo) {
+          console.log('geo added', addedLocation, global.locale)
+        }
       },
       addLocation () {
         this.adding = true
@@ -66,7 +71,7 @@
       },
       async setCanUserAddChild () {
         let parentGeo = await GeoService.getGeoById(this.parentGeoId)
-        this.canUserAddChild = parentGeo.geoType.canUserAddChild
+        this.canUserAddChild = (parentGeo && parentGeo.hasOwnProperty('geoType')) ? parentGeo.geoType.canUserAddChild : false
       }
     }
   }
