@@ -51,7 +51,8 @@ var webpackConfig = merge(baseWebpackConfig, {
     new webpack.LoaderOptionsPlugin({ options: {} }),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
-      'process.env': env
+      'process.env': env,
+      VERSION: require('../package.json').version
     }),
     // new MiniCssExtractPlugin({
     //   filename: '[name].css',
@@ -100,9 +101,9 @@ var webpackConfig = merge(baseWebpackConfig, {
         from: path.resolve(__dirname, '../static/config.xml'),
         to: path.resolve(config.build.assetsRoot, 'config.xml'),
         transform: function (content) {
-          var replacements = {
+          var replacements = merge(require('../config/config.xml'), {
             CORDOVA_CONTENT_SOURCE: 'index.html'
-          }
+          })
           content = content.toString()
           for (var key in replacements) {
             content = content.replace(key, replacements[key])
