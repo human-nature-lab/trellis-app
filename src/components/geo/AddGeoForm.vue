@@ -82,7 +82,7 @@
                     <v-list-tile-content class="align-end">{{ altitude }}</v-list-tile-content>
                   </v-list-tile>
                 </v-list>
-                <v-btn @click="getPosition">{{$t('use_your_current_position')}}</v-btn>
+                <v-btn @click="getPosition">{{$t('use_current_position')}}</v-btn>
                 <v-btn v-if="this.parentGeoId !== null" @click="useParentPosition">{{$t('use_parent_position')}}</v-btn>
               </v-card-text>
               <v-card-actions>
@@ -193,7 +193,7 @@
         return (this.geo && this.geo.hasOwnProperty('altitude') && isNumber(this.geo.altitude)) ? this.geo.altitude : this.$t('none')
       },
       positionSet () {
-        return (isNumber(this.latitude) && isNumber(this.longitude) && isNumber(this.altitude))
+        return (isNumber(this.latitude) && isNumber(this.longitude))
       }
     },
     methods: {
