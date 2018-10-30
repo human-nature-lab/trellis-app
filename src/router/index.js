@@ -49,12 +49,17 @@ router.onError(err => {
 /**
  * Add element to browser history and try to return to the current location
  * @param {Object} route
+ * @param {Object} query
  */
-export function pushRouteAndQueueCurrent (route) {
+export function pushRouteAndQueueCurrent (route, query) {
   if (!route.query) {
     route.query = {}
   }
-  route.query.to = router.currentRoute.fullPath
+  if (query) {
+    route.query.to = { path: router.currentRoute.fullPath, query: query }
+  } else {
+    route.query.to = router.currentRoute.fullPath
+  }
   router.push(route)
 }
 

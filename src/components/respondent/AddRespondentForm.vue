@@ -77,13 +77,18 @@
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum'
-  import {pushRoute} from '../../router'
+  import {pushRoute, pushRouteAndQueueCurrent} from '../../router'
   export default {
     components: {PhotoAlbum},
     name: 'add-respondent-form',
     props: {
       associatedRespondentId: String,
-      studyId: String
+      studyId: String,
+      redirectToRespondentInfo: {
+        type: Boolean,
+        'default': true,
+        required: false
+      }
     },
     data () {
       return {
@@ -128,23 +133,39 @@
         this.checkingForCensus = false
         if (this.hasCensusForm) {
           setTimeout(() => {
-            pushRoute({
-              name: 'StartCensusForm',
-              params: {
-                studyId: this.studyId,
-                censusTypeId: censusTypeId
-              },
-              query: {
-                respondentId: this.respondent.id
-              }
-            }, {
-              name: 'Respondent',
-              params: {
-                studyId: this.studyId,
-                respondentId: this.respondent.id
-              },
-              replace: true
-            })
+            if (this.redirectToRespondentInfo) {
+              pushRoute({
+                name: 'StartCensusForm',
+                params: {
+                  studyId: this.studyId,
+                  censusTypeId: censusTypeId
+                },
+                query: {
+                  respondentId: this.respondent.id
+                }
+              }, {
+                name: 'Respondent',
+                params: {
+                  studyId: this.studyId,
+                  respondentId: this.respondent.id
+                },
+                replace: true
+              })
+            } else {
+              pushRouteAndQueueCurrent({
+                name: 'StartCensusForm',
+                params: {
+                  studyId: this.studyId,
+                  censusTypeId: censusTypeId
+                },
+                query: {
+                  respondentId: this.respondent.id
+                }
+              }, {
+                associatedRespondentId: this.associatedRespondentId,
+                associatedRespondentName: this.name
+              })
+            }
           }, censusDelay)
         } else {
           setTimeout(() => {
