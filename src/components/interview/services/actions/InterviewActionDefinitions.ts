@@ -114,7 +114,7 @@ actionManager.add(AT.respondent_move, addDatumLimit(1))
 actionManager.add(AT.respondent_add_geo, addDatumLimit(1))
 actionManager.add(AT.respondent_remove_geo, addDatumLimit(1))
 actionManager.add(AT.other_respondent_added, function () {
-  debugger
+  //debugger
   addOrUpdateSingleDatum.apply(null, arguments)
 })
 

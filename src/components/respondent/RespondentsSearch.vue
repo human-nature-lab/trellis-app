@@ -9,8 +9,9 @@
       <v-btn
         v-if="canSelect"
         @click="onDone"
+        color="primary"
         :disabled="isLoading">
-        <v-progress-circular v-if="isLoading" indeterminate color="primary" />
+        <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
         <span v-else>
           {{ $t('done') }}
         </span>
@@ -27,7 +28,7 @@
         tags
         @input="onQueryChange"
         :loading="conditionTagsLoading"
-        autocomplete/>
+        autocomplete></v-select>
       <v-tooltip bottom>
         <v-btn
           slot="activator"
@@ -49,56 +50,64 @@
         :key="geo.id"
         @input="removeGeoFilter(index)"
         :close="canRemoveGeos">
-        <GeoBreadcrumbs :geo-id="geo" :show-ancestors="false"/>
+        <geo-breadcrumbs :geo-id="geo" :show-ancestors="false"></geo-breadcrumbs>
       </v-chip>
+    </v-layout>
+    <v-layout v-if="selected.length > 0">
+      <v-flex>
+        <v-chip
+          v-for="(r) in selected"
+          :key="r.id"
+          @input="onSelectRespondent(r)"
+          :close="true">
+          {{ getRespondentName(r) }}
+        </v-chip>
+      </v-flex>
+    </v-layout>
+    <v-layout row>
+      <v-spacer></v-spacer>
+      <v-tooltip top v-if="canAddRespondent">
+        <v-btn
+          slot="activator"
+          @click="showAssociatedRespondentDialog = true"
+          :loading="isLoading">
+          {{ $t('add_other_respondent') }}
+          <v-icon>add</v-icon>
+        </v-btn>
+        <span v-if="respondentId">
+            {{ $t('add_other_respondent') }}
+          </span>
+        <span v-else>
+            {{ $t('add_respondent') }}
+          </span>
+      </v-tooltip>
     </v-layout>
     <v-alert v-if="error">
       {{error}}
     </v-alert>
     <v-container class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
-        <RespondentItem
+        <respondent-item
           v-for="respondent in respondentResults"
           :key="respondent.id"
           :formsButtonVisible="formsButtonVisible"
           :infoButtonVisible="infoButtonVisible"
           @selected="onSelectRespondent(respondent)"
           :selected="isSelected(respondent)"
-          :respondent="respondent" />
+          :respondent="respondent"></respondent-item>
       </v-layout>
       <v-layout v-if="!respondentResults.length" ma-3>
         {{ $t('no_results') }}: {{query}}
-      </v-layout>
-      <v-layout row>
-        <v-spacer />
-        <v-tooltip top v-if="canAddRespondent">
-          <v-btn
-            slot="activator"
-            fixed
-            fab
-            bottom
-            right
-            @click="showAssociatedRespondentDialog = true"
-            :loading="isLoading"
-            color="primary">
-            <v-icon style="height:auto;">add</v-icon>
-          </v-btn>
-          <span v-if="respondentId">
-            {{ $t('add_other_respondent') }}
-          </span>
-          <span v-else>
-            {{ $t('add_respondent') }}
-          </span>
-        </v-tooltip>
       </v-layout>
     </v-container>
     <v-dialog
       v-model="showAssociatedRespondentDialog">
       <v-card>
-        <AddRespondentForm
+        <add-respondent-form
           @close="addRespondentClose"
           :studyId="studyId"
-          :associatedRespondentId="respondentId" />
+          :redirectToRespondentInfo="false"
+          :associatedRespondentId="respondentId"></add-respondent-form>
       </v-card>
     </v-dialog>
   </v-container>
@@ -163,6 +172,11 @@
   export default {
     name: 'respondents-search',
     props: {
+      searchQuery: {
+        type: String,
+        required: false,
+        default: undefined
+      },
       canSelect: {
         type: Boolean,
         default: false
@@ -284,7 +298,6 @@
         PhotoService.cancelAllOutstanding()
         return RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
           .then(respondents => {
-            console.log('respondents', respondents)
             this.results = respondents
             this.error = null
           }).catch(err => {
@@ -295,33 +308,33 @@
       },
       onSelectRespondent (respondent) {
         this.$emit('selectRespondent', respondent)
-        console.log('onSelectRespondent', respondent)
         if (!this.canSelect) {
           router.push({name: 'Respondent', params: {respondentId: respondent.id, studyId: this.studyId}})
           return
         }
-        if (this.limit && this.selected.length > this.limit) return
 
-        let sIndex = this.selected.indexOf(respondent.id)
-        let aIndex = this.added.indexOf(respondent.id)
-        let rIndex = this.removed.indexOf(respondent.id)
+        let sIndex = this.selected.findIndex((r) => r.id === respondent.id)
+        let aIndex = this.added.findIndex((r) => r.id === respondent.id)
+        let rIndex = this.removed.findIndex((r) => r.id === respondent.id)
         if (aIndex > -1) {
           this.added.splice(aIndex, 1)
         } else if (rIndex > -1) {
           this.removed.splice(rIndex, 1)
         } else if (sIndex > -1) {
-          this.removed.push(respondent.id)
+          this.removed.push(respondent)
         } else {
-          this.added.push(respondent.id)
+          // Do not add another respondent if we're at the limit
+          if (this.limit && (this.selected.length + 1) > this.limit) return
+          this.added.push(respondent)
         }
       },
       onDone () {
-        this.$emit('selected', this.added, this.removed)
+        this.$emit('selected', this.added.map((r) => r.id), this.removed.map((r) => r.id))
         this.added = []
         this.removed = []
       },
       isSelected (respondent) {
-        return this.selected.indexOf(respondent.id) > -1
+        return this.selected.findIndex((r) => r.id === respondent.id) > -1
       },
       addRespondentClose (respondent) {
         // TODO: Maybe add this to cache (if there is one)
@@ -329,6 +342,17 @@
           this.results.push(respondent)
         }
         this.showAssociatedRespondentDialog = false
+      },
+      getRespondentName (respondent) {
+        let rName = respondent.names.find(n => n.isDisplayName)
+        return rName ? rName.name : this.respondent.name
+      },
+    },
+    watch : {
+      'searchQuery': function(searchTerm) {
+        if (searchTerm !== undefined) {
+          this.query = searchTerm
+        }
       }
     },
     computed: {
@@ -337,7 +361,7 @@
       },
       selected () {
         let selected = this.selectedRespondents.concat(this.added)
-        return selected.filter(id => this.removed.indexOf(id) === -1)
+        return selected.filter((r) => this.removed.findIndex((removed) => removed.id === r.id) === -1)
       },
       respondentResults () {
         return orderBy(this.results, ['score', 'name'], ['desc', 'asc'])

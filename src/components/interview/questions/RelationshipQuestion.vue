@@ -42,6 +42,7 @@
           :baseFilters="baseRespondentFilters"
           :selectedRespondents="selectedRespondents"
           :canRemoveGeos="false"
+          :searchQuery="searchQuery"
           :isLoading="isSavingEdges" />
       </v-card>
     </v-dialog>
@@ -57,6 +58,7 @@
   import EdgeService from '../../../services/edge/EdgeService'
   import parameterTypes from '../../../static/parameter.types'
   import GeoService from '../../../services/geo/GeoService'
+  import RespondentService from '../../../services/respondent/RespondentService'
   export default {
     name: 'relationship-question',
     props: {
@@ -76,7 +78,8 @@
         loadedEdges: {},
         error: null,
         isSavingEdges: false,
-        baseAncestorId: null
+        baseAncestorId: null,
+        searchQuery: undefined
       }
     },
     computed: {
@@ -121,7 +124,7 @@
       selectedRespondents: function () {
         console.log('recalculating selected respondents')
         return this.edges.map(edge => {
-          return edge.targetRespondentId
+          return edge.targetRespondent
         })
       },
       selectLimit: function () {
@@ -205,6 +208,17 @@
     },
     created: function () {
       this.loadEdges(this.edgeIds)
+      /* TODO: How can we pass the $route.query.associatedRespondentName to prefil the respondent search dialog? */
+      if (this.$route && this.$route.query && this.$route.query.associatedRespondentId) {
+        this.searchQuery = this.$route.query.associatedRespondentName
+        console.log('searchQuery', this.searchQuery)
+        this.respondentSearchDialog = true
+        // Remove the associatedRespondentId from the queryString
+        let query = Object.assign({}, this.$route.query)
+        delete query.associatedRespondentId
+        delete query.associatedRespondentName
+        this.$router.replace({ query })
+      }
     },
     components: {
       Photo,
