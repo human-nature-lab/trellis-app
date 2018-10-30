@@ -1,21 +1,31 @@
 <template>
-  <v-flex>
+  <v-flex sm12>
     <FormListItem
       v-for="form in cForms"
       :key="form.id"
       :form="form"
-      v-if="showForm(form)"
-      @click="$emit('click', form)"/>
+      :respondent="respondent"
+      :allowMultipleSurveys="allowMultipleSurveys"
+      :canCreateSurveys="canCreateSurveys"
+      @newInterview="newInterview"
+      v-if="showForm(form)" />
   </v-flex>
 </template>
 
-<script>
+<script lang="ts">
   import Vue from 'vue'
+  // @ts-ignore
   import FormListItem from './FormListItem'
+  import {DisplayForm} from './respondent/RespondentForms'
+  import Interview from "../entities/trellis/Interview"
 
   export default Vue.extend({
     name: 'forms-view',
     props: {
+      respondent: {
+        type: Object,
+        required: true
+      },
       forms: {
         type: Array,
         required: true
@@ -27,10 +37,21 @@
       showUnpublished: {
         type: Boolean,
         default: false
+      },
+      allowMultipleSurveys: {
+        type: Boolean,
+        default: false
+      },
+      canCreateSurveys: {
+        type: Boolean,
+        default: true
       }
     },
     methods: {
-      showForm (form) {
+      newInterview (interview: Interview) {
+        this.$emit('newInterview', interview)
+      },
+      showForm (form): boolean {
         if (form.isPublished && !form.isSkipped) {
           return true
         } else if (form.isPublished) {
@@ -43,10 +64,10 @@
       }
     },
     computed: {
-      cForms () {
-        return this.forms.map((form, i) => {
+      cForms (): DisplayForm[] {
+        return this.forms.map((form: DisplayForm, i) => {
           form.nComplete = form.surveys.reduce((c, s) => (s.completedAt ? c + 1 : c), 0)
-          form.isComplete = form.surveys.length && form.surveys[0].completedAt || false
+          form.isComplete = form.surveys.length && !!form.surveys[0].completedAt || false
           form.isStarted = form.surveys.length && !form.surveys[0].completedAt || false
           return form
         })

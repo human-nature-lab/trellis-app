@@ -14,7 +14,6 @@ export default class FormServiceCordova implements FormServiceInterface {
     let studyForms = await repo.find({
       where: {
         studyId: studyId,
-        censusTypeId: IsNull(),
         deletedAt: IsNull()
       }
     })
