@@ -127,7 +127,6 @@
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
   import PhotoService from '../../services/photo/PhotoService'
-  import Photo from '../../entities/trellis/Photo'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
