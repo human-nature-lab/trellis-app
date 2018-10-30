@@ -6,6 +6,8 @@ import actionManager from './ActionManager'
 import {addDatum, addDatumLimit, addOrUpdateSingleDatum, removeDatum, updateDatum, ActionPayload} from './DatumOperations'
 import Question from '../../../../entities/trellis/Question'
 import InterviewManagerOld, {default as InterviewManager} from '../../classes/InterviewManager'
+import Datum from "../../../../entities/trellis/Datum";
+import Choice from "../../../../entities/trellis/Choice";
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
@@ -17,49 +19,46 @@ const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val sho
  * datum are being created so that the ids are recycled
  */
 actionManager.add(AT.select_choice, function (interview: InterviewManagerOld, payload: ActionPayload, questionDatum: QuestionDatum, questionBlueprint: Question) {
-  let choice = questionBlueprint.choices.map(c => c.choice).find(c => c.id === payload.choice_id)
-  let shouldRemoveOthers = questionBlueprint.questionTypeId === QT.multiple_choice
-  let paramMap = new Map()
+  // The choice we are selecting
+  let choice: Choice
+  const choiceValMap: Map<string, Choice> = new Map()
+  for (let qc of questionBlueprint.choices) {
+    if (qc.choiceId === payload.choice_id) {
+      choice = qc.choice
+    }
+    choiceValMap.set(qc.choice.val, qc.choice)
+  }
 
-  // Handle any parameters on the choice being selected
-  let choiceHasOtherInput = false
-  for (let param of questionBlueprint.questionParameters) {
-    paramMap.set(param.val, param.parameter)
-    if (choice.val === param.val) {
-      let pId = parseInt(param.parameterId, 10)
-      if (pId === parameterTypes.other) {
-        choiceHasOtherInput = true
-      }
-      if (pId === parameterTypes.exclusive) {
-        shouldRemoveOthers = true
-      }
+  // Create an array of choices with the exclusive parameter
+  let exclusiveChoices: string[] = []
+  let otherChoices: string[] = []
+  for (let qp of questionBlueprint.questionParameters) {
+    if (+qp.parameterId === parameterTypes.exclusive) {
+      exclusiveChoices.push(choiceValMap.get(qp.val).id)
+    } else if (+qp.parameterId === parameterTypes.other) {
+      otherChoices.push(choiceValMap.get(qp.val).id)
     }
   }
 
-  // Remove any other exclusive choices that are currently selected
-  let exclusiveParameter = questionBlueprint.questionParameters.find(p => {
-    return parseInt(p.parameterId, 10) === parameterTypes.exclusive
-  })
-  if (exclusiveParameter) {
-    let cChoice = questionBlueprint.choices.find(c => c.choice.val === exclusiveParameter.val)
-    if (cChoice) {
-      for (let i = 0; i < questionDatum.data.length; i++) {
-        let datum = questionDatum.data[i]
-        if (datum.choiceId === cChoice.id) {
-          questionDatum.data.splice(i, 1)
-          break
-        }
-      }
-    } else {
-      // debugger
-    }
-  }
-
+  // Remove all other choices if this one is an exclusive choice
+  const shouldRemoveOthers: boolean = exclusiveChoices.indexOf(choice.id) > -1 || questionBlueprint.questionTypeId === QT.multiple_choice
   if (shouldRemoveOthers) {
-    questionDatum.data = [] // This could break references... shouldn't be a since we're trying to pass around copies
+    interview.data.removeAllDatum(questionDatum)
   }
-  let datum = addDatum(interview, payload, questionDatum)
-  if (choiceHasOtherInput) {
+
+  // Remove any selected exclusive choices
+  const questionHasExclusive = exclusiveChoices.length > 0
+  if (questionHasExclusive) {
+    interview.data.filterDatum(questionDatum, (d: Datum) => {
+      return exclusiveChoices.indexOf(d.choiceId) > -1
+    })
+  }
+
+  // Add the selected datum
+  const datum = addDatum(interview, payload, questionDatum)
+
+  // Reset the datum value to blank if the datum has the 'other' parameter
+  if (otherChoices.indexOf(choice.id) > -1) {
     datum.val = ''
   }
 })
