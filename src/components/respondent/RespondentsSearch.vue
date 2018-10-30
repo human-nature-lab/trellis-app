@@ -82,7 +82,7 @@
           </span>
       </v-tooltip>
     </v-layout>
-    <v-alert v-if="error">
+    <v-alert v-show="error">
       {{error}}
     </v-alert>
     <v-container class="respondents" fluid grid-list-sm>
@@ -291,19 +291,20 @@
       clearFilters () {
         this.filters.conditionTags = []
       },
-      getCurrentPage () {
+      async getCurrentPage () {
         let study = this.global.study
         this.isLoading = true
         PhotoService.cancelAllOutstanding()
-        return RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
-          .then(respondents => {
-            this.results = respondents
-            this.error = null
-          }).catch(err => {
-            this.error = err.toLocaleString()
-          }).finally(() => {
-            this.isLoading = false
-          })
+        try {
+          this.results = await RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
+          this.error = null
+        } catch (err) {
+          console.error(err)
+          this.error = err
+          alert('Unable to load respondents')
+        } finally {
+          this.isLoading = false
+        }
       },
       onSelectRespondent (respondent) {
         this.$emit('selectRespondent', respondent)
