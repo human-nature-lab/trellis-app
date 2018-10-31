@@ -5,7 +5,7 @@
     </v-layout>
     <v-stepper v-model="step" vertical>
 
-      <v-stepper-step step="1" :complete="step > 1">{{$t('add_respondent')}}</v-stepper-step>
+      <v-stepper-step step="1" :complete="step > 1">{{isAssociatedWithRespondent ? $t('add_other_respondent') : $t('add_respondent')}}</v-stepper-step>
       <v-stepper-content step="1">
         <v-card>
           <v-card-text>
@@ -90,6 +90,11 @@
         required: false
       }
     },
+    computed: {
+      isAssociatedWithRespondent () {
+        return !!this.associatedRespondentId
+      }
+    },
     data () {
       return {
         step: 1,
@@ -128,7 +133,7 @@
         const censusDelay = 1500
         this.step++
         this.checkingForCensus = true
-        const censusTypeId = this.associatedRespondentId ? censusTypes.add_associated_respondent : censusTypes.add_respondent
+        const censusTypeId = this.isAssociatedWithRespondent ? censusTypes.add_associated_respondent : censusTypes.add_respondent
         this.hasCensusForm = await CensusFormService.hasCensusForm(this.studyId, censusTypeId)
         this.checkingForCensus = false
         if (this.hasCensusForm) {
