@@ -79,7 +79,6 @@
 </script>
 
 <style lang="sass">
-  .checkbox-group
     .input-group
       label
         position: static
@@ -90,8 +89,8 @@
       &.other
         .input-group__details
           display: none
-      .checkbox-group
-        .input-group--text-field
-          margin-top: 0
-          margin-bottom: 10px
+    .checkbox-group
+      .input-group--text-field
+        margin-top: 0
+        margin-bottom: 10px
 </style>
