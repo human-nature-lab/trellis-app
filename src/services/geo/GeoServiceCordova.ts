@@ -6,6 +6,7 @@ import GeoType from '../../entities/trellis/GeoType'
 import uuid from 'uuid/v4'
 import GeoPhoto from "../../entities/trellis/GeoPhoto";
 import Photo from "../../entities/trellis/Photo";
+import geoCache from './GeoCache'
 
 export default class GeoServiceCordova extends GeoServiceAbstract {
 
@@ -79,7 +80,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
 
   async getGeosById (geoIds) {
     const repository = await DatabaseService.getRepository(Geo)
-    return await repository.find({
+    return repository.find({
       where: {
         deletedAt: IsNull(),
         id: In(geoIds)
@@ -90,6 +91,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
 
   async removeGeo (geoId) {
     const repository = await DatabaseService.getRepository(Geo)
+    geoCache.del(geoId)
     return repository.update({id: geoId}, {deletedAt: new Date()})
   }
 
@@ -114,7 +116,14 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     let ancestorIds = {}
     let ancestors = []
     while (currentGeoId !== null && !ancestors.hasOwnProperty(currentGeoId) && count < 25) {
-      let geo = await this.getGeoById(currentGeoId)
+      // This caching seems necessary for relationship questions when the respondent has a large number of respondent geos. This method is called for each of those
+      let geo
+      if (geoCache.has(currentGeoId)) {
+        geo = geoCache.get(currentGeoId)
+      } else {
+        geo = await this.getGeoById(currentGeoId)
+        geoCache.set(currentGeoId, geo)
+      }
       ancestors.push(geo)
       ancestorIds[geoId] = true
       currentGeoId = geo.parentId
