@@ -1,7 +1,9 @@
-import { sharedInterviewInstance } from '../components/interview/classes/InterviewManager'
+import {default as InterviewManager, sharedInterviewInstance} from '../components/interview/classes/InterviewManager'
 import EdgeService from './edge/EdgeService'
 import RosterService from './roster/RosterService'
 import StringInterpolationService from './StringInterpolationService'
+import {InterviewLocation} from "../components/interview/services/InterviewAlligator";
+import TranslationText from "../entities/trellis/TranslationText";
 
 export default class InterpolationService {
   /**
@@ -11,7 +13,7 @@ export default class InterpolationService {
    * @param {Object} location
    * @returns {Translation}
    */
-  static async getInterpolatedTranslationText (translationText, location) {
+  static async getInterpolatedTranslationText (translationText: TranslationText[], location: InterviewLocation) {
     for (const t of translationText) {
       let varNames = StringInterpolationService.getInterpolationKeys(t.translatedText)
       for (const varName of varNames) {
@@ -22,7 +24,7 @@ export default class InterpolationService {
     return translationText
   }
 
-  static async getFillByVarName (varName, interviewManager, location) {
+  static async getFillByVarName (varName: string, interviewManager: InterviewManager, location: InterviewLocation) {
     try {
       let questionDatum = interviewManager.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpRepetition)
       let question = interviewManager.questionIndex.get(questionDatum.questionId)
