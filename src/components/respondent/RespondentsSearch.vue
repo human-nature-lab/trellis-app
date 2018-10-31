@@ -66,21 +66,19 @@
     </v-layout>
     <v-layout row>
       <v-spacer></v-spacer>
-      <v-tooltip top v-if="canAddRespondent">
-        <v-btn
-          slot="activator"
-          @click="showAssociatedRespondentDialog = true"
-          :loading="isLoading">
-          {{ $t('add_other_respondent') }}
-          <v-icon>add</v-icon>
-        </v-btn>
+      <v-btn
+        v-if="canAddRespondent"
+        slot="activator"
+        color="primary"
+        @click="showAssociatedRespondentDialog = true"
+        :loading="isLoading">
         <span v-if="respondentId">
-            {{ $t('add_other_respondent') }}
-          </span>
+          {{ $t('add_other_respondent') }}
+        </span>
         <span v-else>
-            {{ $t('add_respondent') }}
-          </span>
-      </v-tooltip>
+          {{ $t('add_respondent') }}
+        </span>
+      </v-btn>
     </v-layout>
     <v-alert v-show="error">
       {{error}}
@@ -375,3 +373,9 @@
     }
   }
 </script>
+
+<style lang="sass">
+  /*.fab-offset*/
+    /*margin-right: 13px*/
+    /*margin-bottom: 35px*/
+</style>
