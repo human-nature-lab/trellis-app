@@ -79,18 +79,19 @@
 </script>
 
 <style lang="sass">
-  .input-group
-    label
-      position: static
-      height: auto
-      white-space: normal
-      display: block
-      line-height: 20px
-    &.other
-      .input-group__details
-        display: none
-    .checkbox-group
-      .input-group--text-field
-        margin-top: 0
-        margin-bottom: 10px
+  .checkbox-group
+    .input-group
+      label
+        position: static
+        height: auto
+        white-space: normal
+        display: block
+        line-height: 20px
+      &.other
+        .input-group__details
+          display: none
+      .checkbox-group
+        .input-group--text-field
+          margin-top: 0
+          margin-bottom: 10px
 </style>
