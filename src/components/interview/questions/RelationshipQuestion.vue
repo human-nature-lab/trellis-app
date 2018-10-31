@@ -90,7 +90,8 @@
         return !hasFalseParam
       },
       currentGeo () {
-        return this.respondent.geos.find(geo => geo.pivot.is_current)
+        const rGeo = this.respondent.geos.find(geo => geo.isCurrent)
+        return rGeo ? rGeo.geo : null
       },
       geoTypeParameterValue () {
         let geoTypeParameter = this.question.questionParameters.find(p => parseInt(p.parameterId, 10) === parameterTypes.geo_type)
@@ -100,7 +101,7 @@
         let filters = {
           include_children: true
         }
-        if (this.geoTypeParameterValue) {
+        if (this.geoTypeParameterValue && this.baseAncestorId) {
           filters.geos = [this.baseAncestorId]
         }
         return filters
@@ -139,10 +140,10 @@
     methods: {
       showRespondentSearch () {
         let promise = new Promise(resolve => resolve())
-        if (this.geoTypeParameterValue && !this.baseAncestorId) {
+        if (this.geoTypeParameterValue && !this.baseAncestorId && this.currentGeo) {
           promise = GeoService.getGeoAncestors(this.currentGeo.id).then(ancestors => {
             let geoTypeCompareVal = this.geoTypeParameterValue.replace(' ', '').toLowerCase()
-            let baseAncestor = ancestors.find(a => a.geo_type.name.replace(' ', '').toLowerCase() === geoTypeCompareVal)
+            let baseAncestor = ancestors.find(a => a.geoType.name.replace(' ', '').toLowerCase() === geoTypeCompareVal)
             if (!baseAncestor) console.warn('Unable to find respondent ancestor matching', this.geoTypeParameterValue)
             this.baseAncestorId = baseAncestor ? baseAncestor.id : null
           })
