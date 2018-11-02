@@ -6,8 +6,7 @@
       :class="{'open': isOpen}">
       <v-layout
         row>
-        <v-flex class="centered icon-container clickable"
-                @click="$emit('click')">
+        <v-flex class="centered icon-container clickable" @click="tryCreatingSurvey">
           <v-tooltip
             right
             v-if="form.isComplete">
@@ -61,11 +60,8 @@
         column
         class="ml-5"
         v-if="isOpen">
-        <v-flex
-          v-for="survey in form.surveys"
-          :data-survey-id="survey.id"
-          :key="survey.id">
-          <table>
+        <v-flex>
+          <table class="table">
             <thead>
               <tr>
                 <th>Status</th>
@@ -78,7 +74,8 @@
               <tr
                 v-for="survey in form.surveys"
                 :data-survey-id="survey.id"
-                :key="survey.id">
+                :key="survey.id"
+                @click="tryStartingSurvey(survey)">
                 <td>
                   <span
                     v-if="survey.completedAt"
@@ -92,7 +89,7 @@
                   </span>
                 </td>
                 <td>
-                  <table>
+                  <table class="table">
                     <tr>
                       <th>{{ $t('surveyor') }}</th>
                       <th>{{ $t('start_time') }}</th>
@@ -120,13 +117,30 @@
 <script>
   // @ts-ignore
   import AsyncTranslationText from './AsyncTranslationText.vue'
-  import global from '../static/singleton'
 
-  export default {
+  import Vue from 'vue'
+  import global from '../static/singleton'
+  import SurveyService from "../services/survey"
+  import InterviewService from "../services/interview/InterviewService"
+  import {getCurrentPosition} from './LocationFinder'
+
+  export default Vue.extend({
     name: 'form-list-item',
     props: {
+      respondent: {
+        type: Object,
+        required: true
+      },
       form: {
         type: Object,
+        required: true
+      },
+      allowMultipleSurveys: {
+        type: Boolean,
+        required: true
+      },
+      canCreateSurveys: {
+        type: Boolean,
         required: true
       }
     },
@@ -149,22 +163,67 @@
     },
     methods: {
       getName (user) {
-        if (!user) return 'No user defined'
-        else return user.name
+        return user ? user.name : this.$t('unknown_user')
       },
       getUsername (user) {
-        if (!user) return ''
-        else return user.username
+        return user ? user.username : ''
+      },
+      async tryCreatingSurvey () {
+        if (!this.canCreateSurveys){
+          // Do nothing
+          alert(this.$t('cant_start_form'))
+        } else if (this.form.surveys.length !== 0 && !this.allowMultipleSurveys) {
+          alert(this.$t('cant_create_survey'))
+        } else if (this.form.surveys.length === 0 || confirm(this.$t('create_another_survey'))) {
+          this.global.loading.active = true
+          // Start a new survey
+          let survey
+          try {
+            survey = await SurveyService.create(this.global.study.id, this.respondent.id, this.form.id)
+          } catch (err) {
+            console.error(err)
+            alert(this.$t('create_survey_failed', [err]))
+          }
+          if (survey) {
+            this.tryStartingSurvey(survey)
+          }
+          this.global.loading.active = false
+        }
+      },
+      async tryStartingSurvey (survey) {
+        // TODO: Log errors in db
+        let coords, interview
+        if (survey.completedAt) {
+          alert(this.$t('cant_resume_survey'))
+        } else {
+          try {
+            coords = await getCurrentPosition()
+          } catch (err) {
+            console.error(err)
+            alert(this.$t('gps_error', [err]))
+          }
+          try {
+            interview = await InterviewService.create(survey.id, coords)
+            this.$emit('newInterview', interview)
+          } catch (err) {
+            console.error(err)
+            alert(this.$t('create_interview_failed', [err]))
+          }
+        }
       }
     },
     components: {
       AsyncTranslationText
     }
-  }
+  })
 </script>
 
 <style lang="sass" scoped>
   table
+    &.striped
+      >tbody
+        >tr:nth-child(2n)
+          background: #f5f5f5
     thead
       th
         border-bottom: 1px solid grey

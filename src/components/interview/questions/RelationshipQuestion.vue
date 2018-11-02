@@ -78,7 +78,7 @@
         loadedEdges: {},
         error: null,
         isSavingEdges: false,
-        baseAncestorId: null,
+        baseAncestorIds: [],
         searchQuery: undefined
       }
     },
@@ -90,7 +90,8 @@
         return !hasFalseParam
       },
       currentGeo () {
-        return this.respondent.geos.find(geo => geo.pivot.is_current)
+        const rGeo = this.respondent.geos.find(geo => geo.isCurrent)
+        return rGeo ? rGeo.geo : null
       },
       geoTypeParameterValue () {
         let geoTypeParameter = this.question.questionParameters.find(p => parseInt(p.parameterId, 10) === parameterTypes.geo_type)
@@ -100,8 +101,8 @@
         let filters = {
           include_children: true
         }
-        if (this.geoTypeParameterValue) {
-          filters.geos = [this.baseAncestorId]
+        if (this.geoTypeParameterValue && this.baseAncestorIds.length) {
+          filters.geos = this.baseAncestorIds.slice()
         }
         return filters
       },
@@ -139,13 +140,19 @@
     methods: {
       showRespondentSearch () {
         let promise = new Promise(resolve => resolve())
-        if (this.geoTypeParameterValue && !this.baseAncestorId) {
-          promise = GeoService.getGeoAncestors(this.currentGeo.id).then(ancestors => {
-            let geoTypeCompareVal = this.geoTypeParameterValue.replace(' ', '').toLowerCase()
-            let baseAncestor = ancestors.find(a => a.geo_type.name.replace(' ', '').toLowerCase() === geoTypeCompareVal)
-            if (!baseAncestor) console.warn('Unable to find respondent ancestor matching', this.geoTypeParameterValue)
-            this.baseAncestorId = baseAncestor ? baseAncestor.id : null
-          })
+        if (this.geoTypeParameterValue && !this.baseAncestorIds.length && this.respondent.geos.length) {
+          const p = []
+          let geoTypeCompareVal = this.geoTypeParameterValue.replace(' ', '').toLowerCase()
+          for (let rGeo of this.respondent.geos) {
+            p.push(GeoService.getGeoAncestors(rGeo.geoId).then(ancestors => {
+              let baseAncestor = ancestors.find(a => a.geoType.name.replace(' ', '').toLowerCase() === geoTypeCompareVal)
+              if (!baseAncestor) console.warn('Unable to find respondent ancestor matching', this.geoTypeParameterValue)
+              if (baseAncestor) {
+                this.baseAncestorIds.push(baseAncestor.id)
+              }
+            }))
+          }
+          promise = Promise.all(p)
         }
         promise.then(() => {
           this.respondentSearchDialog = true

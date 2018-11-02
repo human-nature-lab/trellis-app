@@ -202,7 +202,7 @@
         const d = data
         this.initializeInterview(d.interview, d.actions, d.data, d.conditionTags, d.form, d.respondentFills)
       },
-      initializeInterview: function (interview, actions, data, conditionTags, formBlueprint) {
+      initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, respondentFills) {
         clearSharedInterview()
         this.dialog.end = false
         this.dialog.beginning = false
@@ -211,7 +211,7 @@
         this.interviewConditionTags = null
         this.interviewData = null
         this.interviewActions = null
-        interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags)
+        interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags, respondentFills)
         if (this.type === 'interview') {
           interviewState.attachDataPersistSlave()
           interviewState.attachActionsPersistSlave()
