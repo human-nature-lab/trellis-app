@@ -16,7 +16,7 @@
     <v-alert v-show="error" color="error">{{error}}</v-alert>
     <v-data-table
       disable-initial-sort
-      class="mb-3"
+      class="mb-3 no-wrap-table"
       :headers="locationHeaders"
       :items="locations"
       hide-actions>
@@ -143,16 +143,9 @@
           this.isMovingGeo = true
         }
       },
-      moveGeo (respondentGeo: RespondentGeo, geo: Geo): Promise<void> {
-        return RespondentService.moveRespondentGeo(this.respondent.id, respondentGeo.id, geo.id).then(resGeo => {
-          let index = this.respondent.geos.findIndex(rg => rg.id === respondentGeo.id)
-          this.respondent.geos.push(resGeo)
-          this.$emit('after-move', resGeo)
-        })
-      },
       doneMovingGeo (oldGeo: RespondentGeo, newGeo: RespondentGeo) {
         this.respondent.geos.push(newGeo)
-        this.$emit('afterMove', newGeo)
+        this.$emit('after-move', newGeo)
         this.isMovingGeo = false
       },
       doneAddingGeo (rGeo: RespondentGeo) {
@@ -199,6 +192,7 @@
 <style lang="sass">
   .main-column
     width: 90%
-  td:not(:first-child)
-    white-space: nowrap
+  .no-wrap-table
+    td:not(:first-child)
+      white-space: nowrap
 </style>

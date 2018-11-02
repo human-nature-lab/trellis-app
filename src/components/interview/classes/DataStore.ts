@@ -14,7 +14,11 @@ import {ConditionTagInterface} from "../../../services/interview/InterviewDataIn
 import ConditionTag from "../../../entities/trellis/ConditionTag";
 
 export interface FindFunction<T> {
-  (o: T, i: number, a: T[]): boolean
+  (o: T, i?: number, a?: T[]): boolean
+}
+
+export interface FilterFunction<T> {
+  (o: T, i?: number, a?: T[]): boolean
 }
 
 export default class DataStore extends Emitter {
@@ -164,16 +168,48 @@ export default class DataStore extends Emitter {
    * @returns {boolean}
    */
   public removeDatum (questionDatum: QuestionDatum, findFunc: FindFunction<Datum>): boolean {
+    let removedData = false
     const datumIndex = questionDatum.data.findIndex(findFunc)
     if (datumIndex > -1) {
       questionDatum.data.splice(datumIndex, 1)
+      removedData = true
     }
     // Update the sort order for remaining datum
     for (let i = datumIndex; i < questionDatum.data.length; i++) {
       questionDatum.data[i].sortOrder = i;
     }
     this.emitChange()
-    return true
+    return removedData
+  }
+
+  /**
+   * Filter out any datum on this supplied question datum. This filter happens in reverse order.
+   * @param {QuestionDatum} questionDatum
+   * @param {FilterFunction<Datum>} filterFunc
+   * @returns {boolean} - returns true if any data were removed
+   */
+  public filterDatum (questionDatum: QuestionDatum, filterFunc: FilterFunction<Datum>): boolean {
+    let removedData = false
+    let i = questionDatum.data.length
+    while (i--) {
+      if (filterFunc(questionDatum.data[i], i, questionDatum.data)) {
+        questionDatum.data.splice(i, 1)
+        removedData = true
+      }
+    }
+    return removedData
+  }
+
+  /**
+   * Remove all datum for the supplied QuestionDatum
+   * @param {QuestionDatum} questionDatum
+   * @returns {boolean}
+   */
+  public removeAllDatum (questionDatum: QuestionDatum): boolean {
+    const dataWasRemoved = questionDatum.data.length > 0
+    questionDatum.data.splice(0)
+    this.emitChange()
+    return dataWasRemoved
   }
 
   /**

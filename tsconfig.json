@@ -11,7 +11,10 @@
     "declaration": false,
     "sourceMap": true,
     "noImplicitThis": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "baseUrl": ".",
+    "jsx": "preserve"
   },
   "exclude": [
     "build",

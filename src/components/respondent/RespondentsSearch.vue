@@ -66,23 +66,21 @@
     </v-layout>
     <v-layout row>
       <v-spacer></v-spacer>
-      <v-tooltip top v-if="canAddRespondent">
-        <v-btn
-          slot="activator"
-          @click="showAssociatedRespondentDialog = true"
-          :loading="isLoading">
-          {{ $t('add_other_respondent') }}
-          <v-icon>add</v-icon>
-        </v-btn>
+      <v-btn
+        v-if="canAddRespondent"
+        slot="activator"
+        color="primary"
+        @click="showAssociatedRespondentDialog = true"
+        :loading="isLoading">
         <span v-if="respondentId">
-            {{ $t('add_other_respondent') }}
-          </span>
+          {{ $t('add_other_respondent') }}
+        </span>
         <span v-else>
-            {{ $t('add_respondent') }}
-          </span>
-      </v-tooltip>
+          {{ $t('add_respondent') }}
+        </span>
+      </v-btn>
     </v-layout>
-    <v-alert v-if="error">
+    <v-alert v-show="error">
       {{error}}
     </v-alert>
     <v-container class="respondents" fluid grid-list-sm>
@@ -127,7 +125,6 @@
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
   import PhotoService from '../../services/photo/PhotoService'
-  import Photo from '../../entities/trellis/Photo'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
@@ -292,19 +289,20 @@
       clearFilters () {
         this.filters.conditionTags = []
       },
-      getCurrentPage () {
+      async getCurrentPage () {
         let study = this.global.study
         this.isLoading = true
         PhotoService.cancelAllOutstanding()
-        return RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
-          .then(respondents => {
-            this.results = respondents
-            this.error = null
-          }).catch(err => {
-            this.error = err.toLocaleString()
-          }).finally(() => {
-            this.isLoading = false
-          })
+        try {
+          this.results = await RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
+          this.error = null
+        } catch (err) {
+          console.error(err)
+          this.error = err
+          alert('Unable to load respondents')
+        } finally {
+          this.isLoading = false
+        }
       },
       onSelectRespondent (respondent) {
         this.$emit('selectRespondent', respondent)
@@ -375,3 +373,9 @@
     }
   }
 </script>
+
+<style lang="sass">
+  /*.fab-offset*/
+    /*margin-right: 13px*/
+    /*margin-bottom: 35px*/
+</style>

@@ -43,8 +43,6 @@ export default class TranslationService {
    * @returns {null|string}
    */
   static getAny (translation: Translation, locale: Locale = null) {
-    // translation = transformToTranslation(translation)
-    console.log('get any', translation, locale)
     let translated = TranslationService.getTranslated(translation, locale)
     if (!translated) {
       if (translation.translationText && translation.translationText.length) {

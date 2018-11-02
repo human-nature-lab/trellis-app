@@ -30,9 +30,10 @@ export default class InterviewManagerBase extends Emitter {
   protected respondentFills: RespondentFillStore = new RespondentFillStore()
   protected conditionAssigner: ConditionAssignmentService = new ConditionAssignmentService()
   protected varNameIndex: Map<string, string> = new Map()
-  protected questionIndex: Map<string, Question> = new Map()
   protected questionIdToSectionIndex: Map<string, Section> = new Map()
   protected questionIdToPageIndex: Map<string, Page> = new Map()
+
+  public questionIndex: Map<string, Question> = new Map()
   public questionIdToSectionNum: Map<string, number> = new Map()
   public questionIdToPageNum: Map<string, number> = new Map()
 

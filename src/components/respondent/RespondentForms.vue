@@ -33,22 +33,33 @@
         <FormsView
           v-if="forms"
           :forms="forms"
+          :respondent="respondent"
           :showHidden="showHidden"
           :showUnpublished="showUnpublished"
-          @click="startInterview"/>
+          :allowMultipleSurveys="false"
+          @newInterview="startInterview" />
+      </v-card>
+      <v-card>
+        <v-toolbar flat>
+          <v-toolbar-title>{{$t('census_forms')}}</v-toolbar-title>
+        </v-toolbar>
+        <FormsView
+          v-if="censusForms"
+          :forms="censusForms"
+          :respondent="respondent"
+          :canCreateSurveys="false"
+          @newInterview="startInterview" />
       </v-card>
     </v-container>
   </v-flex>
 </template>
 
 <script lang="ts">
-  // @ts-ignore
   import FormsView from '../FormsView'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import SurveyService from '../../services/survey'
   import FormService from '../../services/form/FormService'
   import RespondentService from '../../services/respondent/RespondentService'
-  import InterviewService from '../../services/interview/InterviewService'
   import global from '../../static/singleton'
   import Vue from 'vue'
   import Survey from '../../entities/trellis/Survey'
@@ -58,8 +69,7 @@
   import SkipService from "../../services/SkipService"
   import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag"
   import {pushRouteAndQueueCurrent} from '../../router'
-  // @ts-ignore
-  import {getCurrentPosition} from '../LocationFinder'
+  import Interview from '../../entities/trellis/Interview'
 
   export class DisplayForm {
     public isComplete?: boolean
@@ -71,6 +81,7 @@
       public surveys: Survey[],
       public isPublished: boolean,
       public isSkipped: boolean,
+      public censusTypeId: string
     ) {}
   }
 
@@ -109,6 +120,7 @@
       return {
         global,
         forms: [] as DisplayForm[],
+        censusForms: [] as DisplayForm[],
         respondent: null as Respondent,
         conditionTags: [] as RespondentConditionTag[],
         showHidden: false,
@@ -127,44 +139,8 @@
       FormsView
     },
     methods: {
-      async startInterview (form: DisplayForm) {
-        if (form.isComplete) {
-          alert(`Can't reopen a form that has already been completed`)
-          return
-        }
-        let interview
-        this.global.loading.active = true
-        let surveyId
-        if (form.isStarted) {
-          surveyId = form.surveys[0].id
-        } else {
-          try {
-            let survey = await SurveyService.create(this.global.study.id, this.respondent.id, form.id)
-            surveyId = survey.id
-          } catch (err) {
-            console.error(err)
-            alert('Unable to create new survey')
-          }
-        }
-        if (surveyId) {
-          let coords: Coordinates
-          try {
-            coords = await getCurrentPosition()
-          } catch (err) {
-            console.error(err)
-            alert('Error getting position: ' + err)
-          }
-          try {
-            interview = await InterviewService.create(surveyId, coords)
-            pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
-          } catch (err) {
-            this.error = err
-            console.error(err)
-            alert('Unable to create new interview on survey: ' + surveyId)
-            alert(err)
-          }
-        }
-        this.global.loading.active = false
+      async startInterview (interview: Interview) {
+        pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
       },
       hydrate (data: RespondentFormsData) {
           // Join any surveys that have been created with the possible forms
@@ -177,10 +153,11 @@
             return c.conditionTag.name
           }))
           const isSkipped = SkipService.shouldSkip(studyForm.form.skips, conditionTags)
-          return new DisplayForm(studyForm.formMasterId, studyForm.form.nameTranslation, formSurveys, studyForm.form.isPublished, isSkipped)
+          return new DisplayForm(studyForm.formMasterId, studyForm.form.nameTranslation, formSurveys, studyForm.form.isPublished, isSkipped, studyForm.censusTypeId)
         })
         this.respondent = data.respondent
-        this.forms.push(...forms)
+        this.censusForms = forms.filter(f => f.censusTypeId)
+        this.forms = forms.filter(f => !f.censusTypeId)
       }
     }
   })
