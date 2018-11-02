@@ -22,6 +22,7 @@
       </v-btn>
     </v-fab-transition>
     <add-geo-form
+      v-if="adding"
       @close="addLocationClose"
       :adding="adding"
       :parentGeoId="parentGeoId">
@@ -35,6 +36,7 @@
   import AddGeoForm from './AddGeoForm.vue'
   import GeoService from '../../services/geo/GeoService'
   import global from '../../static/singleton'
+  import { pushRoute } from '../../router/index'
 
   export default {
     name: 'geo',
@@ -59,7 +61,12 @@
       addLocationClose (addedLocation) {
         this.adding = false
         if (addedLocation instanceof Geo) {
-          console.log('geo added', addedLocation, global.locale)
+          pushRoute({
+            name: 'Geo',
+            params: {
+              geoId: addedLocation.id
+            }
+          })
         }
       },
       addLocation () {

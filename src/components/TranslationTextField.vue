@@ -1,15 +1,16 @@
 <template>
   <v-container grid-list-xl fluid>
     <v-layout wrap>
-      <v-flex xs10>
+      <v-flex xs9>
         <v-text-field
           v-on:keyup="onChangeTranslation"
           v-model="textFieldValue"
+          :placeholder="$t('new_location')"
           :autofocus="true"
           :disabled="saving">
         </v-text-field>
       </v-flex>
-      <v-flex xs2>
+      <v-flex xs3>
         <v-select
           v-on:change="onChangeLocale"
           :items="languageTags"
@@ -52,6 +53,14 @@
         this.saving = true
         // Persist any changes to the current translation
         this.textFieldValues[this.selectedLanguageTag] = this.textFieldValue
+        // If any other language has an empty string, use the current string field for the value
+        for (let languageTag in this.textFieldValues) {
+          if (this.textFieldValues.hasOwnProperty(languageTag)) {
+            if (this.textFieldValues[languageTag] === '') {
+              this.textFieldValues[languageTag] = this.textFieldValue
+            }
+          }
+        }
 
         // Save any changed translationText elements
         for (const translationText of this.translation.translationText) {
