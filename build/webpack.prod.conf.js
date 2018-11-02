@@ -52,7 +52,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
       'process.env': env,
-      VERSION: require('../package.json').version
+      VERSION: JSON.stringify(require('../package.json').version)
     }),
     // new MiniCssExtractPlugin({
     //   filename: '[name].css',
