@@ -91,8 +91,8 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     }
 
     if (Array.isArray(filters.geos) && filters.geos.length > 0) {
-      let geos = filters.geos
-      let parentGeos = filters.geos
+      let geos = filters.geos.slice()
+      let parentGeos = filters.geos.slice()
       const maxLimit = 10
       if (filters.include_children) {
         const geoRepo = await DatabaseService.getRepository(Geo)
@@ -109,13 +109,14 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
           geos = geos.concat(children.filter(g => g.geoType.canContainRespondent).map(g => g.id))
           parentGeos = children.map(g => g.id)
           hasMoreChildren = children.length > 0
+          console.log('hasMoreChildren', hasMoreChildren)
         }
       }
       // TODO: Handle the maximum parameters limitation in sqlite -> https://www.sqlite.org/limits.html
       if (geos.length > 999) {
         throw new Error('Too many respondent geos')
       }
-      q = q.andWhere('"respondent"."id" in (select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:geos))', {geos: geos.join(',')})
+      q = q.andWhere('"respondent"."id" in (select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geos))', { geos })
     }
 
     q = q.andWhere('"respondent"."deleted_at" is null')
