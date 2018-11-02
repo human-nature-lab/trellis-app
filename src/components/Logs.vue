@@ -47,15 +47,15 @@
         <v-container
           fluid
           color="white">
-          <v-list>
-            <v-list-tile
+          <v-layout column>
+            <v-flex
               v-for="prop in ['message', 'fullMessage', 'component', 'syncId', 'interviewId', 'deviceId', 'userId', 'version', 'offline', 'uploadedAt']">
               <v-layout>
                 <v-flex class="subheader">{{prop}}</v-flex>
                 <v-flex>{{fullLog[prop]}}</v-flex>
               </v-layout>
-            </v-list-tile>
-          </v-list>
+            </v-flex>
+          </v-layout>
         </v-container>
       </v-card>
     </v-dialog>

@@ -5,7 +5,7 @@
     :hide-overlay="false"
     :value="value"
     @input="$emit('input', $event)">
-    <ModalTitle title="" @close="$emit('input', false)"/>
+    <ModalTitle :title="title" @close="$emit('input', false)"/>
     <v-container
       fluid
       fill-height
@@ -29,6 +29,9 @@
       photo: {
         type: Object,
         required: true
+      },
+      title: {
+        type: String
       }
     },
     name: 'FullscreenPhoto'

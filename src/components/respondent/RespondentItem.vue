@@ -5,39 +5,36 @@
       tile
       :class="{selected: selected === true, respondent: true, 'ma-1': true}">
       <v-card-media class="respondent-photo"
-                    @click="onClick()">
+                    @click="onClick">
         <Photo
           :photo="photo"
           width="150"
           height="150" />
       </v-card-media>
-      <v-card-text class="respondent-name"
-                   @click="onClick()">
-        {{name}}
-        <!--<v-btn @click="onClick">Select</v-btn>-->
-      </v-card-text>
-      <!--<v-card-actions>-->
-        <!--<v-btn-->
-          <!--icon-->
-          <!--v-if="formsButtonVisible"-->
-          <!--:to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">-->
-          <!--<v-icon>assignment</v-icon>-->
-        <!--</v-btn>-->
-        <!--<v-spacer></v-spacer>-->
-        <!--<v-btn-->
-          <!--icon-->
-          <!--v-if="infoButtonVisible"-->
-          <!--:to="{name: 'Respondent', params: {studyId: global.study.id, respondentId: respondent.id}}">-->
-          <!--<v-icon>info</v-icon>-->
-        <!--</v-btn>-->
-      <!--</v-card-actions>-->
+      <v-card-actions class="respondent-name">
+        <v-flex>
+          {{name}}
+        </v-flex>
+        <v-spacer />
+        <v-btn
+          @click="showFullscreen = true"
+          icon>
+          <v-icon :large="$vuetify.breakpoint.smAndDown">fullscreen</v-icon>
+        </v-btn>
+      </v-card-actions>
     </v-card>
+    <FullscreenPhoto
+      :title="name"
+      v-model="showFullscreen"
+      :photo="photo" />
   </v-flex>
 </template>
 
 <script lang="ts">
   // @ts-ignore
   import Photo from '../photo/Photo'
+  // @ts-ignore
+  import FullscreenPhoto from '../photo/FullscreenPhoto'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
   export default Vue.extend({
@@ -61,7 +58,8 @@
     },
     data () {
       return {
-        showInfo: false
+        showInfo: false,
+        showFullscreen: false
       }
     },
     methods: {
@@ -84,7 +82,8 @@
       }
     },
     components: {
-      Photo
+      Photo,
+      FullscreenPhoto
     }
   })
 </script>
