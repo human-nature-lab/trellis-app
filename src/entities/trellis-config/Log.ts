@@ -1,8 +1,11 @@
 import {PrimaryColumn, Entity, Column} from 'typeorm'
 import {Serializable} from '../decorators/WebOrmDecorators'
+import MomentTransformer from "../base/MomentTransformer";
+import BaseEntity from "../base/BaseEntity";
+import {Moment} from "moment";
 
 @Entity("log")
-export default class Log {
+export default class Log extends BaseEntity {
   @PrimaryColumn({ name: "id" }) @Serializable
   id: string;
 
@@ -30,6 +33,25 @@ export default class Log {
   @Column({ name: "user_id", nullable: true }) @Serializable
   userId: string;
 
-  @Column({ name: "created_at" }) @Serializable
-  createdAt: Date;
+  @Column({ name: "created_at", type: 'datetime', transformer: MomentTransformer }) @Serializable
+  createdAt: Moment;
+
+  @Column({name: 'version', nullable: true}) @Serializable
+  version: string
+
+  @Column({name: 'offline', default: true, nullable: true}) @Serializable
+  offline: boolean
+
+  @Column({name: 'user_agent', nullable: true}) @Serializable
+  userAgent: string
+
+  @Column({name: 'uploaded_at', nullable: true, type: 'datetime', transformer: MomentTransformer})
+  uploadedAt: Moment
+
+  toSnakeJSON () {
+    const d = super.toSnakeJSON()
+    // @ts-ignore
+    d.full_message = JSON.stringify(d.full_message)
+    return d
+  }
 }

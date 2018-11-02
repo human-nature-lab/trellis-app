@@ -102,6 +102,7 @@
   import LocationFinder from './components/LocationFinder'
   import router from './router'
   import singleton from './static/singleton'
+  import {defaultLoggingService} from './services/logging/LoggingService'
 
   export default {
     name: 'web-app',
@@ -127,6 +128,7 @@
         document.removeEventListener('pause', this.onPause)
         document.removeEventListener('resume', this.onResume, false)
         document.removeEventListener('backbutton', this.onBackButton)
+        defaultLoggingService.flushQueue()
       }
     },
     components: {
@@ -148,6 +150,9 @@
       onPause () {
         // Handle the pause lifecycle event.
         console.log('pause')
+        if (this.withinCordova) {
+          defaultLoggingService.flushQueue()
+        }
       },
       onResume () {
         // Handle the resume lifecycle event.

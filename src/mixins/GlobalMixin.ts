@@ -1,18 +1,12 @@
 import config from '../config'
 import {APP_ENV} from '../static/constants'
 import Vue from 'vue'
+import logger from '../services/logging/LoggingService'
 
 export default Vue.mixin({
   methods: {
-    log (...args: any[]): void {
-      if (config.debug) {
-        console.log(...args)
-      }
-    },
-    debug (...args: any[]): void {
-      if (config.debug) {
-        console.debug(...args)
-      }
+    log (Log): void {
+      logger.log()
     }
   },
   computed: {

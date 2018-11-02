@@ -2,13 +2,13 @@ import Study from '../entities/trellis/Study'
 import Locale from '../entities/trellis/Locale'
 import User from '../entities/trellis/User'
 import storage from '../services/StorageService'
+import Action from "../entities/trellis/Action";
+import Form from "../entities/trellis/Form";
 declare const cordova: any
 
-export class SearchDrawer {
-  constructor (
-    public component: any = null,
-    public open: boolean = false
-  ) {}
+export interface SearchDrawer {
+  component: any
+  open: boolean
 }
 
 export class MenuDrawer {
@@ -17,40 +17,59 @@ export class MenuDrawer {
   ) {}
 }
 
-export class Loading {
-  constructor (
-    public active: boolean = false,
-    public step: number = 0,
-    public steps: number = 0,
-    public indeterminate: boolean = true,
-    public message: string = '',
-    public error: any = null
-  ) {}
+export interface Loading {
+  active: boolean
+  step: number
+  steps: number
+  indeterminate: boolean
+  message: string
+  error: any
 }
 
-export class Singleton {
-  constructor (
-    public study: Study,
-    public locale: Locale,
-    public darkTheme: boolean,
-    public user: User = null,
-    public offline: boolean = storage.get('offline') !== null ? storage.get('offline') : (typeof cordova === 'object'),
-    public searchDrawer: SearchDrawer = new SearchDrawer(),
-    public menuDrawer: MenuDrawer = new MenuDrawer(),
-    public loading: Loading = new Loading(),
-    public interview: object = {
-      form: null,
-      actions: null,
-      data: null,
-      conditionTags: null
-    }
-  ) {}
+export interface Singleton {
+  study: Study
+  locale: Locale
+  deviceId: string
+  darkTheme: boolean
+  user: User
+  offline: boolean
+  searchDrawer: SearchDrawer
+  menuDrawer: MenuDrawer
+  loading: Loading
+  interview: {
+    form: Form,
+    actions: Action[],
+    data: any,
+    conditionTags: any
+  }
 }
 
-const singleton = new Singleton(
-  null,
-  null,
-  false
-)
-
-export default singleton
+export default {
+  study: null,
+  locale: null,
+  darkTheme: false,
+  deviceId: null,
+  user: null,
+  offline: storage.get('offline') !== null ? storage.get('offline') : (typeof cordova === 'object'),
+  searchDrawer: {
+    component: null,
+    open: false
+  } as SearchDrawer,
+  menuDrawer: {
+    open: false
+  } as MenuDrawer,
+  loading: {
+    active: false,
+    step: 0,
+    steps: 0,
+    indeterminate: true,
+    message: '',
+    error: null
+  } as Loading,
+  interview: {
+    form: null,
+    actions: null,
+    data: null,
+    conditionTags: null
+  }
+} as Singleton

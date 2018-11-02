@@ -123,6 +123,9 @@
   import SurveyService from "../services/survey"
   import InterviewService from "../services/interview/InterviewService"
   import {getCurrentPosition} from './LocationFinder'
+  import {defaultLoggingService as logger} from '../services/logging/LoggingService'
+
+  '../services/logging/LoggingService'
 
   export default Vue.extend({
     name: 'form-list-item',
@@ -181,7 +184,8 @@
           try {
             survey = await SurveyService.create(this.global.study.id, this.respondent.id, this.form.id)
           } catch (err) {
-            console.error(err)
+            err.component = 'FormListItem'
+            logger.log(err)
             alert(this.$t('create_survey_failed', [err]))
           }
           if (survey) {
@@ -199,6 +203,8 @@
           try {
             coords = await getCurrentPosition()
           } catch (err) {
+            err.component('FormListItem')
+            logger.log(err)
             console.error(err)
             alert(this.$t('gps_error', [err]))
           }

@@ -2,8 +2,6 @@ import {parseDate} from '../../services/DateService'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {getColumnMeta} from '../decorators/WebOrmDecorators'
 import {deepCopy} from '../../services/JSONUtil'
-import {AfterLoad, AfterInsert} from 'typeorm'
-import moment from "moment";
 
 export default class BaseEntity implements SnakeSerializable {
 

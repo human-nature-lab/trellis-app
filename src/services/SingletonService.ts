@@ -4,6 +4,7 @@ import LocaleService from './locale/LocaleService'
 import StudyService from './study/StudyService'
 import i18n from '../i18n'
 import moment from 'moment'
+import DeviceService from "./device/DeviceService";
 
 enum StorageKey {
   theme = 'dark-theme',
@@ -41,6 +42,7 @@ class SingletonService {
       }
       console.log('loaded locale', singleton.locale)
     }
+    singleton.deviceId = await DeviceService.getUUID()
   }
 
   setCurrentStudy (study) {
