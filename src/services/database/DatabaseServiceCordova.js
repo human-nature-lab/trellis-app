@@ -137,8 +137,8 @@ const trellisConnection = {
     UserStudy
   ],
   namingStrategy: new SnakeCaseNamingStrategy(),
-  logging: ['warning', 'error'] // reduced logging
-  // logging: true // verbose logging
+  // logging: ['warning', 'error'] // reduced logging
+  logging: true // verbose logging
 }
 
 export default class DatabaseServiceCordova {
@@ -161,8 +161,7 @@ export default class DatabaseServiceCordova {
 
   async getRepository (...args) {
     const conn = await this.getDatabase()
-    let repo = await conn.getRepository(...args)
-    return repo
+    return conn.getRepository(...args)
   }
 
   createConfigDatabase () {
@@ -173,6 +172,11 @@ export default class DatabaseServiceCordova {
   async getConfigDatabase () {
     await this.configDatabaseCreated
     return getConnection('trellis-config')
+  }
+
+  async getConfigRepository (...args) {
+    const conn = await this.getConfigDatabase()
+    return conn.getRepository(...args)
   }
 
   async createUpdatedRecordsTable (queryRunner, status) {

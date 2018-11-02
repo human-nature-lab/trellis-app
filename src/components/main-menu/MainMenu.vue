@@ -49,6 +49,14 @@
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
+      <v-list-tile v-if="global.offline" :to="{name: 'Logs'}">
+        <v-list-tile-action>
+          <v-icon>error_outline</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-title>
+          {{ $t('logs') }}
+        </v-list-tile-title>
+      </v-list-tile>
     </v-list>
     <v-divider></v-divider>
     <v-list dense subheader>

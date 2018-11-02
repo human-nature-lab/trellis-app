@@ -1,20 +1,35 @@
 import merge from 'lodash/merge'
 import uuid from 'uuid/v4'
 import Log from '../../entities/trellis-config/Log'
-const defaultSeverity = 'info'
+import defaultConfig from './DefaultLoggingConfig'
+import config from '../../config'
+import {LoggingConfig, LoggingLevel, LogRequest} from "./LoggingTypes";
+import singleton from "../../static/singleton";
+import {now} from '../DateService'
+
+declare const VERSION: string
+const version: string = VERSION
+console.log(`Trellis v${version}`)
+const defaultSeverity = LoggingLevel.info
 
 export default abstract class LoggingServiceAbstract {
 
   defaultOptions: object
+  protected config: LoggingConfig
 
-  constructor (options) {
+  constructor (options?) {
+    this.config = merge(defaultConfig, config.logging)
     this.defaultOptions = {}
     if (typeof options === 'object') {
       merge(this.defaultOptions, options)
     }
   }
 
-  createLog (_request) {
+  abstract async log (_request):Promise<Log|void>
+  abstract async getLogPage (page: number, limit: number|null): Promise<Log[]>
+  abstract async getLogCount (): Promise<number>
+
+  createLog (_request: LogRequest): Log {
     if (_request === null || _request === undefined) {
       throw new Error('Invalid logger request')
     }
@@ -27,18 +42,20 @@ export default abstract class LoggingServiceAbstract {
     log.component = this.getComponent(request)
     log.syncId = this.getSyncId(request)
     log.interviewId = this.getInterviewId(request)
+    // TODO: Can't we just grab these?
     log.deviceId = this.getDeviceId(request)
     log.userId = this.getUserId(request)
-    log.createdAt = new Date()
+    log.createdAt = now()
+    log.version = version
+    log.offline = singleton.offline
+    log.userAgent = navigator.userAgent
     return log
   }
 
-  abstract async log (_request):Promise<Log|void>
-
-  getSeverity (request) {
+  getSeverity (request: LogRequest) {
     if (typeof request === 'object') {
       if (request instanceof Error) {
-        return 'error'
+        return LoggingLevel.error
       }
       if (request.hasOwnProperty('severity')) {
         return request.severity
@@ -47,7 +64,7 @@ export default abstract class LoggingServiceAbstract {
     return defaultSeverity
   }
 
-  getMessage (request) {
+  getMessage (request: LogRequest) {
     if (typeof request === 'string') {
       return request
     }
@@ -62,7 +79,7 @@ export default abstract class LoggingServiceAbstract {
     return ''
   }
 
-  getFullMessage (request) {
+  getFullMessage (request: LogRequest) {
     if (typeof request === 'object') {
       if (request.hasOwnProperty('fullMessage')) {
         return request.fullMessage
@@ -73,38 +90,40 @@ export default abstract class LoggingServiceAbstract {
     return null
   }
 
-  getComponent (request) {
+  getComponent (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('component')) {
       return request.component
     }
     return null
   }
 
-  getSyncId (request) {
+  getSyncId (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('syncId')) {
       return request.syncId
     }
     return null
   }
 
-  getInterviewId (request) {
+  getInterviewId (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('interviewId')) {
       return request.interviewId
     }
     return null
   }
 
-  getDeviceId (request) {
+  getDeviceId (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('deviceId')) {
       return request.deviceId
+    } else {
+      return singleton.deviceId
     }
-    return null
   }
 
-  getUserId (request) {
+  getUserId (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('userId')) {
       return request.userId
+    } else {
+      return singleton.user ? singleton.user.id : null
     }
-    return null
   }
 }

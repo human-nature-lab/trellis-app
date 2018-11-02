@@ -23,7 +23,8 @@ module.exports = merge(baseWebpackConfig, {
   plugins: [
     new webpack.LoaderOptionsPlugin({ options: {} }),
     new webpack.DefinePlugin({
-      'process.env': config.dev.env
+      'process.env': config.dev.env,
+      VERSION: JSON.stringify(require('../package').version)
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
