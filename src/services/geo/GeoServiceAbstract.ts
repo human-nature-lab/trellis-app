@@ -37,7 +37,7 @@ export default abstract class GeoServiceInterface {
       let translationText = new TranslationText()
       translationText.localeId = locales[i].id
       translationText.locale = locales[i]
-      translationText.translatedText = 'New Location'
+      translationText.translatedText = ''
       geo.nameTranslation.translationText.push(translationText)
     }
     return geo

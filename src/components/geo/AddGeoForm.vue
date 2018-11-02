@@ -124,6 +124,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
+                  :disabled="!isDone"
                   @click="done">
                   {{$t('done')}}
                 </v-btn>
@@ -159,8 +160,7 @@
     name: 'add-geo-form',
     props: {
       parentGeoId: {
-        type: String,
-        'default': null
+        type: String
       },
       adding: {
         type: Boolean,
@@ -175,7 +175,8 @@
         error: null,
         isSaving: false,
         geo: null,
-        checkingForCensus: false
+        checkingForCensus: false,
+        isDone: false
       }
     },
     async created () {
@@ -265,9 +266,7 @@
           })
         } else {
           this.checkingForCensus = false
-          setTimeout(() => {
-            this.$emit('close', this.geo)
-          }, 1500)
+          this.isDone = true
         }
       }
     }
