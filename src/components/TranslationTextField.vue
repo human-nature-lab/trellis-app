@@ -18,8 +18,8 @@
           :disabled="saving">
         </v-select>
       </v-flex>
-      <v-btn flat @click="onSave" :disabled="!enableSave || saving">Save</v-btn>
-      <v-btn flat @click="onCancel" :disabled="saving">Cancel</v-btn>
+      <v-btn flat @click="onSave" :disabled="!enableSave || saving">{{ $t('save') }}</v-btn>
+      <v-btn flat @click="onCancel" :disabled="saving">{{ $t('cancel') }}</v-btn>
     </v-layout>
   </v-container>
 </template>
