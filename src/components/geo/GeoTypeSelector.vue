@@ -7,14 +7,14 @@
           :items="geoTypes"
           v-model="curGeoType"
           item-text="name"
-          label="Select a location type">
+          :label="$t('select_location_type')">
         </v-select>
         <v-btn
           :disabled="curGeoType === null || geoTypeSelected"
           flat
           right
           @click="selectGeoType">
-          Select
+          {{ $t('select') }}
         </v-btn>
       </v-flex>
     </v-layout>
