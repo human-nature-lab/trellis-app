@@ -40,8 +40,8 @@ export default class InterpolationService {
           return edges[0].targetRespondent.name
         case 'roster':
           let rosterId = (followUpDatum) ? followUpDatum.rosterId : datum.rosterId
-          const roster = await RosterService.getRosterRows([rosterId])
-          return roster[0].val
+          const rows = await RosterService.getRosterRows([rosterId])
+          return rows[0].val
         default:
           return datum.val
       }

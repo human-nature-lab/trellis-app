@@ -52,6 +52,7 @@ export default class InterviewManager extends InterviewManagerBase {
     this.data = new DataStore()
     this.actions = new ActionStore(this.blueprint)
 
+    console.log('InterviewManager: initial data', data)
     if (data) this.data.loadData(data)
     if (conditionTags) this.data.loadConditionTags(conditionTags)
     if (respondentFills) this.respondentFills.fill(respondentFills)

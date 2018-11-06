@@ -5,6 +5,8 @@ import Respondent from './Respondent'
 import Form from './Form'
 import Interview from './Interview'
 import {mapFromSnakeJSON} from '../../services/JSONUtil'
+import MomentTransformer from "../base/MomentTransformer";
+import {Moment} from "moment";
 
 @Entity()
 export default class Survey extends TimestampedSoftDelete {
@@ -18,8 +20,8 @@ export default class Survey extends TimestampedSoftDelete {
   studyId: string
   @Column({ nullable: true }) @Serializable
   lastQuestionId: string
-  @Column({ type: 'datetime', nullable: true}) @Serializable
-  completedAt: Date
+  @Column({ type: 'datetime', nullable: true, transformer: MomentTransformer}) @Serializable
+  completedAt: Moment
 
   @Relationship(type => Form)
   @OneToOne(type => Form)
