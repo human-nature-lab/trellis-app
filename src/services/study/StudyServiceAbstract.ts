@@ -6,9 +6,9 @@ export default abstract class StudyServiceAbstract {
    * Get the currently selected study
    * @returns {Promise<Study>}
    */
-  getCurrentStudy(): Study | null {
+  getCurrentStudy(): Study | undefined {
     const study = SingletonService.get('study')
-    return (study instanceof Study) ? study : null
+    return (study instanceof Study) ? study : undefined
   }
 
   /**
@@ -24,7 +24,7 @@ export default abstract class StudyServiceAbstract {
    * @param {string} studyId
    * @returns {Promise<Study>}
    */
-  abstract getStudy(studyId): Promise<Study>
+  abstract getStudy(studyId): Promise<Study|undefined>
 
   /**
    * Get all of the studies assigned to me

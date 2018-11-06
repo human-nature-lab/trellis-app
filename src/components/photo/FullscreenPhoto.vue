@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     fullscreen
-    lazy
+    v-if="value"
     :hide-overlay="false"
     :value="value"
     @input="$emit('input', $event)">
@@ -27,8 +27,7 @@
         required: true
       },
       photo: {
-        type: Object,
-        required: true
+        type: Object
       },
       title: {
         type: String

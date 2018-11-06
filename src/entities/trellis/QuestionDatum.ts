@@ -77,7 +77,7 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     q.skippedAt = this.skippedAt
     q.dkRf = this.dkRf
     q.dkRfVal = this.dkRfVal
-    q.data = []
+    q.data = this.data.map(d => d.copy())
     q.createdAt = this.createdAt
     q.updatedAt = this.updatedAt
     q.deletedAt = this.deletedAt

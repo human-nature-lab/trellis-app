@@ -58,7 +58,6 @@ export default abstract class Recycler<T> {
     } else {
       return obj
     }
-    // return obj
   }
 
   /**
