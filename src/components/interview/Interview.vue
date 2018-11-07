@@ -275,6 +275,7 @@
           this.dialog.end = false
           this.exit()
         } catch (err) {
+          this.log(err)
           this.error = err
         }
       },

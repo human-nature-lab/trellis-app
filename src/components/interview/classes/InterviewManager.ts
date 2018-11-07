@@ -164,10 +164,7 @@ export default class InterviewManager extends InterviewManagerBase {
     let questionDatum: QuestionDatum = null
     let questionBlueprint: Question = null
     if (action.questionId) {
-      // let followUpQuestionId = this.questionIdToSectionIndex.get(action.questionId).followUpQuestionId
       questionDatum = this.navigator.getActionQuestionDatum(action)
-      // let actionFollowUpDatumId = this.navigator.getFollowUpQuestionDatumIdByFollowUpRepetition(followUpQuestionId, action.sectionFollowUpRepetition)
-      // questionDatum = this.data.getSingleQuestionDatumByLocation(action.questionId, action.sectionRepetition, actionFollowUpDatumId)
       questionBlueprint = this.questionIndex.get(action.questionId)
       if (!questionDatum) {
         debugger

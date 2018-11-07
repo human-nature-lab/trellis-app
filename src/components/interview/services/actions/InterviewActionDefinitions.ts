@@ -109,9 +109,9 @@ actionManager.add(AT.change_sort_order, function (interview, payload, questionDa
 actionManager.add(AT.set_val, addOrUpdateSingleDatum)
 actionManager.add(AT.remove_geo, removeDatum((datum, payload) => datum.geoId === payload.geo_id))
 actionManager.add(AT.add_geo, addDatum)
-actionManager.add(AT.respondent_move, addDatumLimit(1))
-actionManager.add(AT.respondent_add_geo, addDatumLimit(1))
-actionManager.add(AT.respondent_remove_geo, addDatumLimit(1))
+actionManager.add(AT.respondent_move, addDatum)
+actionManager.add(AT.respondent_add_geo, addDatum)
+actionManager.add(AT.respondent_remove_geo, addDatum)
 actionManager.add(AT.other_respondent_added, function () {
   //debugger
   addOrUpdateSingleDatum.apply(null, arguments)
