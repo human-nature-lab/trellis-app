@@ -248,6 +248,8 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
               name: addedDatum.name,
               photoId: addedDatum.photoId,
               questionDatumId: addedDatum.questionDatumId,
+              respondentGeoId: addedDatum.respondentGeoId,
+              respondentNameId: addedDatum.respondentNameId,
               rosterId: addedDatum.rosterId,
               sortOrder: addedDatum.sortOrder,
               surveyId: addedDatum.surveyId,

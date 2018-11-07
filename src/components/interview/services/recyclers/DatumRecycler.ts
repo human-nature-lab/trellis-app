@@ -12,6 +12,8 @@ export interface DatumPayload {
   edge_id?: string
   photo_id?: string
   roster_id?: string
+  respondent_geo_id?: string
+  respondent_name_id?: string
 }
 
 class DatumRecycler extends Recycler<Datum> {
@@ -28,7 +30,9 @@ class DatumRecycler extends Recycler<Datum> {
       d.edgeId,
       d.geoId,
       d.photoId,
-      d.rosterId
+      d.rosterId,
+      d.respondentGeoId,
+      d.respondentNameId
     ].join('-')
   }
   objectCreator (questionDatum: QuestionDatum, payload: DatumPayload) {
@@ -44,7 +48,9 @@ class DatumRecycler extends Recycler<Datum> {
       geoId: payload.geo_id,
       photoId: payload.photo_id,
       rosterId: payload.roster_id,
-      choiceId: payload.choice_id
+      choiceId: payload.choice_id,
+      respondentGeoId: payload.respondent_geo_id,
+      respondentNameId: payload.respondent_name_id
     })
   }
 }

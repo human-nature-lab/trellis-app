@@ -18,6 +18,8 @@ export interface DatumRecyclerData {
   photoId: string
   rosterId: string
   choiceId: string
+  respondentGeoId: string
+  respondentNameId: string
 }
 
 @Entity()
@@ -40,6 +42,10 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   public photoId: string;
   @Column() @Serializable
   public questionDatumId: string;
+  @Column() @Serializable
+  public respondentGeoId: string
+  @Column() @Serializable
+  public  respondentNameId: string
   @Column() @Serializable
   public rosterId: string;
   @Column({type: 'integer'}) @Serializable
@@ -80,6 +86,8 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
     d.name = this.name
     d.photoId = this.photoId
     d.questionDatumId = this.questionDatumId
+    d.respondentGeoId = this.respondentGeoId
+    d.respondentNameId = this.respondentNameId
     d.rosterId = this.rosterId
     d.sortOrder = this.sortOrder
     d.surveyId = this.surveyId

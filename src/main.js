@@ -18,6 +18,19 @@ import router from './router'
 import config from './config'
 import theme from './static/theme'
 import {APP_ENV} from './static/constants'
+import {defaultLoggingService} from './services/logging/LoggingService'
+import {LoggingLevel} from './services/logging/LoggingTypes'
+
+window.onerror = function (message, source, lineno, colno, error) {
+  defaultLoggingService.log({
+    severity: LoggingLevel.error,
+    message,
+    component: `Line: ${lineno}, Column: ${colno} - ${source}`,
+    error,
+    lineno,
+    colno
+  })
+}
 
 Vue.use(Vuetify, theme)
 Vue.config.productionTip = false

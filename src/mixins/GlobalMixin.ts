@@ -1,12 +1,15 @@
 import config from '../config'
 import {APP_ENV} from '../static/constants'
 import Vue from 'vue'
-import logger from '../services/logging/LoggingService'
+import {defaultLoggingService} from '../services/logging/LoggingService'
 
 export default Vue.mixin({
   methods: {
-    log (Log): void {
-      logger.log()
+    log (log: any): void {
+      if (log && !log.component) {
+        log.component = this.$options.name
+      }
+      defaultLoggingService.log(log)
     }
   },
   computed: {
