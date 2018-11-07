@@ -36,10 +36,10 @@
           <v-layout row
                     justify-space-between>
             <v-btn @click="onPrevious"
-                   :disabled="isFirstPage || prevWorking"
+                   :disabled="prevWorking"
                    justify-left>
               <v-icon left>chevron_left</v-icon>
-              {{ $t('previous') }}
+              {{isAtBeginning ? $t('exit') : $t('previous')}}
             </v-btn>
             <v-btn @click="onNext"
                    :disabled="!isNavigationEnabled || nextWorking"
@@ -95,6 +95,10 @@
       isAtEnd: {
         type: Boolean,
         default: false
+      },
+      isAtBeginning: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
@@ -139,12 +143,6 @@
           }
         }
         return true
-      },
-      isFirstPage () {
-        return this.location.page === 0 &&
-          this.location.section === 0 &&
-          this.location.sectionRepetition === 0 &&
-          this.location.sectionFollowUpDatumRepetition === 0
       },
       datumLength () {
         let l = 0

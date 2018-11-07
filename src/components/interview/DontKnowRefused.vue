@@ -19,7 +19,7 @@
         :rules="rules"
         v-model="reason"
         required
-        autofocus />
+        :autofocus="!reason || !reason.length" />
     </v-layout>
   </v-flex>
 </template>

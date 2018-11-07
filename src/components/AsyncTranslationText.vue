@@ -27,14 +27,18 @@
     data () {
       return {
         translated: this.$t('loading'),
-        localTranslation: this.translation
+        localTranslation: this.translation.copy(),
       }
     },
     watch: {
       translation (newTranslation) {
         if (newTranslation.id !== this.localTranslation.id) {
-          this.localTranslation = newTranslation
-          this.loadTranslation()
+          this.reset()
+        }
+      },
+      location (newL, oldL) {
+        if (!(newL.page === oldL.page && newL.section === oldL.section && newL.sectionRepetition === oldL.sectionRepetition && newL.sectionFollowUpRepetition === oldL.sectionFollowUpRepetition)) {
+          this.reset()
         }
       }
     },
@@ -42,6 +46,10 @@
       this.loadTranslation()
     },
     methods: {
+      reset () {
+        this.localTranslation = this.translation.copy()
+        this.loadTranslation()
+      },
       async loadTranslation () {
         // Don't load if they already exist
         if (!this.localTranslation || !this.localTranslation.translationText || !this.localTranslation.translationText.length) {
