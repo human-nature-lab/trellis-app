@@ -396,5 +396,7 @@ create_survey_failed,Failed to create a new survey: {0},Error al crear una nueva
 create_interview_failed,Failed to create a new interview: {0},Error al crear una nueva entrevista: {0},
 cant_resume_survey,Can't resume a completed survey.,No puede con tinuar una encuesta completa.,
 gps_error,Error accessing GPS: {0},Error al accesar el GPS: {0},
-logs,Logs,,
 select,Select,Seleccionar,
+logs,Logs,,
+page,Page,,The current page within the section
+repetition,Repetition,,The current repetition of the the section

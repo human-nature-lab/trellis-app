@@ -3,8 +3,18 @@
     <v-layout column>
       <v-toolbar flat>
         <v-toolbar-title>
-          <TranslatedText :translation="sectionTranslation" :locale="global.locale" />
-          <span class="subheading light">(Page {{pageNum}})</span>
+          <AsyncTranslationText
+            v-if="section"
+            :translation="section.nameTranslation"
+            :locale="global.locale" />
+          <span class="subheading light">
+            ({{$t('page')}} {{location.page + 1}})
+          </span>
+          <span
+            class="subheading light"
+            v-if="isRepeated">
+            ({{$t('repetition')}} {{currentRepetition + 1}})
+          </span>
         </v-toolbar-title>
       </v-toolbar>
       <v-flex>
@@ -20,6 +30,7 @@
               :actions="interviewActions"
               :data="interviewData"
               :isAtEnd="isAtEnd"
+              :isAtBeginning="isAtBeginning"
               :conditionTags="interviewConditionTags"
               :interview="interview" />
       </v-flex>
@@ -113,7 +124,7 @@
   import RoutePreloadMixin from '../../mixins/RoutePreloadMixin'
   import Page from './Page'
   import ConditionTagList from './ConditionTagList'
-  import TranslatedText from '../TranslatedText'
+  import AsyncTranslationText from '../AsyncTranslationText'
   import menuBus from '../main-menu/MenuBus'
   import global from '../../static/singleton'
 
@@ -145,6 +156,7 @@
       return {
         global,
         isAtEnd: false,
+        isAtBeginning: false,
         artificiallyExtendLoadTime: false,
         formId: null,
         surveyId: null,
@@ -172,8 +184,7 @@
         alreadyExited: false,
         questions: [],
         loadingStep: 0,
-        sectionTranslation: null,
-        pageNum: null
+        section: null
       }
     },
     created () {
@@ -236,9 +247,9 @@
       },
       updateInterview () {
         this.isAtEnd = interviewState.navigator.isAtEnd
+        this.isAtBeginning = interviewState.navigator.isAtStart
         this.location = interviewState.location
-        this.sectionTranslation = interviewState.navigator.currentSection().nameTranslation
-        this.pageNum = interviewState.location.page
+        this.section = interviewState.navigator.currentSection()
         // The reference to this.location needs to be here so that we have a dependency on this.location
         let questions = interviewState.getPageQuestions(
           this.location.section,
@@ -314,7 +325,7 @@
           this.showSafeToExitMessage = true
         })
         this.completeInterview()
-        const dialogText = 'You have unsaved changes. Are you sure you want to leave?'
+        const dialogText = this.$t('survey_message_exit')
         e.returnValue = dialogText
         return dialogText
       }
@@ -322,12 +333,18 @@
     computed: {
       formIsEmpty () {
         return !(this.form && this.form.sections && this.form.sections.length)
+      },
+      isRepeated () {
+        return this.section && (this.section.isRepeatable || this.section.followUpQuestionId !== null)
+      },
+      currentRepetition () {
+        return this.section.isRepeatable ? this.location.sectionRepetition : this.location.sectionFollowUpRepetition
       }
     },
     components: {
       Page,
       ConditionTagList,
-      TranslatedText
+      AsyncTranslationText
     }
   }
 </script>

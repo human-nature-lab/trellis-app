@@ -19,10 +19,10 @@
     <v-text-field
       solo
       single-line
-      autofocus
       :placeholder="$t('other')"
       v-if="choice.isSelected && choice.isOther"
       :value="choice.otherText"
+      :autofocus="!choice.otherText || !choice.otherText.length"
       @input="onOtherChange"/>
   </div>
 </template>
