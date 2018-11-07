@@ -163,7 +163,9 @@
       },
       onBackButton () {
         console.log('back button pressed')
-        router.go(-1)
+        if (router.currentRoute.name !== 'Interview' || confirm(this.$t('survey_message_exit'))) {
+          router.go(-1)
+        }
       },
     }
   }
