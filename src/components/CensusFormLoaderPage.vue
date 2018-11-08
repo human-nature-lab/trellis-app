@@ -15,14 +15,7 @@
     return CensusService.getCensusForm(to.params.studyId, to.params.censusTypeId)
       .then(f => {
         res.form = f
-        return SurveyService.getSurvey(to.params.studyId, to.query.respondentId, f.id)
-      })
-      .then(survey => {
-        if (survey) {
-          return survey
-        } else {
-          return SurveyService.create(to.params.studyId, to.query.respondentId, res.form.id)
-        }
+        return SurveyService.create(to.params.studyId, to.query.respondentId, res.form.id)
       })
       .then(survey => InterviewService.create(survey.id))
       .then(interview => {
