@@ -24,6 +24,7 @@
       :headers="headers"
       :items="logs"
       :total-items="total"
+      :pagination.sync="pagination"
       @update:pagination="updatePage">
       <template slot="items" slot-scope="props" >
         <tr @click="showFull(props.item)">
@@ -32,6 +33,9 @@
           </td>
           <td>
             {{props.item.message}}
+          </td>
+          <td>
+            {{props.item.component}}
           </td>
           <td>
             <v-icon v-if="props.item.uploadedAt" color="green">check</v-icon>
@@ -93,11 +97,14 @@
           text: 'Message',
           value: 'message'
         }, {
+          text: 'Component',
+          value: 'component'
+        }, {
           text: 'Uploaded',
           value: 'uploadedAt'
         }],
         pagination: {
-          descending: false,
+          descending: true,
           page: 1,
           rowsPerPage: 100,
           sortBy: 'createdAt'
@@ -132,7 +139,6 @@
       },
       updatePage (pagination) {
         this.pagination = pagination
-        console.log('pagination', JSON.stringify(this.pagination, null, 2))
         this.loadPage()
       },
       async loadPage () {
@@ -155,6 +161,7 @@
               }
             }
           })
+          this.loadPage()
           this.upload.message = 'Done uploading logs!'
         } catch (err) {
           err.component = 'Logs'

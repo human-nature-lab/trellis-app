@@ -5,7 +5,7 @@ import {defaultLoggingService} from '../services/logging/LoggingService'
 
 export default Vue.mixin({
   methods: {
-    log (log: any): void {
+    log (this: Vue, log: any): void {
       if (log && !log.component) {
         log.component = this.$options.name
       }

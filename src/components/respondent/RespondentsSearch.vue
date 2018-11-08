@@ -281,6 +281,7 @@
           this.conditionTags = tags.map(c => c.name)
           this.conditionTagsLoaded = true
         }).catch(err => {
+          this.log(err)
           this.error = err
         }).then(() => {
           this.conditionTagsLoading = false
@@ -297,7 +298,7 @@
           this.results = await RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
           this.error = null
         } catch (err) {
-          console.error(err)
+          this.log(err)
           this.error = err
           alert('Unable to load respondents')
         } finally {

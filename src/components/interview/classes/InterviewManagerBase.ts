@@ -19,6 +19,7 @@ import SectionConditionTagRecycler from "../services/recyclers/SectionConditionT
 import Interview from "../../../entities/trellis/Interview";
 import Datum from "../../../entities/trellis/Datum";
 import InterviewAlligator from "../services/InterviewAlligator";
+import {defaultLoggingService as logger} from "../../../services/logging/LoggingService";
 
 export default class InterviewManagerBase extends Emitter {
 
@@ -228,7 +229,8 @@ export default class InterviewManagerBase extends Emitter {
             this.assignConditionTag(act)
           }
         } catch (err) {
-          console.error('Unable to assign condition tag correctly')
+          err.component = 'InterviewManagerBase.ts'
+          logger.log(err)
           throw err
         }
       }

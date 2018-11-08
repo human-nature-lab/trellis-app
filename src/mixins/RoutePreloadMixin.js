@@ -1,5 +1,6 @@
 import singleton from '../static/singleton'
 import router from '../router'
+import {defaultLoggingService as logger} from '../services/logging/LoggingService'
 
 /**
  * Creates a mixin which takes a loadCallback and will call the hydrate method at the appropriate times. This mixin is
@@ -25,8 +26,8 @@ export default function RoutePreloadMixin (loadCallback, fullscreen = false) {
         data = await loadCallback(to)
         next()
       } catch (err) {
-        console.error('Unable to load route:', to)
-        console.error(err)
+        err.component = 'RoutePreloadMixin.js@beforeRouteEnter'
+        logger.log(err)
         singleton.loading.error = err.toString()
       } finally {
         singleton.loading.active = false
@@ -43,8 +44,8 @@ export default function RoutePreloadMixin (loadCallback, fullscreen = false) {
         this.hydrate(routeData)
         singleton.loading.error = null
       } catch (err) {
-        console.error('Unable to update route:', to)
-        console.error(err)
+        err.component = 'RoutePreloadMixin.js@beforeRouteUpdate'
+        logger.log(err)
         singleton.loading.error = err.toString()
       } finally {
         singleton.loading.active = false
@@ -52,15 +53,13 @@ export default function RoutePreloadMixin (loadCallback, fullscreen = false) {
       }
     },
     async beforeRouteLeave (to, from, next) {
-      // singleton.loading.active = true
-      // singleton.loading.message = 'Validating guards...'
       try {
         if (this.leaving) {
           await this.leaving()
         }
       } catch (err) {
-        console.error('Error leaving:', to)
-        console.error(err)
+        err.component = 'RoutePreloadMixin.js@beforeRouteLeave'
+        logger.log(err)
       } finally {
         next()
       }

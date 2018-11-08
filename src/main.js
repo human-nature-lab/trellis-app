@@ -25,7 +25,7 @@ window.onerror = function (message, source, lineno, colno, error) {
   defaultLoggingService.log({
     severity: LoggingLevel.error,
     message,
-    component: `Line: ${lineno}, Column: ${colno} - ${source}`,
+    component: `caught by main.js: Line: ${lineno}, Column: ${colno} - ${source}`,
     error,
     lineno,
     colno
