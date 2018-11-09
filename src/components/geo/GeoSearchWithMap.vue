@@ -26,6 +26,16 @@
       ref="mapContainer"
       id="leafletMap"
       style="position: relative;">
+      <v-btn
+        class="floating-button"
+        @click.stop="printMap"
+        :dark="global.darkTheme"
+        fab
+        absolute
+        bottom
+        left>
+        <v-icon style="height:auto;">print</v-icon>
+      </v-btn>
       <permission :role-whitelist="['admin']">
         <v-btn
           v-if="selectedGeo === null && parentGeo !== null && parentGeo.geoType.canUserAddChild"
@@ -103,6 +113,7 @@
     },
     data: function () {
       return {
+        alwaysReposition: true,
         global: global,
         parentGeo: null,
         geoResults: [],
@@ -121,7 +132,6 @@
       }
     },
     async created () {
-      console.log('this.$router', this.$router)
       let curGeo = (this.$router.currentRoute.params.geoId) ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
       this.selectGeo(curGeo)
     },
@@ -130,7 +140,6 @@
     },
     methods: {
       selectGeo: async function (geo) {
-        console.log('selectGeo')
         const geoId = (geo && geo.id) ? geo.id : null
         const geoResults = await GeoService.getGeosByParentId(geoId)
         if (geoResults.length > 0) {
@@ -142,7 +151,6 @@
         }
       },
       setUpMap: function () {
-        console.log('setUpMap')
         this.trellisMap = L.map('leafletMap').setView([0.0, 0.0], 1)
         delete L.Icon.Default.prototype._getIconUrl
         L.Icon.Default.mergeOptions({
@@ -157,12 +165,11 @@
           accessToken: 'pk.eyJ1IjoiZGlzcGVyc2UiLCJhIjoiSUtqRFhKZyJ9.eixdwJkaNkCiPPWew9i4pQ'
         }).addTo(this.trellisMap)
         this.labelMarkerLayer = L.layerGroup().addTo(this.trellisMap)
-        this.trellisMap.on('zoomend resize moveend', () => {
+        this.trellisMap.on('zoomend resize', () => {
           this.repositionMarkers()
         })
       },
       displayResults: function (results) {
-        console.log('displayResults')
         this.geoResults = results
         this.clearMarkers()
         this.addMarkers(results)
@@ -218,6 +225,9 @@
         const study = await StudyService.getCurrentStudy()
         const parentGeoId = (this.parentGeo === null) ? null : this.parentGeo.id
         this.selectedGeo = GeoService.createNewGeo(parentGeoId, study.locales)
+      },
+      printMap: function () {
+        this.global.printMode = !this.global.printMode
       },
       removeGeoDone: function (removedGeoId) {
         this.selectedGeo = null
@@ -305,12 +315,12 @@
         this.clearPaths()
         let graph = createGraph()
         let bounds = this.trellisMap.getBounds()
-        console.log('bounds', bounds)
         let layout = forceDirectedLayout(graph)
         for (let i = 0; i < this.tooltipMarkers.length; i++) {
           let marker = this.tooltipMarkers[i]
           // Only reposition visible markers
-          if (bounds.contains(marker.origin._latlng)) {
+          // TODO: check within bounds and a generous margin, ticket #150
+          if (this.alwaysReposition || bounds.contains(marker.origin._latlng)) {
             let labelId = `label_${i}`
             let markerId = `marker_${i}`
             let markerNode = graph.addNode(markerId)
@@ -407,6 +417,25 @@
 
 <style lang="sass">
   @import "../../../node_modules/leaflet/dist/leaflet.css"
+
+  @media print
+    .floating-button
+      display: none
+
+  .print-mode
+    .toolbar
+      display: none
+    .leaflet-control-container
+      display: none
+    .progress-linear
+      display: none
+    .content
+      padding: 0 0 0 !important
+      width: 8.5in
+      height: 11in
+      position: absolute
+      top: 0
+      left: 0
 
   .snack
     z-index: 3000 !important
