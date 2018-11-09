@@ -55,10 +55,24 @@
               :items="uploads">
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
               <template slot="items" slot-scope="props">
-                <td>{{ props.item.created_at }}</td>
-                <td>{{ props.item.file_name }}</td>
-                <td>{{ props.item.device_id }}</td>
-                <td>{{ props.item.status }}</td>
+                <tr>
+                  <td>
+                    <v-btn
+                      :disabled="props.item.status !== 'SUCCESS'"
+                      icon
+                      @click="props.item.isOpen = !props.item.isOpen">
+                      <v-icon v-if="props.item.isOpen">keyboard_arrow_down</v-icon>
+                      <v-icon v-else>keyboard_arrow_right</v-icon>
+                    </v-btn>
+                  </td>
+                  <td>{{ props.item.created_at }}</td>
+                  <td>{{ props.item.file_name }}</td>
+                  <td>{{ props.item.device_id }}</td>
+                  <td>{{ props.item.status }}</td>
+                </tr>
+                <UploadLogs
+                  :upload="props.item"
+                  :isOpen="props.item.isOpen"/>
               </template>
               <template slot="no-data">
                 <v-alert :value="!uploadsLoading" type="info">
@@ -87,9 +101,10 @@
 
 <script>
   import SyncAdminService from '../../../services/SyncAdminService'
-
+  import UploadLogs from './UploadLogs'
   export default {
     name: 'sync-admin',
+    components: {UploadLogs},
     data () {
       return {
         uploadPagination: {
@@ -116,24 +131,22 @@
         uploadsProcessing: false,
         uploadsLoading: true,
         uploads: [],
-        uploadColumns: [
-          {
-            text: 'Created on',
-            value: 'created_at'
-          },
-          {
-            text: 'File name',
-            value: 'file_name'
-          },
-          {
-            text: 'Device id',
-            value: 'device_id'
-          },
-          {
-            text: 'Status',
-            value: 'status'
-          }
-        ]
+        uploadColumns: [{
+          text: '',
+          sortable: false
+        }, {
+          text: 'Created on',
+          value: 'created_at'
+        }, {
+          text: 'File name',
+          value: 'file_name'
+        }, {
+          text: 'Device id',
+          value: 'device_id'
+        }, {
+          text: 'Status',
+          value: 'status'
+        }]
       }
     },
     created () {
@@ -147,7 +160,10 @@
     methods: {
       getUploads: async function () {
         const uploads = await SyncAdminService.listUploads()
-        this.uploads = uploads
+        this.uploads = uploads.map(u => {
+          u.isOpen = false
+          return u
+        })
         this.uploadsLoading = false;
       },
       getSnapshots: async function () {

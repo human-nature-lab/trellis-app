@@ -15,9 +15,9 @@
 <script>
     import FileService from '../../../../services/file/FileService'
     import DeviceService from '../../../../services/device/DeviceService'
+    import DatabaseService from '../../../../services/database/DatabaseService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
-    import config from '../../../../config'
 
     export default {
       name: 'upload-images',
@@ -55,7 +55,8 @@
             this.progressIndeterminate = false
             const photoFile = this.imagesToUpload.pop()
             const deviceId = await DeviceService.getUUID()
-            const uri = config.apiRoot + `/sync/device/${deviceId}/upload/image`
+            const apiRoot = await DatabaseService.getServerIPAddress()
+            const uri = apiRoot + `/sync/device/${deviceId}/upload/image`
             FileService.upload(uri, photoFile)
               .then(() => {
                 this.numImagesUploaded++
