@@ -33,6 +33,7 @@ export interface Singleton {
   darkTheme: boolean
   user: User
   offline: boolean
+  printMode: boolean
   searchDrawer: SearchDrawer
   menuDrawer: MenuDrawer
   loading: Loading
@@ -51,6 +52,7 @@ export default {
   deviceId: null,
   user: null,
   offline: storage.get('offline') !== null ? storage.get('offline') : (typeof cordova === 'object'),
+  printMode: false,
   searchDrawer: {
     component: null,
     open: false
