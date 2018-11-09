@@ -1,5 +1,5 @@
 <template>
-  <v-app light dense class="web" :dark="global.darkTheme">
+  <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode }">
     <v-dialog
       max-width="300"
       v-model="global.loading.fullscreen && global.loading.active"
