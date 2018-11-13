@@ -6,7 +6,7 @@
           <v-layout row class="sync-content">
             <v-flex class="xs12">
               <sync-status
-                v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos"
+                v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
                 :local-latest-snapshot="localLatestSnapshot"
                 :updated-records-count="updatedRecordsCount">
               </sync-status>
@@ -15,7 +15,8 @@
                 v-on:server-ip-config-done="onServerIPConfigDone">
               </server-ip-config>
               <upload
-                v-if="uploading"
+                v-if="uploading || uploadingPhotos"
+                :init-upload-step="uploadStep"
                 v-on:upload-done="uploadDone"
                 v-on:upload-cancelled="uploadCancelled">
               </upload>
@@ -32,11 +33,17 @@
             row
             class="mt-2 sync-footer"
             justify-space-between>
-            <v-flex class="xs3 text-xs-left">
+            <v-flex class="xs6 text-xs-left">
               <v-btn :disabled="!enableUpload"
                      :loading="uploading"
                      @click="onUpload">
                 <v-icon>cloud_upload</v-icon>
+              </v-btn>
+              <v-btn @click="onUploadPhotos"
+                     :loading="uploadingPhotos"
+                     :disabled="!enablePhotoDownload">
+                <v-icon>collections</v-icon>
+                <v-icon>arrow_upward</v-icon>
               </v-btn>
             </v-flex>
             <v-flex class="xs6 text-xs-right">
@@ -48,7 +55,8 @@
               <v-btn @click="onDownloadPhotos"
                      :loading="downloadingPhotos"
                      :disabled="!enablePhotoDownload">
-                <v-icon>portrait</v-icon>
+                <v-icon>collections</v-icon>
+                <v-icon>arrow_downward</v-icon>
               </v-btn>
             </v-flex>
           </v-layout>
@@ -73,9 +81,11 @@
       return {
         loading: true,
         downloadStep: 1,
+        uploadStep: 1,
         uploading: false,
         downloading: false,
         downloadingPhotos: false,
+        uploadingPhotos: false,
         serverIPAddress: null,
         serverLatestSnapshot: null,
         localLatestSnapshot: null,
@@ -106,7 +116,12 @@
         this.downloading = true
       },
       onUpload: function () {
+        this.uploadStep = 1
         this.uploading = true
+      },
+      onUploadPhotos: function () {
+        this.uploadStep = 3
+        this.uploadingPhotos = true;
       },
       onDownloadPhotos: function () {
         this.downloadStep = 4
@@ -115,11 +130,13 @@
       downloadCancelled: function () {
         this.downloading = false
         this.downloadingPhotos = false
+        this.uploadingPhotos = false
         // Re-init in case download was successful
         this.initComponent()
       },
       downloadDone: function () {
         this.downloading = false
+        this.downloadingPhotos = false
         this.initComponent()
       },
       uploadCancelled: function () {
@@ -129,6 +146,7 @@
       },
       uploadDone: function () {
         this.uploading = false
+        this.uploadingPhotos = false
         this.initComponent()
       }
     },
@@ -146,7 +164,7 @@
         return ( (this.localLatestSnapshot !== null) && this.enableAll )
       },
       enableAll: function () {
-        return ( !this.loading && !this.downloading && !this.downloadingPhotos && !this.uploading )
+        return ( !this.loading && !this.downloading && !this.downloadingPhotos && !this.uploadingPhotos && !this.uploading )
       }
     },
     components: {
