@@ -127,6 +127,7 @@
             this.resolve(pos)
           }, dialogCloseDelay)
         }).catch(err => {
+          this.log(err)
           if (err.code === PositionError.PERMISSION_DENIED) {
             this.state = 'permission-denied'
             console.error('Permission denied')
