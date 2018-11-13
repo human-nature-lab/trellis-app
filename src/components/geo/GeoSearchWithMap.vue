@@ -158,10 +158,12 @@
           iconUrl: require('leaflet/dist/images/marker-icon.png'),
           shadowUrl: require('leaflet/dist/images/marker-shadow.png')
         })
-        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        // TODO: before releasing to open source, switch to this tile layer. L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        // TODO: consider making the tile layer and accessToken configurable
+        L.tileLayer('https://a.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
           attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
           maxZoom: 21,
-          id: 'mapbox.streets',
+          id: 'mapbox.emerald',
           accessToken: '***REMOVED***'
         }).addTo(this.trellisMap)
         this.labelMarkerLayer = L.layerGroup().addTo(this.trellisMap)
