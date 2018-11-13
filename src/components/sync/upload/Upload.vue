@@ -134,7 +134,7 @@
     name: 'upload',
     data () {
       return {
-        uploadStep: 1,
+        uploadStep: this.initUploadStep,
         uploadSubStep: 0,
         continueStatusArray: [BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED, BUTTON_STATUS.DISABLED],
         sync: undefined,
@@ -170,6 +170,10 @@
         })
     },
     props: {
+      initUploadStep: {
+        type: Number,
+        required: true
+      }
     },
     methods: {
       showLog: function () {
