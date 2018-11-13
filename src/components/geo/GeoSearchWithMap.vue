@@ -160,11 +160,12 @@
         })
         // TODO: before releasing to open source, switch to this tile layer. L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
         // TODO: consider making the tile layer and accessToken configurable
-        L.tileLayer('https://a.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
           attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
           maxZoom: 21,
           id: 'mapbox.emerald',
-          accessToken: 'pk.eyJ1IjoiZGlzcGVyc2UiLCJhIjoiSUtqRFhKZyJ9.eixdwJkaNkCiPPWew9i4pQ'
+          accessToken: 'pk.eyJ1IjoiZGlzcGVyc2UiLCJhIjoiSUtqRFhKZyJ9.eixdwJkaNkCiPPWew9i4pQ',
+          style: 'mapbox://styles/mapbox/streets-v10'
         }).addTo(this.trellisMap)
         this.labelMarkerLayer = L.layerGroup().addTo(this.trellisMap)
         this.trellisMap.on('zoomend resize', () => {
