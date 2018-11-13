@@ -3,7 +3,7 @@ export default abstract class GeoLocationAbstract {
   private options = {
     enableHighAccuracy: true,
     timeout: 15000,
-    maximumAge: 30 * 60 * 1000 // 1/2 hour
+    maximumAge: 5 * 60 * 1000 // 1/2 hour
   }
 
   async getCurrentPosition () {
