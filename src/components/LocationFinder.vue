@@ -43,10 +43,33 @@
                 </v-layout>
               </v-flex>
               <v-flex v-else-if="state === 'found-location'">
-                <v-icon color="success">check</v-icon>
-                <v-flex>{{$t('position_success')}}</v-flex>
+                <v-layout>
+                  <v-flex>
+                    <v-icon color="success">check</v-icon>
+                  </v-flex>
+                  <v-flex>{{$t('position_success')}}</v-flex>
+                </v-layout>
                 <v-layout>
                   Lat: {{lastKnownCoordinates.latitude}} Long: {{lastKnownCoordinates.longitude}}
+                </v-layout>
+              </v-flex>
+              <v-flex v-else-if="state === 'expired-location'">
+                <v-layout row>
+                  <v-flex>{{$t('last_known_position', [`Lat: ${lastKnownCoordinates.latitude}, Long: ${lastKnownCoordinates.longitude}`])}}</v-flex>
+                  <v-spacer></v-spacer>
+                  <v-flex>{{lastKnownTime.fromNow()}}</v-flex>
+                </v-layout>
+                <v-layout>
+                  <v-spacer></v-spacer>
+                  <v-btn v-if="lastKnownCoordinates" @click="useLastPosition">
+                    {{$t('use_last_position')}}
+                  </v-btn>
+                  <v-btn @click="skip">
+                    {{$t('skip')}}
+                  </v-btn>
+                  <v-btn @click="retry">
+                    {{$t('retry')}}
+                  </v-btn>
                 </v-layout>
               </v-flex>
               <v-flex v-else-if="state === 'use-last-location'">
@@ -63,6 +86,7 @@
 </template>
 
 <script>
+  import * as moment from 'moment'
   import GeoLocationService from '../services/geolocation/index'
 
   const PositionError = {
@@ -74,9 +98,11 @@
   const data = {
     isOpen: false,
     lastKnownCoordinates: null,
+    lastKnownTime: 0,
     attempts: 0,
     maxAttempts: 3,
-    state: 'detecting'
+    state: 'detecting',
+    tolerance: 5 * 60 * 1000
   }
 
   const dialogCloseDelay = 3000
@@ -116,15 +142,16 @@
       skip () {
         this.resolve(null)
       },
-      useLastPosition () {
-        this.resolve(this.lastKnownCoordinates)
+      async useLastPosition () {
+        const lastPos = await GeoLocationService.getLatestPosition()
+        this.resolve(lastPos.coords)
       },
       retry () {
         this.state = 'detecting'
         this.getPosition().then(pos => {
           this.state = 'found-location'
           setTimeout(() => {
-            this.resolve(pos)
+            this.resolve(pos.coords)
           }, dialogCloseDelay)
         }).catch(err => {
           this.log(err)
@@ -150,9 +177,11 @@
       },
       getPosition () {
         this.attempts++
-        return GeoLocationService.getCurrentPosition().then(pos => {
+        const tol = 5 * 60 * 1000
+        return GeoLocationService.getLocationTolerance(tol).then(pos => {
           this.lastKnownCoordinates = pos.coords
-          return pos.coords
+          this.lastKnownTime = moment(pos.timestamp)
+          return pos
         })
       }
     }

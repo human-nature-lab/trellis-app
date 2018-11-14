@@ -79,8 +79,8 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
       throw new Error('Invalid logger request')
     }
     const log = this.createLog(_request)
-    this.queue.push(log)
     this.consoleLog(log)
+    this.queue.push(log)
     if (this.config.max > 0 && this.queue.length > this.config.max) {
       this.flushQueue()
     } else {

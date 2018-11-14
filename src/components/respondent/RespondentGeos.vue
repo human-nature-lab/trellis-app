@@ -16,7 +16,7 @@
     <v-alert v-show="error" color="error">{{error}}</v-alert>
     <v-data-table
       disable-initial-sort
-      class="mb-3 no-wrap-table"
+      class="mb-3"
       :headers="locationHeaders"
       :items="locations"
       hide-actions>
