@@ -57,6 +57,14 @@
           {{ $t('logs') }}
         </v-list-tile-title>
       </v-list-tile>
+      <v-list-tile v-if="isCordova" :to="{name: 'LocationHistory'}">
+        <v-list-tile-action>
+          <v-icon>history</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-title>
+          Location History
+        </v-list-tile-title>
+      </v-list-tile>
     </v-list>
     <v-divider></v-divider>
     <v-list dense subheader>

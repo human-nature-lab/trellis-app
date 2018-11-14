@@ -103,6 +103,7 @@
   import router from './router'
   import singleton from './static/singleton'
   import {defaultLoggingService} from './services/logging/LoggingService'
+  import GeoLocationService from './services/geolocation'
 
   export default {
     name: 'web-app',
@@ -121,6 +122,7 @@
         document.addEventListener('pause', this.onPause, false)
         document.addEventListener('resume', this.onResume, false)
         document.addEventListener('backbutton', this.onBackButton)
+        GeoLocationService.watchPosition()
       }
     },
     beforeDestroy () {
@@ -129,6 +131,7 @@
         document.removeEventListener('resume', this.onResume, false)
         document.removeEventListener('backbutton', this.onBackButton)
         defaultLoggingService.flushQueue()
+        GeoLocationService.clearWatch()
       }
     },
     components: {

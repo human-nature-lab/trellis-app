@@ -19,6 +19,7 @@ import WebLogin from '../components/login/WebLogin'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
 const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../components/ServiceTesting')
+const LocationHistory = () => import(/* webpackChunkName: "location-history" */'../components/LocationHistory')
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
@@ -85,4 +86,8 @@ export default [{
   path: '/survey/:surveyId/completed',
   name: 'SurveyComplete',
   component: SurveyComplete
+}, {
+  path: '/location-history',
+  name: 'LocationHistory',
+  component: LocationHistory
 }]
