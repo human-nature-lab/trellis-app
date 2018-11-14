@@ -168,7 +168,7 @@
         // TODO: consider making the tile layer and accessToken configurable
         L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
           attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-          maxZoom: 21,
+          maxZoom: 20,
           id: 'mapbox.emerald',
           accessToken: '***REMOVED***',
           style: 'mapbox://styles/mapbox/streets-v10'
