@@ -161,7 +161,7 @@
         return ( (this.updatedRecordsCount > 0) && this.enableAll )
       },
       enablePhotoDownload: function () {
-        return ( (this.localLatestSnapshot !== null) && this.enableAll )
+        return ( this.localLatestSnapshot && this.enableAll )
       },
       enableAll: function () {
         return ( !this.loading && !this.downloading && !this.downloadingPhotos && !this.uploadingPhotos && !this.uploading )
