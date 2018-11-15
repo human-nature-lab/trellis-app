@@ -43,7 +43,7 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
       params['i'] = filters.includeChildren
     }
     if (filters.onlyCurrentGeo) {
-      params['c'] = filters.onlyCurrentGeo
+      params['cg'] = filters.onlyCurrentGeo
     }
     studyId = encodeURIComponent(studyId)
     let res = await http().get(`study/${studyId}/respondents/search`, {
