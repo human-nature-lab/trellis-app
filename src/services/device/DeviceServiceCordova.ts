@@ -11,7 +11,7 @@ export default class DeviceServiceCordova {
     this.platform = undefined
     document.addEventListener('deviceready', () => { this.isReady = true }, false)
   }
-  getUUID () {
+  getUUID (): Promise<string> {
     return new Promise((resolve) => {
       if (this.uuid !== undefined) {
         resolve(this.uuid)
