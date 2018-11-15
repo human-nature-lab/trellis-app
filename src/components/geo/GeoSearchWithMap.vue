@@ -128,7 +128,9 @@
         markerPositions: [],
         minZoom: undefined,
         selectedGeo: null,
-        snackbar: false
+        snackbar: false,
+        layout: null,
+        graph: null
       }
     },
     async created () {
@@ -137,6 +139,10 @@
     },
     mounted () {
       this.setUpMap()
+    },
+    beforeDestroy () {
+      // Removing these event listeners before destroying the component prevents an out of memory crash
+      this.trellisMap.off('zoomend resize')
     },
     methods: {
       selectGeo: async function (geo) {
@@ -162,7 +168,7 @@
         // TODO: consider making the tile layer and accessToken configurable
         L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
           attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-          maxZoom: 21,
+          maxZoom: 20,
           id: 'mapbox.emerald',
           accessToken: 'pk.eyJ1IjoiZGlzcGVyc2UiLCJhIjoiSUtqRFhKZyJ9.eixdwJkaNkCiPPWew9i4pQ',
           style: 'mapbox://styles/mapbox/streets-v10'
@@ -316,9 +322,9 @@
       },
       repositionMarkers: function () {
         this.clearPaths()
-        let graph = createGraph()
+        this.graph = createGraph()
         let bounds = this.trellisMap.getBounds()
-        let layout = forceDirectedLayout(graph)
+        this.layout = forceDirectedLayout(this.graph)
         for (let i = 0; i < this.tooltipMarkers.length; i++) {
           let marker = this.tooltipMarkers[i]
           // Only reposition visible markers
@@ -326,28 +332,28 @@
           if (this.alwaysReposition || bounds.contains(marker.origin._latlng)) {
             let labelId = `label_${i}`
             let markerId = `marker_${i}`
-            let markerNode = graph.addNode(markerId)
+            let markerNode = this.graph.addNode(markerId)
             let pos = this.latLngToPos(marker.origin._latlng.lat, marker.origin._latlng.lng, bounds)
-            graph.addNode(labelId, marker)
-            graph.addLink(labelId, markerId)
-            layout.pinNode(markerNode, true)
+            this.graph.addNode(labelId, marker)
+            this.graph.addLink(labelId, markerId)
+            this.layout.pinNode(markerNode, true)
             let x = pos[0]
             let y = pos[1]
-            layout.setNodePosition(labelId, x, y)
-            layout.setNodePosition(markerId, x, y)
+            this.layout.setNodePosition(labelId, x, y)
+            this.layout.setNodePosition(markerId, x, y)
           }
         }
         for (let i = 0; i < ITERATIONS; i++) {
-          layout.step()
+          this.layout.step()
         }
         function selectGeo (vm) {
           return function () {
             vm.selectedGeo = this.geo
           }
         }
-        graph.forEachNode((node) => {
+        this.graph.forEachNode((node) => {
           if (node.data) {
-            let pos = layout.getNodePosition(node.id)
+            let pos = this.layout.getNodePosition(node.id)
             let latLng = this.posToLatLng(pos, bounds)
             let markerPoint = node.data.origin._latlng
             let labelPoint = L.latLng(latLng[0], latLng[1])
