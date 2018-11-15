@@ -1,5 +1,5 @@
 <template>
-  <v-flex xs12 sm6 md4 lg3 xl2>
+  <v-flex xs6 sm6 md4 lg3 xl2>
     <v-card
       :ripple="{class: 'primary--text'}"
       :raised="selected === true"
