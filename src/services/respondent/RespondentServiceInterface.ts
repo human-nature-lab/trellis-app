@@ -6,8 +6,10 @@ import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
 
 export interface SearchFilter {
-  conditionTags: string[], // Array of condition tag names
-  geos: string[] // Array of geo ids
+  conditionTags?: string[],    // Array of condition tag names
+  geos?: string[]              // Array of geo ids
+  onlyCurrentGeo?: boolean     // Indicates that only current residents should be included
+  includeChildren?: boolean    // Indicates that nested respondents should be included
 }
 
 export default interface RespondentServiceInterface {

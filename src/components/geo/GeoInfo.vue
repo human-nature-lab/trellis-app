@@ -36,6 +36,7 @@
   import {Route} from 'vue-router'
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
+  import {SearchFilter} from "../../services/respondent/RespondentServiceInterface"
 
   export default Vue.extend({
     name: 'geo-info',
@@ -63,8 +64,8 @@
           query: {
             filters: JSON.stringify({
               geos: [this.geo.id],
-              include_children: true
-            })
+              includeChildren: true
+            } as SearchFilter)
           }
         })
       },

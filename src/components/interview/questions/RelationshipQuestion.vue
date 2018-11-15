@@ -99,7 +99,8 @@
       },
       baseRespondentFilters () {
         let filters = {
-          include_children: true
+          includeChildren: true,
+          onlyCurrentGeo: false
         }
         if (this.geoTypeParameterValue && this.baseAncestorIds.length) {
           filters.geos = this.baseAncestorIds.slice()

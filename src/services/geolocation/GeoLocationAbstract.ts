@@ -30,7 +30,6 @@ export default abstract class GeoLocationAbstract {
     }
     try {
       this.watchId = navigator.geolocation.watchPosition(this.onPosition.bind(this), err => {
-        debugger
         // @ts-ignore
         err.component = component
         logger.log(err)
