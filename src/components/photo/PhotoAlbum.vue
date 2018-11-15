@@ -7,14 +7,13 @@
     </v-toolbar>
     <v-layout row align-content-start wrap>
       <v-flex
-        xs3
+        xs6 sm6 md4 lg3 xl2
         v-for="photo in photos"
         :key="photo.id">
         <photo
           @click="showFull(photo)"
           :isCentered="true"
-          :height="height"
-          :width="width"
+          width="100%"
           :photo="photo">
         </photo>
       </v-flex>
