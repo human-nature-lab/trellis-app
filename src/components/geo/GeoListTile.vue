@@ -70,7 +70,7 @@
         index.push({
           name: 'GeoSearchWithMap',
           params: {
-            geoId: (this.geo.parentId) ? this.geo.parentId : this.geo.id
+            geoId: this.geo.id
           }
         })
       },
