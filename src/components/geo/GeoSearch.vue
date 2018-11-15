@@ -99,8 +99,8 @@
         default () {
           return {
             'no-parent': true,
-            include_children: false,
-            'study': singleton.study ? singleton.study.id : null
+            includeChildren: false,
+            study: singleton.study ? singleton.study.id : null
           }
         }
       },

@@ -1,4 +1,4 @@
-import RespondentServiceInterface from './RespondentServiceInterface'
+import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
@@ -51,7 +51,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return respondent
   }
 
-  async getSearchPage (studyId: string, query: string, filters, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
+  async getSearchPage (studyId: string, query: string, filters: SearchFilter, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
     const repository = await DatabaseService.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
     let q = queryBuilder.where('"respondent"."id" in (select respondent_id from study_respondent where study_id = :studyId)', {studyId: studyId})
@@ -94,7 +94,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       let geos = filters.geos.slice()
       let parentGeos = filters.geos.slice()
       const maxLimit = 10
-      if (filters.include_children) {
+      if (filters.includeChildren) {
         const geoRepo = await DatabaseService.getRepository(Geo)
         let hasMoreChildren = true;
         let c = 0;
@@ -116,7 +116,14 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       if (geos.length > 999) {
         throw new Error('Too many respondent geos')
       }
-      q = q.andWhere('"respondent"."id" in (select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geos))', { geos })
+      let subSelect = 'select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geos)'
+      let params = { geos }
+      // debugger
+      if (filters.onlyCurrentGeo) {
+        subSelect += ' and is_current = :onlyCurrentGeo'
+        params['onlyCurrentGeo'] = 1
+      }
+      q = q.andWhere(`"respondent"."id" in (${subSelect})`, params)
     }
 
     q = q.andWhere('"respondent"."deleted_at" is null')

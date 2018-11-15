@@ -1,5 +1,5 @@
 import http from '../http/AxiosInstance'
-import RespondentServiceInterface from './RespondentServiceInterface'
+import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
@@ -25,7 +25,8 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     let res = await http().get(`respondent/${respondentId}`)
     return new Respondent().fromSnakeJSON(res.data.respondent)
   }
-  async getSearchPage (studyId: string, query: string, filters, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
+  async getSearchPage (studyId: string, query: string, filters: SearchFilter, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
+    // TODO: Add is_current filter
     let params = {
       q: query,
       offset: page * size,
@@ -38,8 +39,11 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     if (filters.geos) {
       params['g'] = filters.geos.join(',')
     }
-    if (filters.include_children) {
-      params['i'] = filters.include_children
+    if (filters.includeChildren) {
+      params['i'] = filters.includeChildren
+    }
+    if (filters.onlyCurrentGeo) {
+      params['c'] = filters.onlyCurrentGeo
     }
     studyId = encodeURIComponent(studyId)
     let res = await http().get(`study/${studyId}/respondents/search`, {

@@ -199,7 +199,8 @@
         default: () => ({
           conditionTags: [],
           geos: [],
-          include_children: false
+          includeChildren: false,
+          onlyCurrentGeo: true
         })
       },
       selectedRespondents: {
