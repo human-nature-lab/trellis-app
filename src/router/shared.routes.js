@@ -16,10 +16,12 @@ import ValidateCensusForm from './guards/ValidateCensusForm'
 import ValidateCompletedSurvey from './guards/ValidateCompletedSurvey'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
 import WebLogin from '../components/login/WebLogin'
+import TrellisInfo from '../components/TrellisInfo'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
 const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../components/ServiceTesting')
 const LocationHistory = () => import(/* webpackChunkName: "location-history" */'../components/LocationHistory')
+// const TrellisInfo = () => import(/* webpackChunkName: "trellis-info" */'../components/TrellisInfo')
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
@@ -90,4 +92,8 @@ export default [{
   path: '/location-history',
   name: 'LocationHistory',
   component: LocationHistory
+}, {
+  path: '/info',
+  name: 'Info',
+  component: TrellisInfo
 }]

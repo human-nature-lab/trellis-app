@@ -15,6 +15,10 @@ class LoggingServiceWeb extends LoggingServiceAbstract {
     throw new Error('LoggingServiceWeb.getLogCount is unimplemented')
   }
 
+  async getUploadedCount (): Promise<number> {
+    throw new Error('LoggingServiceWeb.getUploadedCount is unimplemented')
+  }
+
 }
 
 export default LoggingServiceWeb
