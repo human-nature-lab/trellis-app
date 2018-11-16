@@ -16,6 +16,14 @@
               Upload logs
             </v-list-tile-content>
           </v-list-tile>
+          <v-list-tile @click="deleteLogs">
+            <v-list-tile-action>
+              <v-icon>delete</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              Delete logs
+            </v-list-tile-content>
+          </v-list-tile>
         </v-list>
       </v-menu>
     </v-toolbar>
@@ -75,6 +83,14 @@
         </v-container>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="deleteM.isOpen" :persistent="!deleteM.canExit">
+      <ModalTitle title="Delete logs" @close="deleteM.isOpen = false" />
+      <v-card>
+        <v-container>
+          <v-layout>{{deleteM.message}}</v-layout>
+        </v-container>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -84,6 +100,7 @@
   import Log from "../entities/trellis-config/Log"
   import ModalTitle from './ModalTitle'
   import uploadLogs from "../services/logging/UploadLogs"
+  import DeleteLogs from "../services/logging/DeleteLogs"
 
   export default Vue.extend({
     name: 'Logs',
@@ -120,6 +137,11 @@
           hasConnected: false,
           numToUpload: 0,
           numUploaded: 0
+        },
+        deleteM: {
+          isOpen: false,
+          canExit: false,
+          message: ''
         },
         error: null,
         fullLog: null,
@@ -169,6 +191,22 @@
           this.upload.message = err
         } finally {
           this.upload.isActive = false
+        }
+      },
+      async deleteLogs () {
+        if (confirm('Are you sure you would like to delete the logs?')) {
+          try {
+            this.deleteM.isOpen = true
+            this.deleteM.canExit = false
+            this.deleteM.message = 'Deleting'
+            await DeleteLogs()
+            this.deleteM.message = 'Logs have been deleted'
+          } catch (err) {
+            this.log(err)
+          } finally {
+            this.deleteM.canExit = true
+            this.loadPage()
+          }
         }
       }
     }
