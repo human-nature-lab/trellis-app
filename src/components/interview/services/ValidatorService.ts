@@ -1,4 +1,4 @@
-import v18n from '../../../i18n'
+import v18n from '../../../i18n/index'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import Question from '../../../entities/trellis/Question'
 import QuestionParameter from '../../../entities/trellis/QuestionParameter'

@@ -3,7 +3,7 @@ import DatabaseService from '../database/DatabaseService'
 import Photo from '../../entities/trellis/Photo'
 import uuid from 'uuid/v4'
 import PhotoServiceAbstract from './PhotoServiceAbstract'
-import {In} from "typeorm";
+import {In, IsNull} from "typeorm";
 
 declare global {
   interface Window {ImageResizer: any}
@@ -117,5 +117,20 @@ export default class PhotoServiceCordova extends PhotoServiceAbstract {
         quality: 100
       })
     })
+  }
+
+  async getPhotoCount (): Promise<number> {
+    const repo = await DatabaseService.getRepository(Photo)
+    return repo.count({
+      deletedAt: IsNull()
+    })
+  }
+
+  async getPhotoFileCount (): Promise<number> {
+    return FileService.countDirectoryFiles(await FileService.getPhotosDir())
+  }
+
+  async getPhotosSize (): Promise<number> {
+    return FileService.getDirectorySize(await FileService.getPhotosDir(), true)
   }
 }

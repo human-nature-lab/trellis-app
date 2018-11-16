@@ -49,7 +49,7 @@
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
-      <v-list-tile v-if="global.offline" :to="{name: 'Logs'}">
+      <!--<v-list-tile v-if="global.offline" :to="{name: 'Logs'}">
         <v-list-tile-action>
           <v-icon>error_outline</v-icon>
         </v-list-tile-action>
@@ -63,6 +63,14 @@
         </v-list-tile-action>
         <v-list-tile-title>
           Location History
+        </v-list-tile-title>
+      </v-list-tile>-->
+      <v-list-tile :to="{name: 'Info'}">
+        <v-list-tile-action>
+          <v-icon>info</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-title>
+          {{$t('information')}}
         </v-list-tile-title>
       </v-list-tile>
     </v-list>

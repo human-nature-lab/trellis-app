@@ -4,6 +4,7 @@ import LoggingServiceAbstract from './LoggingServiceAbstract'
 import Log from "../../entities/trellis-config/Log";
 import throttle from 'lodash/throttle'
 import {LogRequest} from "./LoggingTypes";
+import {IsNull, Not} from "typeorm";
 
 class LoggingServiceCordova extends LoggingServiceAbstract {
 
@@ -104,6 +105,18 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   public async getLogCount (): Promise<number> {
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.count()
+  }
+
+  public async getUploadedCount (): Promise<number> {
+    const repo = await DatabaseService.getConfigRepository(Log)
+    return repo.count({
+      uploadedAt: Not(IsNull())
+    })
+  }
+
+  public async deleteUploaded (): Promise<void> {
+    const repo = await DatabaseService.getConfigRepository(Log)
+    return repo.delete()
   }
 
 }
