@@ -290,7 +290,12 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     // Soft delete the previous respondent geo
     // await repository.update({id: respondentGeoId}, {deletedAt: new Date()})
 
-    return newRespondentGeo
+    return repository.findOne({
+      where: {
+        id: newRespondentGeo.id
+      },
+      relations: ['geo', 'geo.geoType', 'geo.nameTranslation']
+    })
   }
 
   async removeRespondentGeo (respondentId, respondentGeoId) {

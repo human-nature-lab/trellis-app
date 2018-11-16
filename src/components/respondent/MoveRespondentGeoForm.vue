@@ -8,36 +8,49 @@
         :title="$t('move_respondent_location')"
         @close="$emit('input', false)" />
       <v-card-text>
-        <v-container fluid v-if="respondentGeo">
-          <v-layout>
-            Moving from:
-            <v-chip
-              color="primary"
-              outline
-              label>
-              <AsyncTranslationText v-if="respondentGeo.geo" :translation="respondentGeo.geo.nameTranslation" />
-              <span v-else>{{$t('unknown_location')}}</span>
-            </v-chip>
-          </v-layout>
-          <v-layout wrap>
-            <v-flex v-if="newGeo" sm6 md3>
-              Moving to:
+        <v-container fluid>
+          <v-layout row wrap align-center>
+            <v-flex xs4>
+              Moving from:
+            </v-flex>
+            <v-flex xs8>
               <v-chip
-                :disabled="moveToUnknown"
+                color="primary"
+                outline
+                label
+                v-if="respondentGeo !== null">
+                <AsyncTranslationText v-if="respondentGeo.geo" :translation="respondentGeo.geo.nameTranslation" />
+                <span v-if="respondentGeo.geo === null">{{$t('unknown_location')}}</span>
+              </v-chip>
+            </v-flex>
+          </v-layout>
+          <v-layout row wrap align-center v-if="newGeo || moveToUnknown">
+            <v-flex xs4>
+              Moving to:
+            </v-flex>
+            <v-flex xs8>
+              <v-chip
                 color="primary"
                 outline
                 label>
-                <AsyncTranslationText :translation="newGeo.nameTranslation" />
+                <AsyncTranslationText v-if="newGeo && !moveToUnknown" :translation="newGeo.nameTranslation" />
+                <span v-if="moveToUnknown">{{$t('unknown_location')}}</span>
               </v-chip>
             </v-flex>
-            <v-flex sm6 md3>
+          </v-layout>
+          <v-layout row wrap>
+            <v-spacer></v-spacer>
+            <v-flex xs6>
               <v-btn
                 :disabled="moveToUnknown"
                 @click="isSearchOpen = true">
                 {{$t('select_location')}}
               </v-btn>
             </v-flex>
-            <v-flex sm6 md3>
+          </v-layout>
+          <v-layout row wrap mt-3>
+            <v-spacer></v-spacer>
+            <v-flex xs6>
               <v-checkbox
                 v-model="moveToUnknown"
                 :label="$t('unknown_location')" />
@@ -107,7 +120,6 @@
           let rGeo
           if (this.moveToUnknown) {
             rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, null)
-            debugger
           } else if (this.newGeo && this.newGeo.id === this.respondentGeo.geoId) {
             return
           } else {
