@@ -1,6 +1,6 @@
 <template>
   <v-layout row class="cart">
-    <v-flex xs9 >
+    <v-flex xs8>
       <v-layout row class="items">
         <div
           v-for="item in items"
@@ -13,7 +13,7 @@
         </div>
       </v-layout>
     </v-flex>
-    <v-flex xs3>
+    <v-flex xs4>
       <v-btn @click="$emit('done')">
         {{ $t('done') }}
       </v-btn>
