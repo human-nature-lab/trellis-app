@@ -61,4 +61,12 @@ export default class PhotoServiceWeb extends PhotoServiceAbstract {
     console.error('Need to implement this in WEB')
     return new Photo()
   }
+
+  async getPhotoCount (): Promise<number> {
+    throw Error('getPhotoCount is unimplemented')
+  }
+
+  async getPhotoFileCount (): Promise<number> {
+    throw Error('getPhotoFileCount is unimplemented')
+  }
 }

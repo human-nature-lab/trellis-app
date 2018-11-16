@@ -1,7 +1,7 @@
-import Sync from '../components/sync/Sync'
-import Logs from '../components/Logs'
-// const Sync = () => import()
-// const Logs = () => import(/* webpackChunkName: "logs" */'../components/Logs')
+// import Sync from '../components/sync/Sync'
+// import Logs from '../components/Logs'
+const Sync = () => import(/* webpackChunkName: "sync" */'../components/sync/Sync')
+const Logs = () => import(/* webpackChunkName: "logs" */'../components/Logs')
 
 export default [{
   path: '/',

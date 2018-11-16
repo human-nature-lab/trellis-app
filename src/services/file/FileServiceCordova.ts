@@ -292,6 +292,50 @@ class FileServiceCordova {
     })
   }
 
+  countDirectoryFiles (dir: DirectoryEntry): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      dir.createReader().readEntries((entries: Entry[]) => {
+        resolve(entries.length)
+      }, err => {
+        reject(err)
+      })
+    })
+  }
+
+  getDirectorySize (dir: DirectoryEntry, includeChildren: boolean = false): Promise<number> {
+    return new Promise((resolve, reject) => {
+      dir.getMetadata((meta: Metadata) => {
+        if (!includeChildren) {
+          resolve(meta.size)
+        } else {
+          // Count size of each entry
+          dir.createReader().readEntries((entries: Entry[]) => {
+            let size = meta.size
+            let processedCount = 0
+            let errorCount = 0
+            function fileFinished () {
+              processedCount++
+              if (processedCount >= entries.length) {
+                resolve(size)
+              }
+            }
+            entries.forEach(entry => {
+              entry.getMetadata((meta: Metadata) => {
+                size += meta.size
+                fileFinished()
+              }, err => {
+                errorCount++
+                fileFinished()
+              })
+            })
+          })
+        }
+      }, err => {
+        reject(err)
+      })
+    })
+  }
+
   static getDefaultRequestFileSystemOptions (): FileSystemOptions {
     return {
       storageType: StorageType.PERSISTENT,

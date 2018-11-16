@@ -1,13 +1,12 @@
 // import Interview from '../components/interview/Interview'
-import RespondentForms from '../components/respondent/RespondentForms'
-import RespondentsSearch from '../components/respondent/RespondentsSearch'
-import RespondentInfo from '../components/respondent/RespondentInfo'
-import CameraTest from '../components/CameraTest'
-import Geo from '../components/geo/Geo'
-import GeoInfo from '../components/geo/GeoInfo'
-import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
-import LocaleSelectorPage from '../components/LocaleSelectorPage'
-import StudySelectorPage from '../components/StudySelectorPage'
+// import RespondentForms from '../components/respondent/RespondentForms'
+// import RespondentsSearch from '../components/respondent/RespondentsSearch'
+// import RespondentInfo from '../components/respondent/RespondentInfo'
+import Geo from '../components/geo/Geo' // Do we still use this?
+// import GeoInfo from '../components/geo/GeoInfo'
+// import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
+// import LocaleSelectorPage from '../components/LocaleSelectorPage'
+// import StudySelectorPage from '../components/StudySelectorPage'
 import SurveyComplete from '../components/interview/SurveyComplete'
 import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
@@ -16,10 +15,19 @@ import ValidateCensusForm from './guards/ValidateCensusForm'
 import ValidateCompletedSurvey from './guards/ValidateCompletedSurvey'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
 import WebLogin from '../components/login/WebLogin'
+// import TrellisInfo from '../components/TrellisInfo'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
 const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../components/ServiceTesting')
 const LocationHistory = () => import(/* webpackChunkName: "location-history" */'../components/LocationHistory')
+const TrellisInfo = () => import(/* webpackChunkName: "trellis-info" */'../components/TrellisInfo')
+const GeoSearchWithMap = () => import(/* webpackChunkName: "geo-search" */'../components/geo/GeoSearchWithMap')
+const LocaleSelectorPage = () => import(/* webpackChunkName: "locale-selector" */'../components/LocaleSelectorPage')
+const StudySelectorPage = () => import(/* webpackChunkName: "study-selector" */'../components/StudySelectorPage')
+const RespondentsSearch = () => import(/* webpackChunkName: "respondent-search" */'../components/respondent/RespondentsSearch')
+const RespondentForms = () => import(/* webpackChunkName: "respondent-forms" */'../components/respondent/RespondentForms')
+const RespondentInfo = () => import(/* webpackChunkName: "respondent-info" */'../components/respondent/RespondentInfo')
+const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'../components/geo/GeoInfo')
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
@@ -41,10 +49,6 @@ export default [{
   name: 'locale',
   component: LocaleSelectorPage,
   beforeEnter: ValidateStudy
-}, {
-  path: '/camera',
-  name: 'camera',
-  component: CameraTest
 }, {
   path: '/search/locations',
   name: 'GeoSearch',
@@ -90,4 +94,8 @@ export default [{
   path: '/location-history',
   name: 'LocationHistory',
   component: LocationHistory
+}, {
+  path: '/info',
+  name: 'Info',
+  component: TrellisInfo
 }]

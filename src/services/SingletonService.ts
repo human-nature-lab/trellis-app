@@ -2,7 +2,7 @@ import singleton from '../static/singleton'
 import storage from './StorageService'
 import LocaleService from './locale/LocaleService'
 import StudyService from './study/StudyService'
-import i18n from '../i18n'
+import i18n from '../i18n/index'
 import moment from 'moment'
 import DeviceService from "./device/DeviceService";
 

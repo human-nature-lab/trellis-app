@@ -14,7 +14,7 @@ function resolve (dir) {
 module.exports = {
   target: 'web',
   entry: {
-    app: ['babel-polyfill', './src/main.js']
+    app: ['babel-polyfill', './src/main.ts']
   },
   output: {
     path: config.build.assetsRoot,
@@ -25,17 +25,22 @@ module.exports = {
     chunkFilename: '[id].[hash:8].js'
   },
   optimization: {
-    // usedExports: true,
+    usedExports: true,
     // concatenateModules: true,
     // minimize: true,
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
-        commons: {
-          test: /[\\/]node_modules[\\/]/,
-          name: "vendor",
-          chunks: "all",
+        cordova: {
+          test: /\/services\/.*Cordova\.[jt]sx?$/,
+          name: 'cordova-services',
+          chunks: 'all'
         },
+        web: {
+          test: /\/services\/.*Web\.[jt]sx?$/,
+          name: 'web-services',
+          chunks: 'all'
+        }
       },
     },
   },
