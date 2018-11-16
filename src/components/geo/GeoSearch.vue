@@ -57,7 +57,7 @@
       <div class="geo-list">
         <v-list v-if="results.length">
           <geo-list-tile
-            v-for="geo in results"
+            v-for="geo in orderedResults"
             :isSelectable="geoIsSelectable(geo)"
             :selected="isGeoSelected(geo)"
             @click="onGeoClick(geo)"
@@ -65,6 +65,16 @@
             :key="geo.id"
             :geo="geo">
           </geo-list-tile>
+          <v-list-tile v-if="results.length === defaultSearchResultsLimit">
+            <v-list-tile-content>
+              <v-list-tile-title>
+                {{ $t('displaying_first_results',[defaultSearchResultsLimit]) }}
+              </v-list-tile-title>
+              <v-list-tile-sub-title>
+                {{ $t('use_search_field_results') }}
+              </v-list-tile-sub-title>
+            </v-list-tile-content>
+          </v-list-tile>
         </v-list>
         <v-flex v-else>
           <span v-if="isSearching">{{ $t('searching') }}</span>
@@ -86,6 +96,8 @@
   import singleton from '../../static/singleton'
   import router from '../../router'
   import Vue from 'vue'
+  import global from '../../static/singleton'
+
   export default {
     router,
     name: 'geo-search',
@@ -127,6 +139,7 @@
     },
     data: function () {
       return {
+        defaultSearchResultsLimit: GeoService.getDefaultSearchResultsLimit(),
         global: singleton,
         userFilters: {
           parent: null,
@@ -151,6 +164,15 @@
     computed: {
       filters () {
         return Object.assign({}, this.baseFilters, this.userFilters)
+      },
+      orderedResults () {
+        function compare(a, b) {
+          const aName = a.nameTranslation.translationText.find((tt) => tt.localeId === global.locale.id).translatedText
+          const bName = b.nameTranslation.translationText.find((tt) => tt.localeId === global.locale.id).translatedText
+          // TODO: je104 comes before je004, would need to split into numeric and non-numeric and sort separately
+          return aName.localeCompare(bName)
+        }
+        return this.results.sort(compare)
       },
       selectedIds () {
         return this.selectedGeos.map(g => g.id)
@@ -280,6 +302,8 @@
 </script>
 
 <style lang="sass">
+  .list__tile__title
+    height: 30px
   .geo-search
     margin-bottom: 60px
   .move-up
