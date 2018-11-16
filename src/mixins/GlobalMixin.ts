@@ -22,3 +22,11 @@ export default Vue.mixin({
     }
   }
 })
+
+declare module 'vue/types/vue' {
+  interface Vue {
+    log (log: any): Promise<Log>
+    isWeb: boolean
+    isCordova: boolean
+  }
+}

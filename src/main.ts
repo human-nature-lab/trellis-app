@@ -6,12 +6,13 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.css'
 import VueCordova from 'vue-cordova'
 import VueHead from 'vue-head'
-import i18n from './i18n'
-import Debug from './components/Debug'
+import i18n from './i18n/index'
 import './mixins/GlobalMixin'
 import 'typeface-roboto/index.css'
 import 'material-design-icons-iconfont'
-
+// @ts-ignore
+import Debug from './components/Debug'
+// @ts-ignore
 import WebApp from './WebApp'
 import router from './router'
 
@@ -49,6 +50,7 @@ export default new Vue({
   components: {
     WebApp
   },
+  // @ts-ignore
   head: {
     meta: [
       {

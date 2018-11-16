@@ -28,6 +28,7 @@ export default abstract class LoggingServiceAbstract {
   abstract async log (_request):Promise<Log|void>
   abstract async getLogPage (page: number, limit: number|null): Promise<Log[]>
   abstract async getLogCount (): Promise<number>
+  abstract async getUploadedCount (): Promise<number>
 
   createLog (_request: LogRequest): Log {
     if (_request === null || _request === undefined) {

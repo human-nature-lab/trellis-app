@@ -64,7 +64,7 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Status</th>
+                <th>{{$t('interview_status')}}</th>
                 <th class="a-left">
                   {{ $t('interviews') }}
                 </th>

@@ -26,4 +26,16 @@ export default abstract class PhotoServiceAbstract {
    * @returns {Promise<Photo>}
    */
   abstract takePhoto (): Promise<Photo>
+
+  /**
+   * Return the count of photos in the database.
+   * @returns {Promise<number>}
+   */
+  abstract getPhotoCount (): Promise<number>
+
+  /**
+   * Get the count of photos on the file system
+   * @returns {Promise<number>}
+   */
+  abstract getPhotoFileCount (): Promise<number>
 }
