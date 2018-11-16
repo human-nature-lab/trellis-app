@@ -57,7 +57,7 @@ remove_location,Remove this location,Remover esta ubicación,
 move_respondent_location,Move this respondent location,Mover la ubicación de este participante,
 not_started,Not started,No iniciado (or iniciada depending on what you're referring to),
 interviews,Interviews,Entrevistas,
-status,Status,Estado (de la entrevista),"The state of the interview (completed, in progress...)"
+interview_status,Status,Estado (de la entrevista),"The state of the interview (completed, in progress...)"
 surveyor,Surveyor,Encuestador,
 start_time,Start time,Hora de inicio (de la entrevista),
 end_time,End time,Hora del fin (de la entrevista),
@@ -158,7 +158,7 @@ detecting_location_message_age,This message will update each time a location is 
 detecting_location_no,Skip Trellis requires your permission to access the device camera.,Omitir,
 detecting_location_title,Detecting location... Trellis requires your permission to access the device storage.,Detectando la ubicación...,
 detecting_location_yes,Save last-known location,Guardar la última ubicación conocida,
-device_id,device id,ID del dispositivo,
+device_id,Device ID,ID del dispositivo,
 device_name,device name,nombre de dispositivo,
 device_not_found,Device not Found!,¡Dispositivo no encontrado!,
 device_not_found_in_device_table,DeviceId {0} not found in device table,"ID {0} no se encuentra en la tabla del dispositivo, consulte el administrador para corregir",
@@ -400,3 +400,18 @@ select,Select,Seleccionar,
 logs,Logs,,
 page,Page,,The current page within the section
 repetition,Repetition,,The current repetition of the the section
+information,Information,,Menu item
+storage,Storage,,Referencing files and database
+device,Device,,
+status,Status,,
+pending,Pending,,
+last_updated,Last updated,,
+working,Working,,Functioning correctly
+uploaded,Uploaded,,A count of entries moved to the server
+pending_photos,Pending photos,,
+pending_rows,Pending rows,,
+db_photos,DB Photos,,Photos in the database
+size,Size,,Amount of space used by the files
+device_photos,Device photos,,Photos actually on device
+version,Version,,Label for version of the software
+server_url,Server URL,URL del servidor,
