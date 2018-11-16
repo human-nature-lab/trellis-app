@@ -14,7 +14,7 @@ function resolve (dir) {
 module.exports = {
   target: 'web',
   entry: {
-    app: ['babel-polyfill', './src/main.js']
+    app: ['babel-polyfill', './src/main.ts']
   },
   output: {
     path: config.build.assetsRoot,

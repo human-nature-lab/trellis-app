@@ -4,7 +4,8 @@ import DatabaseService from './database/DatabaseService'
 import DeviceService from './device/DeviceService'
 import { syncInstance } from './http/AxiosInstance'
 import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
-import {Connection} from 'typeorm'
+import {Connection, IsNull} from 'typeorm'
+import Photo from "../entities/trellis/Photo";
 
 /**
  * Max number of rows to write to upload file at a time.
@@ -62,7 +63,7 @@ class SyncService {
     return http.get(`list-uploads`)
   }
 
-  async getMissingPhotos (source: CancelTokenSource) {
+  async getMissingPhotos (source?: CancelTokenSource) {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const deviceId = await DeviceService.getUUID()
@@ -244,6 +245,12 @@ class SyncService {
     }
 
     return updatedPhotos
+  }
+
+  async getNewPhotosCount (): Promise<number> {
+    const conn = await DatabaseService.getDatabase()
+    const res = await conn.query('select count(*) as c from updated_records where table_name = "photo"')
+    return res[0].c
   }
 
 }

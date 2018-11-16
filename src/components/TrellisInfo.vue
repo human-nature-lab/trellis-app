@@ -6,17 +6,21 @@
             <v-card-text>
               <v-container>
                 <v-layout class="display-1 mb-2">{{cat.title}}</v-layout>
-                <v-layout row v-for="pair in cat.items">
+                <v-layout v-if="cat.component" :is="cat.component"></v-layout>
+                <v-layout v-else row v-for="pair in cat.items">
                   <v-flex class="subheading">{{pair.key}}</v-flex>
                   <v-spacer />
-                  <v-flex
-                    class="text-sm-right body-2"
-                    v-if="pair.val !== null">{{pair.val}}</v-flex>
-                  <v-progress-circular
-                    v-else
-                    color="primary"
-                    indeterminate
-                    :size="16" />
+                  <v-flex v-if="pair.component" class="text-sm-right body-2">
+                    <component :is="pair.component"></component>
+                  </v-flex>
+                  <v-flex v-else class="text-sm-right body-2">
+                    <span v-if="pair.val !== null">{{pair.val}}</span>
+                    <v-progress-circular
+                      v-else
+                      color="primary"
+                      indeterminate
+                      :size="16" />
+                  </v-flex>
                 </v-layout>
               </v-container>
             </v-card-text>
@@ -28,25 +32,31 @@
 
 <script lang="ts">
   import DeviceService from "../services/device/DeviceService"
+  import GeoLocationService from '../services/geolocation'
 
   declare const VERSION: string
-  import Vue from 'vue'
+  import Vue, {Component} from 'vue'
   import global from '../static/singleton'
   import DatabaseService from '../services/database/DatabaseService'
   import PhotoService from "../services/photo/PhotoService"
   import {defaultLoggingService as logger} from '../services/logging/LoggingService'
   import {RawLocation} from "vue-router/types/router"
   import formatBytesFilter from '../filters/format-bytes.filter'
+  import SyncService from "../services/SyncService"
+  import moment from 'moment'
+  import {TranslateResult} from "vue-i18n"
 
   interface KeyPair {
-    key: string
-    val: any
+    key: TranslateResult
+    val?: any,
+    component?: Component
   }
 
   interface Category {
-    title: string
+    title: TranslateResult
     items: KeyPair[]
     to?: RawLocation
+    component?: Component
   }
 
   export default Vue.extend({
@@ -62,7 +72,8 @@
         uploadEntries: 0,
         logEntries: 0,
         deviceId: null,
-        serverUrl: null
+        serverUrl: null,
+        gpsInterval: null
       }
     },
     created () {
@@ -70,21 +81,27 @@
       this.loadStorage()
       this.loadUploads()
       this.loadLogs()
+      this.loadGPS()
+    },
+    beforeDestroy () {
+      if (this.gpsInterval) {
+        clearInterval(this.gpsInterval)
+      }
     },
     methods: {
       loadDevice () {
         const device = {
-          key: 'Device Id',
+          key: this.$t('device_id'),
           val: null
         }
         const server = {
-          key: 'Server URL',
+          key: this.$t('server_url'),
           val: null
         }
         this.categories.push({
-          title: "Device",
+          title: this.$t('device'),
           items: [{
-            key: 'Version',
+            key: this.$t('version'),
             val: this.version
           }, device, server]
         })
@@ -97,19 +114,19 @@
       },
       loadStorage () {
         const photoFiles = {
-          key: 'Device Photos',
+          key: this.$t('device_photos'),
           val: null
         }
         const photoEntries = {
-          key: 'DB Photos',
+          key: this.$t('db_photos'),
           val: null
         }
         const photosSize = {
-          key: 'Size',
+          key: this.$t('size'),
           val: null
         }
         this.categories.push({
-          title: 'Storage',
+          title: this.$t('storage'),
           items: [photoFiles, photoEntries, photosSize]
         })
         PhotoService.getPhotoCount().then(c => photoEntries.val = c)
@@ -117,22 +134,24 @@
         PhotoService.getPhotosSize().then(size => photosSize.val = formatBytesFilter(size))
       },
       loadUploads () {
-        const files = {key: 'Files', val: null}
-        const pending = {key: 'Pending', val: null}
+        const pendingPhotos = {key: this.$t('pending_photos'), val: null}
+        const pendingRows = {key:  this.$t('pending_rows'), val: null}
         this.categories.push({
-          title: "Uploads",
+          title: this.$t('uploads'),
           items: [
-            files,
-            pending
-          ]
+            pendingPhotos,
+            pendingRows
+          ],
+          to: {name: 'Sync'}
         })
-        DatabaseService.getUpdatedRecordsCount().then(c => pending.val = c)
+        SyncService.getNewPhotosCount().then(c => pendingPhotos.val = c)
+        DatabaseService.getUpdatedRecordsCount().then(c => pendingRows.val = c)
       },
       loadLogs () {
-        const totalLogs = {key: 'Logs', val: null}
-        const uploaded = {key: 'Uploaded', val: null}
+        const totalLogs = {key: this.$t('logs'), val: null}
+        const uploaded = {key: this.$t('uploaded'), val: null}
         this.categories.push({
-          title: 'Logs',
+          title: this.$t('logs'),
           items: [
             totalLogs,
             uploaded
@@ -141,6 +160,51 @@
         })
         logger.getLogCount().then(c => totalLogs.val = c)
         logger.getUploadedCount().then(c => uploaded.val = c)
+      },
+      loadGPS () {
+        const statusData = {
+          classes: ['red', 'red--text'],
+          status: this.$t('pending')
+        }
+        const status = {
+          key: this.$t('status'),
+          component: {
+            template: '<v-chip label outline :class="classes">{{status}}</v-chip>',
+            data () {return statusData}
+          }
+        }
+        const updateData = {
+          classes: ['yellow', 'green--text'],
+          label: this.$t('pending')
+        }
+        const lastUpdate = {
+          key: this.$t('last_updated'),
+          component: {
+            template: '<v-chip label outline :class="classes">{{label}}</v-chip>',
+            data () {return updateData}
+          }
+        }
+        this.categories.push({
+          title: 'GPS',
+          items: [status, lastUpdate],
+          to: {name: 'LocationHistory'}
+        })
+        this.gpsInterval = setInterval(async () => {
+          // TODO: Check that the latest update was at a reasonable time
+          const isWorking = await GeoLocationService.hasPositionHistory()
+          statusData.status = isWorking ? this.$t('working') : this.$t('pending')
+          statusData.classes = isWorking ? ['green', 'green--text'] : ['red', 'red--text']
+          const lastUpdatedPosition = await GeoLocationService.getLatestPosition()
+          if (lastUpdatedPosition) {
+            const lastUpdated = moment(lastUpdatedPosition.timestamp + 4000)
+            const tol = 5 * 60 * 1000
+            const withinTol = Date.now() - lastUpdatedPosition.timestamp < tol
+            updateData.label = lastUpdated.fromNow()
+            updateData.classes = withinTol ? ['green', 'green--text'] : ['red', 'red--text']
+          } else {
+            updateData.label = this.$t('none')
+          }
+        }, 2000)
       }
     }
   })

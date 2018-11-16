@@ -5,6 +5,7 @@ import {IsNull} from "typeorm";
 import merge from 'lodash/merge'
 import DeviceService from "../device/DeviceService";
 
+
 interface LogUploadOptions {
   progress?: Function
   batchSize?: number
