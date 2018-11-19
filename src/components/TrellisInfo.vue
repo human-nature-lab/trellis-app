@@ -1,7 +1,7 @@
 <template>
     <v-container class="ma-1" grid-list-sm fluid>
       <v-layout row wrap>
-        <v-flex xs6 v-for="cat in categories">
+        <v-flex xs12 sm12 md6 lg6 xl6 v-for="cat in categories">
           <v-card :ripple="!!cat.to" tile :to="cat.to">
             <v-card-text>
               <v-container>
