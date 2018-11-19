@@ -4,7 +4,12 @@
         <v-list>
           <v-list-tile v-for="geo in geos" :key="geo.id">
             <v-list-tile-content>
-              {{geo.nameTranslation ? translate(geo) : $t('loading')}}
+              <span v-if="geo.nameTranslation">
+                <async-translation-text :translation="geo.nameTranslation"></async-translation-text>
+              </span>
+              <span v-else>
+                {{ $t('loading') }}
+              </span>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -40,6 +45,7 @@
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
   import global from '../../../static/singleton'
+  import AsyncTranslationText from '../../AsyncTranslationText.vue'
   export default {
     name: 'geo-question',
     mixins: [ActionMixin],
@@ -149,6 +155,7 @@
       }
     },
     components: {
+      AsyncTranslationText,
       GeoSearch,
       GeoListTile
     }
