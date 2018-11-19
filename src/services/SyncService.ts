@@ -5,7 +5,8 @@ import DeviceService from './device/DeviceService'
 import { syncInstance } from './http/AxiosInstance'
 import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
 import {Connection, IsNull} from 'typeorm'
-import Photo from "../entities/trellis/Photo";
+import LoginService from '../services/login'
+import global from '../static/singleton'
 
 /**
  * Max number of rows to write to upload file at a time.
@@ -124,20 +125,18 @@ class SyncService {
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     await repository.update({id: _sync.id}, {completedAt: new Date(), status: 'success'})
-    /* TODO: For debug purposes only */
-    const syncs = await repository.find()
-    console.debug('syncs', syncs)
-    /* For debug purposes only */
+    // Log out user, un-set study, locale (in case User, Study, Locale tables have changed)
+    await LoginService.logout()
+    global.study = null
+    global.locale = null
+    // TODO: is this necessary
+    global.user = null
   }
 
   async registerCancelledSync (_sync: Sync): Promise<void> {
     const connection = await DatabaseService.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     await repository.update({id: _sync.id}, {status: 'cancelled'})
-    /* TODO: For debug purposes only */
-    const syncs = await repository.find()
-    console.debug('syncs', syncs)
-    /* For debug purposes only */
   }
 
   async verifyUpload (fileEntry, md5hash) {
