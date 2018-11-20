@@ -32,6 +32,10 @@
       showAncestors: {
         type: Boolean,
         default: true
+      },
+      maxDepth: {
+        type: Number,
+        default: 0
       }
     },
     data () {
@@ -57,7 +61,10 @@
         if (!this.geoId) return
         this.isLoading = true
         GeoService.getGeoAncestors(this.geoId).then(ancestors => {
-          this.ancestors = ancestors
+          this.ancestors = ancestors.slice()
+          if (this.maxDepth) {
+            this.ancestors.splice(0, this.ancestors.length - this.maxDepth)
+          }
         }).catch(err => {
           this.error = err
         }).finally(() => {

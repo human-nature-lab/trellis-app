@@ -2,6 +2,7 @@ import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
 import config from '../../config'
 import merge from 'lodash/merge'
+import CancellablePromise from "../../classes/CancellablePromise";
 declare var md5chksum, FileTransfer, cordova
 /* global md5chksum, FileTransfer */
 
@@ -302,37 +303,56 @@ class FileServiceCordova {
     })
   }
 
-  getDirectorySize (dir: DirectoryEntry, includeChildren: boolean = false): Promise<number> {
-    return new Promise((resolve, reject) => {
+  getDirectorySize (dir: DirectoryEntry, includeChildren: boolean = false): CancellablePromise<number> {
+    let isCancelled = false
+    return new CancellablePromise((resolve, reject) => {
       dir.getMetadata((meta: Metadata) => {
         if (!includeChildren) {
           resolve(meta.size)
         } else {
           // Count size of each entry
           dir.createReader().readEntries((entries: Entry[]) => {
+            const totalCount = entries.length
             let size = meta.size
             let processedCount = 0
             let errorCount = 0
-            function fileFinished () {
-              processedCount++
-              if (processedCount >= entries.length) {
-                resolve(size)
+            const batchSize = 500
+            function processBatch () {
+              const batchEntries: Entry[] = entries.splice(0, batchSize)
+              const totalBatchCount = batchEntries.length
+              let batchCount = 0
+              console.log('processing', totalBatchCount, 'total', totalCount, 'remaining', entries.length)
+              function checkBatchFinished () {
+                if (processedCount >= totalCount || isCancelled) {
+                  resolve(size)
+                } else if (batchCount >= totalBatchCount) {
+                  processBatch()
+                }
               }
-            }
-            entries.forEach(entry => {
-              entry.getMetadata((meta: Metadata) => {
-                size += meta.size
-                fileFinished()
-              }, err => {
-                errorCount++
-                fileFinished()
+              checkBatchFinished()
+              batchEntries.forEach(entry => {
+                entry.getMetadata((meta: Metadata) => {
+                  size += meta.size
+                  processedCount++
+                  batchCount++
+                  checkBatchFinished()
+                }, err => {
+                  errorCount++
+                  processedCount++
+                  batchCount++
+                  checkBatchFinished()
+                })
               })
-            })
+            }
+            processBatch()
           })
         }
       }, err => {
         reject(err)
       })
+    }, () => {
+      console.log('cancelling')
+      isCancelled = true
     })
   }
 

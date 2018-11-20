@@ -16,42 +16,83 @@
           {{ $t('done') }}
         </span>
       </v-btn>
+      <v-btn icon @click="filtersIsOpen = !filtersIsOpen">
+        <v-icon v-if="filtersIsOpen">keyboard_arrow_up</v-icon>
+        <v-icon v-else>keyboard_arrow_down</v-icon>
+      </v-btn>
     </v-layout>
-    <v-layout>
-      <v-select
-        :items="conditionTags"
-        v-model="filters.conditionTags"
-        :label="$t('condition_tags')"
-        single-line
-        dense
-        chips
-        tags
-        @input="onQueryChange"
-        :loading="conditionTagsLoading"
-        autocomplete></v-select>
-      <v-tooltip bottom>
-        <v-btn
-          slot="activator"
-          icon
-          @click="clearFilters">
-          <v-icon>clear</v-icon>
-        </v-btn>
-        <span>
-          {{ $t('clear') }}
-        </span>
-      </v-tooltip>
-    </v-layout>
-    <v-layout v-if="filters.geos && filters.geos.length">
-      <span>
-        {{ $t('geo_search_filter') }}
-      </span>
-      <v-chip
-        v-for="(geo, index) in filters.geos"
-        :key="geo.id"
-        @input="removeGeoFilter(index)"
-        :close="canRemoveGeos">
-        <geo-breadcrumbs :geo-id="geo" :show-ancestors="false"></geo-breadcrumbs>
-      </v-chip>
+    <v-scale-transition>
+      <v-layout column v-if="filtersIsOpen">
+        <v-flex>
+          <v-layout>
+            <v-select
+              :items="conditionTags"
+              v-model="filters.conditionTags"
+              :label="$t('condition_tags')"
+              single-line
+              dense
+              chips
+              tags
+              @input="onQueryChange"
+              :loading="conditionTagsLoading"
+              autocomplete>
+              <v-chip
+                slot="selection"
+                slot-scope="props"
+                outline
+                color="primary">
+                <v-avatar>
+                  <v-icon>label</v-icon>
+                </v-avatar>
+                {{props.item}}
+              </v-chip>
+            </v-select>
+            <v-tooltip bottom>
+              <v-btn
+                slot="activator"
+                icon
+                @click="clearFilters">
+                <v-icon>clear</v-icon>
+              </v-btn>
+              <span>
+                {{ $t('clear') }}
+              </span>
+            </v-tooltip>
+          </v-layout>
+          <v-layout row wrap>
+            <v-flex>
+              <v-checkbox
+                v-model="filters.includeChildren"
+                :label="$t('include_child_locations')" />
+            </v-flex>
+            <v-flex>
+              <v-checkbox
+                :value="!filters.onlyCurrentGeo"
+                @input="filters.onlyCurrentGeo = !filter.onlyCurrentGeo"
+                :label="$t('show_past_residents')" />
+            </v-flex>
+          </v-layout>
+        </v-flex>
+      </v-layout>
+    </v-scale-transition>
+    <v-layout row wrap v-if="filters.geos && filters.geos.length">
+      <v-flex>
+        {{ $t('filters') }}
+      </v-flex>
+      <v-flex v-for="(geo, index) in filters.geos"
+              :key="geo.id">
+        <v-chip
+          color="primary"
+          @input="removeGeoFilter(index)"
+          :close="canRemoveGeos">
+          <v-avatar>
+            <v-icon>home</v-icon>
+          </v-avatar>
+          <GeoBreadcrumbs
+            :geoId="geo"
+            :maxDepth="2" />
+        </v-chip>
+      </v-flex>
     </v-layout>
     <v-layout v-if="selected.length > 0">
       <v-flex>
@@ -85,14 +126,15 @@
     </v-alert>
     <v-container class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
-        <respondent-item
+        <RespondentItem
           v-for="respondent in respondentResults"
           :key="respondent.id"
           :formsButtonVisible="formsButtonVisible"
           :infoButtonVisible="infoButtonVisible"
           @selected="onSelectRespondent(respondent)"
           :selected="isSelected(respondent)"
-          :respondent="respondent"></respondent-item>
+          :respondent="respondent"
+          :labels="getRespondentLabels(respondent)"/>
       </v-layout>
       <v-layout v-if="!respondentResults.length" ma-3>
         {{ $t('no_results') }}: {{query}}
@@ -242,12 +284,16 @@
         conditionTagsLoaded: false,
         conditionTagsLoading: false,
         isLoading: false,
-        showAssociatedRespondentDialog: false
+        showAssociatedRespondentDialog: false,
+        filtersIsOpen: false
       }
     },
     created () {
       if (this.shouldUpdateRoute) {
         loadRoute(this)
+        if (this.filters.conditionTags.length) {
+          this.filtersIsOpen = true
+        }
       }
       this.loadConditionTags()
       this.getCurrentPage()
@@ -258,9 +304,6 @@
       },
       removeGeoFilter (index) {
         this.filters.geos.splice(index, 1)
-        this.search().then(() => {
-          updateRoute(this)
-        })
       },
       translate (translation) {
         return TranslationService.getAny(translation, this.global.locale.id)
@@ -347,12 +390,33 @@
         let rName = respondent.names.find(n => n.isDisplayName)
         return rName ? rName.name : this.respondent.name
       },
+      getRespondentLabels (respondent) {
+        if (!this.showLabels) return []
+        const labels = []
+        // let isPastResident = true
+        // for (let geo of respondent.geos) {
+        //   if (geo.isCurrent && this.filters.geos.indexOf(geo.geoId) > -1) {
+        //     isPastResident = false
+        //     break
+        //   }
+        // }
+        // if (isPastResident) {
+        //   labels.push(this.$t('past_resident'))
+        // }
+        return labels
+      }
     },
     watch : {
-      'searchQuery': function(searchTerm) {
+      searchQuery (searchTerm) {
         if (searchTerm !== undefined) {
           this.query = searchTerm
         }
+      },
+      filters: {
+        handler (newFilters, oldFilters) {
+          this.search()
+        },
+        deep: true
       }
     },
     computed: {
@@ -365,6 +429,9 @@
       },
       respondentResults () {
         return orderBy(this.results, ['score', 'name'], ['desc', 'asc'])
+      },
+      showLabels () {
+        return this.filters.geos.length > 0
       }
     },
     components: {

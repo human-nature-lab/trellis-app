@@ -5,16 +5,16 @@ export default abstract class PhotoServiceAbstract {
   /**
    * Return an array of photos from an array of photo ids
    * @param {string[]} photoIds
-   * @returns {Promise<Photo[]>}
+   * @returns {PromiseLike<Photo[]>}
    */
-  abstract getPhotosByIds (photoIds: string[]): Promise<Photo[]>
+  abstract getPhotosByIds (photoIds: string[]): PromiseLike<Photo[]>
 
   /**
    * Load the image source as as string
    * @param photoId
-   * @returns {Promise<string>}
+   * @returns {PromiseLike<string>}
    */
-  abstract getPhotoSrc (photoId: string): Promise<any>
+  abstract getPhotoSrc (photoId: string): PromiseLike<any>
 
   /**
    * Cancel any outstanding photos that are loading
@@ -23,19 +23,19 @@ export default abstract class PhotoServiceAbstract {
 
   /**
    * Take a photo
-   * @returns {Promise<Photo>}
+   * @returns {PromiseLike<Photo>}
    */
-  abstract takePhoto (): Promise<Photo>
+  abstract takePhoto (): PromiseLike<Photo>
 
   /**
    * Return the count of photos in the database.
-   * @returns {Promise<number>}
+   * @returns {PromiseLike<number>}
    */
-  abstract getPhotoCount (): Promise<number>
+  abstract getPhotoCount (): PromiseLike<number>
 
   /**
    * Get the count of photos on the file system
-   * @returns {Promise<number>}
+   * @returns {PromiseLike<number>}
    */
-  abstract getPhotoFileCount (): Promise<number>
+  abstract getPhotoFileCount (): PromiseLike<number>
 }
