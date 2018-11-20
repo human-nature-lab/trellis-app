@@ -4,6 +4,7 @@ import Photo from '../../entities/trellis/Photo'
 import uuid from 'uuid/v4'
 import PhotoServiceAbstract from './PhotoServiceAbstract'
 import {In, IsNull} from "typeorm";
+import CancellablePromise from "../../classes/CancellablePromise";
 
 declare global {
   interface Window {ImageResizer: any}
@@ -130,7 +131,9 @@ export default class PhotoServiceCordova extends PhotoServiceAbstract {
     return FileService.countDirectoryFiles(await FileService.getPhotosDir())
   }
 
-  async getPhotosSize (): Promise<number> {
-    return FileService.getDirectorySize(await FileService.getPhotosDir(), true)
+  getPhotosSize (): CancellablePromise<number> {
+    return FileService.getPhotosDir().then(dir => {
+      return FileService.getDirectorySize(dir, true)
+    })
   }
 }

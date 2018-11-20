@@ -125,8 +125,6 @@
   import {getCurrentPosition} from './LocationFinder'
   import {defaultLoggingService as logger} from '../services/logging/LoggingService'
 
-  '../services/logging/LoggingService'
-
   export default Vue.extend({
     name: 'form-list-item',
     props: {

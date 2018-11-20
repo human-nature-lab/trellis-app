@@ -130,7 +130,10 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     q = q.take(size).skip(page * size)
     q = q.leftJoinAndSelect('respondent.photos', 'photo')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
-    return await q.getMany()
+    q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
+    const respondents = await q.getMany()
+    removeSoftDeleted(respondents)
+    return respondents
   }
 
   async addName (respondentId, name, isDisplayName = false, localeId = null): Promise<RespondentName> {

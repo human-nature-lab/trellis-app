@@ -131,7 +131,9 @@
         })
         PhotoService.getPhotoCount().then(c => photoEntries.val = c)
         PhotoService.getPhotoFileCount().then(c => photoFiles.val = c)
-        PhotoService.getPhotosSize().then(size => photosSize.val = formatBytesFilter(size))
+        PhotoService.getPhotosSize().then(size => {
+          photosSize.val = formatBytesFilter(size)
+        })
       },
       loadUploads () {
         const pendingPhotos = {key: this.$t('pending_photos'), val: null}
