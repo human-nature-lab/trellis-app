@@ -19,6 +19,11 @@ export abstract class GeoSearchParams {
 }
 
 export default abstract class GeoServiceInterface {
+  static DEFAULT_SEARCH_RESULTS_LIMIT = 50
+
+  getDefaultSearchResultsLimit () {
+    return GeoServiceInterface.DEFAULT_SEARCH_RESULTS_LIMIT
+  }
 
   /**
    * Creates an in-memory Geo object to work with before persisting

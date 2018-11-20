@@ -134,7 +134,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
 
   async search (params) {
     const query = (params.hasOwnProperty('query')) ? params.query : null
-    const limit = (params.hasOwnProperty('limit')) ? params.limit : 25
+    const limit = (params.hasOwnProperty('limit')) ? params.limit : GeoServiceCordova.DEFAULT_SEARCH_RESULTS_LIMIT
     const offset = (params.hasOwnProperty('offset')) ? params.offset : 0
     const studyId = (params.hasOwnProperty('study')) ? params.study : null
     const parentGeoId = (params.hasOwnProperty('parent')) ? params.parent : null

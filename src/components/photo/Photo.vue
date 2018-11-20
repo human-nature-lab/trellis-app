@@ -94,10 +94,14 @@
     },
     watch: {
       photo () {
-        this.resetPhoto()
+        if (this.id !== (this.photo ? this.photo.id : this.photoId)) {
+          this.resetPhoto()
+        }
       },
       photoId () {
-        this.resetPhoto()
+        if (this.id !== (this.photo ? this.photo.id : this.photoId)) {
+          this.resetPhoto()
+        }
       }
     },
     beforeDestroy: function () {
