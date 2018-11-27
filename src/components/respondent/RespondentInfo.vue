@@ -22,8 +22,11 @@
               {{error}}
             </v-alert>
             <PhotoAlbum
+              v-if="photoMetaData !== null"
+              :photo-meta-data="photoMetaData"
               :photos="respondent.photos"
-              @photo="onNewPhoto" />
+              @photo="onNewPhoto"
+              @reorder-photos="onReorderPhotos" />
             <RespondentGeos
               :use-census-form="true"
               :study-id="global.study.id"
@@ -59,6 +62,7 @@
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
   import singleton from '../../static/singleton'
   import RespondentName from "../../entities/trellis/RespondentName"
+  import SortedPhoto from "../../types/SortedPhoto"
 
   /**
    * The respondent info router loader
@@ -73,6 +77,10 @@
   export default Vue.extend({
     name: 'respondent-info',
     mixins: [RouteMixinFactory(preloadRespondent, true)],
+    async created () {
+      console.log('respondent.photos', this.respondent.photos)
+      this.photoMetaData = await RespondentService.getPhotoMetaData(this.respondent.id)
+    },
     data () {
       return {
         global: singleton,
@@ -90,12 +98,14 @@
           geoSearch: false,
           conditionTag: false
         },
-        isAddingPhoto: false
+        isAddingPhoto: false,
+        photoMetaData: null as object
       }
     },
     methods: {
       async hydrate (respondent: Respondent) {
         console.log('hydrate', respondent)
+        console.log('respondent.photos', respondent.photos)
         this.respondent = respondent
         this.respondentConditionTags = await respondent.respondentConditionTags
       },
@@ -106,6 +116,23 @@
         await RespondentService.addPhoto(this.respondent.id, photo)
         this.respondent.photos.push(photo)
         this.isAddingPhoto = false
+      },
+      async onReorderPhotos (photos) {
+        console.log('onReorderPhotos', photos)
+        let sortedPhotos: SortedPhoto[] = []
+        for (let photo of photos) {
+          console.log('photo', photo)
+          if (photo.hasOwnProperty('id') &&
+              photo.hasOwnProperty('sortOrder')) {
+            let sortedPhoto = {
+              elementId: this.respondent.id,
+              sortOrder: photo.sortOrder,
+              photoId: photo.id
+            }
+            sortedPhotos.push(sortedPhoto)
+          }
+        }
+        await RespondentService.orderPhotos(sortedPhotos)
       }
     },
     computed: {

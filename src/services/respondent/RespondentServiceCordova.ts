@@ -10,9 +10,9 @@ import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
 import {removeSoftDeleted} from "../database/SoftDeleteHelper";
 import Geo from "../../entities/trellis/Geo";
+import SortedPhoto from "../../types/SortedPhoto"
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
-
   async addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto> {
     const repo = await DatabaseService.getRepository(RespondentPhoto)
     let rPhoto = new RespondentPhoto()
@@ -23,6 +23,30 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return rPhoto
   }
 
+  async getPhotoMetaData (respondentId: string) {
+    const repository = await DatabaseService.getRepository(RespondentPhoto)
+    return repository.find({
+      where: {
+        deletedAt: IsNull(),
+        respondentId: respondentId
+      }
+    })
+  }
+
+  async orderPhotos (respondentPhotos : Array<SortedPhoto>) {
+    console.log('respondentPhotos', respondentPhotos)
+    const repository = await DatabaseService.getRepository(RespondentPhoto)
+    for (let respondentPhoto of respondentPhotos) {
+      console.log('respondentPhoto', respondentPhoto)
+      await repository.update({
+        respondentId: respondentPhoto.elementId,
+        photoId: respondentPhoto.photoId
+      }, {
+        sortOrder: respondentPhoto.sortOrder
+      })
+    }
+  }
+
   async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentFill)
@@ -30,6 +54,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   }
 
   async getRespondentById (respondentId: string): Promise<Respondent> {
+    // TODO: replace findOne with a QueryBuilder so we can return photos with sortOrder and notes left joined
     const repository = await DatabaseService.getRepository(Respondent)
     let respondent = await repository.findOne({
       where: {
