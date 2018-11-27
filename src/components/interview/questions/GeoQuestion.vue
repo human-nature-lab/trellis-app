@@ -5,7 +5,10 @@
           <v-list-tile v-for="geo in geos" :key="geo.id">
             <v-list-tile-content>
               <span v-if="geo.nameTranslation">
-                <async-translation-text :translation="geo.nameTranslation"></async-translation-text>
+                <GeoBreadcrumbs
+                  :canNavigate="false"
+                  :geoId="geo.id"
+                  :maxDepth="3" />
               </span>
               <span v-else>
                 {{ $t('loading') }}
@@ -20,18 +23,23 @@
           bottom
           right
           @click="openGeoSearch()">
-          <v-icon style="height:auto;">add</v-icon>
+          <v-icon
+            style="height:auto;">{{geoIds.length ? 'edit': 'add'}}</v-icon>
         </v-btn>
       </v-card>
       <!--we need the geo-search-dialog class for geo search to work correctly in the dialog-->
       <v-dialog
         content-class="geo-search-dialog"
+        fullscreen
         lazy
         v-model="geoSearchDialog">
+        <ModalTitle
+          :title="$t('location_search')"
+          @close="geoSearchDialog=false"/>
         <GeoSearch
-          :is-selectable="true"
+          :isSelectable="isGeoSelectable"
           :selectedGeos="selectedGeos"
-          :should-update-route="false"
+          :shouldUpdateRoute="false"
           @doneSelecting="onDoneSelecting" />
       </v-dialog>
     </v-flex>
@@ -40,12 +48,15 @@
 <script>
   import GeoService from '../../../services/geo/GeoService'
   import GeoSearch from '../../geo/GeoSearch'
+  import GeoBreadcrumbs from '../../geo/GeoBreadcrumbs'
   import GeoListTile from '../../geo/GeoListTile'
   import TranslationService from '../../../services/TranslationService'
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
+  import PT from '../../../static/parameter.types'
   import global from '../../../static/singleton'
   import AsyncTranslationText from '../../AsyncTranslationText.vue'
+  import ModalTitle from '../../ModalTitle'
   export default {
     name: 'geo-question',
     mixins: [ActionMixin],
@@ -134,13 +145,16 @@
         }
         this.geoSearchDialog = false
         this.loadGeos(this.geoIds)
+      },
+      isGeoSelectable (geo) {
+        return this.allowedGeoTypes.indexOf(geo.geoType.name.replace(/\s/g, '').toLowerCase()) > -1
       }
     },
     computed: {
-      geoIds: function () {
+      geoIds () {
         return this.question.datum.data.map(d => d.geoId)
       },
-      geos: function () {
+      geos () {
         console.log('recalculating any new geos to load')
         let toLoad = []
         let rows = this.geoIds.map(id => {
@@ -152,12 +166,23 @@
         })
         this.loadGeos(toLoad)
         return rows
+      },
+      allowedGeoTypes () {
+        const types = []
+        for (let qp of this.question.questionParameters) {
+          if (qp.parameterId == PT.geo_type) {
+            types.push(qp.val.replace(/\s/g, '').toLowerCase())
+          }
+        }
+        return types
       }
     },
     components: {
       AsyncTranslationText,
       GeoSearch,
-      GeoListTile
+      GeoListTile,
+      ModalTitle,
+      GeoBreadcrumbs
     }
   }
 </script>

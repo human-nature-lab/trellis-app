@@ -27,8 +27,12 @@
       {{ $t('add_relationship') }}
     </v-btn>
     <v-dialog
+      fullscreen
       lazy
       v-model="respondentSearchDialog">
+      <ModalTitle
+        :title="$t('respondent_search')"
+        @close="respondentSearchDialog = false"/>
       <v-card>
         <RespondentsSearch
           :canSelect="true"
@@ -55,6 +59,7 @@
   import ActionMixin from '../mixins/ActionMixin'
   import Photo from '../../photo/Photo'
   import RespondentsSearch from '../../respondent/RespondentsSearch'
+  import ModalTitle from '../../ModalTitle'
   import EdgeService from '../../../services/edge/EdgeService'
   import parameterTypes from '../../../static/parameter.types'
   import GeoService from '../../../services/geo/GeoService'
@@ -230,7 +235,8 @@
     },
     components: {
       Photo,
-      RespondentsSearch
+      RespondentsSearch,
+      ModalTitle
     }
   }
 </script>

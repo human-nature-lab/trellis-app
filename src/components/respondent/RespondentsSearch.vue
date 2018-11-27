@@ -9,7 +9,7 @@
       <v-btn
         v-if="canSelect"
         @click="onDone"
-        color="primary"
+        class="text--primary"
         :disabled="isLoading">
         <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
         <span v-else>
@@ -75,25 +75,28 @@
         </v-flex>
       </v-layout>
     </v-scale-transition>
+    <v-divider v-if="filters.geos && filters.geos.length" />
     <v-layout row wrap v-if="filters.geos && filters.geos.length">
-      <v-flex>
-        {{ $t('filters') }}
+      <v-flex class="subheading">
+        <v-container>{{ $t('filters') }}</v-container>
       </v-flex>
-      <v-flex v-for="(geo, index) in filters.geos"
-              :key="geo.id">
-        <v-chip
-          color="primary"
-          @input="removeGeoFilter(index)"
-          :close="canRemoveGeos">
-          <v-avatar>
-            <v-icon>home</v-icon>
-          </v-avatar>
-          <GeoBreadcrumbs
-            :geoId="geo"
-            :maxDepth="2" />
-        </v-chip>
-      </v-flex>
+      <v-spacer />
+      <v-chip
+        v-for="(geo, index) in filters.geos"
+        :key="geo.id"
+        color="primary"
+        outline
+        @input="removeGeoFilter(index)"
+        :close="canRemoveGeos">
+        <v-avatar>
+          <v-icon>home</v-icon>
+        </v-avatar>
+        <GeoBreadcrumbs
+          :geoId="geo"
+          :maxDepth="2" />
+      </v-chip>
     </v-layout>
+    <v-divider v-if="selected.length > 0" />
     <v-layout v-if="selected.length > 0">
       <v-flex>
         <v-chip
@@ -143,11 +146,11 @@
     <v-dialog
       v-model="showAssociatedRespondentDialog">
       <v-card>
-        <add-respondent-form
+        <AddRespondentForm
           @close="addRespondentClose"
           :studyId="studyId"
           :redirectToRespondentInfo="false"
-          :associatedRespondentId="respondentId"></add-respondent-form>
+          :associatedRespondentId="respondentId"></AddRespondentForm>
       </v-card>
     </v-dialog>
   </v-container>

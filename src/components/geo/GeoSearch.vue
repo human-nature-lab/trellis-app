@@ -22,8 +22,27 @@
           <v-alert v-show="error" color="error">
             {{ error }}
           </v-alert>
+          <v-divider />
+          <Cart
+            @done="onDone"
+            @remove="removeGeo"
+            :items="selectedGeos">
+            <template slot-scope="props">
+              <v-chip
+                outline
+                close
+                color="primary"
+                @input="removeGeo(props.item)">
+                <v-avatar>
+                  <v-icon>home</v-icon>
+                </v-avatar>
+                {{translate(props.item)}}
+              </v-chip>
+            </template>
+          </Cart>
+          <v-divider />
           <v-container
-            class="move-up"
+            v-ripple
             v-if="lastParentIds.length > 1"
             @click="moveUpOneLevel">
             <v-layout row>
@@ -37,22 +56,6 @@
             </v-layout>
           </v-container>
         </v-container>
-        <v-container v-if="selectedGeos.length">
-          <v-card>
-            <v-container fluid>
-              <Cart
-                @done="onDone"
-                @remove="removeGeo"
-                :items="selectedGeos">
-                <template slot-scope="props">
-                  <v-chip close @input="removeGeo(props.item)">
-                    {{translate(props.item)}}
-                  </v-chip>
-                </template>
-              </Cart>
-            </v-container>
-          </v-card>
-        </v-container>
       </div>
       <div class="geo-list">
         <v-list v-if="results.length">
@@ -65,6 +68,7 @@
             :key="geo.id"
             :geo="geo">
           </geo-list-tile>
+          <v-divider />
           <v-list-tile v-if="results.length === defaultSearchResultsLimit">
             <v-list-tile-content>
               <v-list-tile-title>
@@ -86,16 +90,13 @@
 </template>
 
 <script>
-  // @ts-ignore
   import GeoListTile from './GeoListTile'
-  // @ts-ignore
   import Cart from '../Cart'
   import debounce from 'lodash/debounce'
   import GeoService from '../../services/geo/GeoService'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
   import router from '../../router'
-  import Vue from 'vue'
   import global from '../../static/singleton'
 
   export default {
@@ -116,12 +117,6 @@
           }
         }
       },
-      allowedTypes: {
-        type: Array,
-        'default': function () {
-          return []
-        }
-      },
       showRespondentsLink: {
         type: Boolean,
         'default': true
@@ -137,7 +132,7 @@
         type: Number
       }
     },
-    data: function () {
+    data () {
       return {
         defaultSearchResultsLimit: GeoService.getDefaultSearchResultsLimit(),
         global: singleton,
@@ -167,8 +162,10 @@
       },
       orderedResults () {
         function compare(a, b) {
-          const aName = a.nameTranslation.translationText.find((tt) => tt.localeId === global.locale.id).translatedText
-          const bName = b.nameTranslation.translationText.find((tt) => tt.localeId === global.locale.id).translatedText
+          const aTransText = a.nameTranslation.translationText.find((tt) => tt.localeId === global.locale.id)
+          const bTransText = b.nameTranslation.translationText.find((tt) => tt.localeId === global.locale.id)
+          const aName = aTransText ? aTransText.translatedText : (a.nameTranslation.translationText.length ? a.nameTranslation.translationText[0].translatedText : '')
+          const bName = bTransText ? bTransText.translatedText : (b.nameTranslation.translationText.length ? b.nameTranslation.translationText[0].translatedText : '')
           // TODO: je104 comes before je004, would need to split into numeric and non-numeric and sort separately
           return aName.localeCompare(bName)
         }
@@ -246,19 +243,19 @@
           this.addGeo(geo)
         }
       },
-      onGeoSelect: function (geo) {
+      onGeoSelect (geo) {
         if (this.geoIsSelectable(geo)) {
           this.selectGeo(geo)
         }
       },
-      onDone: function () {
+      onDone () {
         this.$emit('doneSelecting', this.selectedGeos.map(s => s.copy()))
         // Empty the array without breaking references
         while (this.selectedGeos.length) {
           this.selectedGeos.pop()
         }
       },
-      search: function () {
+      search () {
         this.isSearching = true
         let filters = {}
         if (this.query) {
@@ -276,8 +273,10 @@
           }
           this.$emit('returned-geo-results', results, this.userFilters.parent)
         }).catch(err => {
-          console.error(err)
-          this.error = `Unable to retrieve geos for the current filters`
+          this.log({
+            message: `Unable to retrieve geos for the current filters`
+          })
+          this.log(err)
         }).then(() => {
           this.isSearching = false
           this.updateRoute()
@@ -310,8 +309,8 @@
     cursor: pointer
     &:hover
       background: rgba(0, 0, 0, .2)
-  .geo-search-dialog
-    height: 90%
+  /*.geo-search-dialog*/
+    /*height: 90%*/
   .geo-list
     overflow-y: auto
     flex-grow: 1

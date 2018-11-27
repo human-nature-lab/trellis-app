@@ -1,24 +1,27 @@
 <template>
-  <v-layout row class="cart">
-    <v-flex xs8>
-      <v-layout row class="items">
-        <div
-          v-for="item in items"
-          :key="item.id">
-          <slot v-bind:item="item">
-            <div class="cart-item elevation-1">
-              {{ item }}
-            </div>
-          </slot>
-        </div>
-      </v-layout>
-    </v-flex>
-    <v-flex xs4>
-      <v-btn @click="$emit('done')">
+  <v-container fluid>
+    <v-layout row class="cart">
+      <v-flex>
+        <v-layout row wrap class="items">
+          <div
+            v-for="item in items"
+            :key="item.id">
+            <slot v-bind:item="item">
+              <div class="cart-item elevation-1">
+                {{ item }}
+              </div>
+            </slot>
+          </div>
+        </v-layout>
+      </v-flex>
+      <v-spacer />
+      <v-btn
+        @click="$emit('done')"
+        class="primary--text">
         {{ $t('done') }}
       </v-btn>
-    </v-flex>
-  </v-layout>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -36,7 +39,7 @@
 <style lang="sass" scoped>
 .cart
   background: white
-  max-height: 150px
+  /*max-height: 150px*/
 .cart-item
   height: 100px
   width: 100px
