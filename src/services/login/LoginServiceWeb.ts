@@ -28,6 +28,7 @@ export default class LoginServiceWeb implements LoginServiceInterface {
   logout () {
     return new Promise(resolve => {
       removeToken()
+      singleton.user = null
       resolve()
     })
   }
