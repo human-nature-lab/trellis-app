@@ -6,14 +6,22 @@
     <span v-else-if="isLoading">
       Loading...
     </span>
-    <span v-else>
+    <span v-else-if="canNavigate">
       <router-link
         class="geo-name"
         :to="{name: 'Geo', params: {geoId: geo.id}}"
         v-for="geo in ancestors"
         :key="geo.id">
-        <AsyncTranslationText :translation="geo.nameTranslation"></AsyncTranslationText>
+        <AsyncTranslationText :translation="geo.nameTranslation" />
       </router-link>
+    </span>
+    <span v-else>
+      <span
+        class="geo-name"
+        v-for="geo in ancestors"
+        :key="geo.id">
+        <AsyncTranslationText :translation="geo.nameTranslation" />
+      </span>
     </span>
   </span>
 </template>
@@ -36,6 +44,10 @@
       maxDepth: {
         type: Number,
         default: 0
+      },
+      canNavigate: {
+        type: Boolean,
+        default: true
       }
     },
     data () {

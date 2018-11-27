@@ -98,8 +98,20 @@
       }
     },
     update () {
-      if (!this.hasChanged) {
-        this.hasChanged = true
+      this.hasChanged = true
+    },
+    watch: {
+      'question': {
+        handler () {
+          this.hasChanged = true
+        },
+        deep: true
+      },
+      location: {
+        handler () {
+          this.hasChanged = true
+        },
+        deep: true
       }
     },
     computed: {

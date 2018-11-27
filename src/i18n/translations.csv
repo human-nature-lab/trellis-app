@@ -55,7 +55,7 @@ condition_tags,Condition tags,Etiquetas de condición,
 condition_tag,Condition tag,Etiqueta de condición,
 remove_location,Remove this location,Remover esta ubicación,
 move_respondent_location,Move this respondent location,Mover la ubicación de este participante,
-not_started,Not started,No iniciado (or iniciada depending on what you're referring to),
+not_started,Not started,No iniciada,
 interviews,Interviews,Entrevistas,
 interview_status,Status,Estado (de la entrevista),"The state of the interview (completed, in progress...)"
 surveyor,Surveyor,Encuestador,
@@ -397,21 +397,27 @@ create_interview_failed,Failed to create a new interview: {0},Error al crear una
 cant_resume_survey,Can't resume a completed survey.,No puede con tinuar una encuesta completa.,
 gps_error,Error accessing GPS: {0},Error al accesar el GPS: {0},
 select,Select,Seleccionar,
-logs,Logs,,
-page,Page,,The current page within the section
-repetition,Repetition,,The current repetition of the the section
-information,Information,,Menu item
-storage,Storage,,Referencing files and database
-device,Device,,
-status,Status,,
-pending,Pending,,
-last_updated,Last updated,,
-working,Working,,Functioning correctly
-uploaded,Uploaded,,A count of entries moved to the server
-pending_photos,Pending photos,,
-pending_rows,Pending rows,,
-db_photos,DB Photos,,Photos in the database
-size,Size,,Amount of space used by the files
-device_photos,Device photos,,Photos actually on device
-version,Version,,Label for version of the software
+logs,Logs,Logaritmos,
+page,Page,Pagina,The current page within the section
+repetition,Repetition,Repeticion,The current repetition of the the section
+information,Information,Informacion,Menu item
+storage,Storage,Almacenaje,Referencing files and database
+device,Device,Dispositivo,
+status,Status,Estado,
+pending,Pending,Pendiente,
+last_updated,Last updated,Actualizado por ultima vez,
+working,Working,Funcionando,Functioning correctly
+uploaded,Uploaded,Subido,A count of entries moved to the server
+pending_photos,Pending photos,Fotos pendientes,
+pending_rows,Pending rows,Filas pendientes,
+db_photos,DB Photos,Fotos en la base de datos,Photos in the database
+size,Size,Tamaño,Amount of space used by the files
+device_photos,Device photos,Fotos en el dispositivo ,Photos actually on device
+version,Version,Version,Label for version of the software
 server_url,Server URL,URL del servidor,
+displaying_first_results,Displaying the first {0} results,Mostrando los primeros {0} resultados,
+use_search_field_results,Use the search field above to narrow down the results.,Use el espacio de busqueda arriba para filtrar los resultados,
+include_child_locations,Include child locations,,
+show_past_residents,Show past residents,,
+respondent_search,Respondent Search,,
+filters,Filters,,
