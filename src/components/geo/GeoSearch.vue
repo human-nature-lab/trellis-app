@@ -22,8 +22,9 @@
           <v-alert v-show="error" color="error">
             {{ error }}
           </v-alert>
-          <v-divider />
+          <v-divider v-if="showCart" />
           <Cart
+            v-if="showCart"
             @done="onDone"
             @remove="removeGeo"
             :items="selectedGeos">
@@ -40,7 +41,7 @@
               </v-chip>
             </template>
           </Cart>
-          <v-divider />
+          <v-divider v-if="showCart" />
           <v-container
             v-ripple
             v-if="lastParentIds.length > 1"
@@ -123,6 +124,10 @@
       },
       isSelectable: {
         'default': false
+      },
+      showCart: {
+        type: Boolean,
+        default: false
       },
       shouldUpdateRoute: {
         type: Boolean,

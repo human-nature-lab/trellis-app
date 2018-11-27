@@ -37,6 +37,7 @@
           :title="$t('location_search')"
           @close="geoSearchDialog=false"/>
         <GeoSearch
+          :showCart="true"
           :isSelectable="isGeoSelectable"
           :selectedGeos="selectedGeos"
           :shouldUpdateRoute="false"
