@@ -387,4 +387,12 @@ export default class DatabaseServiceCordova {
         where uploaded_at is null;`)
     return totalRowResults[0]['total_rows']
   }
+
+  async getDatabaseFileUri () {
+    return `/data/data/edu.yale.trellis.surveyview/databases/${trellisConnection.database}`
+  }
+
+  async getConfigDatabaseFileUri () {
+    return `/data/data/edu.yale.trellis.surveyview/databases/${trellisConfigConnection.database}`
+  }
 }

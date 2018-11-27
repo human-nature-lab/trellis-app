@@ -1,9 +1,13 @@
-import Interview from '../components/interview/Interview'
-import RespondentsSearch from '../components/respondent/RespondentsSearch'
+// import Interview from '../components/interview/Interview'
+// import RespondentsSearch from '../components/respondent/RespondentsSearch'
+// import SyncAdmin from '../components/sync/admin/SyncAdmin.vue'
 import ValidateLocale from './guards/ValidateLocale'
 import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
-import SyncAdmin from '../components/sync/admin/SyncAdmin.vue'
+
+const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
+const RespondentsSearch = () => import(/* webpackChunkName: "respondents-search" */'../components/respondent/RespondentsSearch')
+const SyncAdmin = () => import(/* webpackChunkName: "sync-admin" */'../components/sync/admin/SyncAdmin.vue')
 
 export default [{
   path: '/',
