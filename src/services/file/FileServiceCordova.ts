@@ -118,10 +118,14 @@ class FileServiceCordova {
     })
   }
 
-  getFile (filePath): Promise<FileEntry> {
-    return new Promise((resolve, reject) => {
-      window.resolveLocalFileSystemURL(filePath, entry => {
-        resolve(entry as FileEntry)
+  getFile (filePath: string): Promise<FileEntry> {
+    return new Promise(async (resolve, reject) => {
+      const path = cordova.file.dataDirectory + filePath
+      console.log('getFile', path)
+      const fs = await this.requestFileSystem()
+      debugger
+      fs.root.getFile(filePath, {create: false, exclusive: false}, (file: FileEntry) => {
+        debugger
       }, reject)
     })
   }
@@ -223,7 +227,7 @@ class FileServiceCordova {
     return promise
   }
 
-  upload (uri, fileEntry, onUploadProgress) {
+  upload (uri: string, fileEntry: FileEntry, onUploadProgress: () => any) {
     const promise = new Promise((resolve, reject) => {
       DeviceService.isDeviceReady()
         .then(() => {
@@ -303,6 +307,27 @@ class FileServiceCordova {
     })
   }
 
+  /**
+   * Get the size of a file specified by a string
+   * @param {string} filePath
+   * @returns {Promise<number>}
+   */
+  getFileSize (filePath: string): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let file: FileEntry = await this.getFile(filePath)
+        debugger
+        file.getMetadata(meta => {
+          resolve(meta.size)
+        }, err => {
+          reject(err)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
   getDirectorySize (dir: DirectoryEntry, includeChildren: boolean = false): CancellablePromise<number> {
     let isCancelled = false
     return new CancellablePromise((resolve, reject) => {
@@ -321,7 +346,6 @@ class FileServiceCordova {
               const batchEntries: Entry[] = entries.splice(0, batchSize)
               const totalBatchCount = batchEntries.length
               let batchCount = 0
-              console.log('processing', totalBatchCount, 'total', totalCount, 'remaining', entries.length)
               function checkBatchFinished () {
                 if (processedCount >= totalCount || isCancelled) {
                   resolve(size)

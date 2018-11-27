@@ -25,19 +25,19 @@ module.exports = {
     chunkFilename: '[id].[hash:8].js'
   },
   optimization: {
-    usedExports: true,
+    // usedExports: true,
     // concatenateModules: true,
     // minimize: true,
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
         cordova: {
-          test: /\/services\/.*Cordova\.[jt]sx?$/,
+          test: /\/services\/.*Cordova/,
           name: 'cordova-services',
           chunks: 'all'
         },
         web: {
-          test: /\/services\/.*Web\.[jt]sx?$/,
+          test: /\/services\/.*Web/,
           name: 'web-services',
           chunks: 'all'
         }
