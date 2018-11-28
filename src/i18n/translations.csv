@@ -411,7 +411,7 @@ uploaded,Uploaded,Subido,A count of entries moved to the server
 pending_photos,Pending photos,Fotos pendientes,
 pending_rows,Pending rows,Filas pendientes,
 db_photos,DB Photos,Fotos en la base de datos,Photos in the database
-size,Size,Tamaño,Amount of space used by the files
+photos_size,Photos size,Tamaño fotos,Amount of space used by the files
 device_photos,Device photos,Fotos en el dispositivo ,Photos actually on device
 version,Version,Version,Label for version of the software
 server_url,Server URL,URL del servidor,
@@ -421,3 +421,9 @@ include_child_locations,Include child locations,,
 show_past_residents,Show past residents,,
 respondent_search,Respondent Search,,
 filters,Filters,,
+db_size,Database size,,
+config_db_size,Config database size,,
+backup_database,Backup database,,
+backup_success,Database upload completed successfully,,
+backup_failed,Database upload failed,,
+backup_working,Uploading the database...,,
