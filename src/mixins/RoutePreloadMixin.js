@@ -1,6 +1,7 @@
 import singleton from '../static/singleton'
 import router from '../router'
 import {defaultLoggingService as logger} from '../services/logging/LoggingService'
+import {AddSnack} from '../components/SnackbarQueue'
 
 /**
  * Creates a mixin which takes a loadCallback and will call the hydrate method at the appropriate times. This mixin is
@@ -29,6 +30,7 @@ export default function RoutePreloadMixin (loadCallback, fullscreen = false) {
         err.component = 'RoutePreloadMixin.js@beforeRouteEnter'
         logger.log(err)
         singleton.loading.error = err.toString()
+        AddSnack(`Unable to enter route: ${to.name}`, {color: 'error'})
       } finally {
         singleton.loading.active = false
       }
@@ -46,6 +48,7 @@ export default function RoutePreloadMixin (loadCallback, fullscreen = false) {
       } catch (err) {
         err.component = 'RoutePreloadMixin.js@beforeRouteUpdate'
         logger.log(err)
+        AddSnack(`Unable to update route: ${to.name}`, {color: 'error'})
         singleton.loading.error = err.toString()
       } finally {
         singleton.loading.active = false
@@ -60,6 +63,7 @@ export default function RoutePreloadMixin (loadCallback, fullscreen = false) {
       } catch (err) {
         err.component = 'RoutePreloadMixin.js@beforeRouteLeave'
         logger.log(err)
+        AddSnack(`Unable to leave route: ${from.name}`, {color: 'error'})
       } finally {
         next()
       }

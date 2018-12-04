@@ -22,14 +22,31 @@ import {APP_ENV} from './static/constants'
 import {defaultLoggingService} from './services/logging/LoggingService'
 import {LoggingLevel} from './services/logging/LoggingTypes'
 
-window.onerror = function (message, source, lineno, colno, error) {
+window.addEventListener('error', function unhandledError (e: ErrorEvent) {
+  const error: Error = e.error
+  const message = error.message
   defaultLoggingService.log({
     severity: LoggingLevel.error,
     message,
-    component: `caught by main.js: Line: ${lineno}, Column: ${colno} - ${source}`,
-    error,
-    lineno,
-    colno
+    component: `main.js@unhandledError`,
+    error
+  })
+})
+window.addEventListener('unhandledrejection', function unhandledRejection (e: PromiseRejectionEvent) {
+  defaultLoggingService.log({
+    severity: LoggingLevel.error,
+    message: e.reason instanceof Error ? e.reason.message : e.reason,
+    component: 'main.js@unhandledRejection',
+    error: e.reason
+  })
+})
+
+Vue.config.errorHandler = function (err: Error, vm: Vue, info: string) {
+  defaultLoggingService.log({
+    severity: LoggingLevel.error,
+    message: info,
+    component: `main.ts@Vue.config.errorHandler for ${vm['name']}`,
+    error: err
   })
 }
 

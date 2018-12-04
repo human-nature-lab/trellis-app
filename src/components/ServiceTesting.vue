@@ -3,6 +3,22 @@
     <v-card>
       <v-toolbar>
         <v-toolbar-title>Service Testing</v-toolbar-title>
+        <v-spacer />
+        <v-menu offset-y>
+          <v-btn icon slot="activator">
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+          <v-list>
+            <v-list-tile @click="addAlert">
+              <v-list-tile-action>
+                <v-icon>add_alert</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                Add Alert
+              </v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </v-toolbar>
       <v-expansion-panel v-model="testSelectorOpen">
         <v-expansion-panel-content>
@@ -55,6 +71,7 @@
   import LoginServiceCordova from '../services/login/LoginServiceCordova'
   import LoginServiceWeb from '../services/login/LoginServiceWeb'
   import config from '../config'
+  import {randomFrom} from '../classes/M'
   import 'mocha/mocha.js'
   import testModules from '../../test/services'
 
@@ -81,6 +98,14 @@
       // if (runner) runner.teardown('bdd')
     },
     methods: {
+      addAlert () {
+        const types = ['error', 'info', 'warn', 'primary', 'secondary']
+        if (Math.random() > .5) {
+          this.alert(randomFrom(types), 'A persistent alert', {timeout: 0})
+        } else {
+          this.alert(randomFrom(types), 'A random alert that dismisses itself')
+        }
+      },
       getNestedTitle (test) {
         let title = test.title
         let t = test.parent

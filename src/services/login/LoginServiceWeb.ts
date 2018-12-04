@@ -26,7 +26,8 @@ export default class LoginServiceWeb implements LoginServiceInterface {
   }
 
   logout () {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      return reject(new Error('failed to logout'))
       removeToken()
       resolve()
     })

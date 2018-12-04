@@ -59,7 +59,11 @@
         </v-container>
       </div>
       <div class="geo-list">
-        <v-list v-if="results.length">
+        <v-container v-if="!results.length">
+          <span v-if="isSearching">{{ $t('searching') }}</span>
+          <span v-else>{{ $t('no_locations_found') }}</span>
+        </v-container>
+        <v-list v-show="results.length">
           <geo-list-tile
             v-for="geo in orderedResults"
             :isSelectable="geoIsSelectable(geo)"
@@ -81,10 +85,6 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-        <v-flex v-else>
-          <span v-if="isSearching">{{ $t('searching') }}</span>
-          <span v-else>{{ $t('no_locations_found') }}</span>
-        </v-flex>
       </div>
     </v-layout>
   </v-card>

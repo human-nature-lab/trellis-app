@@ -42,6 +42,14 @@
                 {{$t('backup_database')}}
               </v-list-tile-content>
             </v-list-tile>
+            <v-list-tile @click="eatSnack">
+              <v-list-tile-action>
+                <v-icon>snack</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                Eat snack
+              </v-list-tile-content>
+            </v-list-tile>
           </v-list>
         </v-menu>
       </v-toolbar>

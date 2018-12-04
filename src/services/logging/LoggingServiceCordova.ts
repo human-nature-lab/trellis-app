@@ -3,7 +3,7 @@ import AlertService from '../../services/AlertService'
 import LoggingServiceAbstract from './LoggingServiceAbstract'
 import Log from "../../entities/trellis-config/Log";
 import throttle from 'lodash/throttle'
-import {LogRequest} from "./LoggingTypes";
+import {LoggingLevel, LogRequest} from "./LoggingTypes";
 import {IsNull, Not} from "typeorm";
 
 class LoggingServiceCordova extends LoggingServiceAbstract {
@@ -19,6 +19,7 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
       this.save = this.flushQueue
     } else {
       this.save = throttle(this.flushQueue.bind(this), this.config.rate)
+      setInterval(this.save.bind(this), 5000)
     }
   }
 
@@ -57,20 +58,6 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   /**
-   * Logic for writing the log to the console
-   * @param {Log} log
-   */
-  private consoleLog (log: Log): void {
-    if (this.config.console) {
-      if (console[log.severity]) {
-        console[log.severity](log.message, log)
-      } else {
-        console.log(log.message, log)
-      }
-    }
-  }
-
-  /**
    * The logged method
    * @param _request
    * @returns {Promise<Log>}
@@ -80,13 +67,16 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
       throw new Error('Invalid logger request')
     }
     const log = this.createLog(_request)
-    this.consoleLog(log)
-    this.queue.push(log)
-    if (this.config.max > 0 && this.queue.length > this.config.max) {
-      this.flushQueue()
-    } else {
-      this.save()
+    if (this.shouldWriteLog(log)) {
+      this.consoleLog(log)
+      this.queue.push(log)
+      if (this.config.max > 0 && this.queue.length > this.config.max) {
+        this.flushQueue()
+      } else {
+        this.save()
+      }
     }
+
     return log
   }
 

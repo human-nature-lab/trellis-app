@@ -156,7 +156,8 @@
           await GeoService.removeGeo(this.selectedGeo.id)
           this.$emit('remove-geo-done', this.selectedGeo.id)
         } catch (err) {
-          console.error(err)
+          this.log(err)
+          this.alert('error', `Unable to remove geo: ${this.selectedGeo.id}`, {timeout: 0})
         }
       },
       onEditingDone: async function () {

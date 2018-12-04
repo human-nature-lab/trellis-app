@@ -8,7 +8,7 @@ export enum LoggingLevel {
 }
 
 export interface LoggingConfig {
-  levels: 0 | LoggingLevel[]
+  levels: null | LoggingLevel[]
   console: boolean
   max: number
   rate: number

@@ -28,7 +28,8 @@ export default class LoginServiceCordova implements LoginServiceInterface {
   }
 
   logout () {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      return reject(';askdf;lkasdflkjlkjasdflkjasdfj')
       UserService.removeCurrentUser()
       resolve()
     })
