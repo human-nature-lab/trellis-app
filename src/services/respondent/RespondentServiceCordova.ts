@@ -5,7 +5,7 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
-import {Brackets, Connection, ConnectionManager, EntityManager, IsNull, QueryBuilder} from 'typeorm'
+import {Brackets, Connection, EntityManager, IsNull} from 'typeorm'
 import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
 import {removeSoftDeleted} from "../database/SoftDeleteHelper";
@@ -125,12 +125,14 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       }
       q = q.andWhere(`"respondent"."id" in (${subSelect})`, params)
     }
-
     q = q.andWhere('"respondent"."deleted_at" is null')
     q = q.take(size).skip(page * size)
     q = q.leftJoinAndSelect('respondent.photos', 'photo')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
+    if (filters.randomize) {
+      q = q.orderBy('RANDOM()')
+    }
     const respondents = await q.getMany()
     removeSoftDeleted(respondents)
     return respondents
@@ -270,14 +272,14 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return rGeo
   }
 
-  async editRespondentGeo (respondentId, respondentGeoId, isCurrent) {
+  async editRespondentGeo (respondentId: string, respondentGeoId: string, isCurrent: boolean) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
     await repository.update({id: respondentGeoId}, {isCurrent: isCurrent})
     return await repository.findOne({ deletedAt: null, id: respondentGeoId })
   }
 
-  async moveRespondentGeo (respondentId, respondentGeoId, newGeoId) {
+  async moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string, isCurrent?: boolean, notes?: string) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
     const oldRespondentGeo = await repository.findOne(respondentGeoId)
@@ -286,8 +288,8 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     newRespondentGeo.geoId = newGeoId
     newRespondentGeo.respondentId = respondentId
     newRespondentGeo.previousRespondentGeoId = respondentGeoId
-    newRespondentGeo.notes = oldRespondentGeo.isCurrent
-    newRespondentGeo.isCurrent = oldRespondentGeo.isCurrent
+    newRespondentGeo.notes = notes ? notes : oldRespondentGeo.isCurrent
+    newRespondentGeo.isCurrent = isCurrent !== undefined ? isCurrent : oldRespondentGeo.isCurrent
     await connection.manager.save(newRespondentGeo)
 
     // Soft delete the previous respondent geo
@@ -301,7 +303,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     })
   }
 
-  async removeRespondentGeo (respondentId, respondentGeoId) {
+  async removeRespondentGeo (respondentId: string, respondentGeoId: string) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
     await repository.update({id: respondentGeoId}, {deletedAt: new Date()})
