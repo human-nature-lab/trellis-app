@@ -10,6 +10,10 @@ export function random (min: number = 0, max: number = 1): number {
   return Math.random() * (max - min) + min
 }
 
+export function randomFrom<T> (collection: T[]): T {
+  return collection[randomInt(0, collection.length)]
+}
+
 export function interpolateColor (percentage: number, minColor: string, maxColor: string) {
   function interpolate (p: number, minHex: string, maxHex: string): string {
     const maxNum = parseInt(maxHex, 16)

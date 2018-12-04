@@ -1,9 +1,6 @@
 <template>
   <span class="geo-breadcrumbs">
-    <span v-if="error" class="error">
-      {{error}}
-    </span>
-    <span v-else-if="isLoading">
+    <span v-if="isLoading">
       Loading...
     </span>
     <span v-else-if="canNavigate">
@@ -53,7 +50,6 @@
     data () {
       return {
         global: singleton,
-        error: null,
         isLoading: false,
         ancestors: []
       }
@@ -78,7 +74,8 @@
             this.ancestors.splice(0, this.ancestors.length - this.maxDepth)
           }
         }).catch(err => {
-          this.error = err
+          this.log(err)
+          this.alert('error', `Unable to load ancestors for geo: ${this.geoId}`)
         }).finally(() => {
           this.isLoading = false
         })

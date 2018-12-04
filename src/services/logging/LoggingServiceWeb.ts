@@ -4,7 +4,11 @@ import Log from "../../entities/trellis-config/Log";
 class LoggingServiceWeb extends LoggingServiceAbstract {
 
   async log (_request) {
-    throw new Error('Unimplemented')
+    // TODO: Implement the web version
+    const log = this.createLog(_request)
+    if (this.shouldWriteLog(log)) {
+      this.consoleLog(log)
+    }
   }
 
   async getLogPage (page: number, limit: number): Promise<Log[]> {

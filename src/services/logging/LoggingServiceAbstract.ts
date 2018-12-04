@@ -30,7 +30,30 @@ export default abstract class LoggingServiceAbstract {
   abstract async getLogCount (): Promise<number>
   abstract async getUploadedCount (): Promise<number>
 
-  createLog (_request: LogRequest): Log {
+  /**
+   * Logic for writing the log to the console
+   * @param {Log} log
+   */
+  protected consoleLog (log: Log): void {
+    if (this.config.console) {
+      if (console[log.severity]) {
+        console[log.severity](log.message, log)
+      } else {
+        console.log(log.message, log)
+      }
+    }
+  }
+
+  /**
+   * Check if this log should be filtered out or not
+   * @param {Log} log
+   * @returns {boolean}
+   */
+  protected shouldWriteLog (log: Log): boolean {
+    return !this.config.levels || this.config.levels.indexOf(log.severity as LoggingLevel) > -1
+  }
+
+  protected createLog (_request: LogRequest): Log {
     if (_request === null || _request === undefined) {
       throw new Error('Invalid logger request')
     }

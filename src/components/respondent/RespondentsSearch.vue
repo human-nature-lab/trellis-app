@@ -65,10 +65,9 @@
                 v-model="filters.includeChildren"
                 :label="$t('include_child_locations')" />
             </v-flex>
-            <v-flex>
+            <v-flex v-if="showPastResidentsOption">
               <v-checkbox
-                :value="!filters.onlyCurrentGeo"
-                @input="filters.onlyCurrentGeo = !filter.onlyCurrentGeo"
+                v-model="showPastResidents"
                 :label="$t('show_past_residents')" />
             </v-flex>
           </v-layout>
@@ -115,7 +114,8 @@
         slot="activator"
         color="primary"
         @click="showAssociatedRespondentDialog = true"
-        :loading="isLoading">
+        :loading="isLoading"
+        :disabled="isLoading">
         <span v-if="respondentId">
           {{ $t('add_other_respondent') }}
         </span>
@@ -139,8 +139,20 @@
           :respondent="respondent"
           :labels="getRespondentLabels(respondent)"/>
       </v-layout>
+      <v-card v-if="respondentResults.length === requestPageSize">
+        <v-container>
+          <v-layout class="subheading">
+            {{ $t('displaying_first_results',[requestPageSize]) }}
+          </v-layout>
+          <v-layout>
+            {{ $t('use_search_field_results') }}
+          </v-layout>
+        </v-container>
+      </v-card>
       <v-layout v-if="!respondentResults.length" ma-3>
-        {{ $t('no_results') }}: {{query}}
+        <v-container>
+          {{ $t('no_results') }}: {{query}}
+        </v-container>
       </v-layout>
     </v-container>
     <v-dialog
@@ -245,7 +257,8 @@
           conditionTags: [],
           geos: [],
           includeChildren: false,
-          onlyCurrentGeo: true
+          onlyCurrentGeo: true,
+          randomize: true
         })
       },
       selectedRespondents: {
@@ -435,6 +448,17 @@
       },
       showLabels () {
         return this.filters.geos.length > 0
+      },
+      showPastResidents: {
+        get () {
+          return this.filters ? !this.filters.onlyCurrentGeo : false
+        },
+        set (val) {
+          this.filters.onlyCurrentGeo = !val
+        }
+      },
+      showPastResidentsOption () {
+        return this.filters && !!this.filters.geos.length
       }
     },
     components: {

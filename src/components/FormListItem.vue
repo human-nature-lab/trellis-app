@@ -182,7 +182,7 @@
           try {
             survey = await SurveyService.create(this.global.study.id, this.respondent.id, this.form.id)
           } catch (err) {
-            err.component = 'FormListItem'
+            err.component = 'FormListItem.vue@tryCreatingSurvey'
             logger.log(err)
             alert(this.$t('create_survey_failed', [err]))
           }
@@ -193,7 +193,6 @@
         }
       },
       async tryStartingSurvey (survey) {
-        // TODO: Log errors in db
         let coords, interview
         if (survey.completedAt) {
           alert(this.$t('cant_resume_survey'))
@@ -201,7 +200,7 @@
           try {
             coords = await getCurrentPosition()
           } catch (err) {
-            err.component('FormListItem')
+            err.component('FormListItem.vue@tryStartingSurvey')
             logger.log(err)
             console.error(err)
             alert(this.$t('gps_error', [err]))
