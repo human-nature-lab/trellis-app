@@ -37,7 +37,7 @@
                   </v-btn>
                 </v-list-tile>
                 <v-list-tile>
-                  <v-btn icon>
+                  <v-btn icon @click.native="deletePhoto(photo)">
                     <v-icon medium>delete</v-icon>
                   </v-btn>
                 </v-list-tile>
@@ -154,6 +154,9 @@
       updatePhotos () {
         this.editingPhoto = null
         this.$emit('update-photos', this.photos)
+      },
+      deletePhoto (photo) {
+        this.$emit('delete-photo', photo)
       }
     }
   }
