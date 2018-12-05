@@ -71,9 +71,9 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
       this.consoleLog(log)
       this.queue.push(log)
       if (this.config.max > 0 && this.queue.length > this.config.max) {
-        this.flushQueue()
+        await this.flushQueue()
       } else {
-        this.save()
+        await this.save()
       }
     }
 
