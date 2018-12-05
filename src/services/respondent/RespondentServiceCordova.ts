@@ -23,6 +23,15 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return rPhoto
   }
 
+  async removePhoto (photo: PhotoWithPivotTable) {
+    const repository = await DatabaseService.getRepository(RespondentPhoto)
+    await repository.update({
+      id: photo.pivot.id
+    }, {
+      deletedAt: new Date()
+    })
+  }
+
   async updatePhotos (photosWithPivotTable : Array<PhotoWithPivotTable>) {
     const repository = await DatabaseService.getRepository(RespondentPhoto)
     for (let photoWithPivotTable of photosWithPivotTable) {
@@ -158,6 +167,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
     q = q.andWhere('"respondent"."deleted_at" is null')
     q = q.take(size).skip(page * size)
+    // TODO: return one photo with the lowest sort order to act as the profile picture (favorited photo)
     q = q.leftJoinAndSelect('respondent.photos', 'photo')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     return await q.getMany()
