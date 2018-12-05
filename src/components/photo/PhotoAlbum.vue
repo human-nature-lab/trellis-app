@@ -32,7 +32,7 @@
               </v-btn>
               <v-list>
                 <v-list-tile>
-                  <v-btn icon>
+                  <v-btn icon @click.native="editPhoto(photo)">
                     <v-icon medium>edit</v-icon>
                   </v-btn>
                 </v-list-tile>
@@ -48,7 +48,24 @@
       </v-flex>
       <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     </transition-group>
-    <fullscreen-photo v-if="fullPhoto !== null" :photo="fullPhoto" v-model="isFullOpen"></fullscreen-photo>
+    <fullscreen-photo v-if="fullPhoto !== null" title="" :photo="fullPhoto" v-model="isFullOpen"></fullscreen-photo>
+    <v-dialog scrollable v-if="editingPhoto !== null" v-model="showDialog" persistent max-width="500px">
+      <v-card>
+        <v-toolbar>
+          <v-toolbar-title>
+            {{ $t('notes') }}
+          </v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
+          <v-text-field multi-line auto-grow textarea v-model="editingPhoto.pivot.notes"></v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn flat @click.native="editPhoto(null)">{{ $t('cancel') }}</v-btn>
+          <v-btn flat @click.native="updatePhotos(editingPhoto)">{{ $t('save') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -59,7 +76,6 @@
   import orderBy from 'lodash/orderBy'
 
   // TODO: Make it possible to remove photos. What should the UI look like for this?
-  // TODO: Make it possible to reorder photos
   export default {
     components: {
       Photo,
@@ -73,7 +89,9 @@
         imageSources: () => [],
         numTimesLoaded: 0,
         fullPhoto: null,
-        isFullOpen: false
+        editingPhoto: null,
+        isFullOpen: false,
+        showDialog: false
       }
     },
     name: 'PhotoAlbum',
@@ -127,6 +145,14 @@
         for (let i = 0; i < this.orderedPhotos.length; i++) {
           this.orderedPhotos[i].pivot.sortOrder = i
         }
+        this.$emit('update-photos', this.photos)
+      },
+      editPhoto (photo) {
+        this.editingPhoto = photo
+        this.showDialog = (this.editingPhoto !== null)
+      },
+      updatePhotos () {
+        this.editingPhoto = null
         this.$emit('update-photos', this.photos)
       }
     }
