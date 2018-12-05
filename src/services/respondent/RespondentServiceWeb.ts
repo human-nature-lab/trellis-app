@@ -6,7 +6,7 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
-import SortedPhoto from '../../types/SortedPhoto'
+import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 export default class RespondentServiceWeb implements RespondentServiceInterface {
 
   async addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto> {
@@ -18,7 +18,7 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     throw new Error("Can't get photo meta data yet") // TODO: Respondent meta data
   }
 
-  async orderPhotos (respondentPhotos : Array<SortedPhoto>) {
+  async updatePhotos (photos: Array<PhotoWithPivotTable>) {
     throw new Error("Can't order respondent photos yet") // TODO: Respondent photo ordering
   }
 

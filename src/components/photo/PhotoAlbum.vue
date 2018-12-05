@@ -22,7 +22,7 @@
           </v-card-media>
           <v-card-actions class="photo-actions">
             <v-btn flat icon color="amber" @click="setFavorite(photo)">
-              <v-icon v-if="photo.sortOrder === 0" medium>star</v-icon>
+              <v-icon v-if="photo.pivot.sortOrder === 0" medium>star</v-icon>
               <v-icon v-else medium>star_border</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
@@ -73,38 +73,12 @@
         imageSources: () => [],
         numTimesLoaded: 0,
         fullPhoto: null,
-        isFullOpen: false,
-        photosWithMetaData: []
+        isFullOpen: false
       }
-    },
-    created () {
-      for (let i = 0; i < this.photos.length; i++) {
-        const photo = this.photos[i]
-        let sortOrder = i
-        let notes = ''
-        const metaData = this.photoMetaData.find((pmd) => pmd.photoId === photo.id)
-        if (metaData !== undefined) {
-          sortOrder = metaData.sortOrder
-          notes = metaData.notes
-        }
-        const photoWithMetaData = {
-          id: photo.id,
-          fileName: photo.fileName,
-          sortOrder: sortOrder,
-          notes: notes
-        }
-        this.photosWithMetaData.push(photoWithMetaData)
-      }
-      console.log('this.photosWithMetaData', this.photosWithMetaData)
-      console.log('this.orderedPhotos', this.orderedPhotos)
     },
     name: 'PhotoAlbum',
     props: {
       photos: {
-        type: Array,
-        default: () => []
-      },
-      photoMetaData: {
         type: Array,
         default: () => []
       },
@@ -129,7 +103,7 @@
     },
     computed: {
       orderedPhotos: function () {
-        return orderBy(this.photosWithMetaData, 'sortOrder')
+        return orderBy(this.photos, 'pivot.sortOrder')
       }
     },
     methods: {
@@ -138,25 +112,22 @@
         this.isFullOpen = true
       },
       onAddPhoto (photo) {
-        const photoWithMetaData = {
-          id: photo.id,
-          fileName: photo.fileName,
-          sortOrder: (this.photosWithMetaData.length - 1),
-          notes: ''
-        }
-        this.photosWithMetaData.push(photoWithMetaData)
         this.$emit('photo', photo)
       },
       setFavorite (photo) {
-        for (let i = 0; i < this.photosWithMetaData.length; i++) {
-          const p = this.photosWithMetaData[i]
+        for (let i = 0; i < this.photos.length; i++) {
+          const p = this.photos[i]
           if (p === photo) {
-            p.sortOrder = 0
+            p.pivot.sortOrder = 0
           } else {
-            p.sortOrder++
+            p.pivot.sortOrder++
           }
         }
-        this.$emit('reorder-photos', this.photosWithMetaData)
+        // renumber photos before updating
+        for (let i = 0; i < this.orderedPhotos.length; i++) {
+          this.orderedPhotos[i].pivot.sortOrder = i
+        }
+        this.$emit('update-photos', this.photos)
       }
     }
   }
