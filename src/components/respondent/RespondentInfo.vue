@@ -104,8 +104,8 @@
         this.respondentConditionTags = []
       },
       onNewPhoto: async function (photo) {
-        await RespondentService.addPhoto(this.respondent.id, photo)
-        this.respondent.photos.push(photo)
+        let photoWithPivotTable = await RespondentService.addPhoto(this.respondent.id, photo)
+        this.respondent.photos.push(photoWithPivotTable)
         this.isAddingPhoto = false
       },
       onUpdatePhotos: async function (photos) {
