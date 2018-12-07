@@ -4,14 +4,12 @@ import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
-import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 export default class RespondentServiceWeb implements RespondentServiceInterface {
 
-  async addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto> {
+  async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     throw new Error("Can't add respondent photo yet") // TODO: Respondent photo web
-    return new RespondentPhoto()
   }
 
   async getPhotoMetaData (respondentId: string) {
