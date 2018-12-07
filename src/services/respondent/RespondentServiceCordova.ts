@@ -13,14 +13,23 @@ import Geo from "../../entities/trellis/Geo";
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
-  async addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto> {
+
+  async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     const repo = await DatabaseService.getRepository(RespondentPhoto)
     let rPhoto = new RespondentPhoto()
     rPhoto.photoId = photo.id
     rPhoto.respondentId = respondentId
     rPhoto.sortOrder = await repo.createQueryBuilder('rp').where('rp.respondentId = :respondentId', {respondentId}).getCount()
     await repo.save(rPhoto)
-    return rPhoto
+    let respondentPhoto = await repo.findOne({
+      where: {
+        id: rPhoto.id
+      },
+      relations: [
+        'photo'
+      ]
+    })
+    return new PhotoWithPivotTable(respondentPhoto)
   }
 
   async removePhoto (photo: PhotoWithPivotTable) {
@@ -167,8 +176,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
     q = q.andWhere('"respondent"."deleted_at" is null')
     q = q.take(size).skip(page * size)
-    // TODO: return one photo with the lowest sort order to act as the profile picture (favorited photo)
-    q = q.leftJoinAndSelect('respondent.photos', 'photo')
+    q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     return await q.getMany()
   }
