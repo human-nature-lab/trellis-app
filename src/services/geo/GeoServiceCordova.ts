@@ -7,28 +7,42 @@ import uuid from 'uuid/v4'
 import GeoPhoto from "../../entities/trellis/GeoPhoto";
 import Photo from "../../entities/trellis/Photo";
 import geoCache from './GeoCache'
+import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
+import {removeSoftDeleted} from '../database/SoftDeleteHelper'
 
 export default class GeoServiceCordova extends GeoServiceAbstract {
 
-  async addPhoto (geoId: string, photo: Photo): Promise<GeoPhoto> {
+  async addPhoto (geoId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     const repo = await DatabaseService.getRepository(GeoPhoto)
     let gPhoto = new GeoPhoto()
     gPhoto.photoId = photo.id
     gPhoto.geoId = geoId
     gPhoto.sortOrder = await repo.createQueryBuilder('gp').where('gp.geoId = :geoId', {geoId}).getCount()
     await repo.save(gPhoto)
-    return gPhoto
+    let geoPhoto = await repo.findOne({
+      where: {
+        id: gPhoto.id
+      },
+      relations: [
+        'photo'
+      ]
+    })
+    return new PhotoWithPivotTable(geoPhoto)
   }
 
   async getGeoById (geoId) {
     const repository = await DatabaseService.getRepository(Geo)
-    return repository.findOne({
+    let geo = await repository.findOne({
       where: {
         deletedAt: IsNull(),
         id: geoId
       },
-      relations: ['geoType', 'photos', 'nameTranslation', 'nameTranslation.translationText']
+      relations: ['geoType', 'nameTranslation', 'nameTranslation.translationText']
     })
+
+    geo.photos = await this.getGeoPhotos(geoId)
+    removeSoftDeleted(geo)
+    return geo
   }
 
   async getGeosByParentId (parentId) {
@@ -40,6 +54,47 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       },
       relations: ['geoType', 'photos', 'nameTranslation', 'nameTranslation.translationText']
     })
+  }
+
+  async updatePhotos (photosWithPivotTable : Array<PhotoWithPivotTable>) {
+    const repository = await DatabaseService.getRepository(GeoPhoto)
+    for (let photoWithPivotTable of photosWithPivotTable) {
+      await repository.update({
+        id: photoWithPivotTable.pivot.id
+      }, {
+        sortOrder: photoWithPivotTable.pivot.sortOrder,
+        notes: photoWithPivotTable.pivot.notes
+      })
+    }
+  }
+
+  async removePhoto (photo: PhotoWithPivotTable) {
+    const repository = await DatabaseService.getRepository(GeoPhoto)
+    await repository.update({
+      id: photo.pivot.id
+    }, {
+      deletedAt: new Date()
+    })
+  }
+
+  async getGeoPhotos (geoId: string): Promise<Array<PhotoWithPivotTable>> {
+    const geoPhotoRepository = await DatabaseService.getRepository(GeoPhoto)
+    let geoPhotos = await geoPhotoRepository.find({
+      where: {
+        deletedAt: IsNull(),
+        geoId: geoId
+      },
+      relations: [
+        'photo'
+      ]
+    })
+    let photos: PhotoWithPivotTable[]  = []
+    for (let i = 0; i < geoPhotos.length; i++) {
+      let geoPhoto = geoPhotos[i]
+      photos.push(new PhotoWithPivotTable(geoPhoto))
+    }
+
+    return photos
   }
 
   async createGeo (geo: Geo): Promise<Geo> {

@@ -234,6 +234,7 @@
     display: block
     overflow: hidden
     position: relative
+    margin: auto
     /*background: black*/
     img
       display: block

@@ -10,7 +10,7 @@
             color="error"
             outline>({{$t('other_respondent')}})</v-chip>
         </v-toolbar-title>
-        <v-spacer />
+        <v-spacer></v-spacer>
         <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
           {{ $t('forms') }}
         </v-btn>
@@ -21,18 +21,20 @@
             <v-alert v-show="error" type="error">
               {{error}}
             </v-alert>
-            <PhotoAlbum
+            <photo-album
               :photos="respondent.photos"
-              @photo="onNewPhoto" />
-            <RespondentGeos
+              @photo="onNewPhoto"
+              @delete-photo="onDeletePhoto"
+              @update-photos="onUpdatePhotos"></photo-album>
+            <respondent-geos
               :use-census-form="true"
               :study-id="global.study.id"
-              :respondent="respondent" />
-            <RespondentConditionTags
+              :respondent="respondent"></respondent-geos>
+            <respondent-condition-tags
               :respondent="respondent"
-              :conditionTags="respondentConditionTags" />
-            <RespondentNames
-              :respondent="respondent" />
+              :conditionTags="respondentConditionTags"></respondent-condition-tags>
+            <respondent-names
+              :respondent="respondent"></respondent-names>
           </v-layout>
         </v-container>
       </v-card-text>
@@ -94,18 +96,30 @@
       }
     },
     methods: {
-      async hydrate (respondent: Respondent) {
-        console.log('hydrate', respondent)
+      hydrate: async function (respondent: Respondent) {
         this.respondent = respondent
         this.respondentConditionTags = await respondent.respondentConditionTags
       },
-      leaving () {
+      leaving: function () {
         this.respondentConditionTags = []
       },
-      async onNewPhoto (photo) {
-        await RespondentService.addPhoto(this.respondent.id, photo)
-        this.respondent.photos.push(photo)
+      onNewPhoto: async function (photo) {
+        let photoWithPivotTable = await RespondentService.addPhoto(this.respondent.id, photo)
+        this.respondent.photos.push(photoWithPivotTable)
         this.isAddingPhoto = false
+      },
+      onUpdatePhotos: async function (photos) {
+        await RespondentService.updatePhotos(photos)
+      },
+      onDeletePhoto: async function (photo) {
+        let confirmMessage = this.$t('remove_photo_confirm') + ''
+        if (!window.confirm(confirmMessage)) return
+        try {
+          await RespondentService.removePhoto(photo)
+          this.respondent.photos.splice(this.respondent.photos.indexOf(photo), 1)
+        } catch (err) {
+          console.error(err)
+        }
       }
     },
     computed: {

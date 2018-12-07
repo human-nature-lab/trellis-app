@@ -2,8 +2,8 @@ import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
-import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
+import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export interface SearchFilter {
   conditionTags?: string[],    // Array of condition tag names
@@ -19,9 +19,9 @@ export default interface RespondentServiceInterface {
    * Add a photo to this respondent
    * @param {string} respondentId
    * @param {Photo} photo
-   * @returns {Promise<RespondentPhoto>}
+   * @returns {Promise<PhotoWithPivotTable>}
    */
-  addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto>
+  addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable>
 
   /**
    * Get the fills for this respondent by respondent id
