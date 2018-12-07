@@ -27,7 +27,6 @@
       {{ $t('add_relationship') }}
     </v-btn>
     <v-dialog
-      fullscreen
       lazy
       v-model="respondentSearchDialog">
       <ModalTitle
@@ -225,7 +224,7 @@
       if (this.$route && this.$route.query && this.$route.query.associatedRespondentId) {
         this.searchQuery = this.$route.query.associatedRespondentName
         console.log('searchQuery', this.searchQuery)
-        this.respondentSearchDialog = true
+        this.showRespondentSearch()
         // Remove the associatedRespondentId from the queryString
         let query = Object.assign({}, this.$route.query)
         delete query.associatedRespondentId

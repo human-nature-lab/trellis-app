@@ -30,7 +30,6 @@
       <!--we need the geo-search-dialog class for geo search to work correctly in the dialog-->
       <v-dialog
         content-class="geo-search-dialog"
-        fullscreen
         lazy
         v-model="geoSearchDialog">
         <ModalTitle

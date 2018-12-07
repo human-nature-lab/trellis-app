@@ -451,6 +451,7 @@ export default class InterviewManager extends InterviewManagerBase {
     if (lastRealAction) {
       const lastLocation = this.actions.actionToLocation(lastRealAction)
       while (this.currentLocationHasValidResponses() && this.navigator.locationIsAheadOfCurrent(lastLocation) && this.stepForward());
+      this.stepBackward()
     } else {
       this.navigator.seekTo({section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
     }
