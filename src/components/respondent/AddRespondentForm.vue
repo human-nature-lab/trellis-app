@@ -118,15 +118,17 @@
         this.isSaving = true
         try {
           const respondent = await RespondentService.createRespondent(this.studyId, this.name, this.geoId, this.associatedRespondentId)
-          // respondent.photos = []
           this.respondentExists = true
           this.respondent = respondent
+          this.step++
         } catch (err) {
-          debugger
-          this.error = err
+          err.component = 'AddRespondentForm@save'
+          this.log(err)
+          this.alert('error', `Unable to create respondent: ${this.name}`, { timeout: 0 })
+          this.step = 0
+          this.respondent = null
         } finally {
           this.isSaving = false
-          this.step++
         }
       },
       async checkCensus () {

@@ -104,7 +104,8 @@
       baseRespondentFilters () {
         let filters = {
           includeChildren: true,
-          onlyCurrentGeo: false
+          onlyCurrentGeo: false,
+          randomize: true
         }
         if (this.geoTypeParameterValue && this.baseAncestorIds.length) {
           filters.geos = this.baseAncestorIds.slice()
@@ -147,10 +148,10 @@
         let promise = new Promise(resolve => resolve())
         if (this.geoTypeParameterValue && !this.baseAncestorIds.length && this.respondent.geos.length) {
           const p = []
-          let geoTypeCompareVal = this.geoTypeParameterValue.replace(' ', '').toLowerCase()
+          let geoTypeCompareVal = this.geoTypeParameterValue.replace(/\s/g, '').toLowerCase()
           for (let rGeo of this.respondent.geos) {
             p.push(GeoService.getGeoAncestors(rGeo.geoId).then(ancestors => {
-              let baseAncestor = ancestors.find(a => a.geoType.name.replace(' ', '').toLowerCase() === geoTypeCompareVal)
+              let baseAncestor = ancestors.find(a => a.geoType.name.replace(/\s/g, '').toLowerCase() === geoTypeCompareVal)
               if (!baseAncestor) console.warn('Unable to find respondent ancestor matching', this.geoTypeParameterValue)
               if (baseAncestor) {
                 this.baseAncestorIds.push(baseAncestor.id)
@@ -224,7 +225,7 @@
       if (this.$route && this.$route.query && this.$route.query.associatedRespondentId) {
         this.searchQuery = this.$route.query.associatedRespondentName
         console.log('searchQuery', this.searchQuery)
-        this.showRespondentSearch()
+        // this.showRespondentSearch()
         // Remove the associatedRespondentId from the queryString
         let query = Object.assign({}, this.$route.query)
         delete query.associatedRespondentId
