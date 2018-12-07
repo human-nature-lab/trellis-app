@@ -49,6 +49,7 @@
     "ngraph.graph": "0.0.14",
     "node-sass": "^4.9.2",
     "performant-array-to-tree": "git+https://github.com/wyattis/performant-array-to-tree.git",
+    "phonegap-plugin-barcodescanner": "^8.0.1",
     "reflect-metadata": "^0.1.12",
     "typeface-roboto": "0.0.54",
     "typeorm": "^0.2.7",
@@ -62,6 +63,7 @@
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.0.0",
     "@types/lru-cache": "^4.1.1",
+    "@types/phonegap-plugin-barcodescanner": "0.0.3",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.26.3",
     "babel-eslint": "^7.1.1",
@@ -176,6 +178,9 @@
       "cordova-plugin-zeep": {},
       "cordova-plugin-simple-image-resizer": {
         "ANDROID_EXIFINTERFACES_VERSION": "27.+"
+      },
+      "phonegap-plugin-barcodescanner": {
+        "ANDROID_SUPPORT_V4_VERSION": "27.+"
       }
     },
     "platforms": [
