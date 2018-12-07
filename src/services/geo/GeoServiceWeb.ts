@@ -2,14 +2,14 @@ import http from '../http/AxiosInstance'
 import GeoServiceAbstract from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import GeoType from '../../entities/trellis/GeoType'
-import GeoPhoto from "../../entities/trellis/GeoPhoto";
 import Photo from "../../entities/trellis/Photo";
+import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export default class GeoServiceWeb extends GeoServiceAbstract {
 
-  async addPhoto (geoId: string, photo: Photo): Promise<GeoPhoto> {
+  async addPhoto (geoId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     // TODO: Add geo photo on web side
-    return new GeoPhoto()
+    throw new Error("Can't add photos on web side yet")
   }
 
   getGeoById (geoId) {
@@ -33,7 +33,6 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
   }
 
   async createGeo (geo: Geo): Promise<any> {
-    console.log('createGeo', geo)
     return http().put('/geo', {
       geo: geo
     })
