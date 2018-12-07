@@ -22,7 +22,11 @@
           </v-flex>
         </v-layout>
         <v-layout>
-          <PhotoAlbum :photos="geo.photos" @photo="addPhoto" />
+          <PhotoAlbum
+            :photos="geo.photos"
+            @photo="addPhoto"
+            @deletePhoto="onDeletePhoto"
+            @updatePhotos="onUpdatePhotos" />
         </v-layout>
       </v-card-text>
     </v-card>
@@ -63,7 +67,6 @@
     methods: {
       hydrate (geo: Geo) {
         this.geo = geo
-        console.log('GeoInfo', geo)
         this.translation = geo.nameTranslation
       },
       viewRespondents () {
@@ -78,8 +81,21 @@
         })
       },
       async addPhoto (photo: Photo) {
-        await GeoService.addPhoto(this.geo.id, photo)
-        this.geo.photos.push(photo)
+        let photoWithPivotTable = await GeoService.addPhoto(this.geo.id, photo)
+        this.geo.photos.push(photoWithPivotTable)
+      },
+      onUpdatePhotos: async function (photos) {
+        await GeoService.updatePhotos(photos)
+      },
+      onDeletePhoto: async function (photo) {
+        let confirmMessage = this.$t('remove_photo_confirm') + ''
+        if (!window.confirm(confirmMessage)) return
+        try {
+          await GeoService.removePhoto(photo)
+          this.geo.photos.splice(this.geo.photos.indexOf(photo), 1)
+        } catch (err) {
+          console.error(err)
+        }
       }
     }
   })
