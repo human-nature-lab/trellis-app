@@ -77,7 +77,7 @@ export function pushRouteAndQueueCurrent (route, query) {
     route.query = {}
   }
   if (query) {
-    route.query.to = { path: router.currentRoute.fullPath, query: query }
+    route.query.to = JSON.stringify({ path: router.currentRoute.fullPath, query: query })
   } else {
     route.query.to = router.currentRoute.fullPath
   }
