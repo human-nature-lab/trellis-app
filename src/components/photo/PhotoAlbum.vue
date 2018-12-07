@@ -5,13 +5,13 @@
       <v-spacer></v-spacer>
       <AddPhoto v-if="allowAdding" @photo="onAddPhoto"></AddPhoto>
     </v-toolbar>
-    <transition-group name="photo-cards" tag="div" class="layout row wrap align-content-start">
+    <transition-group name="photo-cards" tag="div" class="layout row wrap">
       <v-flex
         xs6 sm6 md4 lg3 xl2
         v-for="photo in orderedPhotos"
         class="photo-flex"
         :key="photo.id">
-        <v-card height="100%" class="photo-vcard">
+        <v-card class="photo-vcard">
           <v-card-media>
             <photo
               @click="showFull(photo)"
@@ -163,11 +163,12 @@
 </script>
 
 <style lang="sass">
+  .photo-card
+    position: relative
   .photo-flex
     transition: all 1s
-    .photo-vcard
-      padding-bottom: 52px
     .photo-actions
+      background: white
       width: 100%
       position: absolute
       bottom: 0
