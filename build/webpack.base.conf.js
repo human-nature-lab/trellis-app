@@ -61,6 +61,10 @@ module.exports = {
         loader: 'raw-loader'
       },
       {
+        test: /\.md$/,
+        loader: 'raw-loader'
+      },
+      {
         test: /\.csv$/,
         loader: 'csv-loader',
         options: {
