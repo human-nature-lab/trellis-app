@@ -6,9 +6,10 @@ import Action from "../entities/trellis/Action";
 import Form from "../entities/trellis/Form";
 declare const cordova: any
 
-export interface SearchDrawer {
-  component: any
-  open: boolean
+export interface SecondaryDrawer {
+  icon?: string
+  isEnabled: boolean
+  onClick?: Function
 }
 
 export class MenuDrawer {
@@ -34,7 +35,7 @@ export interface Singleton {
   user: User
   offline: boolean
   printMode: boolean
-  searchDrawer: SearchDrawer
+  secondaryDrawer: SecondaryDrawer
   menuDrawer: MenuDrawer
   loading: Loading
   interview: {
@@ -53,10 +54,11 @@ export default {
   user: null,
   offline: storage.get('offline') !== null ? storage.get('offline') : (typeof cordova === 'object'),
   printMode: false,
-  searchDrawer: {
-    component: null,
-    open: false
-  } as SearchDrawer,
+  secondaryDrawer: {
+    icon: null,
+    isOpen: false,
+    isEnabled: false
+  } as SecondaryDrawer,
   menuDrawer: {
     open: false
   } as MenuDrawer,

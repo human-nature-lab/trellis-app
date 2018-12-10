@@ -46,16 +46,11 @@
         </v-btn>
         <span>{{$t('change_locale')}}</span>
       </v-tooltip>
-      <v-tooltip left>
-        <v-btn
-          slot="activator"
-          icon
-          @click.stop="global.searchDrawer.open = !global.searchDrawer.open"
-          v-if="global.searchDrawer.component !== null">
-          <v-icon>search</v-icon>
-        </v-btn>
-        <span>{{$t('search')}}</span>
-      </v-tooltip>
+      <v-toolbar-side-icon
+        v-if="global.secondaryDrawer.isEnabled"
+        @click.stop="global.secondaryDrawer.onClick">
+        <v-icon>{{global.secondaryDrawer.icon || 'search'}}</v-icon>
+      </v-toolbar-side-icon>
     </v-toolbar>
     <v-content>
       <v-progress-linear
