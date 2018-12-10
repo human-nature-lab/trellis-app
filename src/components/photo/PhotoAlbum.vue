@@ -21,7 +21,7 @@
             </photo>
           </v-card-media>
           <v-card-actions class="photo-actions">
-            <v-btn flat icon color="amber" @click="setFavorite(photo)">
+            <v-btn v-if="allowSorting "flat icon color="amber" @click="setFavorite(photo)">
               <v-icon v-if="photo.pivot.sortOrder === 0" medium>star</v-icon>
               <v-icon v-else medium>star_border</v-icon>
             </v-btn>
@@ -31,7 +31,7 @@
                 <v-icon medium>more_vert</v-icon>
               </v-btn>
               <v-list>
-                <v-list-tile>
+                <v-list-tile v-if="allowNotes">
                   <v-btn icon @click.native="editPhoto(photo)">
                     <v-icon medium>edit</v-icon>
                   </v-btn>
@@ -75,7 +75,6 @@
   import FullscreenPhoto from './FullscreenPhoto'
   import orderBy from 'lodash/orderBy'
 
-  // TODO: Make it possible to remove photos. What should the UI look like for this?
   export default {
     components: {
       Photo,
@@ -115,6 +114,14 @@
         }
       },
       allowAdding: {
+        type: Boolean,
+        default: true
+      },
+      allowSorting: {
+        type: Boolean,
+        default: true
+      },
+      allowNotes: {
         type: Boolean,
         default: true
       }
