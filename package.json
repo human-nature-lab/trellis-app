@@ -1,8 +1,8 @@
 {
   "name": "trellis",
-  "version": "3.0.18",
+  "version": "3.0.19",
   "description": "The form view component of the Trellis platform.",
-  "author": "wyattis <wyattisrael@gmail.com>",
+  "author": "wyattis <wyatt.israel@yale.edu>, disperse <mark.mcknight@yale.edu>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
