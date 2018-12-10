@@ -103,7 +103,8 @@
           items: [{
             key: this.$t('version'),
             val: this.version
-          }, device, server]
+          }, device, server],
+          to: {name: 'Changelog'}
         })
         DeviceService.getUUID().then(id => {
           device.val = id
