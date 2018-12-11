@@ -33,6 +33,7 @@
     <v-dialog lazy v-model="showGeoSearch">
       <ModalTitle :title="$t('location_search')" @close="showGeoSearch=false" />
       <GeoSearch
+        :showCart="true"
         :limit="1"
         :is-selectable="true"
         :should-update-route="false"
