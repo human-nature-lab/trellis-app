@@ -147,6 +147,7 @@
         this.loadGeos(this.geoIds)
       },
       isGeoSelectable (geo) {
+        console.log('isSelectable', geo.geoType.name)
         return this.allowedGeoTypes.indexOf(geo.geoType.name.replace(/\s/g, '').toLowerCase()) > -1
       }
     },

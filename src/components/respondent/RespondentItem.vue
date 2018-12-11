@@ -27,7 +27,8 @@
         <v-chip
           label
           outline
-          v-for="label in labels">
+          v-for="label in labels"
+          :key="label">
           {{label}}
         </v-chip>
       </v-card-text>
