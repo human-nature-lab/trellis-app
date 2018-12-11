@@ -1,10 +1,11 @@
 <template>
-  <v-container fluid grid-list-xs class="ma-0 pa-0">
+  <v-container fluid grid-list-xs class="ma-0 pa-0 photo-album-container">
     <v-toolbar flat>
       <v-toolbar-title>{{title}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <AddPhoto v-if="allowAdding" @photo="onAddPhoto"></AddPhoto>
+      <AddPhoto v-if="allowAdding && global.offline" @photo="onAddPhoto"></AddPhoto>
     </v-toolbar>
+    <v-progress-linear v-if="loading" :indeterminate="true"></v-progress-linear>
     <transition-group name="photo-cards" tag="div" class="layout row wrap">
       <v-flex
         xs6 sm6 md4 lg3 xl2
@@ -74,6 +75,7 @@
   import AddPhoto from './AddPhoto'
   import FullscreenPhoto from './FullscreenPhoto'
   import orderBy from 'lodash/orderBy'
+  import global from '../../static/singleton'
 
   export default {
     components: {
@@ -90,40 +92,45 @@
         fullPhoto: null,
         editingPhoto: null,
         isFullOpen: false,
-        showDialog: false
+        showDialog: false,
+        global: global
       }
     },
     name: 'PhotoAlbum',
     props: {
       photos: {
         type: Array,
-        default: () => []
+        'default': () => []
       },
       width: {
         type: String,
-        default: '250'
+        'default': '250'
       },
       height: {
         type: String,
-        default: '250'
+        'default': '250'
       },
       title: {
         type: String,
-        default: function () {
+        'default': function () {
           return this.$t('photos')
         }
       },
       allowAdding: {
         type: Boolean,
-        default: true
+        'default': true
       },
       allowSorting: {
         type: Boolean,
-        default: true
+        'default': true
       },
       allowNotes: {
         type: Boolean,
-        default: true
+        'default': true
+      },
+      loading: {
+        type: Boolean,
+        'default': false
       }
     },
     computed: {
@@ -170,6 +177,8 @@
 </script>
 
 <style lang="sass">
+  .photo-album-container
+    min-height: 10em
   .photo-card
     position: relative
   .photo-flex
