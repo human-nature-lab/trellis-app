@@ -27,7 +27,7 @@ const StudySelectorPage = () => import(/* webpackChunkName: "study-selector" */'
 const RespondentsSearch = () => import(/* webpackChunkName: "respondent-search" */'../components/respondent/RespondentsSearch')
 const RespondentForms = () => import(/* webpackChunkName: "respondent-forms" */'../components/respondent/RespondentForms')
 const RespondentInfo = () => import(/* webpackChunkName: "respondent-info" */'../components/respondent/RespondentInfo')
-const Documentation = () => import(/* webpackChunkName: "documentation" */'../components/Documentation')
+const DocsRoute = () => import(/* webpackChunkName: "documentation" */'../components/documentation/DocsRoute')
 const Changelog = () => import(/* webpackChunkName: "changelog" */'../components/Changelog')
 const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'../components/geo/GeoInfo')
 
@@ -101,9 +101,9 @@ export default [{
   name: 'Info',
   component: TrellisInfo
 }, {
-  path: '/documentation',
+  path: '/documentation/:filePath?',
   name: 'Documentation',
-  component: Documentation
+  component: DocsRoute
 }, {
   path: '/changelog',
   name: 'Changelog',
