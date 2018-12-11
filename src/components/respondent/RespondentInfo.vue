@@ -22,7 +22,8 @@
               {{error}}
             </v-alert>
             <photo-album
-              :photos="respondent.photos"
+              :loading="respondentPhotosLoading"
+              :photos="respondentPhotos"
               @photo="onNewPhoto"
               @delete-photo="onDeletePhoto"
               @update-photos="onUpdatePhotos"></photo-album>
@@ -79,6 +80,8 @@
       return {
         global: singleton,
         respondent: null as Respondent,
+        respondentPhotosLoading: true,
+        respondentPhotos: [],
         respondentConditionTags: [] as RespondentConditionTag[],
         error: null as any,
         deleting: {} as object,
@@ -99,13 +102,15 @@
       hydrate: async function (respondent: Respondent) {
         this.respondent = respondent
         this.respondentConditionTags = await respondent.respondentConditionTags
+        this.respondentPhotos = await RespondentService.getRespondentPhotos(respondent.id)
+        this.respondentPhotosLoading = false
       },
       leaving: function () {
         this.respondentConditionTags = []
       },
       onNewPhoto: async function (photo) {
         let photoWithPivotTable = await RespondentService.addPhoto(this.respondent.id, photo)
-        this.respondent.photos.push(photoWithPivotTable)
+        this.respondentPhotos.push(photoWithPivotTable)
         this.isAddingPhoto = false
       },
       onUpdatePhotos: async function (photos) {
@@ -116,7 +121,7 @@
         if (!window.confirm(confirmMessage)) return
         try {
           await RespondentService.removePhoto(photo)
-          this.respondent.photos.splice(this.respondent.photos.indexOf(photo), 1)
+          this.respondentPhotos.splice(this.respondentPhotos.indexOf(photo), 1)
         } catch (err) {
           console.error(err)
         }
