@@ -26,6 +26,7 @@
           <v-checkbox
             v-model="modulesToRun"
             v-for="name in testModules"
+            :key="name"
             :value="name"
             :label="name" />
         </v-expansion-panel-content>

@@ -10,7 +10,7 @@ import {InterviewLocation} from '../services/InterviewAlligator'
 import Form from '../../../entities/trellis/Form'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import Action from '../../../entities/trellis/Action'
-import ConditionTagInterface from '../../../services/condition-tag/ConditionTagInterface'
+import {ConditionTagInterface} from '../../../services/interview/InterviewDataInterface'
 import RespondentFill from '../../../entities/trellis/RespondentFill'
 import Interview from '../../../entities/trellis/Interview'
 import InterviewManagerBase from "./InterviewManagerBase";
@@ -54,7 +54,7 @@ export default class InterviewManager extends InterviewManagerBase {
 
     console.log('InterviewManager: initial data', data)
     if (data) this.data.loadData(data)
-    if (conditionTags) this.data.loadConditionTags(conditionTags)
+    if (conditionTags) this.data.loadConditionTags(conditionTags, baseRespondentConditionTags)
     if (respondentFills) this.respondentFills.fill(respondentFills)
     if (actions) this.actions.load(actions)
 
@@ -74,6 +74,7 @@ export default class InterviewManager extends InterviewManagerBase {
    * Run anything that needs to wait until other stuff is initialized before being run
    */
   initialize () {
+    console.log('Initial condition tags', this.data.conditionTags)
     this.actions.initialize() // This emits an initial state event to any subscribers (the actionsPersistSlave)
     this.data.initialize()    // This emits an initial state event to any subscribers (the dataPersistSlave)
     this.data.reset()
@@ -261,6 +262,7 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 
   stepForward (): boolean {
+    console.log('current ConditionTags', this.getConditionTags(this.location.sectionRepetition, this.location.sectionFollowUpDatumId))
     this.onPageExit()
     if (this.navigator.isAtEnd) {
       this.atEnd()

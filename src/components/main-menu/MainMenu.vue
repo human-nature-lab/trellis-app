@@ -47,6 +47,16 @@
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
+      <v-list-tile :to="{name: 'Documentation'}">
+        <v-list-tile-action>
+          <v-icon>help</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{ $t('documentation') }}
+          </v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
       <!--<v-list-tile v-if="global.offline" :to="{name: 'Logs'}">
         <v-list-tile-action>
           <v-icon>error_outline</v-icon>
@@ -169,7 +179,7 @@
         </v-list-tile-content>
       </v-list-tile>
       <v-list-tile
-        v-if="isCordovaBuild"
+        v-if="isDebug"
         :to="{ name: 'ServiceTesting' }">
         <v-list-tile-action>
           <v-icon>build</v-icon>
@@ -243,6 +253,9 @@
       }
     },
     computed: {
+      isDebug () {
+        return config.debug
+      },
       isCordovaBuild () {
         return config.appEnv === APP_ENV.CORDOVA
       },

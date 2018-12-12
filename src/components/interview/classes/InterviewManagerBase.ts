@@ -252,6 +252,10 @@ export default class InterviewManagerBase extends Emitter {
     return new Set(this.getConditionTags(sectionReptition, sectionFollowUpDatumId))
   }
 
+  getAllConditionTags () {
+    return this.data.getAllConditionTagNames()
+  }
+
   getSortedQuestionDatumData (questionDatumId: string, useRandom: boolean = false): Datum[] {
     let data = this.data.getQuestionDatumById(questionDatumId).data
     if (useRandom) {

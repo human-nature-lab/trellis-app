@@ -120,12 +120,12 @@ export default class InterviewLoader {
 
       // Then we need to loop through questions and find all assigned condition tags in this form
       // We'll store the condition tag IDs in this object
-      let conditionTagIds = {}
+      let conditionTagIds = new Map()
       form.sections.forEach((section) => {
         section.questionGroups.forEach((questionGroup) => {
           questionGroup.questions.forEach((question) => {
             question.assignConditionTags.forEach((act) => {
-              conditionTagIds[act.conditionTagId] = true
+              conditionTagIds.set(act.conditionTagId, true)
             })
           })
         })
@@ -133,7 +133,7 @@ export default class InterviewLoader {
 
       // Now let's filter out any condition tags that may be assigned by the current form
       baseRespondentConditionTags = baseRespondentConditionTags.filter((rct) => {
-        return (! conditionTagIds.hasOwnProperty(rct.conditionTagId))
+        return !conditionTagIds.get(rct.conditionTagId)
       })
       // We're left by condition tags that were assigned outside of the scope of this form
 

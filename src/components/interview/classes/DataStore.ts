@@ -99,6 +99,7 @@ export default class DataStore extends Emitter {
     } else if (tags && tags.respondent) {
       this.baseRespondentConditionTags = tags.respondent
     }
+    console.log('base respondent ConditionTags', this.baseRespondentConditionTags.map(rct => rct.conditionTag.name), baseRespondentConditionTags.map(rct => rct.conditionTag.name))
     for (let type of ['respondent', 'survey', 'section']) {
       if (this.conditionTags[type] && tags[type]) {
         for (let tag of tags[type]) {
@@ -286,6 +287,17 @@ export default class DataStore extends Emitter {
       }
     }
     return tags
+  }
+
+  public getAllConditionTags (): ConditionTag[] {
+    let tags: ConditionTag[] = this.conditionTags.respondent.map(rct => ConditionTagStore.getTagById(rct.conditionTagId))
+    tags = tags.concat(this.conditionTags.survey.map(sct => ConditionTagStore.getTagById(sct.conditionId)))
+    tags = tags.concat(this.conditionTags.section.map(sct => ConditionTagStore.getTagById(sct.conditionId)))
+    return tags
+  }
+
+  public getAllConditionTagNames (): string[] {
+    return this.getAllConditionTags().map(tag => tag.name)
   }
 
   /**
