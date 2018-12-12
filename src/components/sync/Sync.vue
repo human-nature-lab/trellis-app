@@ -36,10 +36,10 @@
             <v-flex class="xs6 text-xs-left">
               <v-btn :disabled="!enableUpload"
                      :loading="uploading"
-                     @click.once="onUpload">
+                     @click="onUpload">
                 <v-icon>cloud_upload</v-icon>
               </v-btn>
-              <v-btn @click.once="onUploadPhotos"
+              <v-btn @click="onUploadPhotos"
                      :loading="uploadingPhotos"
                      :disabled="!enablePhotoDownload">
                 <v-icon>collections</v-icon>
@@ -47,12 +47,12 @@
               </v-btn>
             </v-flex>
             <v-flex class="xs6 text-xs-right">
-              <v-btn @click.once="onDownload"
+              <v-btn @click="onDownload"
                      :loading="downloading"
                      :disabled="!enableDownload">
                 <v-icon>cloud_download</v-icon>
               </v-btn>
-              <v-btn @click.once="onDownloadPhotos"
+              <v-btn @click="onDownloadPhotos"
                      :loading="downloadingPhotos"
                      :disabled="!enablePhotoDownload">
                 <v-icon>collections</v-icon>
