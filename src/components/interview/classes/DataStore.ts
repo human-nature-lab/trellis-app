@@ -99,7 +99,6 @@ export default class DataStore extends Emitter {
     } else if (tags && tags.respondent) {
       this.baseRespondentConditionTags = tags.respondent
     }
-    console.log('base respondent ConditionTags', this.baseRespondentConditionTags.map(rct => rct.conditionTag.name), baseRespondentConditionTags.map(rct => rct.conditionTag.name))
     for (let type of ['respondent', 'survey', 'section']) {
       if (this.conditionTags[type] && tags[type]) {
         for (let tag of tags[type]) {

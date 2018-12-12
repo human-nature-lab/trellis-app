@@ -262,7 +262,6 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 
   stepForward (): boolean {
-    console.log('current ConditionTags', this.getConditionTags(this.location.sectionRepetition, this.location.sectionFollowUpDatumId))
     this.onPageExit()
     if (this.navigator.isAtEnd) {
       this.atEnd()

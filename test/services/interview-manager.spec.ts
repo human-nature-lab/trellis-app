@@ -186,7 +186,7 @@ export default function () {
 
     describe('Loading', () => {
       it('should sort all sections of the form correctly', async () => {
-        for (let id of {forms.firstPageSkipped, formId]) {
+        for (let id of [forms.firstPageSkipped, formId]) {
           const manager = await setupInterviewManager(id)
           manager.initialize()
           const sections = manager.blueprint.sections
@@ -603,46 +603,46 @@ export default function () {
       })
     })
 
-    // describe('Storage', () => {
-    //   describe('Condition tags', () => {
-    //     it('should store respondent level condition tags', async () => {
-    //       const tagName = 'resp_was_assigned'
-    //       const manager = await setupInterviewManager(forms.conditionAssignment)
-    //       manager.attachDataPersistSlave()
-    //       manager.initialize()
-    //       let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
-    //       console.log('conditionTags', conditionTags)
-    //       expect(conditionTags).to.not.include(tagName, 'The RCT already exists. Please reset DB or delete')
-    //       validateLocation(manager.location, {section: 0, page: 0})
-    //       selectNChoice(manager, 1)
-    //       next(manager)
-    //       validateLocation(manager.location, {section: 0, page: 1, sectionFollowUpRepetition: 0, sectionRepetition: 0})
-    //       selectNChoice(manager, 0)
-    //       next(manager)
-    //       validateLocation(manager.location, {section: 0, page: 2, sectionFollowUpRepetition: 0, sectionRepetition: 0})
-    //       selectNChoice(manager, 0)
-    //       next(manager)
-    //       validateLocation(manager.location, {section: 0, page: 3, sectionFollowUpRepetition: 0, sectionRepetition: 0})
-    //       conditionTags = manager.navigator.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
-    //       expect(conditionTags).to.include(tagName, 'The respondent condition tag was not assigned in memory')
-    //       await manager.save()
-    //       let data = await InterviewService.getData(manager.interview.id)
-    //       expect(data.conditionTags.respondent.length).to.be.greaterThan(0, 'No respondent condition tags assigned')
-    //       let respondentConditionTags = data.conditionTags.respondent.map(rct => rct.conditionTag.name)
-    //       expect(respondentConditionTags).to.include(tagName, 'The respondent condition tag was not assigned in the database')
-    //       manager.destroy()
-    //     })
-    //   })
-      // it('should assign conditions on the last page', async () => {
-      //   throw Error('TODO') // TODO
-      // })
-      // it('should only call save once when we exit', async () => {
-      //   throw Error('TODO') // TODO
-      // })
-    //   it('should save actions when they happen')
-    //   it('should save data eventually')
-    //   it('should rebuild all the data and save before locking the survey')
-    //   it('should save data and actions before leaving')
-    // })
+    describe('Storage', () => {
+      describe('Condition tags', () => {
+        it('should store respondent level condition tags', async () => {
+          const tagName = 'resp_was_assigned'
+          const manager = await setupInterviewManager(forms.conditionAssignment)
+          manager.attachDataPersistSlave()
+          manager.initialize()
+          let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+          console.log('conditionTags', conditionTags)
+          expect(conditionTags).to.not.include(tagName, 'The RCT already exists. Please reset DB or delete')
+          validateLocation(manager.location, {section: 0, page: 0})
+          selectNChoice(manager, 1)
+          next(manager)
+          validateLocation(manager.location, {section: 0, page: 1, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          selectNChoice(manager, 0)
+          next(manager)
+          validateLocation(manager.location, {section: 0, page: 2, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          selectNChoice(manager, 0)
+          next(manager)
+          validateLocation(manager.location, {section: 0, page: 3, sectionFollowUpRepetition: 0, sectionRepetition: 0})
+          conditionTags = manager.navigator.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+          expect(conditionTags).to.include(tagName, 'The respondent condition tag was not assigned in memory')
+          await manager.save()
+          let data = await InterviewService.getData(manager.interview.id)
+          expect(data.conditionTags.respondent.length).to.be.greaterThan(0, 'No respondent condition tags assigned')
+          let respondentConditionTags = data.conditionTags.respondent.map(rct => rct.conditionTag.name)
+          expect(respondentConditionTags).to.include(tagName, 'The respondent condition tag was not assigned in the database')
+          manager.destroy()
+        })
+      })
+      it('should assign conditions on the last page', async () => {
+        throw Error('TODO') // TODO
+      })
+      it('should only call save once when we exit', async () => {
+        throw Error('TODO') // TODO
+      })
+      it('should save actions when they happen')
+      it('should save data eventually')
+      it('should rebuild all the data and save before locking the survey')
+      it('should save data and actions before leaving')
+    })
   })
 }
