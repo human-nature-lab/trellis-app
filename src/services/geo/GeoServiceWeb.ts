@@ -4,12 +4,36 @@ import Geo from '../../entities/trellis/Geo'
 import GeoType from '../../entities/trellis/GeoType'
 import Photo from "../../entities/trellis/Photo";
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
+import GeoPhoto from '../../entities/trellis/GeoPhoto'
 
 export default class GeoServiceWeb extends GeoServiceAbstract {
 
   async addPhoto (geoId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     // TODO: Add geo photo on web side
     throw new Error("Can't add photos on web side yet")
+  }
+
+  async updatePhotos (photos: Array<PhotoWithPivotTable>) {
+    return http().post(`geo-photos`, { photos: photos })
+  }
+
+  async removePhoto (photo: PhotoWithPivotTable) {
+    let geoPhotoId = encodeURIComponent(photo.pivot.id)
+    return http().delete(`geo-photo/${geoPhotoId}`)
+  }
+
+  async getGeoPhotos (geoId: string): Promise<Array<PhotoWithPivotTable>> {
+    let photos: PhotoWithPivotTable[]  = []
+    geoId = encodeURIComponent(geoId)
+    let res = await http().get(`geo/${geoId}/photos`)
+    for (let i = 0; i < res.data.photos.length; i++) {
+      let geoPhoto = new GeoPhoto().fromSnakeJSON(res.data.photos[i])
+      let photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
+      geoPhoto.photo = photo
+      photos.push(new PhotoWithPivotTable(geoPhoto))
+    }
+
+    return photos
   }
 
   getGeoById (geoId) {
