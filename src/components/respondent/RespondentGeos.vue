@@ -21,13 +21,13 @@
       :items="locations"
       hide-actions>
       <template slot="items" slot-scope="props">
-        <RespondentGeoRow
+        <respondent-geo-row
           @remove="remove"
           @move="startMove"
-          :showHistory="!!props.item.history && !!props.item.history.length"
-          :showControls="true"
+          :show-history="!!props.item.history && !!props.item.history.length"
+          :show-controls="true"
           v-model="props.expanded"
-          :respondentGeo="props.item" />
+          :respondent-geo="props.item"></respondent-geo-row>
       </template>
       <template slot="expand" slot-scope="props">
         <v-data-table
@@ -36,21 +36,21 @@
           :items="props.item.history"
           hide-actions>
           <template slot="items" slot-scope="historyProps">
-            <RespondentGeoRow :respondentGeo="historyProps.item" />
+            <respondent-geo-row :respondentGeo="historyProps.item"></respondent-geo-row>
           </template>
         </v-data-table>
       </template>
     </v-data-table>
-    <AddRespondentGeoForm
+    <add-respondent-geo-form
       v-model="isAddingGeo"
       @added="doneAddingGeo"
-      :respondent="respondent"/>
-    <MoveRespondentGeoForm
+      :respondent="respondent"></add-respondent-geo-form>
+    <move-respondent-geo-form
       v-if="isMovingGeo"
       v-model="isMovingGeo"
       @done="doneMovingGeo"
-      :respondentGeo="movingRespondentGeo"
-      :respondent="respondent"/>
+      :respondent-geo="movingRespondentGeo"
+      :respondent="respondent"></move-respondent-geo-form>
   </v-flex>
 </template>
 
@@ -153,7 +153,7 @@
         this.$emit('after-add', rGeo)
       },
       remove (respondentGeoId: string): Promise<void> {
-        if (!confirm('Are you sure you want to delete this respondent geo?')) return
+        if (!confirm(this.$t('confirm_delete_geo') + '')) return
         return RespondentService.removeRespondentGeo(this.respondent.id, respondentGeoId).then(() => {
           let index = this.respondent.geos.findIndex(g => g.id === respondentGeoId)
           let rm = this.respondent.geos.splice(index, 1)
@@ -163,30 +163,34 @@
     },
     computed: {
       locations (): RespondentGeo[] {
-        // TODO: Build the inverted tree structure correctly
-        // let tree = arrayToTree(this.respondent.geos, 'id','previousRespondentGeoId')
-        // tree = invertTree(tree)
-        let relationShipCounts: {[id: string]: number} = {}
         for (let rGeo of this.respondent.geos) {
-          if (!relationShipCounts.hasOwnProperty(rGeo.previousRespondentGeoId)) {
-            relationShipCounts[rGeo.previousRespondentGeoId] = 0
-          }
-          relationShipCounts[rGeo.previousRespondentGeoId]++
+          rGeo.history = []
         }
-        let tree = []
-        for (let rGeo of this.respondent.geos) {
-          if (!relationShipCounts[rGeo.id]) {
-            rGeo.history = []
-            tree.push(rGeo)
-            console.log(rGeo.id, rGeo.geoId)
-            // console.log(rGeo.geo.nameTranslation.translationText[0])
-          }
+        let rootNodes = []
+        let tailNodes = this.respondent.geos.filter((node) => {
+          return node.previousRespondentGeoId === null
+        })
+
+        for (let node of tailNodes) {
+          rootNodes.push(buildNodeHistory(node, this.respondent.geos))
         }
-        console.log('tree', JSON.stringify(tree, null, 2))
-        return tree
+        return rootNodes
       }
     }
   })
+
+  function buildNodeHistory(curNode, nodes) {
+    let nextNode = nodes.find((n) => {
+      return n.previousRespondentGeoId === curNode.id
+    })
+    if (nextNode === undefined) {
+      // Found the root node, return it
+      return curNode
+    } else {
+      nextNode.history = [curNode].concat(curNode.history)
+      return buildNodeHistory(nextNode, nodes)
+    }
+  }
 </script>
 
 <style lang="sass">
