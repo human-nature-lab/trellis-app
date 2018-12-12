@@ -9,12 +9,17 @@
         </v-btn>
       </v-toolbar>
       <v-card-text>
-        <v-alert v-show="error" color="error">{{error}}</v-alert>
+        <v-alert v-if="error" color="error">{{error}}</v-alert>
         <v-layout class="pa-3">
           <geo-breadcrumbs v-if="geo.parentId" :geo-id="geo.parentId"></geo-breadcrumbs>
         </v-layout>
         <v-layout>
-          <photo-album :photos="geo.photos" @photo="addPhoto"></photo-album>
+          <photo-album
+            :loading="geoPhotosLoading"
+            :photos="geoPhotos"
+            @photo="addPhoto"
+            @delete-photo="onDeletePhoto"
+            @update-photos="onUpdatePhotos"></photo-album>
         </v-layout>
       </v-card-text>
     </v-card>
@@ -49,14 +54,17 @@
       return {
         geo: null,
         translation: null,
-        error: null
+        error: null,
+        geoPhotos: [],
+        geoPhotosLoading: true
       }
     },
     methods: {
-      hydrate (geo: Geo) {
+      hydrate: async function (geo: Geo) {
         this.geo = geo
-        console.log('GeoInfo', geo)
         this.translation = geo.nameTranslation
+        this.geoPhotos = await GeoService.getGeoPhotos(geo.id)
+        this.geoPhotosLoading = false
       },
       viewRespondents () {
         router.push({
@@ -70,8 +78,21 @@
         })
       },
       async addPhoto (photo: Photo) {
-        await GeoService.addPhoto(this.geo.id, photo)
-        this.geo.photos.push(photo)
+        let photoWithPivotTable = await GeoService.addPhoto(this.geo.id, photo)
+        this.geoPhotos.push(photoWithPivotTable)
+      },
+      onUpdatePhotos: async function (photos) {
+        await GeoService.updatePhotos(photos)
+      },
+      onDeletePhoto: async function (photo) {
+        let confirmMessage = this.$t('remove_photo_confirm') + ''
+        if (!window.confirm(confirmMessage)) return
+        try {
+          await GeoService.removePhoto(photo)
+          this.geoPhotos.splice(this.geoPhotos.indexOf(photo), 1)
+        } catch (err) {
+          console.error(err)
+        }
       }
     }
   })

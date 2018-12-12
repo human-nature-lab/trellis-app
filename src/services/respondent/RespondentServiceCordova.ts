@@ -5,28 +5,78 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
-import {Brackets, Connection, ConnectionManager, EntityManager, IsNull, QueryBuilder} from 'typeorm'
+import {Brackets, Connection, EntityManager, IsNull} from 'typeorm'
 import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
 import {removeSoftDeleted} from "../database/SoftDeleteHelper";
 import Geo from "../../entities/trellis/Geo";
+import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
 
-  async addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto> {
+  async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     const repo = await DatabaseService.getRepository(RespondentPhoto)
     let rPhoto = new RespondentPhoto()
     rPhoto.photoId = photo.id
     rPhoto.respondentId = respondentId
     rPhoto.sortOrder = await repo.createQueryBuilder('rp').where('rp.respondentId = :respondentId', {respondentId}).getCount()
     await repo.save(rPhoto)
-    return rPhoto
+    let respondentPhoto = await repo.findOne({
+      where: {
+        id: rPhoto.id
+      },
+      relations: [
+        'photo'
+      ]
+    })
+    return new PhotoWithPivotTable(respondentPhoto)
+  }
+
+  async removePhoto (photo: PhotoWithPivotTable) {
+    const repository = await DatabaseService.getRepository(RespondentPhoto)
+    await repository.update({
+      id: photo.pivot.id
+    }, {
+      deletedAt: new Date()
+    })
+  }
+
+  async updatePhotos (photosWithPivotTable : Array<PhotoWithPivotTable>) {
+    const repository = await DatabaseService.getRepository(RespondentPhoto)
+    for (let photoWithPivotTable of photosWithPivotTable) {
+      await repository.update({
+        id: photoWithPivotTable.pivot.id
+      }, {
+        sortOrder: photoWithPivotTable.pivot.sortOrder,
+        notes: photoWithPivotTable.pivot.notes
+      })
+    }
   }
 
   async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentFill)
     return await repository.find({ deletedAt: null, respondentId: respondentId })
+  }
+
+  async getRespondentPhotos (respondentId: string): Promise<Array<PhotoWithPivotTable>> {
+    const respondentPhotoRepository = await DatabaseService.getRepository(RespondentPhoto)
+    let respondentPhotos = await respondentPhotoRepository.find({
+      where: {
+        deletedAt: IsNull(),
+        respondentId: respondentId
+      },
+      relations: [
+        'photo'
+      ]
+    })
+    let photos: PhotoWithPivotTable[]  = []
+    for (let i = 0; i < respondentPhotos.length; i++) {
+      let respondentPhoto = respondentPhotos[i]
+      photos.push(new PhotoWithPivotTable(respondentPhoto))
+    }
+
+    return photos
   }
 
   async getRespondentById (respondentId: string): Promise<Respondent> {
@@ -37,7 +87,6 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
         id: respondentId
       },
       relations: [
-        'photos',
         'geos',
         'names',
         'geos.geo',
@@ -47,6 +96,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       ]
     })
 
+    respondent.photos = await this.getRespondentPhotos(respondentId)
     removeSoftDeleted(respondent)
     return respondent
   }
@@ -65,7 +115,6 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
     if (typeof query === 'string' && query.trim().length > 0) {
       const searchTerms = query.split(' ')
-      console.log('searchTerms', searchTerms)
       for (let i = 0; i < searchTerms.length; i++) {
         let searchTerm = '% ' + searchTerms[i].trim() + '%'
         q = q.andWhere(`"respondent"."id" in (select distinct respondent_id from respondent_name where " " || name like :searchTerm${i})`, {[`searchTerm${i}`]: searchTerm})
@@ -109,7 +158,6 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
           geos = geos.concat(children.filter(g => g.geoType.canContainRespondent).map(g => g.id))
           parentGeos = children.map(g => g.id)
           hasMoreChildren = children.length > 0
-          console.log('hasMoreChildren', hasMoreChildren)
         }
       }
       // TODO: Handle the maximum parameters limitation in sqlite -> https://www.sqlite.org/limits.html
@@ -128,7 +176,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
 
     q = q.andWhere('"respondent"."deleted_at" is null')
     q = q.take(size).skip(page * size)
-    q = q.leftJoinAndSelect('respondent.photos', 'photo')
+    q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     return await q.getMany()
   }
