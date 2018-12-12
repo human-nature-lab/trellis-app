@@ -24,6 +24,7 @@ export interface InterviewData {
   interview: Interview
   actions?: Action[]
   interviewType: string
+  baseRespondentConditionTags?: RespondentConditionTag[]
 }
 
 export default class InterviewLoader {
@@ -46,7 +47,8 @@ export default class InterviewLoader {
           form: res.form,
           locale,
           actions: res.actions,
-          interviewType: 'interview'
+          interviewType: 'interview',
+          baseRespondentConditionTags: res.baseRespondentConditionTags
         }
       } catch (err) {
         err.component = 'InterviewLoader.ts@load'
