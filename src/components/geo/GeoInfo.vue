@@ -15,7 +15,8 @@
         </v-layout>
         <v-layout>
           <photo-album
-            :photos="geo.photos"
+            :loading="geoPhotosLoading"
+            :photos="geoPhotos"
             @photo="addPhoto"
             @delete-photo="onDeletePhoto"
             @update-photos="onUpdatePhotos"></photo-album>
@@ -53,13 +54,17 @@
       return {
         geo: null,
         translation: null,
-        error: null
+        error: null,
+        geoPhotos: [],
+        geoPhotosLoading: true
       }
     },
     methods: {
-      hydrate (geo: Geo) {
+      hydrate: async function (geo: Geo) {
         this.geo = geo
         this.translation = geo.nameTranslation
+        this.geoPhotos = await GeoService.getGeoPhotos(geo.id)
+        this.geoPhotosLoading = false
       },
       viewRespondents () {
         router.push({
@@ -74,7 +79,7 @@
       },
       async addPhoto (photo: Photo) {
         let photoWithPivotTable = await GeoService.addPhoto(this.geo.id, photo)
-        this.geo.photos.push(photoWithPivotTable)
+        this.geoPhotos.push(photoWithPivotTable)
       },
       onUpdatePhotos: async function (photos) {
         await GeoService.updatePhotos(photos)
@@ -84,7 +89,7 @@
         if (!window.confirm(confirmMessage)) return
         try {
           await GeoService.removePhoto(photo)
-          this.geo.photos.splice(this.geo.photos.indexOf(photo), 1)
+          this.geoPhotos.splice(this.geoPhotos.indexOf(photo), 1)
         } catch (err) {
           console.error(err)
         }
