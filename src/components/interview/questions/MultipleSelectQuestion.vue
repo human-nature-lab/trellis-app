@@ -6,7 +6,7 @@
       :location="location"
       :disabled="isQuestionDisabled"
       v-for="displayChoice in displayChoices"
-      :key="displaychoice.id"/>
+      :key="displayChoice.id"/>
   </div>
 </template>
 
