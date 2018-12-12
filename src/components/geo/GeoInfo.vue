@@ -2,16 +2,24 @@
   <v-flex xs12>
     <v-card tile>
       <v-toolbar card prominent>
-        <v-toolbar-title>{{ $t('geo') }}: <AsyncTranslationText :translation="geo.nameTranslation"></AsyncTranslationText></v-toolbar-title>
+        <v-toolbar-title>
+          <AsyncTranslationText :translation="geo.nameTranslation" />
+        </v-toolbar-title>
         <v-spacer />
         <v-btn @click="viewRespondents">
           {{ $t('respondents') }}
         </v-btn>
       </v-toolbar>
       <v-card-text>
-        <v-alert v-if="error" color="error">{{error}}</v-alert>
-        <v-layout class="pa-3">
-          <geo-breadcrumbs v-if="geo.parentId" :geo-id="geo.parentId"></geo-breadcrumbs>
+        <v-alert v-show="error" color="error">{{error}}</v-alert>
+        <v-layout wrap class="mb-3">
+          <v-flex>
+            <span class="subheading">{{ $t('location') }}:</span>  <GeoBreadcrumbs v-if="geo.id" :geoId="geo.id" />
+          </v-flex>
+          <v-spacer />
+          <v-flex class="text-xs-right">
+            <span class="subheading">{{ $t('type') }}:</span>  {{geo.geoType.name}}
+          </v-flex>
         </v-layout>
         <v-layout>
           <photo-album

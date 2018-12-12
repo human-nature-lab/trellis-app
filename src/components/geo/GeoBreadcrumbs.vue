@@ -1,19 +1,24 @@
 <template>
   <span class="geo-breadcrumbs">
-    <span v-if="error" class="error">
-      {{error}}
-    </span>
-    <span v-else-if="isLoading">
+    <span v-if="isLoading">
       Loading...
     </span>
-    <span v-else>
+    <span v-else-if="canNavigate">
       <router-link
         class="geo-name"
         :to="{name: 'Geo', params: {geoId: geo.id}}"
         v-for="geo in ancestors"
         :key="geo.id">
-        <AsyncTranslationText :translation="geo.nameTranslation"></AsyncTranslationText>
+        <AsyncTranslationText :translation="geo.nameTranslation" />
       </router-link>
+    </span>
+    <span v-else>
+      <span
+        class="geo-name"
+        v-for="geo in ancestors"
+        :key="geo.id">
+        <AsyncTranslationText :translation="geo.nameTranslation" />
+      </span>
     </span>
   </span>
 </template>
@@ -32,12 +37,19 @@
       showAncestors: {
         type: Boolean,
         default: true
+      },
+      maxDepth: {
+        type: Number,
+        default: 0
+      },
+      canNavigate: {
+        type: Boolean,
+        default: true
       }
     },
     data () {
       return {
         global: singleton,
-        error: null,
         isLoading: false,
         ancestors: []
       }
@@ -57,9 +69,13 @@
         if (!this.geoId) return
         this.isLoading = true
         GeoService.getGeoAncestors(this.geoId).then(ancestors => {
-          this.ancestors = ancestors
+          this.ancestors = ancestors.slice()
+          if (this.maxDepth) {
+            this.ancestors.splice(0, this.ancestors.length - this.maxDepth)
+          }
         }).catch(err => {
-          this.error = err
+          this.log(err)
+          this.alert('error', `Unable to load ancestors for geo: ${this.geoId}`)
         }).finally(() => {
           this.isLoading = false
         })

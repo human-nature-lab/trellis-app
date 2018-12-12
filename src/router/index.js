@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import {defaultLoggingService as logger} from '../services/logging/LoggingService'
 import singleton from '../static/singleton'
 import ValidateSync from './guards/ValidateSync'
 import ValidateLogin from './guards/ValidateLogin'
@@ -8,6 +9,8 @@ import chain from './guards/ChainableGuards'
 import appRoutes from './app.routes'
 import webRoutes from './web.routes'
 import sharedRoutes from './shared.routes'
+import { LoggingLevel } from '../services/logging/LoggingTypes'
+import {AddSnack} from '../components/SnackbarQueue'
 
 let routes = sharedRoutes
 if (singleton.offline) {
@@ -33,17 +36,35 @@ if (singleton.offline) {
 }
 
 router.beforeEach((to, from, next) => {
-  console.log('before navigating to', to)
+  logger.log({
+    component: 'router/index.js@beforeEach',
+    message: `before navigating to: ${to.fullPath}`,
+    severity: LoggingLevel.debug
+  })
   setTimeout(next)
 })
 
-router.afterEach((to) => console.log('after navigating to', to))
+router.afterEach((to) => {
+  logger.log({
+    component: 'router/index.js@afterEach',
+    message: `after navigating to: ${to.fullPath}`,
+    severity: LoggingLevel.debug
+  })
+})
 
-router.onReady(() => console.log('router ready'))
+router.onReady(() => {
+  logger.log({
+    component: 'router/index.js@onReady',
+    message: 'onReady',
+    severity: LoggingLevel.debug
+  })
+})
 
 router.onError(err => {
-  console.error('Router error:', err)
-  alert('Unable to load route!')
+  err.severity = LoggingLevel.error
+  err.component = err.component ? err.component : 'router/index.js@onError'
+  logger.log(err)
+  AddSnack('Unable to load route', {timeout: 0})
 })
 
 /**
@@ -56,7 +77,7 @@ export function pushRouteAndQueueCurrent (route, query) {
     route.query = {}
   }
   if (query) {
-    route.query.to = { path: router.currentRoute.fullPath, query: query }
+    route.query.to = JSON.stringify({ path: router.currentRoute.fullPath, query: query })
   } else {
     route.query.to = router.currentRoute.fullPath
   }

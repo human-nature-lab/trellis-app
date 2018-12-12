@@ -1,8 +1,10 @@
 import config from '../config'
 import {APP_ENV} from '../static/constants'
-import Vue from 'vue'
+import Vue, {Component} from 'vue'
 import {defaultLoggingService} from '../services/logging/LoggingService'
 import Log from "../entities/trellis-config/Log";
+// @ts-ignore
+import {AddSnack} from '../components/SnackbarQueue'
 
 export default Vue.mixin({
   methods: {
@@ -11,7 +13,19 @@ export default Vue.mixin({
         log.component = this.$options.name
       }
       return defaultLoggingService.log(log)
+    },
+    addSnack (msg, config?) {
+      AddSnack(msg, config)
+    },
+    alert (color: string, msg, config?) {
+      config = config ? config : {}
+      config.color = color
+      AddSnack(msg, config)
     }
+  },
+  errorCaptured (err: Error, vm: Vue, info: string) {
+    // @ts-ignore
+    this.log(err)
   },
   computed: {
     isWeb (): boolean {
@@ -26,6 +40,8 @@ export default Vue.mixin({
 declare module 'vue/types/vue' {
   interface Vue {
     log (log: any): Promise<Log>
+    addSnack (msg, config?): void
+    alert (color: string, msg, config?): void
     isWeb: boolean
     isCordova: boolean
   }

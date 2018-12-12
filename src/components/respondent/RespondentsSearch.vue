@@ -9,50 +9,93 @@
       <v-btn
         v-if="canSelect"
         @click="onDone"
-        color="primary"
+        class="text--primary"
         :disabled="isLoading">
         <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
         <span v-else>
           {{ $t('done') }}
         </span>
       </v-btn>
+      <v-btn icon @click="filtersIsOpen = !filtersIsOpen">
+        <v-icon v-if="filtersIsOpen">keyboard_arrow_up</v-icon>
+        <v-icon v-else>keyboard_arrow_down</v-icon>
+      </v-btn>
     </v-layout>
-    <v-layout>
-      <v-select
-        :items="conditionTags"
-        v-model="filters.conditionTags"
-        :label="$t('condition_tags')"
-        single-line
-        dense
-        chips
-        tags
-        @input="onQueryChange"
-        :loading="conditionTagsLoading"
-        autocomplete></v-select>
-      <v-tooltip bottom>
-        <v-btn
-          slot="activator"
-          icon
-          @click="clearFilters">
-          <v-icon>clear</v-icon>
-        </v-btn>
-        <span>
-          {{ $t('clear') }}
-        </span>
-      </v-tooltip>
-    </v-layout>
-    <v-layout v-if="filters.geos && filters.geos.length">
-      <span>
-        {{ $t('geo_search_filter') }}
-      </span>
+    <v-scale-transition>
+      <v-layout column v-if="filtersIsOpen">
+        <v-flex>
+          <v-layout>
+            <v-select
+              :items="conditionTags"
+              v-model="filters.conditionTags"
+              :label="$t('condition_tags')"
+              single-line
+              dense
+              chips
+              tags
+              @input="onQueryChange"
+              :loading="conditionTagsLoading"
+              autocomplete>
+              <v-chip
+                slot="selection"
+                slot-scope="props"
+                outline
+                color="primary">
+                <v-avatar>
+                  <v-icon>label</v-icon>
+                </v-avatar>
+                {{props.item}}
+              </v-chip>
+            </v-select>
+            <v-tooltip bottom>
+              <v-btn
+                slot="activator"
+                icon
+                @click="clearFilters">
+                <v-icon>clear</v-icon>
+              </v-btn>
+              <span>
+                {{ $t('clear') }}
+              </span>
+            </v-tooltip>
+          </v-layout>
+          <v-layout row wrap>
+            <v-flex>
+              <v-checkbox
+                v-model="filters.includeChildren"
+                :label="$t('include_child_locations')" />
+            </v-flex>
+            <v-flex v-if="showPastResidentsOption">
+              <v-checkbox
+                v-model="showPastResidents"
+                :label="$t('show_past_residents')" />
+            </v-flex>
+          </v-layout>
+        </v-flex>
+      </v-layout>
+    </v-scale-transition>
+    <v-divider v-if="filters.geos && filters.geos.length" />
+    <v-layout row wrap v-if="filters.geos && filters.geos.length">
+      <v-flex class="subheading">
+        <v-container>{{ $t('filters') }}</v-container>
+      </v-flex>
+      <v-spacer />
       <v-chip
         v-for="(geo, index) in filters.geos"
         :key="geo.id"
+        color="primary"
+        outline
         @input="removeGeoFilter(index)"
         :close="canRemoveGeos">
-        <geo-breadcrumbs :geo-id="geo" :show-ancestors="false"></geo-breadcrumbs>
+        <v-avatar>
+          <v-icon>home</v-icon>
+        </v-avatar>
+        <GeoBreadcrumbs
+          :geoId="geo"
+          :maxDepth="2" />
       </v-chip>
     </v-layout>
+    <v-divider v-if="selected.length > 0" />
     <v-layout v-if="selected.length > 0">
       <v-flex>
         <v-chip
@@ -71,7 +114,8 @@
         slot="activator"
         color="primary"
         @click="showAssociatedRespondentDialog = true"
-        :loading="isLoading">
+        :loading="isLoading"
+        :disabled="isLoading">
         <span v-if="respondentId">
           {{ $t('add_other_respondent') }}
         </span>
@@ -85,27 +129,40 @@
     </v-alert>
     <v-container class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
-        <respondent-item
+        <RespondentItem
           v-for="respondent in respondentResults"
           :key="respondent.id"
           :formsButtonVisible="formsButtonVisible"
           :infoButtonVisible="infoButtonVisible"
           @selected="onSelectRespondent(respondent)"
           :selected="isSelected(respondent)"
-          :respondent="respondent"></respondent-item>
+          :respondent="respondent"
+          :labels="getRespondentLabels(respondent)"/>
       </v-layout>
+      <v-card v-if="respondentResults.length === requestPageSize">
+        <v-container>
+          <v-layout class="subheading">
+            {{ $t('displaying_first_results',[requestPageSize]) }}
+          </v-layout>
+          <v-layout>
+            {{ $t('use_search_field_results') }}
+          </v-layout>
+        </v-container>
+      </v-card>
       <v-layout v-if="!respondentResults.length" ma-3>
-        {{ $t('no_results') }}: {{query}}
+        <v-container>
+          {{ $t('no_results') }}: {{query}}
+        </v-container>
       </v-layout>
     </v-container>
     <v-dialog
       v-model="showAssociatedRespondentDialog">
       <v-card>
-        <add-respondent-form
+        <AddRespondentForm
           @close="addRespondentClose"
           :studyId="studyId"
           :redirectToRespondentInfo="false"
-          :associatedRespondentId="respondentId"></add-respondent-form>
+          :associatedRespondentId="respondentId"></AddRespondentForm>
       </v-card>
     </v-dialog>
   </v-container>
@@ -200,7 +257,8 @@
           conditionTags: [],
           geos: [],
           includeChildren: false,
-          onlyCurrentGeo: true
+          onlyCurrentGeo: true,
+          randomize: true
         })
       },
       selectedRespondents: {
@@ -242,12 +300,16 @@
         conditionTagsLoaded: false,
         conditionTagsLoading: false,
         isLoading: false,
-        showAssociatedRespondentDialog: false
+        showAssociatedRespondentDialog: false,
+        filtersIsOpen: false
       }
     },
     created () {
       if (this.shouldUpdateRoute) {
         loadRoute(this)
+        if (this.filters.conditionTags.length) {
+          this.filtersIsOpen = true
+        }
       }
       this.loadConditionTags()
       this.getCurrentPage()
@@ -258,9 +320,6 @@
       },
       removeGeoFilter (index) {
         this.filters.geos.splice(index, 1)
-        this.search().then(() => {
-          updateRoute(this)
-        })
       },
       translate (translation) {
         return TranslationService.getAny(translation, this.global.locale.id)
@@ -347,12 +406,33 @@
         let rName = respondent.names.find(n => n.isDisplayName)
         return rName ? rName.name : this.respondent.name
       },
+      getRespondentLabels (respondent) {
+        if (!this.showLabels) return []
+        const labels = []
+        // let isPastResident = true
+        // for (let geo of respondent.geos) {
+        //   if (geo.isCurrent && this.filters.geos.indexOf(geo.geoId) > -1) {
+        //     isPastResident = false
+        //     break
+        //   }
+        // }
+        // if (isPastResident) {
+        //   labels.push(this.$t('past_resident'))
+        // }
+        return labels
+      }
     },
     watch : {
-      'searchQuery': function(searchTerm) {
+      searchQuery (searchTerm) {
         if (searchTerm !== undefined) {
           this.query = searchTerm
         }
+      },
+      filters: {
+        handler (newFilters, oldFilters) {
+          this.search()
+        },
+        deep: true
       }
     },
     computed: {
@@ -365,6 +445,20 @@
       },
       respondentResults () {
         return orderBy(this.results, ['score', 'name'], ['desc', 'asc'])
+      },
+      showLabels () {
+        return this.filters.geos.length > 0
+      },
+      showPastResidents: {
+        get () {
+          return this.filters ? !this.filters.onlyCurrentGeo : false
+        },
+        set (val) {
+          this.filters.onlyCurrentGeo = !val
+        }
+      },
+      showPastResidentsOption () {
+        return this.filters && !!this.filters.geos.length
       }
     },
     components: {

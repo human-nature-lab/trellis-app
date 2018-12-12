@@ -1,7 +1,7 @@
 <template>
   <v-toolbar
     flat
-    color="accent"
+    color="primary"
     class="white--text">
     <v-toolbar-title>
       <slot>

@@ -60,6 +60,7 @@ import Sync from '../../entities/trellis-config/Sync'
 import FileService from '../file/FileService'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 import PreloadAction from '../../entities/trellis/PreloadAction'
+import config from '../../config'
 
 const trellisConfigConnection = {
   type: 'cordova',
@@ -137,8 +138,9 @@ const trellisConnection = {
     UserStudy
   ],
   namingStrategy: new SnakeCaseNamingStrategy(),
-  logging: ['warning', 'error'] // reduced logging
+  // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
+  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error']
 }
 
 export default class DatabaseServiceCordova {
@@ -386,5 +388,13 @@ export default class DatabaseServiceCordova {
         from updated_records
         where uploaded_at is null;`)
     return totalRowResults[0]['total_rows']
+  }
+
+  async getDatabaseFileUri () {
+    return `/data/data/edu.yale.trellis.surveyview/databases/${trellisConnection.database}`
+  }
+
+  async getConfigDatabaseFileUri () {
+    return `/data/data/edu.yale.trellis.surveyview/databases/${trellisConfigConnection.database}`
   }
 }

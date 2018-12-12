@@ -101,84 +101,110 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return respondent
   }
 
+  /**
+   * Build the list of geoIds to include in the query. This list can get very big if the includeChildren flag is on.
+   * @param {string[]} geos
+   * @param {boolean} includeChildren
+   * @returns {Promise<string[]>}
+   */
+  private async getGeoIds (geos: string[], includeChildren: boolean): Promise<string[]> {
+    geos = geos.slice()
+    let parentGeos = geos.slice()
+    const maxLimit = 10
+    if (includeChildren) {
+      const geoRepo = await DatabaseService.getRepository(Geo)
+      let hasMoreChildren = true;
+      let c = 0;
+      while (hasMoreChildren && c < maxLimit) {
+        c++;
+        hasMoreChildren = false;
+        const q = (await geoRepo.createQueryBuilder('geo'))
+          .where('geo.parent_id in (:...parentGeos)', {parentGeos})
+          .andWhere('geo.deleted_at is null')
+          .leftJoinAndSelect('geo.geoType', 'gt')
+        const children = await q.getMany()
+        geos = geos.concat(children.filter(g => g.geoType.canContainRespondent).map(g => g.id))
+        parentGeos = children.map(g => g.id)
+        hasMoreChildren = children.length > 0
+        console.log('hasMoreChildren', hasMoreChildren)
+      }
+    }
+    return geos
+  }
+
   async getSearchPage (studyId: string, query: string, filters: SearchFilter, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
     const repository = await DatabaseService.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
-    let q = queryBuilder.where('"respondent"."id" in (select respondent_id from study_respondent where study_id = :studyId)', {studyId: studyId})
+    let geos
 
-    if (respondentId !== null) {
-      q = q.andWhere(new Brackets(qb => {
-        qb.where('associated_respondent_id is null')
-          .orWhere('associated_respondent_id = :respondentId', {respondentId: respondentId})
-      }))
+    // Get the relevant geo ids to use later
+    if (Array.isArray(filters.geos) && filters.geos.length > 0) {
+      geos = await this.getGeoIds(filters.geos, filters.includeChildren)
     }
 
+
+    let q = queryBuilder.where('"respondent"."id" in (select respondent_id from study_respondent where study_id = :studyId)', {studyId: studyId})
+
+    // Query string broken into words
     if (typeof query === 'string' && query.trim().length > 0) {
       const searchTerms = query.split(' ')
       for (let i = 0; i < searchTerms.length; i++) {
         let searchTerm = '% ' + searchTerms[i].trim() + '%'
-        q = q.andWhere(`"respondent"."id" in (select distinct respondent_id from respondent_name where " " || name like :searchTerm${i})`, {[`searchTerm${i}`]: searchTerm})
+        q.andWhere(`"respondent"."id" in (select distinct respondent_id from respondent_name where " " || name like :searchTerm${i})`, {[`searchTerm${i}`]: searchTerm})
       }
     }
 
+    // Condition tag filters
     if (Array.isArray(filters.conditionTags) && filters.conditionTags.length > 0) {
       let conditionTagNames = filters.conditionTags
       if (conditionTagNames.length > 1) {
         // TODO: Isn't this group by very expensive?
         // Doesn't it basically require grouping every single respondent_condition_tag regardless of how many responses we actually want?
         q = q.andWhere('"respondent"."id" in (' +
-                          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
-                            'select id from condition_tag where name in (:...conditionTagNames)) ' +
-                          'group by respondent_id having count(distinct condition_tag_id) = :conditionCount)',
+          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
+          'select id from condition_tag where name in (:...conditionTagNames)) ' +
+          'group by respondent_id having count(distinct condition_tag_id) = :conditionCount)',
           {conditionTagNames: conditionTagNames, conditionCount: conditionTagNames.length})
       } else {
         q = q.andWhere('"respondent"."id" in (' +
-                          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
-                            'select id from condition_tag where name in (:...conditionTagNames)))',
+          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
+          'select id from condition_tag where name in (:...conditionTagNames)))',
           {conditionTagNames: conditionTagNames})
       }
     }
 
-    if (Array.isArray(filters.geos) && filters.geos.length > 0) {
-      let geos = filters.geos.slice()
-      let parentGeos = filters.geos.slice()
-      const maxLimit = 10
-      if (filters.includeChildren) {
-        const geoRepo = await DatabaseService.getRepository(Geo)
-        let hasMoreChildren = true;
-        let c = 0;
-        while (hasMoreChildren && c < maxLimit) {
-          c++;
-          hasMoreChildren = false;
-          const q = (await geoRepo.createQueryBuilder('geo'))
-            .where('geo.parent_id in (:...parentGeos)', {parentGeos})
-            .andWhere('geo.deleted_at is null')
-            .leftJoinAndSelect('geo.geoType', 'gt')
-          const children = await q.getMany()
-          geos = geos.concat(children.filter(g => g.geoType.canContainRespondent).map(g => g.id))
-          parentGeos = children.map(g => g.id)
-          hasMoreChildren = children.length > 0
+    // Geo filters
+    q.andWhere(new Brackets(qb => {
+      qb.where(new Brackets(gq => {
+        gq.where('associated_respondent_id is null')
+        // TODO: Handle the maximum parameters limitation in sqlite -> https://www.sqlite.org/limits.html
+        if (geos && geos.length > 0) {
+          if (geos.length > 999) {
+            throw new Error('Too many respondent geos')
+          }
+          let subSelect = 'select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geos)'
+          let params = { geos }
+          // debugger
+          if (filters.onlyCurrentGeo) {
+            subSelect += ' and is_current = :onlyCurrentGeo'
+            params['onlyCurrentGeo'] = 1
+          }
+          gq.andWhere(`"respondent"."id" in (${subSelect})`, params)
         }
-      }
-      // TODO: Handle the maximum parameters limitation in sqlite -> https://www.sqlite.org/limits.html
-      if (geos.length > 999) {
-        throw new Error('Too many respondent geos')
-      }
-      let subSelect = 'select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geos)'
-      let params = { geos }
-      // debugger
-      if (filters.onlyCurrentGeo) {
-        subSelect += ' and is_current = :onlyCurrentGeo'
-        params['onlyCurrentGeo'] = 1
-      }
-      q = q.andWhere(`"respondent"."id" in (${subSelect})`, params)
-    }
-
+      }))
+      qb.orWhere('associated_respondent_id = :respondentId', {respondentId: respondentId})
+    }))
     q = q.andWhere('"respondent"."deleted_at" is null')
     q = q.take(size).skip(page * size)
     q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
-    return await q.getMany()
+    q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
+    if (filters.randomize) {
+      q = q.orderBy('RANDOM()')
+    }
+    const respondents = await q.getMany()
+    removeSoftDeleted(respondents)
+    return respondents
   }
 
   async addName (respondentId, name, isDisplayName = false, localeId = null): Promise<RespondentName> {
@@ -315,14 +341,14 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return rGeo
   }
 
-  async editRespondentGeo (respondentId, respondentGeoId, isCurrent) {
+  async editRespondentGeo (respondentId: string, respondentGeoId: string, isCurrent: boolean) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
     await repository.update({id: respondentGeoId}, {isCurrent: isCurrent})
     return await repository.findOne({ deletedAt: null, id: respondentGeoId })
   }
 
-  async moveRespondentGeo (respondentId, respondentGeoId, newGeoId) {
+  async moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string, isCurrent?: boolean, notes?: string) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
     const oldRespondentGeo = await repository.findOne(respondentGeoId)
@@ -331,8 +357,8 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     newRespondentGeo.geoId = newGeoId
     newRespondentGeo.respondentId = respondentId
     newRespondentGeo.previousRespondentGeoId = respondentGeoId
-    newRespondentGeo.notes = oldRespondentGeo.isCurrent
-    newRespondentGeo.isCurrent = oldRespondentGeo.isCurrent
+    newRespondentGeo.notes = notes ? notes : oldRespondentGeo.isCurrent
+    newRespondentGeo.isCurrent = isCurrent !== undefined ? isCurrent : oldRespondentGeo.isCurrent
     await connection.manager.save(newRespondentGeo)
 
     // Soft delete the previous respondent geo
@@ -346,7 +372,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     })
   }
 
-  async removeRespondentGeo (respondentId, respondentGeoId) {
+  async removeRespondentGeo (respondentId: string, respondentGeoId: string) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
     await repository.update({id: respondentGeoId}, {deletedAt: new Date()})

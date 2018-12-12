@@ -122,16 +122,19 @@
           val: null
         }
         const photosSize = {
-          key: this.$t('size'),
+          key: this.$t('photos_size'),
           val: null
         }
         this.categories.push({
           title: this.$t('storage'),
-          items: [photoFiles, photoEntries, photosSize]
+          items: [photoFiles, photoEntries, photosSize],
+          to: {name: 'Storage'}
         })
         PhotoService.getPhotoCount().then(c => photoEntries.val = c)
         PhotoService.getPhotoFileCount().then(c => photoFiles.val = c)
-        PhotoService.getPhotosSize().then(size => photosSize.val = formatBytesFilter(size))
+        PhotoService.getPhotosSize().then(size => {
+          photosSize.val = formatBytesFilter(size)
+        })
       },
       loadUploads () {
         const pendingPhotos = {key: this.$t('pending_photos'), val: null}

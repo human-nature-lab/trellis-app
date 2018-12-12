@@ -6,6 +6,8 @@
     :placeholder="$t('text_placeholder')"
     textarea
     :disabled="isQuestionDisabled"
+    :append-icon="barcodeIcon"
+    :append-icon-cb="doScan"
     />
 </template>
 
@@ -14,6 +16,8 @@
   import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
+  import BarcodeMixin from '../mixins/BarcodeMixin'
+
   export default {
     name: 'text-question',
     props: {
@@ -22,8 +26,8 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin, VuetifyValidationRules, ActionMixin],
-    data: function () {
+    mixins: [QuestionDisabledMixin, VuetifyValidationRules, ActionMixin, BarcodeMixin],
+    data () {
       return {
         newText: null,
         oldText: null
@@ -31,14 +35,19 @@
     },
     computed: {
       text: {
-        get: function () {
+        get () {
           return this.question.datum.data.length ? this.question.datum.data[0].val : ''
         },
-        set: function (val) {
+        set (val) {
           this.action(AT.set_text, {
             val: val
           })
         }
+      }
+    },
+    methods: {
+      async doScan () {
+        this.text = await this.scan()
       }
     }
   }

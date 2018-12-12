@@ -2,6 +2,7 @@ import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
 import config from '../../config'
 import merge from 'lodash/merge'
+import CancellablePromise from "../../classes/CancellablePromise";
 declare var md5chksum, FileTransfer, cordova
 /* global md5chksum, FileTransfer */
 
@@ -117,10 +118,14 @@ class FileServiceCordova {
     })
   }
 
-  getFile (filePath): Promise<FileEntry> {
-    return new Promise((resolve, reject) => {
-      window.resolveLocalFileSystemURL(filePath, entry => {
-        resolve(entry as FileEntry)
+  getFile (filePath: string): Promise<FileEntry> {
+    return new Promise(async (resolve, reject) => {
+      const path = cordova.file.dataDirectory + filePath
+      console.log('getFile', path)
+      const fs = await this.requestFileSystem()
+      debugger
+      fs.root.getFile(filePath, {create: false, exclusive: false}, (file: FileEntry) => {
+        debugger
       }, reject)
     })
   }
@@ -222,7 +227,7 @@ class FileServiceCordova {
     return promise
   }
 
-  upload (uri, fileEntry, onUploadProgress) {
+  upload (uri: string, fileEntry: FileEntry, onUploadProgress: () => any) {
     const promise = new Promise((resolve, reject) => {
       DeviceService.isDeviceReady()
         .then(() => {
@@ -302,37 +307,76 @@ class FileServiceCordova {
     })
   }
 
-  getDirectorySize (dir: DirectoryEntry, includeChildren: boolean = false): Promise<number> {
-    return new Promise((resolve, reject) => {
+  /**
+   * Get the size of a file specified by a string
+   * @param {string} filePath
+   * @returns {Promise<number>}
+   */
+  getFileSize (filePath: string): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let file: FileEntry = await this.getFile(filePath)
+        debugger
+        file.getMetadata(meta => {
+          resolve(meta.size)
+        }, err => {
+          reject(err)
+        })
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
+  getDirectorySize (dir: DirectoryEntry, includeChildren: boolean = false): CancellablePromise<number> {
+    let isCancelled = false
+    return new CancellablePromise((resolve, reject) => {
       dir.getMetadata((meta: Metadata) => {
         if (!includeChildren) {
           resolve(meta.size)
         } else {
           // Count size of each entry
           dir.createReader().readEntries((entries: Entry[]) => {
+            const totalCount = entries.length
             let size = meta.size
             let processedCount = 0
             let errorCount = 0
-            function fileFinished () {
-              processedCount++
-              if (processedCount >= entries.length) {
-                resolve(size)
+            const batchSize = 500
+            function processBatch () {
+              const batchEntries: Entry[] = entries.splice(0, batchSize)
+              const totalBatchCount = batchEntries.length
+              let batchCount = 0
+              function checkBatchFinished () {
+                if (processedCount >= totalCount || isCancelled) {
+                  resolve(size)
+                } else if (batchCount >= totalBatchCount) {
+                  processBatch()
+                }
               }
-            }
-            entries.forEach(entry => {
-              entry.getMetadata((meta: Metadata) => {
-                size += meta.size
-                fileFinished()
-              }, err => {
-                errorCount++
-                fileFinished()
+              checkBatchFinished()
+              batchEntries.forEach(entry => {
+                entry.getMetadata((meta: Metadata) => {
+                  size += meta.size
+                  processedCount++
+                  batchCount++
+                  checkBatchFinished()
+                }, err => {
+                  errorCount++
+                  processedCount++
+                  batchCount++
+                  checkBatchFinished()
+                })
               })
-            })
+            }
+            processBatch()
           })
         }
       }, err => {
         reject(err)
       })
+    }, () => {
+      console.log('cancelling')
+      isCancelled = true
     })
   }
 

@@ -28,6 +28,8 @@
               v-model="newText"
               v-if="rowIndex === editingIndex"
               autofocus
+              :append-icon="barcodeIcon"
+              :append-icon-cb="scanBarcode"
               @keyup.enter="stopEditingAndSave(row, rowIndex)"
               @keyup.esc.stop="stopEditingAndRevert(row, rowIndex)" />
             <span class="roster-val"
@@ -101,7 +103,9 @@
               v-model="newText"
               autofocus
               @keyup.esc="stopAddingWithoutSaving"
-              @keyup.enter="stopAddingAndSave" />
+              @keyup.enter="stopAddingAndSave"
+              :append-icon="barcodeIcon"
+              :append-icon-cb="scanBarcode"/>
           </v-list-tile-content>
           <v-list-tile-action>
             <v-btn
@@ -138,6 +142,7 @@
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import RosterService from '../../../services/roster/RosterService'
   import ActionMixin from '../mixins/ActionMixin'
+  import BarcodeMixin from '../mixins/BarcodeMixin'
   import AT from '../../../static/action.types'
   export default {
     name: 'roster-question',
@@ -147,7 +152,7 @@
         required: true
       }
     },
-    mixins: [QuestionDisabledMixin, ActionMixin],
+    mixins: [QuestionDisabledMixin, ActionMixin, BarcodeMixin],
     data: function () {
       return {
         rosterCache: {},
@@ -163,6 +168,9 @@
       this.loadRosters(this.rosterIds)
     },
     methods: {
+      async scanBarcode () {
+        this.newText = await this.scan()
+      },
       startEditingRow (row, index) {
         this.newText = row.val
         this.oldText = row.val

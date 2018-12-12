@@ -19,29 +19,35 @@
                 outline
                 label
                 v-if="respondentGeo !== null">
-                <AsyncTranslationText v-if="respondentGeo.geo" :translation="respondentGeo.geo.nameTranslation" />
+                <GeoBreadcrumbs
+                  v-if="respondentGeo.geo"
+                  :geoId="respondentGeo.geoId"
+                  :canNavigate="false"
+                  :maxDepth="4" />
                 <span v-if="respondentGeo.geo === null">{{$t('unknown_location')}}</span>
               </v-chip>
             </v-flex>
           </v-layout>
-          <v-layout row wrap align-center v-if="newGeo || moveToUnknown">
+          <v-layout row wrap align-center>
             <v-flex xs4>
               Moving to:
             </v-flex>
             <v-flex xs8>
               <v-chip
+                v-if="newGeo"
                 color="primary"
                 outline
-                label>
-                <AsyncTranslationText v-if="newGeo && !moveToUnknown" :translation="newGeo.nameTranslation" />
+                label
+                @click="isSearchOpen = true">
                 <span v-if="moveToUnknown">{{$t('unknown_location')}}</span>
+                <GeoBreadcrumbs
+                  v-else
+                  :geoId="newGeo.id"
+                  :canNavigate="false"
+                  :maxDepth="4" />
               </v-chip>
-            </v-flex>
-          </v-layout>
-          <v-layout row wrap>
-            <v-spacer></v-spacer>
-            <v-flex xs6>
               <v-btn
+                v-else
                 :disabled="moveToUnknown"
                 @click="isSearchOpen = true">
                 {{$t('select_location')}}
@@ -49,13 +55,28 @@
             </v-flex>
           </v-layout>
           <v-layout row wrap mt-3>
-            <v-spacer></v-spacer>
+            <v-flex xs6>
+              <v-checkbox
+                v-model="isCurrent"
+                :label="$t('current_geo_location')" />
+            </v-flex>
             <v-flex xs6>
               <v-checkbox
                 v-model="moveToUnknown"
                 :label="$t('unknown_location')" />
             </v-flex>
           </v-layout>
+          <v-expansion-panel inset>
+            <v-expansion-panel-content>
+              <div slot="header">{{ $t('notes') }}</div>
+              <v-text-field
+                v-model="notes"
+                auto-grow
+                full-width
+                :placeholder="$t('notes')"
+                textarea/>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
           <v-layout>
             <v-spacer />
             <v-btn
@@ -73,8 +94,9 @@
         @close="isSearchOpen = false" />
       <GeoSearch
         :limit="1"
-        :is-selectable="true"
-        :should-update-route="false"
+        :isSelectable="true"
+        :showCart="true"
+        :shouldUpdateRoute="false"
         @doneSelecting="geoSelected" />
     </v-dialog>
   </v-dialog>
@@ -85,15 +107,18 @@
   import GeoSearch from '../geo/GeoSearch'
   import AsyncTranslationText from '../AsyncTranslationText'
   import RespondentService from '../../services/respondent/RespondentService'
+  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
 
   export default {
     name: 'MoveRespondentGeoForm',
-    components: {ModalTitle, AsyncTranslationText, GeoSearch},
+    components: {GeoBreadcrumbs, ModalTitle, AsyncTranslationText, GeoSearch},
     data () {
       return {
         isSearchOpen: false,
         newGeo: null,
-        moveToUnknown: false
+        moveToUnknown: false,
+        isCurrent: true,
+        notes: ''
       }
     },
     props: {
@@ -119,11 +144,11 @@
         try {
           let rGeo
           if (this.moveToUnknown) {
-            rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, null)
+            rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, null, this.isCurrent)
           } else if (this.newGeo && this.newGeo.id === this.respondentGeo.geoId) {
             return
           } else {
-            rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, this.newGeo.id)
+            rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, this.newGeo.id, this.isCurrent)
           }
           this.$emit('done', this.respondentGeo, rGeo)
         } catch (err) {
@@ -132,6 +157,8 @@
         } finally {
           this.newGeo = null
           this.moveToUnknown = false
+          this.isCurrent = true
+          this.notes = ''
         }
       }
     }

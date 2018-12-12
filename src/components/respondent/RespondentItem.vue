@@ -23,6 +23,14 @@
           <v-icon :large="$vuetify.breakpoint.smAndDown">fullscreen</v-icon>
         </v-btn>
       </v-card-actions>
+      <v-card-text v-if="labels && labels.length">
+        <v-chip
+          label
+          outline
+          v-for="label in labels">
+          {{label}}
+        </v-chip>
+      </v-card-text>
     </v-card>
     <FullscreenPhoto
       :title="name"
@@ -38,6 +46,7 @@
   import FullscreenPhoto from '../photo/FullscreenPhoto'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
+  import {TranslateResult} from "vue-i18n"
   export default Vue.extend({
     name: 'respondent-item',
     props: {
@@ -55,6 +64,9 @@
       },
       selected: {
         type: Boolean
+      },
+      labels: {
+        type: Array
       }
     },
     data () {
@@ -69,9 +81,7 @@
       },
       photoFromFile () {},
       photoFromCamera () {},
-      cancelLoad () {
-        this
-      }
+      cancelLoad () {}
     },
     computed: {
       name (): string {
