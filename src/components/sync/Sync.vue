@@ -36,10 +36,10 @@
             <v-flex class="xs6 text-xs-left">
               <v-btn :disabled="!enableUpload"
                      :loading="uploading"
-                     @click="onUpload">
+                     @click.once="onUpload">
                 <v-icon>cloud_upload</v-icon>
               </v-btn>
-              <v-btn @click="onUploadPhotos"
+              <v-btn @click.once="onUploadPhotos"
                      :loading="uploadingPhotos"
                      :disabled="!enablePhotoDownload">
                 <v-icon>collections</v-icon>
@@ -47,12 +47,12 @@
               </v-btn>
             </v-flex>
             <v-flex class="xs6 text-xs-right">
-              <v-btn @click="onDownload"
+              <v-btn @click.once="onDownload"
                      :loading="downloading"
                      :disabled="!enableDownload">
                 <v-icon>cloud_download</v-icon>
               </v-btn>
-              <v-btn @click="onDownloadPhotos"
+              <v-btn @click.once="onDownloadPhotos"
                      :loading="downloadingPhotos"
                      :disabled="!enablePhotoDownload">
                 <v-icon>collections</v-icon>
@@ -121,11 +121,11 @@
       },
       onUploadPhotos: function () {
         this.uploadStep = 3
-        this.uploadingPhotos = true;
+        this.uploadingPhotos = true
       },
       onDownloadPhotos: function () {
         this.downloadStep = 4
-        this.downloadingPhotos = true;
+        this.downloadingPhotos = true
       },
       downloadCancelled: function () {
         this.downloading = false
@@ -141,6 +141,7 @@
       },
       uploadCancelled: function () {
         this.uploading = false
+        this.uploadingPhotos = false
         // Re-init in case upload was successful
         this.initComponent()
       },
