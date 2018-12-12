@@ -4,13 +4,36 @@ import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
-import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
 import Photo from "../../entities/trellis/Photo";
+import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
+import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
 export default class RespondentServiceWeb implements RespondentServiceInterface {
 
-  async addPhoto (respondentId: string, photo: Photo): Promise<RespondentPhoto> {
+  async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     throw new Error("Can't add respondent photo yet") // TODO: Respondent photo web
-    return new RespondentPhoto()
+  }
+
+  async updatePhotos (photos: Array<PhotoWithPivotTable>) {
+    return http().post(`respondent-photos`, { photos: photos })
+  }
+
+  async removePhoto (photo: PhotoWithPivotTable) {
+    let respondentPhotoId = encodeURIComponent(photo.pivot.id)
+    return http().delete(`respondent-photo/${respondentPhotoId}`)
+  }
+
+  async getRespondentPhotos (respondentId: string): Promise<Array<PhotoWithPivotTable>> {
+    let photos: PhotoWithPivotTable[]  = []
+    respondentId = encodeURIComponent(respondentId)
+    let res = await http().get(`respondent/${respondentId}/photos`)
+    for (let i = 0; i < res.data.photos.length; i++) {
+      let respondentPhoto = new RespondentPhoto().fromSnakeJSON(res.data.photos[i])
+      let photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
+      respondentPhoto.photo = photo
+      photos.push(new PhotoWithPivotTable(respondentPhoto))
+    }
+
+    return photos
   }
 
   async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
@@ -20,11 +43,13 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
       return new RespondentFill().fromSnakeJSON(f)
     })
   }
+
   async getRespondentById (respondentId: string): Promise<Respondent> {
     respondentId = encodeURIComponent(respondentId)
     let res = await http().get(`respondent/${respondentId}`)
     return new Respondent().fromSnakeJSON(res.data.respondent)
   }
+
   async getSearchPage (studyId: string, query: string, filters: SearchFilter, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
     // TODO: Add is_current filter
     let params = {

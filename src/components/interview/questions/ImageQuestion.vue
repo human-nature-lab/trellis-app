@@ -1,9 +1,11 @@
 <template>
-    <PhotoAlbum
-      :photos="photos"
-      @photo="addPhoto"
-      :allowAdding="!isQuestionDisabled"
-      @remove="removePhoto" />
+  <photo-album
+    :photos="photosWithPivotTable"
+    @photo="addPhoto"
+    @delete-photo="removePhoto"
+    :allowAdding="!isQuestionDisabled"
+    :allow-sorting="false"
+    :allow-notes="false"></photo-album>
 </template>
 
 <script>
@@ -20,6 +22,24 @@
     computed: {
       photoIds () {
         return this.question.datum.data.map(d => d.photoId)
+      },
+      photosWithPivotTable () {
+        let photosWithPivotTable = []
+        for (let i = 0; i < this.question.datum.data.length; i++) {
+          let d = this.question.datum.data[i]
+          photosWithPivotTable.push({
+            id: d.photoId,
+            fileName: '',
+            pivot: {
+              id: d.id,
+              sortOrder: d.sortOrder,
+              notes: '',
+              entityId: d.id,
+              photoId: d.photoId
+            }
+          })
+        }
+        return photosWithPivotTable
       }
     },
     created () {
