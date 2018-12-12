@@ -6,7 +6,7 @@
       <AddPhoto v-if="allowAdding && global.offline" @photo="onAddPhoto"></AddPhoto>
     </v-toolbar>
     <v-progress-linear v-if="loading" :indeterminate="true"></v-progress-linear>
-    <transition-group name="photo-cards" tag="div" class="layout row wrap">
+    <transition-group v-if="this.photos.length > 0" name="photo-cards" tag="div" class="layout row wrap">
       <v-flex
         xs6 sm6 md4 lg3 xl2
         v-for="photo in orderedPhotos"
