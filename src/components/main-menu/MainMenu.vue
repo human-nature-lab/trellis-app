@@ -2,8 +2,6 @@
   <v-flex>
     <v-list dense>
       <v-list-tile :dark="global.darkTheme">
-        <v-list-tile-content>
-        </v-list-tile-content>
         <v-list-tile-action @click="global.menuDrawer.open = false" class="text-right">
           <v-icon>arrow_back</v-icon>
         </v-list-tile-action>
@@ -65,14 +63,6 @@
           Location History
         </v-list-tile-title>
       </v-list-tile>-->
-      <v-list-tile :to="{name: 'Info'}">
-        <v-list-tile-action>
-          <v-icon>info</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-title>
-          {{$t('information')}}
-        </v-list-tile-title>
-      </v-list-tile>
     </v-list>
     <v-divider></v-divider>
     <v-list dense subheader>
@@ -83,17 +73,21 @@
         <v-list-tile-action>
           <v-icon>assignment</v-icon>
         </v-list-tile-action>
-        <v-list-tile-title>
-          {{ $t('change_study') }}
-        </v-list-tile-title>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{ $t('change_study') }}
+          </v-list-tile-title>
+        </v-list-tile-content>
       </v-list-tile>
       <v-list-tile :to="{name: 'locale', query: {to: $route.fullPath}}">
         <v-list-tile-action>
           <v-icon>language</v-icon>
         </v-list-tile-action>
-        <v-list-tile-title>
-          {{ $t('change_locale') }}
-        </v-list-tile-title>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{ $t('change_locale') }}
+          </v-list-tile-title>
+        </v-list-tile-content>
       </v-list-tile>
       <v-list-tile @click="toggleDarkTheme()">
         <v-list-tile-action>
@@ -116,11 +110,14 @@
           <v-icon>location_searching</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
-          {{ $t('copy_url') }}
+          <v-list-tile-title>
+            {{ $t('copy_url') }}
+          </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
-      <v-list-tile v-if="isInterview"
-                   @click="emit('showConditionTags')">
+      <v-list-tile
+        v-if="isInterview"
+        @click="emit('showConditionTags')">
         <v-list-tile-action>
           <v-icon>local_offer</v-icon>
         </v-list-tile-action>
@@ -145,7 +142,9 @@
           <v-icon>exit_to_app</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
-          {{ $t('logout') }}
+          <v-list-tile-title>
+            {{ $t('logout') }}
+          </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
       <!--<v-list-tile-->
@@ -159,6 +158,16 @@
           <!--<span v-else>{{$t('online')}}</span>-->
         <!--</v-list-tile-content>-->
       <!--</v-list-tile>-->
+      <v-list-tile :to="{name: 'Info'}">
+        <v-list-tile-action>
+          <v-icon>info</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            {{$t('information')}}
+          </v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
       <v-list-tile
         v-if="isCordovaBuild"
         :to="{ name: 'ServiceTesting' }">
@@ -166,24 +175,12 @@
           <v-icon>build</v-icon>
         </v-list-tile-action>
         <v-list-tile-content>
-          Service Testing
+          <v-list-tile-title>
+            Service Testing
+          </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
-    <v-snackbar
-      absolute
-      top
-      vertical
-      color="primary"
-      :timeout="5000"
-      v-model="showCopiedSnackbar">
-      {{ $t('copied_url') }}
-      <v-btn
-        flat
-        @click="showCopiedSnackbar = false">
-        {{ $t('close') }}
-      </v-btn>
-    </v-snackbar>
   </v-flex>
 </template>
 
@@ -195,14 +192,11 @@
   import SingletonService from '../../services/SingletonService'
   import storage from '../../services/StorageService'
   import global from '../../static/singleton'
-  // import PermissionMixin from '../../mixins/PermissionMixin'
   import {APP_ENV} from '../../static/constants'
 
   export default {
     name: 'dropdown-menu',
-    // mixins: [PermissionMixin],
     data: () => ({
-      showCopiedSnackbar: false,
       global
     }),
     methods: {
@@ -213,9 +207,25 @@
         menuBus.$emit(eventName, ...args)
       },
       copyCurrentLocation () {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-          this.showCopiedSnackbar = true
-        })
+        try {
+          navigator.clipboard.writeText(window.location.href).then(() => {
+            this.log({
+              severity: 'info',
+              message: 'information'
+            })
+            this.log({
+              severity: 'debug',
+              message: 'debugging'
+            })
+            this.alert('success', 'Text copied to clipboard!', {color: 'info', top: true})
+          }).catch(err => {
+            this.log(err)
+            this.alert('error', `Unable to copy to clipboard. ${window.location.href}`, {timeout: 0})
+          })
+        } catch (err) {
+          this.log(err)
+          this.alert('error', `Unable to copy to clipboard. ${window.location.href}`, {timeout: 0})
+        }
       },
       logout () {
         LoginService.logout().then(() => {
@@ -234,9 +244,7 @@
     },
     computed: {
       isCordovaBuild () {
-        const v = config.appEnv === APP_ENV.CORDOVA
-        console.log('isCordovaBuild', v)
-        return v
+        return config.appEnv === APP_ENV.CORDOVA
       },
       isInterview () {
         return this.$route.name === 'Interview' || this.$route.name === 'InterviewPreview'

@@ -99,8 +99,8 @@
   import {defaultLoggingService} from "../services/logging/LoggingService"
   import Log from "../entities/trellis-config/Log"
   import ModalTitle from './ModalTitle'
-  import uploadLogs from "../services/logging/UploadLogs"
-  import DeleteLogs from "../services/logging/DeleteLogs"
+  import uploadLogs from "../services/upload/UploadLogs"
+  import DeleteLogs from "../services/upload/DeleteLogs"
 
   export default Vue.extend({
     name: 'Logs',

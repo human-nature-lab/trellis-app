@@ -11,6 +11,9 @@ import Form from '../../../entities/trellis/Form'
 import InterviewDataInterface, {ConditionTagInterface} from '../../../services/interview/InterviewDataInterface'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
+import {defaultLoggingService as logger} from "../../../services/logging/LoggingService";
+// @ts-ignore
+import {AddSnack} from '../../SnackbarQueue'
 
 export interface InterviewData {
   respondentFills?: RespondentFill[]
@@ -33,29 +36,41 @@ export default class InterviewLoader {
    */
   static async load (route: Route): Promise<InterviewData> {
     if (route.name === 'Interview') {
-      let [res, locale] = [await InterviewLoader.loadInterview(route.params.interviewId), await InterviewLoader.loadLocale(route)]
-      return {
-        respondentFills: res.respondentFills,
-        conditionTags: res.data.conditionTags,
-        data: res.data && res.data.data,
-        interview: res.interview,
-        form: res.form,
-        locale,
-        actions: res.actions,
-        interviewType: 'interview'
+      try {
+        let [res, locale] = [await InterviewLoader.loadInterview(route.params.interviewId), await InterviewLoader.loadLocale(route)]
+        return {
+          respondentFills: res.respondentFills,
+          conditionTags: res.data.conditionTags,
+          data: res.data && res.data.data,
+          interview: res.interview,
+          form: res.form,
+          locale,
+          actions: res.actions,
+          interviewType: 'interview'
+        }
+      } catch (err) {
+        err.component = 'InterviewLoader.ts@load'
+        logger.log(err)
+        AddSnack('Unable to load interview!', {timeout: 0, color: 'error'})
       }
     } else {
-      let [res, locale] = [await InterviewLoader.loadPreview(route.params.formId), await InterviewLoader.loadLocale(route)]
-      return {
-        form: res.form,
-        locale,
-        interview: new Interview().fromSnakeJSON({
-          id: 'Preview ID',
-          survey: {
-            respondent_id: 'Preview respondent id'
-          }
-        }),
-        interviewType: 'preview'
+      try {
+        let [res, locale] = [await InterviewLoader.loadPreview(route.params.formId), await InterviewLoader.loadLocale(route)]
+        return {
+          form: res.form,
+          locale,
+          interview: new Interview().fromSnakeJSON({
+            id: 'Preview ID',
+            survey: {
+              respondent_id: 'Preview respondent id'
+            }
+          }),
+          interviewType: 'preview'
+        }
+      } catch (err) {
+        err.component = 'InterviewLoader.ts@load'
+        logger.log(err)
+        AddSnack('Unable to load interview preview!', {timeout: 0, color: 'error'})
       }
     }
   }

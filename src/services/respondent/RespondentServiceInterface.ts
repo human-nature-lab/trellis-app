@@ -10,6 +10,7 @@ export interface SearchFilter {
   geos?: string[]              // Array of geo ids
   onlyCurrentGeo?: boolean     // Indicates that only current residents should be included
   includeChildren?: boolean    // Indicates that nested respondents should be included
+  randomize?: boolean          // Indicates that the respondents results should be randomized TODO: Web
 }
 
 export default interface RespondentServiceInterface {
@@ -134,7 +135,12 @@ export default interface RespondentServiceInterface {
    * @param newGeoId
    * @returns Promise<RespondentGeo>
    */
-  moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string): Promise<RespondentGeo>
+  moveRespondentGeo (
+    respondentId: string,
+    respondentGeoId: string,
+    newGeoId: string,
+    isCurrent?: boolean,
+    notes?: string): Promise<RespondentGeo>
 
   /**
    * Delete the respondent geo by id

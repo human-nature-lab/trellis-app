@@ -1,7 +1,6 @@
-// import Sync from '../components/sync/Sync'
-// import Logs from '../components/Logs'
 const Sync = () => import(/* webpackChunkName: "sync" */'../components/sync/Sync')
 const Logs = () => import(/* webpackChunkName: "logs" */'../components/Logs')
+const Storage = () => import(/* webpackChunkName: "storage" */'../components/Storage')
 
 export default [{
   path: '/',
@@ -15,4 +14,8 @@ export default [{
   path: '/logs',
   name: 'Logs',
   component: Logs
+}, {
+  path: '/storage',
+  name: 'Storage',
+  component: Storage
 }]

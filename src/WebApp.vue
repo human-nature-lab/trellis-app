@@ -88,6 +88,7 @@
 
     <LocationFinder />
     <CensusFormChecker />
+    <SnackbarQueue />
 
   </v-app>
 </template>
@@ -104,10 +105,11 @@
   import singleton from './static/singleton'
   import {defaultLoggingService} from './services/logging/LoggingService'
   import GeoLocationService from './services/geolocation'
+  import SnackbarQueue from './components/SnackbarQueue'
 
   export default {
     name: 'web-app',
-    data: function () {
+    data () {
       return {
         global: singleton,
         error: null,
@@ -139,7 +141,8 @@
       MainMenu,
       TrellisAlert,
       LocationFinder,
-      CensusFormChecker
+      CensusFormChecker,
+      SnackbarQueue
     },
     computed: {
       withinCordova () {

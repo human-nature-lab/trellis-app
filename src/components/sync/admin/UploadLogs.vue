@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-  import UploadLogService from '../../../services/upload-log'
+  import UploadLogService from '../../../services/upload/index'
   import Vue from "vue"
   import UploadLog from "../../../entities/web/UploadLog"
 

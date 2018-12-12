@@ -72,7 +72,6 @@
         isEditing: false,
         isAdding: false,
         deleting: [],
-        error: null,
         currentName: null,
         nameHeaders: [{
           text: 'Name',
@@ -102,7 +101,7 @@
       async removeName (nameId: string): Promise<void> {
         let name = this.respondent.names.find(name => name.id === nameId)
         if (name && name.isDisplayName) {
-          this.error = `Cannot delete the display name for a respondent`
+          this.alert('error', `Cannot delete the display name for a respondent`)
           return
         }
         this.deleting[nameId] = true
@@ -111,8 +110,8 @@
           let index = this.respondent.names.findIndex(name => name.id === nameId)
           this.respondent.names.splice(index, 1)
         } catch (err) {
-          console.error(err)
-          this.error = `Failed to delete the respondent name -> ${name.name}`
+          this.log(err)
+          this.alert('error', `Failed to delete the respondent name -> ${name.name}`, {timeout: 0})
         } finally {
           this.deleting[nameId] = false
           this.$forceUpdate()

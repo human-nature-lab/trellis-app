@@ -15,9 +15,6 @@
         </v-btn>
       </v-card-title>
       <v-card-text>
-        <v-layout v-if="error">
-          <v-alert>{{error}}</v-alert>
-        </v-layout>
         <v-stepper v-model="step" vertical>
 
           <v-stepper-step step="1" :complete="step > 1">{{$t('add_location')}}</v-stepper-step>
@@ -172,7 +169,6 @@
         step: 1,
         addLocationCompleted: false,
         locationTypeSelected: false,
-        error: null,
         isSaving: false,
         geo: null,
         checkingForCensus: false,
@@ -180,8 +176,13 @@
       }
     },
     async created () {
-      const study = await StudyService.getCurrentStudy()
-      this.geo = GeoService.createNewGeo(this.parentGeoId, study.locales)
+      try {
+        const study = await StudyService.getCurrentStudy()
+        this.geo = GeoService.createNewGeo(this.parentGeoId, study.locales)
+      } catch (err) {
+        this.log(err)
+        this.alert('error', 'Could not get current study', {timeout: 0})
+      }
     },
     computed: {
       latitude () {
@@ -215,8 +216,8 @@
           this.geo.longitude = coords.longitude
           this.geo.altitude = coords.altitude
         } catch (err) {
-          console.error(err)
-          this.error = 'Error getting position: ' + err
+          this.log(err)
+          this.alert('error', 'Could not get current position', {timeout: 0})
         }
       },
       async useParentPosition () {
@@ -229,7 +230,8 @@
         try {
           await GeoService.createGeo(this.geo)
         } catch (err) {
-          this.error = err
+          this.log(err)
+          this.alert('error', `Could not create new geo`, {timeout: 0})
         }
         this.step++
       },

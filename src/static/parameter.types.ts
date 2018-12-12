@@ -8,6 +8,7 @@ export default {
   max_roster: 15,
   exclusive: 16,
   can_add_respondent: 17,
+  allow_barcode: 18,
   max: 2,
   other: 3,
   none: 4,

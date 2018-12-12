@@ -70,6 +70,9 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     if (filters.onlyCurrentGeo) {
       params['cg'] = filters.onlyCurrentGeo
     }
+    if (filters.randomize) {
+      params['r'] = filters.randomize
+    }
     studyId = encodeURIComponent(studyId)
     let res = await http().get(`study/${studyId}/respondents/search`, {
       params: params
@@ -123,11 +126,13 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
       is_current: isCurrent
     }).then(res => new RespondentGeo().fromSnakeJSON(res.data.respondent_geo))
   }
-  moveRespondentGeo (respondentId, respondentGeoId, newGeoId) {
+  moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string, isCurrent?: boolean, notes?: string) {
     respondentId = encodeURIComponent(respondentId)
     respondentGeoId = encodeURIComponent(respondentGeoId)
     return http().post(`respondent/${respondentId}/geo/${respondentGeoId}/move`, {
-      new_geo_id: newGeoId
+      new_geo_id: newGeoId,
+      is_current: isCurrent,
+      notes: notes
     }).then(res => {
       return new RespondentGeo().fromSnakeJSON(res.data.respondentGeo)
     })
