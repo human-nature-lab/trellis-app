@@ -178,11 +178,11 @@
     async created () {
       try {
         const study = await StudyService.getCurrentStudy()
+        this.geo = GeoService.createNewGeo(this.parentGeoId, study.locales)
       } catch (err) {
         this.log(err)
         this.alert('error', 'Could not get current study', {timeout: 0})
       }
-      this.geo = GeoService.createNewGeo(this.parentGeoId, study.locales)
     },
     computed: {
       latitude () {
