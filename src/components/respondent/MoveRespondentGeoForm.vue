@@ -11,26 +11,25 @@
         <v-container fluid>
           <v-layout row wrap align-center>
             <v-flex xs4>
-              Moving from:
+              {{ $t('moving_from') }}
             </v-flex>
             <v-flex xs8>
               <v-chip
                 color="primary"
                 outline
-                label
-                v-if="respondentGeo !== null">
+                label>
                 <GeoBreadcrumbs
-                  v-if="respondentGeo.geo"
+                  v-if="respondentGeo.geoId !== null && respondentGeo.geo"
                   :geoId="respondentGeo.geoId"
                   :canNavigate="false"
                   :maxDepth="4" />
-                <span v-if="respondentGeo.geo === null">{{$t('unknown_location')}}</span>
+                <span v-if="respondentGeo.geoId === null">{{$t('unknown_location')}}</span>
               </v-chip>
             </v-flex>
           </v-layout>
           <v-layout row wrap align-center>
             <v-flex xs4>
-              Moving to:
+              {{ $t('moving_to') }}
             </v-flex>
             <v-flex xs8>
               <v-chip
