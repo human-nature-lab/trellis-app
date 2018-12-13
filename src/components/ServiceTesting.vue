@@ -1,69 +1,71 @@
 <template>
-  <v-container fluid>
-    <v-card>
-      <v-toolbar>
-        <v-toolbar-title>Service Testing</v-toolbar-title>
-        <v-spacer />
-        <v-menu offset-y>
-          <v-btn icon slot="activator">
-            <v-icon>more_vert</v-icon>
-          </v-btn>
-          <v-list>
-            <v-list-tile @click="addAlert">
-              <v-list-tile-action>
-                <v-icon>add_alert</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                Add Alert
-              </v-list-tile-content>
-            </v-list-tile>
-          </v-list>
-        </v-menu>
-      </v-toolbar>
-      <v-expansion-panel v-model="testSelectorOpen">
-        <v-expansion-panel-content>
-          <div slot="header">Test suites</div>
-          <v-checkbox
-            v-model="modulesToRun"
-            v-for="name in testModules"
-            :key="name"
-            :value="name"
-            :label="name" />
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-      <v-toolbar flat>
-        <v-toolbar-title>Results</v-toolbar-title>
-      </v-toolbar>
+  <v-flex>
+    <v-container fluid>
       <v-card>
-        <v-flex
-          v-for="test in tests"
-          v-model="test.open"
-          :key="test.title">
-          <v-layout row>
-            <v-flex xs>
-              <v-icon v-if="test.state === SUCCESSFUL" color="success">check_circle</v-icon>
-              <v-icon v-else-if="test.state === FAILED" color="error">error</v-icon>
-            </v-flex>
-            <v-layout column>
-              <v-flex>{{test.title}} - {{test.duration}}</v-flex>
-              <v-flex>{{ test.err }}</v-flex>
+        <v-toolbar>
+          <v-toolbar-title>Service Testing</v-toolbar-title>
+          <v-spacer />
+          <v-menu offset-y>
+            <v-btn icon slot="activator">
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+            <v-list>
+              <v-list-tile @click="addAlert">
+                <v-list-tile-action>
+                  <v-icon>add_alert</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  Add Alert
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+        </v-toolbar>
+        <v-expansion-panel v-model="testSelectorOpen">
+          <v-expansion-panel-content>
+            <div slot="header">Test suites</div>
+            <v-checkbox
+              v-model="modulesToRun"
+              v-for="name in testModules"
+              :key="name"
+              :value="name"
+              :label="name" />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-toolbar flat>
+          <v-toolbar-title>Results</v-toolbar-title>
+        </v-toolbar>
+        <v-card>
+          <v-flex
+            v-for="test in tests"
+            v-model="test.open"
+            :key="test.title">
+            <v-layout row>
+              <v-flex xs>
+                <v-icon v-if="test.state === SUCCESSFUL" color="success">check_circle</v-icon>
+                <v-icon v-else-if="test.state === FAILED" color="error">error</v-icon>
+              </v-flex>
+              <v-layout column>
+                <v-flex>{{test.title}} - {{test.duration}}</v-flex>
+                <v-flex>{{ test.err }}</v-flex>
+              </v-layout>
             </v-layout>
-          </v-layout>
-        </v-flex>
+          </v-flex>
+        </v-card>
+        <v-card-actions>
+          <v-btn
+            :disabled="state !== WAITING"
+            @click="start()">
+            <span v-if="state === WAITING">Start</span>
+            <v-progress-circular v-else />
+          </v-btn>
+          <v-checkbox
+            label="Debug errors"
+            v-model="debugErrors" />
+        </v-card-actions>
       </v-card>
-      <v-card-actions>
-        <v-btn
-          :disabled="state !== WAITING"
-          @click="start()">
-          <span v-if="state === WAITING">Start</span>
-          <v-progress-circular v-else />
-        </v-btn>
-        <v-checkbox
-          label="Debug errors"
-          v-model="debugErrors" />
-      </v-card-actions>
-    </v-card>
-  </v-container>
+    </v-container>
+  </v-flex>
 </template>
 
 <script>

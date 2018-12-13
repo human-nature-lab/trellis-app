@@ -25,10 +25,57 @@ export default abstract class LoggingServiceAbstract {
     }
   }
 
-  abstract async log (_request):Promise<Log|void>
+  abstract async log (_request): Promise<Log|void>
   abstract async getLogPage (page: number, limit: number|null): Promise<Log[]>
   abstract async getLogCount (): Promise<number>
   abstract async getUploadedCount (): Promise<number>
+
+  private transformToLog (_request: any): object {
+    if (typeof _request === 'string') {
+      return {
+        msg: _request
+      }
+    } else {
+      return _request
+    }
+  }
+
+  public error (_request): Promise<Log|void> {
+    _request = this.transformToLog(_request)
+    if (_request) _request.severity = LoggingLevel.error
+    return this.log(_request)
+  }
+
+  public warn (_request): Promise<Log|void> {
+    _request = this.transformToLog(_request)
+    if (_request) _request.severity = LoggingLevel.warn
+    return this.log(_request)
+  }
+
+  public info (_request): Promise<Log|void> {
+    _request = this.transformToLog(_request)
+    if (_request) _request.severity = LoggingLevel.info
+    return this.log(_request)
+  }
+
+  public debug (_request): Promise<Log|void> {
+    _request = this.transformToLog(_request)
+    if (_request) _request.severity = LoggingLevel.debug
+    return this.log(_request)
+  }
+
+  public trace (_request): Promise<Log|void> {
+    _request = this.transformToLog(_request)
+    if (_request) _request.severity = LoggingLevel.trace
+    return this.log(_request)
+  }
+
+  public verbose (_request): Promise<Log|void> {
+    _request = this.transformToLog(_request)
+    if (_request) _request.severity = LoggingLevel.verbose
+    return this.log(_request)
+  }
+
 
   /**
    * Logic for writing the log to the console
@@ -76,7 +123,7 @@ export default abstract class LoggingServiceAbstract {
     return log
   }
 
-  getSeverity (request: LogRequest) {
+  protected getSeverity (request: LogRequest) {
     if (typeof request === 'object') {
       if (request instanceof Error) {
         return LoggingLevel.error
@@ -88,7 +135,7 @@ export default abstract class LoggingServiceAbstract {
     return defaultSeverity
   }
 
-  getMessage (request: LogRequest) {
+  protected getMessage (request: LogRequest) {
     if (typeof request === 'string') {
       return request
     }
@@ -103,7 +150,7 @@ export default abstract class LoggingServiceAbstract {
     return ''
   }
 
-  getFullMessage (request: LogRequest) {
+  protected getFullMessage (request: LogRequest) {
     if (typeof request === 'object') {
       if (request.hasOwnProperty('fullMessage')) {
         return request.fullMessage
@@ -114,28 +161,28 @@ export default abstract class LoggingServiceAbstract {
     return null
   }
 
-  getComponent (request: LogRequest) {
+  protected getComponent (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('component')) {
       return request.component
     }
     return null
   }
 
-  getSyncId (request: LogRequest) {
+  protected getSyncId (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('syncId')) {
       return request.syncId
     }
     return null
   }
 
-  getInterviewId (request: LogRequest) {
+  protected getInterviewId (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('interviewId')) {
       return request.interviewId
     }
     return null
   }
 
-  getDeviceId (request: LogRequest) {
+  protected getDeviceId (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('deviceId')) {
       return request.deviceId
     } else {
@@ -143,7 +190,7 @@ export default abstract class LoggingServiceAbstract {
     }
   }
 
-  getUserId (request: LogRequest) {
+  protected getUserId (request: LogRequest) {
     if (typeof request === 'object' && request.hasOwnProperty('userId')) {
       return request.userId
     } else {

@@ -193,6 +193,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
     const connection = await DatabaseService.getDatabase()
 
     return connection.transaction(async manager => {
+      console.log('saveData transaction open')
       await manager.query(`PRAGMA defer_foreign_keys = true;`)
 
       // Remove stuff first
@@ -334,6 +335,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
         await manager.update(SurveyConditionTag, { id: removedSurveyConditionTag.id }, { deletedAt: new Date() })
       }
 
+      console.log('saveData transaction closing')
     })
 
   }

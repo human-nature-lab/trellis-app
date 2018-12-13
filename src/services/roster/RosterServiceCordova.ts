@@ -8,12 +8,20 @@ export default class RosterServiceCordova implements RosterServiceInterface {
     return await repo.findByIds(rosterIds)
   }
   async createRosterRows (rosterRows: string[]): Promise<Roster[]> {
+    const conn = await DatabaseService.getDatabase()
     const repo = await DatabaseService.getRepository(Roster)
     let rosters = rosterRows.map(val => {
       let roster = new Roster()
       roster.val = val
       return roster
     })
+
+    // await conn.transaction(async manager => {
+    //   console.log('roster transaction open')
+    //   await manager.insert(Roster, rosters)
+    //   console.log('roster transaction closing')
+    // })
+
     let res = await repo.save(rosters)
     return rosters
   }
