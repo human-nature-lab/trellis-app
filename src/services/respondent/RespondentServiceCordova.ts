@@ -361,8 +361,8 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     newRespondentGeo.isCurrent = isCurrent !== undefined ? isCurrent : oldRespondentGeo.isCurrent
     await connection.manager.save(newRespondentGeo)
 
-    // Soft delete the previous respondent geo
-    // await repository.update({id: respondentGeoId}, {deletedAt: new Date()})
+    // Set the previous respondent geo is_current to 0
+    await repository.update({id: respondentGeoId}, {isCurrent: 0})
 
     return repository.findOne({
       where: {
