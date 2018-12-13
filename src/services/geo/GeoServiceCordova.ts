@@ -228,7 +228,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
 
     q = q.take(limit).skip(offset)
       .leftJoinAndSelect('geo.geoType', 'geo_type')
-      .leftJoinAndSelect('geo.photos', 'photos')
+      .leftJoinAndSelect('geo.photos', 'photo', 'geo_photo.deleted_at is null and geo_photo.sort_order = 0')
       .leftJoinAndSelect('geo.nameTranslation', 'translation')
       .leftJoinAndSelect('translation.translationText', 'translation_text')
     return await q.getMany()
