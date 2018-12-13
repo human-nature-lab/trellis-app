@@ -67,6 +67,7 @@
                   </td>
                   <td>{{ props.item.created_at }}</td>
                   <td>{{ props.item.file_name }}</td>
+                  <td>{{ (props.item.device) ? props.item.device.name : $t('not_found') }}</td>
                   <td>{{ props.item.device_id }}</td>
                   <td>{{ props.item.status }}</td>
                 </tr>
@@ -141,6 +142,9 @@
           text: 'File name',
           value: 'file_name'
         }, {
+          text: 'Device name',
+          value: 'device.name'
+        }, {
           text: 'Device id',
           value: 'device_id'
         }, {
@@ -160,6 +164,7 @@
     methods: {
       getUploads: async function () {
         const uploads = await SyncAdminService.listUploads()
+        console.log('uploads', uploads)
         this.uploads = uploads.map(u => {
           u.isOpen = false
           return u
