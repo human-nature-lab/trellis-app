@@ -1,13 +1,13 @@
 <template>
     <v-container class="ma-1" grid-list-sm fluid>
       <v-layout row wrap>
-        <v-flex xs12 sm12 md6 lg6 xl6 v-for="cat in categories">
+        <v-flex xs12 sm12 md6 lg6 xl6 v-for="cat in categories" :key="cat">
           <v-card :ripple="!!cat.to" tile :to="cat.to">
             <v-card-text>
               <v-container>
                 <v-layout class="display-1 mb-2">{{cat.title}}</v-layout>
                 <v-layout v-if="cat.component" :is="cat.component"></v-layout>
-                <v-layout v-else row v-for="pair in cat.items">
+                <v-layout v-else row v-for="pair in cat.items" :key="pair.key">
                   <v-flex class="subheading">{{pair.key}}</v-flex>
                   <v-spacer />
                   <v-flex v-if="pair.component" class="text-sm-right body-2">
@@ -103,7 +103,8 @@
           items: [{
             key: this.$t('version'),
             val: this.version
-          }, device, server]
+          }, device, server],
+          to: {name: 'Changelog'}
         })
         DeviceService.getUUID().then(id => {
           device.val = id

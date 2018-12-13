@@ -288,6 +288,17 @@ export default class DataStore extends Emitter {
     return tags
   }
 
+  public getAllConditionTags (): ConditionTag[] {
+    let tags: ConditionTag[] = this.conditionTags.respondent.map(rct => ConditionTagStore.getTagById(rct.conditionTagId))
+    tags = tags.concat(this.conditionTags.survey.map(sct => ConditionTagStore.getTagById(sct.conditionId)))
+    tags = tags.concat(this.conditionTags.section.map(sct => ConditionTagStore.getTagById(sct.conditionId)))
+    return tags
+  }
+
+  public getAllConditionTagNames (): string[] {
+    return this.getAllConditionTags().map(tag => tag.name)
+  }
+
   /**
    * Get an array of all the condition tag names for this location in the survey
    * @param sectionRepetition
