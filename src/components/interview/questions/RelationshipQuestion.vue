@@ -63,6 +63,8 @@
   import parameterTypes from '../../../static/parameter.types'
   import GeoService from '../../../services/geo/GeoService'
   import RespondentService from '../../../services/respondent/RespondentService'
+  import uniq from 'lodash/uniq'
+
   export default {
     name: 'relationship-question',
     props: {
@@ -150,17 +152,22 @@
           const p = []
           let geoTypeCompareVal = this.geoTypeParameterValue.replace(/\s/g, '').toLowerCase()
           for (let rGeo of this.respondent.geos) {
-            p.push(GeoService.getGeoAncestors(rGeo.geoId).then(ancestors => {
-              let baseAncestor = ancestors.find(a => a.geoType.name.replace(/\s/g, '').toLowerCase() === geoTypeCompareVal)
-              if (!baseAncestor) console.warn('Unable to find respondent ancestor matching', this.geoTypeParameterValue)
-              if (baseAncestor) {
-                this.baseAncestorIds.push(baseAncestor.id)
-              }
-            }))
+            // Restrict respondent geos to current geos
+            if (rGeo.isCurrent) {
+              p.push(GeoService.getGeoAncestors(rGeo.geoId).then(ancestors => {
+                let baseAncestor = ancestors.find(a => a.geoType.name.replace(/\s/g, '').toLowerCase() === geoTypeCompareVal)
+                if (!baseAncestor) console.warn('Unable to find respondent ancestor matching', this.geoTypeParameterValue)
+                if (baseAncestor) {
+                  this.baseAncestorIds.push(baseAncestor.id)
+                }
+              }))
+            }
           }
           promise = Promise.all(p)
         }
         promise.then(() => {
+          // Remove duplicate IDs
+          this.baseAncestorIds = uniq(this.baseAncestorIds)
           this.respondentSearchDialog = true
         })
       },
