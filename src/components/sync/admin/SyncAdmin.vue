@@ -164,7 +164,6 @@
     methods: {
       getUploads: async function () {
         const uploads = await SyncAdminService.listUploads()
-        console.log('uploads', uploads)
         this.uploads = uploads.map(u => {
           u.isOpen = false
           return u

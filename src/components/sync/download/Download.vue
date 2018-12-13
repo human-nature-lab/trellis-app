@@ -131,21 +131,29 @@
                 v-bind:continue-status="continueStatusArray[3]"
                 v-on:continue-clicked="onContinue"
                 v-on:cancel-clicked="onCancel">
-                <generate-image-list
+                <check-connection
                   v-if="downloadStep > 3"
+                  :logging-service="loggingService"
+                  v-on:connection-ok="downloadSubStep = 2"></check-connection>
+                <authenticate-device
+                  v-if="downloadStep > 3 && downloadSubStep > 1"
+                  :logging-service="loggingService"
+                  v-on:authentication-ok="downloadSubStep = 3"></authenticate-device>
+                <generate-image-list
+                  v-if="downloadStep > 3 && downloadSubStep > 2"
                   :logging-service="loggingService"
                   v-on:generate-image-list-done="generateImageListDone">
                 </generate-image-list>
                 <calculate-image-size
                   v-bind:images-to-download="imagesToDownload"
-                  v-if="downloadStep > 3 && downloadSubStep > 1"
+                  v-if="downloadStep > 3 && downloadSubStep > 3"
                   :logging-service="loggingService"
                   v-on:calculate-image-size-done="calculateImageSizeDone">
                 </calculate-image-size>
                 <download-images
                   v-bind:images-to-download="imagesToDownload"
                   v-bind:num-images-found="numImagesFound"
-                  v-if="downloadStep > 3 && downloadSubStep > 2"
+                  v-if="downloadStep > 3 && downloadSubStep > 4"
                   :logging-service="loggingService"
                   v-on:download-images-done="downloadImagesDone">
                 </download-images>
@@ -337,11 +345,11 @@
       },
       generateImageListDone: function (imageList) {
         this.imagesToDownload = imageList
-        this.downloadSubStep = 2
+        this.downloadSubStep = 4
       },
       calculateImageSizeDone: function (photosFound) {
         this.numImagesFound = photosFound
-        this.downloadSubStep = 3
+        this.downloadSubStep = 5
       },
       downloadImagesDone: function (imagesDownloaded) {
         this.continueStatus = BUTTON_STATUS.DONE
