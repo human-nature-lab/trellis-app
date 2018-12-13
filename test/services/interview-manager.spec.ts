@@ -8,7 +8,7 @@ import {
   rosterId,
   editRosterId,
   firstPageRosterIds,
-  prefillRespondentId, middlePageRosterIds, lastPageRosterIds, respondentId3, edgeIds
+  prefillRespondentId, middlePageRosterIds, lastPageRosterIds, respondentId3, edgeIds, reloadConditionTagSurveyId
 } from "../testing-ids";
 import SurveyService from "../../src/services/survey/index";
 import InterviewService from "../../src/services/interview/InterviewService";
@@ -30,6 +30,7 @@ import moment from 'moment'
 import Form from "../../src/entities/trellis/Form";
 import Skip from "../../src/entities/trellis/Skip";
 import Measurement from "../../src/classes/Measurement";
+import InterviewLoader from "../../src/components/interview/services/InterviewLoader";
 
 interface SimpleLocation {
   section?: number
@@ -167,6 +168,16 @@ function setupInterviewManager (formId: string, rId?: string, sId?: string, cust
     }
     return new InterviewManager(interview, form, actions, data.data, data.conditionTags, fills)
   })
+}
+
+async function resumeSurvey (formId: string, rId: string, surveyId: string, customActions?: Action[]) {
+  const interview = await InterviewService.create(surveyId)
+  const res = await InterviewLoader.loadInterview(interview.id)
+  let {form, actions, data, respondentFills, baseRespondentConditionTags} = res
+  if (customActions) {
+    actions = customActions
+  }
+  return new InterviewManager(interview, form, actions, data.data, data.conditionTags, respondentFills, baseRespondentConditionTags)
 }
 
 export default function () {
@@ -561,6 +572,35 @@ export default function () {
         ].map(s => ({section: s[0], sectionRepetition: s[1], sectionFollowUpRepetition: s[2], page: s[3]}))
         stepThroughRandomly(200, manager, repeatedLocationSequence, 5, false)
       })
+      it('should handle reloading forms and changing respondent condition tags', async () => {
+        const manager = await resumeSurvey(forms.reloadConditionTag, respondentId, reloadConditionTagSurveyId)
+        manager.initialize()
+        validateLocation(manager.location, {section: 0, page: 1}) // Expect to start on the second (skipped) page
+        let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+        expect(conditionTags).to.include('dont_skip', '"dont_skip" condition tag should be assigned initially').and.not.include('skip', '"skip" condition tag should ot be assigned')
+        prev(manager)
+        selectChoice(manager, 'skip')
+        next(manager)
+        validateLocation(manager.location, {section: 0, page: 2})
+        conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
+        expect(conditionTags).to.include('skip', '"skip" condition tag should be assigned now').and.not.include('dont_skip', '"dont_skip" condition tag should be removed now')
+      })
+      it('should not make duplicates of condition tags', async () => {
+        const manager = await resumeSurvey(forms.reloadConditionTag, respondentId, reloadConditionTagSurveyId)
+        manager.initialize()
+        validateLocation(manager.location, {section: 0, page: 1}) // Expect to start on the second (skipped) page
+        let conditionTags = manager.getAllConditionTags() // This is okay for non repeated sections
+        let counts = conditionTags.reduce((agg, tag) => {
+          if (!agg[tag]) {
+            agg[tag] = 0
+          }
+          agg[tag]++
+          return agg
+        }, {})
+        for (let key in counts) {
+          expect(counts[key]).to.be.at.most(1, `${key} is a duplicate tag`)
+        }
+      })
     })
 
     describe('Storage', () => {
@@ -593,12 +633,12 @@ export default function () {
           manager.destroy()
         })
       })
-      // it('should assign conditions on the last page', async () => {
-      //   throw Error('TODO') // TODO
-      // })
-      // it('should only call save once when we exit', async () => {
-      //   throw Error('TODO') // TODO
-      // })
+      it('should assign conditions on the last page', async () => {
+        throw Error('TODO') // TODO
+      })
+      it('should only call save once when we exit', async () => {
+        throw Error('TODO') // TODO
+      })
       it('should save actions when they happen')
       it('should save data eventually')
       it('should rebuild all the data and save before locking the survey')

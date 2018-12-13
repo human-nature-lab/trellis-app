@@ -11,7 +11,7 @@ export const editRosterId = '1c257b6b-688b-4ec6-9804-12b0472eff59'
 export const interviewId = '8d032e56-25a5-4f85-8a88-f015d059ff08'
 export const geoId = '3a1dc8cb-b49a-459b-b023-68240597ed4e'
 export const edgeIds = ['15177bdd-b5cf-11e8-8fd7-0800271047e3', '151785da-b5cf-11e8-8fd7-0800271047e3']
-
+export const reloadConditionTagSurveyId = '06b47daa-7c73-4325-842f-abd4e92c674b'
 
 export const forms = {
   firstPageSkipped: 'cb801404-806f-4ed1-b5bd-88997ad81f80',
@@ -22,7 +22,8 @@ export const forms = {
   conditionReassignment: '40030eb6-0722-42c6-a91a-91dbd7f161aa',
   skipWithPrevious: '69916710-30aa-4247-85d3-08f5e1f34043',
   largeRepeated: '139ccd02-8fc3-4fd1-b96f-44e621f5c724',
-  basicNavigation: '01a36e93-32e0-4161-b1d5-6458c21d9edc'
+  basicNavigation: '01a36e93-32e0-4161-b1d5-6458c21d9edc',
+  reloadConditionTag: '7e26ff10-1a4d-4e11-9703-b9a0bd213733'
 }
 
 export const firstPageRosterIds = ['5ca96a1d-e47f-4fcb-90ed-b9955798412c', 'fc8b035f-0b6e-4a6b-8c69-b69beabb7f76', 'ff7ac9ca-bf86-46ca-b2bc-53d7b721e20a']

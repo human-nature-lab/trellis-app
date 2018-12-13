@@ -223,10 +223,10 @@
       // Called by RoutePreloadMixin
       hydrate (data) {
         this.type = data.interviewType
-        const d = data
-        this.initializeInterview(d.interview, d.actions, d.data, d.conditionTags, d.form, d.respondentFills)
+        this.initializeInterview(data)
       },
-      initializeInterview: function (interview, actions, data, conditionTags, formBlueprint, respondentFills) {
+      initializeInterview: function (d) {
+        let {actions, form, baseRespondentConditionTags, conditionTags, data, interview, respondentFills} = d
         clearSharedInterview()
         this.dialog.end = false
         this.dialog.beginning = false
@@ -235,7 +235,7 @@
         this.interviewConditionTags = null
         this.interviewData = null
         this.interviewActions = null
-        interviewState = sharedInterview(interview, formBlueprint, actions, data, conditionTags, respondentFills)
+        interviewState = sharedInterview(interview, form, actions, data, conditionTags, respondentFills, baseRespondentConditionTags)
         if (this.type === 'interview') {
           interviewState.attachDataPersistSlave()
           interviewState.attachActionsPersistSlave()
@@ -246,7 +246,7 @@
         this.interviewConditionTags = interviewState.data.conditionTags
         this.interviewActions = interviewState.actions.store
         this.interview = interview
-        this.form = formBlueprint
+        this.form = form
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
         this.updateInterview()
