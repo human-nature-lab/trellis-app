@@ -132,7 +132,6 @@
         onDone: function () {
           this.success = true
           this.downloading = false
-          console.log('donezo')
           if (this.failedImages.length > 0) {
             this.loggingService.log({
               severity: 'warn',
@@ -153,7 +152,6 @@
         },
         ignore: function () {
           this.currentLog = undefined
-          this.onDone()
         },
         stopDownload: function () {
           this.isCancelling = true
