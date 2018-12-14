@@ -33,6 +33,9 @@ export default Vue.mixin({
     },
     isCordova (): boolean {
       return config.appEnv === APP_ENV.CORDOVA
+    },
+    isDebug (): boolean {
+      return config.debug
     }
   }
 })
@@ -44,5 +47,6 @@ declare module 'vue/types/vue' {
     alert (color: string, msg, config?): void
     isWeb: boolean
     isCordova: boolean
+    isDebug: boolean
   }
 }
