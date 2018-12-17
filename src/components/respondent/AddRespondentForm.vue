@@ -29,10 +29,12 @@
       <v-stepper-content step="2">
         <v-card v-if="respondent">
           <v-card-text>
-            <PhotoAlbum
+            <photo-album
               :title="$t('add_photos')"
               :photos="respondent.photos"
-              @photo="addPhoto"/>
+              @photo="addPhoto"
+              @delete-photo="onDeletePhoto"
+              @update-photos="onUpdatePhotos"></photo-album>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -110,8 +112,21 @@
     },
     methods: {
       async addPhoto (photo) {
-        await RespondentService.addPhoto(this.respondent.id, photo)
-        this.respondent.photos.push(photo)
+        let returnPhoto = await RespondentService.addPhoto(this.respondent.id, photo)
+        this.respondent.photos.push(returnPhoto)
+      },
+      async onUpdatePhotos (photos) {
+        await RespondentService.updatePhotos(photos)
+      },
+      async onDeletePhoto (photo) {
+        let confirmMessage = this.$t('remove_photo_confirm') + ''
+        if (!window.confirm(confirmMessage)) return
+        try {
+          await RespondentService.removePhoto(photo)
+          this.respondent.photos.splice(this.respondent.photos.indexOf(photo), 1)
+        } catch (err) {
+          console.error(err)
+        }
       },
       async save () {
         if (!this.name.length) return
