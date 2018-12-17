@@ -131,7 +131,7 @@
 <style lang="sass">
   $listPadding: 30px
   .markdown
-    ul
+    ul, ol
       margin-block-start: 1em
       margin-block-end: 1em
       padding-inline-start: $listPadding

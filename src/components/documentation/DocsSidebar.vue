@@ -1,34 +1,42 @@
 <template>
-  <v-navigation-drawer
-    :width="width"
-    disable-resize-watcher
-    disable-route-watcher
-    right
-    app
-    v-model="isOpen">
+  <div>
     <v-navigation-drawer
+      :width="width"
+      disable-resize-watcher
+      disable-route-watcher
       right
       app
+      v-model="isOpen">
+      <v-toolbar flat>
+        <v-btn icon @click="openTOC">
+          <v-icon>toc</v-icon>
+        </v-btn>
+        <v-toolbar-title>
+          {{$t('documentation')}}
+        </v-toolbar-title>
+        <v-spacer />
+        <v-btn icon @click="isOpen = false">
+          <v-icon>arrow_forward</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <Documentation
+        v-if="currentFile"
+        @navigation="openDoc"
+        :preventLinkPropagation="true"
+        :currentFile="currentFile" />
+    </v-navigation-drawer>
+    <v-navigation-drawer
+      disable-resize-watcher
+      right
+      app
+      :width="width"
       v-model="isTOCOpen">
       <DocsTOC
         :preventLinkPropagation="true"
+        @close="closeTOC"
         @navigation="openDoc" />
     </v-navigation-drawer>
-    <v-toolbar flat>
-      <v-toolbar-title>
-        {{$t('documentation')}}
-      </v-toolbar-title>
-      <v-spacer />
-      <v-btn @click="isTOCOpen = true">
-        <v-icon>toc</v-icon>
-      </v-btn>
-    </v-toolbar>
-    <Documentation
-      v-if="currentFile"
-      @navigation="openDoc"
-      :preventLinkPropagation="true"
-      :currentFile="currentFile" />
-  </v-navigation-drawer>
+  </div>
 </template>
 
 <script lang="ts">
@@ -76,6 +84,14 @@
         } else {
           this.isTOCOpen = true
         }
+      },
+      openTOC () {
+        this.isTOCOpen = true
+        this.isOpen = false
+      },
+      closeTOC () {
+        this.isTOCOpen = false
+        this.isOpen = true
       }
     }
   })

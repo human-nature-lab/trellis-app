@@ -103,8 +103,11 @@
 <script>
   import SyncAdminService from '../../../services/SyncAdminService'
   import UploadLogs from './UploadLogs'
+  import DocsLinkMixin from '../../../mixins/DocsLinkMixin'
+  import DocsFiles from '../../documentation/DocsFiles'
   export default {
     name: 'sync-admin',
+    mixins: [DocsLinkMixin(DocsFiles.sync.admin)],
     components: {UploadLogs},
     data () {
       return {

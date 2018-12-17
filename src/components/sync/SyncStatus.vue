@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title>
           <h3 class="headline mb-0">
-            <DocsLinkBadge to="syncing/Introduction.md">{{ $t('sync_status') }}</DocsLinkBadge>
+            {{ $t('sync_status') }}
           </h3>
         </v-card-title>
         <v-card-text>
