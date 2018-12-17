@@ -3,7 +3,9 @@
     <v-flex xs12 sm12 md12>
       <v-card>
         <v-card-title>
-          <h3 class="headline mb-0">{{ $t('sync_status') }}</h3>
+          <h3 class="headline mb-0">
+            <DocsLinkBadge to="syncing/Introduction.md">{{ $t('sync_status') }}</DocsLinkBadge>
+          </h3>
         </v-card-title>
         <v-card-text>
           <v-alert
@@ -30,7 +32,9 @@
 <script>
   /* TODO: Consider adding information about the last upload here. */
   import DateService from '../../services/DateService'
+  import DocsLinkBadge from '../documentation/DocsLinkBadge'
   export default {
+    components: {DocsLinkBadge},
     name: 'sync-status',
     props: {
       localLatestSnapshot: {
