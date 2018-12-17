@@ -35,11 +35,13 @@
   import GeoSearch from './GeoSearch.vue'
   import AddGeoForm from './AddGeoForm.vue'
   import GeoService from '../../services/geo/GeoService'
-  import global from '../../static/singleton'
+  import DocsFiles from '../documentation/DocsFiles'
+  import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import { pushRoute } from '../../router/index'
 
   export default {
     name: 'geo',
+    mixins: [DocsLinkMixin(DocsFiles.locations.search)],
     data () {
       return {
         parentGeoId: null,

@@ -69,14 +69,16 @@
 <script>
   import AlertService from '../../services/AlertService'
   import SyncStatus from './SyncStatus'
-  import SyncService from '../../services/SyncService'
   import DatabaseService from '../../services/database/DatabaseService'
   import Download from './download/Download'
   import Upload from './upload/Upload'
   import ServerIpConfig from './ServerIPConfig.vue'
+  import DocsLinkMixin from '../../mixins/DocsLinkMixin'
+  import DocsFiles from '../documentation/DocsFiles'
 
   export default {
     name: 'sync',
+    mixins: [DocsLinkMixin(DocsFiles.sync.introduction)],
     data () {
       return {
         loading: true,

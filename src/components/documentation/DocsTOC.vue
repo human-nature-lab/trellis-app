@@ -4,6 +4,10 @@
         <v-toolbar-title>
           Table of contents
         </v-toolbar-title>
+        <v-spacer />
+        <v-btn icon @click="$emit('close')">
+          <v-icon>arrow_forward</v-icon>
+        </v-btn>
       </v-toolbar>
       <v-container>
         <v-layout>
