@@ -59,6 +59,14 @@ export default function defaultInstance (): AxiosInstance {
   return defaultInst
 }
 
+export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance> {
+  return axios.create({
+    baseURL: apiRoot + '/sync',
+    timeout: 0,
+    headers: {'X-Key': config.xKey}
+  })
+}
+
 export async function syncInstance (): Promise<AxiosInstance>  {
   if (syncInst === undefined) {
     const apiRoot = await DatabaseService.getServerIPAddress()
