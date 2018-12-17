@@ -3,11 +3,13 @@
     <v-container>
       <v-layout v-if="isLoaded">
         <Markdown
-          :transformLinks="true"
+          :transformLinks="transformLinks"
+          :preventLinkPropagation="preventLinkPropagation"
+          @navigation="$emit('navigation', $event)"
           routeName="Documentation"
           paramName="filePath"
           :fileName="currentFile"
-          :markdown="html" />
+          :markdown="markdown" />
       </v-layout>
       <v-layout v-else>{{$t('loading')}}</v-layout>
     </v-container>
@@ -24,6 +26,14 @@
       currentFile: {
         type: String,
         required: true
+      },
+      transformLinks: {
+        type: Boolean,
+        default: false
+      },
+      preventLinkPropagation: {
+        type: Boolean,
+        default: false
       }
     },
     async created () {
@@ -39,7 +49,7 @@
       }
     },
     computed: {
-      html (): string {
+      markdown (): string {
         console.log('Current documentation file', this.currentFile, this.content)
         if (this.isReady && this.content[this.currentFile]) {
           return this.content[this.currentFile]

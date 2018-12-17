@@ -84,6 +84,7 @@
     <LocationFinder />
     <CensusFormChecker />
     <SnackbarQueue />
+    <DocsSidebar />
 
   </v-app>
 </template>
@@ -101,6 +102,7 @@
   import {defaultLoggingService} from './services/logging/LoggingService'
   import GeoLocationService from './services/geolocation'
   import SnackbarQueue from './components/SnackbarQueue'
+  import DocsSidebar from './components/documentation/DocsSidebar'
 
   export default {
     name: 'web-app',
@@ -137,7 +139,8 @@
       TrellisAlert,
       LocationFinder,
       CensusFormChecker,
-      SnackbarQueue
+      SnackbarQueue,
+      DocsSidebar
     },
     computed: {
       withinCordova () {
