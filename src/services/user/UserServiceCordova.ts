@@ -22,6 +22,14 @@ export class UserServiceCordova extends UserServiceAbstract {
     return this._currentUserRequest
   }
 
+  async getAll (): Promise<User[]> {
+    throw new Error('not implemented')
+  }
+
+  async addUser (): Promise<User> {
+    throw new Error('not implemented')
+  }
+
 }
 
 export default UserServiceCordova

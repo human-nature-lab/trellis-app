@@ -6,7 +6,7 @@ const config = {
   xKey: '***REMOVED***',
   apiRoot: 'https://api.***REMOVED***',
   database: {
-    logging: ['warning', 'error']
+    logging: ['warning', 'error']g
   },
   logging: {
     levels: ['warn', 'error']
