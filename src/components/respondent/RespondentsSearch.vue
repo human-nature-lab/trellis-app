@@ -447,7 +447,7 @@
         return selected.filter((r) => this.removed.findIndex((removed) => removed.id === r.id) === -1)
       },
       respondentResults () {
-        return orderBy(this.results, ['score', 'name'], ['desc', 'asc'])
+        return orderBy(this.results, ['score'], ['desc'])
       },
       showLabels () {
         return this.filters.geos.length > 0

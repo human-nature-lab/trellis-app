@@ -3,6 +3,7 @@
     <RespondentGeos
       :respondent="respondent"
       :study-id="global.study.id"
+      :geoSelectionFilter="isGeoSelectable"
       @after-add="afterAdd"
       @after-move="afterMove"
       @after-remove="afterRemove" />
@@ -14,6 +15,7 @@
   import AT from '../../../static/action.types'
   import ActionMixin from '../mixins/ActionMixin'
   import global from '../../../static/singleton'
+  import GeoTypeParameterMixin from '../mixins/GeoTypeParameterMixin'
   export default {
     name: 'respondent-geo-question',
     data () {
@@ -51,7 +53,7 @@
         })
       }
     },
-    mixins: [ActionMixin],
+    mixins: [ActionMixin, GeoTypeParameterMixin],
     components: {RespondentGeos}
   }
 </script>

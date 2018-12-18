@@ -57,9 +57,10 @@
   import global from '../../../static/singleton'
   import AsyncTranslationText from '../../AsyncTranslationText.vue'
   import ModalTitle from '../../ModalTitle'
+  import GeoTypeParameterMixin from '../mixins/GeoTypeParameterMixin'
   export default {
     name: 'geo-question',
-    mixins: [ActionMixin],
+    mixins: [ActionMixin, GeoTypeParameterMixin],
     props: {
       question: {
         type: Object,
@@ -145,10 +146,6 @@
         }
         this.geoSearchDialog = false
         this.loadGeos(this.geoIds)
-      },
-      isGeoSelectable (geo) {
-        console.log('isSelectable', geo.geoType.name)
-        return this.allowedGeoTypes.indexOf(geo.geoType.name.replace(/\s/g, '').toLowerCase()) > -1
       }
     },
     computed: {
@@ -167,15 +164,6 @@
         })
         this.loadGeos(toLoad)
         return rows
-      },
-      allowedGeoTypes () {
-        const types = []
-        for (let qp of this.question.questionParameters) {
-          if (qp.parameterId == PT.geo_type) {
-            types.push(qp.val.replace(/\s/g, '').toLowerCase())
-          }
-        }
-        return types
       }
     },
     components: {
