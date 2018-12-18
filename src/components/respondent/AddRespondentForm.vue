@@ -9,6 +9,7 @@
       <v-stepper-content step="1">
         <v-card>
           <v-card-text>
+            <v-subheader>{{ $t('respondent_name_instructions') }}</v-subheader>
             <v-text-field
               required
               :label="$t('respondent_full_name')"
