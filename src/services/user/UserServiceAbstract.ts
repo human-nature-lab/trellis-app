@@ -4,11 +4,11 @@ export abstract class UserServiceAbstract {
 
   private _user: User
 
-  set user (user: User) {
+  set user(user: User) {
     this._user = user
   }
 
-  get user (): User {
+  get user(): User {
     return this._user
   }
 
@@ -16,13 +16,13 @@ export abstract class UserServiceAbstract {
    * Load the current user and store it in local storage
    * @returns {Promise<Object>}
    */
-  abstract loadCurrentUser (): Promise<User>
+  abstract loadCurrentUser(): Promise<User>
 
   /**
    * Get the current user
    * @returns {Object}
    */
-  getCurrentUser (): User {
+  getCurrentUser(): User {
     return this.user
   }
 
@@ -30,14 +30,25 @@ export abstract class UserServiceAbstract {
    * Set the user
    * @param user
    */
-  setCurrentUser (user: User): void {
+  setCurrentUser(user: User): void {
     this.user = user
   }
 
   /**
    * Remove current user
    */
-  removeCurrentUser (): void {
+  removeCurrentUser(): void {
     delete(this._user)
   }
+
+  /**
+   * Get all users
+   */
+  abstract getAll(): Promise<User[]>
+
+  /**
+   * Create a new user
+   * @returns {Promise<User>}
+   */
+  abstract addUser (): Promise<User>
 }
