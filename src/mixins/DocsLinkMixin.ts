@@ -4,21 +4,19 @@ import bus, {DocsEventTypes} from '../components/documentation/DocsEventBus'
 
 let previousState
 export default function DocsLinkMixin (docLink: any) {
-  return {
+  return config.debug ? {
     beforeRouteEnter (to, from, next) {
-      if (config.debug) {
-        previousState = JSON.parse(JSON.stringify(global.secondaryDrawer))
-        previousState.onClick = global.secondaryDrawer.onClick
-        global.secondaryDrawer.isEnabled = true
-        global.secondaryDrawer.icon = 'help_outline'
-        global.secondaryDrawer.onClick = () => {
-          bus.$emit(DocsEventTypes.open, docLink)
-        }
-        next()
+      previousState = JSON.parse(JSON.stringify(global.secondaryDrawer))
+      previousState.onClick = global.secondaryDrawer.onClick
+      global.secondaryDrawer.isEnabled = true
+      global.secondaryDrawer.icon = 'help_outline'
+      global.secondaryDrawer.onClick = () => {
+        bus.$emit(DocsEventTypes.open, docLink)
       }
+      next()
     },
     beforeRouteLeave (to, from, next) {
-      if (config.debug && previousState) {
+      if (previousState) {
         global.secondaryDrawer.isEnabled = previousState.isEnabled
         global.secondaryDrawer.icon = previousState.icon
         global.secondaryDrawer.onClick = previousState.onClick
@@ -27,5 +25,5 @@ export default function DocsLinkMixin (docLink: any) {
         previousState = null
       }
     }
-  }
+  } : {}
 }
