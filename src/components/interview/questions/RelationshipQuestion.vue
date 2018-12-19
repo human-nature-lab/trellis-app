@@ -103,6 +103,14 @@
         let geoTypeParameter = this.question.questionParameters.find(p => parseInt(p.parameterId, 10) === parameterTypes.geo_type)
         return geoTypeParameter ? geoTypeParameter.val : null
       },
+      orConditionTagParameterValues () {
+        let orConditionTagParameters = this.question.questionParameters.filter(p => parseInt(p.parameterId, 10) === parameterTypes.or_respondent_condition_tag)
+        return orConditionTagParameters.map(ctp => ctp.val)
+      },
+      andConditionTagParameterValues () {
+        let andConditionTagParameters = this.question.questionParameters.filter(p => parseInt(p.parameterId, 10) === parameterTypes.and_respondent_condition_tag)
+        return andConditionTagParameters.map(ctp => ctp.val)
+      },
       baseRespondentFilters () {
         let filters = {
           includeChildren: true,
@@ -111,6 +119,12 @@
         }
         if (this.geoTypeParameterValue && this.baseAncestorIds.length) {
           filters.geos = this.baseAncestorIds.slice()
+        }
+        if (this.andConditionTagParameterValues.length > 0) {
+          filters.conditionTags = this.andConditionTagParameterValues
+        }
+        if (this.orConditionTagParameterValues.length > 0) {
+          filters.orConditionTags = this.orConditionTagParameterValues
         }
         return filters
       },
