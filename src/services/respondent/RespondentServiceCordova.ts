@@ -193,6 +193,16 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
         }
       }))
       qb.orWhere('associated_respondent_id = :respondentId', {respondentId: respondentId})
+
+      // Or condition tag filters
+      if (Array.isArray(filters.orConditionTags) && filters.orConditionTags.length > 0) {
+        let orConditionTagNames = filters.orConditionTags
+        qb.orWhere('"respondent"."id" in (' +
+          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
+          'select id from condition_tag where name in (:...orConditionTagNames)))',
+          {orConditionTagNames: orConditionTagNames})
+      }
+
     }))
     q = q.andWhere('"respondent"."deleted_at" is null')
     q = q.take(size).skip(page * size)

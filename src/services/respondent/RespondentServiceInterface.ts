@@ -6,7 +6,8 @@ import Photo from "../../entities/trellis/Photo";
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export interface SearchFilter {
-  conditionTags?: string[],    // Array of condition tag names
+  conditionTags?: string[],    // Array of condition tag names to filter respondents by, logical AND
+  orConditionTags?: string[],  // Array of condition tag names to union respondents by, logical OR
   geos?: string[]              // Array of geo ids
   onlyCurrentGeo?: boolean     // Indicates that only current residents should be included
   includeChildren?: boolean    // Indicates that nested respondents should be included

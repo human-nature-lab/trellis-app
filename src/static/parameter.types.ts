@@ -9,6 +9,8 @@ export default {
   exclusive: 16,
   can_add_respondent: 17,
   allow_barcode: 18,
+  and_respondent_condition_tag: 19,
+  or_respondent_condition_tag: 20,
   max: 2,
   other: 3,
   none: 4,

@@ -255,6 +255,7 @@
         type: Object,
         default: () => ({
           conditionTags: [],
+          orConditionTags: [],
           geos: [],
           includeChildren: false,
           onlyCurrentGeo: true,
@@ -291,6 +292,7 @@
         query: '',
         filters: Object.assign({
           conditionTags: [],
+          orConditionTags: [],
           geos: []
         }, this.baseFilters),
         added: [],
