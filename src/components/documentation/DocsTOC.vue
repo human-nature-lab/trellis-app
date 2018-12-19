@@ -1,13 +1,21 @@
 <template>
     <v-flex>
+      <v-toolbar flat>
+        <v-toolbar-title>
+          Table of contents
+        </v-toolbar-title>
+        <v-spacer />
+        <v-btn icon @click="$emit('close')">
+          <v-icon>arrow_forward</v-icon>
+        </v-btn>
+      </v-toolbar>
       <v-container>
-        <v-layout class="mb-3">
-          <h3>Table of contents</h3>
-        </v-layout>
         <v-layout>
           <Markdown
             v-if="content"
-            :transformLinks="true"
+            @navigation="$emit('navigation', $event)"
+            :preventLinkPropagation="preventLinkPropagation"
+            :transformLinks="transformLinks"
             routeName="Documentation"
             paramName="filePath"
             fileName="_Sidebar.md"
@@ -26,11 +34,21 @@
       const docs = (await import(/* webpackChunkName: "documentation" */'./docs')).default
       this.content = docs.content['./' + this.fileName]
     },
-    name: 'DocsTOC',
     data () {
       return {
         fileName: '_Sidebar.md',
         content: null
+      }
+    },
+    name: 'DocsTOC',
+    props: {
+      transformLinks: {
+        type: Boolean,
+        default: false
+      },
+      preventLinkPropagation: {
+        type: Boolean,
+        default: false
       }
     }
   })

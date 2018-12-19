@@ -93,7 +93,7 @@
         @close="isSearchOpen = false" />
       <GeoSearch
         :limit="1"
-        :isSelectable="true"
+        :isSelectable="geoSelectionFilter"
         :showCart="true"
         :shouldUpdateRoute="false"
         @doneSelecting="geoSelected" />
@@ -132,6 +132,9 @@
       respondentGeo: {
         type: Object,
         required: true
+      },
+      geoSelectionFilter: {
+        default: true
       }
     },
     methods: {
