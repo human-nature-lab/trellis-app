@@ -182,6 +182,8 @@
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
   import PhotoService from '../../services/photo/PhotoService'
+  import DocsLinkMixin from '../../mixins/DocsLinkMixin'
+  import DocsFiles from '../documentation/DocsFiles'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
@@ -225,6 +227,7 @@
 
   export default {
     name: 'respondents-search',
+    mixins: [DocsLinkMixin(DocsFiles.respondents.search)],
     props: {
       searchQuery: {
         type: String,
@@ -446,7 +449,7 @@
         return selected.filter((r) => this.removed.findIndex((removed) => removed.id === r.id) === -1)
       },
       respondentResults () {
-        return orderBy(this.results, ['score', 'name'], ['desc', 'asc'])
+        return orderBy(this.results, ['score'], ['desc'])
       },
       showLabels () {
         return this.filters.geos.length > 0

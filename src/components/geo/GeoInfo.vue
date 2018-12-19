@@ -44,18 +44,21 @@
   import Photo from '../../entities/trellis/Photo'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
+  import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import GeoService from '../../services/geo/GeoService'
   import router from '../../router'
   import {Route} from 'vue-router'
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
   import {SearchFilter} from "../../services/respondent/RespondentServiceInterface"
+  import DocsFiles from "../documentation/DocsFiles"
 
   export default Vue.extend({
     name: 'geo-info',
     mixins: [
       RouteMixinFactory((r: Route) => GeoService.getGeoById(r.params.geoId)),
-      TranslationMixin
+      TranslationMixin,
+      DocsLinkMixin(DocsFiles.locations.info)
     ],
     components: {GeoBreadcrumbs, PhotoAlbum, AsyncTranslationText},
     data () {

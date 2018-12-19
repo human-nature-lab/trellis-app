@@ -61,6 +61,8 @@ import FileService from '../file/FileService'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 import PreloadAction from '../../entities/trellis/PreloadAction'
 import config from '../../config'
+import {monekypatch} from './monekypatch'
+monekypatch()
 
 const trellisConfigConnection = {
   type: 'cordova',
@@ -76,67 +78,69 @@ const trellisConfigConnection = {
   synchronize: true
 }
 
+const entities = [
+  Action,
+  AssignConditionTag,
+  CensusType,
+  Choice,
+  ConditionTag,
+  Datum,
+  DatumType,
+  Edge,
+  Form,
+  FormSection,
+  FormSkip,
+  FormType,
+  Geo,
+  GeoPhoto,
+  GeoType,
+  Interview,
+  Locale,
+  Parameter,
+  Photo,
+  PhotoTag,
+  PreloadAction,
+  Question,
+  QuestionAssignConditionTag,
+  QuestionChoice,
+  QuestionDatum,
+  QuestionGroup,
+  QuestionGroupSkip,
+  QuestionParameter,
+  QuestionType,
+  Respondent,
+  RespondentConditionTag,
+  RespondentFill,
+  RespondentGeo,
+  RespondentName,
+  RespondentPhoto,
+  Roster,
+  Section,
+  SectionConditionTag,
+  SectionQuestionGroup,
+  SectionSkip,
+  Skip,
+  SkipConditionTag,
+  Study,
+  StudyForm,
+  StudyLocale,
+  StudyParameter,
+  StudyRespondent,
+  Survey,
+  SurveyConditionTag,
+  Tag,
+  Translation,
+  TranslationText,
+  User,
+  UserStudy
+]
+
 const trellisConnection = {
   type: 'cordova',
   database: 'trellis',
   name: 'trellis',
   location: 'default',
-  entities: [
-    Action,
-    AssignConditionTag,
-    CensusType,
-    Choice,
-    ConditionTag,
-    Datum,
-    DatumType,
-    Edge,
-    Form,
-    FormSection,
-    FormSkip,
-    FormType,
-    Geo,
-    GeoPhoto,
-    GeoType,
-    Interview,
-    Locale,
-    Parameter,
-    Photo,
-    PhotoTag,
-    PreloadAction,
-    Question,
-    QuestionAssignConditionTag,
-    QuestionChoice,
-    QuestionDatum,
-    QuestionGroup,
-    QuestionGroupSkip,
-    QuestionParameter,
-    QuestionType,
-    Respondent,
-    RespondentConditionTag,
-    RespondentFill,
-    RespondentGeo,
-    RespondentName,
-    RespondentPhoto,
-    Roster,
-    Section,
-    SectionConditionTag,
-    SectionQuestionGroup,
-    SectionSkip,
-    Skip,
-    SkipConditionTag,
-    Study,
-    StudyForm,
-    StudyLocale,
-    StudyParameter,
-    StudyRespondent,
-    Survey,
-    SurveyConditionTag,
-    Tag,
-    Translation,
-    TranslationText,
-    User,
-    UserStudy
-  ],
+  entities,
   namingStrategy: new SnakeCaseNamingStrategy(),
   // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
@@ -329,17 +333,7 @@ export default class DatabaseServiceCordova {
     return (config === undefined) ? undefined : config.val
   }
 
-  async setServerIPAddress (serverIP) {
-    let re = /(((http(s?)):(\/?)(\/?))?)(.*)/
-    let groups = serverIP.match(re)
-    console.log('groups', groups)
-    let protocol = groups[3]
-    let address = groups[7]
-    let combinedAddress = `https://${address}`
-    if (protocol === 'http') {
-      combinedAddress = `http://${address}`
-    }
-    console.log('combinedAddress', combinedAddress)
+  async setServerIPAddress (combinedAddress) {
     const connection = await this.getConfigDatabase()
     const repository = await connection.getRepository(Config)
     const config = await this.getServerIPAddress()

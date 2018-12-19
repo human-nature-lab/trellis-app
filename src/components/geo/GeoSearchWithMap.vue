@@ -70,8 +70,8 @@
 <script>
   /* global L */
   import 'leaflet'
-  import index from '../../router/index'
-  import Geo from '../../entities/trellis/Geo'
+  import DocsLinkMixin from '../../mixins/DocsLinkMixin'
+  import DocsFiles from '../documentation/DocsFiles'
   import GeoService from '../../services/geo/GeoService'
   import GeoSearch from './GeoSearch'
   import TranslationService from '../../services/TranslationService'
@@ -81,7 +81,6 @@
   import GeoEditPanel from './GeoEditPanel.vue'
   import Permission from '../Permission'
   import StudyService from '../../services/study/StudyService'
-  import {Route} from 'vue-router'
 
   const targetMapWidth = 600
 
@@ -105,6 +104,7 @@
 
   export default {
     name: 'geo-search-with-map',
+    mixins: [DocsLinkMixin(DocsFiles.locations.map)],
     props: {
       visibleGeoIds: {
         type: Array,
@@ -134,7 +134,7 @@
       }
     },
     async created () {
-      let curGeo = (this.$router.currentRoute.params.geoId) ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
+      let curGeo = this.$router.currentRoute.params.geoId ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
       this.selectGeo(curGeo)
     },
     mounted () {

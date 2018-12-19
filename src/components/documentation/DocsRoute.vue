@@ -2,9 +2,11 @@
   <v-flex>
     <Documentation
       v-if="currentFile"
+      :transformLinks="true"
       :currentFile="currentFile" />
     <v-navigation-drawer right app v-model="isTOCOpen">
-      <DocsTOC />
+      <DocsTOC
+        :transformLinks="true" />
     </v-navigation-drawer>
   </v-flex>
 </template>
@@ -30,8 +32,7 @@
       next()
     },
     beforeRouteLeave (to: Route, from: Route, next) {
-      // TODO: Reset the secondaryDrawer
-      global.secondaryDrawer.icon = 'help'
+      global.secondaryDrawer.isEnabled = false
       next()
     },
     async created () {

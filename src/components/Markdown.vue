@@ -1,6 +1,6 @@
 <template>
   <v-flex class="markdown">
-    <div v-html="html" />
+    <div v-html="html" ref="mdContainer" />
   </v-flex>
 </template>
 
@@ -36,6 +36,14 @@
       markdown: {
         type: String,
         required: true
+      },
+      preventLinkPropagation: {
+        type: Boolean,
+        default: false
+      },
+      useAbsolutePath: {
+        type: Boolean,
+        default: true
       }
     },
     computed: {
@@ -79,23 +87,41 @@
         return path.dirname(this.fileName)
       },
       html (): string {
-        if (this.transformLinks) {
-          // We replace links with relative versions to ensure they always match relative to the current location
-          const renderer = new marked.Renderer()
-          renderer.link = (href, title, text) => {
-            const params: {[key: string]: string} = {}
-            params[this.paramName as string] = path.normalize(path.join(this.currentDirLoc as string, href))
+        // @ts-ignore
+        this.$nextTick(this.attachLinkListeners)
+        const renderer = new marked.Renderer()
+        renderer.link = (href, title, text) => {
+          if (this.useAbsolutePath) {
+            href = path.normalize(path.join(this.currentDirLoc as string, href))
+          }
+          const params: {[key: string]: string} = {}
+          params[this.paramName as string] = href
+          if (this.transformLinks) {
             const res: {href: string} = router.resolve({
               name: this.routeName,
               params
             })
-            return `<a href="${res.href}"` + (title ? `title="${title}"` : '') + `>
+            href = res.href
+          }
+          return `<a href="${href}"` + (title ? `title="${title}"` : '') + `>
                     ${text}
                   </a>`
-          }
-          return marked(this.transformedMarkdown, {renderer: renderer}) as string
-        } else {
-          return marked(this.transformedMarkdown) as string
+        }
+        return marked(this.transformedMarkdown, {renderer: renderer}) as string
+      }
+    },
+    methods: {
+      attachLinkListeners () {
+        if (this.$refs.mdContainer instanceof Element) {
+          this.$refs.mdContainer.querySelectorAll('a').forEach(a => {
+            a.addEventListener('click', (e) => {
+              // @ts-ignore
+              if (this.preventLinkPropagation) {
+                e.preventDefault()
+              }
+              this.$emit('navigation', a.getAttribute('href'))
+            })
+          })
         }
       }
     }
@@ -105,7 +131,7 @@
 <style lang="sass">
   $listPadding: 30px
   .markdown
-    ul
+    ul, ol
       margin-block-start: 1em
       margin-block-end: 1em
       padding-inline-start: $listPadding

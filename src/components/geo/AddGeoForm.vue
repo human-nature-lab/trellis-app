@@ -100,8 +100,9 @@
                 <photo-album
                   :title="$t('add_photos')"
                   :photos="geo.photos"
-                  @photo="addPhoto">
-                </photo-album>
+                  @photo="addPhoto"
+                  @delete-photo="onDeletePhoto"
+                  @update-photos="onUpdatePhotos"></photo-album>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -228,7 +229,7 @@
       },
       async onPositioningDone () {
         try {
-          await GeoService.createGeo(this.geo)
+          this.geo = await GeoService.createGeo(this.geo)
         } catch (err) {
           this.log(err)
           this.alert('error', `Could not create new geo`, {timeout: 0})
@@ -236,8 +237,21 @@
         this.step++
       },
       async addPhoto (photo) {
-        await GeoService.addPhoto(this.geo.id, photo)
-        this.geo.photos.push(photo)
+        let returnPhoto = await GeoService.addPhoto(this.geo.id, photo)
+        this.geo.photos.push(returnPhoto)
+      },
+      async onUpdatePhotos (photos) {
+        await GeoService.updatePhotos(photos)
+      },
+      async onDeletePhoto (photo) {
+        let confirmMessage = this.$t('remove_photo_confirm') + ''
+        if (!window.confirm(confirmMessage)) return
+        try {
+          await GeoService.removePhoto(photo)
+          this.geo.photos.splice(this.geo.photos.indexOf(photo), 1)
+        } catch (err) {
+          console.error(err)
+        }
       },
       done () {
         this.closeDialog(this.geo)

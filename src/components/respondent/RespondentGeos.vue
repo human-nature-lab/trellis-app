@@ -44,11 +44,13 @@
     <add-respondent-geo-form
       v-model="isAddingGeo"
       @added="doneAddingGeo"
+      :geoSelectionFilter="geoSelectionFilter"
       :respondent="respondent"></add-respondent-geo-form>
     <move-respondent-geo-form
       v-if="isMovingGeo"
       v-model="isMovingGeo"
       @done="doneMovingGeo"
+      :geoSelectionFilter="geoSelectionFilter"
       :respondent-geo="movingRespondentGeo"
       :respondent="respondent"></move-respondent-geo-form>
   </v-flex>
@@ -90,6 +92,9 @@
       useCensusForm: {
         type: Boolean,
         default: false
+      },
+      geoSelectionFilter: {
+        default: true
       }
     },
     data: () => ({

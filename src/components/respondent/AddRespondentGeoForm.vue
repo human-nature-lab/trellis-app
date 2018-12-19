@@ -35,7 +35,7 @@
       <GeoSearch
         :showCart="true"
         :limit="1"
-        :is-selectable="true"
+        :isSelectable="geoSelectionFilter"
         :should-update-route="false"
         @doneSelecting="geoSelected" />
     </v-dialog>
@@ -72,6 +72,9 @@
       respondent: {
         type: Object,
         required: true
+      },
+      geoSelectionFilter: {
+        default: true
       }
     },
     methods: {

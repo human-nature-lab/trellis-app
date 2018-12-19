@@ -7,11 +7,6 @@
         </h2>
       </v-flex>
     </v-layout>
-    <v-layout v-if="showError" justify-space-around>
-      <v-alert>
-        {{errorMessage}}
-      </v-alert>
-    </v-layout>
     <v-layout justify-space-around>
       <v-flex xs8>
         <v-form
@@ -23,13 +18,15 @@
             :label="$t('server_ip_address')"
             autocapitalize="off"
             autocorrect="off"
+            :disabled="loading"
             required
             autofocus
             v-model="ipAddress">
           </v-text-field>
           <v-btn
             @click="setIpAddress()"
-            :disabled="!valid">
+            :loading="loading"
+            :disabled="!valid || loading">
             {{ $t('save') }}
           </v-btn>
         </v-form>
@@ -39,32 +36,50 @@
 </template>
 
 <script>
+  import { heartbeatInstance } from '../../services/http/AxiosInstance'
   import DatabaseService from '../../services/database/DatabaseService'
+  import AlertService from '../../services/AlertService'
+
   export default {
     name: 'server-ip-config',
     data: function () {
       return {
-        errorMessage: undefined,
+        loading: false,
         ipAddress: '',
-        error: null,
         valid: false
       }
     },
     methods: {
       setIpAddress: async function () {
-        this.errorMessage = undefined
         if (!this.$refs.form.validate()) return
         try {
-          await DatabaseService.setServerIPAddress(this.ipAddress)
+          this.loading = true
+          let combinedAddress = constructCombinedAddress(this.ipAddress)
+          const http = await heartbeatInstance(combinedAddress)
+          await http.get(`heartbeat`)
+          await DatabaseService.setServerIPAddress(combinedAddress)
           this.$emit('server-ip-config-done')
         } catch (err) {
-          this.errorMessage = err.message
+          AlertService.addAlert(err)
+        } finally {
+          this.loading = false
         }
-      },
-      showError: function () {
-        return (this.errorMessage !== undefined)
       }
     }
+  }
+
+  function constructCombinedAddress(serverIP) {
+    let re = /(((http(s?)):(\/?)(\/?))?)(.*)/
+    let groups = serverIP.match(re)
+    console.log('groups', groups)
+    let protocol = groups[3]
+    let address = groups[7]
+    let combinedAddress = `https://${address}`
+    if (protocol === 'http') {
+      combinedAddress = `http://${address}`
+    }
+    console.log('combinedAddress', combinedAddress)
+    return combinedAddress
   }
 </script>
 
