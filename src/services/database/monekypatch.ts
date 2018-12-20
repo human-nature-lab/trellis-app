@@ -13,7 +13,8 @@ const mutex = new Mutex()
 
 class CordovaQueryRunnerPatched extends CordovaQueryRunner {
   private _releaseMutex: MutexInterface.Releaser | null
-    async startTransaction (): Promise<void> {
+
+  async startTransaction (): Promise<void> {
     console.debug('monekypatch CordovaQueryRunnerPatched.startTransaction')
     this._releaseMutex = await mutex.acquire()
     console.debug('monekypatch CordovaQueryRunnerPatched.startTransaction -> acquired mutex')
