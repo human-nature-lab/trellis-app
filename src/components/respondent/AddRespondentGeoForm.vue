@@ -17,7 +17,7 @@
             </v-flex>
             <v-flex>
               <v-btn @click="showGeoSearch=true">
-                {{selectedGeo ? $t('change_location') : $t('add_location')}}
+                {{selectedGeo ? $t('select_location') : $t('add_location')}}
               </v-btn>
             </v-flex>
           </v-layout>
