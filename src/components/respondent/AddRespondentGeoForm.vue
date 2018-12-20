@@ -59,7 +59,7 @@
     name: 'AddRespondentGeoForm',
     data () {
       return {
-        isCurrent: false,
+        isCurrent: true,
         showGeoSearch: false,
         selectedGeo: null
       }
