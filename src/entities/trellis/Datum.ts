@@ -20,6 +20,8 @@ export interface DatumRecyclerData {
   choiceId: string
   respondentGeoId: string
   respondentNameId: string
+  actionId: string
+  randomSortOrder: number
 }
 
 @Entity()
@@ -54,6 +56,10 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   public surveyId: string;
   @Column() @Serializable
   public val: string;
+  @Column() @Serializable
+  public actionId: string
+  @Column({ type: 'integer' }) @Serializable
+  public randomSortOrder: number
 
   @ManyToOne(type => QuestionDatum, questionDatum => questionDatum.data)
   questionDatum: QuestionDatum
@@ -77,6 +83,7 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
 
   copy () {
     let d = new Datum()
+    d.actionId = this.actionId
     d.choiceId = this.choiceId
     d.datumTypeId = this.datumTypeId
     d.edgeId = this.edgeId

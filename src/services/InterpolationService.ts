@@ -26,6 +26,7 @@ export default class InterpolationService {
 
   static async getFillByVarName (varName: string, interviewManager: InterviewManager, location: InterviewLocation) {
     try {
+      // TODO: fix this
       let questionDatum = interviewManager.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpRepetition)
       let question = interviewManager.questionIndex.get(questionDatum.questionId)
       let followUpDatum

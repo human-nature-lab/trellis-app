@@ -8,6 +8,7 @@ import Question from '../../../../entities/trellis/Question'
 import InterviewManagerOld, {default as InterviewManager} from '../../classes/InterviewManager'
 import Datum from "../../../../entities/trellis/Datum";
 import Choice from "../../../../entities/trellis/Choice";
+import Action from "../../../../entities/trellis/Action";
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
@@ -18,12 +19,12 @@ const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val sho
  * with the datum associated with the question datum at questionDatum.datum. DatumRecycler should be used whenver new
  * datum are being created so that the ids are recycled
  */
-actionManager.add(AT.select_choice, function (interview: InterviewManagerOld, payload: ActionPayload, questionDatum: QuestionDatum, questionBlueprint: Question) {
+actionManager.add(AT.select_choice, function (interview: InterviewManagerOld, action: Action, questionDatum: QuestionDatum, questionBlueprint: Question) {
   // The choice we are selecting
   let choice: Choice
   const choiceValMap: Map<string, Choice> = new Map()
   for (let qc of questionBlueprint.choices) {
-    if (qc.choiceId === payload.choice_id) {
+    if (qc.choiceId === action.payload.choice_id) {
       choice = qc.choice
     }
     choiceValMap.set(qc.choice.val, qc.choice)
@@ -55,7 +56,7 @@ actionManager.add(AT.select_choice, function (interview: InterviewManagerOld, pa
   }
 
   // Add the selected datum
-  const datum = addDatum(interview, payload, questionDatum)
+  const datum = addDatum(interview, action, questionDatum)
 
   // Reset the datum value to blank if the datum has the 'other' parameter
   if (otherChoices.indexOf(choice.id) > -1) {
@@ -64,9 +65,9 @@ actionManager.add(AT.select_choice, function (interview: InterviewManagerOld, pa
 })
 actionManager.add(AT.deselect_choice, removeDatum((d, payload) => d.choiceId === payload.choice_id))
 actionManager.add(AT.other_choice_text, updateDatum((d, payload) => d.choiceId === payload.choice_id))
-actionManager.add(AT.dk_rf, function (interview, payload, questionDatum) {
+actionManager.add(AT.dk_rf, function (interview, action, questionDatum) {
   if (questionDatum) {
-    questionDatum.dkRf = payload.dk_rf // True or false
+    questionDatum.dkRf = action.payload.dk_rf // True or false
     // Optionally remove dk_rf responses if they deselect dk_rf
     if (shouldRemoveDkRfResponsesOnDeselect && questionDatum.dkRf === null) {
       questionDatum.dkRfVal = null
@@ -77,11 +78,11 @@ actionManager.add(AT.dk_rf, function (interview, payload, questionDatum) {
   //   interview.deleteAllQuestionDatumData(questionDatum)
   // }
 })
-actionManager.add(AT.dk_rf_val, function (interview, payload: ActionPayload, questionDatum) {
+actionManager.add(AT.dk_rf_val, function (interview, action: Action, questionDatum) {
   if (questionDatum) {
-    questionDatum.dkRfVal = payload.dk_rf_val
+    questionDatum.dkRfVal = action.payload.dk_rf_val
   } else {
-    console.error('dk-rf-val', 'invalid input without a questionDatum', payload)
+    console.error('dk-rf-val', 'invalid input without a questionDatum', action.payload)
   }
 })
 actionManager.add(AT.next, function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): void {
@@ -97,12 +98,13 @@ actionManager.add(AT.add_photo, addDatum)
 actionManager.add(AT.remove_photo, removeDatum((datum, payload) => datum.photoId === payload.photo_id))
 actionManager.add(AT.add_roster_row, addDatum)
 actionManager.add(AT.remove_roster_row, removeDatum((datum, payload) => datum.rosterId === payload.roster_id))
-actionManager.add(AT.change_sort_order, function (interview, payload, questionDatum: QuestionDatum) {
-  let datum = questionDatum.data.find(datum => datum.id === payload.datum_id)
+actionManager.add(AT.change_sort_order, function (interview, action: Action, questionDatum: QuestionDatum) {
+  // TODO: This is not right. We can't have a datum_id in the payload because the datum_ids can change
+  let datum = questionDatum.data.find(datum => datum.id === action.payload.datum_id)
   if (datum) {
-    datum.sortOrder = payload.sort_order
+    datum.sortOrder = action.payload.sort_order
   } else {
-    throw new Error('No datum exists with this id: ' + payload.datum_id)
+    throw new Error('No datum exists with this id: ' + action.payload.datum_id)
   }
 })
 

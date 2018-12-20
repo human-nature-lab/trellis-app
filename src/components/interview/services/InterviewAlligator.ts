@@ -79,7 +79,7 @@ export default class InterviewAlligator {
     }
   }
 
-  private addLocation (pageId: string, sectionId: string, followUpDatumId?: string, eventOrder?: number, sectionRepetition?: number): void {
+  private addLocation (pageId: string, sectionId: string, followUpDatumId?: string, sectionFollowUpRepetition?: number, sectionRepetition?: number): void {
     const loc = {
       pageId,
       page: this.pageToNumIndex.get(pageId),
@@ -87,7 +87,7 @@ export default class InterviewAlligator {
       section: this.sectionToNumIndex.get(sectionId),
       sectionRepetition,
       sectionFollowUpDatumId: followUpDatumId,
-      sectionFollowUpRepetition: eventOrder
+      sectionFollowUpRepetition
     } as InterviewLocation
     if (this.shouldSkipPage(loc)) {
       // console.log('skipping', JSON.stringify(loc), JSON.stringify(this.data.conditionTags), Array.from(this.getConditionTagSet(loc.sectionRepetition, loc.sectionFollowUpDatumId)))
@@ -97,11 +97,17 @@ export default class InterviewAlligator {
     }
   }
 
-  private getFollowUpDatum (followUpQuestionId: string): Datum[] {
+  /**
+   * Returns an array of all data (datum) present on the folloow up question
+   * @param {string} followUpQuestionId
+   * @returns {Datum[]}
+   */
+  private getFollowUpQuestionDatum (followUpQuestionId: string): Datum[] {
     const questionData: QuestionDatum[] = this.data.getQuestionDataByQuestionId(followUpQuestionId)
     if (!questionData) {
       return []
     }
+    // TODO: This assumes that the follow up question is not inside another follow up section
     let qd = questionData.find((qd: QuestionDatum) => {
       return qd.questionId === followUpQuestionId
     })
@@ -128,7 +134,7 @@ export default class InterviewAlligator {
       const isInitialSection = initLocation.section === s
       // TODO: Check if the section is repeated
       if (section.followUpQuestionId) {
-        const data =  this.getFollowUpDatum(section.followUpQuestionId)
+        let data: Datum[] = this.getFollowUpQuestionDatum(section.followUpQuestionId)
         // debugger
         // console.log('follow up data', data.length)
         // if (!data.length) {
@@ -146,13 +152,16 @@ export default class InterviewAlligator {
         //   }
         // }
         const initFollowUpRepetition = isInitialSection ? initLocation.sectionFollowUpRepetition : 0
+        data = data.slice() // Make new array that we can sort
+        // TODO: Sort based on sort method
+
         for (let d = initFollowUpRepetition; d < data.length; d++) {
           const datum = data[d]
           const isSameRepetitionAsInitial = isInitialSection && d === initLocation.sectionFollowUpRepetition
           const initPage =  isSameRepetitionAsInitial ? initLocation.page : 0
           for (let p = initPage; p < section.questionGroups.length; p++) {
             const page = section.questionGroups[p]
-            this.addLocation(page.id, section.id, datum.id, datum.eventOrder, 0)
+            this.addLocation(page.id, section.id, datum.id, d, 0)
             actuallyUpdated++
           }
         }
@@ -214,7 +223,7 @@ export default class InterviewAlligator {
       if (qDatum.followUpDatumId) {
         // TODO: Lookup questionDatum by datum eventOrder
         const datum = this.data.getDatumById(qDatum.followUpDatumId)
-        if (datum.eventOrder === action.sectionFollowUpRepetition) {
+        if (datum.actionId === action.followUpActionId) {
           return qDatum
         }
       } else if (questionData.length === 1) {
