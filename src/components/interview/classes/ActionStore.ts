@@ -130,12 +130,11 @@ export default class ActionStore extends Emitter {
   }
 
   /**
-   * Getter for the actions. Defaults to the ordered store
+   * Getter for the actions.
    * @returns {Action[]}
    */
   public get actions (): Action[] {
-    // @ts-ignore
-    return this.sortedStore
+    return this.store
   }
 
   /**
