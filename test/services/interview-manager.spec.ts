@@ -45,6 +45,7 @@ interface SimpleLocation {
   section?: number
   sectionRepetition?: number
   sectionFollowUpRepetition?: number
+  sectionFollowUpDatumId?: string
   page: number
 }
 
@@ -56,11 +57,15 @@ async function createNewSurvey (formId: string, rId: string, sId: string): Promi
 function validateLocation (currentLoc: InterviewLocation, desiredLocation: SimpleLocation) {
   desiredLocation.section = desiredLocation.section || 0
   desiredLocation.sectionRepetition = desiredLocation.sectionRepetition || 0
-  desiredLocation.sectionFollowUpRepetition = desiredLocation.sectionFollowUpRepetition || 0
   expect(currentLoc.page).to.equal(desiredLocation.page, `We aren't at the correct page`)
   expect(currentLoc.section).to.equal(desiredLocation.section, `We aren't at the correct section`)
   expect(currentLoc.sectionRepetition).to.equal(desiredLocation.sectionRepetition, `We aren't at the correct sectionRepetition`)
-  expect(currentLoc.sectionFollowUpRepetition).to.equal(desiredLocation.sectionFollowUpRepetition, `We aren't at the correct sectionFollowUpRepetition`)
+  if (desiredLocation.sectionFollowUpRepetition != null) {
+    expect(currentLoc.sectionFollowUpRepetition).to.equal(desiredLocation.sectionFollowUpRepetition, `We aren't at the correct sectionFollowUpRepetition`)
+  }
+  if (desiredLocation.sectionFollowUpDatumId) {
+    expect(currentLoc.sectionFollowUpDatumId).to.equal(desiredLocation.sectionFollowUpDatumId, `We aren't at the correct sectionFollowUpDatumId`)
+  }
 }
 
 function validateDatum (initialDatum: object[], compareDatum: QuestionDatum[]) {
@@ -114,14 +119,14 @@ function makeAction (questionId: string, actionType: string, payload: ActionPayl
   return action
 }
 
-async function selectRespondent (manager: InterviewManager, respondentId: string): Promise<Action> {
+async function selectRespondent (manager: InterviewManager, respondentId: string, pushAction = false): Promise<Action> {
   const l = manager.location
   const questions = manager.getPageQuestions(l.section, l.sectionRepetition, l.sectionFollowUpDatumId, l.page)
   if (questions.length > 1) {
     throw 'More than one question on this page'
   }
   const q = questions[0]
-  if (q.questionType.name !== QT.relationship) {
+  if (q.questionType.id !== QT.relationship) {
     throw 'Question is not a relationship type question'
   }
   let edges = await EdgeService.createEdges([{
@@ -133,7 +138,7 @@ async function selectRespondent (manager: InterviewManager, respondentId: string
     val: edges[0].id,
     name: q.varName
   })
-  manager.pushAction(action)
+  if (pushAction) manager.pushAction(action)
   return action
 }
 
@@ -341,6 +346,29 @@ export default function () {
         validateLocation(manager.location, {page: 0})
       })
 
+      it('should handle randomization of repeated sections', async () => {
+        const manager = await setupInterviewManager(forms.randomFollowUpSections)
+        manager.initialize()
+        validateLocation(manager.location, {page: 0})
+        let action1 = await selectRespondent(manager, respondentId2, false)
+        let action2 = await selectRespondent(manager, respondentId3, false)
+        action1.randomSortOrder = 1000000
+        action2.randomSortOrder = 0
+        manager.pushAction(action1)
+        manager.pushAction(action2)
+        let orderedSectionDatumIds = manager.getCurrentPageQuestions()[0].datum.data.sort((a, b) => a.randomSortOrder - b.randomSortOrder).map(d => d.id)
+        let sectionFollowUpDatumId = orderedSectionDatumIds.shift()
+        next(manager)
+        validateLocation(manager.location, {page: 0, section: 1, sectionFollowUpDatumId})
+        next(manager)
+        validateLocation(manager.location, {page: 1, section: 1, sectionFollowUpDatumId})
+        next(manager)
+        validateLocation(manager.location, {page: 2, section: 1, sectionFollowUpDatumId})
+        sectionFollowUpDatumId = orderedSectionDatumIds.shift()
+        next(manager)
+        validateLocation(manager.location, {page: 0, section: 1, sectionFollowUpDatumId})
+      })
+
       describe('PERFORMANCE', () => {
         let manager
         before(async () => {
@@ -520,15 +548,6 @@ export default function () {
       })
       it('should handle skipping the last question in a repeated section', async () => {
         throw 'TODO'
-      })
-      it('should handle randomization of repeated sections', async () => {
-        const manager = await setupInterviewManager(forms.randomFollowUpSections)
-        manager.initialize()
-        validateLocation(manager.location, {page: 0})
-        await selectRespondent(manager, respondentId2)
-        await selectRespondent(manager, respondentId3)
-        next(manager)
-        validateLocation(manager.location, {page: 0, section: 1})
       })
     })
 
