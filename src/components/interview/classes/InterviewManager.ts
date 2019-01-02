@@ -539,23 +539,28 @@ export default class InterviewManager extends InterviewManagerBase {
 
   /**
    * Get a question datum by the question var name. There should only be one per question per repetition
-   * @param {String} varName
-   * @param {Number} sectionFollowUpRepetition
-   * @returns {Object}
+   * @param {string} varName
+   * @param {string} sectionFollowUpDatumId
+   * @returns {QuestionDatum}
    */
-  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpRepetition: number): QuestionDatum {
+  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpDatumId: string): QuestionDatum {
     let questionId = this.varNameIndex.get(varName)
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
-    // console.log('Getting question by varname', varName, sectionFollowUpRepetition)
-    let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
-    for (let qD of questionDatum) {
-      if (qD.data.findIndex(d => d.eventOrder === sectionFollowUpRepetition) > -1) {
-        return qD
+    // Find the question which has this specific datu1m id
+    let questionData = this.data.getQuestionDataByQuestionId(questionId) || []
+    if (sectionFollowUpDatumId) {
+      for (let qD of questionData) {
+        if (qD.data.findIndex(d => d.id === sectionFollowUpDatumId) > -1) {
+          return qD
+        }
       }
+    } else if (questionData.length === 1) {
+      return questionData[0]
+    } else {
+      throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
     }
-    throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
   }
 
   /**

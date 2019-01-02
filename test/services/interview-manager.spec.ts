@@ -8,13 +8,20 @@ import {
   rosterId,
   editRosterId,
   firstPageRosterIds,
-  prefillRespondentId, middlePageRosterIds, lastPageRosterIds, respondentId3, edgeIds, reloadConditionTagSurveyId
+  prefillRespondentId,
+  middlePageRosterIds,
+  lastPageRosterIds,
+  respondentId3,
+  edgeIds,
+  reloadConditionTagSurveyId,
+  respondentId2
 } from "../testing-ids";
 import SurveyService from "../../src/services/survey/index";
 import InterviewService from "../../src/services/interview/InterviewService";
 import FormService from "../../src/services/form/FormService";
 import RespondentService from "../../src/services/respondent/RespondentService";
 import AT from '../../src/static/action.types'
+import QT from '../../src/static/question.types'
 
 import {expect} from 'chai'
 import './globals'
@@ -31,6 +38,8 @@ import InterviewLoader from "../../src/components/interview/services/InterviewLo
 import Form from "../../src/entities/trellis/Form";
 import Skip from "../../src/entities/trellis/Skip";
 import Measurement from "../../src/classes/Measurement";
+import EdgeService from "../../src/services/edge/EdgeService";
+
 
 interface SimpleLocation {
   section?: number
@@ -102,6 +111,29 @@ function makeAction (questionId: string, actionType: string, payload: ActionPayl
   action.questionId = questionId
   action.createdAt = moment().add(n, 'seconds')
   n++
+  return action
+}
+
+async function selectRespondent (manager: InterviewManager, respondentId: string): Promise<Action> {
+  const l = manager.location
+  const questions = manager.getPageQuestions(l.section, l.sectionRepetition, l.sectionFollowUpDatumId, l.page)
+  if (questions.length > 1) {
+    throw 'More than one question on this page'
+  }
+  const q = questions[0]
+  if (q.questionType.name !== QT.relationship) {
+    throw 'Question is not a relationship type question'
+  }
+  let edges = await EdgeService.createEdges([{
+    source_respondent_id: manager.interview.survey.respondentId,
+    target_respondent_id: respondentId
+  }])
+  let action = makeAction(q.id, AT.add_edge, {
+    edge_id: edges[0].id,
+    val: edges[0].id,
+    name: q.varName
+  })
+  manager.pushAction(action)
   return action
 }
 
@@ -486,7 +518,18 @@ export default function () {
         expect(manager.navigator.isAtEnd).to.be.true
         validateLocation(manager.location, {section: 0, page: 1})
       })
-      it('should handle skipping the last question in a repeated section')
+      it('should handle skipping the last question in a repeated section', async () => {
+        throw 'TODO'
+      })
+      it('should handle randomization of repeated sections', async () => {
+        const manager = await setupInterviewManager(forms.randomFollowUpSections)
+        manager.initialize()
+        validateLocation(manager.location, {page: 0})
+        await selectRespondent(manager, respondentId2)
+        await selectRespondent(manager, respondentId3)
+        next(manager)
+        validateLocation(manager.location, {page: 0, section: 1})
+      })
     })
 
     describe('Lifecycle', () => {

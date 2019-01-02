@@ -4,6 +4,12 @@ import RosterService from './roster/RosterService'
 import StringInterpolationService from './StringInterpolationService'
 import {InterviewLocation} from "../components/interview/services/InterviewAlligator";
 import TranslationText from "../entities/trellis/TranslationText";
+import QT from '../static/question.types'
+import Datum from "../entities/trellis/Datum";
+import Question from "../entities/trellis/Question";
+import TranslationService from "./TranslationService";
+import singleton from '../static/singleton'
+import QuestionDatum from "../entities/trellis/QuestionDatum";
 
 export default class InterpolationService {
   /**
@@ -24,34 +30,66 @@ export default class InterpolationService {
     return translationText
   }
 
+  /**
+   * Grab all of the relevant data for any question type in parallel. All values are formatted as strings.
+   * @param {Datum[]} data
+   * @param {Question} question
+   * @returns {Promise<string[]>}
+   */
+  static getInterpolatedData (data: Datum[], question: Question): Promise<string[]> {
+    const promises = []
+    for (let datum of data) {
+      switch (question.questionType.id) {
+        case QT.relationship:
+          promises.push(EdgeService.getEdges([datum.edgeId]).then(edges => edges[0].targetRespondent.name))
+          break
+        case QT.roster:
+          promises.push(RosterService.getRosterRows([datum.rosterId]).then(rows => rows[0].val))
+          break
+        case QT.multiple_select:
+        case QT.multiple_choice:
+          const qc = question.choices.find(qc => qc.choiceId === datum.choiceId)
+          if (qc) {
+            const choice = qc.choice
+            promises.push(new Promise(resolve => {
+              resolve(TranslationService.getAny(choice.choiceTranslation, singleton.locale))
+            }))
+          }
+          break
+        default:
+          promises.push(new Promise(resolve => resolve(datum.val)))
+          break
+      }
+    }
+    return Promise.all(promises)
+  }
+
+  /**
+   * Get a fill value using the varName of a question and the current location within the interview
+   * @param {string} varName
+   * @param {InterviewManager} interviewManager
+   * @param {InterviewLocation} location
+   * @returns {Promise<any>}
+   */
   static async getFillByVarName (varName: string, interviewManager: InterviewManager, location: InterviewLocation) {
     try {
-      // TODO: fix this
-      let questionDatum = interviewManager.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpRepetition)
-      let question = interviewManager.questionIndex.get(questionDatum.questionId)
-      let followUpDatum
+      let questionDatum: QuestionDatum = interviewManager.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpDatumId)
+      let question: Question = interviewManager.questionIndex.get(questionDatum.questionId)
+      let vals: string[]
       if (location.sectionFollowUpDatumId) {
-        followUpDatum = questionDatum.data.find(d => d.id === location.sectionFollowUpDatumId)
+        // Find the specific datum for this follow up repetition
+        let datum = questionDatum.data.find(d => d.id === location.sectionFollowUpDatumId)
+        vals = await InterpolationService.getInterpolatedData([datum], question)
+      } else {
+        vals = await InterpolationService.getInterpolatedData(questionDatum.data, question)
       }
-      let datum = questionDatum.data.find(d => d.eventOrder === location.sectionFollowUpRepetition)
-      switch (question.questionType.name) {
-        case 'relationship':
-          let edgeId = (followUpDatum) ? followUpDatum.edgeId : datum.edgeId
-          const edges = await EdgeService.getEdges([edgeId])
-          return edges[0].targetRespondent.name
-        case 'roster':
-          let rosterId = (followUpDatum) ? followUpDatum.rosterId : datum.rosterId
-          const rows = await RosterService.getRosterRows([rosterId])
-          return rows[0].val
-        default:
-          return datum.val
-      }
+      return vals.join(',')
     } catch (err) {
       let fill = interviewManager.getRespondentFillByVarName(varName)
       if (fill) {
         return fill
       } else {
-        // TODO: translate
+        // TODO: translate error message
         return 'NO FILL FOUND'
       }
     }

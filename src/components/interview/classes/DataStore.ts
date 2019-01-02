@@ -176,6 +176,7 @@ export default class DataStore extends Emitter {
   public addDatum (questionDatum: QuestionDatum, qd: QuestionDatum, action: Action): Datum {
     // console.log('adding datum', arguments)
     const datum = DatumRecycler.getNoKey(qd, action)
+    datum.randomSortOrder = action.randomSortOrder
     this.datumIdMap.set(datum.id, datum)
     this.actionIdMap.set(datum.actionId, datum)
     datum.sortOrder = questionDatum.data.length
