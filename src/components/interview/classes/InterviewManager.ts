@@ -1,4 +1,4 @@
-import SkipService from '../../../services/SkipService'
+import uuidv4 from 'uuid/v4'
 import actionManager from '../services/actions/InterviewActionDefinitions'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
@@ -147,6 +147,9 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param {Action} action - The action without location information
    */
   pushAction (action: Action) {
+    if (!action.id) {
+      action.id = uuidv4()
+    }
     action.interviewId = this.interview.id
     let followUpActionId
     if (action.actionType !== AT.next && action.actionType !== AT.previous && this.navigator.loc.sectionFollowUpDatumId) {
