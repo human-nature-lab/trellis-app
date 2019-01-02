@@ -20,6 +20,10 @@ export interface InterviewLocation {
   pageId?: string
 }
 
+enum SortMethod {
+  NATURAL,
+  RANDOM
+}
 
 export default class InterviewAlligator {
   private index = 0
@@ -134,6 +138,7 @@ export default class InterviewAlligator {
       const isInitialSection = initLocation.section === s
       // TODO: Check if the section is repeated
       if (section.followUpQuestionId) {
+        const sortMethod: SortMethod = section.formSections[0].randomizeFollowUp ? SortMethod.RANDOM : SortMethod.NATURAL
         let data: Datum[] = this.getFollowUpQuestionDatum(section.followUpQuestionId)
         // debugger
         // console.log('follow up data', data.length)
@@ -154,7 +159,9 @@ export default class InterviewAlligator {
         const initFollowUpRepetition = isInitialSection ? initLocation.sectionFollowUpRepetition : 0
         data = data.slice() // Make new array that we can sort
         // TODO: Sort based on sort method
-
+        data.sort(function (a, b) {
+          return sortMethod === SortMethod.NATURAL ? a.sortOrder - b.sortOrder : a.randomSortOrder - b.randomSortOrder
+        })
         for (let d = initFollowUpRepetition; d < data.length; d++) {
           const datum = data[d]
           const isSameRepetitionAsInitial = isInitialSection && d === initLocation.sectionFollowUpRepetition
