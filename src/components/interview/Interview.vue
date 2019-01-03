@@ -281,6 +281,7 @@
           return q
         })
         this.questions = questions || []
+        console.log('pages', interviewState.navigator.pages)
       },
       showBeginningDialog () {
         this.dialog.beginning = true

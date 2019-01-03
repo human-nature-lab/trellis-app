@@ -14,6 +14,21 @@ export function randomFrom<T> (collection: T[]): T {
   return collection[randomInt(0, collection.length)]
 }
 
+/**
+ * Returns a random integer with the specified number of bits
+ * @param {number} bits
+ * @returns {number}
+ */
+export function randomIntBits (bits: number): number {
+  if (bits > 53) {
+    throw new Error('higher than the maximum allowed bits in JS')
+  } else if (bits === 53) {
+    return randomInt(0, Number.MAX_SAFE_INTEGER - 1) // We add one in randomInt, so we need to subtract one to make sure this doesn't lead to undefined behavior
+  } else {
+    return randomInt(0, Math.pow(2, bits))
+  }
+}
+
 export function interpolateColor (percentage: number, minColor: string, maxColor: string) {
   function interpolate (p: number, minHex: string, maxHex: string): string {
     const maxNum = parseInt(maxHex, 16)

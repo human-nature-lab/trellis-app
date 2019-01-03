@@ -12,6 +12,7 @@ import SectionConditionTag from '../../../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../../../entities/trellis/SurveyConditionTag'
 import {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
 import ConditionTag from "../../../entities/trellis/ConditionTag";
+import Action from "../../../entities/trellis/Action";
 
 export interface FindFunction<T> {
   (o: T, i?: number, a?: T[]): boolean
@@ -32,6 +33,8 @@ export default class DataStore extends Emitter {
   private datumIdMap: Map<string, Datum> = new Map()
   private questionDatumIdMap: Map<string, QuestionDatum> = new Map()
   private questionDatumQuestionIdIndex: Map<string, QuestionDatum[]> = new Map()
+  private actionIdMap: Map<string, Datum> = new Map()
+  private followUpDatumIdMap: Map<string, Datum> = new Map()
   constructor (throttleRate = 10000) {
     super()
     this.reset()
@@ -61,6 +64,8 @@ export default class DataStore extends Emitter {
     this.questionDatumIdMap.clear()
     this.questionDatumQuestionIdIndex.clear()
     this.datumIdMap.clear()
+    this.actionIdMap.clear()
+    this.followUpDatumIdMap.clear()
     this.emitChange()
   }
 
@@ -139,6 +144,21 @@ export default class DataStore extends Emitter {
     }
   }
 
+  /**
+   * Returns the action_id associated with a questionDatumId in a follow up section.
+   * @param {string} questionDatumId
+   * @returns {string}
+   */
+  public getFollowUpActionId (questionId: string, sectionFollowUpDatumId: string, sectionRepetition: number): string {
+    const questionData: QuestionDatum[] = this.questionDatumQuestionIdIndex.get(questionId)
+    let questionDatum = questionData.find(qd => qd.followUpDatumId === sectionFollowUpDatumId &&
+      qd.sectionRepetition === sectionRepetition)
+    if (!questionDatum) throw Error('Question datum id must be valid')
+    const datum = this.datumIdMap.get(questionDatum.followUpDatumId)
+    if (!datum) throw Error('Follow up datum id must be valid')
+    return datum.actionId
+  }
+
   public emitChange () {
     this.emit('change', {
       data: this.data,
@@ -149,11 +169,16 @@ export default class DataStore extends Emitter {
   /**
    * An accessor function to add a datum to a questionDatum. This will notify any subscribers of the change.
    * @param {QuestionDatum} questionDatum
-   * @param args
+   * @param {QuestionDatum} qd
+   * @param {Action} action
+   * @returns {Datum}
    */
-  public addDatum (questionDatum: QuestionDatum, ...args): Datum {
-    const datum = DatumRecycler.getNoKey(...args)
+  public addDatum (questionDatum: QuestionDatum, qd: QuestionDatum, action: Action): Datum {
+    // console.log('adding datum', arguments)
+    const datum = DatumRecycler.getNoKey(qd, action)
+    datum.randomSortOrder = action.randomSortOrder
     this.datumIdMap.set(datum.id, datum)
+    this.actionIdMap.set(datum.actionId, datum)
     datum.sortOrder = questionDatum.data.length
     questionDatum.data.push(datum)
     this.emitChange()

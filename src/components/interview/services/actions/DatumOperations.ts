@@ -1,8 +1,9 @@
 import {snakeToCamel} from '../../../../services/JSONUtil'
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
-import DatumRecycler from '../recyclers/DatumRecycler'
 import Datum from '../../../../entities/trellis/Datum'
 import InterviewManager from "../../classes/InterviewManager";
+import {ActionHandler} from "./ActionManager";
+import Action from "../../../../entities/trellis/Action";
 
 interface DatumFindFunc {
   (value: Datum, payload: ActionPayload): boolean
@@ -19,7 +20,10 @@ export interface ActionPayload {
   geo_id?: string
   edge_id?: string
   photo_id?: string,
-  datum_id?: string
+  datum_id?: string,
+  random_sort_order?: number,
+  respondent_geo_id?: string,
+  respondent_name_id?: string
 }
 
 /**
@@ -28,14 +32,14 @@ export interface ActionPayload {
  * @param {string} [title]
  * @returns {Function<Datum>}
  */
-export function updateDatum (findFunc: DatumFindFunc, title?: string) {
-  return function (interview: InterviewManager, payload: ActionPayload, questionDatum: QuestionDatum): Datum {
+export function updateDatum (findFunc: DatumFindFunc, title?: string): ActionHandler {
+  return function (interview: InterviewManager, action: Action, questionDatum: QuestionDatum): Datum {
     let datum = questionDatum.data.find(d => {
-      return findFunc(d, payload)
+      return findFunc(d, action.payload)
     })
     if (datum) {
-      for (let key in payload) {
-        datum[key] = payload[key]
+      for (let key in action.payload) {
+        datum[key] = action.payload[key]
       }
     } else {
       let msg = 'No datum exists that matches this find closure.'
@@ -52,10 +56,10 @@ export function updateDatum (findFunc: DatumFindFunc, title?: string) {
  * @param {string} title
  * @returns {(interview: object, payload: ActionPayload, questionDatum: QuestionDatum) => Datum}
  */
-export function removeDatum (findFunc: DatumFindFunc, title?: string) {
-  return function (interview: object, payload: ActionPayload, questionDatum: QuestionDatum): Datum {
+export function removeDatum (findFunc: DatumFindFunc, title?: string): ActionHandler {
+  return function (interview: object, action: Action, questionDatum: QuestionDatum): Datum {
     let index = questionDatum.data.findIndex(datum => {
-      return findFunc(datum, payload)
+      return findFunc(datum, action.payload)
     })
     if (index > -1) {
       return questionDatum.data.splice(index, 1)[0]
@@ -69,34 +73,34 @@ export function removeDatum (findFunc: DatumFindFunc, title?: string) {
 
 /**
  * If the datum exists it will be updated with all values in the payload. If there isn't a datum, one will be created.
- * @param {Object} interview
- * @param {Object} payload
- * @param {Object} questionDatum
- * @returns {Datum}
+ * @param {InterviewManager} interview
+ * @param {Action} action
+ * @param {QuestionDatum} questionDatum
+ * @returns {any}
  */
-export function addOrUpdateSingleDatum (interview: InterviewManager, payload: ActionPayload, questionDatum: QuestionDatum) {
+export function addOrUpdateSingleDatum (interview: InterviewManager, action: Action, questionDatum: QuestionDatum) {
   let datum
   if (questionDatum.data.length) {
     datum = questionDatum.data[0]
-    for (let key in payload) {
+    for (let key in action.payload) {
       let camel = snakeToCamel(key)
-      datum[camel] = payload[key]
+      datum[camel] = action.payload[key]
     }
   } else {
-    datum = addDatum(interview, payload, questionDatum)
+    datum = addDatum(interview, action, questionDatum)
   }
   return datum
 }
 
 /**
- * Push a single datum to the questionDatum.data array. Uses the recycler
- * @param {Object} interview
- * @param {Object} payload
- * @param {Object} questionDatum
+ * Push a single datum to the questionDatum.data array. Uses the recycler.
+ * @param {InterviewManager} interview
+ * @param {Action} action
+ * @param {QuestionDatum} questionDatum
  * @returns {Datum}
  */
-export function addDatum (interview: InterviewManager, payload: ActionPayload, questionDatum: QuestionDatum) {
-  return interview.data.addDatum(questionDatum, questionDatum, payload)
+export function addDatum (interview: InterviewManager, action: Action, questionDatum: QuestionDatum) {
+  return interview.data.addDatum(questionDatum, questionDatum, action)
 }
 
 /**
@@ -104,9 +108,9 @@ export function addDatum (interview: InterviewManager, payload: ActionPayload, q
  * @param {Number} limit
  * @returns {Function}
  */
-export function addDatumLimit (limit: number) {
-  return function (interview: InterviewManager, payload: ActionPayload, questionDatum: QuestionDatum) {
-    let datum = addDatum(interview, payload, questionDatum)
+export function addDatumLimit (limit: number): ActionHandler {
+  return function (interview: InterviewManager, action, questionDatum: QuestionDatum) {
+    let datum = addDatum(interview, action, questionDatum)
     if (questionDatum.data.length > limit) {
       questionDatum.data.shift()
     }

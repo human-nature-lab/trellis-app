@@ -1,5 +1,4 @@
 import Emitter from '../../../classes/Emitter'
-import SortedArray from '../../../classes/SortedArray'
 import {now, parseDate} from '../../../services/DateService'
 import Action from '../../../entities/trellis/Action'
 import Form from '../../../entities/trellis/Form'
@@ -7,6 +6,7 @@ import {InterviewLocation} from '../services/InterviewAlligator'
 import AT from '../../../static/action.types'
 import {locToNumber} from "../services/LocationHelpers";
 import {ActionPayload} from "../services/actions/DatumOperations";
+import {randomIntBits} from "../../../classes/M";
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -16,8 +16,8 @@ import {ActionPayload} from "../services/actions/DatumOperations";
 export default class ActionStore extends Emitter {
   public store: any[]
   public lastRealAction: Action|null = null
+  public questionBins: Map<string, Action[]> = new Map()
   private lastRealActionLocNum: number = -1
-  private sortedStore: SortedArray<Action>
   private questionIndex: Map<string, Action[]> = new Map()
   private questionToPageIndex: Map<string, number>
   private questionToSectionIndex: Map<string, number>
@@ -25,33 +25,6 @@ export default class ActionStore extends Emitter {
   constructor (blueprint: Form) {
     super()
     this._createPageAndSectionIndexes(blueprint)
-    this.sortedStore = new SortedArray((a: Action, b: Action) => {
-      if (a.questionId && b.questionId) {
-        const aLocNum = locToNumber(this.actionToLocation(a))
-        const bLocNum = locToNumber(this.actionToLocation(b))
-        if (aLocNum === bLocNum) {
-          const aHasN = a.payload  && a.payload['n'] !== null && a.payload['n'] !== undefined
-          const bHasN = b.payload && b.payload['n'] !== null && b.payload['n'] !== undefined
-          if (aHasN && bHasN) {
-            return a.payload['n'] - b.payload['n']
-          } else if (aHasN) {
-            return 1
-          } else if (bHasN) {
-            return -1
-          } else {
-            if (a.createdAt === b.createdAt) {
-              return 0
-            } else {
-              return a.createdAt > b.createdAt ? 1 : -1
-            }
-          }
-        } else {
-          return aLocNum - bLocNum
-        }
-      } else {
-        return <any>(b.questionId != null) - <any>(a.questionId != null)
-      }
-    })
     this.store = []
     this.questionIndex = new Map()
   }
@@ -83,13 +56,40 @@ export default class ActionStore extends Emitter {
     }
   }
 
+  private makeBinKey (questionId: string, followUpActionId?: string, repetition?: number): string {
+    if (!followUpActionId) followUpActionId = null
+    if (!repetition) repetition = null
+    return `${questionId}-${followUpActionId}-${repetition}`
+  }
+
+  private insertIntoQuestionBins (action: Action) {
+    const key = this.makeBinKey(action.questionId, action.followUpActionId, action.sectionRepetition)
+    let questionActions = this.questionBins.get(key)
+    if (!questionActions) {
+      questionActions = []
+      this.questionBins.set(key, questionActions)
+    }
+    questionActions.push(action)
+    questionActions.sort((a, b) => a.sortOrder - b.sortOrder)
+  }
+
+  /**
+   * Returns an array of actions that are valid for this question
+   * @param {string} questionId
+   * @param {string} followUpActionId
+   * @param {number} repetition
+   * @returns {Action[] | null}
+   */
+  public getQuestionActions (questionId: string, followUpActionId?: string, repetition?: number): Action[] | null {
+    const key = this.makeBinKey(questionId, followUpActionId, repetition)
+    return this.questionBins.get(key)
+  }
+
   /**
    * Insert an action while maintaining the actions in a sorted state based on the order of the survey
    * @param {Action} action
    */
   insertIntoStore (action: Action) {
-    this.store.push(action)
-    this.sortedStore.insertSorted(action)
     if (!action.payload) {
       action.payload = {} as ActionPayload
     }
@@ -98,10 +98,12 @@ export default class ActionStore extends Emitter {
     } else if (typeof action.payload.val !== 'string') {
       action.payload.val = '' + action.payload.val
     }
-    if (action.payload['n'] === undefined || action.payload['n'] === null) {
-      action.payload['n'] = this.store.length
+    if (action.sortOrder === undefined || action.sortOrder === null) {
+      action.sortOrder = this.store.length
     }
-    // console.log('actions', JSON.stringify(this.actions.map(a => [a.actionType, a.payload['n']])))
+    if (action.randomSortOrder === undefined || action.randomSortOrder === null) {
+      action.randomSortOrder = randomIntBits(53)
+    }
     if (action.preloadActionId === null && action.actionType !== AT.next && action.actionType !== AT.previous && action.questionId !== null) {
       const actionLocNum = locToNumber(this.actionToLocation(action))
       if (!this.lastRealAction || (this.lastRealAction && actionLocNum > this.lastRealActionLocNum)) {
@@ -109,6 +111,8 @@ export default class ActionStore extends Emitter {
         this.lastRealActionLocNum = actionLocNum
       }
     }
+    this.store.push(action)
+    this.insertIntoQuestionBins(action)
   }
 
   /**
@@ -126,11 +130,11 @@ export default class ActionStore extends Emitter {
   }
 
   /**
-   * Getter for the actions. Defaults to the ordered store
+   * Getter for the actions.
    * @returns {Action[]}
    */
   public get actions (): Action[] {
-    return this.sortedStore
+    return this.store
   }
 
   /**
@@ -149,11 +153,12 @@ export default class ActionStore extends Emitter {
   /**
    * Add an action to the store. This will trigger the throttled persist method
    * @param {Action} action
-   * @param {InterviewLocation} location
+   * @param {string} followUpActionId
+   * @param {number} sectionRepetition
    */
-  add (action: Action, location: InterviewLocation): void {
-    action.sectionRepetition = location.sectionRepetition
-    action.sectionFollowUpRepetition = location.sectionFollowUpRepetition
+  add (action: Action, followUpActionId: string, sectionRepetition: number): void {
+    action.sectionRepetition = sectionRepetition
+    action.followUpActionId = followUpActionId
     action.createdAt = action.createdAt || now()
     this.insertIntoStore(action)
     this.emit('change', this.store)

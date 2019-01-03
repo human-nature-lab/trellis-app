@@ -1,4 +1,4 @@
-import SkipService from '../../../services/SkipService'
+import uuidv4 from 'uuid/v4'
 import actionManager from '../services/actions/InterviewActionDefinitions'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
@@ -22,6 +22,7 @@ import {locToNumber} from "../services/LocationHelpers";
 import InterviewAlligator from "../services/InterviewAlligator";
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 import Measurement from "../../../classes/Measurement";
+import Section from "../../../entities/trellis/Section";
 
 const nextTiming = new Measurement('NextTiming')
 const prevTiming = new Measurement('PrevTiming')
@@ -90,7 +91,7 @@ export default class InterviewManager extends InterviewManagerBase {
    * @returns {Promise<[any]>}
    */
   save () {
-    if (!this.actions.actions.length || !this.data.data.length) {
+    if (!this.actions.store.length || !this.data.data.length) {
       console.log('nothing to save')
       return new Promise(resolve => setTimeout(resolve))
     }
@@ -146,8 +147,15 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param {Action} action - The action without location information
    */
   pushAction (action: Action) {
+    if (!action.id) {
+      action.id = uuidv4()
+    }
     action.interviewId = this.interview.id
-    this.actions.add(action, this.navigator.loc)
+    let followUpActionId
+    if (action.actionType !== AT.next && action.actionType !== AT.previous && this.navigator.loc.sectionFollowUpDatumId) {
+      followUpActionId = this.data.getFollowUpActionId(action.questionId, this.navigator.loc.sectionFollowUpDatumId, this.navigator.loc.sectionRepetition)
+    }
+    this.actions.add(action, followUpActionId, this.navigator.loc.sectionRepetition)
     this.performAction(action, true)
     if (action.actionType !== AT.next && action.actionType !== AT.previous) {
       this.hasAddedActions = true
@@ -166,11 +174,13 @@ export default class InterviewManager extends InterviewManagerBase {
     let questionBlueprint: Question = null
     if (action.questionId) {
       questionDatum = this.navigator.getActionQuestionDatum(action)
-      questionBlueprint = this.questionIndex.get(action.questionId)
       if (!questionDatum) {
         debugger
       }
-      // this.data.emitChange()
+      questionBlueprint = this.questionIndex.get(action.questionId)
+      if (!questionBlueprint) {
+        debugger
+      }
     } else if (action.actionType !== 'next' && action.actionType !== 'previous') {
       console.error(action)
       throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
@@ -226,11 +236,7 @@ export default class InterviewManager extends InterviewManagerBase {
     } else if (this.isAtHighWaterMark && this.lastAction) {
       this.stepForward()
       const loc = JSON.parse(JSON.stringify(this.location))
-      const actions = this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous)
-      const n = actions.indexOf(this.lastAction)
-      if (n < 0) throw new Error(`this.lastAction must already be in the action queue`)
-      const futureActions = actions.slice(n + 1, actions.length)
-      this.playActions(futureActions)
+      this.playActionsAndMoveForward()
       this.seek(loc.section, loc.page, loc.sectionRepetition, loc.sectionFollowUpRepetition)
       this.lastActionHasChanged = false
     } else {
@@ -389,23 +395,55 @@ export default class InterviewManager extends InterviewManagerBase {
     return foundInvalidActions ? this.location : null
   }
 
+  private playPageActions (): boolean {
+    const pageQuestions = this.getCurrentPageQuestions()
+    const pageActions = pageQuestions.reduce((actions, q) => {
+      const section: Section = this.questionIdToSectionIndex.get(q.id)
+      let followUpActionId
+      let repetition
+      if (section.followUpQuestionId) {
+        followUpActionId = this.data.getFollowUpActionId(q.id, this.location.sectionFollowUpDatumId, this.location.sectionRepetition)
+      }
+      if (section.isRepeatable) {
+        repetition = this.location.sectionRepetition
+      }
+      const questionActions = this.actions.getQuestionActions(q.id, followUpActionId, repetition)
+      if (followUpActionId) {
+        console.log('follow up page', followUpActionId, JSON.stringify(this.location), questionActions)
+      }
+      return questionActions ? actions.concat(questionActions) : actions
+    }, [] as Action[])
+
+    // if (pageQuestions.length && !pageActions.length) return false
+
+    for (let action of pageActions) {
+      this.performAction(action, false)
+    }
+
+    return true
+  }
+
+  private playActionsAndMoveForward () {
+    let c = 0
+    let keepMoving = true
+    while (keepMoving && c < 1000) {
+      keepMoving = this.playPageActions() && this.currentLocationHasValidResponses() && this.stepForward()
+      c++
+    }
+  }
+
   /**
    * Rebuild the state of the survey by zeroing the location and resetting the data before replaying all actions.
    * Returns an InterviewLocation if we found invalid sections of the survey
    */
-  playAllActions (): InterviewLocation {
+  private playAllActions () {
     // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
     // TODO: Check that state is reset correctly
-    // let conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-    // console.log('initialState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
     this._resetState()
-    // conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-    // console.log('resetState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
     // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
-    // TODO: Verify that actions are ordered correctly
-    return this.playActions(this.actions.actions.filter(a => a.actionType !== AT.next && a.actionType !== AT.previous))
+    this.playActionsAndMoveForward()
   }
 
   /**
@@ -501,23 +539,28 @@ export default class InterviewManager extends InterviewManagerBase {
 
   /**
    * Get a question datum by the question var name. There should only be one per question per repetition
-   * @param {String} varName
-   * @param {Number} sectionFollowUpRepetition
-   * @returns {Object}
+   * @param {string} varName
+   * @param {string} sectionFollowUpDatumId
+   * @returns {QuestionDatum}
    */
-  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpRepetition: number): QuestionDatum {
+  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpDatumId: string): QuestionDatum {
     let questionId = this.varNameIndex.get(varName)
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
-    // console.log('Getting question by varname', varName, sectionFollowUpRepetition)
-    let questionDatum = this.data.getQuestionDataByQuestionId(questionId) || []
-    for (let qD of questionDatum) {
-      if (qD.data.findIndex(d => d.eventOrder === sectionFollowUpRepetition) > -1) {
-        return qD
+    // Find the question which has this specific datu1m id
+    let questionData = this.data.getQuestionDataByQuestionId(questionId) || []
+    if (sectionFollowUpDatumId) {
+      for (let qD of questionData) {
+        if (qD.data.findIndex(d => d.id === sectionFollowUpDatumId) > -1) {
+          return qD
+        }
       }
+    } else if (questionData.length === 1) {
+      return questionData[0]
+    } else {
+      throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
     }
-    throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
   }
 
   /**
