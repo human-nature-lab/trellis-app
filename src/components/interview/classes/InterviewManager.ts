@@ -341,60 +341,6 @@ export default class InterviewManager extends InterviewManagerBase {
     return true
   }
 
-  /**
-   * Play an array of actions in order
-   * @param {Action[]} actions
-   * @returns {InterviewLocation}
-   */
-  playActions (actions: Action[]): InterviewLocation {
-    if (!actions.length) return this.location
-    this._isReplaying = true
-    const actionQueue = new ImmutableQueue(actions)
-    let action = actionQueue.next()
-    let foundInvalidActions = false
-    let nPagesPassed = 1
-    let c = 0
-    while (action && c < 1000) {
-      c++
-      // Check if we have a valid question id and skip it the action if we don't
-      if (!this.questionIndex.has(action.questionId)) {
-        console.log('invalid action question id', action)
-        continue
-      }
-
-      let actionLocation = this.actions.actionToLocation(action)
-      if (this.navigator.locationsAreNumericallyTheSame(actionLocation, this.navigator.loc)) {
-        // console.log('performing action', action, this.navigator.loc)
-        this.performAction(action)
-        action = actionQueue.next()
-      } else if (this.navigator.locationIsAheadOfCurrent(actionLocation) && this.currentLocationHasValidResponses()) {
-        // console.log('action moving forward', action, this.navigator.loc)
-        this.stepForward()
-        nPagesPassed++
-      } else {
-        // console.log('skipping invalid action', action, this.currentLocationHasValidResponses())
-        foundInvalidActions = true
-        action = actionQueue.next()
-      }
-    }
-    if (c >= 1000) {
-      debugger
-    }
-    // Go as far as possible through the survey
-    c = 0
-    while (this.currentLocationHasValidResponses() && this.stepForward() && c < 1000) {
-      c++
-      console.log(this.location.section, this.location.sectionFollowUpRepetition, this.location.page)
-    }
-    if (c >= 1000) {
-      debugger
-    }
-    // conditionTags = this.data.getAllConditionTagsForLocation(this.location.sectionRepetition, this.location.sectionFollowUpDatumId)
-    // console.log('postReplayState', JSON.parse(JSON.stringify(this.data.data)), JSON.parse(JSON.stringify(this.data.conditionTags)), conditionTags.map(c => c.id), conditionTags.map(c => c.name))
-    this._isReplaying = false
-    return foundInvalidActions ? this.location : null
-  }
-
   private playPageActions (): boolean {
     const pageQuestions = this.getCurrentPageQuestions()
     const pageActions = pageQuestions.reduce((actions, q) => {
@@ -486,13 +432,17 @@ export default class InterviewManager extends InterviewManagerBase {
    * Seek through the survey to the last recorded action
    */
   seekToInitialLocation (): void {
-    const lastRealAction = this.actions.lastRealAction
-    if (lastRealAction) {
-      const lastLocation = this.actions.actionToLocation(lastRealAction)
-      while (this.currentLocationHasValidResponses() && this.navigator.locationIsAheadOfCurrent(lastLocation) && this.stepForward());
-      this.stepBackward()
+    if (this.initialLocation && this.navigator.isValidLocation(this.initialLocation)) {
+      this.navigator.seekTo(this.initialLocation)
     } else {
-      this.navigator.seekTo({section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+      const lastRealAction = this.actions.lastRealAction
+      if (lastRealAction) {
+        const lastLocation = this.actions.actionToLocation(lastRealAction)
+        while (this.currentLocationHasValidResponses() && this.navigator.locationIsAheadOfCurrent(lastLocation) && this.stepForward());
+        this.stepBackward()
+      } else {
+        this.navigator.seekTo({section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+      }
     }
   }
 
