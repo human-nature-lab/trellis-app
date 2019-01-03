@@ -136,11 +136,12 @@
   import router, {replaceWithNextOr} from '../../router'
   import InterviewLoader from './services/InterviewLoader'
   import SurveyService from '../../services/survey'
+  import cloneDeep from 'lodash/cloneDeep'
 
   let interviewState
+  let interviewData // used to store the preloaded data for the interview
   export default {
     name: 'interview',
-    mixins: [RoutePreloadMixin(InterviewLoader.load, true)],
     head: {
       title: function () {
         let d = {}
@@ -204,14 +205,30 @@
       actionBus.$on('action', this.actionHandler)
       menuBus.$on('showConditionTags', this.showConditionTags)
       window.onbeforeunload = this.prematureExit
+      this.hydrate(interviewData)
     },
     beforeDestroy: function () {
       window.onbeforeunload = null
       menuBus.$off('showConditionTags', this.showConditionTags)
       actionBus.$off('action', this.actionHandler)
     },
+    async beforeRouteLeave (to, from, next) {
+      await this.leaving()
+      next()
+    },
+    async beforeRouteUpdate (to, from, next) {
+      if (to.params.studyId !== from.params.studyId || to.params.interviewId !== from.params.interviewId) {
+        await this.leaving()
+        interviewData = await InterviewLoader.load(to)
+        this.hydrate(interviewData)
+      }
+      next()
+    },
+    async beforeRouteEnter (to, from, next) {
+      interviewData = await InterviewLoader.load(to)
+      next()
+    },
     methods: {
-      // Called by RoutePreloadMixin
       async leaving () {
         if (!this.alreadyExited) {
           await this.saveData()
@@ -220,7 +237,6 @@
         }
         this.alreadyExited = false // For route updates
       },
-      // Called by RoutePreloadMixin
       hydrate (data) {
         this.type = data.interviewType
         this.initializeInterview(data)
@@ -239,6 +255,9 @@
         if (this.type === 'interview') {
           interviewState.attachDataPersistSlave()
           interviewState.attachActionsPersistSlave()
+        }
+        if (this.$route.query.location) {
+          interviewState.setInitialLocation(JSON.parse(this.$route.query.location))
         }
         interviewState.initialize()
         // Share the relevant parts of the interview with the view
@@ -281,7 +300,21 @@
           return q
         })
         this.questions = questions || []
-        console.log('pages', interviewState.navigator.pages)
+        let route = cloneDeep({
+          name: this.$route.name,
+          params: this.$route.params,
+          query: this.$route.query
+        })
+        if (!route.query) route.query = {}
+        route.query.location = JSON.stringify({
+          page: this.location.page,
+          section: this.location.section,
+          sectionRepetition: this.location.sectionRepetition,
+          sectionFollowUpDatumId: this.location.sectionFollowUpDatumId
+        })
+        this.$nextTick(() => {
+          this.$router.replace(route)
+        })
       },
       showBeginningDialog () {
         this.dialog.beginning = true
