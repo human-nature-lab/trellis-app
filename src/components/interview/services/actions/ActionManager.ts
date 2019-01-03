@@ -5,14 +5,18 @@ import {ActionPayload} from "./DatumOperations";
 import Question from "../../../../entities/trellis/Question";
 
 export interface ActionHandler {
-  (interview: InterviewManager, payload?: ActionPayload, questionDatum?: QuestionDatum, questionBlueprint?: Question)
+  (interview: InterviewManager,
+   action: Action,
+   questionDatum?: QuestionDatum,
+   questionBlueprint?: Question,
+   actionWasInitiatedByHuman?: boolean)
 }
 
 /**
  * Just allow for registering and performing actions. Only one handler per action
  */
 export class ActionManager {
-  private actions = {}
+  private actions: {[key: string]: ActionHandler} = {}
 
   /**
    * Add an action to the action manager
@@ -38,7 +42,7 @@ export class ActionManager {
   do (action: Action, interview: InterviewManager, questionDatum: QuestionDatum, questionBlueprint: Question, actionWasInitiatedByAHuman: boolean) {
     let type = action.actionType
     if (this.actions[type]) {
-      return this.actions[type](interview, action.payload, questionDatum, questionBlueprint, actionWasInitiatedByAHuman)
+      return this.actions[type](interview, action, questionDatum, questionBlueprint, actionWasInitiatedByAHuman)
     } else {
       console.error('No handler has been added for action:', type)
     }
