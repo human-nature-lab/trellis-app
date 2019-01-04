@@ -370,12 +370,14 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 
   private playActionsAndMoveForward () {
+    this._isReplaying = true
     let c = 0
     let keepMoving = true
     while (keepMoving && c < 1000) {
       keepMoving = this.playPageActions() && this.currentLocationHasValidResponses() && this.stepForward()
       c++
     }
+    this._isReplaying = false
   }
 
   /**
