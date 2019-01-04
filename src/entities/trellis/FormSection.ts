@@ -21,6 +21,8 @@ export default class FormSection extends SparseTimestampedSoftDelete {
   repeatPromptTranslationId: string
   @Column({ nullable: true }) @Serializable
   followUpQuestionId: string
+  @Column() @Serializable
+  randomizeFollowUp: boolean
 
   @ManyToOne(type => Section, section => section.formSections)
   section: Section

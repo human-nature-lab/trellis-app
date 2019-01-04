@@ -2,6 +2,7 @@ import Recycler from '../../../../classes/Recycler'
 import Datum from '../../../../entities/trellis/Datum'
 import {now} from '../../../../services/DateService';
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
+import Action from "../../../../entities/trellis/Action";
 
 export interface DatumPayload {
   name?: string
@@ -14,9 +15,12 @@ export interface DatumPayload {
   roster_id?: string
   respondent_geo_id?: string
   respondent_name_id?: string
+  action_id: string
+  random_sort_order: number
 }
 
 class DatumRecycler extends Recycler<Datum> {
+
   keyExtractor (d: Datum) {
     // The unique key of a datum is everything except for the id. This means that previously deleted datum could be
     // recreated if it has already been deleted from the server, but it also means that quick changes to datum that end
@@ -35,12 +39,13 @@ class DatumRecycler extends Recycler<Datum> {
       d.respondentNameId
     ].join('-')
   }
-  objectCreator (questionDatum: QuestionDatum, payload: DatumPayload) {
-    let maxEventOrder = Math.max(-1, ...questionDatum.data.map(d => d.eventOrder))
+
+  objectCreator (questionDatum: QuestionDatum, action: Action) {
+    const payload = action.payload
     return new Datum().fromRecycler({
       surveyId: questionDatum.surveyId,
       questionDatumId: questionDatum.id,
-      eventOrder: maxEventOrder + 1,
+      eventOrder: 0,
       val: payload.val,
       sortOrder: payload.sort_order,
       name: payload.name || '',
@@ -50,7 +55,9 @@ class DatumRecycler extends Recycler<Datum> {
       rosterId: payload.roster_id,
       choiceId: payload.choice_id,
       respondentGeoId: payload.respondent_geo_id,
-      respondentNameId: payload.respondent_name_id
+      respondentNameId: payload.respondent_name_id,
+      actionId: action.id,
+      randomSortOrder: payload.random_sort_order
     })
   }
 }
