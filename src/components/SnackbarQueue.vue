@@ -16,6 +16,12 @@
           v-if="showClose"
           @click="next"
           flat>{{$t('close')}}</v-btn>
+        <v-btn
+          v-if="showCloseAll"
+          @click="closeAll"
+          flat>
+          {{$t('close_all')}} ({{queue.length}})
+        </v-btn>
       </v-snackbar>
     </div>
 </template>
@@ -56,6 +62,7 @@
     isVisible: false,
     isClosing: false,
     showClose: false,
+    showCloseAll: false,
     timeoutId: null
   }
 
@@ -97,6 +104,7 @@
           } else {
             this.showClose = true
           }
+          this.showCloseAll = this.queue.length >= 3
         }
       },
       next () {
@@ -112,6 +120,10 @@
           this.timeoutId = null
           this.nextOrDone()
         }, 300)
+      },
+      closeAll () {
+        this.queue = []
+        this.next()
       }
     }
   })

@@ -18,12 +18,32 @@ export default function dataPersistSlave (interviewId: string, dataStore: DataSt
       conditionTags: dataStore.conditionTags
     }
   }
+
+  function hasChanges (obj: object) {
+    if (!obj) return false
+    if (obj && typeof obj === 'object') {
+      for (let key in obj) {
+        if ((Array.isArray(obj[key]) && obj[key].length > 0) || hasChanges(obj[key])) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
   function saveData (newState: InterviewDataInterface, prevState: InterviewDataInterface): Promise<any> {
     let dataDiff = DiffService.dataDiff(newState.data, prevState.data)
     let tagDiff = DiffService.conditionTagsDiff(newState.conditionTags, prevState.conditionTags)
     let diff = new InterviewDeltaInterface(dataDiff, tagDiff)
-    return InterviewService.saveData(interviewId, diff)
+    if (hasChanges(diff)) {
+      console.log('changes found', diff)
+      return InterviewService.saveData(interviewId, diff)
+    } else {
+      console.log('no changes found', diff)
+      return new Promise(resolve => resolve())
+    }
   }
+
   function shouldSave (newState: InterviewDataInterface, prevState: InterviewDataInterface) {
     return true
   }

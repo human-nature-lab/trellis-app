@@ -31,23 +31,23 @@ export default class PhotoServiceWeb extends PhotoServiceAbstract {
   getPhotoSrc (photoId) {
     let source
     // Get the base64 encoded photo and return the url. This method is cached
-    const p = new CancellablePromise(resolve => {
+    const p = new CancellablePromise(async (resolve, reject) => {
       if (cache.has(photoId)) {
-        return resolve(cache.get(photoId))
+        resolve(cache.get(photoId))
       } else {
-        source = axios.CancelToken.source()
-        return resolve(http().get(`photo/${photoId}`, {
-          cancelToken: source.token
-        }).then(res => {
+        try {
+          source = axios.CancelToken.source()
+          const res = await http().get(`photo/${photoId}`, {
+            cancelToken: source.token
+          })
           let src = `data:${res.headers['content-type']};base64,` + res.data
           cache.set(photoId, src)
-          return src
-        }).catch(err => {
-          throw err
-        }).finally(() => {
+          resolve(src)
+        } catch (err) {
+          reject(err)
+        } finally {
           this.existingCancelTokens.delete(source)
-        }))
-        this.existingCancelTokens.add(source)
+        }
       }
     }, () => {
       if (source && source.cancel) {

@@ -159,17 +159,17 @@
       load () {
         if (this.isLoaded) return
         if (!this.id) {
-          this.setError(new Error('No id present for this photo'))
+          return this.setError(new Error('No id present for this photo'))
         }
         if (!this.srcLoaded && !this.loadingError) {
           this.srcLoading = true
           this.loadingPromise = PhotoService.getPhotoSrc(this.id).then(src => {
             this.setSrc(src)
           }).catch(err => {
-            console.log('err', err)
-            if (!(err && err.message && err.message === 'Canceled image load')) {
+            if (err && !(err.message && err.message === 'Canceled image load')) {
               this.setError(err)
             }
+            return true
           })
         }
       },
