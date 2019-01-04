@@ -138,6 +138,19 @@
   import SurveyService from '../../services/survey'
   import cloneDeep from 'lodash/cloneDeep'
 
+  function load (to) {
+    return new Promise(async (resolve, reject) => {
+      global.loading.active = true
+      global.loading.indeterminate = true
+      global.loading.fullscreen = true
+      interviewData = await InterviewLoader.load(to)
+      resolve()
+      setTimeout(() => {
+        global.loading.active = false
+      })
+    })
+  }
+
   let interviewState
   let interviewData // used to store the preloaded data for the interview
   export default {
@@ -219,13 +232,13 @@
     async beforeRouteUpdate (to, from, next) {
       if (to.params.studyId !== from.params.studyId || to.params.interviewId !== from.params.interviewId) {
         await this.leaving()
-        interviewData = await InterviewLoader.load(to)
+        await load(to)
         this.hydrate(interviewData)
       }
       next()
     },
     async beforeRouteEnter (to, from, next) {
-      interviewData = await InterviewLoader.load(to)
+      await load(to)
       next()
     },
     methods: {
@@ -312,9 +325,7 @@
           sectionRepetition: this.location.sectionRepetition,
           sectionFollowUpDatumId: this.location.sectionFollowUpDatumId
         })
-        this.$nextTick(() => {
-          this.$router.replace(route)
-        })
+        this.$router.replace(route)
       },
       showBeginningDialog () {
         this.dialog.beginning = true
