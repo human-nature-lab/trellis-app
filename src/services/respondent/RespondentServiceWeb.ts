@@ -61,6 +61,9 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     if (filters.conditionTags) {
       params['c'] = filters.conditionTags.join(',')
     }
+    if (filters.orConditionTags) {
+      params['oc'] = filters.orConditionTags.join(',')
+    }
     if (filters.geos) {
       params['g'] = filters.geos.join(',')
     }
