@@ -91,7 +91,8 @@
         type: Boolean,
         'default': true,
         required: false
-      }
+      },
+      onRespondentAdded: Function
     },
     computed: {
       isAssociatedWithRespondent () {
@@ -155,6 +156,9 @@
         this.hasCensusForm = await CensusFormService.hasCensusForm(this.studyId, censusTypeId)
         this.checkingForCensus = false
         if (this.hasCensusForm) {
+          if (this.onRespondentAdded) {
+            await this.onRespondentAdded(this.respondent.copy())
+          }
           setTimeout(() => {
             if (this.redirectToRespondentInfo) {
               pushRoute({

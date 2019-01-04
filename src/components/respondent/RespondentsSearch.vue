@@ -162,6 +162,7 @@
           @close="addRespondentClose"
           :studyId="studyId"
           :redirectToRespondentInfo="false"
+          :onRespondentAdded="onRespondentAdded"
           :associatedRespondentId="respondentId"></AddRespondentForm>
       </v-card>
     </v-dialog>
@@ -279,7 +280,8 @@
       canRemoveGeos: {
         type: Boolean,
         default: true
-      }
+      },
+      onRespondentAdded: Function
     },
     head: {
       title: {
@@ -446,7 +448,7 @@
       },
       selected () {
         let selected = this.selectedRespondents.concat(this.added)
-        return selected.filter((r) => this.removed.findIndex((removed) => removed.id === r.id) === -1)
+        return selected.filter(r => r && this.removed.findIndex((removed) => removed.id === r.id) === -1)
       },
       respondentResults () {
         return orderBy(this.results, ['score'], ['desc'])
