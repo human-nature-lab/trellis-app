@@ -33,21 +33,29 @@ window.addEventListener('error', function unhandledError (e: ErrorEvent) {
   })
 })
 window.addEventListener('unhandledrejection', function unhandledRejection (e: PromiseRejectionEvent) {
-  defaultLoggingService.log({
-    severity: LoggingLevel.error,
-    message: e.reason instanceof Error ? e.reason.message : e.reason,
-    component: 'main.js@unhandledRejection',
-    error: e.reason
-  })
+  if (!config.debug) {
+    defaultLoggingService.log({
+      severity: LoggingLevel.error,
+      message: e.reason instanceof Error ? e.reason.message : e.reason,
+      component: 'main.js@unhandledRejection',
+      error: e.reason
+    })
+  } else {
+    throw e
+  }
 })
 
 Vue.config.errorHandler = function (err: Error, vm: Vue, info: string) {
-  defaultLoggingService.log({
-    severity: LoggingLevel.error,
-    message: info,
-    component: `main.ts@Vue.config.errorHandler for ${vm['name']}`,
-    error: err
-  })
+  if (!config.debug) {
+    defaultLoggingService.log({
+      severity: LoggingLevel.error,
+      message: info,
+      component: `main.ts@Vue.config.errorHandler for ${vm['name']}`,
+      error: err
+    })
+  } else {
+    throw err
+  }
 }
 
 Vue.use(Vuetify, theme)

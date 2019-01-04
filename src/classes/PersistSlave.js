@@ -65,6 +65,7 @@ export default class PersistSlave {
     }
     if (this.errors.length > this.maxFailures) {
       console.log('exceeded max attempts at storing data', this.errors)
+      return
     }
     let state = this.stateExtractor()
 
