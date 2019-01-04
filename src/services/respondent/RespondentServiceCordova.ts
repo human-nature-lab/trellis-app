@@ -198,7 +198,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       if (Array.isArray(filters.orConditionTags) && filters.orConditionTags.length > 0) {
         let orConditionTagNames = filters.orConditionTags
         qb.orWhere('"respondent"."id" in (' +
-          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
+          'select distinct respondent_id from respondent_condition_tag where deleted_at is null and condition_tag_id in (' +
           'select id from condition_tag where name in (:...orConditionTagNames)))',
           {orConditionTagNames: orConditionTagNames})
       }
