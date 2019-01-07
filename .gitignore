@@ -31,6 +31,7 @@ www/js/vendor.*.js
 *.swp
 
 config.js
+config.dev.js
 config.xml.js
 
 src/entities/**/*.js

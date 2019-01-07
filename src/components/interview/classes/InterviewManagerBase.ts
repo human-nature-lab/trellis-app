@@ -33,6 +33,7 @@ export default class InterviewManagerBase extends Emitter {
   protected varNameIndex: Map<string, string> = new Map()
   protected questionIdToSectionIndex: Map<string, Section> = new Map()
   protected questionIdToPageIndex: Map<string, Page> = new Map()
+  protected initialLocation!: InterviewLocation
 
   public questionIndex: Map<string, Question> = new Map()
   public questionIdToSectionNum: Map<string, number> = new Map()
@@ -107,6 +108,24 @@ export default class InterviewManagerBase extends Emitter {
         })
       })
     })
+  }
+
+  setInitialLocation (location: object) {
+    const loc = {
+      page: 0,
+      section: 0,
+      sectionRepetition: 0,
+      sectionFollowUpRepetition: 0,
+      sectionFollowUpDatumId: null
+    }
+    if (location) {
+      for (let key of Object.keys(loc)) {
+        if (location[key] != null) {
+          loc[key] = location[key]
+        }
+      }
+    }
+    this.initialLocation = loc
   }
 
   /**
