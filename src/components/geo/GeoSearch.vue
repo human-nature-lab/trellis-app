@@ -309,7 +309,7 @@
   .list__tile__title
     height: 30px
   .geo-search
-    margin-bottom: 60px
+    padding-bottom: 60px
   .move-up
     cursor: pointer
     &:hover
