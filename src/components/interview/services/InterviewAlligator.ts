@@ -9,15 +9,17 @@ import Question from "../../../entities/trellis/Question";
 import SkipService from "../../../services/SkipService";
 import Action from "../../../entities/trellis/Action";
 import {locToNumber} from "./LocationHelpers";
+import * as moment from "moment";
+import Base = moment.unitOfTime.Base;
 
 export interface InterviewLocation {
   section: number
   sectionRepetition: number
-  sectionFollowUpRepetition: number
   page: number
-  sectionFollowUpDatumId?: string
   sectionId?: string
   pageId?: string
+  sectionFollowUpRepetition: number
+  sectionFollowUpDatumId?: string
 }
 
 enum SortMethod {
@@ -99,6 +101,23 @@ export default class InterviewAlligator {
     } else {
       this.pages.push(loc)
     }
+  }
+
+  /**
+   * Test if a location is a valid one for this interview in its current state
+   * @param {InterviewLocation} loc
+   * @returns {boolean}
+   */
+  public isValidLocation (loc: InterviewLocation): boolean {
+    this.updateIfNecessary()
+    return this.pages.findIndex(l => {
+      const isSame = l.page === loc.page &&
+        l.section === loc.section &&
+        l.sectionRepetition === loc.sectionRepetition
+      return loc.sectionFollowUpRepetition ?
+        isSame && loc.sectionFollowUpDatumId === l.sectionFollowUpDatumId :
+        isSame && loc.sectionFollowUpRepetition === l.sectionFollowUpRepetition
+    }) > -1
   }
 
   /**
@@ -191,7 +210,7 @@ export default class InterviewAlligator {
     }
   }
 
-  getConditionTagSet (sectionRepetition: number, sectionFollowUpDatumId: string): Set<string> {
+  getConditionTagSet (sectionRepetition: number, sectionFollowUpDatumId?: string): Set<string> {
     return new Set(this.data.getLocationConditionTagNames(sectionRepetition, sectionFollowUpDatumId))
   }
 

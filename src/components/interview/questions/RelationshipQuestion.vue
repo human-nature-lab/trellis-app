@@ -39,7 +39,7 @@
           :shouldUpdateRoute="false"
           :canAddRespondent="canAddRespondent"
           @selected="onSelected"
-          @respondentAdded="onOtherRespondentAdded"
+          :onRespondentAdded="onRespondentAdded"
           :respondentId="respondent.id"
           :formsButtonVisible="false"
           :baseFilters="baseRespondentFilters"
@@ -210,10 +210,12 @@
           edge_id: edgeId
         })
       },
-      onOtherRespondentAdded (respondent) {
-        this.action(ActionTypes.other_respondent_added, {
-          respondent_id: respondent.id
-        })
+      async onRespondentAdded (respondent) {
+        const edges = await EdgeService.createEdges([{
+          source_respondent_id: this.respondent.id,
+          target_respondent_id: respondent.id
+        }])
+        this.add(edges[0].id)
       },
       onSelected: function (added, removed) {
         this.isSavingEdges = true
