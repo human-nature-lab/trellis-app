@@ -10,7 +10,7 @@
           :label="$t('select_location_type')">
         </v-select>
         <v-btn
-          :disabled="curGeoType === null || geoTypeSelected"
+          :disabled="curGeoType === null || disableButton"
           flat
           right
           @click="selectGeoType">
@@ -23,6 +23,7 @@
 
 <script>
   import Geo from '../../entities/trellis/Geo'
+  import GeoType from '../../entities/trellis/GeoType'
   import GeoService from '../../services/geo/GeoService'
   import global from '../../static/singleton'
 
@@ -32,25 +33,35 @@
       GeoService.getGeoTypesByStudy(global.study.id, this.showUserAddable)
         .then((geoTypes) => {
           this.geoTypes = geoTypes
+          if (this.geoType) {
+            this.curGeoType = this.geoTypes.find((gt) => gt.id === this.geoType.id)
+          }
         })
     },
     props: {
+      disableButton: {
+        type: Boolean,
+        required: false,
+        'default': false
+      },
       showUserAddable: {
         type: Boolean,
         required: false,
         'default': false
+      },
+      geoType: {
+        type: GeoType,
+        required: false
       }
     },
     data: function () {
       return {
         geoTypes: [],
-        curGeoType: null,
-        geoTypeSelected: false
+        curGeoType: null
       }
     },
     methods: {
       selectGeoType: function () {
-        this.geoTypeSelected = true
         this.$emit('geo-type-selected', this.curGeoType)
       }
     }
