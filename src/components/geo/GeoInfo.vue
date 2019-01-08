@@ -18,7 +18,17 @@
           </v-flex>
           <v-spacer />
           <v-flex class="text-xs-right">
-            <span class="subheading">{{ $t('type') }}:</span>  {{geo.geoType.name}}
+            <span class="subheading">
+              {{ $t('type') }}:
+              {{ geo.geoType.name }}
+              <permission :role-whitelist="['admin', 'manager']">
+                <v-btn
+                  icon
+                  @click="showGeoTypeDialog = true">
+                  <v-icon>edit</v-icon>
+                </v-btn>
+              </permission>
+            </span>
           </v-flex>
         </v-layout>
         <v-layout>
@@ -31,6 +41,15 @@
         </v-layout>
       </v-card-text>
     </v-card>
+    <v-dialog
+      v-model="showGeoTypeDialog">
+      <v-card>
+        <geo-type-selector
+          v-on:geo-type-selected="onGeoTypeSelected"
+          :geoType="geo.geoType">
+        </geo-type-selector>
+      </v-card>
+    </v-dialog>
   </v-flex>
 </template>
 
@@ -40,7 +59,11 @@
   // @ts-ignore
   import PhotoAlbum from '../photo/PhotoAlbum'
   // @ts-ignore
+  import GeoTypeSelector from './GeoTypeSelector'
+  // @ts-ignore
   import AsyncTranslationText from '../AsyncTranslationText'
+  // @ts-ignore
+  import Permission from '../Permission'
   import Photo from '../../entities/trellis/Photo'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
@@ -50,8 +73,8 @@
   import {Route} from 'vue-router'
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
-  import {SearchFilter} from "../../services/respondent/RespondentServiceInterface"
-  import DocsFiles from "../documentation/DocsFiles"
+  import {SearchFilter} from '../../services/respondent/RespondentServiceInterface'
+  import DocsFiles from '../documentation/DocsFiles'
 
   export default Vue.extend({
     name: 'geo-info',
@@ -60,14 +83,21 @@
       TranslationMixin,
       DocsLinkMixin(DocsFiles.locations.info)
     ],
-    components: {GeoBreadcrumbs, PhotoAlbum, AsyncTranslationText},
+    components: {
+      GeoBreadcrumbs,
+      PhotoAlbum,
+      AsyncTranslationText,
+      GeoTypeSelector,
+      Permission
+    },
     data () {
       return {
         geo: null,
         translation: null,
         error: null,
         geoPhotos: [],
-        geoPhotosLoading: true
+        geoPhotosLoading: true,
+        showGeoTypeDialog: false
       }
     },
     methods: {
@@ -103,6 +133,18 @@
           this.geoPhotos.splice(this.geoPhotos.indexOf(photo), 1)
         } catch (err) {
           console.error(err)
+        }
+      },
+      onGeoTypeSelected: async function (geoType) {
+        if (geoType.id === this.geo.geoType.id) return
+        this.geo.geoTypeId = geoType.id
+        this.geo.geoType = geoType
+        try {
+          GeoService.updateGeo(this.geo)
+        } catch (err) {
+          console.error(err)
+        } finally {
+          this.showGeoTypeDialog = false
         }
       }
     }
