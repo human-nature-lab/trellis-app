@@ -62,6 +62,17 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
     })
   }
 
+  async updateGeo (geo: Geo) {
+    return http().post(`/geo/${geo.id}`, {
+      'geo_type_id' : geo.geoTypeId,
+      'parent_id' : geo.parentId,
+      'latitude' : geo.latitude,
+      'longitude' : geo.longitude,
+      'altitude' : geo.altitude,
+      'name_translation_id' : geo.nameTranslationId
+    })
+  }
+
   async getGeoTypesByStudy (studyId: string, getUserAddable: boolean): Promise<GeoType[]> {
     let res = await http().get(`/geo-types`, {
       params: {
