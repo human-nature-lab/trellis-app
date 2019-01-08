@@ -255,6 +255,8 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
               sortOrder: addedDatum.sortOrder,
               surveyId: addedDatum.surveyId,
               val: addedDatum.val,
+              randomSortOrder: addedDatum.randomSortOrder,
+              actionId: addedDatum.actionId,
               createdAt: addedDatum.createdAt,
               updatedAt: addedDatum.updatedAt,
               deletedAt: addedDatum.deletedAt
@@ -289,7 +291,9 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
             questionDatumId: updatedDatum.questionDatumId,
             geoId: updatedDatum.geoId,
             edgeId: updatedDatum.edgeId,
-            photoId: updatedDatum.photoId
+            photoId: updatedDatum.photoId,
+            randomSortOrder: updatedDatum.randomSortOrder,
+            actionId: updatedDatum.actionId,
           })
       }
 
