@@ -22,7 +22,7 @@
             <v-card>
               <v-card-text>
                 <translation-text-field
-                  v-if="geo !== null"
+                  v-if="geo !== null && step === 1"
                   :persist="false"
                   :translation="geo.nameTranslation"
                   v-on:editing-cancelled="closeDialog(null)"
@@ -45,6 +45,7 @@
             <v-card>
               <v-card-text>
                 <geo-type-selector
+                  :disable-button="locationTypeSelected"
                   :show-user-addable="true"
                   v-on:geo-type-selected="onGeoTypeSelected">
                 </geo-type-selector>
@@ -148,6 +149,7 @@
   import { pushRouteAndQueueCurrent } from '../../router'
   import { getCurrentPosition } from '../LocationFinder'
   import isNumber from 'lodash/isNumber'
+  import global from '../../static/singleton'
 
   export default {
     components: {
@@ -268,7 +270,7 @@
       async checkCensus () {
         this.step++
         this.checkingForCensus = true
-        const hasCensus = await CensusFormService.hasCensusForm(this.studyId, censusTypes.add_geo)
+        const hasCensus = await CensusFormService.hasCensusForm(global.study.id, censusTypes.add_geo)
         if (hasCensus) {
           pushRouteAndQueueCurrent({
             name: 'StartCensusForm',
