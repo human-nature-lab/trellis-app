@@ -116,6 +116,12 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     return this.getGeoById(geo.id)
   }
 
+  async updateGeo (geo: Geo) {
+    const connection = await DatabaseService.getDatabase()
+    const repository = await connection.getRepository(Geo)
+    await repository.save(geo)
+  }
+
   async getGeoTypesByStudy (studyId: string, getUserAddable: boolean): Promise<GeoType[]> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(GeoType)
@@ -126,7 +132,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       q = q.andWhere('"study_id" = :studyId', {studyId: studyId})
     }
 
-    if (getUserAddable !== null) {
+    if (getUserAddable) {
       q = q.andWhere('"can_user_add" = 1')
     }
 
