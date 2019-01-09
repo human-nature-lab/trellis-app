@@ -14,6 +14,7 @@ import {IsNull, Repository, SelectQueryBuilder} from 'typeorm'
 import Survey from '../../entities/trellis/Survey'
 import Datum from '../../entities/trellis/Datum'
 import InterviewDataInterface from './InterviewDataInterface'
+import {randomIntBits} from "../../classes/M";
 
 export default class InterviewServiceCordova implements InterviewServiceInterface {
 
@@ -77,7 +78,7 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
         interviewId
       })
     let preloadActions = await q.getMany()
-    const insertActions = preloadActions.map(p => {
+    const insertActions = preloadActions.map((p, i) => {
       let a = new Action()
       a.preloadActionId = p.id
       a.payload = p.payload
@@ -87,6 +88,8 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
       a.createdAt = now()
       a.sectionFollowUpRepetition = 0
       a.sectionRepetition = 0
+      a.randomSortOrder = randomIntBits(53)
+      a.sortOrder = i
       return a
     })
     const repo = await DatabaseService.getRepository(Action)
