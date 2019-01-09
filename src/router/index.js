@@ -36,9 +36,12 @@ if (singleton.offline) {
 }
 
 router.beforeEach((to, from, next) => {
-  singleton.loading.indeterminate = true
-  singleton.loading.active = true
-  singleton.loading.fullscreen = true
+  if (to.name !== from.name) {
+    // Moving to new page, loading
+    singleton.loading.indeterminate = true
+    singleton.loading.active = true
+    singleton.loading.fullscreen = true
+  }
   logger.log({
     component: 'router/index.js@beforeEach',
     message: `before navigating to: ${to.fullPath}`,
