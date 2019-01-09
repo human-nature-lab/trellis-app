@@ -36,6 +36,9 @@ if (singleton.offline) {
 }
 
 router.beforeEach((to, from, next) => {
+  singleton.loading.indeterminate = true
+  singleton.loading.active = true
+  singleton.loading.fullscreen = true
   logger.log({
     component: 'router/index.js@beforeEach',
     message: `before navigating to: ${to.fullPath}`,
@@ -45,6 +48,7 @@ router.beforeEach((to, from, next) => {
 })
 
 router.afterEach((to) => {
+  singleton.loading.active = false
   logger.log({
     component: 'router/index.js@afterEach',
     message: `after navigating to: ${to.fullPath}`,
