@@ -6,7 +6,7 @@
       :class="{'open': isOpen}">
       <v-layout
         row>
-        <v-flex class="centered icon-container clickable" @click="tryCreatingSurvey">
+        <v-flex class="centered icon-container clickable" @click.once="tryCreatingSurvey">
           <v-tooltip
             right
             v-if="form.isComplete">
@@ -124,6 +124,7 @@
   import InterviewService from "../services/interview/InterviewService"
   import {getCurrentPosition} from './LocationFinder'
   import {defaultLoggingService as logger} from '../services/logging/LoggingService'
+  import singleton from '../static/singleton'
 
   export default Vue.extend({
     name: 'form-list-item',
@@ -170,13 +171,16 @@
         return user ? user.username : ''
       },
       async tryCreatingSurvey () {
+        singleton.loading.indeterminate = true
+        singleton.loading.active = true
+        singleton.loading.fullscreen = true
         if (!this.canCreateSurveys){
           // Do nothing
           alert(this.$t('cant_start_form'))
         } else if (this.form.surveys.length !== 0 && !this.allowMultipleSurveys) {
           alert(this.$t('cant_create_survey'))
         } else if (this.form.surveys.length === 0 || confirm(this.$t('create_another_survey'))) {
-          this.global.loading.active = true
+          // this.global.loading.active = true
           // Start a new survey
           let survey
           try {
@@ -189,7 +193,7 @@
           if (survey) {
             this.tryStartingSurvey(survey)
           }
-          this.global.loading.active = false
+          //this.global.loading.active = false
         }
       },
       async tryStartingSurvey (survey) {
