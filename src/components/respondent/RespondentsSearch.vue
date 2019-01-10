@@ -59,13 +59,13 @@
               </span>
             </v-tooltip>
           </v-layout>
-          <v-layout row wrap>
+          <v-layout row wrap v-if="showGeoFilterOptions">
             <v-flex>
               <v-checkbox
                 v-model="filters.includeChildren"
                 :label="$t('include_child_locations')" />
             </v-flex>
-            <v-flex v-if="showPastResidentsOption">
+            <v-flex>
               <v-checkbox
                 v-model="showPastResidents"
                 :label="$t('show_past_residents')" />
@@ -464,7 +464,7 @@
           this.filters.onlyCurrentGeo = !val
         }
       },
-      showPastResidentsOption () {
+      showGeoFilterOptions () {
         return this.filters && !!this.filters.geos.length
       }
     },
