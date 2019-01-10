@@ -31,7 +31,7 @@
         <v-card v-if="respondent">
           <v-card-text>
             <photo-album
-              :title="$t('add_photos')"
+              :title="$t('photos')"
               :photos="respondent.photos"
               @photo="addPhoto"
               @delete-photo="onDeletePhoto"
