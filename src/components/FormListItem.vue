@@ -171,16 +171,15 @@
         return user ? user.username : ''
       },
       async tryCreatingSurvey () {
-        singleton.loading.indeterminate = true
-        singleton.loading.active = true
-        singleton.loading.fullscreen = true
         if (!this.canCreateSurveys){
           // Do nothing
           alert(this.$t('cant_start_form'))
         } else if (this.form.surveys.length !== 0 && !this.allowMultipleSurveys) {
           alert(this.$t('cant_create_survey'))
         } else if (this.form.surveys.length === 0 || confirm(this.$t('create_another_survey'))) {
-          // this.global.loading.active = true
+          singleton.loading.indeterminate = true
+          singleton.loading.active = true
+          singleton.loading.fullscreen = true
           // Start a new survey
           let survey
           try {

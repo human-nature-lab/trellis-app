@@ -128,13 +128,6 @@
         error: ''
       }
     },
-    // head: {
-    //     title () {
-    //       return {
-    //         inner: `${this.respondent.name} Forms`
-    //       }
-    //     }
-    // },
     components: {
       FormsView
     },
