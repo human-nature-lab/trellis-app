@@ -14,16 +14,19 @@
         <v-alert v-show="error" color="error">{{error}}</v-alert>
         <v-layout wrap class="mb-3">
           <v-flex>
-            <span class="subheading">{{ $t('location') }}:</span>  <GeoBreadcrumbs v-if="geo.id" :geoId="geo.id" />
+            <span class="subheading button-min-height">
+              {{ $t('location') }}: <geo-breadcrumbs v-if="geo.id" :geoId="geo.id"></geo-breadcrumbs>
+            </span>
           </v-flex>
-          <v-spacer />
+          <v-spacer></v-spacer>
           <v-flex class="text-xs-right">
-            <span class="subheading">
+            <span class="subheading button-min-height">
               {{ $t('type') }}:
               {{ geo.geoType.name }}
               <permission :role-whitelist="['admin', 'manager']">
                 <v-btn
                   icon
+                  small
                   @click="showGeoTypeDialog = true">
                   <v-icon>edit</v-icon>
                 </v-btn>
@@ -150,3 +153,9 @@
     }
   })
 </script>
+
+<style scoped>
+  .button-min-height {
+    line-height: 40px;
+  }
+</style>
