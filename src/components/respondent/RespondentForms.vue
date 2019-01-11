@@ -1,7 +1,7 @@
 <template>
   <v-flex class="respondent-forms">
     <v-container fluid>
-      <v-alert v-if="error">{{this.error}}</v-alert>
+      <v-alert v-if="error">{{ error }}</v-alert>
       <v-card>
         <v-toolbar flat>
           <v-toolbar-title>
@@ -21,34 +21,30 @@
                 </v-list-tile-action>
                 <v-list-tile-title>{{$t('show_all')}}</v-list-tile-title>
               </v-list-tile>
-              <!--<v-list-tile @click="showUnpublished=!showUnpublished">-->
-                <!--<v-list-tile-action>-->
-                  <!--<v-icon v-if="showUnpublished">check</v-icon>-->
-                <!--</v-list-tile-action>-->
-                <!--<v-list-tile-title>{{$t('show_unpublished')}}</v-list-tile-title>-->
-              <!--</v-list-tile>-->
             </v-list>
           </v-menu>
         </v-toolbar>
-        <FormsView
+        <forms-view
           v-if="forms"
           :forms="forms"
           :respondent="respondent"
           :showHidden="showHidden"
           :showUnpublished="showUnpublished"
           :allowMultipleSurveys="false"
-          @newInterview="startInterview" />
+          @newInterview="startInterview">
+        </forms-view>
       </v-card>
       <v-card>
         <v-toolbar flat>
           <v-toolbar-title>{{$t('census_forms')}}</v-toolbar-title>
         </v-toolbar>
-        <FormsView
+        <forms-view
           v-if="censusForms"
           :forms="censusForms"
           :respondent="respondent"
-          :canCreateSurveys="false"
-          @newInterview="startInterview" />
+          :canCreateSurveys="true"
+          @newInterview="startInterview">
+        </forms-view>
       </v-card>
     </v-container>
   </v-flex>
