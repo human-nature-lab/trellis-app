@@ -67,7 +67,7 @@
                   </td>
                   <td>{{ props.item.created_at }}</td>
                   <td>{{ props.item.file_name }}</td>
-                  <td>{{ (props.item.device) ? props.item.device.name : $t('not_found') }}</td>
+                  <td>{{ (props.item.device_name) ? props.item.device_name : $t('not_found') }}</td>
                   <td>{{ props.item.device_id }}</td>
                   <td>{{ props.item.status }}</td>
                 </tr>
@@ -146,7 +146,7 @@
           value: 'file_name'
         }, {
           text: 'Device name',
-          value: 'device.name'
+          value: 'device_name'
         }, {
           text: 'Device id',
           value: 'device_id'
