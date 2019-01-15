@@ -9,8 +9,8 @@ all return a respondent with the name "Alice Beth Carrera":
 ### Viewing results
 
 The search will return the first 20 respondents who match the search terms provided. Click on a respondent to navigate 
-to their info page. Click the full screen button (<i class="icon material-icons black--text">fullscreen</i>) to display a full 
-screen photo of the respondent for identification.
+to their info page. Click the full screen button (<i class="icon material-icons black--text">fullscreen</i>) to display 
+a full screen photo of the respondent for identification.
 
 ### Adding new respondents
 

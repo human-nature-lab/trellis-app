@@ -185,6 +185,7 @@
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
   .route-loading
+    position: absolute
     margin: 0
     margin-top: 2px
   .navigation-drawer
