@@ -97,6 +97,7 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
     d.respondentNameId = this.respondentNameId
     d.rosterId = this.rosterId
     d.sortOrder = this.sortOrder
+    d.randomSortOrder = this.randomSortOrder
     d.surveyId = this.surveyId
     d.val = this.val
     d.createdAt = this.createdAt

@@ -110,10 +110,13 @@ export default class DiffService {
       keys = union(Object.keys(one), Object.keys(two))
     }
     for (let key of keys) {
+      let isSame = true
       if (Moment.isMoment(one[key])) {
-        return one[key].isSame(two[key])
+        isSame = one[key].isSame(two[key])
+      } else if (one[key] === null || (!Array.isArray(one[key]) && typeof one[key] !== 'object')) {
+        isSame = one[key] === two[key]
       }
-      if (one[key] !== two[key]) {
+      if (!isSame) {
         return false
       }
     }

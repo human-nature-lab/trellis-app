@@ -11,5 +11,6 @@ export default {
   'InterviewManager': require('./interview-manager.spec'),
   'ConditionAssignment': require('./condition-assignment.spec'),
   'SkipService': require('./skip-service.test'),
-  'Transactions': require('./transactions.test')
+  'Transactions': require('./transactions.test'),
+  'DiffService': require('./diff-service.test')
 }
