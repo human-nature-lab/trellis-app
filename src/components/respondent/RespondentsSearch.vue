@@ -334,7 +334,7 @@
       onQueryChange: debounce(function () {
         this.isLoading = true
         this.search()
-      }, 400),
+      }, 1000),
       search () {
         if (this.shouldUpdateRoute) {
           updateRoute(this)
