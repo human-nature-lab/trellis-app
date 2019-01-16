@@ -7,7 +7,7 @@
         </v-toolbar-title>
         <v-spacer />
         <v-btn
-          :disabled="!isAdmin"
+          :disabled="!canAddUser"
           icon
           @click="userToEdit = null; showEditUser = true">
           <v-icon>add</v-icon>
@@ -46,6 +46,9 @@
   import RoutePreloadMixin from "../mixins/RoutePreloadMixin"
   import DocsLinkMixin from "../mixins/DocsLinkMixin"
   import DocsFiles from "../components/documentation/DocsFiles"
+  import Role from "../components/user/Role"
+  import global from '../static/singleton'
+
   async function loadUsers (to: Route, from: Route) {
     const page = to.query.page || 0
     return UserService.getPage(page)
@@ -55,8 +58,8 @@
     name: 'Users',
     components: {UserRow, UserEdit},
     computed: {
-      isAdmin (): boolean {
-        return
+      canAddUser (): boolean {
+        return !!this.global.user && this.global.user.role === Role.ADMIN
       },
       headers () {
         return [{
@@ -80,6 +83,7 @@
     },
     data () {
       return {
+        global,
         users: null,
         showEditUser: false,
         userToEdit: null,

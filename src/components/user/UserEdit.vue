@@ -53,12 +53,7 @@
   import PasswordField from './PasswordField'
   import merge from 'lodash/merge'
   import isEqual from 'lodash/isEqual'
-
-  enum Role {
-    ADMIN = 'ADMIN',
-    SUPERVISOR = 'SUPERVISOR',
-    SURVEYOR = 'SURVEYOR'
-  }
+  import Role from "./Role"
 
   interface UserLike {
     id?: string
