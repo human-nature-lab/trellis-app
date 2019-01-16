@@ -1,12 +1,4 @@
-// import Interview from '../components/interview/Interview'
-// import RespondentForms from '../components/respondent/RespondentForms'
-// import RespondentsSearch from '../components/respondent/RespondentsSearch'
-// import RespondentInfo from '../components/respondent/RespondentInfo'
-import Geo from '../components/geo/Geo' // Do we still use this?
-// import GeoInfo from '../components/geo/GeoInfo'
-// import GeoSearchWithMap from '../components/geo/GeoSearchWithMap'
-// import LocaleSelectorPage from '../components/LocaleSelectorPage'
-// import StudySelectorPage from '../components/StudySelectorPage'
+import Geo from '../components/geo/Geo'
 import SurveyComplete from '../components/interview/SurveyComplete'
 import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
@@ -15,7 +7,6 @@ import ValidateCensusForm from './guards/ValidateCensusForm'
 import ValidateCompletedSurvey from './guards/ValidateCompletedSurvey'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
 import WebLogin from '../components/login/WebLogin'
-// import TrellisInfo from '../components/TrellisInfo'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
 const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../components/ServiceTesting')

@@ -1,4 +1,5 @@
 import User from '../../entities/trellis/User'
+import UserStudy from "../../entities/trellis/UserStudy";
 
 export abstract class UserServiceAbstract {
 
@@ -44,11 +45,48 @@ export abstract class UserServiceAbstract {
   /**
    * Get all users
    */
-  abstract getAll(): Promise<User[]>
+  abstract getPage(page?: number, size?: number): Promise<User[]>
 
   /**
    * Create a new user
    * @returns {Promise<User>}
    */
-  abstract addUser (): Promise<User>
+  abstract createUser (user: User): Promise<User>
+
+  /**
+   * Delete a single user
+   * @param userId
+   */
+  abstract deleteUser (userId: string): Promise<void>
+
+  /**
+   * Persist changes to a single user
+   * @param user
+   */
+  abstract updateUser (user: User): Promise<User>
+
+  /**
+   * Add a study to a user
+   * @param {User} user
+   * @param {string} studyId
+   * @returns {PromiseLike<UserStudy>}
+   */
+  abstract addStudy (user: User, studyId: string): PromiseLike<UserStudy>
+
+  /**
+   * Remove a study from a user
+   * @param {User} user
+   * @param {string} studyId
+   * @returns {PromiseLike<void>}
+   */
+  abstract removeStudy (user: User, studyId: string): PromiseLike<void>
+
+  /**
+   * Update a user's password
+   * @param {User} user
+   * @param {string} oldPassword
+   * @param {string} newPassword
+   * @returns {PromiseLike<User>}
+   */
+  abstract updatePassword (user: User, oldPassword: string, newPassword: string): PromiseLike<void>
 }

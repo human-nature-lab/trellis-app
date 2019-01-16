@@ -103,6 +103,7 @@
   import GeoLocationService from './services/geolocation'
   import SnackbarQueue from './components/SnackbarQueue'
   import DocsSidebar from './components/documentation/DocsSidebar'
+  import UserService from './services/user/UserService'
 
   export default {
     name: 'web-app',
@@ -114,7 +115,7 @@
         alerts: AlertService.alerts
       }
     },
-    created () {
+    async created () {
       /* load the singleton object (selected study, locale, theme) from local storage */
       // await SingletonService.loadFromLocalStorage()
       if (this.withinCordova) {
@@ -123,6 +124,8 @@
         document.addEventListener('backbutton', this.onBackButton)
         GeoLocationService.watchPosition()
       }
+      const user = await UserService.loadCurrentUser()
+      this.$set(this.global, 'user', user)
     },
     beforeDestroy () {
       if (this.withinCordova) {

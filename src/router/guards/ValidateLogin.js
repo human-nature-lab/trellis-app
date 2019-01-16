@@ -9,6 +9,7 @@ export default async function (to, from, next) {
     // Got the sync even if not logged in
     next()
   } else if (!user && config && config.user) {
+    debugger
     await LoginService.login(config.user.username, config.user.password)
     next()
   } else if (!(user instanceof User) && to.name !== 'Login') {
