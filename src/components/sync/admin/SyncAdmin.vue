@@ -66,10 +66,10 @@
                     </v-btn>
                   </td>
                   <td>{{ props.item.created_at }}</td>
-                  <td>{{ props.item.file_name }}</td>
+                  <td>{{ props.item.status }}</td>
                   <td>{{ (props.item.device_name) ? props.item.device_name : $t('not_found') }}</td>
                   <td>{{ props.item.device_id }}</td>
-                  <td>{{ props.item.status }}</td>
+                  <td>{{ props.item.file_name }}</td>
                 </tr>
                 <UploadLogs
                   :upload="props.item"
@@ -142,8 +142,8 @@
           text: 'Created on',
           value: 'created_at'
         }, {
-          text: 'File name',
-          value: 'file_name'
+          text: 'Status',
+          value: 'status'
         }, {
           text: 'Device name',
           value: 'device_name'
@@ -151,8 +151,8 @@
           text: 'Device id',
           value: 'device_id'
         }, {
-          text: 'Status',
-          value: 'status'
+          text: 'File name',
+          value: 'file_name'
         }]
       }
     },
