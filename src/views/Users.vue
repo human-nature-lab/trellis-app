@@ -44,6 +44,8 @@
   import UserService from '../services/user/UserService'
   import Vue from 'vue'
   import RoutePreloadMixin from "../mixins/RoutePreloadMixin"
+  import DocsLinkMixin from "../mixins/DocsLinkMixin"
+  import DocsFiles from "../components/documentation/DocsFiles"
   async function loadUsers (to: Route, from: Route) {
     const page = to.query.page || 0
     return UserService.getPage(page)
@@ -89,7 +91,7 @@
         }
       }
     },
-    mixins: [RoutePreloadMixin(loadUsers)],
+    mixins: [RoutePreloadMixin(loadUsers), DocsLinkMixin(DocsFiles.users.intro)],
     methods: {
       hydrate (users: User[]) {
         console.log('users', users)

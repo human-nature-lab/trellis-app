@@ -9,7 +9,7 @@
   import * as marked from 'marked'
   import router from '../router'
   import * as path from 'path'
-  import {Route} from "vue-router/types/router"
+
   export default Vue.extend({
     name: 'Markdown',
     props: {
@@ -44,6 +44,10 @@
       useAbsolutePath: {
         type: Boolean,
         default: true
+      },
+      target: {
+        type: String,
+        default: null
       }
     },
     computed: {
@@ -84,7 +88,7 @@
       },
       currentDirLoc (): string {
         // @ts-ignore
-        return path.dirname(this.fileName)
+        return <string>path.dirname(this.fileName)
       },
       html (): string {
         // @ts-ignore
@@ -107,11 +111,11 @@
                     ${text}
                   </a>`
         }
-        return marked(this.transformedMarkdown, {renderer: renderer}) as string
+        return <string>marked(this.transformedMarkdown, {renderer: renderer})
       }
     },
     methods: {
-      attachLinkListeners () {
+      attachLinkListeners (): void {
         if (this.$refs.mdContainer instanceof Element) {
           this.$refs.mdContainer.querySelectorAll('a').forEach(a => {
             a.addEventListener('click', (e) => {
@@ -122,6 +126,24 @@
               this.$emit('navigation', a.getAttribute('href'))
             })
           })
+        }
+        // @ts-ignore
+        this.$nextTick(this.scrollToTarget)
+      },
+      scrollToTarget (): void {
+        // @ts-ignore
+        const target: string = this.target
+        if (target && this.$refs.mdContainer instanceof HTMLElement) {
+          const el = this.$refs.mdContainer.querySelector('#' + target)
+          if (el) {
+            setTimeout(() => {
+              console.log('scrolling into view', target)
+              el.scrollIntoView({
+                block: 'nearest',
+                inline: 'start'
+              })
+            }, 300)
+          }
         }
       }
     }

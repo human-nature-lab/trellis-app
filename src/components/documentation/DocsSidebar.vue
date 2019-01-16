@@ -13,6 +13,9 @@
         </v-btn>
         <v-toolbar-title>
           {{$t('documentation')}}
+          <a :href="newTabLink" target="_blank" class="btn btn--flat btn--icon">
+            <v-icon>launch</v-icon>
+          </a>
         </v-toolbar-title>
         <v-spacer />
         <v-btn icon @click="isOpen = false">
@@ -44,6 +47,7 @@
   import Documentation from './Documentation'
   import Vue from 'vue'
   import bus, {DocsEventTypes} from './DocsEventBus'
+  import router from '../../router'
   export default Vue.extend({
     components: {DocsTOC, Documentation},
     name: 'DocsSidebar',
@@ -71,6 +75,15 @@
       width (): number {
         // TODO: Handle various screen widths
         return 400
+      },
+      newTabLink (): object {
+        const route = router.resolve({
+          name: 'Documentation',
+          params: {
+            filePath: this.currentFile.slice(2)
+          }
+        })
+        return route.href
       }
     },
     methods: {
@@ -96,7 +109,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>
