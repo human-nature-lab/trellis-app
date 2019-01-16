@@ -6,6 +6,7 @@ let previousState
 export default function DocsLinkMixin (docLink: any) {
   return config.debug ? {
     beforeRouteEnter (to, from, next) {
+      console.log('updating documentation link', docLink)
       previousState = JSON.parse(JSON.stringify(global.secondaryDrawer))
       previousState.onClick = global.secondaryDrawer.onClick
       global.secondaryDrawer.isEnabled = true
