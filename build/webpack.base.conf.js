@@ -4,14 +4,16 @@ var config = require('../config')
 var vueLoaderConfig = require('./vue-loader.conf')
 var FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 var webpack = require('webpack')
+var SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 
+const smp = new SpeedMeasurePlugin()
 const { VueLoaderPlugin } = require('vue-loader')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
-module.exports = {
+module.exports = smp.wrap({
   target: 'web',
   entry: {
     app: ['babel-polyfill', './src/main.ts']
@@ -137,4 +139,4 @@ module.exports = {
       result.request = result.request.replace(/typeorm/, "typeorm/browser");
     })
   ]
-}
+})
