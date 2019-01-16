@@ -7,6 +7,9 @@ const config = {
   apiRoot: 'https://api.***REMOVED***',
   database: {
     logging: ['warning', 'error']
+  },
+  logging: {
+    levels: ['warn', 'error']
   }
 }
 

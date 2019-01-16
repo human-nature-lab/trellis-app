@@ -14,18 +14,13 @@ import {ConditionTagInterface} from '../../../services/interview/InterviewDataIn
 import RespondentFill from '../../../entities/trellis/RespondentFill'
 import Interview from '../../../entities/trellis/Interview'
 import InterviewManagerBase from "./InterviewManagerBase";
-import ImmutableQueue from "../../../classes/ImmutableQueue";
 import Question from "../../../entities/trellis/Question";
 import QT from '../../../static/question.types'
 import PT from '../../../static/parameter.types'
 import {locToNumber} from "../services/LocationHelpers";
 import InterviewAlligator from "../services/InterviewAlligator";
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
-import Measurement from "../../../classes/Measurement";
 import Section from "../../../entities/trellis/Section";
-
-const nextTiming = new Measurement('NextTiming')
-const prevTiming = new Measurement('PrevTiming')
 
 export default class InterviewManager extends InterviewManagerBase {
 
