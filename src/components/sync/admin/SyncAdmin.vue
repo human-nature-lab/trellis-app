@@ -58,7 +58,7 @@
                 <tr>
                   <td>
                     <v-btn
-                      :disabled="props.item.status !== 'SUCCESS'"
+                      :disabled="props.item.status !== 'SUCCESS' && props.item.status !== 'FAILED'"
                       icon
                       @click="props.item.isOpen = !props.item.isOpen">
                       <v-icon v-if="props.item.isOpen">keyboard_arrow_down</v-icon>
@@ -73,7 +73,32 @@
                 </tr>
                 <UploadLogs
                   :upload="props.item"
-                  :isOpen="props.item.isOpen"/>
+                  :isOpen="props.item.status === 'SUCCESS' && props.item.isOpen"/>
+                <tr v-if="props.item.status === 'FAILED' && props.item.isOpen" >
+                  <td colspan="6">
+                    <v-alert
+                      value="true"
+                      type="error"
+                      outline>
+                      <v-layout row wrap>
+                        <v-flex>
+                          {{ props.item.error_message }}
+                        </v-flex>
+                      </v-layout>
+                      <v-layout row wrap>
+                        <v-flex xs12>
+                          <div class="textarea-wrapper">
+                            <textarea
+                              readonly
+                              rows="10"
+                              :value="props.item.error_trace">
+                            </textarea>
+                          </div>
+                        </v-flex>
+                      </v-layout>
+                    </v-alert>
+                  </td>
+                </tr>
               </template>
               <template slot="no-data">
                 <v-alert :value="!uploadsLoading" type="info">
@@ -203,4 +228,13 @@
     }
   }
 </script>
+
+<style lang="sass" scoped>
+  .textarea-wrapper
+    flex: 0 0 100%
+  .textarea-wrapper > textarea
+    width: 100%
+    border: 1px solid #dd2c00
+    overflow: scroll
+</style>
 
