@@ -13,7 +13,11 @@
         </v-btn>
         <v-toolbar-title>
           {{$t('documentation')}}
-          <a :href="newTabLink" target="_blank" class="btn btn--flat btn--icon">
+          <a
+            v-if="isWeb"
+            :href="newTabLink"
+            target="_blank"
+            class="btn btn--flat btn--icon">
             <v-icon>launch</v-icon>
           </a>
         </v-toolbar-title>
