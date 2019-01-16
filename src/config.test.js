@@ -6,7 +6,7 @@ const config = {
   xKey: 'rXghvr7C1Q8dRmhX2Lyl3wC62TyoAr95',
   apiRoot: 'https://api.trellistest.net',
   database: {
-    logging: ['warning', 'error']g
+    logging: ['warning', 'error']
   },
   logging: {
     levels: ['warn', 'error']
