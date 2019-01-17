@@ -3,6 +3,7 @@ import DatabaseService from '../database/DatabaseService'
 import { UserServiceAbstract } from './UserServiceAbstract'
 import router from '../../router'
 import UserStudy from "../../entities/trellis/UserStudy";
+import Pagination from "../../types/Pagination";
 export class UserServiceCordova extends UserServiceAbstract {
 
   private _currentUserRequest: Promise<any>
@@ -24,7 +25,7 @@ export class UserServiceCordova extends UserServiceAbstract {
     return this._currentUserRequest
   }
 
-  async getPage (page: number = 0, size: number = 100): Promise<User[]> {
+  async getPage (page: number = 0, size: number = 100): Promise<Pagination<User>> {
     const repo = await DatabaseService.getRepository(User)
     return repo.find({
       take: size,

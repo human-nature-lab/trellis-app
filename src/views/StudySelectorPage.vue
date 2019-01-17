@@ -4,11 +4,11 @@
       <v-card>
         <v-toolbar flat>
           <v-toolbar-title>
-            {{ $t('select_language') }}
+            {{ $t('select_study') }}
           </v-toolbar-title>
         </v-toolbar>
         <v-container fluid>
-         <LocaleSelector @change="done"/>
+          <StudySelector @change="done"/>
         </v-container>
       </v-card>
     </v-layout>
@@ -16,15 +16,14 @@
 </template>
 
 <script>
-  import LocaleSelector from './LocaleSelector'
   import index from '../router/index'
+  import StudySelector from '../components/StudySelector'
   export default {
-    name: 'locale-selector',
+    name: 'study-selector-page',
     methods: {
       done: function () {
         if (this.$route.query.to) {
-          let path = this.$route.query.to.replace(/locale=[^&?]*/g, '')
-          index.push({path: path})
+          index.push({path: this.$route.query.to})
         } else {
           index.push({name: 'Home'})
         }
@@ -32,11 +31,11 @@
     },
     head: {
       title: {
-        inner: 'Locale Selector'
+        inner: 'Study Selector'
       }
     },
     components: {
-      LocaleSelector
+      StudySelector
     }
   }
 </script>

@@ -16,7 +16,7 @@
         multiple
         chips />
     </td>
-    <td class="justify-right justify-content-right layout px-0">
+    <td class="actions">
       <v-btn icon small class="mx-0" @click="$emit('edit')" :disabled="!isAdminOrOwner">
         <v-icon>edit</v-icon>
       </v-btn>
@@ -94,6 +94,7 @@
   })
 </script>
 
-<style scoped>
-
+<style lang="sass" scoped>
+  .actions
+    white-space: nowrap
 </style>

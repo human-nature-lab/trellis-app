@@ -16,8 +16,9 @@
       <v-data-table
         :headers="headers"
         :items="users"
-        :pagination.sync="pagination"
-        class="elevation-1">
+        :loading="isLoading"
+        :total-items="total"
+        :pagination.sync="pagination">
         <UserRow
           slot="items"
           slot-scope="props"
@@ -40,19 +41,12 @@
   import User from '../entities/Trellis/User'
   import UserEdit from '../components/user/UserEdit'
   import UserRow from '../components/user/UserRow'
-  import {Route} from 'vue-router/types/router'
   import UserService from '../services/user/UserService'
   import Vue from 'vue'
-  import RoutePreloadMixin from "../mixins/RoutePreloadMixin"
   import DocsLinkMixin from "../mixins/DocsLinkMixin"
   import DocsFiles from "../components/documentation/DocsFiles"
   import Role from "../components/user/Role"
   import global from '../static/singleton'
-
-  async function loadUsers (to: Route, from: Route) {
-    const page = to.query.page || 0
-    return UserService.getPage(page)
-  }
 
   export default Vue.extend({
     name: 'Users',
@@ -76,34 +70,52 @@
           sortable: false
         }, {
           text: 'Actions',
-          sortable: false,
-          align: 'right'
+          sortable: false
         }]
+      }
+    },
+    watch: {
+      pagination: {
+        handler () {
+          this.loadUsers()
+        },
+        deep: true
       }
     },
     data () {
       return {
         global,
-        users: null,
+        users: [],
+        total: 25,
         showEditUser: false,
         userToEdit: null,
+        isLoading: false,
         pagination: {
           descending: false,
           page: 1,
-          rowsPerPage: 100,
+          rowsPerPage: 25,
           sortBy: 'name'
         }
       }
     },
-    mixins: [RoutePreloadMixin(loadUsers), DocsLinkMixin(DocsFiles.users.intro)],
+    mixins: [DocsLinkMixin(DocsFiles.users.intro)],
     methods: {
-      hydrate (users: User[]) {
-        console.log('users', users)
-        this.users = users
-      },
       async editUser (user: User) {
         this.showEditUser = true
         this.userToEdit = user
+      },
+      updatePage (pagination) {
+        debugger
+        this.pagination = pagination
+        this.loadUsers()
+      },
+      async loadUsers () {
+        this.isLoading = true
+        const page = await UserService.getPage(this.pagination.page - 1, this.pagination.rowsPerPage, this.pagination.sortBy, this.pagination.descending)
+        this.total = page.total
+        this.users = page.data
+        console.log('users', this.users)
+        this.isLoading = false
       },
       async deleteUser (user: User) {
         if (confirm(this.$t('delete_user') as string)) {
@@ -138,7 +150,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

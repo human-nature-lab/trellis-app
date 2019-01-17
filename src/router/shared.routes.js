@@ -9,12 +9,12 @@ import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
 import WebLogin from '../components/login/WebLogin'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
-const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../components/ServiceTesting')
+const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../views/ServiceTesting')
 const LocationHistory = () => import(/* webpackChunkName: "location-history" */'../components/LocationHistory')
-const TrellisInfo = () => import(/* webpackChunkName: "trellis-info" */'../components/TrellisInfo')
+const TrellisInfo = () => import(/* webpackChunkName: "trellis-info" */'../views/TrellisInfo')
 const GeoSearchWithMap = () => import(/* webpackChunkName: "geo-search" */'../components/geo/GeoSearchWithMap')
-const LocaleSelectorPage = () => import(/* webpackChunkName: "locale-selector" */'../components/LocaleSelectorPage')
-const StudySelectorPage = () => import(/* webpackChunkName: "study-selector" */'../components/StudySelectorPage')
+const LocaleSelectorPage = () => import(/* webpackChunkName: "locale-selector" */'../views/LocaleSelectorPage')
+const StudySelectorPage = () => import(/* webpackChunkName: "study-selector" */'../views/StudySelectorPage')
 const RespondentsSearch = () => import(/* webpackChunkName: "respondent-search" */'../components/respondent/RespondentsSearch')
 const RespondentForms = () => import(/* webpackChunkName: "respondent-forms" */'../components/respondent/RespondentForms')
 const RespondentInfo = () => import(/* webpackChunkName: "respondent-info" */'../components/respondent/RespondentInfo')
