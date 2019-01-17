@@ -61,7 +61,8 @@
           color="white">
           <v-layout column>
             <v-flex
-              v-for="prop in ['message', 'fullMessage', 'component', 'syncId', 'interviewId', 'deviceId', 'userId', 'version', 'offline', 'uploadedAt']">
+              v-for="prop in ['message', 'fullMessage', 'component', 'syncId', 'interviewId', 'deviceId', 'userId', 'version', 'offline', 'uploadedAt']"
+              :key="prop">
               <v-layout>
                 <v-flex class="subheader">{{prop}}</v-flex>
                 <v-flex>{{fullLog[prop]}}</v-flex>
@@ -98,7 +99,7 @@
   import Vue from 'vue'
   import {defaultLoggingService} from "../services/logging/LoggingService"
   import Log from "../entities/trellis-config/Log"
-  import ModalTitle from './ModalTitle'
+  import ModalTitle from '../components/ModalTitle'
   import uploadLogs from "../services/upload/UploadLogs"
   import DeleteLogs from "../services/upload/DeleteLogs"
 
@@ -212,7 +213,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

@@ -32,9 +32,7 @@
 
 <script lang="ts">
   import DeviceService from "../services/device/DeviceService"
-  import GeoLocationService from '../services/geolocation'
-
-  declare const VERSION: string
+  import GeoLocationService from '../services/geolocation/index'
   import Vue, {Component} from 'vue'
   import global from '../static/singleton'
   import DatabaseService from '../services/database/DatabaseService'
@@ -44,6 +42,8 @@
   import formatBytesFilter from '../filters/format-bytes.filter'
   import SyncService from "../services/SyncService"
   import moment from 'moment'
+
+  declare const VERSION: string
 
   interface KeyPair {
     key: string
