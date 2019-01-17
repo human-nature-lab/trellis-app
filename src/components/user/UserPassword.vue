@@ -1,8 +1,5 @@
 <template>
   <v-form ref="form" v-model="formValid" lazy-validation>
-    <v-flex class="display-2">
-      {{$t('change_password')}}
-    </v-flex>
     <v-text-field
       v-if="(global.user && global.user.role !== 'ADMIN')"
       v-model="oldPassword"
@@ -25,9 +22,9 @@
   import UserService from "../../services/user/UserService"
   import PasswordField from './PasswordField'
   import Vue from 'vue'
-  import {Vue as VueType} from 'vue/types/vue'
+
   export default Vue.extend({
-    name: 'UserEditPassword',
+    name: 'UserPassword',
     components: {PasswordField},
     props: {
       user: Object as () => User
@@ -52,11 +49,10 @@
         if (this.$refs.form.validate()) {
           try {
             const res = await UserService.updatePassword(this.user, this.oldPassword, this.newPassword)
-            debugger
-            this.alert('success', this.$t('password_updated'))
+            const msg = this.$t('password_updated')
+            this.alert('success', msg)
           } catch (err) {
-            debugger
-            this.alert('error', `Invalid password or permissions`)
+            this.alert('error', `Invalid password or permissions`, {timeout: 0})
           }
         }
       }
