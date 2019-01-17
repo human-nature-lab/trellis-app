@@ -17,7 +17,10 @@ export default Vue.extend({
   },
   methods: {
     isGeoSelectable (geo: Geo) {
-      console.log('isSelectable', geo.geoType.name)
+      // If there are no geo type parameters then all geo types should be selectable
+      if (this.question.questionParameters.filter(p => p.parameterId == PT.geo_type).length === 0) {
+        return true
+      }
       return this.allowedGeoTypes.indexOf(geo.geoType.name.replace(geoTypeNameReplacer, '').toLowerCase()) > -1
     }
   }
