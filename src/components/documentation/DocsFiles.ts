@@ -30,6 +30,9 @@ export default transformToPaths({
     admin: 'Admin',
     introduction: 'Introduction'
   },
+  users: {
+    intro: 'Introduction'
+  },
   sidebar: '_Sidebar',
   home: 'Home'
 }, '.md')

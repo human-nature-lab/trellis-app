@@ -1,198 +1,44 @@
 <template>
   <v-flex>
     <v-list dense>
-      <v-list-tile :dark="global.darkTheme">
-        <v-list-tile-action  class="text-right">
-          <v-btn icon @click="global.menuDrawer.open = false">
-            <v-icon>arrow_back</v-icon>
-          </v-btn>
-        </v-list-tile-action>
-      </v-list-tile>
-      <v-divider></v-divider>
-      <v-list-tile :to="{name: 'RespondentsSearch'}">
-        <v-list-tile-action>
-          <v-icon>group</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('respondents') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile :to="{name: 'GeoSearch'}">
-        <v-list-tile-action>
-          <v-icon>place</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('locations') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile v-if="!global.offline" :to="{name: 'SyncAdmin'}">
-        <v-list-tile-action>
-          <v-icon>sync</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('sync') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile v-if="global.offline" :to="{name: 'Sync'}">
-        <v-list-tile-action>
-          <v-icon>sync</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('sync') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile v-if="isDebug" :to="{name: 'Documentation'}">
-        <v-list-tile-action>
-          <v-icon>help</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('documentation') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <!--<v-list-tile v-if="global.offline" :to="{name: 'Logs'}">
-        <v-list-tile-action>
-          <v-icon>error_outline</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-title>
-          {{ $t('logs') }}
-        </v-list-tile-title>
-      </v-list-tile>
-      <v-list-tile v-if="isCordova" :to="{name: 'LocationHistory'}">
-        <v-list-tile-action>
-          <v-icon>history</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-title>
-          Location History
-        </v-list-tile-title>
-      </v-list-tile>-->
+      <v-toolbar flat>
+        <v-btn icon @click="global.menuDrawer.open = false">
+          <v-icon>arrow_back</v-icon>
+        </v-btn>
+        <v-flex class="text-xs-right" v-if="isLoggedIn">
+          {{ $t('logged_in_as', [global.user.username]) }}
+        </v-flex>
+      </v-toolbar>
+      <template v-for="section in sections">
+        <v-divider :key="section.title + 'divider'"></v-divider>
+        <v-list dense subheader :key="section.title + 'list'">
+          <v-subheader v-if="section.title">
+            {{ $t(section.title) }}
+          </v-subheader>
+          <v-divider v-if="section.title"></v-divider>
+          <v-list-tile
+            v-for="item in section.items"
+            :key="item.title"
+            v-if="item.showIf !== false"
+            @click="(e) => item.click && item.click(e)"
+            v-bind="{to: item.to ? item.to : null}">
+            <v-list-tile-action>
+              <v-icon>{{item.icon}}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>
+                {{ $t(item.title) }}
+              </v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          </v-list>
+      </template>
     </v-list>
-    <v-divider></v-divider>
-    <v-list dense subheader>
-      <v-subheader>
-        {{ $t('settings') }}
-      </v-subheader>
-      <v-list-tile :to="{name: 'StudySelector', query: {to: $route.fullPath}}">
-        <v-list-tile-action>
-          <v-icon>assignment</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('change_study') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile :to="{name: 'locale', query: {to: $route.fullPath}}">
-        <v-list-tile-action>
-          <v-icon>language</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('change_locale') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile @click="toggleDarkTheme()">
-        <v-list-tile-action>
-          <v-icon>wb_sunny</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('toggle_dark') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-    </v-list>
-    <v-divider></v-divider>
-    <v-list dense subheader>
-      <v-subheader>
-        {{ $t('general') }}
-      </v-subheader>
-      <v-list-tile @click="copyCurrentLocation">
-        <v-list-tile-action>
-          <v-icon>location_searching</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('copy_url') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile
-        v-if="isInterview"
-        @click="emit('showConditionTags')">
-        <v-list-tile-action>
-          <v-icon>local_offer</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('condition_tags') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile @click="refresh()">
-        <v-list-tile-action>
-          <v-icon>refresh</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('refresh') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile @click="logout">
-        <v-list-tile-action>
-          <v-icon>exit_to_app</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{ $t('logout') }}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <!--<v-list-tile-->
-        <!--v-if="isCordovaBuild"-->
-        <!--@click="toggleOffline">-->
-        <!--<v-list-tile-action>-->
-          <!--<v-icon>exit_to_app</v-icon>-->
-        <!--</v-list-tile-action>-->
-        <!--<v-list-tile-content>-->
-          <!--<span v-if="global.offline">{{$t('offline')}}</span>-->
-          <!--<span v-else>{{$t('online')}}</span>-->
-        <!--</v-list-tile-content>-->
-      <!--</v-list-tile>-->
-      <v-list-tile :to="{name: 'Info'}">
-        <v-list-tile-action>
-          <v-icon>info</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            {{$t('information')}}
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <v-list-tile
-        v-if="isDebug"
-        :to="{ name: 'ServiceTesting' }">
-        <v-list-tile-action>
-          <v-icon>build</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>
-            Service Testing
-          </v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-    </v-list>
+    <TrellisModal
+      v-model="showPasswordModal"
+      :title="$t('change_password')">
+      <UserPassword :user="global.user" />
+    </TrellisModal>
   </v-flex>
 </template>
 
@@ -205,11 +51,18 @@
   import storage from '../../services/StorageService'
   import global from '../../static/singleton'
   import {APP_ENV} from '../../static/constants'
+  import UserPassword from '../user/UserPassword'
+  import TrellisModal from '../TrellisModal'
+  import IsAdminMixin from '../../mixins/IsAdminMixin'
+  import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
 
   export default {
+    mixins: [ IsAdminMixin, IsLoggedInMixin],
+    components: { UserPassword, TrellisModal},
     name: 'dropdown-menu',
     data: () => ({
-      global
+      global,
+      showPasswordModal: false
     }),
     methods: {
       refresh () {
@@ -252,6 +105,9 @@
         storage.clear()
         SingletonService.setOnlineOffline(offline)
         setTimeout(() => this.refresh(), 50)
+      },
+      changePassword () {
+        this.showPasswordModal = true
       }
     },
     computed: {
@@ -263,6 +119,87 @@
       },
       isInterview () {
         return this.$route.name === 'Interview' || this.$route.name === 'InterviewPreview'
+      },
+      sections () {
+        return [{
+          items: [{
+            title: 'respondents',
+            icon: 'group',
+            to: {name: 'RespondentsSearch'}
+          }, {
+            title: 'locations',
+            icon: 'place',
+            to: {name: 'GeoSearch'}
+          }, {
+            showIf: !this.global.offline,
+            to: {name: 'SyncAdmin'},
+            icon: 'sync',
+            title: 'sync'
+          }, {
+            showIf: this.isWeb && this.isAdmin,
+            to: {name: 'Users'},
+            icon: 'recent_actors',
+            title: 'users'
+          }, {
+            showIf: this.global.offline,
+            to: {name: 'Sync'},
+            icon: 'sync',
+            title: 'sync'
+          }, {
+            showIf: this.isDebug,
+            to: {name: 'Documentation'},
+            icon: 'help',
+            title: 'documentation'
+          }]
+        }, {
+          title: 'settings',
+          items: [{
+            to: {name: 'StudySelector', query: {to: this.$route.fullPath}},
+            icon: 'assignment',
+            title: 'change_study'
+          }, {
+            title: 'change_locale',
+            icon: 'language',
+            to: {name: 'locale', query: {to: this.$route.fullPath}}
+          }, {
+            click: this.toggleDarkTheme,
+            icon: 'wb_sunny',
+            title: 'toggle_dark'
+          }]
+        }, {
+          title: 'general',
+          items: [{
+            to: {name: 'Info'},
+            icon: 'info',
+            title: 'information'
+          }, {
+            showIf: this.isInterview,
+            click: () => this.emit('showConditionTags'),
+            icon: 'local_offer',
+            title: 'condition_tags'
+          }, {
+            click: this.logout,
+            icon: 'exit_to_app',
+            title: 'logout'
+          }, {
+            click: this.changePassword,
+            icon: 'settings_backup_restore',
+            title: 'change_password'
+          }, {
+            click: this.copyCurrentLocation,
+            icon: 'location_searching',
+            title: 'copy_url'
+          }, {
+            click: this.refresh,
+            icon: 'refresh',
+            title: 'refresh'
+          }, {
+            showIf: this.isDebug,
+            to: { name: 'ServiceTesting' },
+            icon: 'build',
+            title: 'Service Testing'
+          }]
+        }]
       }
     }
   }
