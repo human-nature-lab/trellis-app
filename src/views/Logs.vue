@@ -61,7 +61,8 @@
           color="white">
           <v-layout column>
             <v-flex
-              v-for="prop in ['message', 'fullMessage', 'component', 'syncId', 'interviewId', 'deviceId', 'userId', 'version', 'offline', 'uploadedAt']">
+              v-for="prop in ['message', 'fullMessage', 'component', 'syncId', 'interviewId', 'deviceId', 'userId', 'version', 'offline', 'uploadedAt']"
+              :key="prop">
               <v-layout>
                 <v-flex class="subheader">{{prop}}</v-flex>
                 <v-flex>{{fullLog[prop]}}</v-flex>

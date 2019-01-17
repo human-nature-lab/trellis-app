@@ -1,8 +1,5 @@
 <template>
   <v-form ref="form" v-model="formIsValid">
-    <v-flex class="display-2">
-      {{isNewUser ? $t('new_user_title') : $t('edit_user_title', [newUser.name])}}
-    </v-flex>
     <v-text-field
       v-model="newUser.name"
       :rules="nameRules"
@@ -34,26 +31,23 @@
         {{$t('change_password')}}
       </v-btn>
     </v-flex>
-    <v-dialog v-model="passwordModal" lazy>
-      <v-card>
-        <v-container>
-          <UserEditPassword :user="newUser"/>
-        </v-container>
-      </v-card>
-    </v-dialog>
+    <TrellisModal
+      v-model="passwordModal"
+      :title="$t('change_password')">
+      <UserPassword :user="user" />
+    </TrellisModal>
   </v-form>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
   import User from "../../entities/trellis/User"
-  import UserEditPassword from './UserEditPassword'
-  import UserService from "../../services/user/UserService"
+  import TrellisModal from "../TrellisModal"
+  import UserPassword from './UserPassword'
   import global from '../../static/singleton'
   import PasswordField from './PasswordField'
-  import merge from 'lodash/merge'
-  import isEqual from 'lodash/isEqual'
   import Role from "./Role"
+  import IsAdminMixin from "../../mixins/IsAdminMixin"
 
   interface UserLike {
     id?: string
@@ -72,13 +66,11 @@
   }
 
   export default Vue.extend({
-    components: {UserEditPassword, PasswordField},
-    name: 'UserEdit',
+    name: 'UserEditModal',
+    mixins: [ IsAdminMixin ],
+    components: { UserPassword, PasswordField, TrellisModal },
     created () {
       this.userChange(this.user)
-    },
-    updated () {
-      console.log('arguments', arguments)
     },
     computed: {
       hasChanges (): boolean {
@@ -104,9 +96,6 @@
       usernameRules (): Function[] {
         return [] // TODO: Verify that there aren't special characters
       },
-      isAdmin (): boolean {
-        return !!this.global && !!this.global.user && this.global.user.role === Role.ADMIN
-      },
       isSameUser (): boolean {
         return !!this.global.user && !!this.newUser && this.global.user.id === this.newUser.id
       },
@@ -114,6 +103,7 @@
         return !this.newUser || !this.newUser.id
       },
       canChangePassword (): boolean {
+        // @ts-ignore
         const r = this.isAdmin || (!!this.newUser && !!this.global.user && this.newUser.id === this.global.user.id)
         console.log('can change password', r)
         return r
@@ -128,7 +118,7 @@
       }
     },
     data () {
-      const d = {
+      return {
         global: global,
         formIsValid: false as boolean,
         passwordModal: false,
@@ -141,7 +131,6 @@
           role: this.user.role
         } : Object.assign({}, defaultUser) as UserLike
       }
-      return d
     },
     props: {
       user: Object as () => User
@@ -151,7 +140,6 @@
         return this.formIsValid && this.hasChanges
       },
       userChange (newUser) {
-        console.log('user change', this.newUser, newUser)
         for (let key in this.newUser) {
           this.newUser[key] = newUser ? newUser[key] : defaultUser[key]
         }

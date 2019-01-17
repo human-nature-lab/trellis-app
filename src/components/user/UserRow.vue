@@ -32,11 +32,12 @@
   import User from "../../entities/trellis/User"
   import StudyService from "../../services/study/StudyService"
   import UserService from "../../services/user/UserService"
-  import UserStudy from "../../entities/trellis/UserStudy"
   import global from '../../static/singleton'
+  import IsAdminMixin from "../../mixins/IsAdminMixin"
 
   export default Vue.extend({
     name: 'UserRow',
+    mixins: [IsAdminMixin],
     props: {
       user: Object as () => User
     },
@@ -47,10 +48,8 @@
         },
         set (val) {}
       },
-      isAdmin (): boolean {
-        return !!this.global && !!this.global.user && this.global.user.role === 'ADMIN'
-      },
       isAdminOrOwner (): boolean {
+        // @ts-ignore
         return this.isAdmin || (!!this.user && this.user.id === this.global.user.id)
       }
     },

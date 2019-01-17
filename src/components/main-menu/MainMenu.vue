@@ -10,14 +10,15 @@
         </v-flex>
       </v-toolbar>
       <template v-for="section in sections">
-        <v-divider></v-divider>
-        <v-list dense subheader>
+        <v-divider :key="section.title + 'divider'"></v-divider>
+        <v-list dense subheader :key="section.title + 'list'">
           <v-subheader v-if="section.title">
             {{ $t(section.title) }}
           </v-subheader>
           <v-divider v-if="section.title"></v-divider>
           <v-list-tile
             v-for="item in section.items"
+            :key="item.title"
             v-if="item.showIf !== false"
             @click="(e) => item.click && item.click(e)"
             v-bind="{to: item.to ? item.to : null}">
@@ -33,15 +34,11 @@
           </v-list>
       </template>
     </v-list>
-    <v-dialog
-      lazy
-      v-model="showPasswordModal">
-      <v-card>
-        <v-container>
-          <UserEditPassword :user="global.user"/>
-        </v-container>
-      </v-card>
-    </v-dialog>
+    <TrellisModal
+      v-model="showPasswordModal"
+      :title="$t('change_password')">
+      <UserPassword :user="global.user" />
+    </TrellisModal>
   </v-flex>
 </template>
 
@@ -54,10 +51,14 @@
   import storage from '../../services/StorageService'
   import global from '../../static/singleton'
   import {APP_ENV} from '../../static/constants'
-  import UserEditPassword from '../../components/user/UserEditPassword'
+  import UserPassword from '../user/UserPassword'
+  import TrellisModal from '../TrellisModal'
+  import IsAdminMixin from '../../mixins/IsAdminMixin'
+  import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
 
   export default {
-    components: { UserEditPassword },
+    mixins: [ IsAdminMixin, IsLoggedInMixin],
+    components: { UserPassword, TrellisModal},
     name: 'dropdown-menu',
     data: () => ({
       global,
@@ -69,13 +70,6 @@
       },
       emit (eventName, ...args) {
         menuBus.$emit(eventName, ...args)
-      },
-      getItemProps (item) {
-        const keys = ['icon', 'title', 'to']
-        const props = {}
-      },
-      getItemOn (item) {
-        const on = {}
       },
       copyCurrentLocation () {
         try {
@@ -126,9 +120,6 @@
       isInterview () {
         return this.$route.name === 'Interview' || this.$route.name === 'InterviewPreview'
       },
-      isLoggedIn () {
-        return !!this.global && !!this.global.user
-      },
       sections () {
         return [{
           items: [{
@@ -145,7 +136,7 @@
             icon: 'sync',
             title: 'sync'
           }, {
-            showIf: this.isWeb,
+            showIf: this.isWeb && this.isAdmin,
             to: {name: 'Users'},
             icon: 'recent_actors',
             title: 'users'

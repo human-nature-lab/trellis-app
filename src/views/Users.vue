@@ -7,7 +7,7 @@
         </v-toolbar-title>
         <v-spacer />
         <v-btn
-          :disabled="!canAddUser"
+          :disabled="!isAdmin"
           icon
           @click="userToEdit = null; showEditUser = true">
           <v-icon>add</v-icon>
@@ -18,6 +18,8 @@
         :items="users"
         :loading="isLoading"
         :total-items="total"
+        :rows-per-page-items="[25, 50, 100]"
+        :rows-per-page-text="$t('rows_per_page')"
         :pagination.sync="pagination">
         <UserRow
           slot="items"
@@ -27,13 +29,13 @@
           @delete="deleteUser(props.item)" />
       </v-data-table>
     </v-container>
-    <v-dialog v-model="showEditUser" lazy>
-      <v-card>
-        <v-container>
-          <UserEdit :user="userToEdit" @save="saveUser" />
-        </v-container>
-      </v-card>
-    </v-dialog>
+    <TrellisModal
+      v-model="showEditUser"
+      :title="!userToEdit ? $t('new_user_title') : $t('edit_user_title', [userToEdit.name])">
+      <UserEdit
+        :user="userToEdit"
+        @save="saveUser" />
+    </TrellisModal>
   </v-flex>
 </template>
 
@@ -42,19 +44,18 @@
   import UserEdit from '../components/user/UserEdit'
   import UserRow from '../components/user/UserRow'
   import UserService from '../services/user/UserService'
+  import TrellisModal from '../components/TrellisModal'
   import Vue from 'vue'
   import DocsLinkMixin from "../mixins/DocsLinkMixin"
+  import IsAdminMixin from "../mixins/IsAdminMixin"
   import DocsFiles from "../components/documentation/DocsFiles"
   import Role from "../components/user/Role"
-  import global from '../static/singleton'
 
   export default Vue.extend({
     name: 'Users',
-    components: {UserRow, UserEdit},
+    components: { UserRow, UserEdit, TrellisModal },
+    mixins: [DocsLinkMixin(DocsFiles.users.intro), IsAdminMixin],
     computed: {
-      canAddUser (): boolean {
-        return !!this.global.user && this.global.user.role === Role.ADMIN
-      },
       headers () {
         return [{
           text: 'Name',
@@ -84,7 +85,6 @@
     },
     data () {
       return {
-        global,
         users: [],
         total: 25,
         showEditUser: false,
@@ -98,16 +98,10 @@
         }
       }
     },
-    mixins: [DocsLinkMixin(DocsFiles.users.intro)],
     methods: {
       async editUser (user: User) {
         this.showEditUser = true
         this.userToEdit = user
-      },
-      updatePage (pagination) {
-        debugger
-        this.pagination = pagination
-        this.loadUsers()
       },
       async loadUsers () {
         this.isLoading = true
@@ -118,34 +112,46 @@
         this.isLoading = false
       },
       async deleteUser (user: User) {
-        if (confirm(this.$t('delete_user') as string)) {
+        if (confirm(this.$t('confirm_resource_delete', [user.name]) as string + ' ' + this.$t('cannot_undo'))) {
           try {
             await UserService.deleteUser(user.id)
             const index = this.users.indexOf(user)
             if (index > -1) {
               this.users.splice(index, 1)
             }
-            this.alert('success', this.$t('user_deleted'))
+            this.alert('success', this.$t('resource_deleted', [user.name]))
           } catch (err) {
-            this.alert('error', this.$t('delete_user_failed'))
+            this.alert('error', this.$t('failed_resource_delete', [user.name]))
           }
         }
       },
-      async saveUser (user: User) {
+      async createUser (user: User) {
         try {
-          if (user.id) {
-            user = await UserService.updateUser(user)
-            const index = this.users.findIndex(u => user.id === u.id)
-            this.users.splice(index, 1, user)
-          } else {
-            user = await UserService.createUser(user)
-            this.users.push(user)
-          }
-          this.alert('success', this.$t('user_updated'))
+          user = await UserService.createUser(user)
+          this.users.push(user)
+          this.alert('success', this.$t('resource_created', [user.name]))
           this.showEditUser = false
         } catch (err) {
-          this.alert('error', this.$t('user_update_error'))
+          this.alert('error', this.$t('failed_resource_create', [user.name]))
         }
+      },
+      async updateUser (user: User) {
+        try {
+          user = await UserService.updateUser(user)
+          const index = this.users.findIndex(u => user.id === u.id)
+          this.users.splice(index, 1, user)
+          this.alert('success', this.$t('resource_updated', [user.name]))
+          this.showEditUser = false
+        } catch (err) {
+          this.alert('error', this.$t('failed_resource_update', [user.name]))
+        }
+      },
+      async saveUser (user: User) {
+          if (user.id) {
+            this.updateUser(user)
+          } else {
+            this.createUser(user)
+          }
       }
     }
   })
