@@ -5,10 +5,11 @@
           <v-list-tile v-for="geo in geos" :key="geo.id">
             <v-list-tile-content>
               <span v-if="geo.nameTranslation">
-                <GeoBreadcrumbs
+                <geo-breadcrumbs
                   :canNavigate="false"
                   :geoId="geo.id"
-                  :maxDepth="3" />
+                  :maxDepth="3">
+                </geo-breadcrumbs>
               </span>
               <span v-else>
                 {{ $t('loading') }}
@@ -32,15 +33,17 @@
         content-class="geo-search-dialog"
         lazy
         v-model="geoSearchDialog">
-        <ModalTitle
+        <modal-title
           :title="$t('location_search')"
-          @close="geoSearchDialog=false"/>
-        <GeoSearch
+          @close="geoSearchDialog=false">
+        </modal-title>
+        <geo-search
           :showCart="true"
           :isSelectable="isGeoSelectable"
           :selectedGeos="selectedGeos"
           :shouldUpdateRoute="false"
-          @doneSelecting="onDoneSelecting" />
+          @doneSelecting="onDoneSelecting">
+        </geo-search>
       </v-dialog>
     </v-flex>
 </template>
