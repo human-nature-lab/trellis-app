@@ -3,6 +3,7 @@ import User from '../../entities/trellis/User'
 import { UserServiceAbstract } from './UserServiceAbstract'
 import {adminInst} from "../http/AxiosInstance";
 import UserStudy from "../../entities/trellis/UserStudy";
+import Pagination from "../../types/Pagination";
 
 export class UserServiceWeb extends UserServiceAbstract {
 
@@ -28,11 +29,17 @@ export class UserServiceWeb extends UserServiceAbstract {
     return this._currentUserRequest
   }
 
-  async getPage (page: number = 0, size: number = 100): Promise<User[]> {
+  async getPage (page: number = 0, size: number = 100, sortBy: string = 'name', descending: boolean = false): Promise<Pagination<User>> {
     const res = await adminInst.get('user', {
-      params: { page, size, study: 1 }
+      params: { page, size, sortBy, descending: descending ? 1 : 0, study: 1 }
     })
-    return res.data.users.map(u => new User().fromSnakeJSON(u))
+    const users = res.data.users.map(u => new User().fromSnakeJSON(u))
+    return {
+      total: res.data.total,
+      count: res.data.count,
+      start: res.data.start,
+      data: users
+    }
   }
 
   async createUser (user: User): Promise<User> {

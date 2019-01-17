@@ -1,5 +1,6 @@
 import User from '../../entities/trellis/User'
 import UserStudy from "../../entities/trellis/UserStudy";
+import Pagination from "../../types/Pagination";
 
 export abstract class UserServiceAbstract {
 
@@ -45,7 +46,7 @@ export abstract class UserServiceAbstract {
   /**
    * Get all users
    */
-  abstract getPage(page?: number, size?: number): Promise<User[]>
+  abstract getPage(page?: number, size?: number, sortBy?: string, descending?: boolean): Promise<Pagination<User>>
 
   /**
    * Create a new user

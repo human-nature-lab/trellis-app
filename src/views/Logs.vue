@@ -98,7 +98,7 @@
   import Vue from 'vue'
   import {defaultLoggingService} from "../services/logging/LoggingService"
   import Log from "../entities/trellis-config/Log"
-  import ModalTitle from './ModalTitle'
+  import ModalTitle from '../components/ModalTitle'
   import uploadLogs from "../services/upload/UploadLogs"
   import DeleteLogs from "../services/upload/DeleteLogs"
 
@@ -212,7 +212,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>
