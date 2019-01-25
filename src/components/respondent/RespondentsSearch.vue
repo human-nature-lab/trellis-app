@@ -318,8 +318,8 @@
           this.filtersIsOpen = true
         }
       }
-      this.loadConditionTags()
       this.getCurrentPage()
+      this.loadConditionTags()
     },
     methods: {
       leaving () {
