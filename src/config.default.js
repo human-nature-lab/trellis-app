@@ -6,6 +6,14 @@ export default {
   debug: true,
   xKey: 'rXghvr7C1Q8dRmhX2Lyl3wC62TyoAr95',
   apiRoot: 'http://10.0.1.201',
+  mapTileLayer: {
+    url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}',
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 20,
+    id: 'mapbox.emerald',
+    accessToken: '',
+    style: 'mapbox://styles/mapbox/streets-v10'
+  },
   logging: {
     console: true,    // default true
     rate: 500,        // default: 0 -> messages are written to disk immediately
