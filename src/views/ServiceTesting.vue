@@ -70,13 +70,12 @@
 
 <script>
   /*global mocha*/
-  // import DatabaseServiceCordova from '../services/database/DatabaseServiceCordova'
   import LoginServiceCordova from '../services/login/LoginServiceCordova'
   import LoginServiceWeb from '../services/login/LoginServiceWeb'
   import config from '../config'
   import {randomFrom} from '../classes/M'
   import 'mocha/mocha.js'
-  import testModules from '../../test/services'
+  import testModules from '../../test/services/index'
 
   let runner
   export default {

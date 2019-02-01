@@ -44,6 +44,10 @@ class StudyServiceCordova extends StudyServiceAbstract {
       return await this.getUserStudies(user.id)
     }
   }
+
+  async getAllStudies (): Promise<Study[]> {
+    throw Error('Not implemented')
+  }
 }
 
 export default StudyServiceCordova
