@@ -165,8 +165,6 @@
           iconUrl: require('leaflet/dist/images/marker-icon.png'),
           shadowUrl: require('leaflet/dist/images/marker-shadow.png')
         })
-        // TODO: before releasing to open source, switch to this tile layer. L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        // TODO: consider making the tile layer and accessToken configurable
         L.tileLayer(config.mapTileLayer.url, {
           attribution: config.mapTileLayer.attribution,
           maxZoom: config.mapTileLayer.maxZoom,
