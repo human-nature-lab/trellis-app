@@ -201,19 +201,6 @@
         section: null
       }
     },
-    errorCaptured (err, vm, info) {
-      try {
-        if (err) {
-          if (!err.interviewId) {
-            err.interviewId = this.interview.id
-          }
-        }
-        this.log(err)
-        this.alert('error', info, {timeout: 0})
-      } catch (nerr) {
-        console.error(nerr)
-      }
-    },
     created () {
       actionBus.$on('action', this.actionHandler)
       menuBus.$on('showConditionTags', this.showConditionTags)

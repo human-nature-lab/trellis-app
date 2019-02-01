@@ -9,7 +9,8 @@
           routeName="Documentation"
           paramName="filePath"
           :fileName="currentFile"
-          :markdown="markdown" />
+          :markdown="markdown"
+          :target="target"/>
       </v-layout>
       <v-layout v-else>{{$t('loading')}}</v-layout>
     </v-container>
@@ -49,10 +50,21 @@
       }
     },
     computed: {
+      parts (): string[] {
+        return this.currentFile.split('#')
+      },
+      target (): string|null {
+        return this.parts.length > 1 ? this.parts[1] : null
+      },
+      fileKey (): string {
+        const fileName = this.parts[0]
+        return fileName.slice(-3) === '.md' ? fileName : fileName + '.md'
+      },
       markdown (): string {
         console.log('Current documentation file', this.currentFile, this.content)
-        if (this.isReady && this.content[this.currentFile]) {
-          return this.content[this.currentFile]
+        console.log('key', this.fileKey, 'target', this.target)
+        if (this.isReady && this.content[this.fileKey]) {
+          return this.content[this.fileKey]
         } else {
           return 'Unknown file'
         }
