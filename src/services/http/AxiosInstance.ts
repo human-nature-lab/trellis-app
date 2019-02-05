@@ -20,6 +20,32 @@ export function removeToken () {
   storage.delete(TOKEN_KEY)
 }
 
+function requestInterceptor (request) {
+  request.headers['X-Token'] = storage.get(TOKEN_KEY)
+  return request
+}
+
+function responseInterceptor (response) {
+  if (response.status === 401) {
+    return Promise.reject('Not logged in')
+  }
+  return response
+}
+
+function responseError (err) {
+  if (err.response && err.response.status === 401) {
+    let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
+    singleton.loading.active = false
+    if (router.currentRoute.name === 'login') {
+      return Promise.reject(err.response)
+    } else {
+      router.replace({name: 'Login', query: {to: nextRoute}})
+      return Promise.resolve(err.response)
+    }
+  }
+  return Promise.reject(err)
+}
+
 /**
  * Create the default axios instance. Any authentication for the web app should probably be handled here if possible
  * @returns {Axios}
@@ -33,28 +59,8 @@ export default function defaultInstance (): AxiosInstance {
     })
 
     // Handle authentication using axios [interceptors](https://github.com/axios/axios#interceptors)
-    defaultInst.interceptors.request.use(function (request) {
-      request.headers['X-Token'] = storage.get(TOKEN_KEY)
-      return request
-    })
-    defaultInst.interceptors.response.use(function (response) {
-      if (response.status === 401) {
-        return Promise.reject('Not logged in')
-      }
-      return response
-    }, function (err) {
-      if (err.response && err.response.status === 401) {
-        let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
-        singleton.loading.active = false
-        if (router.currentRoute.name === 'login') {
-          return Promise.reject(err.response)
-        } else {
-          router.replace({name: 'Login', query: {to: nextRoute}})
-          return Promise.resolve(err.response)
-        }
-      }
-      return Promise.reject(err)
-    })
+    defaultInst.interceptors.request.use(requestInterceptor)
+    defaultInst.interceptors.response.use(responseInterceptor, responseError)
   }
   return defaultInst
 }
@@ -78,3 +84,11 @@ export async function syncInstance (): Promise<AxiosInstance>  {
   }
   return syncInst
 }
+
+export const adminInst = axios.create({
+  baseURL: config.apiRoot,
+  headers: {'X-Key': config.xKey}
+})
+
+adminInst.interceptors.request.use(requestInterceptor)
+adminInst.interceptors.response.use(responseInterceptor, responseError)

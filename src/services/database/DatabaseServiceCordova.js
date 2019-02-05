@@ -74,7 +74,7 @@ const trellisConfigConnection = {
     Log,
     Sync
   ],
-  logging: true,
+  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error'],
   synchronize: true
 }
 

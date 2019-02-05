@@ -23,10 +23,6 @@ export default Vue.mixin({
       AddSnack(msg, config)
     }
   },
-  errorCaptured (err: Error, vm: Vue, info: string) {
-    // @ts-ignore
-    this.log(err)
-  },
   computed: {
     isWeb (): boolean {
       return config.appEnv === APP_ENV.WEB
@@ -48,5 +44,7 @@ declare module 'vue/types/vue' {
     isWeb: boolean
     isCordova: boolean
     isDebug: boolean
+    hydrate (data: any): any
+    leaving (): any
   }
 }
