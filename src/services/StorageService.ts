@@ -2,15 +2,14 @@
  * Simple storage that will persist things in localStorage and cache them in memory if they are still being used
  */
 export class StorageService {
-  constructor () {
-    this.data = new Map()
-  }
+  private data: Map<string, any> = new Map()
+  constructor (private cacheResults: boolean = true) {}
 
   /**
    * Clear all items out of local storage
    */
   clear () {
-    this.data = new Map()
+    this.data.clear()
     window.localStorage.clear()
   }
 
@@ -21,7 +20,7 @@ export class StorageService {
    * @returns {any}
    * @private
    */
-  _getLocalStorage (name) {
+  _getLocalStorage (name: string): any {
     try {
       let o = JSON.parse(window.localStorage.getItem(name))
       return o.d
@@ -36,13 +35,9 @@ export class StorageService {
    * @param data
    * @private
    */
-  _setLocalStorage (name, data) {
+  _setLocalStorage (name: string, data: any) {
     let o = {
-      t: 'object',
       d: data
-    }
-    if (typeof data === 'string') {
-      o.t = 'string'
     }
     window.localStorage.setItem(name, JSON.stringify(o))
   }
@@ -52,13 +47,15 @@ export class StorageService {
    * @param {String} key
    * @returns {*|null}
    */
-  get (key) {
-    if (this.data.has(key)) {
+  get (key: string) {
+    if (this.cacheResults && this.data.has(key)) {
       return this.data.get(key)
     }
     let local = this._getLocalStorage(key)
-    if (local !== undefined && local !== null) {
-      this.data.set(key, local)
+    if (local != null) {
+      if (this.cacheResults) {
+        this.data.set(key, local)
+      }
       return local
     } else {
       return null
@@ -71,9 +68,11 @@ export class StorageService {
    * @param {*} data - Must be JSON serializable
    * @returns {*}
    */
-  set (key, data) {
+  set (key: string, data: any) {
     this._setLocalStorage(key, data)
-    this.data.set(key, data)
+    if (this.cacheResults) {
+      this.data.set(key, data)
+    }
     return data
   }
 
@@ -81,10 +80,25 @@ export class StorageService {
    * Delete a key from local storage
    * @param {String} key
    */
-  delete (key) {
-    this.data.delete(key)
+  delete (key: string) {
+    if (this.cacheResults) {
+      this.data.delete(key)
+    }
     window.localStorage.removeItem(key)
   }
+
+
+  /** Aliases for localStorage API **/
+  setItem (key: string, data: any) {
+    return this.set(key, data)
+  }
+  getItem (key: string): any {
+    return this.get(key)
+  }
+  removeItem (key: string) {
+    return this.delete(key)
+  }
+
 }
 
 export default new StorageService()
