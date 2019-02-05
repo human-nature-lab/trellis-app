@@ -13,6 +13,8 @@ var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 var loadMinified = require('./load-minified')
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var MiniCssExtractPlugin = require("mini-css-extract-plugin");
+var SentryPlugin = require('@sentry/webpack-plugin')
+var sentryRelease = require('./utils').sentryRelease()
 
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
@@ -120,6 +122,10 @@ var webpackConfig = merge(baseWebpackConfig, {
       staticFileGlobs: ['dist/**/*.{js,html,css}'],
       minify: true,
       stripPrefix: 'dist/'
+    }),
+    new SentryPlugin({
+      release: sentryRelease,
+      include: './dist'
     })
   ]
 })
