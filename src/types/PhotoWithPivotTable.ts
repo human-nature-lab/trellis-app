@@ -25,8 +25,8 @@ export default class PhotoWithPivotTable {
       entityId = joinTable.datumId
     }
 
-    this.id = joinTable.photo.id
-    this.fileName = joinTable.photo.id
+    this.id = (joinTable.photo) ? joinTable.photo.id : null
+    this.fileName = (joinTable.photo) ? joinTable.photo.fileName : null
     let pivot = new PhotoPivotTable()
     pivot.id = joinTable.id
     pivot.sortOrder = joinTable.sortOrder

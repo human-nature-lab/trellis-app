@@ -1,5 +1,5 @@
 const Sync = () => import(/* webpackChunkName: "sync" */'../components/sync/Sync')
-const Logs = () => import(/* webpackChunkName: "logs" */'../components/Logs')
+const Logs = () => import(/* webpackChunkName: "logs" */'../views/Logs')
 const Storage = () => import(/* webpackChunkName: "storage" */'../components/Storage')
 
 export default [{

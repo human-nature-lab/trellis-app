@@ -24,19 +24,24 @@ export default abstract class StudyServiceAbstract {
    * @param {string} studyId
    * @returns {Promise<Study>}
    */
-  abstract getStudy(studyId): Promise<Study|undefined>
+  abstract getStudy(studyId): PromiseLike<Study|undefined>
 
   /**
    * Get all of the studies assigned to me
-   * @returns {Promise<Study[]>}
+   * @returns {PromiseLike<Study[]>}
    */
-  abstract getMyStudies(): Promise<Study[]>
+  abstract getMyStudies(): PromiseLike<Study[]>
 
   /**
    * Get all studies assigned to a user
    * @param {string} userId
-   * @returns {Promise<Study[]>}
+   * @returns {PromiseLike<Study[]>}
    */
-  abstract getUserStudies(userId: string): Promise<Study[]>
+  abstract getUserStudies(userId: string): PromiseLike<Study[]>
+
+  /**
+   * Get all studies
+   */
+  abstract getAllStudies (): PromiseLike<Study[]>
 }
 
