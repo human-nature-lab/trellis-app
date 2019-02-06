@@ -193,6 +193,7 @@
     margin-top: 2px
   .navigation-drawer
     z-index: 1600
+    padding: 0
   .dialog
     z-index: 1600
   .overlay
