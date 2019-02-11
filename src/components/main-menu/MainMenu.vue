@@ -151,6 +151,10 @@
             icon: 'recent_actors',
             title: 'users'
           }, {
+            to: {name: 'Forms'},
+            icon: 'library_books',
+            title: 'forms'
+          }, {
             to: {name: 'Reports'},
             icon: 'save',
             title: 'reports'

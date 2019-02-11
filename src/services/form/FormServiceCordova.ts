@@ -62,4 +62,12 @@ export default class FormServiceCordova implements FormServiceInterface {
     return form
   }
 
+  createForm (studyId: string, form: Form): Promise<Form> {
+    throw Error('Not implemented')
+  }
+
+  updateForm (studyId: string, formId: string, form: Form): Promise<Form> {
+    throw Error('Not implemented')
+  }
+
 }

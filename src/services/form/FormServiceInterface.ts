@@ -18,4 +18,19 @@ export default interface FormServiceInterface {
    */
   getForm (formId: string, bareBones: boolean): Promise<Form>
 
+  /**
+   * Create a new form in the database
+   * @param studyId
+   * @param form
+   */
+  createForm (studyId: string, form: Form): Promise<Form>
+
+  /**
+   * Update an existing form in the database
+   * @param studyId
+   * @param formId
+   * @param form
+   */
+  updateForm (studyId: string, formId: string, form: Form): Promise<Form>
+
 }
