@@ -20,6 +20,8 @@ import Interview from "../../../entities/trellis/Interview";
 import Datum from "../../../entities/trellis/Datum";
 import InterviewAlligator from "../services/InterviewAlligator";
 import {defaultLoggingService as logger} from "../../../services/logging/LoggingService";
+import Choice from "../../../entities/trellis/Choice";
+import QT from "../../../static/question.types";
 
 export default class InterviewManagerBase extends Emitter {
 
@@ -33,6 +35,7 @@ export default class InterviewManagerBase extends Emitter {
   protected varNameIndex: Map<string, string> = new Map()
   protected questionIdToSectionIndex: Map<string, Section> = new Map()
   protected questionIdToPageIndex: Map<string, Page> = new Map()
+  protected choiceIndex: Map<string, Choice> = new Map()
   protected initialLocation!: InterviewLocation
 
   public questionIndex: Map<string, Question> = new Map()
@@ -82,6 +85,9 @@ export default class InterviewManagerBase extends Emitter {
             question.choices.sort((cA, cB) => {
               return cA.sortOrder - cB.sortOrder
             })
+            for (let qc of question.choices) {
+              this.choiceIndex.set(qc.choiceId, qc.choice)
+            }
           }
           this.questionIdToPageNum.set(question.id, p)
           this.questionIdToSectionNum.set(question.id, s)
@@ -226,21 +232,29 @@ export default class InterviewManagerBase extends Emitter {
       if (!question.datum || !question.datum.data) {
         throw new Error('question datum and data should already exist!')
       }
-      switch (question.questionType.name) {
-        case 'multiple_select':
-        case 'relationship':
-        case 'geo':
-        case 'photo':
-          vars[question.varName] = question.datum.data.map(datum => datum.val)
+      switch (question.questionTypeId) {
+        case QT.multiple_select:
+          vars[question.varName] = question.datum.data.map(d => this.choiceIndex.get(d.choiceId).val)
           break
-        case 'intro':
+        case QT.relationship:
+        case QT.geo:
+        case QT.image:
+        case QT.respondent_geo:
+          vars[question.varName] = question.datum.data.map(d => d.val)
+          break
+        case QT.intro:
           vars[question.varName] = true
+          break
+        case QT.multiple_choice:
+          vars[question.varName] = !!question.datum.data.length && !!question.datum.data[0].choiceId ?
+            this.choiceIndex.get(question.datum.data[0].choiceId).val : undefined
           break
         default:
           vars[question.varName] = question.datum.data.length ? question.datum.data[0].val : undefined
       }
       return vars
     }, {})
+    console.log('condition assignment vars', JSON.stringify(vars))
     for (let question of questionsWithData) {
       for (let act of question.assignConditionTags) {
         try {

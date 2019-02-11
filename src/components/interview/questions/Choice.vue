@@ -19,6 +19,7 @@
     <v-text-field
       solo
       single-line
+      :disabled="disabled"
       :placeholder="$t('other')"
       v-if="choice.isSelected && choice.isOther"
       :value="choice.otherText"

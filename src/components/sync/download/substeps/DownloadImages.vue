@@ -165,7 +165,11 @@
           this.loggingService.log({
             severity: 'info',
             message: this.$t('operation_cancelled')
-          }).then((result) => { this.currentLog = result })
+          }).then((result) => {
+            if (this) {
+              this.currentLog = result
+            }
+          })
         }
       },
       components: {

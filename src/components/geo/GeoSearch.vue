@@ -41,7 +41,7 @@
               </v-chip>
             </template>
           </Cart>
-          <v-divider v-if="showCart" />
+          <v-divider v-if="showCart"></v-divider>
           <v-container
             v-ripple
             v-if="lastParentIds.length > 1"
@@ -73,7 +73,7 @@
             :key="geo.id"
             :geo="geo">
           </geo-list-tile>
-          <v-divider />
+          <v-divider></v-divider>
           <v-list-tile v-if="results.length === defaultSearchResultsLimit">
             <v-list-tile-content>
               <v-list-tile-title>
