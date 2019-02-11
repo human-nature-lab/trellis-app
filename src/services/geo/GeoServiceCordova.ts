@@ -91,7 +91,11 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     let photos: PhotoWithPivotTable[]  = []
     for (let i = 0; i < geoPhotos.length; i++) {
       let geoPhoto = geoPhotos[i]
-      photos.push(new PhotoWithPivotTable(geoPhoto))
+      // Fixes an issue where the location info page will not load
+      // if the respondent_photo table refers to a non-existent photo table row
+      if (geoPhoto.photoId !== null) {
+        photos.push(new PhotoWithPivotTable(geoPhoto))
+      }
     }
 
     return photos

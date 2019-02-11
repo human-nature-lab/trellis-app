@@ -195,6 +195,16 @@ export default class InterviewManager extends InterviewManagerBase {
    * @private
    */
   private onPageExit () {
+    // Remove any datum if they have responded with dk/rf
+    const questions = this.questionsWithData()
+    for (let question of questions) {
+      if (question.datum.dkRf != null) {
+        console.log('dkRf found. Removing data for question', question.id)
+        this.data.removeAllDatum(question.datum)
+      } else if (question.datum.dkRf === null) {
+        question.datum.dkRfVal = null
+      }
+    }
     this._evaluateConditionAssignment()
   }
 

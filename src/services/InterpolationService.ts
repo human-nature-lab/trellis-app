@@ -83,7 +83,7 @@ export default class InterpolationService {
       } else {
         vals = await InterpolationService.getInterpolatedData(questionDatum.data, question)
       }
-      return vals.join(',')
+      return vals.join(', ')
     } catch (err) {
       let fill = interviewManager.getRespondentFillByVarName(varName)
       if (fill) {
