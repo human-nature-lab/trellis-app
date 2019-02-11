@@ -6,6 +6,7 @@ export default {
   debug: true,
   xKey: '***REMOVED***',
   apiRoot: 'http://10.0.1.201',
+  formBuilderUrl: 'http://api.trellisandroid.net/#/form/{form_id}/builder',
   logging: {
     console: true,    // default true
     rate: 500,        // default: 0 -> messages are written to disk immediately

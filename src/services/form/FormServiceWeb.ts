@@ -1,4 +1,5 @@
 import http from '../http/AxiosInstance'
+import {adminInst} from '../http/AxiosInstance'
 import FormServiceInterface from './FormServiceInterface'
 import StudyForm from '../../entities/trellis/StudyForm'
 import Form from '../../entities/trellis/Form'
@@ -27,6 +28,18 @@ export class FormServiceWeb implements FormServiceInterface {
           throw Error('Unable to retrieve form')
         }
       })
+  }
+
+  async createForm (studyId: string, form: Form): Promise<Form> {
+    studyId = encodeURIComponent(studyId)
+    const res = await adminInst.post(`study/${studyId}/form`, {
+      form: form
+    })
+    return new Form().fromSnakeJSON(res.data.form)
+  }
+
+  async updateForm (studyId: string, formId: string, form: Form): Promise<Form> {
+    throw Error('Not implemented')
   }
 
 }
