@@ -6,6 +6,7 @@ const Interview = () => import(/* webpackChunkName: "interview" */'../components
 const RespondentsSearch = () => import(/* webpackChunkName: "respondents-search" */'../components/respondent/RespondentsSearch')
 const SyncAdmin = () => import(/* webpackChunkName: "sync-admin" */'../components/sync/admin/SyncAdmin.vue')
 const Users = () => import(/* webpackChunkName: "users" */'../views/Users')
+const Reports = () => import(/* webpackChunkName: "reports" */'../views/Reports')
 
 export default [{
   path: '/',
@@ -25,4 +26,9 @@ export default [{
   path: '/user',
   name: 'Users',
   component: Users
+}, {
+  path: '/reports',
+  name: 'Reports',
+  component: Reports,
+  beforeEnter: chain(ValidateStudy)
 }]
