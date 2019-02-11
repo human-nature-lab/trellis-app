@@ -11,7 +11,11 @@
       :label="$t('old_password')" />
     <PasswordField v-model="newPassword" />
     <v-flex>
-      <v-btn @click="save" :disabled="!formValid">{{$t('save')}}</v-btn>
+      <v-btn
+        @click="save"
+        :disabled="!formValid">
+        {{$t('save')}}
+      </v-btn>
     </v-flex>
   </v-form>
 </template>
@@ -51,6 +55,7 @@
             const res = await UserService.updatePassword(this.user, this.oldPassword, this.newPassword)
             const msg = this.$t('password_updated')
             this.alert('success', msg)
+            this.$emit('done')
           } catch (err) {
             this.alert('error', `Invalid password or permissions`, {timeout: 0})
           }

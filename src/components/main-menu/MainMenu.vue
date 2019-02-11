@@ -9,7 +9,9 @@
           {{ $t('logged_in_as', [global.user.username]) }}
         </v-flex>
       </v-toolbar>
-      <template v-for="section in sections">
+      <template
+        v-for="section in sections"
+        v-if="section.showIf !== false">
         <v-divider :key="section.title + 'divider'"></v-divider>
         <v-list dense subheader :key="section.title + 'list'">
           <v-subheader v-if="section.title">
@@ -37,7 +39,7 @@
     <TrellisModal
       v-model="showPasswordModal"
       :title="$t('change_password')">
-      <UserPassword :user="global.user" />
+      <UserPassword :user="global.user" @done="showPasswordModal = false" />
     </TrellisModal>
   </v-flex>
 </template>
@@ -136,20 +138,22 @@
             icon: 'sync',
             title: 'sync'
           }, {
-            showIf: this.isWeb && this.isAdmin,
-            to: {name: 'Users'},
-            icon: 'recent_actors',
-            title: 'users'
-          }, {
             showIf: this.global.offline,
             to: {name: 'Sync'},
             icon: 'sync',
             title: 'sync'
+          }]
+        }, {
+          title: 'admin',
+          showIf: this.isWeb && this.isAdmin,
+          items: [{
+            to: {name: 'Users'},
+            icon: 'recent_actors',
+            title: 'users'
           }, {
-            showIf: this.isDebug,
-            to: {name: 'Documentation'},
-            icon: 'help',
-            title: 'documentation'
+            to: {name: 'Reports'},
+            icon: 'save',
+            title: 'reports'
           }]
         }, {
           title: 'settings',
@@ -169,6 +173,11 @@
         }, {
           title: 'general',
           items: [{
+            showIf: this.isDebug,
+            to: {name: 'Documentation'},
+            icon: 'help',
+            title: 'documentation'
+          }, {
             to: {name: 'Info'},
             icon: 'info',
             title: 'information'

@@ -1,7 +1,7 @@
 # Users
 The users view allows privileged users to add, remove and modify users in the system. In Trellis, a user is someone who has the ability to administer surveys on behalf of a respondent. Depending on a user's role, they may also be able to add and modify forms, studies, languages, locations, etc.
 
-Trellis is a distributed, offline system which means that a full [sync](../Glossary#sync), will need to happen
+Trellis is a distributed, offline system which means that a full [sync](../Glossary#sync), will be required for any changes to users to get sent to a mobile device.
 
 ## Adding users
 To add a user click the **plus** icon in the top right corner of the page. This will open a dialog that has the required fields for a new user. Once all of the fields are filled out, click **save** to create the user.
