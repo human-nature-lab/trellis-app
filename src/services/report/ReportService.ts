@@ -44,19 +44,29 @@ class ReportService {
    * @param {string[]} reportIds
    * @returns {Promise<ReportStatus[]>}
    */
-  async getReportsZip (studyId: string, reportIds: string[]): Promise<Blob> {
+  async getReportsZip (studyId: string, reportIds: string[], progress?: (ev: ProgressEvent) => any): Promise<Blob> {
     studyId = encodeURIComponent(studyId)
     const res = await adminInst.get(`study/${studyId}/reports/download`, {
       responseType: 'blob',
       params: {
         reports: reportIds
+      },
+      onDownloadProgress (ev) {
+        if (progress) progress(ev)
       }
     })
     return res.data
   }
 
-  async getReports (reportIds: string[]): Promise<Report[]> {
-    throw new Error('Unimplemented')
+  /**
+   * Get one or more report objects from the server.
+   * @param studyId
+   * @param reportIds
+   */
+  async getReports (studyId: string, reportIds: string[]): Promise<Report[]> {
+    studyId = encodeURIComponent(studyId)
+    const res = await adminInst.get(`study/${studyId}/reports/${reportIds.join(',')}`)
+    return res.data.reports.map(r => new Report().fromSnakeJSON(r))
   }
 
 }
