@@ -37,7 +37,7 @@ export default [{
   path: '/form/:formId/builder',
   name: 'FormBuilder',
   component: FormBuilder,
-  beforeEnter: chain(ValidateStudy)
+  beforeEnter: chain(ValidateStudy, ValidateLocale)
 }, {
   path: '/forms',
   name: 'Forms',

@@ -1,5 +1,5 @@
 import {webService as userService} from '../user/UserService'
-import http, {setToken, removeToken} from '../http/AxiosInstance'
+import http, {setToken, removeToken, Token} from '../http/AxiosInstance'
 import LoginServiceInterface from './LoginServiceInterface'
 import singleton from '../../static/singleton'
 
@@ -11,7 +11,7 @@ export default class LoginServiceWeb implements LoginServiceInterface {
       pass: password
     })
     if (res.status >= 200 && res.status < 400) {
-      setToken(res.data.token.hash)
+      setToken(res.data.token as Token)
       userService.user = null
       singleton.user = await userService.loadCurrentUser()
     } else {

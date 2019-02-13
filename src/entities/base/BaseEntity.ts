@@ -1,7 +1,7 @@
 import {parseDate} from '../../services/DateService'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {getColumnMeta} from '../decorators/WebOrmDecorators'
-import {deepCopy} from '../../services/JSONUtil'
+import {camelToSnake, deepCopy} from '../../services/JSONUtil'
 
 export default class BaseEntity implements SnakeSerializable {
 
@@ -79,11 +79,26 @@ export default class BaseEntity implements SnakeSerializable {
   /**
    * Map all camel case column names to the equivalent snake case name and return a plain object
    */
-  toSnakeJSON (): object {
+  toSnakeJSON (includeRelationships: boolean = false): object {
     const colMeta = getColumnMeta(this)
     const r = {}
     for (let i = 0; i < colMeta.names.length; i++) {
       r[colMeta.snake[i]] = this[colMeta.names[i]]
+    }
+    if (includeRelationships) {
+      for (let o of colMeta.relationships) {
+        const [key, _] = o
+        const snakeKey = camelToSnake(key)
+        if (this[key] == null) {
+          r[snakeKey] = this[key]
+        } else if (Array.isArray(this[key])) {
+          r[snakeKey] = this[key].map(o => o.toSnakeJSON(includeRelationships))
+        } else if (typeof this[key] === 'object' && 'toSnakeJSON' in this[key]) {
+          r[snakeKey] = this[key].toSnakeJSON(includeRelationships)
+        } else {
+          r[snakeKey] = this[key]
+        }
+      }
     }
     return r
   }
