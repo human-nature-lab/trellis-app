@@ -5,15 +5,24 @@ import router from '../../router'
 import singleton from '../../static/singleton'
 import DatabaseService from '../database/DatabaseService'
 
+export interface Token {
+  hash: string
+  name: string
+}
+
 const TOKEN_KEY = 'x-token'
 let defaultInst, syncInst
 
 /**
  * Set the token value. This stores it in local storage as well
- * @param {String} val - The token value
+ * @param {Token} token - The token value
  */
-export function setToken (val) {
-  storage.set(TOKEN_KEY, val)
+export function setToken (token: Token) {
+  storage.set(TOKEN_KEY, token)
+}
+
+export function getToken () {
+  return storage.get(TOKEN_KEY)
 }
 
 export function removeToken () {
@@ -21,7 +30,10 @@ export function removeToken () {
 }
 
 function requestInterceptor (request) {
-  request.headers['X-Token'] = storage.get(TOKEN_KEY)
+  const token = storage.get(TOKEN_KEY)
+  if (token && token.hash) {
+    request.headers['X-Token'] = token.hash
+  }
   return request
 }
 
