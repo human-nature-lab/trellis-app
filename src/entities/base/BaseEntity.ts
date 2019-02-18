@@ -3,6 +3,11 @@ import SnakeSerializable from '../interfaces/SnakeSerializable'
 import {getColumnMeta} from '../decorators/WebOrmDecorators'
 import {camelToSnake, deepCopy} from '../../services/JSONUtil'
 
+interface toSnakeJSONOpts {
+  includeRelationships?: boolean
+  removeUndefined?: boolean
+}
+
 export default class BaseEntity implements SnakeSerializable {
 
   /**
@@ -79,22 +84,24 @@ export default class BaseEntity implements SnakeSerializable {
   /**
    * Map all camel case column names to the equivalent snake case name and return a plain object
    */
-  toSnakeJSON (includeRelationships: boolean = false): object {
+  toSnakeJSON (opts: toSnakeJSONOpts = {includeRelationships: false}): object {
     const colMeta = getColumnMeta(this)
     const r = {}
     for (let i = 0; i < colMeta.names.length; i++) {
-      r[colMeta.snake[i]] = this[colMeta.names[i]]
+      const key = colMeta.names[i]
+      const snakeKey = colMeta.snake[i]
+      r[snakeKey] = this[key]
     }
-    if (includeRelationships) {
+    if (opts.includeRelationships) {
       for (let o of colMeta.relationships) {
         const [key, _] = o
         const snakeKey = camelToSnake(key)
         if (this[key] == null) {
           r[snakeKey] = this[key]
         } else if (Array.isArray(this[key])) {
-          r[snakeKey] = this[key].map(o => o.toSnakeJSON(includeRelationships))
+          r[snakeKey] = this[key].map(o => o.toSnakeJSON(opts))
         } else if (typeof this[key] === 'object' && 'toSnakeJSON' in this[key]) {
-          r[snakeKey] = this[key].toSnakeJSON(includeRelationships)
+          r[snakeKey] = this[key].toSnakeJSON(opts)
         } else {
           r[snakeKey] = this[key]
         }

@@ -1,22 +1,24 @@
 <template>
   <v-flex>
     <v-card>
-      <v-toolbar>
+      <v-toolbar flat>
         <v-toolbar-title>{{ $t('forms') }}</v-toolbar-title>
         <v-spacer />
-        <v-btn @click="isAddingNewForm=true">
+        <v-btn
+          icon
+          @click="isAddingNewForm=true">
           <v-icon>add</v-icon>
         </v-btn>
       </v-toolbar>
+      <v-progress-linear
+        v-if="isLoading"
+        indeterminate />
       <v-list>
-        <v-list-tile
+        <FormListTile
           v-for="form in forms"
+          :form="form"
           :key="form.id"
-          :to="{name: 'FormBuilder', params: {formId: form.id}}">
-          <v-list-tile-title>
-            <AsyncTranslationText :translation="form.nameTranslation" />
-          </v-list-tile-title>
-        </v-list-tile>
+          @delete="deleteForm(form)"/>
       </v-list>
     </v-card>
   </v-flex>
@@ -26,20 +28,24 @@
   import Vue from 'vue'
   import FormService from '../services/form/FormService'
   import global from '../static/singleton'
-  // @ts-ignore
-  import AsyncTranslationText from '../components/AsyncTranslationText'
   import Form from "../entities/trellis/Form"
+  import FormListTile from "../components/forms/FormListTile"
   export default Vue.extend({
     name: 'Forms',
-    components: {AsyncTranslationText},
+    components: {FormListTile},
     async created () {
-      this.forms = (await FormService.getStudyForms(global.study.id)).map(sf => sf.form)
+      this.isLoading = true
+      const studyForms = await FormService.getStudyForms(global.study.id)
+      studyForms.sort((a, b) => a.sortOrder - b.sortOrder )
+      this.forms = studyForms.map(sf => sf.form)
+      this.isLoading = false
     },
     data () {
       return {
         global,
         forms: [] as Form[],
-        isAddingNewForm: false
+        isAddingNewForm: false,
+        isLoading: false
       }
     },
     methods: {
@@ -48,6 +54,13 @@
       },
       saveNewForm () {
 
+      },
+      async deleteForm (form: Form) {
+        if (confirm('Really delete this form?')) {
+          await FormService.deleteForm(global.study.id, form.id)
+          const index = this.forms.findIndex(f => f.id === form.id)
+          this.forms.splice(index, 1)
+        }
       }
     }
   })

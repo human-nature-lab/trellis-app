@@ -1,6 +1,7 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../decorators/WebOrmDecorators'
+import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
+import Skip from "./Skip";
 
 @Entity()
 export default class FormSkip extends SparseTimestampedSoftDelete {
@@ -10,4 +11,7 @@ export default class FormSkip extends SparseTimestampedSoftDelete {
   formId: string
   @Column() @Serializable
   skipId: string
+
+  @Relationship(type => Skip)
+  skip: Skip
 }

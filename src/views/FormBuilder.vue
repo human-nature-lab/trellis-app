@@ -1,6 +1,8 @@
 <template>
   <v-flex>
+    <TrellisLoadingCircle v-if="isLoading"/>
     <iframe
+      v-show="!isLoading"
       :src="iframeSrc"
       frameborder="0" />
   </v-flex>
@@ -18,19 +20,25 @@
       return {
         global,
         formId: this.$route.params.formId,
-        formBuilderUrl: config.formBuilderUrl
+        formBuilderUrl: config.formBuilderUrl,
+        isLoading: true
       }
     },
     beforeRouteUpdate (to: Route, from: Route, next) {
       this.formId = to.params.formId
       next()
     },
+    created () {
+      setTimeout(() => {
+        this.isLoading = false
+      }, 1000)
+    },
     computed: {
       iframeSrc (): string {
         const url = this.formBuilderUrl.replace('{form_id}', this.formId)
           .replace('{token}', JSON.stringify(getToken()))
-          .replace('{study}', JSON.stringify(this.global.study.toSnakeJSON(true)))
-          .replace('{locale}', JSON.stringify(this.global.locale.toSnakeJSON(true)))
+          .replace('{study}', JSON.stringify(this.global.study.toSnakeJSON({includeRelationships: true})))
+          .replace('{locale}', JSON.stringify(this.global.locale.toSnakeJSON({includeRelationships: true})))
         return encodeURI(url)
       }
     }

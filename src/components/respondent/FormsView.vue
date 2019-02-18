@@ -16,8 +16,8 @@
   import Vue from 'vue'
   // @ts-ignore
   import FormListItem from './FormListItem'
-  import {DisplayForm} from './respondent/RespondentForms'
-  import Interview from "../entities/trellis/Interview"
+  import {DisplayForm} from './RespondentForms'
+  import Interview from "../../entities/trellis/Interview"
 
   export default Vue.extend({
     name: 'forms-view',
