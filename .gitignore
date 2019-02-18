@@ -36,3 +36,5 @@ config.xml.js
 
 src/entities/**/*.js
 src/entities/**/*.map
+
+releases

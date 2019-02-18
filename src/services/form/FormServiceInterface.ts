@@ -1,5 +1,7 @@
 import Form from '../../entities/trellis/Form'
 import StudyForm from '../../entities/trellis/StudyForm'
+import Skip from "../../entities/trellis/Skip";
+import FormSkip from "../../entities/trellis/FormSkip";
 
 export default interface FormServiceInterface {
 
@@ -32,5 +34,19 @@ export default interface FormServiceInterface {
    * @param form
    */
   updateForm (studyId: string, formId: string, form: Form): Promise<Form>
+
+  /**
+   * Creates a download for this form
+   * @param studyId
+   * @param formId
+   */
+  exportForm (formId: string): Promise<void>
+
+  /**
+   * Delete this form
+   * @param studyId
+   * @param formId
+   */
+  deleteForm (studyId: string, formId: string): Promise<any>
 
 }
