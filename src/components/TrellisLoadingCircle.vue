@@ -3,15 +3,23 @@
     class="loading-container"
     :style="containerStyles">
     <div
+      v-if="!global.cpuOptimized"
       class="loading-circle"
       :style="circleStyles"></div>
+    <span v-else>Loading...</span>
   </div>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
+  import global from '../static/singleton'
   export default Vue.extend({
     name: 'TrellisLoadingCircle',
+    data () {
+      return {
+        global
+      }
+    },
     props: {
       color: {
         type: String,
