@@ -57,6 +57,7 @@
   import TrellisModal from '../TrellisModal'
   import IsAdminMixin from '../../mixins/IsAdminMixin'
   import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
+  import GeoLocationService from '../../services/geolocation'
 
   export default {
     mixins: [ IsAdminMixin, IsLoggedInMixin],
@@ -101,6 +102,14 @@
       },
       toggleDarkTheme () {
         SingletonService.setDarkTheme(!SingletonService.get('darkTheme'))
+      },
+      toggleBatterySaver () {
+        this.global.cpuOptimized = !this.global.cpuOptimized
+        if (this.global.cpuOptimized) {
+          GeoLocationService.clearWatch()
+        } else {
+          GeoLocationService.watchPosition()
+        }
       },
       toggleOffline () {
         let offline = !SingletonService.get('offline')
@@ -173,6 +182,11 @@
             click: this.toggleDarkTheme,
             icon: 'wb_sunny',
             title: 'toggle_dark'
+          }, {
+            click: this.toggleBatterySaver,
+            icon: this.global.cpuOptimized ? 'battery_full' : 'battery_alert',
+            title: this.global.cpuOptimized ? 'turn_battery_off' : 'turn_battery_on',
+            showIf: this.isCordovaBuild
           }]
         }, {
           title: 'general',

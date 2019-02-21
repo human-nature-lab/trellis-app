@@ -14,6 +14,13 @@
               <v-flex v-if="state === 'detecting'">
                 <v-progress-circular indeterminate />
                 {{$t('detecting_location')}}
+                <v-layout v-if="showSkip">
+                  <v-spacer />
+                  <v-btn
+                    @click="skip">
+                    {{$t('skip')}}
+                  </v-btn>
+                </v-layout>
               </v-flex>
               <v-flex v-else-if="['position-unavailable', 'timeout'].indexOf(state) > -1">
                 <v-layout>
@@ -101,11 +108,14 @@
     lastKnownTime: 0,
     attempts: 0,
     maxAttempts: 3,
+    showSkip: false,
+    isResolved: false,
     state: 'detecting',
     tolerance: 5 * 60 * 1000
   }
 
   const dialogCloseDelay = 3000
+  const skipAvailableDelay = 3000
 
   let vueInstance
 
@@ -135,9 +145,16 @@
     },
     methods: {
       tryForPosition (resolve, reject) {
-        this.resolve = resolve
+        this.isResolved = false
+        this.resolver = resolve
         this.reject = reject
         this.retry()
+      },
+      resolve (...args) {
+        if (!this.isResolved) {
+          this.resolver.apply(null, args)
+          this.isResolved = true
+        }
       },
       skip () {
         this.resolve(null)
@@ -176,13 +193,25 @@
         })
       },
       getPosition () {
+        this.showSkip = false
         this.attempts++
         const tol = 5 * 60 * 1000
-        return GeoLocationService.getLocationTolerance(tol).then(pos => {
-          this.lastKnownCoordinates = pos.coords
-          this.lastKnownTime = moment(pos.timestamp)
-          return pos
-        })
+        setTimeout(() => {
+          this.showSkip = true
+        }, skipAvailableDelay)
+        if (this.isDebug) {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              reject({})
+            }, 30 * 1000)
+          })
+        } else {
+          return GeoLocationService.getLocationTolerance(tol).then(pos => {
+            this.lastKnownCoordinates = pos.coords
+            this.lastKnownTime = moment(pos.timestamp)
+            return pos
+          })
+        }
       }
     }
   }

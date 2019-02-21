@@ -35,6 +35,7 @@ export interface Singleton {
   user: User
   offline: boolean
   printMode: boolean
+  cpuOptimized: boolean
   secondaryDrawer: SecondaryDrawer
   menuDrawer: MenuDrawer
   loading: Loading
@@ -75,5 +76,6 @@ export default {
     actions: null,
     data: null,
     conditionTags: null
-  }
+  },
+  cpuOptimized: false
 } as Singleton
