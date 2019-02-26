@@ -11,10 +11,7 @@
         @click="onDone"
         class="text--primary"
         :disabled="isLoading">
-        <v-progress-circular v-if="isLoading" indeterminate color="primary"></v-progress-circular>
-        <span v-else>
-          {{ $t('done') }}
-        </span>
+        {{ $t('done') }}
       </v-btn>
       <v-btn icon @click="filtersIsOpen = !filtersIsOpen">
         <v-icon v-if="filtersIsOpen">keyboard_arrow_up</v-icon>
@@ -114,7 +111,6 @@
         slot="activator"
         color="primary"
         @click="showAssociatedRespondentDialog = true"
-        :loading="isLoading"
         :disabled="isLoading">
         <span v-if="respondentId">
           {{ $t('add_other_respondent') }}
@@ -179,6 +175,7 @@
   import RespondentItem from './RespondentItem'
   import AddRespondentForm from './AddRespondentForm'
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
+  import TrellisLoadingCircular from '../TrellisLoadingCircle'
   import router from '../../router'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
@@ -318,8 +315,8 @@
           this.filtersIsOpen = true
         }
       }
-      this.loadConditionTags()
       this.getCurrentPage()
+      this.loadConditionTags()
     },
     methods: {
       leaving () {
@@ -472,7 +469,8 @@
       RespondentListItem,
       RespondentItem,
       AddRespondentForm,
-      GeoBreadcrumbs
+      GeoBreadcrumbs,
+      TrellisLoadingCircular
     }
   }
 </script>

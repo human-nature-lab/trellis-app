@@ -5,11 +5,10 @@
     ref="container"
     :style="photoStyles"
     @click="$emit('click', $event)">
-    <v-progress-circular
+    <TrellisLoadingCircle
       v-if="isLoading"
-      indeterminate
       color="primary">
-    </v-progress-circular>
+    </TrellisLoadingCircle>
     <img
       ref="img"
       :src="src"
@@ -23,6 +22,7 @@
   import URL_PLACEHOLDER from '../../assets/baseline-image-24px.svg'
   import PERSON_URL_PLACEHOLDER from '../../assets/baseline-person-24px.svg'
   import BUILDING_URL_PLACEHOLDER from '../../assets/baseline-place-24px.svg'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle'
 
   const observer = new IntersectionObserver(handleIntersections, {
     threshold: 0.5
@@ -44,6 +44,7 @@
 
   export default {
     name: 'photo',
+    components: {TrellisLoadingCircle},
     props: {
       photo: {
         type: Object

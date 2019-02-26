@@ -1,7 +1,5 @@
 <template>
-  <v-flex class="markdown">
-    <div v-html="html" ref="mdContainer" />
-  </v-flex>
+  <v-flex class="markdown" v-html="html" ref="mdContainer" />
 </template>
 
 <script lang="ts">
@@ -111,6 +109,9 @@
                     ${text}
                   </a>`
         }
+        renderer.table = (header: string, body: string) => {
+          return `<table class="table">${header}${body}</table>`
+        }
         return <string>marked(this.transformedMarkdown, {renderer: renderer})
       }
     },
@@ -153,8 +154,14 @@
 <style lang="sass">
   $listPadding: 30px
   .markdown
+    width: 100%
     ul, ol
       margin-block-start: 1em
       margin-block-end: 1em
       padding-inline-start: $listPadding
+    table
+      display: block
+      width: 100%
+      overflow: auto
+      margin-bottom: 20px
 </style>

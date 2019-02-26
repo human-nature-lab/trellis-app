@@ -19,6 +19,11 @@ export default {
     rate: 500,        // default: 0 -> messages are written to disk immediately
     levels: [],       // default: null -> all messages are written to disk
     max: 100          // default: 0 -> infinite logs
+  },
+  sentry: {           // Optional sentry configuration options like dsn
+    dsn: '',                            // Sentry DSN value
+    offline: false,                     // Use offline integration
+    onlineIntervalRate: 1 * 60 * 1000   // The amount of time to wait between checks for online status
   }
 }
 
