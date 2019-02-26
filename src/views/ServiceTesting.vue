@@ -18,6 +18,14 @@
                   Add Alert
                 </v-list-tile-content>
               </v-list-tile>
+              <v-list-tile @click="throwError">
+                <v-list-tile-action>
+                  <v-icon>error</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  Throw error
+                </v-list-tile-content>
+              </v-list-tile>
             </v-list>
           </v-menu>
         </v-toolbar>
@@ -107,6 +115,9 @@
         } else {
           this.alert(randomFrom(types), 'A random alert that dismisses itself')
         }
+      },
+      throwError () {
+        throw new Error('Throwing an error from service testing')
       },
       getNestedTitle (test) {
         let title = test.title

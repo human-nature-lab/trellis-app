@@ -1,5 +1,5 @@
 <template>
-  <v-flex>
+  <v-flex class="documentation">
     <v-container>
       <v-layout v-if="isLoaded">
         <Markdown
@@ -76,6 +76,9 @@
   })
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  .documentation
+    &.container, &.layout
+      width: 100%
+      overflow: hidden
 </style>

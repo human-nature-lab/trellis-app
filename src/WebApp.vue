@@ -10,10 +10,7 @@
         </v-card-title>
         <v-card-text>
           <v-layout row justify-center>
-            <v-progress-circular
-              :size="50"
-              indeterminate>
-            </v-progress-circular>
+            <TrellisLoadingCircular />
           </v-layout>
         </v-card-text>
       </v-card>
@@ -96,6 +93,7 @@
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
+  import TrellisLoadingCircular from './components/TrellisLoadingCircle'
   import LocationFinder from './components/LocationFinder'
   import router from './router'
   import singleton from './static/singleton'
@@ -143,7 +141,8 @@
       LocationFinder,
       CensusFormChecker,
       SnackbarQueue,
-      DocsSidebar
+      DocsSidebar,
+      TrellisLoadingCircular
     },
     computed: {
       withinCordova () {
