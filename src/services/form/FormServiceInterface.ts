@@ -30,10 +30,9 @@ export default interface FormServiceInterface {
   /**
    * Update an existing form in the database
    * @param studyId
-   * @param formId
    * @param form
    */
-  updateForm (studyId: string, formId: string, form: Form): Promise<Form>
+  updateForm (studyId: string, form: Form): Promise<Form>
 
   /**
    * Creates a download for this form

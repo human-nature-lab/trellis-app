@@ -40,23 +40,17 @@
       </v-menu>
       <v-list-tile-content>
         <v-list-tile-title>
-          <AsyncTranslationText :translation="form.nameTranslation" />
+          <AsyncTranslationText :translation="memForm.nameTranslation" />
           <v-chip
-            v-if="form.isPublished"
-            color="success"
+            @click.stop="memForm.isPublished = !memForm.isPublished"
+            :color="memForm.isPublished ? 'success' : 'error'"
             text-color="white"
+            small
             label>
             <v-avatar>
-              <v-icon>check_circle</v-icon>
+              <v-icon v-if="memForm.isPublished">check_circle</v-icon>
             </v-avatar>
-            Published
-          </v-chip>
-          <v-chip
-            v-else
-            color="error"
-            text-color="white"
-            label>
-            Unpublished
+            {{memForm.isPublished ? 'Published' : 'Unpublished'}}
           </v-chip>
         </v-list-tile-title>
       </v-list-tile-content>
@@ -78,6 +72,8 @@
   import TrellisLoadingCircle from '../TrellisLoadingCircle'
   import FormSkips from '../forms/FormSkips'
   import FormService from "../../services/form/FormService"
+  import CompareService from "../../services/CompareService"
+  import debounce from 'lodash/debounce'
 
   export default Vue.extend({
     name: 'FormListTile',
@@ -90,11 +86,32 @@
       return {
         showMenu: false,
         isBusy: false,
-        isOpen: false
+        isOpen: false,
+        memForm: this.form.copy(),
+        saveThrottled: debounce(async form => {
+
+        }, 2000)
       }
     },
     props: {
       form: Object as () => Form
+    },
+    watch: {
+      form (newForm: Form) {
+        this.isBusy = false
+        this.memForm = newForm.copy()
+      },
+      memForm: {
+        handler (newVal: Form) {
+          if (!CompareService.entitiesAreEqual(newVal, this.form)) {
+            this.isBusy = true
+          } else if (this.isBusy) {
+            this.isBusy = false
+            this.saveThrottled.cancel()
+          }
+        },
+        deep: true
+      }
     },
     methods: {
       idFrom (key: string): string {

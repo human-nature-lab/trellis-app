@@ -36,8 +36,7 @@
       async addFormSkip (skip: Skip) {
         try {
           const formSkip: FormSkip = await SkipService.createFormSkip(this.form.id, skip)
-          debugger
-          // this.form.skips.push(formSkip)
+          this.form.skips.push(formSkip.skip)
         } catch (err) {
           this.alert('error', 'Failed to create skip')
         }
