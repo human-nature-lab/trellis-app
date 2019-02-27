@@ -11,11 +11,11 @@ class RespondentConditionTagRecycler extends Recycler<RespondentConditionTag> {
    * @param {RespondentConditionTag} tag
    * @returns {string}
    */
-  keyExtractor (tag: RespondentConditionTag): string {
+  keyExtractor (tag: RespondentConditionTag) {
     return [
       tag.respondentId,
       tag.conditionTagId
-    ].join('-')
+    ]
   }
 
   /**

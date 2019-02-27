@@ -15,9 +15,6 @@ export class UserServiceCordova extends UserServiceAbstract {
         return resolve(this.user)
       } else {
         resolve(null)
-        if (router.currentRoute.name !== 'Login') {
-          router.push("/login")
-        }
       }
     }).finally(() => {
       this._currentUserRequest = null

@@ -85,11 +85,11 @@ actionManager.add(AT.dk_rf_val, function (interview, action: Action, questionDat
     console.error('dk-rf-val', 'invalid input without a questionDatum', action.payload)
   }
 })
-actionManager.add(AT.next, function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): void {
-  interview.next()
+actionManager.add(AT.next, async function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): Promise<void> {
+  await interview.next()
 })
-actionManager.add(AT.previous, function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): void {
-  interview.previous()
+actionManager.add(AT.previous, async function (interview: InterviewManager, a, b, c?, actionWasInitiatedByHuman?: boolean): Promise<void> {
+  await interview.previous()
 })
 actionManager.add(AT.number_change, addOrUpdateSingleDatum)
 actionManager.add(AT.add_edge, addDatum)

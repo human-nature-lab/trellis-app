@@ -241,7 +241,7 @@
         this.type = data.interviewType
         this.initializeInterview(data)
       },
-      initializeInterview: function (d) {
+      async initializeInterview (d) {
         let {actions, form, baseRespondentConditionTags, conditionTags, data, interview, respondentFills} = d
         clearSharedInterview()
         this.dialog.end = false
@@ -253,13 +253,13 @@
         this.interviewActions = null
         interviewState = sharedInterview(interview, form, actions, data, conditionTags, respondentFills, baseRespondentConditionTags)
         if (this.type === 'interview') {
-          interviewState.attachDataPersistSlave()
-          interviewState.attachActionsPersistSlave()
+          interviewState.setSaveData(true)
+          interviewState.setSaveActions(true)
         }
         if (this.$route.query.location) {
           interviewState.setInitialLocation(JSON.parse(this.$route.query.location))
         }
-        interviewState.initialize()
+        await interviewState.initialize()
         // Share the relevant parts of the interview with the view
         this.interviewData = interviewState.data.data
         this.interviewConditionTags = interviewState.data.conditionTags
@@ -268,6 +268,7 @@
         this.form = form
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
+        interviewState.on('error', this.onError, this)
         this.updateInterview()
       },
       actionHandler (action) {
@@ -323,6 +324,9 @@
       showConditionTags () {
         this.dialog.conditionTag = true
       },
+      onError (err) {
+        this.alert('error', err.msg, { timeout: 0 })
+      },
       async lockAndExit () {
         try {
           await this.saveData()
@@ -345,13 +349,9 @@
         })
       },
       async saveData () {
-        if (this.formIsEmpty || this.isSaving) {
-          return
-        } else {
-          this.isSaving = true
-          await interviewState.save()
-          this.isSaving = false
-        }
+        this.isSaving = true
+        await interviewState.finalSave()
+        this.isSaving = false
       },
       async completeSurvey () {
         return await SurveyService.complete(this.interview.surveyId)
@@ -365,7 +365,7 @@
         this.dialog.end = false
         this.exit()
       },
-      prematureExit: function (e) {
+      prematureExit (e) {
         this.saveData().then(() => {
           this.showSafeToExitMessage = true
         })

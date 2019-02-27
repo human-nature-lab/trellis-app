@@ -1,7 +1,7 @@
 import Interview from '../../entities/trellis/Interview'
 import {now} from '../DateService'
 import DatabaseService from '../database/DatabaseService'
-import InterviewServiceInterface from './InterviewServiceInterface'
+import InterviewServiceAbstract from './InterviewServiceAbstract'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import QuestionDatum from '../../entities/trellis/QuestionDatum'
@@ -16,7 +16,7 @@ import Datum from '../../entities/trellis/Datum'
 import InterviewDataInterface from './InterviewDataInterface'
 import {randomIntBits} from "../../classes/M";
 
-export default class InterviewServiceCordova implements InterviewServiceInterface {
+export default class InterviewServiceCordova extends InterviewServiceAbstract {
 
   public async getInterview (interviewId: string): Promise<Interview> {
     const repo = await DatabaseService.getRepository(Interview)

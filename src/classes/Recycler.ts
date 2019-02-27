@@ -1,5 +1,5 @@
 export interface Recyclable<T> {
-  keyExtractor(obj: T): string
+  keyExtractor(obj: T): string | any[]
   objectCreator(...any): T
 }
 /**
@@ -21,7 +21,7 @@ export default abstract class Recycler<T> {
    * @param obj
    * @returns {string}
    */
-  abstract keyExtractor (obj: T): string
+  abstract keyExtractor (obj: T): any[] | string
 
   /**
    * Function that must be defined by parent class to use this class effectively
@@ -61,13 +61,29 @@ export default abstract class Recycler<T> {
   }
 
   /**
+   * Handle all of the possible return values from the keyExtractor method
+   * @param params
+   */
+  private extractKey (obj: T): string {
+    const baseKey = this.keyExtractor(obj)
+    if ('questionDatumId' in obj && obj['questionDatumId'] === 'e281a7ff-4721-48a3-953f-ecbc95f9dc43') {
+      console.log('baseKey', obj['questionDatumId'], baseKey)
+    }
+    if (Array.isArray(baseKey)) {
+      return baseKey.map(v => v == null ? null : v).join('-')
+    } else {
+      return baseKey
+    }
+  }
+
+  /**
    * Get without a key. The key will be created by calling the keyExtractor method with the results of the objectCreator
    * method. This method is much more expensive than just calling the get method since it needs to create a new instance
    * of the object and key regardless of if another one already exists
    * @param {...any} params
    */
   getNoKey (...params): T {
-    let key = this.keyExtractor(this.objectCreator(...params))
+    const key = this.extractKey(this.objectCreator(...params))
     return this.get(key, ...params)
   }
 
@@ -85,7 +101,7 @@ export default abstract class Recycler<T> {
    * @param {any} item
    */
   add (item: T) {
-    let key = this.keyExtractor(item)
+    const key = this.extractKey(item)
     this.set(key, item)
   }
 }

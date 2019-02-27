@@ -10,13 +10,13 @@ class QuestionDatumRecycler extends Recycler<QuestionDatum> implements Recyclabl
    * @param {QuestionDatum} qd
    * @returns {string}
    */
-  keyExtractor (qd: QuestionDatum): string {
+  keyExtractor (qd: QuestionDatum) {
     return [
       qd.surveyId,
       qd.sectionRepetition,
       qd.followUpDatumId,
       qd.questionId
-    ].join('-')
+    ]
   }
 
   /**

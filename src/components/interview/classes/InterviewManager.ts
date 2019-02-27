@@ -2,8 +2,6 @@ import uuidv4 from 'uuid/v4'
 import actionManager from '../services/actions/InterviewActionDefinitions'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
-import dataPersistSlave from '../services/DataPersistSlave'
-import actionsPersistSlave from '../services/ActionsPersistSlave'
 import AT from '../../../static/action.types'
 
 import {InterviewLocation} from '../services/InterviewAlligator'
@@ -58,18 +56,10 @@ export default class InterviewManager extends InterviewManagerBase {
 
   }
 
-  attachDataPersistSlave () {
-    this._dataPersistSlave = dataPersistSlave(this.interview.id, this.data)
-  }
-
-  attachActionsPersistSlave () {
-    this._actionsPersistSlave = actionsPersistSlave(this.interview.id, this.actions)
-  }
-
   /**
    * Run anything that needs to wait until other stuff is initialized before being run
    */
-  initialize () {
+  async initialize () {
     console.log('Initial condition tags', this.data.conditionTags)
     this.actions.initialize() // This emits an initial state event to any subscribers (the actionsPersistSlave)
     this.data.initialize()    // This emits an initial state event to any subscribers (the dataPersistSlave)
@@ -79,41 +69,57 @@ export default class InterviewManager extends InterviewManagerBase {
     this.onFirstPage()
     this.playAllActions()
     this.seekToInitialLocation()
+    await this.save()
   }
 
   /**
    * Make sure all data is stored (if any)
    * @returns {Promise<[any]>}
    */
-  save () {
+  finalSave (): Promise<any> {
     if (!this.actions.store.length || !this.data.data.length) {
-      console.log('nothing to save')
+      console.log('nothing to finalSave')
       return new Promise(resolve => setTimeout(resolve))
     }
     this.playAllActions()
-    let p = []
-    if (this._dataPersistSlave) {
-      p.push(this._dataPersistSlave.save())
+    return this.save()
+  }
+
+  /**
+   * Store all of the data to disk
+   * @returns {Promise<[any]>}
+   */
+  async save (): Promise<void> {
+    if (this.shouldSaveActions) {
+      try {
+        await this.actions.save(this.interview.id)
+      } catch (err) {
+        this.emit('error', {
+          msg: 'Failed to save actions',
+          err
+        })
+        throw err
+      }
     }
-    if (this._actionsPersistSlave) {
-      p.push(this._actionsPersistSlave.save())
+    if (this.shouldSaveData) {
+      try {
+        await this.data.save(this.interview.id)
+      } catch (err) {
+        this.emit('error', {
+          msg: 'Failed to save data',
+          err
+        })
+        throw err
+      }
     }
-    return Promise.all(p)
   }
 
   /**
    * Should be called when you want to cleanup the interview
    */
   destroy () {
-    if (this._dataPersistSlave) {
-      this._dataPersistSlave.destroy()
-      this._dataPersistSlave = null
-    }
-    if (this._actionsPersistSlave) {
-      this._actionsPersistSlave.destroy()
-      this._actionsPersistSlave = null
-    }
     // this.navigator.destroy()
+    this.removeListeners()
   }
 
   /**
@@ -231,13 +237,13 @@ export default class InterviewManager extends InterviewManagerBase {
     this.highWaterMark = 0
   }
 
-  next () {
-    // nextTiming.startTick()
+  async next () {
     this.navigator.updatePagesCalled = 0
     if (this.hasAddedActions && !this.isAtHighWaterMark) {
       this.resetHighWaterMark()
       this.replayToCurrent()
       this.stepForward()
+      await this.save()
     } else if (this.isAtHighWaterMark && this.lastAction) {
       this.stepForward()
       const loc = JSON.parse(JSON.stringify(this.location))
@@ -247,29 +253,14 @@ export default class InterviewManager extends InterviewManagerBase {
     } else {
       this.stepForward()
     }
-    // console.log(nextTiming.stopTick())
-    // console.log(`next(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
-    // console.log(`highWaterMark; ${this.highWaterMark}`)
-    // this.data.emitChange()
-    // console.log('post replay location', this.location, this.navigator.isAtEnd)
+    await this.save()
     this.hasAddedActions = false
-    // console.log('post step location', this.location, this.navigator.isAtEnd)
   }
 
-  previous () {
-    // Old way
-    // this.stepBackward()
-    // this.replayToCurrent()
-    // prevTiming.startTick()
+  async previous () {
     this.navigator.updatePagesCalled = 0
     this.stepBackward()
-    // if (this.hasAddedActions) {
-    //   this.replayToCurrent()
-    // } else {
-    //   // console.log('skipping replay')
-    // }
-    // console.log(prevTiming.stopTick())
-    // console.log(`prev(): updatePages was called: ${this.navigator.updatePagesCalled} times`)
+    await this.save()
   }
 
   stepForward (): boolean {
