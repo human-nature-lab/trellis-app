@@ -71,8 +71,8 @@
   import TrellisLoadingCircle from '../TrellisLoadingCircle'
   import TrellisModal from "../TrellisModal"
   import debounce from 'lodash/debounce'
-  import isEqualWith from 'lodash/isEqualWith'
   import SkipConditionTag from '../../entities/trellis/SkipConditionTag'
+  import CompareService from "../../services/CompareService"
 
   export default Vue.extend({
     name: 'SkipRow',
@@ -118,7 +118,7 @@
     },
     created () {
       this.saveThrottled = debounce(() => {
-        console.log('emitting save event')
+        console.log('emitting finalSave event')
         this.$emit('save', this.memSkip)
       }, 2000)
     },
@@ -131,14 +131,7 @@
       memSkip: {
         handler (newSkip): void {
           console.log('modified memory copy of skip', newSkip)
-          function entityCompare (objVal, othVal) {
-            if (typeof objVal === 'function') {
-              return true
-            } else {
-              return
-            }
-          }
-          if (!isEqualWith(newSkip, this.skip, entityCompare) && newSkip.conditionTags.length) {
+          if (!CompareService.entitiesAreEqual(newSkip, this.skip) && newSkip.conditionTags.length) {
             console.log('mem copy is different from previous')
             this.isDirty = true
             this.saveThrottled(newSkip)

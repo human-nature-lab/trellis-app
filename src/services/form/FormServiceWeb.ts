@@ -4,11 +4,11 @@ import FormServiceInterface from './FormServiceInterface'
 import StudyForm from '../../entities/trellis/StudyForm'
 import {saveAs} from 'file-saver'
 import Form from '../../entities/trellis/Form'
-import {joinURIEncode} from "../http/WebUtils";
+import {uriTemplate} from "../http/WebUtils";
 export class FormServiceWeb implements FormServiceInterface {
 
   getStudyForms (studyId: string): Promise<StudyForm[]> {
-    return http().get(joinURIEncode('study', studyId, 'forms/published')).then(res => {
+    return http().get(uriTemplate('study/{study}/forms/published', [studyId])).then(res => {
       if (res.data.forms) {
         return res.data.forms.map(form => new StudyForm().fromSnakeJSON(form))
       } else {
@@ -19,7 +19,7 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   getForm (formId: string, bareBones: boolean = false): Promise<Form> {
-    return http().get(joinURIEncode('form', formId))
+    return http().get(uriTemplate('form/{form}', [formId]))
       .then(res => {
         if (res.data.form) {
           return new Form().fromSnakeJSON(res.data.form)
@@ -31,14 +31,15 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   async createForm (studyId: string, form: Form): Promise<Form> {
-    const res = await adminInst.post(joinURIEncode('study', studyId, 'form'), {
+    const res = await adminInst.post(uriTemplate('study/{study}/form', [studyId]), {
       form: form
     })
     return new Form().fromSnakeJSON(res.data.form)
   }
 
-  async updateForm (studyId: string, formId: string, form: Form): Promise<Form> {
-    throw Error('Not implemented')
+  async updateForm (studyId: string, form: Form): Promise<Form> {
+    const res = await adminInst.put(uriTemplate('study/{study_id}/form/{form_id}', [studyId, form.id]))
+    return new Form().fromSnakeJSON(res.data.form)
   }
 
   async exportForm (formId: string) {
@@ -48,7 +49,7 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   async deleteForm (studyId: string,formId: string) {
-    await adminInst.delete(joinURIEncode('study', studyId, 'form', formId))
+    await adminInst.delete(uriTemplate('study/{study}/form/{form}', [studyId, formId]))
   }
 
 }

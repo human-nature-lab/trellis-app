@@ -73,7 +73,6 @@
         await this.newSkip(newSkip)
         this.lockNewSkip = false
         this.showNewSkip = false
-        // this.showNewSkip = false
       },
       async updateSkip (skip: Skip) {
         skip = await SkipService.updateSkip(skip)

@@ -48,7 +48,7 @@ function responseError (err) {
   if (err.response && err.response.status === 401) {
     let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
     singleton.loading.active = false
-    if (router.currentRoute.name === 'login') {
+    if (router.currentRoute.name === 'Login') {
       return Promise.reject(err.response)
     } else {
       router.replace({name: 'Login', query: {to: nextRoute}})
