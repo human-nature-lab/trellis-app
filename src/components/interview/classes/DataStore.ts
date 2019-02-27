@@ -10,9 +10,12 @@ import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 import SectionConditionTag from '../../../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../../../entities/trellis/SurveyConditionTag'
-import {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
+import InterviewDataInterface, {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
 import ConditionTag from "../../../entities/trellis/ConditionTag";
 import Action from "../../../entities/trellis/Action";
+import cloneDeep from 'lodash/cloneDeep'
+import InterviewService from "../../../services/interview/InterviewService"
+import {Mutex, MutexInterface} from "async-mutex";
 
 export interface FindFunction<T> {
   (o: T, i?: number, a?: T[]): boolean
@@ -35,6 +38,11 @@ export default class DataStore extends Emitter {
   private questionDatumQuestionIdIndex: Map<string, QuestionDatum[]> = new Map()
   private actionIdMap: Map<string, Datum> = new Map()
   private followUpDatumIdMap: Map<string, Datum> = new Map()
+
+  private previousState!: InterviewDataInterface
+  private mutex = new Mutex()
+  private releaseMutex!: MutexInterface.Releaser
+
   constructor (throttleRate = 10000) {
     super()
     this.reset()
@@ -49,7 +57,35 @@ export default class DataStore extends Emitter {
    * Intitialize the datastore. Emits an initialState event to any subscribers
    */
   initialize () {
+    this.previousState = this.getState()
     this.emit('initialState', this.data)
+  }
+
+  /**
+   * Persist any changes to the data here
+   */
+  public async save (interviewId: string) {
+    console.log('waiting to acquire data mutex')
+    this.releaseMutex = await this.mutex.acquire()
+    console.log('acquired data mutex')
+    try {
+      const newState = this.getState()
+      await InterviewService.saveDiff(interviewId, newState, this.previousState)
+      this.previousState = newState
+    } finally {
+      console.log('releasing data mutex')
+      this.releaseMutex()
+    }
+  }
+
+  /**
+   * Get state
+   */
+  private getState (): InterviewDataInterface {
+    return cloneDeep({
+      data: this.data,
+      conditionTags: this.conditionTags
+    })
   }
 
   /**

@@ -17,7 +17,7 @@ class SectionConditionTagRecycler extends Recycler<SectionConditionTag> {
       tag.conditionId,
       tag.repetition,
       tag.followUpDatumId
-    ].join('-')
+    ]
   }
 
   /**

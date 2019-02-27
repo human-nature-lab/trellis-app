@@ -6,7 +6,6 @@ import {InterviewLocation} from "../services/InterviewAlligator";
 import Section from "../../../entities/trellis/Section";
 import RespondentFillStore from "./RespondentFillStore";
 import Question from "../../../entities/trellis/Question";
-import PersistSlave from '../../../classes/PersistSlave'
 import ConditionAssignmentService from '../../../services/ConditionAssignmentService'
 import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 import QuestionDatumRecycler from "../services/recyclers/QuestionDatumRecycler";
@@ -26,8 +25,8 @@ import QT from "../../../static/question.types";
 export default class InterviewManagerBase extends Emitter {
 
   public navigator: InterviewAlligator
-  protected _dataPersistSlave: PersistSlave
-  protected _actionsPersistSlave: PersistSlave
+  protected shouldSaveData: boolean = false
+  protected shouldSaveActions: boolean = false
 
   // Indexes and data stores
   protected respondentFills: RespondentFillStore = new RespondentFillStore()
@@ -116,6 +115,26 @@ export default class InterviewManagerBase extends Emitter {
     })
   }
 
+  /**
+   * Turn data persistence on or off
+   * @param val
+   */
+  public setSaveData (val: boolean) {
+    this.shouldSaveData = val
+  }
+
+  /**
+   * Turn actions persistence on or off
+   * @param val
+   */
+  public setSaveActions (val: boolean) {
+    this.shouldSaveActions = val
+  }
+
+  /**
+   * Set the initial location of the interview
+   * @param location
+   */
   setInitialLocation (location: object) {
     const loc = {
       page: 0,

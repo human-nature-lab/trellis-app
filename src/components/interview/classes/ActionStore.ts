@@ -7,6 +7,8 @@ import AT from '../../../static/action.types'
 import {locToNumber} from "../services/LocationHelpers";
 import {ActionPayload} from "../services/actions/DatumOperations";
 import {randomIntBits} from "../../../classes/M";
+import InterviewService from "../../../services/interview/InterviewService";
+import {Mutex, MutexInterface}from "async-mutex";
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -21,6 +23,10 @@ export default class ActionStore extends Emitter {
   private questionIndex: Map<string, Action[]> = new Map()
   private questionToPageIndex: Map<string, number>
   private questionToSectionIndex: Map<string, number>
+  private mutex: Mutex = new Mutex()
+  private releaseMutex!: MutexInterface.Releaser
+
+  private previousLength: number = 0
 
   constructor (blueprint: Form) {
     super()
@@ -33,7 +39,35 @@ export default class ActionStore extends Emitter {
    * Emit the initial state to any subscribers
    */
   initialize (): void {
+    this.previousLength = this.store.length
     this.emit('initialState', this.store)
+  }
+
+  /**
+   * Store the actions in the database
+   * @param interviewId
+   */
+  async save (interviewId: string): Promise<void> {
+    // Prevent overlapping
+    console.log('waiting to acquire action mutex')
+    this.releaseMutex = await this.mutex.acquire()
+    console.log('acquired action mutex')
+    // Try without catch block still throws the error after running finally block!
+    try {
+      const newLength = this.store.length
+      if (newLength > this.previousLength) {
+        console.log('saving actions', newLength, this.previousLength, this.store.slice(this.previousLength))
+        await InterviewService.saveActions(interviewId, this.store.slice(this.previousLength))
+        console.log('updating actions length')
+        this.previousLength = newLength
+      } else {
+        console.log('no new actions')
+      }
+    } finally {
+      console.log('releasing actions mutex')
+      this.releaseMutex()
+    }
+
   }
 
   /**
@@ -162,22 +196,6 @@ export default class ActionStore extends Emitter {
     action.createdAt = action.createdAt || now()
     this.insertIntoStore(action)
     this.emit('change', this.store)
-  }
-
-  /**
-   * Save the action in the store and update any indexes
-   * @param {Action} action
-   */
-  save (action: Action): void {
-    this.store.push(action)
-    if (action.questionId) {
-      let questionActions = this.questionIndex.get(action.questionId)
-      if (!questionActions) {
-        questionActions = []
-        this.questionIndex.set(action.questionId, questionActions)
-      }
-      questionActions.push(action)
-    }
   }
 
 }

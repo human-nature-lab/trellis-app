@@ -95,10 +95,9 @@
           this.alert('error', `Unable to copy to clipboard. ${window.location.href}`, {timeout: 0})
         }
       },
-      logout () {
-        LoginService.logout().then(() => {
-          router.push({name: 'Login', query: {to: router.currentRoute.fullPath}})
-        })
+      async logout () {
+        await LoginService.logout()
+        router.push({name: 'Login', query: {to: router.currentRoute.fullPath}})
       },
       toggleDarkTheme () {
         SingletonService.setDarkTheme(!SingletonService.get('darkTheme'))

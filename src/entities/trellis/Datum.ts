@@ -71,7 +71,6 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
    */
   fromRecycler (data: DatumRecyclerData){
     this.id = uuidv4()
-    this.updatedAt = now()
     this.createdAt = now()
     for (let key in data) {
       if (data[key] !== undefined) {

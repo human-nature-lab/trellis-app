@@ -4,6 +4,7 @@ import Datum from '../../../../entities/trellis/Datum'
 import InterviewManager from "../../classes/InterviewManager";
 import {ActionHandler} from "./ActionManager";
 import Action from "../../../../entities/trellis/Action";
+import {defaultLoggingService} from "../../../../services/logging/LoggingService";
 
 interface DatumFindFunc {
   (value: Datum, payload: ActionPayload): boolean
@@ -44,7 +45,7 @@ export function updateDatum (findFunc: DatumFindFunc, title?: string): ActionHan
     } else {
       let msg = 'No datum exists that matches this find closure.'
       if (title) msg += `Found in ${title}`
-      throw new Error(msg)
+      defaultLoggingService.log({ msg })
     }
     return datum
   }
@@ -66,7 +67,7 @@ export function removeDatum (findFunc: DatumFindFunc, title?: string): ActionHan
     } else {
       let msg = 'No datum exists that matches this find closure.'
       if (title) msg += `Found in ${title}`
-      throw new Error(msg)
+      defaultLoggingService.log({ msg })
     }
   }
 }

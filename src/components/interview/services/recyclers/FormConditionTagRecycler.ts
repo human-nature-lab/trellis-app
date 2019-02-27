@@ -9,7 +9,7 @@ class FormConditionTagRecycler extends Recycler<SurveyConditionTag> {
     return [
       tag.conditionId,
       tag.surveyId
-    ].join('-')
+    ]
   }
   objectCreator (interview: InterviewManagerOld, act: SurveyConditionTag) {
     return new SurveyConditionTag().fromRecycler({
