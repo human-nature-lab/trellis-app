@@ -74,4 +74,7 @@ export default class InterviewServiceWeb extends InterviewServiceAbstract {
     return new Interview().fromSnakeJSON(res.data.interview)
   }
 
+  async getLatestInterviewPosition (respondentId: string, tolerance: number): Promise<null|Coordinates> {
+    throw new Error('not implemented')
+  }
 }
