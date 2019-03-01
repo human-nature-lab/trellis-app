@@ -12,7 +12,7 @@ const config = {
     levels: ['warn', 'error']
   },
   sentry: {
-    dsn: 'https://2b6389b3c25d4fa1b2095bda5ada8931@sentry.io/1382357',
+    dsn: 'https://9a69dfd63e02433386c0f98af65354d0@sentry.io/1382345',
     onlineIntervalRate: 2 * 60 * 1000,    // frequency to check if we can send offline logs
     offline: true                         // True if we're using the offline integration
   }

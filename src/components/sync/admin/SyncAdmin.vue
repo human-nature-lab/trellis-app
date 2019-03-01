@@ -46,13 +46,21 @@
             <h3 class="headline mb-0">
               {{ $t('uploads') }}
             </h3>
+            <v-spacer></v-spacer>
+            <v-text-field
+              v-model="search"
+              append-icon="search"
+              :label="$t('search')"
+              single-line
+              hide-details>
+            </v-text-field>
           </v-card-title>
           <v-card-text>
             <v-data-table
               :pagination.sync="uploadPagination"
               :loading="uploadsLoading"
               :headers="uploadColumns"
-              :items="uploads">
+              :items="uploadsFiltered">
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
               <template slot="items" slot-scope="props">
                 <tr>
@@ -145,6 +153,7 @@
           descending: true
         },
         generatingSnapshot: false,
+        search: '',
         snapshotsLoading: true,
         snapshots: [],
         snapshotColumns: [
@@ -188,6 +197,9 @@
     props: {
     },
     computed: {
+      uploadsFiltered: function () {
+        return this.uploads.filter((upload) => upload.device_name.toLowerCase().indexOf(this.search.toLowerCase()) > -1)
+      }
     },
     methods: {
       getUploads: async function () {

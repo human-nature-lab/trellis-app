@@ -14,8 +14,8 @@ var loadMinified = require('./load-minified')
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var MiniCssExtractPlugin = require("mini-css-extract-plugin");
 var SentryPlugin = require('@sentry/webpack-plugin')
-var sentryRelease = require('./utils').sentryRelease()
 var replaceAllBuffer = require('./replaceBuffer').replaceAllBuffer
+var sentryRelease = require('./utils').sentryRelease(config)
 
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
@@ -125,7 +125,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     new SentryPlugin({
       release: sentryRelease,
-      include: './dist'
+      include: './www'
     })
   ]
 })
