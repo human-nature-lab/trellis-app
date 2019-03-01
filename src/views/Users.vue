@@ -49,28 +49,28 @@
   import DocsLinkMixin from "../mixins/DocsLinkMixin"
   import IsAdminMixin from "../mixins/IsAdminMixin"
   import DocsFiles from "../components/documentation/DocsFiles"
-  import Role from "../components/user/Role"
+  import i18n from '../i18n'
 
   export default Vue.extend({
-    name: 'Users',
+    name: i18n.t('users'),
     components: { UserRow, UserEdit, TrellisModal },
     mixins: [DocsLinkMixin(DocsFiles.users.intro), IsAdminMixin],
     computed: {
       headers () {
         return [{
-          text: 'Name',
+          text: this.$t('name'),
           value: 'name'
         }, {
-          text: 'Username',
+          text: this.$t('username'),
           value: 'username'
         }, {
-          text: 'Role',
+          text: this.$t('role'),
           value: 'role'
         }, {
-          text: 'Studies',
+          text: this.$t('studies'),
           sortable: false
         }, {
-          text: 'Actions',
+          text: this.$t('actions'),
           sortable: false
         }]
       }

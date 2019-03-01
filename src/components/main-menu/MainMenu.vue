@@ -161,7 +161,7 @@
           }]
         }, {
           title: 'admin',
-          showIf: this.isWeb && this.isAdmin,
+          showIf: this.isWeb && this.isAdmin && this.isDebug,
           items: [{
             to: {name: 'Users'},
             icon: 'recent_actors',
@@ -189,7 +189,7 @@
             click: this.toggleDarkTheme,
             icon: 'wb_sunny',
             title: 'toggle_dark',
-            switchColor: 'black',
+            switchColor: 'green',
             iconColor: null,
             switchValue: this.global.darkTheme,
           }, {
@@ -201,7 +201,7 @@
             showIf: this.isCordovaBuild
           }, {
             click: this.toggleGPSWatch,
-            title: 'watch_gps',
+            title: 'track_location',
             iconColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green': 'yellow') : null,
             switchColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green': 'yellow') : null,
             icon: this.global.watchGPS ? (this.global.gpsFixed ? 'gps_fixed' : 'gps_not_fixed') : 'gps_off',
