@@ -1,4 +1,4 @@
-import DiffService from '../../src/components/interview/services/DiffService'
+import DiffService from '../../src/services/DiffService'
 import uuid from 'uuid/v4'
 import {now} from '../../src/services/DateService'
 import {expect} from 'chai'

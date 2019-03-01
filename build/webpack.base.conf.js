@@ -16,7 +16,7 @@ function resolve (dir) {
 module.exports = smp.wrap({
   target: 'web',
   entry: {
-    app: ['babel-polyfill', './src/main.ts']
+    app: ['@babel/polyfill', './src/main.ts']
   },
   output: {
     path: config.build.assetsRoot,
@@ -76,30 +76,48 @@ module.exports = smp.wrap({
       },
       {
         test: /\.(js|vue)$/,
-        loader: 'eslint-loader',
+        use: [{
+          loader: 'thread-loader',
+        }, {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        }],
         enforce: 'pre',
-        include: [resolve('src'), resolve('test')],
-        options: {
-          formatter: require('eslint-friendly-formatter')
-        }
+        include: [resolve('src'), resolve('test')]
       },
       {
         test: /\.tsx?$/,
-        loader: 'ts-loader',
-        options: {
-          appendTsSuffixTo: [/\.vue$/],
-        },
+        use: [{
+          loader: 'thread-loader'
+        }, {
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+            happyPackMode: true
+          }
+        }],
         exclude: /node_modules/
       },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: vueLoaderConfig
+        options: vueLoaderConfig,
+        exclude: /node_modules/
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        use: [{
+          loader: 'thread-loader'
+        }, {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/env']
+          }
+        }],
+        include: [resolve('src'), resolve('test')],
+        exclude: /node_modules/
       },
       {
         test: /\.json$/,

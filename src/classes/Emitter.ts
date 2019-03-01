@@ -84,7 +84,7 @@ export default class Emitter {
   /**
    * Remove all listeners from this instance
    */
-  destroyListeners () {
+  removeListeners () {
     this.eventCallbacks = {}
   }
 

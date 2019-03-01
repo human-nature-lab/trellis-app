@@ -25,15 +25,20 @@
             @click="(e) => item.click && item.click(e)"
             v-bind="{to: item.to ? item.to : null}">
             <v-list-tile-action>
-              <v-icon>{{item.icon}}</v-icon>
+              <v-icon :color="item.iconColor">{{item.icon}}</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title>
                 {{ $t(item.title) }}
               </v-list-tile-title>
             </v-list-tile-content>
+            <v-list-tile-action v-if="item.switchValue != null">
+              <v-switch
+                :color="item.switchColor"
+                v-model="item.switchValue" />
+            </v-list-tile-action>
           </v-list-tile>
-          </v-list>
+        </v-list>
       </template>
     </v-list>
     <TrellisModal
@@ -57,6 +62,7 @@
   import TrellisModal from '../TrellisModal'
   import IsAdminMixin from '../../mixins/IsAdminMixin'
   import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
+  import GeoLocationService from '../../services/geolocation'
 
   export default {
     mixins: [ IsAdminMixin, IsLoggedInMixin],
@@ -94,13 +100,23 @@
           this.alert('error', `Unable to copy to clipboard. ${window.location.href}`, {timeout: 0})
         }
       },
-      logout () {
-        LoginService.logout().then(() => {
-          router.push({name: 'Login', query: {to: router.currentRoute.fullPath}})
-        })
+      async logout () {
+        await LoginService.logout()
+        router.push({name: 'Login', query: {to: router.currentRoute.fullPath}})
       },
       toggleDarkTheme () {
         SingletonService.setDarkTheme(!SingletonService.get('darkTheme'))
+      },
+      toggleBatterySaver () {
+        this.global.cpuOptimized = !this.global.cpuOptimized
+      },
+      toggleGPSWatch () {
+        this.global.watchGPS = !this.global.watchGPS
+        if (this.global.watchGPS) {
+          GeoLocationService.watchPosition()
+        } else {
+          GeoLocationService.clearWatch()
+        }
       },
       toggleOffline () {
         let offline = !SingletonService.get('offline')
@@ -151,6 +167,10 @@
             icon: 'recent_actors',
             title: 'users'
           }, {
+            to: {name: 'Forms'},
+            icon: 'library_books',
+            title: 'forms'
+          }, {
             to: {name: 'Reports'},
             icon: 'save',
             title: 'reports'
@@ -168,7 +188,25 @@
           }, {
             click: this.toggleDarkTheme,
             icon: 'wb_sunny',
-            title: 'toggle_dark'
+            title: 'toggle_dark',
+            switchColor: 'black',
+            iconColor: null,
+            switchValue: this.global.darkTheme,
+          }, {
+            click: this.toggleBatterySaver,
+            title: 'battery_saver',
+            icon: 'battery_alert',
+            switchColor: 'green',
+            switchValue: this.global.cpuOptimized,
+            showIf: this.isCordovaBuild
+          }, {
+            click: this.toggleGPSWatch,
+            title: 'watch_gps',
+            iconColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green': 'yellow') : null,
+            switchColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green': 'yellow') : null,
+            icon: this.global.watchGPS ? (this.global.gpsFixed ? 'gps_fixed' : 'gps_not_fixed') : 'gps_off',
+            switchValue: this.global.watchGPS,
+            showIf: this.isCordovaBuild
           }]
         }, {
           title: 'general',

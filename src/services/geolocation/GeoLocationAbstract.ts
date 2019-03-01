@@ -1,5 +1,7 @@
 import {defaultLoggingService as logger} from "../logging/LoggingService";
 import {LoggingLevel} from "../logging/LoggingTypes";
+import global from '../../static/singleton'
+import config from '../../config'
 
 export default abstract class GeoLocationAbstract {
 
@@ -18,6 +20,11 @@ export default abstract class GeoLocationAbstract {
    */
   public watchPosition () {
     console.log('Starting watch')
+    if (config.debug) {
+      setTimeout(() => {
+        global.gpsFixed = true
+      }, 3000)
+    }
     const component = 'GeoLocationAbstract.ts@watchPosition'
     if (this.watchId !== null) {
       logger.log({
@@ -36,6 +43,7 @@ export default abstract class GeoLocationAbstract {
       }, this.options)
     } catch (err) {
       err.component = component
+      global.gpsFixed = false
       logger.log(err)
     }
   }
@@ -45,6 +53,7 @@ export default abstract class GeoLocationAbstract {
    */
   public clearWatch () {
     console.log('Clearing watch')
+    global.gpsFixed = false
     if (this.watchId !== null) {
       navigator.geolocation.clearWatch(this.watchId as number)
       this.watchId = null
@@ -92,9 +101,10 @@ export default abstract class GeoLocationAbstract {
 
   private storePosition (pos: Position): void {
     this.positionHistory.push(pos)
-    if (this.positionHistory.length > 200) {
+    if (this.positionHistory.length > 10) {
       this.positionHistory.shift()
     }
+    global.gpsFixed = true
   }
 
   /**
@@ -103,14 +113,27 @@ export default abstract class GeoLocationAbstract {
    */
   getCurrentPosition (): Promise<Position> {
     return new Promise((resolve, reject) => {
+      if (config.debug && Math.random() > .5) {
+        return resolve({
+          timestamp: 400,
+          coords: {
+            latitude: 1000,
+            longitude: 1000,
+            altitude: -1000000,
+            accuracy: 1000000000000
+          } as Coordinates
+        })
+      }
       try {
         navigator.geolocation.getCurrentPosition(position => {
           this.storePosition(position)
           resolve(position)
         }, err => {
+          global.gpsFixed = false
           reject(err)
         }, this.options)
       } catch (err) {
+        global.gpsFixed = false
         reject(err)
       }
     })

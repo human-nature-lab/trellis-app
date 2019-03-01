@@ -58,8 +58,25 @@ export default class FormServiceCordova implements FormServiceInterface {
     console.log('finished form', form)
 
     removeSoftDeleted(form)
+    console.log('form removed soft deleted')
 
     return form
+  }
+
+  createForm (studyId: string, form: Form): Promise<Form> {
+    throw Error('Not implemented')
+  }
+
+  updateForm (studyId: string, form: Form): Promise<Form> {
+    throw Error('Not implemented')
+  }
+
+  exportForm (formId: string): Promise<any> {
+    throw Error('Not implemented')
+  }
+
+  deleteForm (studyId: string, formId: string): Promise<any> {
+    throw Error('Not implemented')
   }
 
 }

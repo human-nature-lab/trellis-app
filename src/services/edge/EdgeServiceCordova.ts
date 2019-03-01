@@ -1,7 +1,7 @@
 import EdgeServiceInterface, {SourceTarget} from "./EdgeServiceInterface";
 import Edge from "../../entities/trellis/Edge";
 import DatabaseService from '../database/DatabaseService'
-import {In} from "typeorm";
+import {In} from 'typeorm'
 
 export default class EdgeServiceCordova implements EdgeServiceInterface {
   async getEdges (edgeIds: string[]): Promise<Edge[]> {

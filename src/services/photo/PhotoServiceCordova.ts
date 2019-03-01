@@ -3,7 +3,7 @@ import DatabaseService from '../database/DatabaseService'
 import Photo from '../../entities/trellis/Photo'
 import uuid from 'uuid/v4'
 import PhotoServiceAbstract from './PhotoServiceAbstract'
-import {In, IsNull} from "typeorm";
+import {In, IsNull} from 'typeorm'
 import CancellablePromise from "../../classes/CancellablePromise";
 
 declare global {

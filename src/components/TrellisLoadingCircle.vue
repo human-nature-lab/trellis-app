@@ -1,36 +1,72 @@
 <template>
-  <div class="loading-container">
+  <div
+    class="loading-container"
+    :style="containerStyles">
     <div
+      v-if="!global.cpuOptimized"
       class="loading-circle"
-      :style="{borderTopColor: borderColor, borderLeftColor: borderColor}"></div>
+      :style="circleStyles"></div>
+    <span v-else>Loading...</span>
   </div>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  import global from '../static/singleton'
+  export default Vue.extend({
     name: 'TrellisLoadingCircle',
+    data () {
+      return {
+        global
+      }
+    },
     props: {
       color: {
         type: String,
         default: 'primary'
+      },
+      size: {
+        type: String,
+        default: '50px'
+      },
+      thickness: {
+        type: Number,
+        default: 4
       }
     },
     computed: {
       borderColor () {
+        // @ts-ignore
         return this.$vuetify.theme[this.color]
+      },
+      containerStyles (): object {
+        return {
+          width: this.size,
+          height: this.size
+        }
+      },
+      circleStyles (): object {
+        return {
+          width: this.size,
+          height: this.size,
+          borderWidth: this.thickness,
+          borderTopColor: this.borderColor,
+          borderLeftColor: this.borderColor
+        }
       }
     }
-  }
+  })
 </script>
 
 <style lang="sass" scoped>
   .loading-container
+    display: block
     overflow: visible
     .loading-circle
       display: block
       border-radius: 50%
-      width: 50px
-      height: 50px
+      height: 100%
+      width: 100%
       border: 4px solid rgba(0,0,0,0)
       animation: rotate 1s linear infinite
 

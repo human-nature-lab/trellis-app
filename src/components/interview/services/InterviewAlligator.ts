@@ -9,8 +9,6 @@ import Question from "../../../entities/trellis/Question";
 import SkipService from "../../../services/SkipService";
 import Action from "../../../entities/trellis/Action";
 import {locToNumber} from "./LocationHelpers";
-import * as moment from "moment";
-import Base = moment.unitOfTime.Base;
 
 export interface InterviewLocation {
   section: number

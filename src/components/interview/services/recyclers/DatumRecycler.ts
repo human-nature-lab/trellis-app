@@ -37,7 +37,7 @@ class DatumRecycler extends Recycler<Datum> {
       d.rosterId,
       d.respondentGeoId,
       d.respondentNameId
-    ].join('-')
+    ]
   }
 
   objectCreator (questionDatum: QuestionDatum, action: Action) {
