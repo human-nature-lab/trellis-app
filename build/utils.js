@@ -1,17 +1,17 @@
 var path = require('path')
-var config = require('../config')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var VERSION = require('../package').version
 
-exports.sentryRelease = function () {
+exports.sentryRelease = function (cf) {
   let r = 'trellis-' + VERSION
-  if (!config.debug) {
-    r += config.appEnv === 1 ? '-cordova' : '-web'
+  if (!cf.debug) {
+    r += cf.appEnv === 1 ? '-cordova' : '-web'
   }
   return r
 }
 
 exports.assetsPath = function (_path) {
+  var config = require('../config')
   var assetsSubDirectory = process.env.NODE_ENV === 'production'
     ? config.build.assetsSubDirectory
     : config.dev.assetsSubDirectory

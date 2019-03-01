@@ -81,6 +81,7 @@
   import GeoEditPanel from './GeoEditPanel.vue'
   import Permission from '../Permission'
   import StudyService from '../../services/study/StudyService'
+  import config from '../../config'
 
   const targetMapWidth = 600
 
@@ -164,14 +165,12 @@
           iconUrl: require('leaflet/dist/images/marker-icon.png'),
           shadowUrl: require('leaflet/dist/images/marker-shadow.png')
         })
-        // TODO: before releasing to open source, switch to this tile layer. L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-        // TODO: consider making the tile layer and accessToken configurable
-        L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
-          attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-          maxZoom: 20,
-          id: 'mapbox.emerald',
-          accessToken: '***REMOVED***',
-          style: 'mapbox://styles/mapbox/streets-v10'
+        L.tileLayer(config.mapTileLayer.url, {
+          attribution: config.mapTileLayer.attribution,
+          maxZoom: config.mapTileLayer.maxZoom,
+          id: config.mapTileLayer.id,
+          accessToken: config.mapTileLayer.accessToken,
+          style: config.mapTileLayer.style
         }).addTo(this.trellisMap)
         this.labelMarkerLayer = L.layerGroup().addTo(this.trellisMap)
         this.trellisMap.on('zoomend resize', () => {
