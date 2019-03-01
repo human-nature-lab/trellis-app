@@ -25,15 +25,20 @@
             @click="(e) => item.click && item.click(e)"
             v-bind="{to: item.to ? item.to : null}">
             <v-list-tile-action>
-              <v-icon>{{item.icon}}</v-icon>
+              <v-icon :color="item.iconColor">{{item.icon}}</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title>
                 {{ $t(item.title) }}
               </v-list-tile-title>
             </v-list-tile-content>
+            <v-list-tile-action v-if="item.switchValue != null">
+              <v-switch
+                :color="item.switchColor"
+                v-model="item.switchValue" />
+            </v-list-tile-action>
           </v-list-tile>
-          </v-list>
+        </v-list>
       </template>
     </v-list>
     <TrellisModal
@@ -104,10 +109,13 @@
       },
       toggleBatterySaver () {
         this.global.cpuOptimized = !this.global.cpuOptimized
-        if (this.global.cpuOptimized) {
-          GeoLocationService.clearWatch()
-        } else {
+      },
+      toggleGPSWatch () {
+        this.global.watchGPS = !this.global.watchGPS
+        if (this.global.watchGPS) {
           GeoLocationService.watchPosition()
+        } else {
+          GeoLocationService.clearWatch()
         }
       },
       toggleOffline () {
@@ -180,11 +188,24 @@
           }, {
             click: this.toggleDarkTheme,
             icon: 'wb_sunny',
-            title: 'toggle_dark'
+            title: 'toggle_dark',
+            switchColor: 'black',
+            iconColor: null,
+            switchValue: this.global.darkTheme,
           }, {
             click: this.toggleBatterySaver,
-            icon: this.global.cpuOptimized ? 'battery_full' : 'battery_alert',
-            title: this.global.cpuOptimized ? 'turn_battery_off' : 'turn_battery_on',
+            title: 'battery_saver',
+            icon: 'battery_alert',
+            switchColor: 'green',
+            switchValue: this.global.cpuOptimized,
+            showIf: this.isCordovaBuild
+          }, {
+            click: this.toggleGPSWatch,
+            title: 'watch_gps',
+            iconColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green': 'yellow') : null,
+            switchColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green': 'yellow') : null,
+            icon: this.global.watchGPS ? (this.global.gpsFixed ? 'gps_fixed' : 'gps_not_fixed') : 'gps_off',
+            switchValue: this.global.watchGPS,
             showIf: this.isCordovaBuild
           }]
         }, {

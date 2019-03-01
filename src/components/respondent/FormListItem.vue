@@ -149,7 +149,8 @@
     data () {
       return {
         global: global,
-        isOpen: false
+        isOpen: false,
+        previousInterviewCoordinatesTolerance: 24 * 60 * 60 * 1000
       }
     },
     computed: {
@@ -187,7 +188,7 @@
           } catch (err) {
             err.component = 'FormListItem.vue@tryCreatingSurvey'
             logger.log(err)
-            alert(this.$t('create_survey_failed', [err]))
+            this.alert('error', this.$t('create_survey_failed', [err]))
           }
           if (survey) {
             this.tryStartingSurvey(survey)
@@ -201,12 +202,18 @@
           alert(this.$t('cant_resume_survey'))
         } else {
           try {
-            coords = await getCurrentPosition()
+            coords = await InterviewService.getLatestInterviewPosition(survey.respondentId, this.previousInterviewCoordinatesTolerance)
           } catch (err) {
-            err.component('FormListItem.vue@tryStartingSurvey')
-            logger.log(err)
-            console.error(err)
-            alert(this.$t('gps_error', [err]))
+            console.log('no previous interview matching this tolerance found')
+            try {
+              coords = await getCurrentPosition()
+            } catch (err2) {
+              err2.component('FormListItem.vue@tryStartingSurvey')
+              logger.log(err2)
+              console.error(err)
+              console.error(err2)
+              alert(this.$t('gps_error', [err2]))
+            }
           }
           try {
             interview = await InterviewService.create(survey.id, coords)

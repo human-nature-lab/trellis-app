@@ -4,7 +4,7 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Section from './Section'
 import Skip from './Skip'
 import Translation from './Translation'
-import {OneToOne} from 'typeorm/browser'
+import {OneToOne} from 'typeorm'
 
 @Entity()
 export default class Form extends TimestampedSoftDelete {

@@ -4,7 +4,7 @@ import Study from '../../entities/trellis/Study'
 import UserService from '../user/UserService'
 import UserStudy from "../../entities/trellis/UserStudy";
 import User from "../../entities/trellis/User";
-import {IsNull} from "typeorm";
+import {IsNull} from 'typeorm'
 
 class StudyServiceCordova extends StudyServiceAbstract {
   async getStudy (studyId: string): Promise<Study> {
