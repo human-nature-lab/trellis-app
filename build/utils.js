@@ -31,7 +31,7 @@ exports.cssLoaders = function (options) {
 
   // generate loader string to be used with extract text plugin
   function generateLoaders (loader, loaderOptions) {
-    var loaders = [cssLoader]
+    var loaders = ['thread-loader', cssLoader]
     if (loader) {
       loaders.push({
         loader: loader + '-loader',

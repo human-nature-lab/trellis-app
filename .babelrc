@@ -1,18 +1,10 @@
 {
   "presets": [
-    ["env", {
-      "modules": false,
+    ["@babel/preset-env", {
       "targets": {
-        "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+        "chrome": 37
       }
-    }],
-    "stage-2"
+    }]
   ],
-  "plugins": ["transform-runtime"],
-  "env": {
-    "test": {
-      "presets": ["env", "stage-2"],
-      "plugins": [ "istanbul" ]
-    }
-  }
+    "plugins": ["@babel/plugin-syntax-dynamic-import"]
 }

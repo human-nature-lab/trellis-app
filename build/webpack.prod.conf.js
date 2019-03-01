@@ -15,6 +15,7 @@ var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var MiniCssExtractPlugin = require("mini-css-extract-plugin");
 var SentryPlugin = require('@sentry/webpack-plugin')
 var sentryRelease = require('./utils').sentryRelease()
+var replaceAllBuffer = require('./replaceBuffer').replaceAllBuffer
 
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
@@ -107,9 +108,8 @@ var webpackConfig = merge(baseWebpackConfig, {
           var replacements = merge(require('../config/config.xml'), {
             CORDOVA_CONTENT_SOURCE: 'index.html'
           })
-          content = content.toString()
           for (var key in replacements) {
-            content = content.replace(key, replacements[key])
+            content = replaceAllBuffer(content, key, replacements[key])
           }
           return content
         }
