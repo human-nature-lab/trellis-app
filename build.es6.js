@@ -89,16 +89,19 @@ async function buildWeb () {
  * @returns {Promise<void>}
  */
 async function createSentryRelease () {
-  console.log('version', sentryRelease())
+  const config = require('./' + buildConfigPath).default
+  console.log('config', config)
+  const version = sentryRelease(config)
+  console.log('version', version)
   if (!opts.sentryToken || !opts.sentryOrg || !opts.sentryProject) throw new Error('sentryToken, sentryOrg, and sentryProject are all required to create a sentry release')
   const env = {
     SENTRY_AUTH_TOKEN: opts.sentryToken,
     SENTRY_ORG: opts.sentryOrg
   }
-  await exec('sentry-cli', ['releases', '--org', opts.sentryOrg, 'new', '-p', opts.sentryProject, '--log-level=debug', sentryRelease()], {
+  await exec('sentry-cli', ['releases', '--org', opts.sentryOrg, 'new', '-p', opts.sentryProject, '--log-level=debug', version], {
     env
   })
-  await exec('sentry-cli', ['releases', 'set-commits', '--auto', '--log-level=debug', sentryRelease()], {
+  await exec('sentry-cli', ['releases', 'set-commits', '--auto', '--log-level=debug', version], {
     env
   })
 }
@@ -134,8 +137,8 @@ async function main () {
   if (opts.apk) {
     if (!opts.skipBuild) {
       await buildApk()
+      await moveApk()
     }
-    await moveApk()
     if (!opts.skipSentry) {
       await createSentryRelease()
     }
