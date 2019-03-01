@@ -72,6 +72,8 @@ router.onError(err => {
   err.component = err.component ? err.component : 'router/index.js@onError'
   logger.log(err)
   AddSnack('Unable to load route', {timeout: 0})
+  singleton.loading.active = false
+  throw err
 })
 
 /**
