@@ -243,7 +243,6 @@ export default class InterviewManager extends InterviewManagerBase {
       this.resetHighWaterMark()
       this.replayToCurrent()
       this.stepForward()
-      await this.save()
     } else if (this.isAtHighWaterMark && this.lastAction) {
       this.stepForward()
       const loc = JSON.parse(JSON.stringify(this.location))
