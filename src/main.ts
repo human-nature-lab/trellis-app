@@ -20,6 +20,7 @@ import config from './config'
 import theme from './static/theme'
 import {APP_ENV} from './static/constants'
 import './logging'
+import './filters/toFixed.filter'
 
 Vue.use(Vuetify, theme)
 Vue.config.productionTip = false

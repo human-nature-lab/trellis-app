@@ -3,7 +3,7 @@ import ConditionTagInterface from './ConditionTagInterface'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'
 import uuid from 'uuid/v4'
-import {IsNull} from "typeorm";
+import {IsNull} from 'typeorm'
 
 export class ConditionTagCordova implements ConditionTagInterface {
 

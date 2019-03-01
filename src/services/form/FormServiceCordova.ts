@@ -58,6 +58,7 @@ export default class FormServiceCordova implements FormServiceInterface {
     console.log('finished form', form)
 
     removeSoftDeleted(form)
+    console.log('form removed soft deleted')
 
     return form
   }

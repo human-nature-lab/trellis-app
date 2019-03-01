@@ -116,7 +116,7 @@
         document.addEventListener('pause', this.onPause, false)
         document.addEventListener('resume', this.onResume, false)
         document.addEventListener('backbutton', this.onBackButton)
-        GeoLocationService.watchPosition()
+        this.startGPSWatch()
       }
       const user = await UserService.loadCurrentUser()
       this.$set(this.global, 'user', user)
@@ -146,6 +146,11 @@
       }
     },
     methods: {
+      startGPSWatch () {
+        if (this.global.watchGPS) {
+          GeoLocationService.watchPosition()
+        }
+      },
       dismissAlert () {
         AlertService.removeAlert()
       },
@@ -161,7 +166,7 @@
         // Handle the resume lifecycle event.
         // SetTimeout required for iOS.
         setTimeout(function () {
-          GeoLocationService.watchPosition()
+          this.startGPSWatch()
           console.log('resume')
         }, 0)
       },
