@@ -1,9 +1,9 @@
-import {AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta} from '../../../services/interview/InterviewDeltaInterface'
-import QuestionDatum from '../../../entities/trellis/QuestionDatum'
-import SectionConditionTag from "../../../entities/trellis/SectionConditionTag";
-import SurveyConditionTag from "../../../entities/trellis/SurveyConditionTag";
-import RespondentConditionTag from "../../../entities/trellis/RespondentConditionTag";
-import {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
+import {AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta} from './interview/InterviewDeltaInterface'
+import QuestionDatum from '../entities/trellis/QuestionDatum'
+import SectionConditionTag from "../entities/trellis/SectionConditionTag";
+import SurveyConditionTag from "../entities/trellis/SurveyConditionTag";
+import RespondentConditionTag from "../entities/trellis/RespondentConditionTag";
+import {ConditionTagInterface} from "./interview/InterviewDataInterface";
 import * as Moment from 'moment'
 import union from 'lodash/union'
 export default class DiffService {
@@ -113,7 +113,10 @@ export default class DiffService {
       let isSame = true
       if (Moment.isMoment(one[key])) {
         isSame = one[key].isSame(two[key])
-      } else if (one[key] === null || (!Array.isArray(one[key]) && typeof one[key] !== 'object')) {
+      } else if (one[key] === null || one[key] === undefined) {
+        // Behave as though null === undefined
+        isSame = two[key] === null || two[key] === undefined
+      } else if ((!Array.isArray(one[key]) && typeof one[key] !== 'object')) {
         isSame = one[key] === two[key]
       }
       if (!isSame) {
@@ -121,5 +124,21 @@ export default class DiffService {
       }
     }
     return true
+  }
+
+  /**
+   * Returns true if a diff has actual values
+   * @param obj
+   */
+  static hasChanges (obj: object): boolean {
+    if (!obj) return false
+    if (obj && typeof obj === 'object') {
+      for (let key in obj) {
+        if ((Array.isArray(obj[key]) && obj[key].length > 0) || DiffService.hasChanges(obj[key])) {
+          return true
+        }
+      }
+    }
+    return false
   }
 }

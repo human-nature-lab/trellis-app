@@ -4,13 +4,13 @@ import RespondentConditionTag from '../../entities/trellis/RespondentConditionTa
 import SectionConditionTag from '../../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../../entities/trellis/SurveyConditionTag'
 
-import InterviewServiceInterface from './InterviewServiceInterface'
+import InterviewServiceAbstract from './InterviewServiceAbstract'
 import Interview from '../../entities/trellis/Interview'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import GeoLocationService from '../geolocation'
 
-export default class InterviewServiceWeb implements InterviewServiceInterface {
+export default class InterviewServiceWeb extends InterviewServiceAbstract {
 
   async getInterview (interviewId: string) {
     let res = await http().get(`interview/${interviewId}`)
@@ -74,4 +74,7 @@ export default class InterviewServiceWeb implements InterviewServiceInterface {
     return new Interview().fromSnakeJSON(res.data.interview)
   }
 
+  async getLatestInterviewPosition (respondentId: string, tolerance: number): Promise<null|Coordinates> {
+    throw new Error('not implemented')
+  }
 }

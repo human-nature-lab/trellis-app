@@ -35,6 +35,9 @@ export interface Singleton {
   user: User
   offline: boolean
   printMode: boolean
+  cpuOptimized: boolean
+  watchGPS: boolean
+  gpsFixed: boolean
   secondaryDrawer: SecondaryDrawer
   menuDrawer: MenuDrawer
   loading: Loading
@@ -75,5 +78,8 @@ export default {
     actions: null,
     data: null,
     conditionTags: null
-  }
+  },
+  cpuOptimized: false,
+  watchGPS: false,
+  gpsFixed: false
 } as Singleton

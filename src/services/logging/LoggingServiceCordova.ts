@@ -4,7 +4,8 @@ import LoggingServiceAbstract from './LoggingServiceAbstract'
 import Log from "../../entities/trellis-config/Log";
 import throttle from 'lodash/throttle'
 import {LoggingLevel, LogRequest} from "./LoggingTypes";
-import {IsNull, Not} from "typeorm";
+import {IsNull, Not} from 'typeorm'
+import {Mutex, MutexInterface} from "async-mutex";
 
 class LoggingServiceCordova extends LoggingServiceAbstract {
 
@@ -12,6 +13,8 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   private save: Function
   private isSaving: boolean = false
   private hasDeferredData: boolean = false
+  private mutex = new Mutex()
+  private releaseMutex!: MutexInterface.Releaser
 
   constructor (options?) {
     super(options)
@@ -29,31 +32,26 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
    */
   async flushQueue (): Promise<boolean> {
     // Don't allow any overlapping
-    if (this.isSaving) {
-      this.hasDeferredData = true
-      return
-    }
+    this.releaseMutex = await this.mutex.acquire()
+
     const saving = this.queue.slice()
     if (saving.length === 0) {
       return // No need to save when the queue is empty
     }
-    this.isSaving = true
     console.info(`writing ${saving.length} logs to disk`)
+    let succeeded = false
     try {
       const connection = await DatabaseService.getConfigDatabase()
       await connection.manager.save(saving)
       this.queue.splice(0, saving.length) // Remove the saved items from the queue
-      return true
+      succeeded = true
     } catch (err) {
       AlertService.emit('alert', err)
-      return false
+      succeeded = false
     } finally {
-      // Call save again in the scenario where we have saved data
-      if (this.hasDeferredData) {
-        console.log(`${this.queue.length} logs were added during saving. Saving them now.`)
-        this.save()
-      }
-      this.isSaving = false
+      // Call finalSave again in the scenario where we have saved data
+      this.releaseMutex()
+      return succeeded
     }
   }
 

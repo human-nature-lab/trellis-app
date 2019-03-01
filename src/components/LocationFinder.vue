@@ -9,11 +9,18 @@
           <v-toolbar-title>Location</v-toolbar-title>
         </v-toolbar>
         <v-card-text>
-          <v-container fluid>
+          <v-container fluid text-xs-center>
             <v-layout>
               <v-flex v-if="state === 'detecting'">
                 <v-progress-circular indeterminate />
                 {{$t('detecting_location')}}
+                <v-layout v-if="showSkip">
+                  <v-spacer />
+                  <v-btn
+                    @click="skip">
+                    {{$t('skip')}}
+                  </v-btn>
+                </v-layout>
               </v-flex>
               <v-flex v-else-if="['position-unavailable', 'timeout'].indexOf(state) > -1">
                 <v-layout>
@@ -43,14 +50,20 @@
                 </v-layout>
               </v-flex>
               <v-flex v-else-if="state === 'found-location'">
-                <v-layout>
+                <v-layout justify-space-around>
                   <v-flex>
-                    <v-icon color="success">check</v-icon>
+                    <v-icon color="success">check</v-icon> {{$t('position_success')}}
                   </v-flex>
-                  <v-flex>{{$t('position_success')}}</v-flex>
                 </v-layout>
-                <v-layout>
-                  Lat: {{lastKnownCoordinates.latitude}} Long: {{lastKnownCoordinates.longitude}}
+                <v-layout justify-space-around>
+                  <v-flex>
+                    <b>Latitude: </b>{{lastKnownCoordinates.latitude | toFixed(5)}}
+                  </v-flex>
+                </v-layout>
+                <v-layout justify-space-around>
+                  <v-flex>
+                    <b>Longitude: </b>{{lastKnownCoordinates.longitude | toFixed(5)}}
+                  </v-flex>
                 </v-layout>
               </v-flex>
               <v-flex v-else-if="state === 'expired-location'">
@@ -101,11 +114,13 @@
     lastKnownTime: 0,
     attempts: 0,
     maxAttempts: 3,
+    showSkip: false,
+    isResolved: false,
     state: 'detecting',
-    tolerance: 5 * 60 * 1000
+    tolerance: 5 * 60 * 1000,
+    skipAvailableDelay: 3000,
+    dialogCloseDelay: 10 * 1000
   }
-
-  const dialogCloseDelay = 3000
 
   let vueInstance
 
@@ -135,9 +150,16 @@
     },
     methods: {
       tryForPosition (resolve, reject) {
-        this.resolve = resolve
+        this.isResolved = false
+        this.resolver = resolve
         this.reject = reject
         this.retry()
+      },
+      resolve (...args) {
+        if (!this.isResolved) {
+          this.resolver.apply(null, args)
+          this.isResolved = true
+        }
       },
       skip () {
         this.resolve(null)
@@ -152,7 +174,7 @@
           this.state = 'found-location'
           setTimeout(() => {
             this.resolve(pos.coords)
-          }, dialogCloseDelay)
+          }, this.dialogCloseDelay)
         }).catch(err => {
           this.log(err)
           if (err.code === PositionError.PERMISSION_DENIED) {
@@ -160,13 +182,13 @@
             console.error('Permission denied')
             setTimeout(() => {
               this.resolve(null)
-            }, dialogCloseDelay)
+            }, this.dialogCloseDelay)
           } else if (this.attempts >= this.maxAttempts) {
             this.state = 'exceeded-max'
             setTimeout(() => {
               console.error('Too many attempts')
               this.resolve(null)
-            }, dialogCloseDelay)
+            }, this.dialogCloseDelay)
           } else if (err.code === PositionError.TIMEOUT) {
             this.state = 'timeout'
           } else {
@@ -176,8 +198,12 @@
         })
       },
       getPosition () {
+        this.showSkip = false
         this.attempts++
         const tol = 5 * 60 * 1000
+        setTimeout(() => {
+          this.showSkip = true
+        }, this.skipAvailableDelay)
         return GeoLocationService.getLocationTolerance(tol).then(pos => {
           this.lastKnownCoordinates = pos.coords
           this.lastKnownTime = moment(pos.timestamp)

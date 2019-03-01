@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-  import FormsView from '../FormsView'
+  import FormsView from './FormsView'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import SurveyService from '../../services/survey'
   import FormService from '../../services/form/FormService'

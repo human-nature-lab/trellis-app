@@ -1,5 +1,5 @@
 <template>
-  <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode }">
+  <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
     <v-dialog
       max-width="300"
       v-model="global.loading.fullscreen && global.loading.active"
@@ -50,11 +50,6 @@
       </v-toolbar-side-icon>
     </v-toolbar>
     <v-content>
-      <v-progress-linear
-        class="route-loading"
-        indeterminate
-        :height="3"
-        :active="global.loading.active" />
       <v-dialog :value="alerts && alerts.length > 0" persistent>
         <v-card>
           <v-card-text>
@@ -110,7 +105,8 @@
         global: singleton,
         error: null,
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
-        alerts: AlertService.alerts
+        alerts: AlertService.alerts,
+        cpuOptimized: true
       }
     },
     async created () {
@@ -120,7 +116,7 @@
         document.addEventListener('pause', this.onPause, false)
         document.addEventListener('resume', this.onResume, false)
         document.addEventListener('backbutton', this.onBackButton)
-        GeoLocationService.watchPosition()
+        this.startGPSWatch()
       }
       const user = await UserService.loadCurrentUser()
       this.$set(this.global, 'user', user)
@@ -150,6 +146,11 @@
       }
     },
     methods: {
+      startGPSWatch () {
+        if (this.global.watchGPS) {
+          GeoLocationService.watchPosition()
+        }
+      },
       dismissAlert () {
         AlertService.removeAlert()
       },
@@ -157,6 +158,7 @@
         // Handle the pause lifecycle event.
         console.log('pause')
         if (this.withinCordova) {
+          GeoLocationService.clearWatch()
           defaultLoggingService.flushQueue()
         }
       },
@@ -164,6 +166,7 @@
         // Handle the resume lifecycle event.
         // SetTimeout required for iOS.
         setTimeout(function () {
+          this.startGPSWatch()
           console.log('resume')
         }, 0)
       },
@@ -222,4 +225,12 @@
       opacity: 0
     100%
       opacity: 1
+
+  .cpu-optimized
+    *
+      transition-property: none !important
+      transition-duration: 0s !important
+      /*transform: none !important*/
+      animation: none !important
+
 </style>

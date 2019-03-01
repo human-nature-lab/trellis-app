@@ -1,11 +1,14 @@
 import http from '../http/AxiosInstance'
+import {adminInst} from '../http/AxiosInstance'
 import FormServiceInterface from './FormServiceInterface'
 import StudyForm from '../../entities/trellis/StudyForm'
+import {saveAs} from 'file-saver'
 import Form from '../../entities/trellis/Form'
+import {uriTemplate} from "../http/WebUtils";
 export class FormServiceWeb implements FormServiceInterface {
 
   getStudyForms (studyId: string): Promise<StudyForm[]> {
-    return http().get(`study/${studyId}/forms/published`).then(res => {
+    return http().get(uriTemplate('study/{study}/forms/published', [studyId])).then(res => {
       if (res.data.forms) {
         return res.data.forms.map(form => new StudyForm().fromSnakeJSON(form))
       } else {
@@ -16,17 +19,37 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   getForm (formId: string, bareBones: boolean = false): Promise<Form> {
-    return http().get(`form/${formId}`)
+    return http().get(uriTemplate('form/{form}', [formId]))
       .then(res => {
         if (res.data.form) {
-          // let form = new Form().fromSnakeJSON(res.data.form)
-          // console.log(form)
           return new Form().fromSnakeJSON(res.data.form)
         } else {
           console.error(res)
           throw Error('Unable to retrieve form')
         }
       })
+  }
+
+  async createForm (studyId: string, form: Form): Promise<Form> {
+    const res = await adminInst.post(uriTemplate('study/{study}/form', [studyId]), {
+      form: form
+    })
+    return new Form().fromSnakeJSON(res.data.form)
+  }
+
+  async updateForm (studyId: string, form: Form): Promise<Form> {
+    const res = await adminInst.put(uriTemplate('study/{study_id}/form/{form_id}', [studyId, form.id]))
+    return new Form().fromSnakeJSON(res.data.form)
+  }
+
+  async exportForm (formId: string) {
+    const form = await this.getForm(formId)
+    const blob = new Blob([JSON.stringify(form.toSnakeJSON({includeRelationships: true}), null, 2)], { type: 'text/json' })
+    saveAs(blob, `form-${formId}.json`)
+  }
+
+  async deleteForm (studyId: string,formId: string) {
+    await adminInst.delete(uriTemplate('study/{study}/form/{form}', [studyId, formId]))
   }
 
 }

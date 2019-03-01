@@ -6,6 +6,7 @@ export default {
   debug: true,
   xKey: 'rXghvr7C1Q8dRmhX2Lyl3wC62TyoAr95',
   apiRoot: 'http://10.0.1.201',
+  formBuilderUrl: 'http://api.trellisandroid.net/#/form/{form_id}/builder',
   mapTileLayer: {
     url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token={accessToken}',
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',

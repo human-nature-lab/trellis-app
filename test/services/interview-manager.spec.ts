@@ -80,7 +80,7 @@ function validateConditionTags (initialTags: ConditionTagInterface, currentCondi
   })
 }
 
-function stepThroughRandomly (nSteps: number, manager: InterviewManager, locationSequence: SimpleLocation[], currentLocIndex: number = 0, validateData: boolean = true) {
+async function stepThroughRandomly (nSteps: number, manager: InterviewManager, locationSequence: SimpleLocation[], currentLocIndex: number = 0, validateData: boolean = true) {
   const initialDatum = manager['data'].data.map(d => d.copy())
   const initialConditionTags = {
     respondent: manager['data'].conditionTags.respondent.map(c => c.copy()),
@@ -92,12 +92,12 @@ function stepThroughRandomly (nSteps: number, manager: InterviewManager, locatio
     let beforeLoc = locToNumber(manager.location)
     if (moveForward && currentLocIndex !== locationSequence.length - 1) {
       currentLocIndex++
-      manager.next()
+      await manager.next()
       console.log('moving forward', currentLocIndex, `from: ${beforeLoc}, to: ${locToNumber(manager.location)}`)
     } else if (currentLocIndex !== 0) {
       // Move backward, but only if we aren't at the beginning
       currentLocIndex--
-      manager.previous()
+      await manager.previous()
       console.log('moving backward', currentLocIndex, `from: ${beforeLoc}, to: ${locToNumber(manager.location)}`)
     }
     if (validateData) {
@@ -623,7 +623,7 @@ export default function () {
           [1, 0, 1, 0],
           [1, 0, 1, 1]
         ].map(s => ({section: s[0], sectionRepetition: s[1], sectionFollowUpRepetition: s[2], page: s[3]}))
-        stepThroughRandomly(200, manager, repeatedLocationSequence, 5, false)
+        await stepThroughRandomly(200, manager, repeatedLocationSequence, 5, false)
       })
       it('should handle reloading forms and changing respondent condition tags', async () => {
         const manager = await resumeSurvey(forms.reloadConditionTag, respondentId, reloadConditionTagSurveyId)
@@ -661,7 +661,8 @@ export default function () {
         it('should store respondent level condition tags', async () => {
           const tagName = 'resp_was_assigned'
           const manager = await setupInterviewManager(forms.conditionAssignment)
-          manager.attachDataPersistSlave()
+          manager.setSaveData(true)
+          manager.setSaveActions(true)
           manager.initialize()
           let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
           console.log('conditionTags', conditionTags)
@@ -678,7 +679,7 @@ export default function () {
           validateLocation(manager.location, {section: 0, page: 3, sectionFollowUpRepetition: 0, sectionRepetition: 0})
           conditionTags = manager.navigator.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
           expect(conditionTags).to.include(tagName, 'The respondent condition tag was not assigned in memory')
-          await manager.save()
+          await manager.finalSave()
           let data = await InterviewService.getData(manager.interview.id)
           expect(data.conditionTags.respondent.length).to.be.greaterThan(0, 'No respondent condition tags assigned')
           let respondentConditionTags = data.conditionTags.respondent.map(rct => rct.conditionTag.name)

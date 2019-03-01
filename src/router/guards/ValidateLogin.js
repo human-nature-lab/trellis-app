@@ -5,8 +5,8 @@ import config from '../../config'
 
 export default async function (to, from, next) {
   const user = await UserService.getCurrentUser()
-  if (to.name === 'Sync') {
-    // Got the sync even if not logged in
+  if (to.name === 'Sync' || to.name === 'Info' || to.name === 'Documentation') {
+    // Whitelisted pages
     next()
   } else if (!user && config && config.user) {
     await LoginService.login(config.user.username, config.user.password)

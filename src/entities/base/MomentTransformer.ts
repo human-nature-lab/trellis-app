@@ -1,6 +1,6 @@
 import {ValueTransformer} from "typeorm/decorator/options/ValueTransformer";
 import moment, {isDate, isMoment, Moment} from "moment";
-import {FindOperator} from "typeorm";
+import {FindOperator} from 'typeorm'
 
 export class MomentTransformer implements ValueTransformer {
   to (date: Moment|any) {

@@ -1,7 +1,7 @@
 import Interview from '../../entities/trellis/Interview'
 import {now} from '../DateService'
 import DatabaseService from '../database/DatabaseService'
-import InterviewServiceInterface from './InterviewServiceInterface'
+import InterviewServiceAbstract from './InterviewServiceAbstract'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import QuestionDatum from '../../entities/trellis/QuestionDatum'
@@ -16,7 +16,7 @@ import Datum from '../../entities/trellis/Datum'
 import InterviewDataInterface from './InterviewDataInterface'
 import {randomIntBits} from "../../classes/M";
 
-export default class InterviewServiceCordova implements InterviewServiceInterface {
+export default class InterviewServiceCordova extends InterviewServiceAbstract {
 
   public async getInterview (interviewId: string): Promise<Interview> {
     const repo = await DatabaseService.getRepository(Interview)
@@ -157,12 +157,12 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
   }
 
   private async getSectionConditionTags (interviewId: string): Promise<SectionConditionTag[]> {
-    return await (await DatabaseService.getRepository(SurveyConditionTag)).createQueryBuilder('section_condition_tag')
+    return await (await DatabaseService.getRepository(SectionConditionTag)).createQueryBuilder('section_condition_tag')
       .where(qb => {
         return `section_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`
       })
       .andWhere('section_condition_tag.deletedAt is null')
-      .leftJoinAndSelect('section_condition_tag', 'section_condition_tag.conditionTag')
+      .leftJoinAndSelect('section_condition_tag.conditionTag', 'conditionTag')
       .getMany()
   }
 
@@ -350,4 +350,23 @@ export default class InterviewServiceCordova implements InterviewServiceInterfac
   public async getPreload (interviewId: string) {
     return null
   }
+
+  public async getLatestInterviewPosition (respondentId: string, tolerance: number) {
+    const repo = await DatabaseService.getRepository(Interview)
+    const interview = await repo.createQueryBuilder('interview')
+      .where('interview.survey_id in (select id from survey where respondent_id = :respondentId)', { respondentId })
+      .andWhere('interview.createdAt >= :oldestDate', {oldestDate: this.getDateFromTolerance(tolerance)})
+      .andWhere('interview.latitude is not NULL')
+      .getOne()
+    if (interview) {
+      return {
+        latitude: interview.latitude,
+        longitude: interview.longitude,
+        altitude: interview.altitude
+      } as Coordinates
+    } else {
+      throw Error('No previous interview matching these criteria')
+    }
+  }
+
 }
