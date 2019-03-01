@@ -66,9 +66,6 @@ export default abstract class Recycler<T> {
    */
   private extractKey (obj: T): string {
     const baseKey = this.keyExtractor(obj)
-    if ('questionDatumId' in obj && obj['questionDatumId'] === 'e281a7ff-4721-48a3-953f-ecbc95f9dc43') {
-      console.log('baseKey', obj['questionDatumId'], baseKey)
-    }
     if (Array.isArray(baseKey)) {
       return baseKey.map(v => v == null ? null : v).join('-')
     } else {
