@@ -39,6 +39,9 @@
           <td>
             {{props.item.createdAt.local().fromNow()}}
           </td>
+          <td :class="`text--${props.item.severity} ${props.item.severity}`">
+            {{props.item.severity}}
+          </td>
           <td>
             {{props.item.message}}
           </td>
@@ -111,6 +114,9 @@
         headers: [{
           text: 'Timestamp',
           value: 'createdAt'
+        }, {
+          text: 'Severity',
+          value: 'severity'
         }, {
           text: 'Message',
           value: 'message'
