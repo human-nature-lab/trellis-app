@@ -17,6 +17,7 @@ export default class FormServiceCordova implements FormServiceInterface {
         deletedAt: IsNull()
       }
     })
+    removeSoftDeleted(studyForms)
     return studyForms.filter(s => (s.form.isPublished && s.form.deletedAt === null))
   }
 
