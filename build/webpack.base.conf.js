@@ -5,6 +5,7 @@ var vueLoaderConfig = require('./vue-loader.conf')
 var FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 var webpack = require('webpack')
 var SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
+var threadLoader = require('thread-loader')
 
 const smp = new SpeedMeasurePlugin()
 const { VueLoaderPlugin } = require('vue-loader')
@@ -102,8 +103,12 @@ module.exports = smp.wrap({
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader',
-        options: vueLoaderConfig,
+        use: [{
+          loader: 'thread-loader'
+        }, {
+          loader: 'vue-loader',
+          options: vueLoaderConfig,
+        }],
         exclude: /node_modules/
       },
       {
@@ -158,3 +163,9 @@ module.exports = smp.wrap({
     })
   ]
 })
+
+// threadLoader.warmup({}, [
+//   'babel-loader',
+//   'sass-loader',
+//   'eslint-loader'
+// ])
