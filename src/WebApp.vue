@@ -165,7 +165,7 @@
       onResume () {
         // Handle the resume lifecycle event.
         // SetTimeout required for iOS.
-        setTimeout(function () {
+        setTimeout(() => {
           this.startGPSWatch()
           console.log('resume')
         }, 0)
@@ -227,7 +227,7 @@
       opacity: 1
 
   .cpu-optimized
-    *
+    *:not(.stepper_wrapper)
       transition-property: none !important
       transition-duration: 0s !important
       /*transform: none !important*/

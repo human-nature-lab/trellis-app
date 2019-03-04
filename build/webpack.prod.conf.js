@@ -38,16 +38,16 @@ var webpackConfig = merge(baseWebpackConfig, {
   optimization: {
     minimizer: [
       // we specify a custom UglifyJsPlugin here to get source maps in production
-      // new UglifyJsPlugin({
-      //   cache: true,
-      //   parallel: true,
-      //   uglifyOptions: {
-      //     compress: false,
-      //     ecma: 6,
-      //     mangle: false
-      //   },
-      //   // sourceMap: true
-      // })
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        uglifyOptions: {
+          compress: true,
+          ecma: 6,
+          mangle: false
+        },
+        sourceMap: true
+      })
     ]
   },
   plugins: [
@@ -57,10 +57,10 @@ var webpackConfig = merge(baseWebpackConfig, {
       'process.env': env,
       VERSION: JSON.stringify(require('../package.json').version)
     }),
-    // new MiniCssExtractPlugin({
-    //   filename: '[name].css',
-    //   chunkFileName: '[id].css'
-    // }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFileName: '[id].css'
+    }),
     // extract css into its own file
     // new ExtractTextPlugin({
     //   filename: utils.assetsPath('css/[name].[md5:contenthash:hex:15].css')

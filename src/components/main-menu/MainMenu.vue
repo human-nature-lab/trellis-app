@@ -63,6 +63,7 @@
   import IsAdminMixin from '../../mixins/IsAdminMixin'
   import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
   import GeoLocationService from '../../services/geolocation'
+  import Vue from 'vue'
 
   export default {
     mixins: [ IsAdminMixin, IsLoggedInMixin],
@@ -109,6 +110,12 @@
       },
       toggleBatterySaver () {
         this.global.cpuOptimized = !this.global.cpuOptimized
+        if (this.global.cpuOptimized) {
+          this.rippleDirective = Vue.directive('ripple')
+          Vue.directive('ripple', {})
+        } else {
+          Vue.directive('ripple', this.rippleDirective)
+        }
       },
       toggleGPSWatch () {
         this.global.watchGPS = !this.global.watchGPS
