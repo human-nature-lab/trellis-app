@@ -1,5 +1,5 @@
 <template>
-  <v-flex class="respondent-forms">
+  <v-flex xs12 class="respondent-forms">
     <v-container fluid>
       <v-alert v-if="error">{{ error }}</v-alert>
       <v-card>

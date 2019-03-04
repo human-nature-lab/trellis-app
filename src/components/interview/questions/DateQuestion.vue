@@ -2,7 +2,7 @@
     <v-date-picker
       v-model="date"
       reactive
-      landscape
+      :landscape="$vuetify.breakpoint.smAndUp"
       :locale="locale"
       :disabled="isQuestionDisabled">
     </v-date-picker>
