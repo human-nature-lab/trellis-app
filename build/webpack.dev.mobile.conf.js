@@ -8,7 +8,6 @@ var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
-var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 var HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
 var replaceAllBuffer = require('./replaceBuffer').replaceAllBuffer
 
@@ -62,10 +61,6 @@ module.exports = merge(baseWebpackConfig, {
         return content
       }
     }]),
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      openAnalyzer: false
-    }),
     new HardSourceWebpackPlugin()
   ]
 })

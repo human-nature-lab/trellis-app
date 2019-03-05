@@ -9,17 +9,16 @@
         @close="close" />
       <v-card-text>
           <v-layout>
-            <v-flex>Location</v-flex>
-            <v-flex v-if="selectedGeo">
-              <v-chip>
+            <v-flex>
+              Location
+              <v-chip v-if="selectedGeo">
                 <AsyncTranslationText :translation="selectedGeo.nameTranslation" />
               </v-chip>
             </v-flex>
-            <v-flex>
-              <v-btn @click="showGeoSearch=true">
-                {{selectedGeo ? $t('select_location') : $t('add_location')}}
-              </v-btn>
-            </v-flex>
+            <v-spacer />
+            <v-btn @click="showGeoSearch=true">
+              {{selectedGeo ? $t('select_location') : $t('add_location')}}
+            </v-btn>
           </v-layout>
           <v-layout>
             <v-checkbox v-model="isCurrent" :label="$t('current_geo_location')" />

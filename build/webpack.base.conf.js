@@ -5,7 +5,7 @@ var vueLoaderConfig = require('./vue-loader.conf')
 var FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 var webpack = require('webpack')
 var SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
-var threadLoader = require('thread-loader')
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 const smp = new SpeedMeasurePlugin()
 const { VueLoaderPlugin } = require('vue-loader')
@@ -160,10 +160,15 @@ module.exports = smp.wrap({
     new VueLoaderPlugin(),
     new webpack.NormalModuleReplacementPlugin(/typeorm$/, function (result) {
       result.request = result.request.replace(/typeorm/, "typeorm/browser");
-    })
+    }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      openAnalyzer: false
+    }),
   ]
 })
 
+// var threadLoader = require('thread-loader')
 // threadLoader.warmup({}, [
 //   'babel-loader',
 //   'sass-loader',
