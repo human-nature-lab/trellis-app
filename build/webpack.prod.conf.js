@@ -42,11 +42,11 @@ var webpackConfig = merge(baseWebpackConfig, {
       //   cache: true,
       //   parallel: true,
       //   uglifyOptions: {
-      //     compress: false,
+      //     compress: true,
       //     ecma: 6,
       //     mangle: false
       //   },
-      //   // sourceMap: true
+      //   sourceMap: true
       // })
     ]
   },
@@ -57,10 +57,10 @@ var webpackConfig = merge(baseWebpackConfig, {
       'process.env': env,
       VERSION: JSON.stringify(require('../package.json').version)
     }),
-    // new MiniCssExtractPlugin({
-    //   filename: '[name].css',
-    //   chunkFileName: '[id].css'
-    // }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFileName: '[id].css'
+    }),
     // extract css into its own file
     // new ExtractTextPlugin({
     //   filename: utils.assetsPath('css/[name].[md5:contenthash:hex:15].css')
