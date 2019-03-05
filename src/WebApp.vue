@@ -38,6 +38,7 @@
         <v-btn class="subheading"
                slot="activator"
                flat
+               icon
                :to="{name: 'locale', query: {to: $route.fullPath}}">
           {{global.locale ? global.locale.languageTag : ''}}
         </v-btn>
