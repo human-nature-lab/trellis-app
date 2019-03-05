@@ -29,9 +29,16 @@
         <router-link :to="{name: 'Home'}" class="deep-orange--text">
           <img src="../static/img/trellis-logo.png" alt="trellis">
         </router-link>
-        <span class="study" v-if="global.study">
-          ({{global.study.name}})
-        </span>
+      </v-toolbar-title>
+      <v-toolbar-title v-if="global.study" class="study">
+        <v-tooltip right>
+          <v-btn class="subheading" slot="activator"
+                 flat
+                 :to="{name: 'StudySelector', query: {to: $route.fullPath}}">
+            {{global.study.name}}
+          </v-btn>
+          <span>{{$t('change_study')}}</span>
+        </v-tooltip>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-tooltip left>
@@ -208,17 +215,11 @@
     padding-top: 0
   .logo
     height: 55%
-    width: 100%
     img
       max-width: 100%
       max-height: 100%
-    .study
-      color: #9d9d9d
-      font-size: 20px
-      display: inline-flex
-      height: 145%
-      padding-left: 10px
-      vertical-align: middle
+  .study
+    margin-left: 0
   .fade-in
     animation: fade-in .3s ease-in-out 0s 1
   @keyframes fade-in
