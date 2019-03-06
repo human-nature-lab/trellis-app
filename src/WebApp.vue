@@ -232,5 +232,7 @@
       transition-duration: 0s !important
       /*transform: none !important*/
       animation: none !important
+  .page-footer
+    background-color: #808080 !important
 
 </style>
