@@ -227,7 +227,7 @@
       opacity: 1
 
   .cpu-optimized
-    *:not(.stepper_wrapper)
+    *:not(.stepper__wrapper)
       transition-property: none !important
       transition-duration: 0s !important
       /*transform: none !important*/
