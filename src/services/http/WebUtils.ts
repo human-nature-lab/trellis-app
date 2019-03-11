@@ -26,7 +26,7 @@ export function uriTemplate (template: string, argsArrayOrMap: string[]|object):
   if (Array.isArray(argsArrayOrMap)) {
     const reg = /\{\w*\}/
     for (const arg of argsArrayOrMap) {
-      template = template.replace(reg, arg)
+      template = template.replace(reg, encodeURIComponent(arg))
     }
   } else {
     for (let key in argsArrayOrMap) {
