@@ -119,7 +119,7 @@
     state: 'detecting',
     tolerance: 5 * 60 * 1000,
     skipAvailableDelay: 3000,
-    dialogCloseDelay: 10 * 1000
+    dialogCloseDelay: 3 * 1000
   }
 
   let vueInstance
