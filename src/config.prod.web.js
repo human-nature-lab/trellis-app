@@ -1,6 +1,6 @@
-import constants from './static/constants'
+const constants = require('./static/constants')
 
-const config = {
+module.exports = {
   appEnv: constants.APP_ENV.WEB,
   appMode: constants.APP_MODE.PROD,
   xKey: '***REMOVED***',
@@ -26,5 +26,3 @@ const config = {
     offline: true                         // True if we're using the offline integration
   }
 }
-
-export default config
