@@ -3,6 +3,7 @@ const constants = require('./static/constants')
 module.exports = {
   appEnv: constants.APP_ENV.CORDOVA,
   appMode: constants.APP_MODE.PROD,
+  debug: false,
   xKey: '***REMOVED***',
   apiRoot: 'https://api.***REMOVED***',
   database: {
