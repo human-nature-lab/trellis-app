@@ -67,6 +67,27 @@ Any files that are added should also be added to `_Sidebar.md` so that it can be
 ### Creating internal links to the documentation
 Update the `src/components/documentation/DocsFiles.ts` to add files to the documentation. Use this file to reference any links to the documentation throughout your code. This will help prevent accidentally creating broken links to documentation. To create a documentation link in the navigation use the `DocsLinkMixin`. This will make the *help icon* link directly to the relevant file for the current view.
 
+## Releasing
+Creating a production release involves a lot of different moving parts. We release to multiple platforms which each have their own configuration files. Most of the release logic has been turned into a single script.
+
+### Base
+Do all of these things before building for any of the environments.
+1. Bump the version in **package.json**. 3.0.28 elog in the changelog directory. This should be a brief desc-> 3.0.29
+1. Write the version changription of the modifications that have been made to the behavior or user interface in Trellis.
+
+### App
+1. Do all of the things in the base section
+1. Run `node build.js --config=src/config.prod.app.js --apk --sentry-token=${SENTRY_TOKEN} --sentry-org="wyatt-israel"` to build an APK using the supplied configuration file. Token is the API token used for sentry. While not necessary, creating the APK with this flag helps with debugging issues in production.
+1. Once it's done, upload the generated APK in the releases directory to the Google Drive directory.
+
+### Web
+1. Do all of the things in the base section
+1. Run `node build.js --config=src/config.test.web.js --web --sentry-token=${SENTRY_TOKEN} --sentry-org="wyatt-israel"` to bundle files into the www/ directory.
+1. Zip these files and upload to the Trellistest server
+1. Remove the existing www/ directory in the trellis-web repository
+1. Unzip the uploaded zip. This should place these files into the www/ directory to be served by nginx
+1. Do the same steps for prod, but use the `src/config.prod.web.js` configuration file instead
+
 ## Testing
 ### Unit
 All unit tests can be run with `npm run unit`. To debug tests in Chrome use `karma start test/unit/karma.conf.js --browsers=Chrome`
