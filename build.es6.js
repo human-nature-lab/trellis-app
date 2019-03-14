@@ -70,15 +70,30 @@ async function moveApk () {
   })
 }
 
+function getEnv () {
+  if (!opts.sentryToken || !opts.sentryOrg || !opts.sentryProject) throw new Error('sentryToken, sentryOrg, and sentryProject are all required to create a sentry release')
+  return Object.assign({
+    SENTRY_AUTH_TOKEN: opts.sentryToken,
+    SENTRY_ORG: opts.sentryOrg,
+    SENTRY_PROJECT: opts.sentryProject
+  }, process.env)
+}
+
 async function buildApk () {
   console.log('building APK')
-  await exec('npm', ['run', 'android'])
+  const env = getEnv()
+  await exec('npm', ['run', 'android'], {
+    env
+  })
 }
 
 async function buildWeb () {
   // Build files
   console.log('bundling files for web')
-  await exec('npm', ['run', 'build'])
+  const env = getEnv()
+  await exec('npm', ['run', 'build'], {
+    env
+  })
   console.log('zipping files')
   await exec('zip www.zip www/')
   // TODO: Push to server
@@ -93,11 +108,7 @@ async function createSentryRelease () {
   console.log('config', config)
   const version = sentryRelease(config)
   console.log('version', version)
-  if (!opts.sentryToken || !opts.sentryOrg || !opts.sentryProject) throw new Error('sentryToken, sentryOrg, and sentryProject are all required to create a sentry release')
-  const env = {
-    SENTRY_AUTH_TOKEN: opts.sentryToken,
-    SENTRY_ORG: opts.sentryOrg
-  }
+  const env = getEnv()
   await exec('sentry-cli', ['releases', '--org', opts.sentryOrg, 'new', '-p', opts.sentryProject, '--log-level=debug', version], {
     env
   })

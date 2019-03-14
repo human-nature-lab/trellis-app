@@ -7,6 +7,7 @@
   </author>
   <preference name="DisallowOverscroll" value="true" />
   <preference name="ShowSplashScreenSpinner" value="false"/>
+  <preference name="AndroidLaunchMode" value="singleInstance"/>
   <allow-navigation href="*" />
   <access origin="*" />
   <allow-intent href="http://*/*" />

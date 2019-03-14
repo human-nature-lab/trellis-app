@@ -1,8 +1,9 @@
-import constants from './static/constants'
+const constants = require('./static/constants')
 
-const config = {
+module.exports = {
   appEnv: constants.APP_ENV.CORDOVA,
   appMode: constants.APP_MODE.PROD,
+  debug: false,
   xKey: 'rXghvr7C1Q8dRmhX2Lyl3wC62TyoAr95',
   apiRoot: 'https://api.trellisprod.net',
   database: {
@@ -25,5 +26,3 @@ const config = {
     offline: true                         // True if we're using the offline integration
   }
 }
-
-export default config
