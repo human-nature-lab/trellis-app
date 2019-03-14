@@ -1,8 +1,9 @@
-import constants from './static/constants'
+const constants = require('./static/constants')
 
-const config = {
+module.exports = {
   appEnv: constants.APP_ENV.CORDOVA,
   appMode: constants.APP_MODE.PROD,
+  debug: false,
   xKey: '***REMOVED***',
   apiRoot: 'https://api.***REMOVED***',
   database: {
@@ -25,5 +26,3 @@ const config = {
     offline: true                         // True if we're using the offline integration
   }
 }
-
-export default config
