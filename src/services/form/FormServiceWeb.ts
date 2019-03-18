@@ -1,3 +1,4 @@
+import formTypes from "../../static/form.types";
 import http from '../http/AxiosInstance'
 import {adminInst} from '../http/AxiosInstance'
 import FormServiceInterface from './FormServiceInterface'
@@ -18,6 +19,11 @@ export class FormServiceWeb implements FormServiceInterface {
     })
   }
 
+  async getAllStudyForms (studyId: string): Promise<StudyForm[]> {
+    const res = await adminInst.get(uriTemplate('study/{}/form', [studyId]))
+    return res.data.forms.map(f => new StudyForm().fromSnakeJSON(f))
+  }
+
   getForm (formId: string, bareBones: boolean = false): Promise<Form> {
     return http().get(uriTemplate('form/{form}', [formId]))
       .then(res => {
@@ -30,9 +36,9 @@ export class FormServiceWeb implements FormServiceInterface {
       })
   }
 
-  async createForm (studyId: string, form: Form): Promise<Form> {
+  async createForm (studyId: string, formType: formTypes): Promise<Form> {
     const res = await adminInst.post(uriTemplate('study/{study}/form', [studyId]), {
-      form: form
+      form_type: formType
     })
     return new Form().fromSnakeJSON(res.data.form)
   }
