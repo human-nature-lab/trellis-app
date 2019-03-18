@@ -1,34 +1,28 @@
 <template>
-  <v-container grid-list-xl fluid>
-    <v-layout wrap>
-      <v-flex xs9>
-        <v-text-field
-          v-on:keyup="onChangeTranslation"
-          v-model="textFieldValue"
-          :placeholder="$t('new_location')"
-          :autofocus="true"
-          :disabled="saving">
-        </v-text-field>
-      </v-flex>
-      <v-flex xs3>
-        <v-select
-          v-on:change="onChangeLocale"
-          :items="languageTags"
-          v-model="selectedLanguageTag"
-          :disabled="saving">
-        </v-select>
-      </v-flex>
-      <v-btn flat @click="onSave" :disabled="!enableSave || saving">{{ $t('save') }}</v-btn>
-      <v-btn flat @click="onCancel" :disabled="saving">{{ $t('cancel') }}</v-btn>
-    </v-layout>
-  </v-container>
+  <v-flex @click.stop>
+      <ClickToEdit
+        v-model="isEditing"
+        :disabled="saving"
+        @save="onSave"
+        :text="textFieldValue" />
+      <v-select
+        dense
+        class="small-select"
+        v-on:change="onChangeLocale"
+        :items="languageTags"
+        v-model="selectedLanguageTag"
+        :disabled="saving">
+      </v-select>
+  </v-flex>
 </template>
 
 <script>
   import TranslationTextService from '../services/translation-text/TranslationTextService'
+  import ClickToEdit from './ClickToEdit'
   import singleton from '../static/singleton'
   export default {
     name: 'translation-text-field',
+    components: {ClickToEdit},
     created: function () {
       this.translation.translationText.forEach((translationText) => {
         this.languageTags.push(translationText.locale.languageTag)
@@ -45,19 +39,21 @@
         languageTags: [],
         selectedLanguageTag: '',
         enableSave: false,
-        saving: false
+        saving: false,
+        isEditing: false
       }
     },
     methods: {
-      onSave: async function () {
+      async onSave (newValue) {
         this.saving = true
         // Persist any changes to the current translation
-        this.textFieldValues[this.selectedLanguageTag] = this.textFieldValue
+        this.textFieldValues[this.selectedLanguageTag] = newValue
+        this.textFieldValue = newValue
         // If any other language has an empty string, use the current string field for the value
         for (let languageTag in this.textFieldValues) {
           if (this.textFieldValues.hasOwnProperty(languageTag)) {
             if (this.textFieldValues[languageTag] === '') {
-              this.textFieldValues[languageTag] = this.textFieldValue
+              this.textFieldValues[languageTag] = newValue
             }
           }
         }
@@ -71,6 +67,8 @@
             }
           }
         }
+        this.saving = false
+        this.isEditing = false
         this.$emit('editing-done', this.translation)
       },
       onCancel: async function () {
@@ -112,6 +110,12 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  /*.inline*/
+    /*display: inline-block*/
+    /*> **/
+      /*display: inline-block*/
+  .small-select
+    display: inline-block
+    max-width: 60px
 </style>

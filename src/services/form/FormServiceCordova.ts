@@ -1,3 +1,4 @@
+import formTypes from "../../static/form.types";
 import FormServiceInterface from './FormServiceInterface'
 import DatabaseService from '../database/DatabaseService'
 import StudyForm from '../../entities/trellis/StudyForm'
@@ -64,7 +65,7 @@ export default class FormServiceCordova implements FormServiceInterface {
     return form
   }
 
-  createForm (studyId: string, form: Form): Promise<Form> {
+  createForm (studyId: string, formType: formTypes): Promise<Form> {
     throw Error('Not implemented')
   }
 

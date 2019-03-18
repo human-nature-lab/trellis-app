@@ -14,7 +14,7 @@ export default class StudyForm extends TimestampedSoftDelete {
   @Column() @Serializable
   sortOrder: number
   @Column() @Serializable
-  formTypeId: string
+  formTypeId: number
   @Column({ nullable: true }) @Serializable
   censusTypeId: string
 
@@ -27,8 +27,12 @@ export default class StudyForm extends TimestampedSoftDelete {
     if (json.study_form && json.study_form.length) {
       super.fromSnakeJSON(json.study_form[0])
       this.form = new Form().fromSnakeJSON(json)
+    } else if (json.pivot) {
+      super.fromSnakeJSON(json.pivot)
+      this.form = new Form().fromSnakeJSON(json)
     } else {
       super.fromSnakeJSON(json)
+      this.formTypeId = +this.formTypeId
     }
     this.sortOrder = +this.sortOrder // Convert to a number
     return this

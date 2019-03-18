@@ -2,15 +2,22 @@ import Form from '../../entities/trellis/Form'
 import StudyForm from '../../entities/trellis/StudyForm'
 import Skip from "../../entities/trellis/Skip";
 import FormSkip from "../../entities/trellis/FormSkip";
+import formTypes from "../../static/form.types";
 
 export default interface FormServiceInterface {
 
   /**
-   * Gets all forms for the current study
+   * Gets all published forms for a study
    * @param {String} studyId
    * @returns {Promise<StudyForm[]>}
    */
   getStudyForms (studyId: string): Promise<StudyForm[]>
+
+  /**
+   * Gets all of the forms for a study including unpublished.
+   * @param studyId
+   */
+  getAllStudyForms (studyId: string): Promise<StudyForm[]>
 
   /**
    * Gets a single form by id
@@ -23,9 +30,9 @@ export default interface FormServiceInterface {
   /**
    * Create a new form in the database
    * @param studyId
-   * @param form
+   * @param formType
    */
-  createForm (studyId: string, form: Form): Promise<Form>
+  createForm (studyId: string, formType: formTypes): Promise<Form>
 
   /**
    * Update an existing form in the database
