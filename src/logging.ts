@@ -13,7 +13,7 @@ if (config.sentry && config.sentry.dsn) {
   }
   const sentryConfig: BrowserOptions = {
     dsn: config.sentry.dsn,
-    release: 'trellis-' + VERSION,
+    release: release,
     environment: config.debug ? 'dev' : 'prod',
     integrations: [new Sentry.Integrations.Vue({ Vue }), new Sentry.Integrations.RewriteFrames()],
     debug: config.debug
