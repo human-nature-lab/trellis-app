@@ -1,3 +1,5 @@
+import {randomIntBits} from "../../classes/M";
+import {RandomPagination, RandomPaginationResult} from "../../types/Pagination";
 import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
@@ -132,7 +134,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     return geos
   }
 
-  async getSearchPage (studyId: string, query: string, filters: SearchFilter, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
+  async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null,): Promise<RandomPaginationResult<Respondent>> {
     const repository = await DatabaseService.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
     let geos
@@ -142,15 +144,24 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       geos = await this.getGeoIds(filters.geos, filters.includeChildren)
     }
 
+    const seed = pagination.seed || randomIntBits(24)
 
-    let q = queryBuilder.where('"respondent"."id" in (select respondent_id from study_respondent where study_id = :studyId)', {studyId: studyId})
+    let limitQuery = `select r.id from respondent r
+      where r.deleted_at is null 
+      and r.id in (
+        select respondent_id from study_respondent where study_id = '${studyId}'
+      )`
+    let params = {studyId}
+
 
     // Query string broken into words
     if (typeof query === 'string' && query.trim().length > 0) {
       const searchTerms = query.split(' ')
       for (let i = 0; i < searchTerms.length; i++) {
         let searchTerm = '% ' + searchTerms[i].trim() + '%'
-        q.andWhere(`"respondent"."id" in (select distinct respondent_id from respondent_name where " " || name like :searchTerm${i})`, {[`searchTerm${i}`]: searchTerm})
+        const key = `searchTerm${i}`
+        limitQuery += ` and r.id in (select distinct respondent_id from respondent_name where " " || name like :${key})`
+        params[key] = searchTerm
       }
     }
 
@@ -160,61 +171,78 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       if (conditionTagNames.length > 1) {
         // TODO: Isn't this group by very expensive?
         // Doesn't it basically require grouping every single respondent_condition_tag regardless of how many responses we actually want?
-        q = q.andWhere('"respondent"."id" in (' +
-          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
-          'select id from condition_tag where name in (:...conditionTagNames)) ' +
-          'group by respondent_id having count(distinct condition_tag_id) = :conditionCount)',
-          {conditionTagNames: conditionTagNames, conditionCount: conditionTagNames.length})
+        limitQuery += ` and r.id in (
+          select distinct respondent_id from respondent_condition_tag where condition_tag_id in (
+          select id from condition_tag where name in (:...conditionTagNames)) 
+          group by respondent_id having count(distinct condition_tag_id) = :conditionTagsLength)`
+        params['conditionTagNames'] = conditionTagNames
+        params['conditionTagsLength'] = conditionTagNames.length
       } else {
-        q = q.andWhere('"respondent"."id" in (' +
-          'select distinct respondent_id from respondent_condition_tag where condition_tag_id in (' +
-          'select id from condition_tag where name in (:...conditionTagNames)))',
-          {conditionTagNames: conditionTagNames})
+        limitQuery += ` and r.id in (
+          select distinct respondent_id from respondent_condition_tag where condition_tag_id in (
+            select id from condition_tag where name in (:...conditionTagNames)
+          )
+        )`
+        params['conditionTagNames'] = conditionTagNames
       }
     }
 
-    // Geo filters
-    q.andWhere(new Brackets(qb => {
-      qb.where(new Brackets(gq => {
-        gq.where('associated_respondent_id is null')
-        // TODO: Handle the maximum parameters limitation in sqlite -> https://www.sqlite.org/limits.html
-        if (geos && geos.length > 0) {
-          if (geos.length > 999) {
-            throw new Error('Too many respondent geos')
-          }
-          let subSelect = 'select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geos)'
-          let params = { geos }
-          // debugger
-          if (filters.onlyCurrentGeo) {
-            subSelect += ' and is_current = :onlyCurrentGeo'
-            params['onlyCurrentGeo'] = 1
-          }
-          gq.andWhere(`"respondent"."id" in (${subSelect})`, params)
-        }
-      }))
-      qb.orWhere('associated_respondent_id = :respondentId', {respondentId: respondentId})
+    limitQuery += ` and (
+      (r.associated_respondent_id is null`
 
-      // Or condition tag filters
-      if (Array.isArray(filters.orConditionTags) && filters.orConditionTags.length > 0) {
-        let orConditionTagNames = filters.orConditionTags
-        qb.orWhere('"respondent"."id" in (' +
-          'select distinct respondent_id from respondent_condition_tag where deleted_at is null and condition_tag_id in (' +
-          'select id from condition_tag where name in (:...orConditionTagNames)))',
-          {orConditionTagNames: orConditionTagNames})
+    // Geo filters
+    if (geos && geos.length > 0) {
+      if (geos.length > 999) {
+        throw new Error('Too many respondent geos')
       }
 
-    }))
-    q = q.andWhere('"respondent"."deleted_at" is null')
-    q = q.take(size).skip(page * size)
+      let subselect = `select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geoIds)`
+      params['geoIds'] = geos
+
+      if (filters.onlyCurrentGeo) {
+        subselect += ` and is_current = 1`
+      }
+      limitQuery += ` and r.id in (${subselect})`
+    }
+    limitQuery += ')'
+    if (respondentId) {
+      limitQuery += ' or r.associated_respondent_id = :respondentId'
+      params['respondentId'] = respondentId
+    }
+
+    // Or Condition tags
+    if (Array.isArray(filters.orConditionTags) && filters.orConditionTags.length > 0) {
+      let orConditionTagNames = filters.orConditionTags
+      limitQuery += ` or r.id in (
+        select distinct respondent_id from respondent_condition_tag where deleted_at is null and condition_tag_id in (
+          select id from condition_tag where name in (:...orConditionTags)
+      ))`
+      params['orConditionTags'] = orConditionTagNames
+    }
+    limitQuery += ')'
+
+    const offset = pagination.size * pagination.page
+    limitQuery += ` order by substr(r.rowid * ${seed}, length(r.rowid) + 2) limit ${pagination.size} offset ${offset}`
+
+    console.log('limitQuery', limitQuery, params)
+
+    let q = queryBuilder.where(`respondent.id in (${limitQuery})`, params)
     q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
-    if (filters.randomize) {
-      q = q.orderBy('RANDOM()')
-    }
+
     const respondents = await q.getMany()
+
+    // const respondents = []
+    console.log('respondents', respondents)
     removeSoftDeleted(respondents)
-    return respondents
+    return {
+      page: pagination.page,
+      size: pagination.size,
+      seed: seed,
+      total: 0,
+      data: respondents
+    }
   }
 
   async addName (respondentId, name, isDisplayName = false, localeId = null): Promise<RespondentName> {
