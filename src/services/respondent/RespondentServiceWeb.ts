@@ -1,3 +1,4 @@
+import Pagination, {RandomPagination, RandomPaginationResult} from "../../types/Pagination";
 import http from '../http/AxiosInstance'
 import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
@@ -47,12 +48,13 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     return new Respondent().fromSnakeJSON(res.data.respondent)
   }
 
-  async getSearchPage (studyId: string, query: string, filters: SearchFilter, page = 0, size = 50, respondentId = null): Promise<Respondent[]> {
+  async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null): Promise<RandomPaginationResult<Respondent>> {
     // TODO: Add is_current filter
     let params = {
       q: query,
-      offset: page * size,
-      limit: size,
+      page: pagination.page,
+      size: pagination.size,
+      seed: pagination.seed,
       associated_respondent_id: respondentId
     }
     if (filters.conditionTags) {
@@ -73,12 +75,14 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     if (filters.randomize) {
       params['r'] = filters.randomize
     }
-    let res = await http().get(uriTemplate('study/{}/respondents/search', [studyId]), {
-      params: params
-    })
-    return res.data.respondents.slice(0, size).map(r => {
-      return new Respondent().fromSnakeJSON(r)
-    })
+    let res = await http().get(uriTemplate('study/{studyId}/respondents/search', [studyId]), { params })
+    return {
+      page: res.data.page,
+      size: res.data.size,
+      total: res.data.total,
+      seed: res.data.seed,
+      data: res.data.data.map(r => new Respondent().fromSnakeJSON(r))
+    }
   }
   async addName (respondentId, name, isDisplayName = null, localeId = null): Promise<RespondentName> {
     let res = await http().post(uriTemplate('respondent/{}/name', [respondentId]), {
