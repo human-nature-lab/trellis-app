@@ -221,6 +221,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     }
     limitQuery += ')'
 
+    // Psuedo-random sort order is achieved as described here -> https://stackoverflow.com/a/24511461/5551941
     const offset = pagination.size * pagination.page
     limitQuery += ` order by substr(r.rowid * ${seed}, length(r.rowid) + 2) limit ${pagination.size} offset ${offset}`
 

@@ -140,6 +140,10 @@ export function validateParametersWithError (question: Question, parameters: Que
     return true
   }
 
+  if (questionDatum.noOne) {
+    return true
+  }
+
   if (pMap.is_required && (pMap.show_dk || pMap.show_rf)) {
     if (questionDatum.dkRf !== null && questionDatum.dkRf !== undefined && questionDatum.dkRfVal && questionDatum.dkRfVal.length) {
       return true
