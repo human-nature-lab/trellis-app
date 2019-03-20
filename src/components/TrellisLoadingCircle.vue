@@ -32,6 +32,14 @@
       thickness: {
         type: Number,
         default: 4
+      },
+      padding: {
+        type: String,
+        default: '0'
+      },
+      margin: {
+        type: String,
+        default: '0'
       }
     },
     computed: {
@@ -42,7 +50,9 @@
       containerStyles (): object {
         return {
           width: this.size,
-          height: this.size
+          height: this.size,
+          padding: this.padding,
+          margin: this.margin
         }
       },
       circleStyles (): object {

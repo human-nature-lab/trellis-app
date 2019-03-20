@@ -19,6 +19,7 @@ export interface QuestionDatumRecyclerData {
   interviewId: string
   dkRf: boolean
   dkRfVal: string
+  noOne: boolean
 }
 
 @Entity()
@@ -41,6 +42,8 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   public dkRf: boolean
   @Column() @Serializable
   public dkRfVal: string
+  @Column() @Serializable
+  public noOne: boolean
   // @Column() @Serializable
   // public interviewId: string
 
@@ -77,6 +80,7 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     q.skippedAt = this.skippedAt
     q.dkRf = this.dkRf
     q.dkRfVal = this.dkRfVal
+    q.noOne = this.noOne
     q.data = this.data.map(d => d.copy())
     q.createdAt = this.createdAt
     q.updatedAt = this.updatedAt

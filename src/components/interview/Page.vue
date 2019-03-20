@@ -26,6 +26,7 @@
       <v-flex class="page-content">
         <Question
           v-for="question in questions"
+          :disabled="disabled"
           :question="question"
           :interview="interview"
           :location="location"
@@ -36,15 +37,18 @@
           <v-layout row
                     justify-space-between>
             <v-btn @click="onPrevious"
-                   :disabled="prevWorking"
+                   :disabled="disabled"
                    justify-left>
-              <v-icon left>chevron_left</v-icon>
+              <TrellisLoadingCircle v-show="prevActive" size="30px" margin="0 8px" />
+              <v-icon left v-show="!prevActive">chevron_left</v-icon>
               {{isAtBeginning ? $t('exit') : $t('previous')}}
             </v-btn>
             <v-btn @click="onNext"
-                   :disabled="!isNavigationEnabled || nextWorking"
+                   :disabled="!isNavigationEnabled || disabled"
                    justify-right>
-              {{isAtEnd ? $t('finish') : $t('next')}} <v-icon right>chevron_right</v-icon>
+              {{isAtEnd ? $t('finish') : $t('next')}}
+              <TrellisLoadingCircle v-show="nextActive" size="30px" margin="0 8px" />
+              <v-icon right v-show="!nextActive">chevron_right</v-icon>
             </v-btn>
           </v-layout>
       </v-flex>
@@ -54,6 +58,7 @@
 
 <script>
   import Question from './Question.vue'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle'
   import questionDatumRecycler from './services/recyclers/QuestionDatumRecycler'
   import datumRecycler from './services/recyclers/DatumRecycler'
   import ActionMixin from './mixins/ActionMixin'
@@ -99,34 +104,26 @@
       isAtBeginning: {
         type: Boolean,
         default: false
+      },
+      disabled: {
+        type: Boolean,
+        default: false
+      },
+      nextActive: {
+        type: Boolean,
+        default: false
+      },
+      prevActive: {
+        type: Boolean,
+        default: false
       }
     },
     methods: {
       onNext () {
-        // This is setup like this to prevent double presses of the next button
-        if (this.nextWorking) {
-          return
-        }
-        this.nextWorking = true
-        setTimeout(() => {
-          this.actionWithoutQuestion(AT.next)
-          setTimeout(() => {
-            this.nextWorking = false
-          })
-        })
+        this.actionWithoutQuestion(AT.next)
       },
       onPrevious () {
-        // See above
-        if (this.prevWorking) {
-          return
-        }
-        this.prevWorking = true
-        setTimeout(() => {
-          this.actionWithoutQuestion(AT.previous)
-          setTimeout(() => {
-            this.prevWorking = false
-          })
-        })
+        this.actionWithoutQuestion(AT.previous)
       },
       datumRecyclerSize () {
         return datumRecycler.cache.size
@@ -153,7 +150,8 @@
       }
     },
     components: {
-      Question
+      Question,
+      TrellisLoadingCircle
     }
   }
 </script>

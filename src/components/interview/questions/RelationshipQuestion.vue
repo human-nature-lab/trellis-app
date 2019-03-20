@@ -19,12 +19,19 @@
       <v-avatar v-if="edge.isLoading">
         <v-progress-circular indeterminate color="primary" />
       </v-avatar>
-      {{edge.isLoading ? 'Loading...' : edge.targetRespondent.name}}
+      {{ edge.isLoading ? 'Loading...' : edge.targetRespondent.name }}
     </v-chip>
     <v-btn
-      :disabled="isQuestionDisabled"
+      :disabled="isQuestionDisabled || isNoOneSelected"
       @click="showRespondentSearch()">
       {{ $t('add_relationship') }}
+    </v-btn>
+    <v-btn
+      v-if="showNoOne"
+      :disabled="isQuestionDisabled || hasAddedRelationships"
+      :class="{primary: isNoOneSelected}"
+      @click="updateNoOne()">
+      {{ $t('no_one') }}
     </v-btn>
     <v-dialog
       lazy
@@ -95,6 +102,12 @@
         }) > -1
         return !hasFalseParam
       },
+      showNoOne () {
+        const hasHideNoOne = this.question.questionParameters.findIndex(p => {
+          return p.parameterId === parameterTypes.hide_no_one && !!p.val
+        })
+        return !hasHideNoOne
+      },
       currentGeo () {
         const rGeo = this.respondent.geos.find(geo => geo.isCurrent)
         return rGeo ? rGeo.geo : null
@@ -128,7 +141,7 @@
         }
         return filters
       },
-      edgeIds: function () {
+      edgeIds () {
         return this.question.datum.data.map(d => d.edgeId)
       },
       edges: function () {
@@ -157,6 +170,12 @@
           }
         }
         return 0
+      },
+      isNoOneSelected () {
+        return this.question.datum && this.question.datum.noOne
+      },
+      hasAddedRelationships () {
+        return this.question.datum && this.question.datum.data.length > 0
       }
     },
     methods: {
@@ -209,6 +228,13 @@
         this.action(ActionTypes.remove_edge, {
           edge_id: edgeId
         })
+      },
+      updateNoOne () {
+        if (this.isNoOneSelected) {
+          this.action(ActionTypes.deselect_no_one)
+        } else {
+          this.action(ActionTypes.select_no_one)
+        }
       },
       async onRespondentAdded (respondent) {
         const edges = await EdgeService.createEdges([{
@@ -267,4 +293,8 @@
 <style lang="sass" scoped>
 .avatar
   overflow: hidden
+.btn
+  &.active
+    background: orangered
+    color: white
 </style>

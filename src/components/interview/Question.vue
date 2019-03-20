@@ -22,11 +22,13 @@
         :is="currentQuestionComponent"
         :question="question"
         :location="location"
+        :disabled="disabled"
         :respondent="interview.survey.respondent"></div>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
       <DontKnowRefused
-        :question="question"></DontKnowRefused>
+        :disabled="disabled"
+        :question="question" />
     </v-card-actions>
   </v-card>
 </template>
@@ -88,6 +90,10 @@
       },
       location: {
         type: Object,
+        required: true
+      },
+      disabled: {
+        type: Boolean,
         required: true
       }
     },

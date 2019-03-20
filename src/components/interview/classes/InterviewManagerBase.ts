@@ -273,7 +273,7 @@ export default class InterviewManagerBase extends Emitter {
       }
       return vars
     }, {})
-    console.log('condition assignment vars', JSON.stringify(vars))
+
     for (let question of questionsWithData) {
       for (let act of question.assignConditionTags) {
         try {
