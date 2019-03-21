@@ -5,3 +5,14 @@ export default interface Pagination <T> {
   sortBy?: string
   data: T[]
 }
+
+export interface RandomPagination {
+  page: number
+  size: number
+  total: number
+  seed: number|string
+}
+
+export interface RandomPaginationResult <T> extends RandomPagination {
+  data: T[]
+}

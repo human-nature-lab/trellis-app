@@ -43,10 +43,15 @@ export default class InterviewServiceWeb extends InterviewServiceAbstract {
     }
   }
 
-  saveData (interviewId: string, diff: InterviewDeltaInterface) {
+  async saveData (interviewId: string, diff: InterviewDeltaInterface) {
     interviewId = encodeURIComponent(interviewId)
     let d = diff.toSnakeJSON()
-    return http().post(`interview/${interviewId}/data`, d).then(res => res.data)
+    const res = await http().post(`interview/${interviewId}/data`, d)
+    if (res.status >= 200 && res.status < 300) {
+      return res.data
+    } else {
+      throw Error(`Status code: ${res.status}. Unable to save data.`)
+    }
   }
 
   getPreload (interviewId: string): Promise<any> {

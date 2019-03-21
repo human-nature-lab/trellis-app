@@ -174,14 +174,14 @@ function selectNChoice (manager: InterviewManager, n = 0): Action {
 function simpleActionPush (manager: InterviewManager, type: string) {
   let action = new Action()
   action.actionType = type
-  manager.pushAction(action)
+  return manager.pushAction(action)
 }
 
-function next (manager: InterviewManager): void {
-  simpleActionPush(manager, AT.next)
+function next (manager: InterviewManager) {
+  return simpleActionPush(manager, AT.next)
 }
-function prev (manager: InterviewManager): void {
-  simpleActionPush(manager, AT.previous)
+function prev (manager: InterviewManager) {
+  return simpleActionPush(manager, AT.previous)
 }
 
 function getCurrentQuestions (manager: InterviewManager): Question[] {
@@ -216,7 +216,7 @@ export default function () {
       it('should sort all sections of the form correctly', async () => {
         for (let id of [forms.firstPageSkipped, formId]) {
           const manager = await setupInterviewManager(id)
-          manager.initialize()
+          await manager.initialize()
           const sections = manager.blueprint.sections
           const sectionSorted = isSorted(sections, s => s.formSections[0].sortOrder)
           expect(sectionSorted, 'Sections are not sorted correctly').to.be.true
@@ -250,48 +250,48 @@ export default function () {
       let manager
       beforeEach(async () => {
         manager = await setupInterviewManager(forms.rosterPrefill, prefillRespondentId)
-        manager.initialize()
+        await manager.initialize()
       })
-      it('should handle prefill actions for the first question', () => {
+      it('should handle prefill actions for the first question', async () => {
         validateLocation(manager.location, {section: 0, page: 0})
         testRosters(manager, firstPageRosterIds)
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 2})
-        prev(manager)
+        await prev(manager)
         validateLocation(manager.location, {page: 1})
-        prev(manager)
+        await prev(manager)
         validateLocation(manager.location, {page: 0})
         testRosters(manager, firstPageRosterIds)
       })
-      it('should handle prefill actions in the middle', () => {
+      it('should handle prefill actions in the middle', async () => {
         validateLocation(manager.location, {section: 0, page: 0})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 2})
         testRosters(manager, middlePageRosterIds)
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 3})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 4})
-        prev(manager)
+        await prev(manager)
         validateLocation(manager.location, {page: 3})
-        prev(manager)
+        await prev(manager)
         validateLocation(manager.location, {page: 2})
         testRosters(manager, middlePageRosterIds)
       })
-      it('should handle prefill actions at the end', () => {
+      it('should handle prefill actions at the end', async () => {
         validateLocation(manager.location, {section: 0, page: 0})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 2})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 3})
         selectNChoice(manager, 0)
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 4})
         testRosters(manager, lastPageRosterIds)
       })
@@ -300,32 +300,33 @@ export default function () {
     describe('Navigation', () => {
       it('should not require you to press the next button twice after changing a skip condition', async () => {
         const manager = await setupInterviewManager(forms.conditionReassignment)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {page: 0})
         selectChoice(manager, 'c')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1})
-        prev(manager)
-        validateLocation(manager.location, {section: 0, page: 0})
+        await prev(manager)
+        validateLocation(manager.location, {page: 0})
         selectChoice(manager, 'c', false)
         selectChoice(manager, 'd')
-        next(manager)
-        validateLocation(manager.location, {section: 0, page: 2})
+        // manager.isDebugging = true
+        await next(manager)
+        validateLocation(manager.location, {page: 2})
       })
       it('should start on the first page of a form if there are no actions', async () => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {section: 0, page: 0})
       })
       it('should stop at the first invalid question when loading', async () => {
         let manager = await setupInterviewManager(forms.conditionAssignment, respondentId3)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {section: 0, page: 0})
         selectChoice(manager, '2')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {section: 0, page: 1})
         selectChoice(manager, 'one')
-        prev(manager)
+        await prev(manager)
         validateLocation(manager.location, {section: 0, page: 0})
         selectChoice(manager, '2', false)
         let actions = manager['actions'].actions.map(a => a.copy())
@@ -337,18 +338,18 @@ export default function () {
       })
       it('should handle moving backward and forward correctly', async ()  => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {page: 0})
         selectChoice(manager, '2')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1})
-        prev(manager)
+        await prev(manager)
         validateLocation(manager.location, {page: 0})
       })
 
       it('should handle randomization of repeated sections', async () => {
         const manager = await setupInterviewManager(forms.randomFollowUpSections)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {page: 0})
         let action1 = await selectRespondent(manager, respondentId2, false)
         let action2 = await selectRespondent(manager, respondentId3, false)
@@ -358,25 +359,57 @@ export default function () {
         manager.pushAction(action2)
         let orderedSectionDatumIds = manager.getCurrentPageQuestions()[0].datum.data.sort((a, b) => a.randomSortOrder - b.randomSortOrder).map(d => d.id)
         let sectionFollowUpDatumId = orderedSectionDatumIds.shift()
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 0, section: 1, sectionFollowUpDatumId})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1, section: 1, sectionFollowUpDatumId})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 2, section: 1, sectionFollowUpDatumId})
         sectionFollowUpDatumId = orderedSectionDatumIds.shift()
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 0, section: 1, sectionFollowUpDatumId})
+      })
+
+      it('should not be able to navigate backwards until forward navigation is complete', async () => {
+        const manager = await setupInterviewManager(forms.conditionReassignment)
+        manager.setSaveActions(true)
+        manager.setSaveData(true)
+        await manager.initialize()
+        validateLocation(manager.location, {page: 0})
+        selectChoice(manager, 'a')
+        await manager.next()
+        validateLocation(manager.location, {page: 1})
+        await manager.next()
+        validateLocation(manager.location, {page: 2})
+        await manager.previous()
+        await manager.previous()
+        validateLocation(manager.location, {page: 0})
+        selectChoice(manager, 'a', false)
+        selectChoice(manager, 'd')
+        await manager.next()
+        validateLocation(manager.location, {page: 2})
+        await manager.previous()
+        validateLocation(manager.location, {page: 0})
+        selectChoice(manager, 'a')
+        selectChoice(manager, 'd', false)
+        await manager.next()
+        await manager.previous()
+        validateLocation(manager.location, {page: 0})
+        selectChoice(manager, 'a', false)
+        selectChoice(manager, 'd')
+        await manager.next()
+        await manager.next()
+        validateLocation(manager.location, {page: 2})
       })
 
       describe('PERFORMANCE', () => {
         let manager
         before(async () => {
           manager = await setupInterviewManager(forms.largeRepeated)
-          manager.initialize()
+          await manager.initialize()
         })
 
-        it('should run quickly with repeated sections', () => {
+        it('should run quickly with repeated sections', async () => {
           validateLocation(manager.location, {page: 0, section: 0})
           const rosterIds = firstPageRosterIds.concat(middlePageRosterIds.concat(lastPageRosterIds))
           for (let rosterId of rosterIds) {
@@ -387,7 +420,7 @@ export default function () {
             })
             manager.pushAction(a)
           }
-          next(manager)
+          await next(manager)
           let c = 0
           const nActions = 21
           const initialMeasurement = new Measurement('FillTiming')
@@ -396,7 +429,7 @@ export default function () {
             for (let i = 0; i < nActions; i++) {
               selectNChoice(manager)
             }
-            next(manager)
+            await next(manager)
             initialMeasurement.stopTick()
             if (manager.navigator.isAtEnd) {
               break
@@ -407,14 +440,14 @@ export default function () {
           let dir = 0
           const nextMeasurement = new Measurement('NextTiming')
           const prevMeasurement = new Measurement('PrevTiming')
-          function prevM () {
+          async function prevM () {
             prevMeasurement.startTick()
-            prev(manager)
+            await prev(manager)
             prevMeasurement.stopTick()
           }
-          function nextM () {
+          async function nextM () {
             nextMeasurement.startTick()
-            next(manager)
+            await next(manager)
             nextMeasurement.stopTick()
           }
           for (let i = 0; i < 300; i++) {
@@ -422,17 +455,17 @@ export default function () {
               // forward
               if (manager.navigator.isAtEnd) {
                 dir = 1
-                prevM()
+                await prevM()
               } else {
-                nextM()
+                await nextM()
               }
             } else {
               // backward
               if (manager.navigator.isAtStart) {
                 dir = 0
-                nextM()
+                await nextM()
               } else {
-                prevM()
+                await prevM()
               }
             }
           }
@@ -443,56 +476,56 @@ export default function () {
     })
     it('should handle basic navigation', async () => {
       const manager = await setupInterviewManager(forms.basicNavigation)
-      manager.initialize()
+      await manager.initialize()
       validateLocation(manager.location, {page: 0})
-      next(manager)
+      await next(manager)
       validateLocation(manager.location, {page: 1})
       selectNChoice(manager)
-      next(manager)
+      await next(manager)
       validateLocation(manager.location, {section: 1, page: 0})
-      next(manager)
+      await next(manager)
       validateLocation(manager.location, {section: 1, page: 1})
-      prev(manager)
-      prev(manager)
+      await prev(manager)
+      await prev(manager)
       validateLocation(manager.location, {page: 1})
       selectNChoice(manager)
       selectNChoice(manager)
-      next(manager)
+      await next(manager)
       validateLocation(manager.location, {section: 1, page: 0})
-      next(manager)
+      await next(manager)
       validateLocation(manager.location, {section: 1, page: 1})
 
     })
     it('should be able to move backward even if the current page has invalid responses', async () => {
       const manager = await setupInterviewManager(forms.conditionAssignment)
-      manager.initialize()
+      await manager.initialize()
       validateLocation(manager.location, {page: 0})
       selectChoice(manager, '2')
-      next(manager)
+      await next(manager)
       validateLocation(manager.location, {page: 1})
-      prev(manager)
+      await prev(manager)
       validateLocation(manager.location, {page: 0})
-      next(manager)
+      await next(manager)
       validateLocation(manager.location, {page: 1})
       selectChoice(manager, 'one')
-      next(manager)
+      await next(manager)
       validateLocation(manager.location, {page: 2})
       selectChoice(manager, 'yes')
-      prev(manager)
+      await prev(manager)
       validateLocation(manager.location, {page: 1})
       selectChoice(manager, 'one', false)
-      prev(manager)
+      await prev(manager)
       validateLocation(manager.location, {page: 0})
     })
     describe('Skips', () => {
       it('should skip pages correctly even with backward movement', async () => {
         let manager = await setupInterviewManager(forms.skipWithPrevious)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {page: 0})
-        simpleActionPush(manager, AT.next)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 0})
         selectNChoice(manager, 0)
-        simpleActionPush(manager, AT.next)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 1})
         const action = makeAction(manager.getCurrentPageQuestions()[0].id, AT.add_edge, {
           edge_id: edgeIds[0],
@@ -500,20 +533,20 @@ export default function () {
           name: 'edge'
         })
         manager.pushAction(action)
-        simpleActionPush(manager, AT.next)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 2})
         selectChoice(manager, '2')
-        simpleActionPush(manager, AT.next)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 4})
-        simpleActionPush(manager, AT.previous)
+        await prev(manager)
         validateLocation(manager.location, {section: 1, page: 2})
         selectChoice(manager, '1')
-        simpleActionPush(manager, AT.next)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 3})
       })
       it('should handle skips on the first question correctly', async () => {
         const manager = await setupInterviewManager(forms.firstPageSkipped)
-        manager.initialize()
+        await manager.initialize()
         expect(manager.blueprint).to.be.an.instanceOf(Form)
         expect(manager.blueprint.sections[0].questionGroups[0].skips.length).to.be.greaterThan(0, 'No skips defined on the first page')
         const skip: Skip = manager.blueprint.sections[0].questionGroups[0].skips[0]
@@ -523,26 +556,26 @@ export default function () {
       it('should handle skips in repeated sections')
       it('should handle skipping the last question', async () => {
         const manager = await setupInterviewManager(forms.lastPageSkipped)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {section: 0, page: 0})
         selectChoice(manager, 'skip')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {section: 0, page: 1})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {section: 0, page: 1})
       })
       it('should skip follow up sections without any data', async () => {
         const manager = await setupInterviewManager(forms.repeatedSections)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {page: 0})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1})
         selectChoice(manager, 'one')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 2})
-        prev(manager)
+        await prev(manager)
         selectChoice(manager, 'skip')
-        next(manager)
+        await next(manager)
         expect(manager.navigator.isAtEnd).to.be.true
         validateLocation(manager.location, {section: 0, page: 1})
       })
@@ -554,39 +587,41 @@ export default function () {
     describe('Lifecycle', () => {
       it('should handle correctly assigning conditions after changing responses and navigating', async () => {
         const manager = await setupInterviewManager(forms.conditionAssignment)
-        manager.initialize()
+        await manager.initialize()
         selectChoice(manager, '1')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 2})
         let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('is_one', `condition tags should include condition, 'is_one'`).and.not.include('is_two', `condition tags should not include condition, 'is_two'`)
         // manager._debugReplay = true
-        prev(manager)
+        await prev(manager)
         validateLocation(manager.location, {page: 0})
         selectChoice(manager, '2')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1})
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('is_two', `condition tags should include condition, 'is_two'`).and.not.include('is_one', `condition tags should not include condition, 'is_one'`)
         selectNChoice(manager, 0)
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 2})
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('skipped_maybe_was_evaluated', `we don't have the correct conditions assigned now`)
         selectNChoice(manager, 0)
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 3})
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('resp_was_assigned', '"resp_was_assigned" was not assigned correctly')
       })
       it('should handle repeated sections', async () => {
         const manager = await setupInterviewManager(forms.repeatedSections)
-        manager.initialize()
+        manager.setSaveActions(true)
+        manager.setSaveData(true)
+        await manager.initialize()
         validateLocation(manager.location, {page: 0})
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 1})
         selectNChoice(manager, 0)
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {page: 2})
         let question = getCurrentQuestions(manager)[0]
         let action = makeAction(question.id, AT.add_roster_row, {
@@ -601,18 +636,18 @@ export default function () {
           val: editRosterId
         })
         manager.pushAction(action)
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 0, sectionFollowUpRepetition: 0})
         selectChoice(manager, 'cat')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 0, sectionFollowUpRepetition: 1})
         selectChoice(manager, 'dog')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 1, sectionFollowUpRepetition: 1})
-        prev(manager)
+        await prev(manager)
         validateLocation(manager.location, {section: 1, page: 0, sectionFollowUpRepetition: 1})
         expect(manager.data.conditionTags.section.length).to.equal(1, 'We should have 1 section condition tags assigned at this point')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {section: 1, page: 1, sectionFollowUpRepetition: 1})
         expect(manager.data.conditionTags.section.length).to.equal(2, 'We should have 2 section condition tags assigned at this point')
         const repeatedLocationSequence = [
@@ -627,20 +662,20 @@ export default function () {
       })
       it('should handle reloading forms and changing respondent condition tags', async () => {
         const manager = await resumeSurvey(forms.reloadConditionTag, respondentId, reloadConditionTagSurveyId)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {section: 0, page: 1}) // Expect to start on the second (skipped) page
         let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('dont_skip', '"dont_skip" condition tag should be assigned initially').and.not.include('skip', '"skip" condition tag should ot be assigned')
-        prev(manager)
+        await prev(manager)
         selectChoice(manager, 'skip')
-        next(manager)
+        await next(manager)
         validateLocation(manager.location, {section: 0, page: 2})
         conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
         expect(conditionTags).to.include('skip', '"skip" condition tag should be assigned now').and.not.include('dont_skip', '"dont_skip" condition tag should be removed now')
       })
       it('should not make duplicates of condition tags', async () => {
         const manager = await resumeSurvey(forms.reloadConditionTag, respondentId, reloadConditionTagSurveyId)
-        manager.initialize()
+        await manager.initialize()
         validateLocation(manager.location, {section: 0, page: 1}) // Expect to start on the second (skipped) page
         let conditionTags = manager.getAllConditionTags() // This is okay for non repeated sections
         let counts = conditionTags.reduce((agg, tag) => {
@@ -663,19 +698,19 @@ export default function () {
           const manager = await setupInterviewManager(forms.conditionAssignment)
           manager.setSaveData(true)
           manager.setSaveActions(true)
-          manager.initialize()
+          await manager.initialize()
           let conditionTags = manager.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
           console.log('conditionTags', conditionTags)
           expect(conditionTags).to.not.include(tagName, 'The RCT already exists. Please reset DB or delete')
           validateLocation(manager.location, {section: 0, page: 0})
           selectNChoice(manager, 1)
-          next(manager)
+          await next(manager)
           validateLocation(manager.location, {section: 0, page: 1, sectionFollowUpRepetition: 0, sectionRepetition: 0})
           selectNChoice(manager, 0)
-          next(manager)
+          await next(manager)
           validateLocation(manager.location, {section: 0, page: 2, sectionFollowUpRepetition: 0, sectionRepetition: 0})
           selectNChoice(manager, 0)
-          next(manager)
+          await next(manager)
           validateLocation(manager.location, {section: 0, page: 3, sectionFollowUpRepetition: 0, sectionRepetition: 0})
           conditionTags = manager.navigator.getConditionTagSet(manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId)
           expect(conditionTags).to.include(tagName, 'The respondent condition tag was not assigned in memory')

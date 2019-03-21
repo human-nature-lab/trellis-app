@@ -16,7 +16,7 @@ export default {
       action.actionType = type
       action.questionId = this['question'].id
       action.payload = payload
-      actionBus.action(action)
+      return actionBus.action(action)
     },
 
     /**
@@ -28,7 +28,7 @@ export default {
       let action = new Action()
       action.actionType = type
       action.payload = payload
-      actionBus.action(action)
+      return actionBus.action(action)
     }
   }
 }
