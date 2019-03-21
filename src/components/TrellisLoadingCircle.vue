@@ -3,10 +3,8 @@
     class="loading-container"
     :style="containerStyles">
     <div
-      v-if="!global.cpuOptimized"
       class="loading-circle"
-      :style="circleStyles"></div>
-    <span v-else>Loading...</span>
+      :style="circleStyles" />
   </div>
 </template>
 
@@ -32,6 +30,14 @@
       thickness: {
         type: Number,
         default: 4
+      },
+      padding: {
+        type: String,
+        default: '0'
+      },
+      margin: {
+        type: String,
+        default: '0'
       }
     },
     computed: {
@@ -42,7 +48,9 @@
       containerStyles (): object {
         return {
           width: this.size,
-          height: this.size
+          height: this.size,
+          padding: this.padding,
+          margin: this.margin
         }
       },
       circleStyles (): object {
@@ -58,7 +66,7 @@
   })
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass" >
   .loading-container
     display: block
     overflow: visible
@@ -69,6 +77,11 @@
       width: 100%
       border: 4px solid rgba(0,0,0,0)
       animation: rotate 1s linear infinite
+
+  .cpu-optimized
+    .loading-container
+      .loading-circle
+        border-rad
 
   @keyframes rotate
     0%
