@@ -67,14 +67,18 @@ if (config.sentry && config.sentry.dsn) {
     })
   })
   SingletonService.on('locale', (locale: Locale) => {
-    Sentry.configureScope(scope => {
-      scope.setTag('locale', locale.languageName)
-    })
+    if (locale) {
+      Sentry.configureScope(scope => {
+        scope.setTag('locale', locale.languageName)
+      })
+    }
   })
   SingletonService.on('study', (study: Study) => {
-    Sentry.configureScope(scope => {
-      scope.setTag('study', study.id)
-    })
+    if (study) {
+      Sentry.configureScope(scope => {
+        scope.setTag('study', study.id)
+      })
+    }
   })
 
   asyncSetup()

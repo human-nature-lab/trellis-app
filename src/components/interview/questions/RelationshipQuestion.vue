@@ -103,10 +103,10 @@
         return !hasFalseParam
       },
       showNoOne () {
-        const hasHideNoOne = this.question.questionParameters.findIndex(p => {
-          return p.parameterId === parameterTypes.hide_no_one && !!p.val
+        const hideNoOneIndex = this.question.questionParameters.findIndex(p => {
+          return parseInt(p.parameterId, 10) === parameterTypes.hide_no_one && !!+p.val
         })
-        return !hasHideNoOne
+        return hideNoOneIndex === -1
       },
       currentGeo () {
         const rGeo = this.respondent.geos.find(geo => geo.isCurrent)
