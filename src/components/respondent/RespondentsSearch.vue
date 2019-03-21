@@ -104,7 +104,14 @@
         </v-chip>
       </v-flex>
     </v-layout>
-    <v-layout row>
+    <v-layout row wrap>
+      <v-pagination
+        class="pagination"
+        :length="pagination.maxPages + 2"
+        :value="pagination.page + 1"
+        total-visible="7"
+        :disabled="isLoading || (pagination.page === 0 && respondentResults.length !== pagination.size)"
+        @input="updateCurrentPage" />
       <v-spacer></v-spacer>
       <v-btn
         v-if="canAddRespondent"
@@ -135,18 +142,6 @@
           :respondent="respondent"
           :labels="getRespondentLabels(respondent)"/>
       </v-layout>
-      <v-card v-if="pagination.page > 0 || respondentResults.length === pagination.size">
-        <v-container>
-          <v-layout>
-            <v-pagination
-              :length="pagination.maxPages + 2"
-              :value="pagination.page + 1"
-              total-visible="7"
-              :disabled="isLoading"
-              @input="updateCurrentPage" />
-          </v-layout>
-        </v-container>
-      </v-card>
       <v-layout v-if="!respondentResults.length" ma-3>
         <v-container>
           {{ $t('no_results') }}: {{query}}
@@ -494,7 +489,6 @@
 </script>
 
 <style lang="sass">
-  /*.fab-offset*/
-    /*margin-right: 13px*/
-    /*margin-bottom: 35px*/
+  .pagination
+    margin: auto
 </style>
