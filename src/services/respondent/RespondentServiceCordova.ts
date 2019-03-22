@@ -416,4 +416,13 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     const repository = await connection.getRepository(RespondentGeo)
     await repository.update({id: respondentGeoId}, {deletedAt: new Date()})
   }
+
+  async removeRespondent (respondentId: string) {
+    const conn = await DatabaseService.getDatabase()
+    await conn.createQueryBuilder()
+      .update(Respondent)
+      .set({ deletedAt: () => 'CURRENT_TIMESTAMP' })
+      .where('id = :id', { id: respondentId })
+      .execute()
+  }
 }

@@ -150,4 +150,10 @@ export default interface RespondentServiceInterface {
    * @returns {Promise<*>}
    */
   removeRespondentGeo (respondentId: string, respondentGeoId: string): Promise<void>
+
+  /**
+   * Delete the respondent
+   * @param respondentId
+   */
+  removeRespondent (respondentId: string): Promise<void>
 }
