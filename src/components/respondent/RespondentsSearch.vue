@@ -138,6 +138,7 @@
           :formsButtonVisible="formsButtonVisible"
           :infoButtonVisible="infoButtonVisible"
           @selected="onSelectRespondent(respondent)"
+          @delete="removeRespondent(respondent)"
           :selected="isSelected(respondent)"
           :respondent="respondent"
           :labels="getRespondentLabels(respondent)"/>
