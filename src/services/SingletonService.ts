@@ -56,7 +56,6 @@ class SingletonService extends Emitter {
         scope.setTag('server', server)
       })
     }
-
   }
 
   setCurrentStudy (study) {
