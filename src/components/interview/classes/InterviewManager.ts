@@ -252,17 +252,22 @@ export default class InterviewManager extends InterviewManagerBase {
     this.isNavigating = true
     this.navigator.updatePagesCalled = 0
     if (this.hasAddedActions && !this.isAtHighWaterMark) {
+      // We aren't at the end of the survey and we made changes. Replay the all actions to rebuild the state before moving forward.
       this.resetHighWaterMark()
       this.replayToCurrent()
-      this.stepForward()
+      this.stepForward(false)
     } else if (this.isAtHighWaterMark && this.lastAction) {
-      this.stepForward()
-      const loc = JSON.parse(JSON.stringify(this.location))
-      this.playActionsAndMoveForward()
-      this.seek(loc.section, loc.page, loc.sectionRepetition, loc.sectionFollowUpRepetition)
+      // We are at the end of the survey and we made changes. Play all valid actions ahead of this point in the survey and then move back to the correct page.
+      if (this.stepForward()) {
+        // Only play actions and move forward if we haven't already reached the end of the survey
+        const loc = JSON.parse(JSON.stringify(this.location))
+        this.playActionsAndMoveForward()
+        this.seek(loc.section, loc.page, loc.sectionRepetition, loc.sectionFollowUpRepetition)
+      }
       this.lastActionHasChanged = false
     } else {
-      this.stepForward()
+      // No actions have been added so we just move to the next page
+      this.stepForward(false)
     }
     await this.save()
     this.hasAddedActions = false
@@ -280,14 +285,16 @@ export default class InterviewManager extends InterviewManagerBase {
     this.isNavigating = false
   }
 
-  stepForward (): boolean {
-    this.onPageExit()
+  stepForward (dataHasChanged: boolean = true): boolean {
+    if (dataHasChanged) this.onPageExit()
     if (this.navigator.isAtEnd) {
       this.atEnd()
       return false
     }
     this.navigator.next()
-    this.onPageEnter()
+    if (dataHasChanged) {
+      this.onPageEnter()
+    }
     this.updateHighWaterMark()
     return true
   }
@@ -397,11 +404,8 @@ export default class InterviewManager extends InterviewManagerBase {
    * Returns an InterviewLocation if we found invalid sections of the survey
    */
   private playAllActions () {
-    // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
-    // TODO: Check that state is reset correctly
     this._resetState()
-    // TODO: Verify that location is zeroed correctly
     this._zeroLocation()
     this.playActionsAndMoveForward()
   }
@@ -420,6 +424,13 @@ export default class InterviewManager extends InterviewManagerBase {
     this.seek(section, page, sectionRepetition, sectionFollowUpRepetition)
   }
 
+  /**
+   * Seek to a particular location in the form without changing the data
+   * @param section
+   * @param page
+   * @param sectionRepetition
+   * @param sectionFollowUpRepetition
+   */
   seek (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
     // console.log('desired location', {section, page, sectionRepetition, sectionFollowUpRepetition})
     let currentLoc = locToNumber(this.navigator.loc)
@@ -429,7 +440,7 @@ export default class InterviewManager extends InterviewManagerBase {
       let c
       for (c = 0; c < 100; c++) {
         currentLoc = locToNumber(this.navigator.loc)
-        if (currentLoc >= desiredLoc || !this.currentLocationHasValidResponses() || !this.stepForward()) {
+        if (currentLoc >= desiredLoc || !this.currentLocationHasValidResponses() || !this.stepForward(false)) {
           break
         }
       }
@@ -452,7 +463,7 @@ export default class InterviewManager extends InterviewManagerBase {
       const lastRealAction = this.actions.lastRealAction
       if (lastRealAction) {
         const lastLocation = this.actions.actionToLocation(lastRealAction)
-        while (this.currentLocationHasValidResponses() && this.navigator.locationIsAheadOfCurrent(lastLocation) && this.stepForward());
+        while (this.currentLocationHasValidResponses() && this.navigator.locationIsAheadOfCurrent(lastLocation) && this.stepForward(false));
         this.stepBackward()
       } else {
         this.navigator.seekTo({section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
@@ -483,7 +494,6 @@ export default class InterviewManager extends InterviewManagerBase {
    * Handle 'reached the end of survey' event
    */
   atEnd () {
-    this.onPageExit()
     if (!this._isReplaying) {
       this.emit('atEnd', JSON.parse(JSON.stringify(this.location)))
     }
