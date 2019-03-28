@@ -136,7 +136,7 @@
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/actions/ActionBus'
 
-  import {validateParametersWithError} from './services/ValidatorService'
+  import {allParametersAreValidWithError} from './services/ValidatorService'
   import router, {replaceWithNextOr} from '../../router'
   import InterviewLoader from './services/InterviewLoader'
   import SurveyService from '../../services/survey'
@@ -316,7 +316,7 @@
           q.type = {
             name: q.questionType.name
           }
-          let validation = validateParametersWithError(q, q.questionParameters, q.datum)
+          let validation = allParametersAreValidWithError(q, q.questionParameters, q.datum)
           q.allParametersSatisfied = validation === true // Makes non-boolean types falsey
           q.validationError = typeof validation === 'string' ? validation : null
           q.isAnswered = false
