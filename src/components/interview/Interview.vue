@@ -24,7 +24,7 @@
         <span v-if="formIsEmpty">
           {{ $t('form_empty') }}
         </span>
-        <Page v-else
+        <Page v-else-if="location"
               :questions="questions"
               :location="location"
               :actions="interviewActions"

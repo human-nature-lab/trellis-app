@@ -24,7 +24,7 @@ export const forms = {
   largeRepeated: '139ccd02-8fc3-4fd1-b96f-44e621f5c724',
   basicNavigation: '01a36e93-32e0-4161-b1d5-6458c21d9edc',
   reloadConditionTag: '7e26ff10-1a4d-4e11-9703-b9a0bd213733',
-  randomFollowUpSections: '288719f1-3fd0-4333-af14-f0779700bbe7'
+  randomFollowUpSections: 'a059f200-c03e-462f-b7c0-ef2b80bfdfe2'
 }
 
 export const firstPageRosterIds = ['5ca96a1d-e47f-4fcb-90ed-b9955798412c', 'fc8b035f-0b6e-4a6b-8c69-b69beabb7f76', 'ff7ac9ca-bf86-46ca-b2bc-53d7b721e20a']
