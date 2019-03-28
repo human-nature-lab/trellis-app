@@ -62,7 +62,7 @@
         },
         set: function (val) {
           this._reason = val
-          this.action(AT.dk_rf_val, {
+          this.debouncedAction(AT.dk_rf_val, {
             dk_rf_val: val
           })
         }
