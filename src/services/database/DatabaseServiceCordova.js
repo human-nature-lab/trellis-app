@@ -189,8 +189,7 @@ export default class DatabaseServiceCordova {
     try {
       await queryRunner.query(`create table if not exists updated_records (table_name text, updated_record_id text, uploaded_at datetime);`)
     } catch (err) {
-      status.message = 'Rolling back transaction...'
-      await queryRunner.rollbackTransaction()
+      await this.cleanUpTransaction(queryRunner)
       throw err
     }
   }
@@ -215,8 +214,7 @@ export default class DatabaseServiceCordova {
         }
       })
     } catch (err) {
-      status.message = 'Rolling back transaction...'
-      await queryRunner.rollbackTransaction()
+      await this.cleanUpTransaction(queryRunner)
       throw err
     }
   }
@@ -226,6 +224,9 @@ export default class DatabaseServiceCordova {
     const queryRunner = await connection.createQueryRunner()
     await queryRunner.connect()
     await queryRunner.query('PRAGMA foreign_keys = OFF;')
+    await queryRunner.query('PRAGMA synchronous = OFF')
+    await queryRunner.query('PRAGMA journal_mode = MEMORY')     // https://www.sqlite.org/pragma.html#pragma_journal_mode
+    await queryRunner.query('PRAGMA cache_size = 100000')       // Cache size can be set to Kb or pages. This number is in pages. https://www.sqlite.org/pragma.html#pragma_cache_size
     await queryRunner.startTransaction()
     try {
       const selectDropsQuery = `SELECT 'DROP TABLE "' || name || '";' as query FROM "sqlite_master" WHERE "type" = 'table' AND "name" != 'sqlite_sequence'`
@@ -234,10 +235,21 @@ export default class DatabaseServiceCordova {
       await queryRunner.query('PRAGMA foreign_keys = ON;')
       return queryRunner
     } catch (err) {
-      status.message = 'Rolling back transaction...'
-      await queryRunner.rollbackTransaction()
+      await this.cleanUpTransaction(queryRunner)
       throw err
     }
+  }
+
+  async cleanUpTransaction (queryRunner, status) {
+    status.message = 'Rolling back transaction...'
+    await queryRunner.rollbackTransaction()
+    await this.finalizeQuery()
+  }
+
+  async finalizeQuery (queryRunner) {
+    await queryRunner.query('PRAGMA synchronous = NORMAL')      // Default synchronous
+    await queryRunner.query('PRAGMA journal_mode = DELETE')     // Default journal mode
+    await queryRunner.query('PRAGMA cache_size = 2000')         // Default cache size set by sqlite plugin. https://github.com/xpbrew/cordova-sqlite-storage#status
   }
 
   async executeSnapshot (queryRunner, file, trackProgress, isCancelled) {
@@ -278,7 +290,7 @@ export default class DatabaseServiceCordova {
           }
           if (end < fileSize) {
             if (isCancelled()) {
-              await queryRunner.rollbackTransaction()
+              await this.cleanUpTransaction(queryRunner)
               resolve()
             } else {
               start += CHUNK_SIZE
@@ -307,8 +319,7 @@ export default class DatabaseServiceCordova {
     try {
       await this.executeSnapshot(queryRunner, file, trackProgress, isCancelled)
     } catch (err) {
-      status.message = 'Rolling back transaction...'
-      await queryRunner.rollbackTransaction()
+      await this.cleanUpTransaction(queryRunner)
       throw err
     } finally {
       await queryRunner.query('PRAGMA foreign_keys = ON;')
@@ -319,9 +330,9 @@ export default class DatabaseServiceCordova {
     try {
       await queryRunner.query('PRAGMA foreign_key_check;')
       await queryRunner.commitTransaction()
+      await this.finalizeQuery(queryRunner)
     } catch (err) {
-      status.message = 'Rolling back transaction...'
-      await queryRunner.rollbackTransaction()
+      await this.cleanUpTransaction(queryRunner)
       throw err
     }
   }
