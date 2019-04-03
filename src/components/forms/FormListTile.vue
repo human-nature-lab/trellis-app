@@ -1,5 +1,5 @@
 <template>
-  <tr :class="{expandable: isOpen}">
+  <tr>
     <td class="small">
       <v-menu
         offset-x
@@ -35,20 +35,10 @@
       </v-menu>
     </td>
     <td>
-      <TranslationTextField :translation="memForm.nameTranslation" @click.stop.prevent="justCapture" />
+      <TranslationTextField :translation="memForm.nameTranslation" @click.stop.prevent />
     </td>
     <td>
-      <v-chip
-        @click.stop="memForm.isPublished = !memForm.isPublished"
-        :color="memForm.isPublished ? 'success' : 'error'"
-        text-color="white"
-        small
-        label>
-        <v-avatar>
-          <v-icon v-if="memForm.isPublished">check_circle</v-icon>
-        </v-avatar>
-        {{memForm.isPublished ? 'Published' : 'Unpublished'}}
-      </v-chip>
+      <v-checkbox v-model="memForm.isPublished" />
     </td>
     <td>
       <v-btn icon @click="$emit('input', !value)">
@@ -82,11 +72,10 @@
     data () {
       return {
         showMenu: false,
-        isBusy: false,
         isOpen: false,
         memForm: this.form.copy(),
-        saveThrottled: debounce(async form => {
-
+        saveThrottled: debounce(async () => {
+          this.$emit('save', this.memForm)
         }, 2000)
       }
     },
@@ -94,6 +83,10 @@
       form: Object as () => Form,
       value: {
         type: Boolean
+      },
+      isBusy: {
+        type: Boolean,
+        default: false
       }
     },
     watch: {
@@ -104,10 +97,7 @@
       memForm: {
         handler (newVal: Form) {
           if (!CompareService.entitiesAreEqual(newVal, this.form)) {
-            // this.isBusy = true
-          } else if (this.isBusy) {
-            // this.isBusy = false
-            this.saveThrottled.cancel()
+            this.saveThrottled()
           }
         },
         deep: true

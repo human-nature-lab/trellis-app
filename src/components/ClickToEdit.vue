@@ -1,32 +1,41 @@
 <template>
-  <span @click="activate" :class="{disabled: disabled}" class="b-inline">
-    <slot
-      v-hide="value"
-      name="activator">
-      <div>{{memText}}</div>
-    </slot>
-    <slot v-hide="!value">
-      <v-text-field
-        autofocus
-        solo
-        @blur="resetEditorState"
-        :disabled="disabled"
-        v-model="memText" />
-      <v-btn
-        icon
-        :disabled="!hasEdits || disabled"
-        @click.stop
-        @mousedown="save">
-        <v-icon>save</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        :disabled="disabled"
-        @click="resetEditorState()">
-        <v-icon>remove</v-icon>
-      </v-btn>
-    </slot>
-  </span>
+  <v-flex @click="activate" :class="{disabled: disabled}">
+    <v-dialog
+      :value="value"
+      @input="$emit('input', $event)"
+      content-class="top-dialog"
+      lazy>
+      <v-flex slot="activator" class="body-1 pa-1 editable">
+        <v-icon small>edit</v-icon>
+        <span>{{memText}}</span>
+      </v-flex>
+      <v-card>
+        <v-container>
+          <slot>
+            <v-layout row>
+              <v-text-field
+                autofocus
+                :disabled="disabled"
+                v-model="memText" />
+              <v-btn
+                icon
+                :disabled="!hasEdits || disabled"
+                @click.stop
+                @mousedown="save">
+                <v-icon>save</v-icon>
+              </v-btn>
+              <v-btn
+                icon
+                :disabled="disabled"
+                @click="resetEditorState()">
+                <v-icon>clear</v-icon>
+              </v-btn>
+            </v-layout>
+          </slot>
+        </v-container>
+      </v-card>
+    </v-dialog>
+  </v-flex>
 </template>
 
 <script>
@@ -54,7 +63,6 @@
     },
     watch: {
       text () {
-        debugger
         this.resetEditorState()
       }
     },
@@ -81,9 +89,8 @@
 </script>
 
 <style lang="sass" scoped>
-  .b-inline
-    > *
-      display: inline-block
-  .disabled
-    cursor: not-allowed
+  .top-dialog
+    z-index: 500
+  .editable
+    cursor: pointer
 </style>

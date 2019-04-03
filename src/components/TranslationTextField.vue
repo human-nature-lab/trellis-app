@@ -1,5 +1,6 @@
 <template>
-  <v-flex @click.stop>
+  <v-container @click.stop>
+    <v-layout row wrap>
       <ClickToEdit
         v-model="isEditing"
         :disabled="saving"
@@ -13,7 +14,8 @@
         v-model="selectedLanguageTag"
         :disabled="saving">
       </v-select>
-  </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -111,11 +113,12 @@
 </script>
 
 <style lang="sass">
-  /*.inline*/
-    /*display: inline-block*/
-    /*> **/
-      /*display: inline-block*/
+  $width: 60px
   .small-select
     display: inline-block
-    max-width: 60px
+    max-width: $width
+    padding-top: 0
+    min-width: $width
+    .input-group__details
+      display: none
 </style>
