@@ -1,6 +1,6 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
-     <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : prodBannerColor" class="demoBanner">
+     <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demoBanner">
        This server is for demonstration purposes only! Not for human subjects research.
      </v-alert>
     <v-dialog
@@ -118,7 +118,7 @@
         cpuOptimized: true,
         serverMode: config.serverMode,
         demoBannerColor: 'orange darken-4',
-        prodBannerColor: 'amber'
+        testBannerColor: 'amber'
       }
     },
     async created () {
