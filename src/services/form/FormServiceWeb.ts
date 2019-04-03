@@ -38,7 +38,7 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   async updateForm (studyId: string, form: Form): Promise<Form> {
-    const res = await adminInst.put(safeUrl('study/{study_id}/form/{form_id}', [studyId, form.id]))
+    const res = await adminInst.put(safeUrl('study/{study_id}/form/{form_id}', [studyId, form.id]), form)
     return new Form().fromSnakeJSON(res.data.form)
   }
 
