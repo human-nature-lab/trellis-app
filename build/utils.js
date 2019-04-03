@@ -4,9 +4,9 @@ var VERSION = require('../package').version
 
 exports.sentryRelease = function (cf) {
   let r = 'trellis-' + VERSION
-  if (!cf.debug) {
+  // if (!cf.debug) {
     // r += cf.appEnv === 1 ? '-cordova' : '-web'
-  }
+  // }
   return r
 }
 
