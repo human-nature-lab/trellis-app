@@ -16,21 +16,12 @@
       <v-data-table
         :headers="headers"
         :items="studyForms">
-        <template slot="headers" slot-scope="props">
-          <tr>
-            <th class="small"></th>
-            <th class="max-width">Form</th>
-            <th>Published</th>
-            <th class="small"></th>
-          </tr>
-        </template>
         <template slot="items" slot-scope="props">
           <FormListTile
             :form="props.item.form"
-            v-model="props.showHidden"
-            @input="changeMade()"
+            v-model="props.item.showHidden"
             @delete="deleteForm(studyForm)" />
-           <tr v-if="props.showHidden">
+           <tr v-if="props.item.showHidden">
             <td colspan="4">
               <FormSkips :form="props.item.form" />
             </td>
@@ -76,10 +67,20 @@
         isAddingNewForm: false,
         isLoading: false,
         headers: [{
-          text: ''
+          text: 'Actions'
         }, {
-          text: 'Form'
-        }]
+          text: 'Form',
+          class: 'max-width'
+        }, {
+          text: 'Published'
+        }, {
+          text: ''
+        }].map((h, i) => {
+          h.sortable = false
+          h.value = i
+          h.class = h.class || 'small'
+          return h
+        })
       }
     },
     methods: {

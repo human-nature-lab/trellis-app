@@ -453,6 +453,8 @@
   #leafletMap
     height: 400px /* Temporary height, replaced by actual container height via javascript */
     width: 100%
+    .leaflet-pane
+      z-index: 150
   .trellis-popup
     margin: 2px 2px
   .leaflet-tooltip
