@@ -38,7 +38,7 @@
       <TranslationTextField :translation="memForm.nameTranslation" @click.stop.prevent />
     </td>
     <td>
-      <v-checkbox v-model="memForm.isPublished" />
+      <v-checkbox v-model="memForm.isPublished" @change="save" />
     </td>
     <td>
       <v-btn icon @click="$emit('input', !value)">
@@ -91,16 +91,8 @@
     },
     watch: {
       form (newForm: Form) {
-        // this.isBusy = false
+        debugger
         this.memForm = newForm.copy()
-      },
-      memForm: {
-        handler (newVal: Form) {
-          if (!CompareService.entitiesAreEqual(newVal, this.form)) {
-            this.saveThrottled()
-          }
-        },
-        deep: true
       }
     },
     methods: {
@@ -115,6 +107,10 @@
       },
       justCapture () {
         debugger
+      },
+      save () {
+        debugger
+        this.$emit('save', this.memForm)
       }
     }
   })
