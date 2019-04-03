@@ -6,6 +6,7 @@
         :disabled="saving"
         @save="onSave"
         :text="textFieldValue" />
+      <v-spacer />
       <v-select
         dense
         class="small-select"

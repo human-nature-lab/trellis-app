@@ -20,6 +20,7 @@
           <FormListTile
             :form="props.item.form"
             v-model="props.item.showHidden"
+            @save="updateForm"
             @delete="deleteForm(studyForm)" />
            <tr v-if="props.item.showHidden">
             <td colspan="4">
@@ -34,6 +35,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import StudyForm from "../entities/trellis/StudyForm"
   import FormService from '../services/form/FormService'
   import formTypes from "../static/form.types"
   import global from '../static/singleton'
@@ -45,24 +47,13 @@
     name: 'Forms',
     components: {FormListTile, TrellisModal, FormSkips},
     async created () {
-      this.isLoading = true
-      const studyForms = await FormService.getAllStudyForms(global.study.id)
-      const formBins = {}
-      for (const studyForm of studyForms) {
-        if (!formBins[studyForm.formTypeId]) {
-          formBins[studyForm.formTypeId] = []
-        }
-        formBins[studyForm.formTypeId].push(studyForm)
-      }
-      for (const key in formBins) {
-        formBins[key].sort((a, b) => a.sortOrder - b.sortOrder )
-      }
-      this.formBins = formBins
-      this.isLoading = false
+      this.studyForms = await FormService.getAllStudyForms(global.study.id)
+      this.makeBins()
     },
     data () {
       return {
         global,
+        studyForms: null,
         formBins: {} as {[key: string]: Form[]},
         isAddingNewForm: false,
         isLoading: false,
@@ -85,14 +76,33 @@
     },
     methods: {
       async addForm (type: formTypes) {
-        const form = await FormService.createForm(global.study.id, type)
+        const form = await FormService.createForm(this.global.study.id, type)
         this.formBins[type].push(form)
       },
-      updateForm (form: Form) {
+      async updateForm (form: Form) {
+        debugger
+        const newForm = await FormService.updateForm(this.global.study.id, form)
+        const sf = this.studyForms.find((sf: StudyForm) => sf.formId === form.id)
+        sf.form = newForm
+        this.makeBins()
+      },
+      saveNewForm (form) {
 
       },
-      saveNewForm () {
-
+      makeBins () {
+        this.isLoading = true
+        const formBins = {}
+        for (const studyForm of this.studyForms) {
+          if (!formBins[studyForm.formTypeId]) {
+            formBins[studyForm.formTypeId] = []
+          }
+          formBins[studyForm.formTypeId].push(studyForm)
+        }
+        for (const key in formBins) {
+          formBins[key].sort((a, b) => a.sortOrder - b.sortOrder )
+        }
+        this.formBins = formBins
+        this.isLoading = false
       },
       formTypeName (formType: formTypes) {
         formType = +formType  // convert to int
