@@ -22,6 +22,10 @@ export default class FormServiceCordova implements FormServiceInterface {
     return studyForms.filter(s => (s.form.isPublished && s.form.deletedAt === null))
   }
 
+  async getAllStudyForms (studyId: string): Promise<StudyForm[]> {
+    throw Error('Not implemented')
+  }
+
   async getForm (id: string, bareBones: boolean = false): Promise<Form> {
     console.log('getForm', id)
     const connection = await DatabaseService.getDatabase()
@@ -69,7 +73,11 @@ export default class FormServiceCordova implements FormServiceInterface {
     throw Error('Not implemented')
   }
 
-  updateForm (studyId: string, form: Form): Promise<Form> {
+  updateForm (form: Form): Promise<Form> {
+    throw Error('Not implemented')
+  }
+
+  async updateStudyForm (studyId: string, studyForm: StudyForm): Promise<StudyForm> {
     throw Error('Not implemented')
   }
 
