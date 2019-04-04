@@ -91,7 +91,6 @@
     },
     watch: {
       form (newForm: Form) {
-        debugger
         this.memForm = newForm.copy()
       }
     },
@@ -105,11 +104,7 @@
         await FormService.exportForm(this.form.id)
         this.isBusy = false
       },
-      justCapture () {
-        debugger
-      },
       save () {
-        debugger
         this.$emit('save', this.memForm)
       }
     }
