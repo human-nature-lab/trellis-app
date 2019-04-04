@@ -90,10 +90,9 @@
       },
       async updateForm (form: Form) {
         try {
-          debugger
-          await FormService.updateForm(this.global.study.id, form)
-          const sf = this.studyForms.find((sf: StudyForm) => sf.formId === form.id)
-          sf.form = form
+          const newForm = await FormService.updateForm(form)
+          const sf = this.studyForms.find((sf: StudyForm) => sf.form.id === form.id)
+          Object.assign(sf.form, newForm)
           this.alert('success', this.$t('resource_updated', [this.formName(form)]))
         } catch (err) {
           this.alert('error', this.$t('failed_resource_update', [this.formName(form)]))

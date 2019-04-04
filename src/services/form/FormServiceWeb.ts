@@ -43,9 +43,14 @@ export class FormServiceWeb implements FormServiceInterface {
     return new Form().fromSnakeJSON(res.data.form)
   }
 
-  async updateForm (studyId: string, form: Form): Promise<Form> {
-    const res = await adminInst.put(uriTemplate('study/{study_id}/form/{form_id}', [studyId, form.id]))
+  async updateForm (form: Form): Promise<Form> {
+    const res = await adminInst.put(uriTemplate('form/{form_id}', [form.id]), form.toSnakeJSON())
     return new Form().fromSnakeJSON(res.data.form)
+  }
+
+  async updateStudyForm (studyId: string, studyForm: StudyForm): Promise<StudyForm> {
+    const res = await adminInst.put(uriTemplate('study/{}/form/{}', [studyId, studyForm.id]), studyForm.toSnakeJSON())
+    return new StudyForm().fromSnakeJSON(res.data.study_form)
   }
 
   async exportForm (formId: string) {
