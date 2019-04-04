@@ -183,13 +183,18 @@ class FileServiceCordova {
       directoryEntry
         .createReader()
         .readEntries((entries) => {
+          let removedEntries = 0
           entries.forEach((entry) => {
             entry.remove(
-              () => { /* success */ },
+              () => {
+                removedEntries++
+                if (removedEntries === entries.length) {
+                  resolve()
+                }
+              },
               (err) => reject(err))
           })
-        })
-      resolve()
+        }, reject)
     })
   }
 
