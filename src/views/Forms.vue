@@ -37,6 +37,7 @@
   import Vue from 'vue'
   import StudyForm from "../entities/trellis/StudyForm"
   import FormService from '../services/form/FormService'
+  import TranslationService from "../services/TranslationService"
   import formTypes from "../static/form.types"
   import global from '../static/singleton'
   import Form from "../entities/trellis/Form"
@@ -52,7 +53,7 @@
     },
     data () {
       return {
-        global,
+        global: global as Singleton,
         studyForms: null,
         formBins: {} as {[key: string]: Form[]},
         isAddingNewForm: false,
@@ -75,19 +76,29 @@
       }
     },
     methods: {
+      formName (form: Form) {
+        return TranslationService.getAny(form.nameTranslation, this.global.locale)
+      },
       async addForm (type: formTypes) {
-        const form = await FormService.createForm(this.global.study.id, type)
-        this.formBins[type].push(form)
+        try {
+          const form = await FormService.createForm(this.global.study.id, type)
+          this.formBins[type].push(form)
+          this.alert('success', this.$t('resource_created', [this.formName(form)]))
+        } catch (err) {
+          this.alert('error', this.$t('failed_resource_create', [this.$t('form')]))
+        }
       },
       async updateForm (form: Form) {
-        debugger
-        const newForm = await FormService.updateForm(this.global.study.id, form)
-        const sf = this.studyForms.find((sf: StudyForm) => sf.formId === form.id)
-        sf.form = newForm
-        this.makeBins()
-      },
-      saveNewForm (form) {
-
+        try {
+          debugger
+          await FormService.updateForm(this.global.study.id, form)
+          const sf = this.studyForms.find((sf: StudyForm) => sf.formId === form.id)
+          sf.form = form
+          this.alert('success', this.$t('resource_updated', [this.formName(form)]))
+        } catch (err) {
+          this.alert('error', this.$t('failed_resource_update', [this.formName(form)]))
+          this.log(err)
+        }
       },
       makeBins () {
         this.isLoading = true
@@ -115,11 +126,18 @@
             return this.$t('data_forms')
         }
       },
-      async deleteForm (form: Form) {
-        if (confirm('Really delete this form?')) {
-          await FormService.deleteForm(global.study.id, form.id)
-          const index = this.forms.findIndex(f => f.id === form.id)
-          this.forms.splice(index, 1)
+      async deleteForm (studyForm: StudyForm) {
+        debugger
+        if (confirm(this.$t('confirm_delete_resource', [this.formName(studyForm.form)]))) {
+          try {
+            await FormService.deleteForm(this.global.study.id, studyForm.id)
+            const index = this.studyForms.findIndex(sf => sf.id === studyForm.id)
+            this.studyForms.splice(index, 1)
+            this.makeBins()
+            this.alert('success', this.$t('resource_deleted', [this.formName(studyForm.form)]))
+          } catch (err) {
+            this.alert('error', this.$t('failed_resource_delete', [this.formName(studyForm.form)]))
+          }
         }
       }
     }
