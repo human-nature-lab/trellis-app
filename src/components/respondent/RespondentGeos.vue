@@ -24,6 +24,7 @@
         <respondent-geo-row
           @remove="remove"
           @move="startMove"
+          @overrideCurrent="toggleIsCurrent(props.item)"
           :show-history="!!props.item.history && !!props.item.history.length"
           :show-controls="true"
           v-model="props.expanded"
@@ -36,7 +37,7 @@
           :items="props.item.history"
           hide-actions>
           <template slot="items" slot-scope="historyProps">
-            <respondent-geo-row :respondentGeo="historyProps.item"></respondent-geo-row>
+            <RespondentGeoRow :respondentGeo="historyProps.item"></RespondentGeoRow>
           </template>
         </v-data-table>
       </template>
@@ -130,6 +131,19 @@
       }]
     }),
     methods: {
+      async toggleIsCurrent (respondentGeo: RespondentGeo) {
+        const isCurrent = !respondentGeo.isCurrent
+        try {
+          const rg = await RespondentService.editRespondentGeo(respondentGeo.respondentId, respondentGeo.id, isCurrent)
+          const index = this.respondent.geos.indexOf(respondentGeo)
+          if (index > -1) {
+            this.respondent.geos.splice(index, 1, rg)
+          }
+        } catch (err) {
+          this.log(err)
+          this.alert('error', 'Unable to update Current location')
+        }
+      },
       geoIsSelectable (geo: Geo): boolean {
         // Take advantage of JavaScript type coercion here
         return geo.geoType.canContainRespondent == <any>1 // eslint-disable-line

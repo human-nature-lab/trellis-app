@@ -13,15 +13,17 @@
           height="150" />
       </v-card-media>
       <v-card-actions class="respondent-name">
-        <v-flex>
-          {{name}}
-        </v-flex>
-        <v-spacer />
-        <v-btn
-          @click="showFullscreen = true"
-          icon>
-          <v-icon :large="$vuetify.breakpoint.smAndDown">fullscreen</v-icon>
-        </v-btn>
+        <v-layout row wrap>
+          <v-flex>
+            {{name}}
+          </v-flex>
+          <v-spacer />
+          <v-btn
+            @click="showFullscreen = true"
+            icon>
+            <v-icon :large="$vuetify.breakpoint.smAndDown">fullscreen</v-icon>
+          </v-btn>
+        </v-layout>
       </v-card-actions>
       <v-card-text v-if="labels && labels.length">
         <v-chip
@@ -47,9 +49,10 @@
   import FullscreenPhoto from '../photo/FullscreenPhoto'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
-  import {TranslateResult} from "vue-i18n"
+
   export default Vue.extend({
     name: 'respondent-item',
+    components: { Photo, FullscreenPhoto },
     props: {
       formsButtonVisible: {
         type: Boolean,
@@ -92,10 +95,6 @@
       photo (): Photo {
         return this.respondent.photos.length ? this.respondent.photos[0] : null
       }
-    },
-    components: {
-      Photo,
-      FullscreenPhoto
     }
   })
 </script>

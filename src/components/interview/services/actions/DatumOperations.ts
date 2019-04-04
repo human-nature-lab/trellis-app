@@ -58,7 +58,7 @@ export function updateDatum (findFunc: DatumFindFunc, title?: string): ActionHan
  * @returns {(interview: object, payload: ActionPayload, questionDatum: QuestionDatum) => Datum}
  */
 export function removeDatum (findFunc: DatumFindFunc, title?: string): ActionHandler {
-  return function (interview: object, action: Action, questionDatum: QuestionDatum): Datum {
+  return function (interview: InterviewManager, action: Action, questionDatum: QuestionDatum): Datum {
     let index = questionDatum.data.findIndex(datum => {
       return findFunc(datum, action.payload)
     })
@@ -70,6 +70,16 @@ export function removeDatum (findFunc: DatumFindFunc, title?: string): ActionHan
       defaultLoggingService.log({ msg })
     }
   }
+}
+
+/**
+ * Remove all data from a QuestionDatum.
+ * @param interview
+ * @param action
+ * @param questionDatum
+ */
+export function removeAllDatum (interview: InterviewManager, action: Action, questionDatum: QuestionDatum) {
+  questionDatum.data.splice(0, questionDatum.data.length)
 }
 
 /**

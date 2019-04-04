@@ -244,7 +244,7 @@ export default class InterviewManagerBase extends Emitter {
   /**
    * Assign the current condition tags
    */
-  _evaluateConditionAssignment (): void {
+  protected _evaluateConditionAssignment (): void {
     // TODO: This should probably be every question in the survey so far
     const questionsWithData: Question[] = this.questionsWithData()
     let vars = questionsWithData.reduce((vars, question) => {
@@ -273,7 +273,7 @@ export default class InterviewManagerBase extends Emitter {
       }
       return vars
     }, {})
-    console.log('condition assignment vars', JSON.stringify(vars))
+
     for (let question of questionsWithData) {
       for (let act of question.assignConditionTags) {
         try {
@@ -306,6 +306,12 @@ export default class InterviewManagerBase extends Emitter {
 
   getAllConditionTags () {
     return this.data.getAllConditionTagNames()
+  }
+
+  get hasDuplicateTags (): boolean {
+    const conditionTags = this.getAllConditionTags()
+    const conditionTagSet = new Set(conditionTags)
+    return conditionTags.length !== conditionTagSet.size
   }
 
   getSortedQuestionDatumData (questionDatumId: string, useRandom: boolean = false): Datum[] {

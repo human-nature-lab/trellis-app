@@ -23,6 +23,7 @@
           fab
           bottom
           right
+          :disabled="isQuestionDisabled"
           @click="openGeoSearch()">
           <v-icon
             style="height:auto;">{{geoIds.length ? 'edit': 'add'}}</v-icon>
@@ -61,9 +62,10 @@
   import AsyncTranslationText from '../../AsyncTranslationText.vue'
   import ModalTitle from '../../ModalTitle'
   import GeoTypeParameterMixin from '../mixins/GeoTypeParameterMixin'
+  import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   export default {
     name: 'geo-question',
-    mixins: [ActionMixin, GeoTypeParameterMixin],
+    mixins: [ActionMixin, GeoTypeParameterMixin, QuestionDisabledMixin],
     props: {
       question: {
         type: Object,

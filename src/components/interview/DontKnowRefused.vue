@@ -2,12 +2,14 @@
   <v-flex>
     <v-layout row>
       <v-btn
-        v-bind:class="{'primary': dk}"
+        :class="{primary: dk}"
+        :disabled="disabled"
         @click="dk=!dk">
         {{ $t('do_not_know') }}
       </v-btn>
       <v-btn
-        v-bind:class="{'primary': rf}"
+        :class="{primary: rf}"
+        :disabled="disabled"
         @click="rf=!rf">
         {{ $t('refuse_to_answer') }}
       </v-btn>
@@ -15,6 +17,7 @@
     <v-layout v-if="shouldShowReason">
       <v-text-field
         name="Reason"
+        :disabled="disabled"
         :label="$t('reason')"
         :rules="rules"
         v-model="reason"
@@ -31,6 +34,10 @@
     props: {
       question: {
         type: Object,
+        required: true
+      },
+      disabled: {
+        type: Boolean,
         required: true
       }
     },
@@ -55,7 +62,7 @@
         },
         set: function (val) {
           this._reason = val
-          this.action(AT.dk_rf_val, {
+          this.debouncedAction(AT.dk_rf_val, {
             dk_rf_val: val
           })
         }
@@ -97,6 +104,5 @@
     button
       font-size: 12px
       &.btn.btn-selected
-        background: orangered
         color: white
 </style>

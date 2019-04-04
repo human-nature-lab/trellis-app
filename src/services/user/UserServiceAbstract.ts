@@ -1,6 +1,11 @@
+import * as Sentry from "@sentry/browser";
 import User from '../../entities/trellis/User'
 import UserStudy from "../../entities/trellis/UserStudy";
+import global from "../../static/singleton";
 import Pagination from "../../types/Pagination";
+import config from '../../config'
+import PermissionService from "../permission";
+import SingletonService from "../SingletonService";
 
 export abstract class UserServiceAbstract {
 
@@ -32,8 +37,10 @@ export abstract class UserServiceAbstract {
    * Set the user
    * @param user
    */
-  setCurrentUser(user: User): void {
+  async setCurrentUser(user: User): Promise<void> {
     this.user = user
+    SingletonService.set('user', user)
+    await PermissionService.getUserPermissions(user)
   }
 
   /**
@@ -41,6 +48,8 @@ export abstract class UserServiceAbstract {
    */
   removeCurrentUser(): void {
     delete(this._user)
+    SingletonService.set('user', null)
+    PermissionService.resetUserPermissions()
   }
 
   /**

@@ -1,4 +1,3 @@
-var fs = require('fs')
 var path = require('path')
 var utils = require('./utils')
 var webpack = require('webpack')
@@ -8,15 +7,14 @@ var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 var loadMinified = require('./load-minified')
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var MiniCssExtractPlugin = require("mini-css-extract-plugin");
 var SentryPlugin = require('@sentry/webpack-plugin')
-var replaceAllBuffer = require('./replaceBuffer').replaceAllBuffer
 var sentryRelease = require('./utils').sentryRelease(srcConfig)
+var HandlebarsPlugin = require('handlebars-webpack-plugin')
 
 console.log('release', sentryRelease)
 var env = process.env.NODE_ENV === 'testing'
@@ -97,26 +95,11 @@ var webpackConfig = merge(baseWebpackConfig, {
         './service-worker-prod.js'))}</script>`
     }),
     // copy custom static assets
-    new CopyWebpackPlugin([
-      {
-        from: path.resolve(__dirname, '../static'),
-        to: config.build.assetsSubDirectory,
-        ignore: ['.*']
-      },
-      {
-        from: path.resolve(__dirname, '../static/config.xml'),
-        to: path.resolve(config.build.assetsRoot, 'config.xml'),
-        transform: function (content) {
-          var replacements = merge(require('../config/config.xml'), {
-            CORDOVA_CONTENT_SOURCE: 'index.html'
-          })
-          for (var key in replacements) {
-            content = replaceAllBuffer(content, key, replacements[key])
-          }
-          return content
-        }
-      }
-    ]),
+    new CopyWebpackPlugin([{
+      from: path.resolve(__dirname, '../static'),
+      to: config.build.assetsSubDirectory,
+      ignore: ['.*']
+    }]),
     // service worker caching
     new SWPrecacheWebpackPlugin({
       cacheId: 'trellis-2',
@@ -128,6 +111,11 @@ var webpackConfig = merge(baseWebpackConfig, {
     new SentryPlugin({
       release: sentryRelease,
       include: 'www/'
+    }),
+    new HandlebarsPlugin({
+      data: require('../config/config-xml.data.prod'),
+      entry: path.join(__dirname, '../src/config.xml.hbs'),
+      output: path.join(__dirname, '../www/config.xml')
     })
   ]
 })

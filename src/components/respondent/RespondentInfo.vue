@@ -36,6 +36,18 @@
               :conditionTags="respondentConditionTags"></respondent-condition-tags>
             <respondent-names
               :respondent="respondent"></respondent-names>
+            <v-flex v-if="isAdmin">
+              <v-toolbar flat>
+                <v-toolbar-title>{{$t('admin')}}</v-toolbar-title>
+              </v-toolbar>
+              <v-btn
+                color="error"
+                v-if="canDeleteRespondents"
+                @click="deleteRespondent">
+                <v-icon>delete</v-icon>
+                {{$t('delete')}}
+              </v-btn>
+            </v-flex>
           </v-layout>
         </v-container>
       </v-card-text>
@@ -44,6 +56,8 @@
 </template>
 
 <script lang="ts">
+  import {replaceWithNextOr} from '../../router'
+
   // @ts-ignore
   import Permission from '../Permission'
   // @ts-ignore
@@ -61,7 +75,9 @@
   import Vue from 'vue'
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
   import singleton from '../../static/singleton'
-  import RespondentName from "../../entities/trellis/RespondentName"
+  import PermissionMixin from '../../mixins/PermissionMixin'
+  import {TrellisPermission, TrellisRole} from "../../static/permissions.base"
+  import router from '../../router'
 
   /**
    * The respondent info router loader
@@ -75,7 +91,7 @@
 
   export default Vue.extend({
     name: 'respondent-info',
-    mixins: [RouteMixinFactory(preloadRespondent, true)],
+    mixins: [RouteMixinFactory(preloadRespondent, true), PermissionMixin],
     data () {
       return {
         global: singleton,
@@ -125,12 +141,34 @@
         } catch (err) {
           console.error(err)
         }
+      },
+      async deleteRespondent () {
+        if (!confirm(this.$t('confirm_resource_delete', [this.name]))) return
+        try {
+          this.isLoading = true
+          await RespondentService.removeRespondent(this.respondent.id)
+          this.alert('success', this.$t('resource_deleted', [this.name]))
+          replaceWithNextOr(() => {
+            router.go(-1)
+          })
+        } catch (err) {
+          this.log(err)
+          this.alert('error', this.$t('failed_resource_delete', [this.name]))
+        } finally {
+          this.isLoading = false
+        }
       }
     },
     computed: {
       name (): string {
         let rName = this.respondent.names.find(n => n.isDisplayName)
         return rName ? rName.name : this.respondent.name
+      },
+      canDeleteRespondents (): boolean {
+        return this.hasPermission(TrellisPermission.DELETE_RESPONDENT)
+      },
+      isAdmin (): boolean {
+        return this.hasRole(TrellisRole.ADMIN)
       }
     },
     components: {

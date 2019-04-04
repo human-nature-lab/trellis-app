@@ -61,7 +61,7 @@
       },
       onOtherChange (otherVal) {
         console.log('other change', otherVal)
-        this.action(AT.other_choice_text, {
+        this.debouncedAction(AT.other_choice_text, {
           choice_id: this.choice.id,
           val: otherVal,
           name: otherVal

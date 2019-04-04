@@ -26,7 +26,14 @@
       </span>
     </td>
     <td>
-      <v-icon v-if="respondentGeo.isCurrent">check</v-icon>
+      <v-btn
+        icon
+        color="primary"
+        @click="$emit('overrideCurrent')"
+        v-if="canChangeIsCurrent" >
+        <v-icon v-if="respondentGeo.isCurrent">check</v-icon>
+      </v-btn>
+      <v-icon v-else-if="respondentGeo.isCurrent">check</v-icon>
     </td>
     <td
       class="actions"
@@ -56,9 +63,14 @@
 </template>
 
 <script>
+  import {TrellisPermission} from '../../static/permissions.base'
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
   import Permission from '../Permission'
+  import PermissionMixin from '../../mixins/PermissionMixin'
   export default {
+    name: 'RespondentGeoRow',
+    components: {Permission, GeoBreadcrumbs},
+    mixins: [PermissionMixin],
     props: {
       showControls: {
         type: Boolean,
@@ -77,8 +89,11 @@
         required: true
       }
     },
-    name: 'RespondentGeoRow',
-    components: {Permission, GeoBreadcrumbs}
+    computed: {
+      canChangeIsCurrent () {
+        return this.hasPermission(TrellisPermission.CHANGE_RESPONDENT_GEO_CURRENT)
+      }
+    }
   }
 </script>
 
