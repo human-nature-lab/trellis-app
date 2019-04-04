@@ -1,17 +1,18 @@
 <template>
   <v-flex :class="{disabled: disabled}">
     <v-text-field
+      ref="textField"
       :disabled="disabled"
       :readonly="!isEditing"
       dense
       solo
       :flat="!isEditing"
-      :autofocus="isEditing"
       :append-icon="isEditing ? 'save' : 'edit'"
       :prepend-icon="isEditing ? 'clear' : ''"
       :prepend-icon-cb="resetEditorState"
       :append-icon-cb="isEditing ? save : startEditing"
       v-model="memText"
+      @keyup.enter="save"
       class="min-text-field" />
   </v-flex>
 </template>
@@ -32,6 +33,10 @@
       disabled: {
         type: Boolean,
         default: false
+      },
+      autofocus: {
+        type: Boolean,
+        default: true
       }
     },
     data () {
@@ -64,6 +69,12 @@
       },
       startEditing () {
         this.isEditing = true
+        if (this.autofocus && this.$refs.textField && this.$refs.textField.$el) {
+          const input = this.$refs.textField.$el.querySelector('input')
+          if (input) {
+            input.focus()
+          }
+        }
       }
     }
   }
