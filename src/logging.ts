@@ -30,9 +30,9 @@ async function asyncSetup () {
 
 if (config.sentry && config.sentry.dsn) {
   let release = 'trellis-' + VERSION
-  if (!config.debug) {
-    release += (config.appEnv === APP_ENV.CORDOVA ? '-cordova' : '-web')
-  }
+  // if (!config.debug) {
+  //   release += (config.appEnv === APP_ENV.CORDOVA ? '-cordova' : '-web')
+  // }
   const sentryConfig: BrowserOptions = {
     dsn: config.sentry.dsn,
     release: release,
@@ -52,6 +52,10 @@ if (config.sentry && config.sentry.dsn) {
   }
   console.info('Using sentry for logging', sentryConfig)
   Sentry.init(sentryConfig)
+
+  Sentry.configureScope(scope => {
+    scope.setTag('platform', config.appEnv === APP_ENV.CORDOVA ? 'cordova' : 'web')
+  })
 
   // Subscribe to changes to the user and locale via the SingletonService
   SingletonService.on('user', user => {
