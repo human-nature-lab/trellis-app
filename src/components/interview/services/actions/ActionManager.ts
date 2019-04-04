@@ -39,7 +39,7 @@ export class ActionManager {
    * @param {boolean} actionWasInitiatedByAHuman
    * @returns {any}
    */
-  do (action: Action, interview: InterviewManager, questionDatum: QuestionDatum, questionBlueprint: Question, actionWasInitiatedByAHuman: boolean) {
+  do (action: Action, interview: InterviewManager, questionDatum: QuestionDatum, questionBlueprint: Question, actionWasInitiatedByAHuman: boolean): PromiseLike<any>|any {
     let type = action.actionType
     if (this.actions[type]) {
       return this.actions[type](interview, action, questionDatum, questionBlueprint, actionWasInitiatedByAHuman)

@@ -8,7 +8,7 @@
             :translation="section.nameTranslation"
             :locale="global.locale" />
           <span class="subheading light">
-            ({{$t('page')}} {{location.page + 1}})
+            ({{$t('page')}} {{location ? location.page + 1 : '?'}})
           </span>
           <span
             class="subheading light"
@@ -24,12 +24,15 @@
         <span v-if="formIsEmpty">
           {{ $t('form_empty') }}
         </span>
-        <Page v-else
+        <Page v-else-if="location"
               :questions="questions"
               :location="location"
               :actions="interviewActions"
               :data="interviewData"
               :isAtEnd="isAtEnd"
+              :disabled="disableInput"
+              :prevActive="navigation.prev"
+              :nextActive="navigation.next"
               :isAtBeginning="isAtBeginning"
               :conditionTags="interviewConditionTags"
               :interview="interview" />
@@ -127,12 +130,13 @@
   import AsyncTranslationText from '../AsyncTranslationText'
   import menuBus from '../main-menu/MenuBus'
   import global from '../../static/singleton'
+  import AT from '../../static/action.types'
 
   import {sharedInterview, clearSharedInterview} from './classes/InterviewManager'
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/actions/ActionBus'
 
-  import {validateParametersWithError} from './services/ValidatorService'
+  import {allParametersAreValidWithError} from './services/ValidatorService'
   import router, {replaceWithNextOr} from '../../router'
   import InterviewLoader from './services/InterviewLoader'
   import SurveyService from '../../services/survey'
@@ -176,6 +180,7 @@
         surveyId: null,
         isLoading: true,
         isSaving: false,
+        disableInput: false,
         showSafeToExitMessage: false,
         type: 'interview',
         interviewData: {},
@@ -195,6 +200,10 @@
           end: false,
           conditionTag: false
         },
+        navigation: {
+          next: false,
+          prev: false
+        },
         alreadyExited: false,
         questions: [],
         loadingStep: 0,
@@ -202,7 +211,7 @@
       }
     },
     created () {
-      actionBus.$on('action', this.actionHandler)
+      actionBus.on('action', this.actionHandler)
       menuBus.$on('showConditionTags', this.showConditionTags)
       window.onbeforeunload = this.prematureExit
       this.hydrate(interviewData)
@@ -210,7 +219,7 @@
     beforeDestroy: function () {
       window.onbeforeunload = null
       menuBus.$off('showConditionTags', this.showConditionTags)
-      actionBus.$off('action', this.actionHandler)
+      actionBus.off('action', this.actionHandler)
     },
     async beforeRouteLeave (to, from, next) {
       await this.leaving()
@@ -269,14 +278,27 @@
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
         interviewState.on('error', this.onError, this)
+        this.isLoading = false
         this.updateInterview()
       },
-      actionHandler (action) {
+      async actionHandler (action) {
         if (!interviewState) {
           throw Error('Trying to push actions before interview has been initialized')
         }
-        interviewState.pushAction(action)
+        if (action.actionType === AT.next || action.actionType === AT.previous) {
+          this.disableInput = true
+          if (action.actionType === AT.next) {
+            this.navigation.next = true
+          } else {
+            this.navigation.prev = true
+          }
+          this.$forceUpdate()
+        }
+        await interviewState.pushAction(action)
         this.updateInterview()
+        this.disableInput = false
+        this.navigation.next = false
+        this.navigation.prev = false
       },
       updateInterview () {
         this.isAtEnd = interviewState.navigator.isAtEnd
@@ -294,7 +316,7 @@
           q.type = {
             name: q.questionType.name
           }
-          let validation = validateParametersWithError(q, q.questionParameters, q.datum)
+          let validation = allParametersAreValidWithError(q, q.questionParameters, q.datum)
           q.allParametersSatisfied = validation === true // Makes non-boolean types falsey
           q.validationError = typeof validation === 'string' ? validation : null
           q.isAnswered = false
@@ -377,7 +399,7 @@
     },
     computed: {
       formIsEmpty () {
-        return !(this.form && this.form.sections && this.form.sections.length)
+        return !this.isLoading && !(this.form && this.form.sections && this.form.sections.length)
       },
       isRepeated () {
         return this.section && (this.section.isRepeatable || this.section.followUpQuestionId !== null)

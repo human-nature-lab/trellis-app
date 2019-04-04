@@ -321,7 +321,7 @@ export default class DataStore extends Emitter {
    * @returns {boolean}
    * @private
    */
-  _locationMatchesQuestionDatum (questionDatum: QuestionDatum, sectionRepetition: number, sectionFollowUpDatumId: string) {
+  private _locationMatchesQuestionDatum (questionDatum: QuestionDatum, sectionRepetition: number, sectionFollowUpDatumId: string) {
     return questionDatum.sectionRepetition === sectionRepetition &&
       questionDatum.followUpDatumId === sectionFollowUpDatumId
   }

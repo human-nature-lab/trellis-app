@@ -7,17 +7,14 @@ var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
-var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
-var replaceAllBuffer = require('./replaceBuffer').replaceAllBuffer
+var HandlebarsPlugin = require('handlebars-webpack-plugin')
 
 // add hot-reload related code to entry chunks
 Object.keys(baseWebpackConfig.entry).forEach(function (name) {
   baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
 })
 
-
-var replacements = require('../config/config.xml')
 
 module.exports = merge(baseWebpackConfig, {
   mode: 'development',
@@ -51,16 +48,11 @@ module.exports = merge(baseWebpackConfig, {
         './service-worker-dev.js'), 'utf-8')}</script>`
     }),
     new FriendlyErrorsPlugin(),
-    new CopyWebpackPlugin([{
-      from: path.resolve(__dirname, '../static/config.xml'),
-      to: path.resolve(config.build.assetsRoot, 'config.xml'),
-      transform: function (content) {
-        for (var key in replacements) {
-          content = replaceAllBuffer(content, key, replacements[key])
-        }
-        return content
-      }
-    }]),
+    new HandlebarsPlugin({
+      data: require('../config/config-xml.data.dev'),
+      entry: path.join(__dirname, '../src/config.xml.hbs'),
+      output: path.join(__dirname, '../www/config.xml')
+    }),
     new HardSourceWebpackPlugin()
   ]
 })

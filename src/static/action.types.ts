@@ -23,7 +23,9 @@ const ActionTypes = {
   respondent_move: 'respondent-move',
   respondent_add_geo: 'respondent-add-geo',
   respondent_remove_geo: 'respondent-remove-geo',
-  other_respondent_added: 'other-respondent-added'
+  other_respondent_added: 'other-respondent-added',
+  select_no_one: 'select-no-one',
+  deselect_no_one: 'deselect-no-one'
 }
 
 export default ActionTypes
