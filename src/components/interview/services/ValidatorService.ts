@@ -38,8 +38,8 @@ export const typeHandlers = {
   },
   'is_required': function (qd: QuestionDatum, pVal: any, pMap) {
     if (pVal) {
-      if (qd.data && qd.data.length && (qd.data[0].val == null || ('' + qd.data[0].val).length > 0)) {
-
+      const isSingleDatumType = qd.data && qd.data.length && ['text', 'integer', 'decimal'].indexOf(qd.data[0].name) > -1
+      if (qd.data && qd.data.length && (!isSingleDatumType || ('' + qd.data[0].val).length > 0)) {
         return true
       } else if (pMap.show_dk || pMap.show_rf) {
         return qd.dkRf !== undefined && qd.dkRf !== null && qd.dkRfVal && qd.dkRfVal.length

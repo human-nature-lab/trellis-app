@@ -40,6 +40,7 @@
         },
         set (val) {
           this.debouncedAction(AT.set_text, {
+            name: 'text',
             val: val
           })
         }

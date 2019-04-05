@@ -37,6 +37,7 @@
         set (val) {
           this._value = val
           this.debouncedAction(AT.number_change, {
+            name: 'integer',
             val: val
           })
         }

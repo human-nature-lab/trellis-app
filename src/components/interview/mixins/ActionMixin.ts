@@ -12,7 +12,6 @@ export default Vue.extend({
      * @param [payload]
      */
     action (type: string, payload?: ActionPayload) {
-      console.log('action', type, payload)
       if (!this['question'] || !this['question'].id) {
         throw new Error('Unable to use action method without defining the question. Use actionWithoutQuestion instead.')
       }
