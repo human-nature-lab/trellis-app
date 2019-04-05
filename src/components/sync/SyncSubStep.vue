@@ -40,6 +40,11 @@
         _successMessage: ''
       }
     },
+    beforeDestroy () {
+      if (this.working && this.cancel) {
+        this.cancel()
+      }
+    },
     created () {
       if (this.successMessage) {
         this._successMessage = this.successMessage
