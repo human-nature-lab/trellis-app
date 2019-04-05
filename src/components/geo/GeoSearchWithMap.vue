@@ -235,6 +235,7 @@
         this.selectedGeo = GeoService.createNewGeo(parentGeoId, study.locales)
       },
       printMap: function () {
+        this.global.menuDrawer.open = false
         this.global.printMode = !this.global.printMode
       },
       removeGeoDone: function (removedGeoId) {
