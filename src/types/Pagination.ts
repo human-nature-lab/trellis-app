@@ -3,5 +3,5 @@ export default interface Pagination <T> {
   start: number
   count: number
   sortBy?: string
-  data: T[]
+  data?: T[]
 }

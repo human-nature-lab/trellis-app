@@ -15,11 +15,6 @@ import global from '../static/singleton'
 const UPLOAD_NUM_ROWS_WRITE = 100
 
 class SyncService {
-  private deviceId: string
-
-  constructor () {
-    this.deviceId = DeviceService.getUUID()
-  }
 
   async createSync (type: string, deviceId: string): Promise<Sync> {
     const sync = new Sync()

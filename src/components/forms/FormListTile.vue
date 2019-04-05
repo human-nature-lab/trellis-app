@@ -29,7 +29,7 @@
             <v-icon>save_alt</v-icon>
           </v-list-tile>
           <v-list-tile @click="$emit('delete')">
-            <v-icon>delete</v-icon>
+            <v-icon color="error">delete</v-icon>
           </v-list-tile>
         </v-list>
       </v-menu>
@@ -59,7 +59,6 @@
   // @ts-ignore
   import TrellisLoadingCircle from '../TrellisLoadingCircle'
   import FormService from "../../services/form/FormService"
-  import CompareService from "../../services/CompareService"
   import debounce from 'lodash/debounce'
 
   export default Vue.extend({
