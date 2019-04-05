@@ -31,9 +31,6 @@
           fileServicePromise: undefined
         }
       },
-      beforeDestroy () {
-        this.stopDownload()
-      },
       created () {
         this.downloadSnapshot()
       },
