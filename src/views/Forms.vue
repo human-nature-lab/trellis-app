@@ -126,7 +126,6 @@
         }
       },
       async deleteForm (studyForm: StudyForm) {
-        debugger
         if (confirm(this.$t('confirm_delete_resource', [this.formName(studyForm.form)]))) {
           try {
             await FormService.deleteForm(this.global.study.id, studyForm.id)

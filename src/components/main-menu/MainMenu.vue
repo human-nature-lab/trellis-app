@@ -181,6 +181,10 @@
             to: {name: 'Reports'},
             icon: 'save',
             title: 'reports'
+          }, {
+            to: {name: 'Devices'},
+            icon: 'devices',
+            title: 'devices'
           }]
         }, {
           title: 'settings',

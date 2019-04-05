@@ -9,6 +9,7 @@ const SyncAdmin = () => import(/* webpackChunkName: "sync-admin" */'../component
 const Users = () => import(/* webpackChunkName: "users" */'../views/Users')
 const Reports = () => import(/* webpackChunkName: "reports" */'../views/Reports')
 const FormBuilder = () => import(/* webpackChunkName: "form-builder" */'../views/FormBuilder')
+const Devices = () => import(/* webpackChunkName: "devices" */'../views/Devices')
 
 export default [{
   path: '/',
@@ -43,4 +44,8 @@ export default [{
   name: 'Forms',
   component: Forms,
   beforeEnter: chain(ValidateStudy)
+}, {
+  path: '/devices',
+  name: 'Devices',
+  component: Devices
 }]
