@@ -1,7 +1,12 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
      <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demoBanner">
-       This server is for demonstration purposes only! Not for human subjects research.
+       <span v-if="serverMode=='demo'">
+       {{ $t('demo_alert') }}
+       </span>
+       <span v-else-if="serverMode=='test'">
+       {{ $t('test_alert') }}
+       </span>
      </v-alert>
     <v-dialog
       max-width="300"
@@ -106,6 +111,7 @@
   import DocsSidebar from './components/documentation/DocsSidebar'
   import UserService from './services/user/UserService'
   import config from './config'
+  import translations from './i18n/translations'
 
   export default {
     name: 'web-app',
