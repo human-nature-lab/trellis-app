@@ -40,6 +40,12 @@
         _successMessage: ''
       }
     },
+    beforeDestroy () {
+      if (this.working && this.cancel) {
+        console.log("calling cancel method")
+        this.cancel()
+      }
+    },
     created () {
       if (this.successMessage) {
         this._successMessage = this.successMessage
