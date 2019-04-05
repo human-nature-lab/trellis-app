@@ -42,7 +42,6 @@
     },
     beforeDestroy () {
       if (this.working && this.cancel) {
-        console.log("calling cancel method")
         this.cancel()
       }
     },
