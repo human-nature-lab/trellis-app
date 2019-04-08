@@ -24,7 +24,7 @@ export default abstract class StudyServiceAbstract {
    * @param {string} studyId
    * @returns {Promise<Study>}
    */
-  abstract getStudy(studyId): PromiseLike<Study|undefined>
+  abstract getStudy(studyId): PromiseLike<Study | undefined>
 
   /**
    * Get all of the studies assigned to me
@@ -42,6 +42,25 @@ export default abstract class StudyServiceAbstract {
   /**
    * Get all studies
    */
-  abstract getAllStudies (): PromiseLike<Study[]>
+  abstract getAllStudies(): PromiseLike<Study[]>
+
+  /**
+   * Create a new study
+   * @param study
+   */
+  abstract createStudy (study: Study): PromiseLike<Study>
+
+  /**
+   * Update an existing study
+   * @param study
+   */
+  abstract updateStudy (study: Study): PromiseLike<Study>
+
+  /**
+   * Remove a study
+   * @param studyId
+   */
+  abstract removeStudy (studyId: string): PromiseLike<void>
 }
+
 

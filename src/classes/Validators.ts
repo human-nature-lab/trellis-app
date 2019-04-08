@@ -40,4 +40,10 @@ export default class Validators {
       return val >= min && val <= max ? true : invalidResponse || false
     }
   }
+
+  static required (invalidResponse?: string): Validator<any> {
+    return function (val: any) {
+      return val !== null && val !== undefined ? true : invalidResponse || false
+    }
+  }
 }

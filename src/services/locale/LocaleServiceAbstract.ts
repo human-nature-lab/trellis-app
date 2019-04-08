@@ -1,3 +1,4 @@
+import StudyLocale from "../../entities/trellis/StudyLocale";
 import SingletonService from '../SingletonService'
 import Locale from '../../entities/trellis/Locale'
 import Study from '../../entities/trellis/Study'
@@ -63,12 +64,32 @@ export default abstract class LocaleServiceAbstract {
    * @param {string} studyId
    * @returns {Promise<Locale[]>} - Returns a promise that resolves to an array of Locales associated with the study
    */
-  abstract async getStudyLocales (studyId: string): Promise<Locale[]>
+  abstract getStudyLocales (studyId: string): PromiseLike<Locale[]>
 
   /**
    * Get a locale by the localeId
    * @param {string} localeId
-   * @returns {Promise<Object>} - Resolves to the locale or fails
+   * @returns {PromiseLike<Object>} - Resolves to the locale or fails
    */
-  abstract async getLocaleById (localeId: string): Promise<Locale>
-}
+  abstract getLocaleById (localeId: string): PromiseLike<Locale>
+
+  /**
+   * Get all of the locales on this server
+   */
+  abstract getAllLocales (): PromiseLike<Locale[]>
+
+
+  /**
+   * Add a locale to a study
+   * @param studyId
+   * @param locale
+   */
+  abstract addStudyLocale (studyId: string, locale: Locale): PromiseLike<StudyLocale>
+
+  /**
+   * Remove a locale from a study
+   * @param studyId
+   * @param locale
+   */
+  abstract removeStudyLocale (studyId: string, locale: Locale): PromiseLike<void>
+

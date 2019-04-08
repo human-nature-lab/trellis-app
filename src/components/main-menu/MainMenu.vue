@@ -185,6 +185,10 @@
             to: {name: 'Devices'},
             icon: 'devices',
             title: 'devices'
+          }, {
+            to: {name: 'Studies'},
+            icon: 'import_contacts',
+            title: 'studies'
           }]
         }, {
           title: 'settings',

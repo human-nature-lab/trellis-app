@@ -10,6 +10,7 @@ const Users = () => import(/* webpackChunkName: "users" */'../views/Users')
 const Reports = () => import(/* webpackChunkName: "reports" */'../views/Reports')
 const FormBuilder = () => import(/* webpackChunkName: "form-builder" */'../views/FormBuilder')
 const Devices = () => import(/* webpackChunkName: "devices" */'../views/Devices')
+const Studies = () => import(/* webpackChunkName: "studies" */'../views/Studies')
 
 export default [{
   path: '/',
@@ -48,4 +49,8 @@ export default [{
   path: '/devices',
   name: 'Devices',
   component: Devices
+}, {
+  path: '/studies',
+  name: 'Studies',
+  component: Studies
 }]
