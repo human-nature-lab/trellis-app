@@ -198,7 +198,13 @@
     },
     computed: {
       uploadsFiltered: function () {
-        return this.uploads.filter((upload) => upload.device_name.toLowerCase().indexOf(this.search.toLowerCase()) > -1)
+        let returnArray = this.uploads
+        if (this.search && this.search.length > 0) {
+          returnArray = this.uploads.filter(u => {
+            return ((!u.device_name) || u.device_name.toLowerCase().indexOf(this.search.toLowerCase()) > -1)
+          })
+        }
+        return returnArray
       }
     },
     methods: {
