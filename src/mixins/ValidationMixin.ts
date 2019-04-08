@@ -8,6 +8,9 @@ export default Vue.extend({
     },
     maxLength (max: number): Validator<HasLength> {
       return Validators.maxLength(max, this.$t('max_length', [max]) as string)
+    },
+    required (): Validator<any> {
+      return Validators.required(this.$t('required_field') as string)
     }
   }
 })

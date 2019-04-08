@@ -76,7 +76,6 @@
     },
     methods: {
       updateMemcopy (device): void {
-        this.isLoading = true
         if (device) {
           this.memDevice = device.copy()
         } else {
@@ -85,7 +84,6 @@
           d.deviceId = ''
           this.$set(this, 'memDevice', d)
         }
-        this.isLoading = false
       },
       save (): void {
         if (this.canSave && this.$refs.form.validate() && !CompareService.entitiesAreEqual(this.memDevice, this.device)) {

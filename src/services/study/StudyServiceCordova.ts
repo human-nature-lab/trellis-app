@@ -48,6 +48,18 @@ class StudyServiceCordova extends StudyServiceAbstract {
   async getAllStudies (): Promise<Study[]> {
     throw Error('Not implemented')
   }
+
+  createStudy (study: Study): Promise<Study> {
+    throw new Error('Not implemented')
+  }
+
+  updateStudy (study: Study): Promise<Study> {
+    throw new Error('Not implemented')
+  }
+
+  removeStudy (studyId: string): Promise<void> {
+    throw new Error('Not implemented')
+  }
 }
 
 export default StudyServiceCordova
