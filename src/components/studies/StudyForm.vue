@@ -41,13 +41,20 @@
             :label="$t('default_language')" />
         </v-flex>
         <v-flex>
-          <v-spacer />
-          <v-btn
-            @click="save"
-            :disabled="isWorking || !isValid">
-            <TrellisLoadingCircle v-if="isWorking" size="30px" />
-            <span v-else>{{$t('save')}}</span>
-          </v-btn>
+          <v-layout>
+            <v-spacer />
+            <v-btn
+              @click="resetMemcopy(study)"
+              :disabled="isWorking">
+              {{$t('clear')}}
+            </v-btn>
+            <v-btn
+              @click="save"
+              :disabled="isWorking || !isValid">
+              <TrellisLoadingCircle v-if="isWorking" size="30px" />
+              <span v-else>{{$t('save')}}</span>
+            </v-btn>
+          </v-layout>
         </v-flex>
       </v-layout>
     </v-container>
@@ -86,14 +93,14 @@
     },
     watch: {
       study (newStudy) {
-        this.updateMemStudy(newStudy)
+        this.resetMemcopy(newStudy)
       }
     },
     created () {
-      this.updateMemStudy(this.study)
+      this.resetMemcopy(this.study)
     },
     methods: {
-      updateMemStudy (newStudy: Study) {
+      resetMemcopy (newStudy: Study) {
         if (newStudy) {
           this.memStudy = newStudy.copy()
         } else {

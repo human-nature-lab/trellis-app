@@ -1,6 +1,6 @@
 <template>
   <v-flex>
-    <v-container class="ma-0 pa-0">
+    <v-container>
       <v-toolbar flat>
         <v-toolbar-title>
           {{$t('studies')}}

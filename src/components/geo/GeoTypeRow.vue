@@ -1,0 +1,52 @@
+<template>
+  <tr>
+    <td>
+      <CRUDMenu
+        @edit="$emit('edit')"
+        @remove="$emit('remove')" />
+    </td>
+    <td>{{geoType.name}}</td>
+    <td class="center">
+      <v-icon
+        v-if="geoType.canUserAdd"
+        color="primary">
+        check
+      </v-icon>
+    </td>
+    <td class="center">
+      <v-icon
+        v-if="geoType.canUserAddChild"
+        color="primary">
+        check
+      </v-icon>
+    </td>
+    <td class="center">
+      <v-icon
+        v-if="geoType.canContainRespondent"
+        color="primary">
+        check
+      </v-icon>
+    </td>
+  </tr>
+</template>
+
+<script lang="ts">
+  import Vue from 'vue'
+  import GeoType from '../../entities/trellis/GeoType'
+  import CRUDMenu from '../CRUDMenu'
+  export default Vue.extend({
+    name: 'GeoTypeRow',
+    components: { CRUDMenu },
+    props: {
+      geoType: {
+        type: Object as () => GeoType,
+        required: true
+      }
+    }
+  })
+</script>
+
+<style lang="sass" scoped>
+  .center
+    text-align: center
+</style>

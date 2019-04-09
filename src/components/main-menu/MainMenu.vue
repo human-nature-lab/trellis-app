@@ -189,6 +189,10 @@
             to: {name: 'Studies'},
             icon: 'import_contacts',
             title: 'studies'
+          }, {
+            to: {name: 'GeoTypes'},
+            icon: 'edit_location',
+            title: 'geo_types'
           }]
         }, {
           title: 'settings',
