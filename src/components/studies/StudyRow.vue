@@ -1,22 +1,9 @@
 <template>
   <tr>
     <td>
-      <v-menu
-        offset-x
-        max-width="60px"
-        lazy>
-        <v-btn icon slot="activator">
-          <v-icon>more_vert</v-icon>
-        </v-btn>
-        <v-list>
-          <v-list-tile @click="$emit('edit')">
-            <v-icon>edit</v-icon>
-          </v-list-tile>
-          <v-list-tile @click="$emit('remove')">
-            <v-icon color="error">delete</v-icon>
-          </v-list-tile>
-        </v-list>
-      </v-menu>
+      <CRUDMenu
+        @edit="$emit('edit')"
+        @remove="$emit('remove')" />
     </td>
     <td>{{study.name}}</td>
     <td>{{study.photoQuality}}%</td>
@@ -46,8 +33,10 @@
   import Study from '../../entities/trellis/Study'
   import StudyLocale from "../../entities/trellis/StudyLocale"
   import LocaleService from "../../services/locale/LocaleService"
+  import CRUDMenu from '../CRUDMenu'
   export default Vue.extend({
     name: 'StudyRow',
+    components: {CRUDMenu},
     props: {
       study: {
         type: Object as () => Study,

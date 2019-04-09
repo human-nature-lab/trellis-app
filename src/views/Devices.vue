@@ -17,22 +17,9 @@
       :headers="headers">
       <template slot="items" slot-scope="{item: device}">
         <td>
-          <v-menu
-            offset-x
-            max-width="60px"
-            lazy>
-            <v-btn icon slot="activator">
-              <v-icon>more_vert</v-icon>
-            </v-btn>
-            <v-list>
-              <v-list-tile @click="startEdit(device)">
-                <v-icon>edit</v-icon>
-              </v-list-tile>
-              <v-list-tile @click="deleteDevice(device)">
-                <v-icon color="error">delete</v-icon>
-              </v-list-tile>
-            </v-list>
-          </v-menu>
+          <CRUDMenu
+            @edit="startEdit(device)"
+            @remove="deleteDevice(device)" />
         </td>
         <td>{{device.name}}</td>
         <td>{{device.deviceId}}</td>
@@ -53,9 +40,10 @@
   import TrellisModal from '../components/TrellisModal'
   import DeviceForm from '../components/devices/DeviceForm'
   import Pagination from "../types/Pagination"
+  import CRUDMenu from '../components/CRUDMenu'
   export default Vue.extend({
     name: 'Devices',
-    components: { TrellisModal, DeviceForm },
+    components: { TrellisModal, DeviceForm, CRUDMenu },
     data () {
       return {
         isBusy: false,

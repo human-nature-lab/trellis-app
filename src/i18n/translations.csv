@@ -470,3 +470,10 @@ languages,Languages,,
 min_length,Value must be longer than {0},,
 max_length,Value must be shorter than {0},,
 resource_is_same,The {0} has not changed,,"Referring to some resource. e.g. Study, Locale, Device"
+devices,Devices,,
+geo_types,Location types,,
+resource_creating,Creating new {0},,"New Study, New Locale, New Device, New GeoType"
+geo_type,Location type,,
+can_user_create,Respondents can create,,
+can_user_add_child,Respondents can add children,,
+can_contain_respondent,Can contain respondents,,
