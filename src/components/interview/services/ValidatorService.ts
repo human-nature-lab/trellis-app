@@ -173,8 +173,8 @@ export function makeValidationRules (question, parameters) {
   let rules = []
   for (let parameter of parameters) {
     let parameterValue = castParameter(question.type.name, parameter.parameter.name, parameter.val)
-    let errorMessage = validationErrors[parameter.parameter.name](parameterValue)
     if (validationErrors[parameter.parameter.name]) {
+      const errorMessage = validationErrors[parameter.parameter.name](parameterValue)
       rules.push(function (value) {
         return typeHandlers[parameter.parameter.name](question.datum, parameterValue) ? true : errorMessage
       })

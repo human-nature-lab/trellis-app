@@ -2,15 +2,17 @@
   <v-flex>
     <v-layout row>
       <v-btn
+        v-if="showDk"
         :class="{primary: dk}"
         :disabled="disabled"
-        @click="dk=!dk">
+        @click="dk =! dk">
         {{ $t('do_not_know') }}
       </v-btn>
       <v-btn
+        v-if="showRf"
         :class="{primary: rf}"
         :disabled="disabled"
-        @click="rf=!rf">
+        @click="rf =! rf">
         {{ $t('refuse_to_answer') }}
       </v-btn>
     </v-layout>
@@ -30,6 +32,7 @@
 <script>
   import ActionMixin from './mixins/ActionMixin'
   import AT from '../../static/action.types'
+  import PT from '../../static/parameter.types'
   export default {
     props: {
       question: {
@@ -53,6 +56,22 @@
       this._reason = this.question.datum.dk_rf_val // We're actually binding to a text model so here we need to initialize that var
     },
     computed: {
+      showDk () {
+        for (const qp of this.question.questionParameters) {
+          if (parseInt(qp.parameterId, 10) === PT.show_dk) {
+            return !!+qp.val
+          }
+        }
+        return true
+      },
+      showRf () {
+        for (const qp of this.question.questionParameters) {
+          if (parseInt(qp.parameterId, 10) === PT.show_rf) {
+            return !!+qp.val
+          }
+        }
+        return true
+      },
       shouldShowReason: function () {
         return this.question.datum.dkRf != null
       },
