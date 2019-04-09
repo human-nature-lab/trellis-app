@@ -1,5 +1,13 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
+     <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demoBanner">
+       <span v-if="serverMode=='demo'">
+       {{ $t('demo_alert') }}
+       </span>
+       <span v-else-if="serverMode=='test'">
+       {{ $t('test_alert') }}
+       </span>
+     </v-alert>
     <v-dialog
       max-width="300"
       v-model="global.loading.fullscreen && global.loading.active"
@@ -20,7 +28,7 @@
       app>
       <MainMenu />
     </v-navigation-drawer>
-    <v-toolbar fixed app>
+    <v-toolbar fixed app :class="{'mainMenu': serverMode=='production', 'mainMenu-demo': serverMode=='demo' || serverMode=='test'}">
       <!-- MainMenu /-->
       <v-toolbar-side-icon
         @click.stop="global.menuDrawer.open = !global.menuDrawer.open"
@@ -73,10 +81,7 @@
         justify-start
         fluid
         fill-height
-        class="ma-0 pa-0 app-container" :class="{'px-0': $vuetify.breakpoint.xsOnly }">
-        <v-alert v-show="global.loading.error">
-          {{global.loading.error}}
-        </v-alert>
+        :class="{'px-0': $vuetify.breakpoint.xsOnly, 'ma-0 pa-0 app-container': serverMode=='production', 'app-container-demo': serverMode=='demo' || serverMode=='test' }">
         <router-view class="route-container fade-in" />
       </v-container>
     </v-content>
@@ -105,6 +110,8 @@
   import SnackbarQueue from './components/SnackbarQueue'
   import DocsSidebar from './components/documentation/DocsSidebar'
   import UserService from './services/user/UserService'
+  import config from './config'
+  import translations from './i18n/translations'
 
   export default {
     name: 'web-app',
@@ -114,7 +121,10 @@
         error: null,
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
         alerts: AlertService.alerts,
-        cpuOptimized: true
+        cpuOptimized: true,
+        serverMode: config.serverMode,
+        demoBannerColor: 'orange darken-4',
+        testBannerColor: 'amber'
       }
     },
     async created () {
@@ -211,6 +221,20 @@
   .app-container
     /*margin-top: 50px*/
     /*margin-bottom: 50px*/
+  .app-container-demo
+    padding-top: 60px
+  .mainMenu
+    margin-top: 0px !important
+  .mainMenu-demo
+    margin-top: 55px !important
+  .demoBanner
+    z-index: 1600
+    position: fixed
+    width: 100%
+    height: 55px
+    margin-top: 0px
+    font-weight: bold
+    font-size: 20px
   .list--dense
     padding-top: 0
   .logo
