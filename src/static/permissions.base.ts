@@ -4,7 +4,8 @@ export enum TrellisPermission {
   CREATE_OTHER_RESPONDENT,
   CHANGE_RESPONDENT_GEO_CURRENT,
   CREATE_STUDY,
-  ADD_USER
+  ADD_USER,
+  EDIT_GEO
 }
 
 export enum TrellisRole {
@@ -19,7 +20,8 @@ const defaultPermissions: PermissionMap = {
   [TrellisPermission.CREATE_OTHER_RESPONDENT]: true,
   [TrellisPermission.CHANGE_RESPONDENT_GEO_CURRENT]: false,
   [TrellisPermission.CREATE_STUDY]: false,
-  [TrellisPermission.ADD_USER]: false
+  [TrellisPermission.ADD_USER]: false,
+  [TrellisPermission.EDIT_GEO]: false
 }
 
 export type PermissionMap = {

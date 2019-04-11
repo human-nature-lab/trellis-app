@@ -19,20 +19,20 @@
             </span>
           </v-flex>
           <v-spacer></v-spacer>
-          <v-flex class="text-xs-right">
-            <span class="subheading button-min-height">
-              {{ $t('type') }}:
-              {{ geo.geoType.name }}
-              <permission :role-whitelist="['admin', 'manager']">
-                <v-btn
-                  icon
-                  small
-                  @click="showGeoTypeDialog = true">
-                  <v-icon>edit</v-icon>
-                </v-btn>
-              </permission>
-            </span>
-          </v-flex>
+            <v-flex class="text-xs-right">
+              <span class="subheading button-min-height">
+                {{ $t('type') }}:
+                {{ geo.geoType.name }}
+                <Permission :requiresPermission="TrellisPermission.EDIT_GEO">
+                  <v-btn
+                    icon
+                    small
+                    @click="showGeoTypeDialog = true">
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                </Permission>
+              </span>
+            </v-flex>
         </v-layout>
         <v-layout>
           <photo-album
