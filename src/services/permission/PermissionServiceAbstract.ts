@@ -16,7 +16,8 @@ export default abstract class PermissionServiceAbstract {
       TrellisPermission.ADD_USER,
       TrellisPermission.CREATE_STUDY,
       TrellisPermission.DELETE_RESPONDENT,
-      TrellisPermission.CHANGE_RESPONDENT_GEO_CURRENT
+      TrellisPermission.CHANGE_RESPONDENT_GEO_CURRENT,
+      TrellisPermission.EDIT_GEO
     ]
 
     this.resetUserPermissions()

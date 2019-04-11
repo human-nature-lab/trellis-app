@@ -1,3 +1,4 @@
+import User from "../entities/trellis/User";
 import PermissionService from "../services/permission";
 import UserService from '../services/user/UserService'
 import {TrellisPermission} from "../static/permissions.base";
@@ -5,6 +6,9 @@ import global, {Singleton} from '../static/singleton'
 import Vue from 'vue'
 
 export default Vue.extend({
+  props: {
+    requiresPermission: Number as () => TrellisPermission
+  },
   data () {
     return {
       global: global as Singleton,
