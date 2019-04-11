@@ -17,6 +17,7 @@
     import SyncService from '../../../../services/SyncService'
     import axios from 'axios'
     import SyncSubStep from '../../SyncSubStep.vue'
+    import i18n from '../../../../i18n'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
     export default {
       name: 'download-images',
@@ -155,16 +156,16 @@
         },
         stopDownload: function () {
           this.isCancelling = true
-          if (this.sources) {
+          if (this && this.sources) {
             console.log('cancelling', this.sources)
             this.sources.forEach((source) => {
-              source.cancel(this.$t('operation_cancelled'))
+              source.cancel(i18n.$t('operation_cancelled'))
             })
           }
           this.downloading = false
           this.loggingService.log({
             severity: 'info',
-            message: this.$t('operation_cancelled')
+            message: i18n.$t('operation_cancelled')
           }).then((result) => {
             if (this) {
               this.currentLog = result
