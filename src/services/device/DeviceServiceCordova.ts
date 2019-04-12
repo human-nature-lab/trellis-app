@@ -1,7 +1,11 @@
+import Pagination from "../../types/Pagination";
+import DeviceServiceInterface from "./DeviceServiceInterface";
+import Device from '../../entities/trellis/Device'
+
 declare const device
 declare const cordova
 
-export default class DeviceServiceCordova {
+export default class DeviceServiceCordova implements DeviceServiceInterface {
   private isReady: boolean = false
   private platform: string
   private uuid: string
@@ -37,7 +41,7 @@ export default class DeviceServiceCordova {
       }
     })
   }
-  getFreeDiskSpace () {
+  getFreeDiskSpace (): Promise<number> {
     return new Promise((resolve, reject) => {
       this.isDeviceReady()
         .then(() => {
@@ -54,7 +58,7 @@ export default class DeviceServiceCordova {
   setDeviceReady (isReady) {
     this.isReady = isReady
   }
-  isDeviceReady () {
+  isDeviceReady (): Promise<boolean> {
     return new Promise(resolve => {
       const checkReady = () => {
         if (this.isReady) {
@@ -65,5 +69,17 @@ export default class DeviceServiceCordova {
       }
       checkReady()
     })
+  }
+
+  getDevices (pagination: Pagination<Device>): Promise<Pagination<Device>> {
+    throw new Error('Not implemented')
+  }
+
+  async deleteDevice (deviceId: string): Promise<void> {
+    throw new Error('Not implemented')
+  }
+
+  async updateDevice (device: Device): Promise<Device> {
+    throw new Error('Not implemented')
   }
 }

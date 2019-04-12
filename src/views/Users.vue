@@ -1,17 +1,19 @@
 <template>
-  <v-flex>
+  <v-flex xs12>
     <v-container>
       <v-toolbar flat>
         <v-toolbar-title>
           {{$t('users')}}
         </v-toolbar-title>
         <v-spacer />
-        <v-btn
-          :disabled="!isAdmin"
-          icon
-          @click="userToEdit = null; showEditUser = true">
-          <v-icon>add</v-icon>
-        </v-btn>
+        <Permission :requires="TrellisPermission.ADD_USER">
+          <v-btn
+            :disabled="!isAdmin"
+            icon
+            @click="userToEdit = null; showEditUser = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </Permission>
       </v-toolbar>
       <v-data-table
         :headers="headers"
@@ -26,7 +28,7 @@
           slot-scope="props"
           :user="props.item"
           @edit="editUser(props.item)"
-          @delete="deleteUser(props.item)" />
+          @remove="removeUser(props.item)" />
       </v-data-table>
     </v-container>
     <TrellisModal
@@ -40,24 +42,28 @@
 </template>
 
 <script lang="ts">
+  import Permission from '../components/Permission'
   import User from '../entities/Trellis/User'
   import UserEdit from '../components/user/UserEdit'
   import UserRow from '../components/user/UserRow'
   import UserService from '../services/user/UserService'
   import TrellisModal from '../components/TrellisModal'
   import Vue from 'vue'
-  import DocsLinkMixin from "../mixins/DocsLinkMixin"
-  import IsAdminMixin from "../mixins/IsAdminMixin"
-  import DocsFiles from "../components/documentation/DocsFiles"
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
+  import IsAdminMixin from '../mixins/IsAdminMixin'
+  import DocsFiles from '../components/documentation/DocsFiles'
   import i18n from '../i18n'
 
   export default Vue.extend({
     name: i18n.t('users'),
-    components: { UserRow, UserEdit, TrellisModal },
+    components: { UserRow, UserEdit, TrellisModal, Permission },
     mixins: [DocsLinkMixin(DocsFiles.users.intro), IsAdminMixin],
     computed: {
       headers () {
         return [{
+          text: this.$t('actions'),
+          sortable: false
+        }, {
           text: this.$t('name'),
           value: 'name'
         }, {
@@ -68,9 +74,6 @@
           value: 'role'
         }, {
           text: this.$t('studies'),
-          sortable: false
-        }, {
-          text: this.$t('actions'),
           sortable: false
         }]
       }
@@ -111,7 +114,7 @@
         console.log('users', this.users)
         this.isLoading = false
       },
-      async deleteUser (user: User) {
+      async removeUser (user: User) {
         if (confirm(this.$t('confirm_resource_delete', [user.name]) as string + ' ' + this.$t('cannot_undo'))) {
           try {
             await UserService.deleteUser(user.id)

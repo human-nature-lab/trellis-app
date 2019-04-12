@@ -377,8 +377,7 @@
           this.error = null
         } catch (err) {
           this.log(err)
-          this.error = err
-          this.alert('error', 'Unable to load respondents')
+          this.alert('error', 'Unable to load respondents', {timeout: 0})
         } finally {
           this.isLoading = false
         }
