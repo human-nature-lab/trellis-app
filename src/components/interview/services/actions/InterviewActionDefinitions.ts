@@ -3,7 +3,15 @@ import AT from '../../../../static/action.types'
 import QT from '../../../../static/question.types'
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import actionManager from './ActionManager'
-import {addDatum, addDatumLimit, addOrUpdateSingleDatum, removeDatum, updateDatum, ActionPayload} from './DatumOperations'
+import {
+  addDatum,
+  addDatumLimit,
+  addOrUpdateSingleDatum,
+  removeDatum,
+  updateDatum,
+  ActionPayload,
+  removeAllDatum
+} from './DatumOperations'
 import Question from '../../../../entities/trellis/Question'
 import InterviewManagerOld, {default as InterviewManager} from '../../classes/InterviewManager'
 import Datum from "../../../../entities/trellis/Datum";
@@ -123,5 +131,19 @@ actionManager.add(AT.other_respondent_added, function () {
 actionManager.add(AT.set_date, addOrUpdateSingleDatum)
 actionManager.add(AT.set_text, addOrUpdateSingleDatum)
 actionManager.add(AT.set_time, addOrUpdateSingleDatum)
+actionManager.add(AT.deselect_no_one, function (interview, action: Action, questionDatum) {
+  if (questionDatum) {
+    questionDatum.noOne = false
+  } else {
+    console.error(AT.deselect_no_one, 'invalid input without a questionDatum')
+  }
+})
+actionManager.add(AT.select_no_one, function (interview, action: Action, questionDatum) {
+  if (questionDatum) {
+    questionDatum.noOne = true
+  } else {
+    console.error(AT.select_no_one, 'invalid input without a questionDatum')
+  }
+})
 
 export default actionManager

@@ -1,7 +1,7 @@
-import {webService as userService} from '../user/UserService'
+
+import UserService, {webService as userService} from '../user/UserService'
 import http, {setToken, removeToken, Token} from '../http/AxiosInstance'
 import LoginServiceInterface from './LoginServiceInterface'
-import singleton from '../../static/singleton'
 
 export default class LoginServiceWeb implements LoginServiceInterface {
 
@@ -10,10 +10,10 @@ export default class LoginServiceWeb implements LoginServiceInterface {
       username: username,
       pass: password
     })
-    if (res.status >= 200 && res.status < 400) {
+    if (res.status >= 200 && res.status < 300) {
       setToken(res.data.token as Token)
-      userService.user = null
-      singleton.user = await userService.loadCurrentUser()
+      const user = await userService.loadCurrentUser()
+      await UserService.setCurrentUser(user)
     } else {
       throw Error('Unable to log in to this form with the provided credentials')
     }
@@ -25,11 +25,8 @@ export default class LoginServiceWeb implements LoginServiceInterface {
     return (res.status === 200)
   }
 
-  logout () {
-    return new Promise((resolve, reject) => {
-      removeToken()
-      singleton.user = null
-      resolve()
-    })
+  async logout () {
+    removeToken()
+    UserService.removeCurrentUser()
   }
 }

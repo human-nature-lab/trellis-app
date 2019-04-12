@@ -227,7 +227,8 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
               dkRfVal: addedQuestionDatum.dkRfVal,
               createdAt: addedQuestionDatum.createdAt,
               updatedAt: addedQuestionDatum.updatedAt,
-              deletedAt: addedQuestionDatum.deletedAt
+              deletedAt: addedQuestionDatum.deletedAt,
+              noOne: addedQuestionDatum.noOne
             })
         }
       }
@@ -276,7 +277,8 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
             answeredAt: updatedQuestionDatum.answeredAt,
             skippedAt: updatedQuestionDatum.skippedAt,
             dkRf: updatedQuestionDatum.dkRf,
-            dkRfVal: updatedQuestionDatum.dkRfVal
+            dkRfVal: updatedQuestionDatum.dkRfVal,
+            noOne: updatedQuestionDatum.noOne
           })
       }
 

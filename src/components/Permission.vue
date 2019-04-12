@@ -1,41 +1,49 @@
-<template>
-  <span v-show="isVisible">
-    <slot></slot>
-  </span>
-</template>
-
-<script>
-  import UserService from '../services/user/UserService'
-  export default {
+<script lang="ts">
+  /**
+   * This component uses a render function to avoid the limitations of templates. Templates cannot have slots as the root
+   * and, thus, don't allow us to selectively show or hide a component without altering the DOM by adding an unnecessary.
+   */
+  import PermissionMixin from "../mixins/PermissionMixin"
+  import Vue from 'vue'
+  import {TrellisPermission} from "../static/permissions.base"
+  export default Vue.extend({
     name: 'permission',
+    mixins: [PermissionMixin],
     props: {
       roleWhitelist: {
         default: () => []
       },
       roleBlacklist: {
         default: () => []
-      }
-    },
-    beforeCreate () {
-      UserService.loadCurrentUser().then(user => {
-        this.user = user
-      })
+      },
+      requiresPermission: Number as () => TrellisPermission
     },
     computed: {
-      isVisible () {
-        if (!this.user) return false
-        if (this.roleWhitelist.length) {
+      isVisible (): boolean {
+        if (!this.global || !this.global.user) return false
+        if (this.requiresPermission !== null) {
+          return this.hasPermission(this.requiresPermission)
+        } else if (this.roleWhitelist.length) {
           return this.userInWhitelist()
         } else {
           return !this.userInBlacklist()
         }
-      }
-    },
-    data () {
-      return {
-        user: null,
-        whitelist_: this.roleWhitelist.map(r => r.toLowerCase()),
-        blacklist_: this.roleBlacklist.map(r => r.toLowerCase())
+      },
+      whitelistLower (): string[] {
+        return this.roleWhitelist.map(r => r.toLowerCase())
+      },
+      blacklistLower (): string[] {
+        return this.roleBlacklist.map(r => r.toLowerCase())
+      },
+      userInWhitelist (): boolean {
+        if (!this.roleWhitelist.length) return false
+        let role = this.global.user.role.toLowerCase()
+        return this.isInList(this.whitelistLower, role)
+      },
+      userInBlacklist (): boolean {
+        if (!this.roleBlacklist.length) return false
+        let role = this.global.user.role.toLowerCase()
+        return this.isInList(this.blacklistLower, role)
       }
     },
     methods: {
@@ -45,17 +53,10 @@
         } else {
           return val === list
         }
-      },
-      userInWhitelist () {
-        if (!this.roleWhitelist.length) return false
-        let role = this.user.role.toLowerCase()
-        return this.isInList(this.whitelist_, role)
-      },
-      userInBlacklist () {
-        if (!this.roleBlacklist.length) return false
-        let role = this.user.role.toLowerCase()
-        this.isInList(this.blacklist_, role)
       }
+    },
+    render () {
+      return this.isVisible ? this.$slots.default : null
     }
-  }
+  })
 </script>

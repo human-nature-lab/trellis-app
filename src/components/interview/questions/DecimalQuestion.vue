@@ -39,7 +39,8 @@
         set: function (val) {
           this._value = val
           this.question.isAnswered = this.value !== null && this.value !== undefined
-          this.action(AT.number_change, {
+          this.debouncedAction(AT.number_change, {
+            name: 'decimal',
             val: val
           })
         }

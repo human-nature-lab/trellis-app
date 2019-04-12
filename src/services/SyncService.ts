@@ -7,6 +7,7 @@ import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
 import {Connection, IsNull} from 'typeorm'
 import LoginService from '../services/login'
 import global from '../static/singleton'
+import SingletonService from "./SingletonService";
 
 /**
  * Max number of rows to write to upload file at a time.
@@ -122,10 +123,10 @@ class SyncService {
     await repository.update({id: _sync.id}, {completedAt: new Date(), status: 'success'})
     // Log out user, un-set study, locale (in case User, Study, Locale tables have changed)
     await LoginService.logout()
-    global.study = null
-    global.locale = null
+    SingletonService.set('study', null)
+    SingletonService.set('locale', null)
     // TODO: is this necessary
-    global.user = null
+    SingletonService.set('user', null)
   }
 
   async registerCancelledSync (_sync: Sync): Promise<void> {

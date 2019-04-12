@@ -42,9 +42,10 @@
             v-model="password"/>
           <v-alert :value="showError()">{{ errorMessage }}</v-alert>
           <v-btn
-            @click="login()"
-            :disabled="!valid">
-            {{ $t('login') }}
+            @click="login"
+            :disabled="isWorking || !valid">
+            <TrellisLoadingCircle v-if="isWorking" />
+            <span v-else>{{ $t('login') }}</span>
           </v-btn>
         </v-form>
       </v-flex>
@@ -72,6 +73,7 @@
         e1: true,
         error: null,
         valid: false,
+        isWorking: false,
         rules: {
           username: [
             v => !!v || this.$t('required_field')
@@ -104,6 +106,8 @@
             console.error(err)
             this.errorMessage = err.message
           }
+        } finally {
+          this.isWorking = false
         }
       },
       showError: function () {

@@ -39,7 +39,8 @@
           return this.question.datum.data.length ? this.question.datum.data[0].val : ''
         },
         set (val) {
-          this.action(AT.set_text, {
+          this.debouncedAction(AT.set_text, {
+            name: 'text',
             val: val
           })
         }

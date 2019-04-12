@@ -104,7 +104,14 @@
         </v-chip>
       </v-flex>
     </v-layout>
-    <v-layout row>
+    <v-layout row wrap>
+      <v-pagination
+        class="pagination"
+        :length="pagination.maxPages + 2"
+        :value="pagination.page + 1"
+        total-visible="7"
+        :disabled="isLoading || (pagination.page === 0 && respondentResults.length !== pagination.size)"
+        @input="updateCurrentPage" />
       <v-spacer></v-spacer>
       <v-btn
         v-if="canAddRespondent"
@@ -131,20 +138,11 @@
           :formsButtonVisible="formsButtonVisible"
           :infoButtonVisible="infoButtonVisible"
           @selected="onSelectRespondent(respondent)"
+          @delete="removeRespondent(respondent)"
           :selected="isSelected(respondent)"
           :respondent="respondent"
           :labels="getRespondentLabels(respondent)"/>
       </v-layout>
-      <v-card v-if="respondentResults.length === requestPageSize">
-        <v-container>
-          <v-layout class="subheading">
-            {{ $t('displaying_first_results',[requestPageSize]) }}
-          </v-layout>
-          <v-layout>
-            {{ $t('use_search_field_results') }}
-          </v-layout>
-        </v-container>
-      </v-card>
       <v-layout v-if="!respondentResults.length" ma-3>
         <v-container>
           {{ $t('no_results') }}: {{query}}
@@ -285,7 +283,7 @@
         inner: 'Respondent search'
       }
     },
-    data () {
+    data: function () {
       return {
         global: singleton,
         error: null,
@@ -299,13 +297,18 @@
         }, this.baseFilters),
         added: [],
         removed: [],
-        currentPage: 0,
-        requestPageSize: 20,
         conditionTagsLoaded: false,
         conditionTagsLoading: false,
         isLoading: false,
         showAssociatedRespondentDialog: false,
-        filtersIsOpen: false
+        filtersIsOpen: false,
+        pagination: {
+          page: 0,
+          seed: null,
+          size: 20,
+          maxPages: 0,
+          total: 0
+        }
       }
     },
     created () {
@@ -336,6 +339,8 @@
         if (this.shouldUpdateRoute) {
           updateRoute(this)
         }
+        this.pagination.page = 0
+        this.pagination.maxPages = 0
         return this.getCurrentPage()
       },
       loadConditionTags () {
@@ -354,12 +359,21 @@
       clearFilters () {
         this.filters.conditionTags = []
       },
+      async updateCurrentPage (pageVal) {
+        this.pagination.page = pageVal - 1
+        await this.getCurrentPage()
+        if (this.results.length === this.pagination.size && this.pagination.page > this.pagination.maxPages) {
+          this.pagination.maxPages = this.pagination.page
+        }
+      },
       async getCurrentPage () {
         let study = this.global.study
         this.isLoading = true
         PhotoService.cancelAllOutstanding()
         try {
-          this.results = await RespondentService.getSearchPage(study.id, this.query, this.filters, this.currentPage, this.requestPageSize, this.respondentId)
+          const page = await RespondentService.getSearchPage(study.id, this.query, this.filters, this.pagination, this.respondentId)
+          this.pagination.seed = page.seed
+          this.results = page.data
           this.error = null
         } catch (err) {
           this.log(err)
@@ -475,7 +489,6 @@
 </script>
 
 <style lang="sass">
-  /*.fab-offset*/
-    /*margin-right: 13px*/
-    /*margin-bottom: 35px*/
+  .pagination
+    margin: auto
 </style>
