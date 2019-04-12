@@ -136,8 +136,13 @@
         document.addEventListener('backbutton', this.onBackButton)
         this.startGPSWatch()
       }
-      const user = await UserService.loadCurrentUser()
-      this.$set(this.global, 'user', user)
+      try {
+        const user = await UserService.loadCurrentUser()
+        this.$set(this.global, 'user', user)
+      } catch (err) {
+        this.log(err)
+        this.alert('error', 'Unable to load user', {timeout: 0})
+      }
     },
     beforeDestroy () {
       if (this.withinCordova) {

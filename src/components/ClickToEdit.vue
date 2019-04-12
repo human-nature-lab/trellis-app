@@ -3,27 +3,28 @@
     <v-text-field
       ref="textField"
       :disabled="disabled"
-      :readonly="!isEditing"
+      :readonly="!editing"
       dense
       solo
-      :flat="!isEditing"
-      :append-icon="isEditing ? 'save' : 'edit'"
-      :prepend-icon="isEditing ? 'clear' : ''"
+      :flat="!editing"
+      :append-icon="appendIcon"
+      :prepend-icon="editing ? 'clear' : ''"
       :prepend-icon-cb="resetEditorState"
-      :append-icon-cb="isEditing ? save : startEditing"
+      :append-icon-cb="editing ? save : startEditing"
       v-model="memText"
       @keyup.enter="save"
       class="min-text-field" />
   </v-flex>
 </template>
 
-<script>
-  export default {
+<script lang="ts">
+  import Vue from 'vue'
+  export default Vue.extend({
     name: 'ClickToEdit',
     props: {
       value: {
-        type: Boolean,
-        default: false
+        type: String,
+        default: ''
       },
       text: {
         type: String,
@@ -37,38 +38,55 @@
       autofocus: {
         type: Boolean,
         default: true
+      },
+      editable: {
+        type: Boolean,
+        default: true
+      },
+      editing: {
+        type: Boolean,
+        default: false
       }
     },
-    data () {
+    data() {
       return {
-        memText: this.text,
-        isEditing: false
+        memText: this.value
       }
     },
     watch: {
-      text () {
+      value() {
         this.resetEditorState()
       }
     },
     computed: {
-      hasEdits () {
-        return this.memText !== this.text
+      hasEdits (): boolean {
+        return this.memText !== this.value
+      },
+      appendIcon (): string {
+        if (!this.editable) {
+          return null
+        } else if (this.editing) {
+          return 'save'
+        } else {
+          return 'edit'
+        }
       }
     },
     methods: {
-      resetEditorState () {
-        this.memText = this.text
-        this.isEditing = false
+      resetEditorState() {
+        this.memText = this.value
+        this.$emit('update:editing', false)
       },
-      save () {
+      save() {
         if (this.hasEdits) {
           this.$emit('save', this.memText)
         } else {
           this.resetEditorState()
         }
       },
-      startEditing () {
-        this.isEditing = true
+      startEditing() {
+        this.$emit('update:editing', true)
+        // Focus on the input box
         if (this.autofocus && this.$refs.textField && this.$refs.textField.$el) {
           const input = this.$refs.textField.$el.querySelector('input')
           if (input) {
@@ -77,7 +95,7 @@
         }
       }
     }
-  }
+  })
 </script>
 
 <style lang="sass">
