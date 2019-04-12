@@ -1,5 +1,12 @@
 <template>
   <tr>
+    <td class="actions">
+      <CRUDMenu
+        :editable="hasPermission(TrellisPermission.EDIT_USER)"
+        :removable="hasPermission(TrellisPermission.REMOVE_USER)"
+        @edit="$emit('edit')"
+        @remove="$emit('remove')" />
+    </td>
     <td>{{user.name}}</td>
     <td>{{user.username}}</td>
     <td>{{user.role}}</td>
@@ -9,6 +16,7 @@
         :items="allStudies"
         item-text="name"
         item-value="id"
+        :readonly="!hasPermission(TrellisPermission.EDIT_USER)"
         v-model="selectedStudies"
         @change="saveUserStudies"
         dense
@@ -16,28 +24,23 @@
         multiple
         chips />
     </td>
-    <td class="actions">
-      <v-btn icon small class="mx-0" @click="$emit('edit')" :disabled="!isAdminOrOwner">
-        <v-icon>edit</v-icon>
-      </v-btn>
-      <v-btn icon small class="mx-0" @click="$emit('delete')" :disabled="!isAdmin">
-        <v-icon color="error">delete</v-icon>
-      </v-btn>
-    </td>
   </tr>
 </template>
 
 <script lang="ts">
   import Vue from "vue"
   import User from "../../entities/trellis/User"
+  import PermissionMixin from '../../mixins/PermissionMixin'
   import StudyService from "../../services/study/StudyService"
   import UserService from "../../services/user/UserService"
   import global from '../../static/singleton'
   import IsAdminMixin from "../../mixins/IsAdminMixin"
+  import CRUDMenu from '../CRUDMenu'
 
   export default Vue.extend({
     name: 'UserRow',
-    mixins: [IsAdminMixin],
+    mixins: [IsAdminMixin, PermissionMixin],
+    components: { CRUDMenu },
     props: {
       user: Object as () => User
     },

@@ -1,4 +1,3 @@
-import User from "../entities/trellis/User";
 import PermissionService from "../services/permission";
 import UserService from '../services/user/UserService'
 import {TrellisPermission} from "../static/permissions.base";
@@ -7,12 +6,12 @@ import Vue from 'vue'
 
 export default Vue.extend({
   props: {
-    requiresPermission: Number as () => TrellisPermission
+    requires: Number as () => TrellisPermission
   },
   data () {
     return {
       global: global as Singleton,
-      permissions: PermissionService.userPermissions // This object is managed by the PermissionService
+      userPermissions: PermissionService.userPermissions // This object is managed by the PermissionService
     }
   },
   async created () {
@@ -25,8 +24,8 @@ export default Vue.extend({
     await PermissionService.loadIfNotLoaded(this.global.user)
   },
   methods: {
-    hasPermission (permission: TrellisPermission): boolean {
-      return this.permissions[permission]
+    hasPermission (permissions: TrellisPermission|TrellisPermission[]): boolean {
+      return PermissionService.hasPermission(this.userPermissions, permissions)
     },
     hasRole (roles: string|string[]): boolean {
       if (!Array.isArray(roles)) {

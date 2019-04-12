@@ -36,17 +36,18 @@
               :conditionTags="respondentConditionTags"></respondent-condition-tags>
             <respondent-names
               :respondent="respondent"></respondent-names>
-            <v-flex v-if="isAdmin">
+            <v-flex v-if="hasPermission([TrellisPermission.REMOVE_RESPONDENT])">
               <v-toolbar flat>
                 <v-toolbar-title>{{$t('admin')}}</v-toolbar-title>
               </v-toolbar>
-              <v-btn
-                color="error"
-                v-if="canDeleteRespondents"
-                @click="deleteRespondent">
-                <v-icon>delete</v-icon>
-                {{$t('delete')}}
-              </v-btn>
+              <Permission :requires="TrellisPermission.REMOVE_RESPONDENT">
+                <v-btn
+                  color="error"
+                  @click="deleteRespondent">
+                  <v-icon>delete</v-icon>
+                  {{$t('delete')}}
+                </v-btn>
+              </Permission>
             </v-flex>
           </v-layout>
         </v-container>
@@ -76,7 +77,6 @@
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
   import singleton from '../../static/singleton'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import {TrellisPermission, TrellisRole} from "../../static/permissions.base"
   import router from '../../router'
 
   /**
@@ -163,12 +163,6 @@
       name (): string {
         let rName = this.respondent.names.find(n => n.isDisplayName)
         return rName ? rName.name : this.respondent.name
-      },
-      canDeleteRespondents (): boolean {
-        return this.hasPermission(TrellisPermission.DELETE_RESPONDENT)
-      },
-      isAdmin (): boolean {
-        return this.hasRole(TrellisRole.ADMIN)
       }
     },
     components: {

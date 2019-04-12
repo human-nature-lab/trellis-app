@@ -8,7 +8,7 @@ import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import Photo from "../../entities/trellis/Photo";
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
-import {safeUrl} from "../http/WebUtils";
+import {uriTemplate} from "../http/WebUtils";
 export default class RespondentServiceWeb implements RespondentServiceInterface {
 
   async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
@@ -20,12 +20,12 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
   }
 
   async removePhoto (photo: PhotoWithPivotTable) {
-    return http().delete(safeUrl('respondent-photos/{}', [photo.pivot.id]))
+    return http().delete(uriTemplate('respondent-photos/{}', [photo.pivot.id]))
   }
 
   async getRespondentPhotos (respondentId: string): Promise<Array<PhotoWithPivotTable>> {
     let photos: PhotoWithPivotTable[]  = []
-    let res = await http().get(safeUrl('respondent/{}/photos', [respondentId]))
+    let res = await http().get(uriTemplate('respondent/{}/photos', [respondentId]))
     for (let i = 0; i < res.data.photos.length; i++) {
       let respondentPhoto = new RespondentPhoto().fromSnakeJSON(res.data.photos[i])
       let photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
@@ -37,14 +37,14 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
   }
 
   async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
-    let res = await http().get(safeUrl('respondent/{}/fills', [respondentId]))
+    let res = await http().get(uriTemplate('respondent/{}/fills', [respondentId]))
     return res.data.fills.map((f: object) => {
       return new RespondentFill().fromSnakeJSON(f)
     })
   }
 
   async getRespondentById (respondentId: string): Promise<Respondent> {
-    let res = await http().get(safeUrl('respondent/{}', [respondentId]))
+    let res = await http().get(uriTemplate('respondent/{}', [respondentId]))
     return new Respondent().fromSnakeJSON(res.data.respondent)
   }
 
@@ -75,7 +75,7 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     if (filters.randomize) {
       params['r'] = filters.randomize
     }
-    let res = await http().get(safeUrl('study/{studyId}/respondents/search', [studyId]), { params })
+    let res = await http().get(uriTemplate('study/{studyId}/respondents/search', [studyId]), { params })
     return {
       page: res.data.page,
       size: res.data.size,
@@ -85,7 +85,7 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     }
   }
   async addName (respondentId, name, isDisplayName = null, localeId = null): Promise<RespondentName> {
-    let res = await http().post(safeUrl('respondent/{}/name', [respondentId]), {
+    let res = await http().post(uriTemplate('respondent/{}/name', [respondentId]), {
       name: name,
       is_display_name: !!isDisplayName,
       locale_id: localeId
@@ -93,35 +93,35 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     return new RespondentName().fromSnakeJSON(res.data.name)
   }
   editName (respondentId, respondentNameId, newName, isDisplayName = null, localeId = null): Promise<RespondentName> {
-    return http().put(safeUrl('respondent/{}/name/{}', [respondentId, respondentNameId]), {
+    return http().put(uriTemplate('respondent/{}/name/{}', [respondentId, respondentNameId]), {
       name: newName,
       is_display_name: isDisplayName,
       locale_id: localeId
     }).then(res => new RespondentName().fromSnakeJSON(res.data.name))
   }
   removeName (respondentId, respondentNameId): Promise<any> {
-    return http().delete(safeUrl('respondent/{}/name/{}', [respondentId, respondentNameId])).then(r => r.data)
+    return http().delete(uriTemplate('respondent/{}/name/{}', [respondentId, respondentNameId])).then(r => r.data)
   }
   createRespondent (studyId, name, geoId = null, associatedRespondentId = null) {
-    return http().post(safeUrl('study/{}/respondent', [studyId]), {
+    return http().post(uriTemplate('study/{}/respondent', [studyId]), {
       name: name,
       geo_id: geoId,
       associated_respondent_id: associatedRespondentId
     }).then(res => new Respondent().fromSnakeJSON(res.data.respondent))
   }
   addRespondentGeo (respondentId: string, geoId: string, isCurrent: boolean): Promise<RespondentGeo> {
-    return http().post(safeUrl('respondent/{}/geo', [respondentId]), {
+    return http().post(uriTemplate('respondent/{}/geo', [respondentId]), {
       geo_id: geoId,
       is_current: isCurrent // TODO: Handle this on the web side
     }).then(res => new RespondentGeo().fromSnakeJSON(res.data.geo))
   }
   editRespondentGeo (respondentId, respondentGeoId, isCurrent) {
-    return http().put(safeUrl('respondent/{}/geo/{}', [respondentId, respondentGeoId]), {
+    return http().put(uriTemplate('respondent/{}/geo/{}', [respondentId, respondentGeoId]), {
       is_current: isCurrent
     }).then(res => new RespondentGeo().fromSnakeJSON(res.data.respondent_geo))
   }
   moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string, isCurrent?: boolean, notes?: string) {
-    return http().post(safeUrl('respondent/{}/geo/{}/move', [respondentId, respondentGeoId]), {
+    return http().post(uriTemplate('respondent/{}/geo/{}/move', [respondentId, respondentGeoId]), {
       new_geo_id: newGeoId,
       is_current: isCurrent,
       notes: notes
@@ -130,10 +130,10 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
     })
   }
   removeRespondentGeo (respondentId, respondentGeoId) {
-    return http().delete(safeUrl('respondent/{rid}/geo/{rgid}', [respondentId, respondentGeoId])).then(r => r.data)
+    return http().delete(uriTemplate('respondent/{rid}/geo/{rgid}', [respondentId, respondentGeoId])).then(r => r.data)
   }
 
   async removeRespondent (respondentId: string): Promise<void> {
-    const res = await adminInst.delete(safeUrl('respondent/{id}', [respondentId]))
+    const res = await adminInst.delete(uriTemplate('respondent/{id}', [respondentId]))
   }
 }

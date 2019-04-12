@@ -11,18 +11,19 @@
     mixins: [PermissionMixin],
     props: {
       roleWhitelist: {
+        type: Array as () => string[],
         default: () => []
       },
       roleBlacklist: {
         default: () => []
       },
-      requiresPermission: Number as () => TrellisPermission
+      requires: Number as () => TrellisPermission
     },
     computed: {
       isVisible (): boolean {
         if (!this.global || !this.global.user) return false
-        if (this.requiresPermission !== null) {
-          return this.hasPermission(this.requiresPermission)
+        if (this.requires) {
+          return this.hasPermission(this.requires)
         } else if (this.roleWhitelist.length) {
           return this.userInWhitelist()
         } else {

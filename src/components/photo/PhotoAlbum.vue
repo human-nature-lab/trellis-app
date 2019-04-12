@@ -47,8 +47,8 @@
           </v-card-actions>
         </v-card>
       </v-flex>
-      <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     </transition-group>
+    <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     <fullscreen-photo v-if="fullPhoto !== null" title="" :photo="fullPhoto" v-model="isFullOpen"></fullscreen-photo>
     <v-dialog scrollable v-if="editingPhoto !== null" v-model="showDialog" persistent max-width="500px">
       <v-card>
@@ -100,37 +100,37 @@
     props: {
       photos: {
         type: Array,
-        'default': () => []
+        default: () => []
       },
       width: {
         type: String,
-        'default': '250'
+        default: '250'
       },
       height: {
         type: String,
-        'default': '250'
+        default: '250'
       },
       title: {
         type: String,
-        'default': function () {
+        default: function () {
           return this.$t('photos')
         }
       },
       allowAdding: {
         type: Boolean,
-        'default': true
+        default: true
       },
       allowSorting: {
         type: Boolean,
-        'default': true
+        default: true
       },
       allowNotes: {
         type: Boolean,
-        'default': true
+        default: true
       },
       loading: {
         type: Boolean,
-        'default': false
+        default: false
       }
     },
     computed: {

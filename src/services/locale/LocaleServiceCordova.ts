@@ -1,3 +1,4 @@
+import StudyLocale from "../../entities/trellis/StudyLocale";
 import LocaleServiceAbstract from './LocaleServiceAbstract'
 import Locale from '../../entities/trellis/Locale'
 import StudyService from '../study/StudyService'
@@ -14,6 +15,18 @@ class LocaleServiceCordova extends LocaleServiceAbstract {
     const study = await StudyService.getStudy(studyId)
     console.log('study', study)
     return study ? await study.locales : []
+  }
+
+  async getAllLocales (): Promise<Locale[]> {
+    throw new Error('not implemented')
+  }
+
+  async addStudyLocale (studyId: string, locale: Locale): Promise<StudyLocale> {
+    throw new Error('Not Implemented')
+  }
+
+  async removeStudyLocale (studyId: string, locale: Locale): Promise<void> {
+    throw new Error('Not implemented')
   }
 }
 

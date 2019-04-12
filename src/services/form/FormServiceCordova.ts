@@ -1,3 +1,4 @@
+import formTypes from "../../static/form.types";
 import FormServiceInterface from './FormServiceInterface'
 import DatabaseService from '../database/DatabaseService'
 import StudyForm from '../../entities/trellis/StudyForm'
@@ -19,6 +20,10 @@ export default class FormServiceCordova implements FormServiceInterface {
     })
     removeSoftDeleted(studyForms)
     return studyForms.filter(s => (s.form.isPublished && s.form.deletedAt === null))
+  }
+
+  async getAllStudyForms (studyId: string): Promise<StudyForm[]> {
+    throw Error('Not implemented')
   }
 
   async getForm (id: string, bareBones: boolean = false): Promise<Form> {
@@ -64,11 +69,15 @@ export default class FormServiceCordova implements FormServiceInterface {
     return form
   }
 
-  createForm (studyId: string, form: Form): Promise<Form> {
+  createForm (studyId: string, formType: formTypes): Promise<Form> {
     throw Error('Not implemented')
   }
 
-  updateForm (studyId: string, form: Form): Promise<Form> {
+  updateForm (form: Form): Promise<Form> {
+    throw Error('Not implemented')
+  }
+
+  async updateStudyForm (studyId: string, studyForm: StudyForm): Promise<StudyForm> {
     throw Error('Not implemented')
   }
 
