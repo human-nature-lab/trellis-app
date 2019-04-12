@@ -42,6 +42,7 @@
   import formatBytesFilter from '../filters/format-bytes.filter'
   import SyncService from "../services/SyncService"
   import moment from 'moment'
+  import config from '../config'
 
   declare const VERSION: string
 
@@ -77,10 +78,12 @@
     },
     created () {
       this.loadDevice()
-      this.loadStorage()
-      this.loadUploads()
-      this.loadLogs()
-      this.loadGPS()
+      if (this.isCordova){
+        this.loadStorage()
+        this.loadUploads()
+        this.loadGPS()
+        this.loadLogs()
+      }
     },
     beforeDestroy () {
       if (this.gpsInterval) {
@@ -90,43 +93,48 @@
     methods: {
       loadDevice () {
         const device = {
-          key: this.$t('device_id') + '',
+          key: this.$t('device_id') as String,
           val: null
         }
         const server = {
-          key: this.$t('server_url') + '',
+          key: this.$t('server_url') as String,
           val: null
         }
         this.categories.push({
-          title: this.$t('device') + '',
+          title: this.$t('device') as String,
           items: [{
-            key: this.$t('version') + '',
+            key: this.$t('version') as String,
             val: this.version
           }, device, server],
           to: {name: 'Changelog'}
         })
-        DeviceService.getUUID().then(id => {
-          device.val = id
-        })
-        DatabaseService.getServerIPAddress().then(url => {
-          server.val = url
-        })
+        if (this.isCordova) {
+          DeviceService.getUUID().then(id => {
+            device.val = id
+          })
+          DatabaseService.getServerIPAddress().then(url => {
+            server.val = url
+          })
+        } else {
+          device.val = navigator.userAgent
+          server.val = config.apiRoot
+        }
       },
       loadStorage () {
         const photoFiles = {
-          key: this.$t('device_photos') + '',
+          key: this.$t('device_photos'),
           val: null
         }
         const photoEntries = {
-          key: this.$t('db_photos') + '',
+          key: this.$t('db_photos'),
           val: null
         }
         const photosSize = {
-          key: this.$t('photos_size') + '',
+          key: this.$t('photos_size'),
           val: null
         }
         this.categories.push({
-          title: this.$t('storage') + '',
+          title: this.$t('storage'),
           items: [photoFiles, photoEntries, photosSize],
           to: {name: 'Storage'}
         })
@@ -140,7 +148,7 @@
         const pendingPhotos = {key: this.$t('pending_photos') + '', val: null}
         const pendingRows = {key:  this.$t('pending_rows') + '', val: null}
         this.categories.push({
-          title: this.$t('uploads') + '',
+          title: this.$t('uploads'),
           items: [
             pendingPhotos,
             pendingRows
@@ -151,10 +159,10 @@
         DatabaseService.getUpdatedRecordsCount().then(c => pendingRows.val = c)
       },
       loadLogs () {
-        const totalLogs = {key: this.$t('logs') + '', val: null}
-        const uploaded = {key: this.$t('uploaded') + '', val: null}
+        const totalLogs = {key: this.$t('logs'), val: null}
+        const uploaded = {key: this.$t('uploaded'), val: null}
         this.categories.push({
-          title: this.$t('logs') + '',
+          title: this.$t('logs'),
           items: [
             totalLogs,
             uploaded
@@ -170,7 +178,7 @@
           status: this.$t('pending')
         }
         const status = {
-          key: this.$t('status') + '',
+          key: this.$t('status'),
           component: {
             template: '<v-chip label outline :class="classes">{{status}}</v-chip>',
             data () {return statusData}
@@ -181,7 +189,7 @@
           label: this.$t('pending')
         }
         const lastUpdate = {
-          key: this.$t('last_updated') + '',
+          key: this.$t('last_updated'),
           component: {
             template: '<v-chip label outline :class="classes">{{label}}</v-chip>',
             data () {return updateData}
