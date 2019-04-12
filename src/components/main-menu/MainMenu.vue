@@ -64,9 +64,11 @@
   import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
   import GeoLocationService from '../../services/geolocation'
   import Vue from 'vue'
+  import PermissionMixin from '../../mixins/PermissionMixin'
+  import {TrellisPermission} from '../../static/permissions.base'
 
   export default {
-    mixins: [ IsAdminMixin, IsLoggedInMixin],
+    mixins: [ IsAdminMixin, IsLoggedInMixin, PermissionMixin],
     components: { UserPassword, TrellisModal},
     name: 'dropdown-menu',
     data: () => ({
@@ -168,11 +170,12 @@
           }]
         }, {
           title: 'admin',
-          showIf: this.isWeb && this.isAdmin && this.isDebug,
+          showIf: this.isWeb && this.isDebug,
           items: [{
             to: {name: 'Users'},
             icon: 'recent_actors',
-            title: 'users'
+            title: 'users',
+            showIf: this.hasPermission(TrellisPermission.VIEW_USERS)
           }, {
             to: {name: 'Forms'},
             icon: 'library_books',
@@ -180,15 +183,18 @@
           }, {
             to: {name: 'Reports'},
             icon: 'save',
-            title: 'reports'
+            title: 'reports',
+            showIf: this.hasPermission(TrellisPermission.VIEW_REPORTS)
           }, {
             to: {name: 'Devices'},
             icon: 'devices',
-            title: 'devices'
+            title: 'devices',
+            showIf: this.hasPermission(TrellisPermission.VIEW_DEVICES)
           }, {
             to: {name: 'Studies'},
             icon: 'import_contacts',
-            title: 'studies'
+            title: 'studies',
+            showIf: this.hasPermission(TrellisPermission.VIEW_STUDIES)
           }, {
             to: {name: 'GeoTypes'},
             icon: 'edit_location',

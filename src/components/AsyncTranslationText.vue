@@ -31,10 +31,8 @@
       }
     },
     watch: {
-      translation (newTranslation) {
-        if (newTranslation.id !== this.localTranslation.id) {
-          this.reset()
-        }
+      translation () {
+        this.reset()
       },
       location (newL, oldL) {
         if (!(newL.page === oldL.page && newL.section === oldL.section && newL.sectionRepetition === oldL.sectionRepetition && newL.sectionFollowUpRepetition === oldL.sectionFollowUpRepetition)) {

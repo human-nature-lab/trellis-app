@@ -1,20 +1,23 @@
 <template>
-  <v-flex>
+  <v-flex xs12>
+    <v-progress-linear
+      v-if="isLoading"
+      indeterminate />
     <v-card v-for="(studyForms, formType) in formBins">
       <v-toolbar flat>
         <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
         <v-spacer />
-        <v-btn
-          icon
-          @click="addForm(formType)">
-          <v-icon>add</v-icon>
-        </v-btn>
+        <Permission :requires="TrellisPermission.ADD_FORM">
+          <v-btn
+            icon
+            @click="addForm(formType)">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </Permission>
       </v-toolbar>
-      <v-progress-linear
-        v-if="isLoading"
-        indeterminate />
       <v-data-table
         :headers="headers"
+        hide-actions
         :items="studyForms">
         <template slot="items" slot-scope="props">
           <FormListTile
@@ -35,21 +38,25 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import Permission from "../components/Permission.vue"
   import StudyForm from "../entities/trellis/StudyForm"
   import FormService from '../services/form/FormService'
   import TranslationService from "../services/TranslationService"
   import formTypes from "../static/form.types"
-  import global from '../static/singleton'
+  import global, {Singleton} from '../static/singleton'
   import Form from "../entities/trellis/Form"
   import FormListTile from "../components/forms/FormListTile"
   import TrellisModal from '../components/TrellisModal'
   import FormSkips from '../components/forms/FormSkips'
+
   export default Vue.extend({
     name: 'Forms',
-    components: {FormListTile, TrellisModal, FormSkips},
+    components: {FormListTile, TrellisModal, FormSkips, Permission},
     async created () {
+      this.isLoading = true
       this.studyForms = await FormService.getAllStudyForms(global.study.id)
       this.makeBins()
+      this.isLoading = false
     },
     data () {
       return {
@@ -122,11 +129,11 @@
           case formTypes.DEFAULT_CENSUS:
             return this.$t('default_census_forms')
           default:
-            return this.$t('data_forms')
+            return this.$t('forms')
         }
       },
       async deleteForm (studyForm: StudyForm) {
-        if (confirm(this.$t('confirm_delete_resource', [this.formName(studyForm.form)]))) {
+        if (confirm(this.$t('confirm_resource_delete', [this.formName(studyForm.form)]))) {
           try {
             await FormService.deleteForm(this.global.study.id, studyForm.id)
             const index = this.studyForms.findIndex(sf => sf.id === studyForm.id)

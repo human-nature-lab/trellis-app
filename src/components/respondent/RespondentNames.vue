@@ -5,7 +5,7 @@
         {{ $t('names') }}
       </v-toolbar-title>
       <v-spacer />
-      <permission :role-whitelist="['admin','manager']">
+      <Permission :requires="TrellisPermission.ADD_RESPONDENT_NAME">
         <v-tooltip lazy left>
           <v-btn
             slot="activator"
@@ -15,7 +15,7 @@
           </v-btn>
           <span>{{$t('add_respondent_name')}}</span>
         </v-tooltip>
-      </permission>
+      </Permission>
     </v-toolbar>
     <v-data-table
       class="mb-3"
@@ -28,19 +28,21 @@
           <v-icon v-if="props.item.isDisplayName">check</v-icon>
         </td>
         <td>
-          <permission :role-whitelist="['admin','manager']">
+          <Permission :requires="TrellisPermission.EDIT_RESPONDENT_NAME">
             <v-btn
               icon
               @click="currentName = props.item; isEditing = true">
               <v-icon>edit</v-icon>
             </v-btn>
+          </Permission>
+          <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_NAME">
             <v-btn
               icon
               @click="removeName(props.item.id)">
               <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
               <v-icon v-else>delete</v-icon>
             </v-btn>
-          </permission>
+          </Permission>
         </td>
       </template>
     </v-data-table>

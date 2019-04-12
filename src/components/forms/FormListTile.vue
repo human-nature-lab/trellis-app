@@ -18,9 +18,11 @@
           </v-btn>
         </v-list-tile-action>
         <v-list>
-          <v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id}}">
-            <v-icon>edit</v-icon>
-          </v-list-tile>
+          <Permission :requires="TrellisPermission.EDIT_FORM">
+            <v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id}}">
+              <v-icon>edit</v-icon>
+            </v-list-tile>
+          </Permission>
           <v-list-tile @click="printForm">
             <v-icon>print</v-icon>
           </v-list-tile>
@@ -54,6 +56,7 @@
   import Form from '../../entities/trellis/Form'
   // @ts-ignore
   import AsyncTranslationText from '../AsyncTranslationText'
+  import Permission from "../Permission.vue"
   // @ts-ignore
   import TranslationTextField from '../TranslationTextField'
   // @ts-ignore
@@ -66,7 +69,8 @@
     components: {
       AsyncTranslationText,
       TranslationTextField,
-      TrellisLoadingCircle
+      TrellisLoadingCircle,
+      Permission
     },
     data () {
       return {

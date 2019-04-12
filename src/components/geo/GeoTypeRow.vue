@@ -2,6 +2,8 @@
   <tr>
     <td>
       <CRUDMenu
+        :editable="hasPermission(TrellisPermission.EDIT_GEO_TYPE)"
+        :removable="hasPermission(TrellisPermission.REMOVE_GEO_TYPE)"
         @edit="$emit('edit')"
         @remove="$emit('remove')" />
     </td>
@@ -33,9 +35,11 @@
 <script lang="ts">
   import Vue from 'vue'
   import GeoType from '../../entities/trellis/GeoType'
+  import PermissionMixin from "../../mixins/PermissionMixin"
   import CRUDMenu from '../CRUDMenu'
   export default Vue.extend({
     name: 'GeoTypeRow',
+    mixins: [PermissionMixin],
     components: { CRUDMenu },
     props: {
       geoType: {

@@ -1,14 +1,16 @@
 <template>
-  <v-flex>
+  <v-flex xs12>
     <v-container full-width>
       <v-toolbar flat>
         <v-toolbar-title>{{$t('geo_types')}}</v-toolbar-title>
         <v-spacer />
-        <v-btn
-          icon
-          @click="isAdding = true">
-          <v-icon>add</v-icon>
-        </v-btn>
+        <Permission :requires="TrellisPermission.ADD_GEO_TYPE">
+          <v-btn
+            icon
+            @click="isAdding = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </Permission>
       </v-toolbar>
       <v-data-table
         :loading="isLoading || isBusy"
@@ -44,6 +46,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import GeoTypeForm from "../components/geo/GeoTypeForm.vue"
+  import Permission from "../components/Permission.vue"
   import TrellisModal from "../components/TrellisModal.vue"
   import global from '../static/singleton'
   import GeoTypeRow from "../components/geo/GeoTypeRow.vue"
@@ -51,7 +54,7 @@
   import GeoTypeService from '../services/geotype'
   export default Vue.extend({
     name: 'GeoTypes',
-    components: { GeoTypeRow, TrellisModal, GeoTypeForm },
+    components: { GeoTypeRow, TrellisModal, GeoTypeForm, Permission },
     data () {
       return {
         geoTypes: [],

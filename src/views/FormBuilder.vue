@@ -1,5 +1,5 @@
 <template>
-  <v-flex>
+  <v-flex xs12>
     <TrellisLoadingCircle v-if="isLoading"/>
     <iframe
       v-show="!isLoading"
