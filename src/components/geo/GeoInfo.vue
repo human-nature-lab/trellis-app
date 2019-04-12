@@ -11,11 +11,16 @@
         </v-btn>
       </v-toolbar>
       <v-card-text>
-        <v-alert v-show="error" color="error">{{error}}</v-alert>
+        <v-layout>
+          <v-flex>
+            <TranslationTextField
+              :translation="geo.nameTranslation" />
+          </v-flex>
+        </v-layout>
         <v-layout wrap class="mb-3">
           <v-flex>
             <span class="subheading button-min-height">
-              {{ $t('location') }}: <geo-breadcrumbs v-if="geo.id" :geoId="geo.id"></geo-breadcrumbs>
+              {{ $t('location') }}: <GeoBreadcrumbs v-if="geo.id" :geoId="geo.id"></GeoBreadcrumbs>
             </span>
           </v-flex>
           <v-spacer></v-spacer>
@@ -35,28 +40,29 @@
             </v-flex>
         </v-layout>
         <v-layout>
-          <photo-album
+          <PhotoAlbum
             :loading="geoPhotosLoading"
             :photos="geoPhotos"
             @photo="addPhoto"
             @delete-photo="onDeletePhoto"
-            @update-photos="onUpdatePhotos"></photo-album>
+            @update-photos="onUpdatePhotos" />
         </v-layout>
       </v-card-text>
     </v-card>
     <v-dialog
       v-model="showGeoTypeDialog">
       <v-card>
-        <geo-type-selector
+        <GeoTypeSelector
           v-on:geo-type-selected="onGeoTypeSelected"
-          :geoType="geo.geoType">
-        </geo-type-selector>
+          :geoType="geo.geoType" />
       </v-card>
     </v-dialog>
   </v-flex>
 </template>
 
 <script lang="ts">
+  import TranslationTextField from "../TranslationTextField.vue"
+
   // @ts-ignore
   import GeoBreadcrumbs from './GeoBreadcrumbs'
   // @ts-ignore
@@ -91,7 +97,8 @@
       PhotoAlbum,
       AsyncTranslationText,
       GeoTypeSelector,
-      Permission
+      Permission,
+      TranslationTextField
     },
     data () {
       return {

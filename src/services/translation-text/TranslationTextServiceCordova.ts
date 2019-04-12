@@ -5,7 +5,13 @@ import {IsNull} from 'typeorm'
 
 export default class TranslationTextServiceCordova implements TranslationTextServiceInterface {
 
-  async updateTranslatedTextById (translationTextId: string, translatedText: string): Promise<any> {
+  async createTranslationText (translationId: string, translationText: TranslationText): Promise<TranslationText> {
+    const repo = await DatabaseService.getRepository(TranslationText)
+    translationText.translationId = translationId
+    return repo.save(translationText)
+  }
+
+  async updateTranslatedTextById (translationTextId: string, translatedText: string): Promise<TranslationText> {
     const repository = await DatabaseService.getRepository(TranslationText)
     return repository.update({id: translationTextId}, {translatedText: translatedText})
   }

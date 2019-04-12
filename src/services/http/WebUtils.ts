@@ -14,15 +14,15 @@ export function allMatches (str: string, exp: RegExp) {
  * Creates a valid http path with all components of the path properly encoded. There are two ways to use this function.
  *
  *  Named map:
- *    safeUrl('study/{studyId}/form/{formId}', {formId: 314, studyId: 1})
+ *    uriTemplate('study/{studyId}/form/{formId}', {formId: 314, studyId: 1})
  *    > study/1/form/314
  *
  *  Positional array:
- *    safeUrl('study/{study}/form/{}', [1, 314])
+ *    uriTemplate('study/{study}/form/{}', [1, 314])
  *    > study/1/form/314
  * @param args
  */
-export function safeUrl (template: string, argsArrayOrMap: string[]|object): string {
+export function uriTemplate (template: string, argsArrayOrMap: string[]|object): string {
   if (Array.isArray(argsArrayOrMap)) {
     const reg = /\{\w*\}/
     for (const arg of argsArrayOrMap) {
