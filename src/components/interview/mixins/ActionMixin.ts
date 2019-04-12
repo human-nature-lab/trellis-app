@@ -1,7 +1,10 @@
 import actionBus from '../services/actions/ActionBus'
 import Action from '../../../entities/trellis/Action'
 import {ActionPayload} from "../services/actions/DatumOperations";
-export default {
+import Vue from 'vue'
+import debounce from 'lodash/debounce'
+
+export default Vue.extend({
   methods: {
     /**
      * Create and emit an action of type with payload
@@ -16,8 +19,15 @@ export default {
       action.actionType = type
       action.questionId = this['question'].id
       action.payload = payload
-      actionBus.action(action)
+      return actionBus.action(action)
     },
+
+    /**
+     * Create an action with a debounce. Same as above.
+     */
+    debouncedAction: debounce(function (this: Vue) {
+      return this['action'].apply(this, arguments)
+    }, 300),
 
     /**
      * Create and emit an action without a questionId
@@ -28,7 +38,7 @@ export default {
       let action = new Action()
       action.actionType = type
       action.payload = payload
-      actionBus.action(action)
+      return actionBus.action(action)
     }
   }
-}
+})

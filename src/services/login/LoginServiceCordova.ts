@@ -1,8 +1,8 @@
+import PermissionService from "../permission";
 import LoginServiceInterface from './LoginServiceInterface'
 import DatabaseService from '../database/DatabaseService'
 import UserService from '../user/UserService'
 import User from '../../entities/trellis/User'
-import singleton from '../../static/singleton'
 import bcrypt from 'bcryptjs'
 
 export default class LoginServiceCordova implements LoginServiceInterface {
@@ -14,11 +14,10 @@ export default class LoginServiceCordova implements LoginServiceInterface {
     if (user === undefined || user === null) {
       throw Error('Unable to log in with the provided credentials (user not found)')
     }
-    if (! bcrypt.compareSync(password, user.password)) {
+    if (!bcrypt.compareSync(password, user.password)) {
       throw Error('Unable to log in with the provided credentials (incorrect password)')
     }
-    UserService.setCurrentUser(user)
-    singleton.user = user
+    await UserService.setCurrentUser(user)
     return user
   }
 
@@ -27,11 +26,7 @@ export default class LoginServiceCordova implements LoginServiceInterface {
     return (user instanceof User)
   }
 
-  logout () {
-    return new Promise((resolve, reject) => {
-      UserService.removeCurrentUser()
-      singleton.user = null
-      resolve()
-    })
+  async logout () {
+    UserService.removeCurrentUser()
   }
 }

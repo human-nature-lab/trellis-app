@@ -95,7 +95,7 @@ async function buildWeb () {
     env
   })
   console.log('zipping files')
-  await exec('zip www.zip www/')
+  // await exec('zip www.zip www/')
   // TODO: Push to server
 }
 

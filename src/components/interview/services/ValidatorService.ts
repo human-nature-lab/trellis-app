@@ -38,7 +38,8 @@ export const typeHandlers = {
   },
   'is_required': function (qd: QuestionDatum, pVal: any, pMap) {
     if (pVal) {
-      if (qd.data && qd.data.length) {
+      const isSingleDatumType = qd.data && qd.data.length && ['text', 'integer', 'decimal'].indexOf(qd.data[0].name) > -1
+      if (qd.data && qd.data.length && (!isSingleDatumType || ('' + qd.data[0].val).length > 0)) {
         return true
       } else if (pMap.show_dk || pMap.show_rf) {
         return qd.dkRf !== undefined && qd.dkRf !== null && qd.dkRfVal && qd.dkRfVal.length
@@ -122,7 +123,7 @@ export function parametersToMap (parameters: QuestionParameter[], question: Ques
  * @returns {boolean}
  */
 export function validateParameters (question: Question, parameters: QuestionParameter[], questionDatum: QuestionDatum) {
-  return validateParametersWithError(question, parameters, questionDatum) === true
+  return allParametersAreValidWithError(question, parameters, questionDatum) === true
 }
 
 /**
@@ -132,11 +133,15 @@ export function validateParameters (question: Question, parameters: QuestionPara
  * @param {Object} questionDatum
  * @returns {boolean|string}
  */
-export function validateParametersWithError (question: Question, parameters: QuestionParameter[], questionDatum: QuestionDatum) {
+export function allParametersAreValidWithError (question: Question, parameters: QuestionParameter[], questionDatum: QuestionDatum) {
   let pMap = parametersToMap(parameters, question)
 
   // Handle the trivial case
   if (pMap.read_only) {
+    return true
+  }
+
+  if (questionDatum.noOne) {
     return true
   }
 
@@ -147,8 +152,11 @@ export function validateParametersWithError (question: Question, parameters: Que
   }
 
   for (let type of relevantTypes) {
-    if (pMap[type] !== undefined && pMap[type] !== null && !typeHandlers[type](questionDatum, pMap[type], pMap)) {
-      return validationErrors[type](pMap[type])
+    if (pMap[type] !== undefined && pMap[type] !== null) {
+      const validatorResult = typeHandlers[type](questionDatum, pMap[type], pMap)
+      if (!validatorResult) {
+        return validationErrors[type](pMap[type])
+      }
     }
   }
 
@@ -165,8 +173,8 @@ export function makeValidationRules (question, parameters) {
   let rules = []
   for (let parameter of parameters) {
     let parameterValue = castParameter(question.type.name, parameter.parameter.name, parameter.val)
-    let errorMessage = validationErrors[parameter.parameter.name](parameterValue)
     if (validationErrors[parameter.parameter.name]) {
+      const errorMessage = validationErrors[parameter.parameter.name](parameterValue)
       rules.push(function (value) {
         return typeHandlers[parameter.parameter.name](question.datum, parameterValue) ? true : errorMessage
       })

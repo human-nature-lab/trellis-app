@@ -2,19 +2,24 @@
   <v-flex>
     <v-layout row>
       <v-btn
-        v-bind:class="{'primary': dk}"
-        @click="dk=!dk">
+        v-if="showDk"
+        :class="{primary: dk}"
+        :disabled="disabled"
+        @click="dk =! dk">
         {{ $t('do_not_know') }}
       </v-btn>
       <v-btn
-        v-bind:class="{'primary': rf}"
-        @click="rf=!rf">
+        v-if="showRf"
+        :class="{primary: rf}"
+        :disabled="disabled"
+        @click="rf =! rf">
         {{ $t('refuse_to_answer') }}
       </v-btn>
     </v-layout>
     <v-layout v-if="shouldShowReason">
       <v-text-field
         name="Reason"
+        :disabled="disabled"
         :label="$t('reason')"
         :rules="rules"
         v-model="reason"
@@ -27,10 +32,15 @@
 <script>
   import ActionMixin from './mixins/ActionMixin'
   import AT from '../../static/action.types'
+  import PT from '../../static/parameter.types'
   export default {
     props: {
       question: {
         type: Object,
+        required: true
+      },
+      disabled: {
+        type: Boolean,
         required: true
       }
     },
@@ -46,6 +56,22 @@
       this._reason = this.question.datum.dk_rf_val // We're actually binding to a text model so here we need to initialize that var
     },
     computed: {
+      showDk () {
+        for (const qp of this.question.questionParameters) {
+          if (parseInt(qp.parameterId, 10) === PT.show_dk) {
+            return !!+qp.val
+          }
+        }
+        return true
+      },
+      showRf () {
+        for (const qp of this.question.questionParameters) {
+          if (parseInt(qp.parameterId, 10) === PT.show_rf) {
+            return !!+qp.val
+          }
+        }
+        return true
+      },
       shouldShowReason: function () {
         return this.question.datum.dkRf != null
       },
@@ -55,7 +81,7 @@
         },
         set: function (val) {
           this._reason = val
-          this.action(AT.dk_rf_val, {
+          this.debouncedAction(AT.dk_rf_val, {
             dk_rf_val: val
           })
         }
@@ -97,6 +123,5 @@
     button
       font-size: 12px
       &.btn.btn-selected
-        background: orangered
         color: white
 </style>

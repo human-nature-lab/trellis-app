@@ -267,6 +267,7 @@ export default class InterviewAlligator {
   }
 
   public get nextLoc (): InterviewLocation {
+    this.updateIfNecessary()
     return this.index < this.pages.length - 1 ? this.pages[this.index + 1] : undefined
   }
 

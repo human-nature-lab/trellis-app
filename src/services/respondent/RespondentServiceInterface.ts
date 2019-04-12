@@ -3,6 +3,7 @@ import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import Photo from "../../entities/trellis/Photo";
+import {RandomPagination, RandomPaginationResult} from "../../types/Pagination";
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export interface SearchFilter {
@@ -52,10 +53,9 @@ export default interface RespondentServiceInterface {
     studyId: string,
     query: string,
     filters: SearchFilter,
-    page?: number,
-    size?: number,
-    respondentId?
-  ): Promise<Respondent[]>
+    pagination?: RandomPagination,
+    respondentId?: string
+  ): Promise<RandomPaginationResult<Respondent>>
 
   /**
    * Add a name to the respondent
@@ -150,4 +150,10 @@ export default interface RespondentServiceInterface {
    * @returns {Promise<*>}
    */
   removeRespondentGeo (respondentId: string, respondentGeoId: string): Promise<void>
+
+  /**
+   * Delete the respondent
+   * @param respondentId
+   */
+  removeRespondent (respondentId: string): Promise<void>
 }

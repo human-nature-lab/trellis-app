@@ -32,11 +32,6 @@
           }
         }
       },
-      beforeDestroy () {
-        if (!this.success) {
-          this.cancelImport()
-        }
-      },
       created () {
         this.startWork()
       },

@@ -1,6 +1,6 @@
 <template>
   <v-time-picker
-    landscape
+    :landscape="$vuetify.breakpoint.smAndUp"
     v-model="time"
     :disable="isQuestionDisabled"/>
 </template>
