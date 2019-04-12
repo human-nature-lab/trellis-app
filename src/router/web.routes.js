@@ -1,6 +1,8 @@
 import ValidateLocale from './guards/ValidateLocale'
 import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
+import ValidatePermissions from './guards/ValidatePermissions'
+import {TrellisPermission} from '../static/permissions.base'
 
 const Forms = () => import(/* webpackChunkName: "forms" */'../views/Forms')
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
@@ -30,17 +32,18 @@ export default [{
 }, {
   path: '/user',
   name: 'Users',
-  component: Users
+  component: Users,
+  beforeEnter: ValidatePermissions(TrellisPermission.VIEW_USERS)
 }, {
   path: '/reports',
   name: 'Reports',
   component: Reports,
-  beforeEnter: chain(ValidateStudy)
+  beforeEnter: chain(ValidatePermissions(TrellisPermission.VIEW_REPORTS), ValidateStudy)
 }, {
   path: '/form/:formId/builder',
   name: 'FormBuilder',
   component: FormBuilder,
-  beforeEnter: chain(ValidateStudy, ValidateLocale)
+  beforeEnter: chain(ValidatePermissions(TrellisPermission.EDIT_FORM), ValidateStudy, ValidateLocale)
 }, {
   path: '/forms',
   name: 'Forms',
@@ -49,11 +52,13 @@ export default [{
 }, {
   path: '/devices',
   name: 'Devices',
-  component: Devices
+  component: Devices,
+  beforeEnter: ValidatePermissions(TrellisPermission.VIEW_DEVICES)
 }, {
   path: '/studies',
   name: 'Studies',
-  component: Studies
+  component: Studies,
+  beforeEnter: ValidatePermissions(TrellisPermission.VIEW_STUDIES)
 }, {
   path: '/geo-types',
   name: 'GeoTypes',

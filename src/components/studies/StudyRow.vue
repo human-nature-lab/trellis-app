@@ -2,6 +2,8 @@
   <tr>
     <td>
       <CRUDMenu
+        :editable="hasPermission(TrellisPermission.EDIT_STUDY)"
+        :removable="hasPermission(TrellisPermission.REMOVE_STUDY)"
         @edit="$emit('edit')"
         @remove="$emit('remove')" />
     </td>
@@ -14,6 +16,7 @@
         deletable-chips
         multiple
         autocomplete
+        :readonly="!hasPermission(TrellisPermission.EDIT_STUDY)"
         :loading="!locales.length || isWorking"
         v-model="study.locales"
         @change="updateLocales"
@@ -32,11 +35,13 @@
   import Locale from '../../entities/trellis/Locale'
   import Study from '../../entities/trellis/Study'
   import StudyLocale from "../../entities/trellis/StudyLocale"
+  import PermissionMixin from "../../mixins/PermissionMixin"
   import LocaleService from "../../services/locale/LocaleService"
   import CRUDMenu from '../CRUDMenu'
   export default Vue.extend({
     name: 'StudyRow',
-    components: {CRUDMenu},
+    mixins: [PermissionMixin],
+    components: { CRUDMenu },
     props: {
       study: {
         type: Object as () => Study,

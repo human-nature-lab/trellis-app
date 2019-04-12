@@ -1,13 +1,15 @@
 <template>
-  <v-flex>
+  <v-flex xs12>
     <v-toolbar flat>
       <v-toolbar-title>{{$t('devices')}}</v-toolbar-title>
       <v-spacer />
-      <v-btn
-        icon
-        @click="showAddDevice">
-        <v-icon>add</v-icon>
-      </v-btn>
+      <Permission :requires="TrellisPermission.ADD_DEVICE">
+        <v-btn
+          icon
+          @click="showAddDevice">
+          <v-icon>add</v-icon>
+        </v-btn>
+      </Permission>
     </v-toolbar>
     <v-data-table
       :loading="isBusy"
@@ -18,6 +20,8 @@
       <template slot="items" slot-scope="{item: device}">
         <td>
           <CRUDMenu
+            :editable="hasPermission(TrellisPermission.EDIT_DEVICE)"
+            :removable="hasPermission(TrellisPermission.REMOVE_DEVICE)"
             @edit="startEdit(device)"
             @remove="deleteDevice(device)" />
         </td>
@@ -36,6 +40,8 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import Permission from "../components/Permission.vue"
+  import PermissionMixin from "../mixins/PermissionMixin"
   import DeviceService from "../services/device/DeviceService"
   import TrellisModal from '../components/TrellisModal'
   import DeviceForm from '../components/devices/DeviceForm'
@@ -43,7 +49,8 @@
   import CRUDMenu from '../components/CRUDMenu'
   export default Vue.extend({
     name: 'Devices',
-    components: { TrellisModal, DeviceForm, CRUDMenu },
+    mixins: [PermissionMixin],
+    components: { TrellisModal, DeviceForm, CRUDMenu, Permission },
     data () {
       return {
         isBusy: false,

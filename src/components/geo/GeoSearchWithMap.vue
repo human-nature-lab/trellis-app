@@ -36,7 +36,7 @@
         left>
         <v-icon style="height:auto;">print</v-icon>
       </v-btn>
-      <permission :role-whitelist="['admin']">
+      <Permission :requires="TrellisPermission.ADD_GEO">
         <v-btn
           v-if="selectedGeo === null && parentGeo !== null && parentGeo.geoType.canUserAddChild"
           class="deep-orange floating-button"
@@ -48,11 +48,11 @@
           right>
           <v-icon style="height:auto;">add</v-icon>
         </v-btn>
-      </permission>
+      </Permission>
     </v-flex>
     <div>
-      <permission :role-whitelist="['admin']">
-        <geo-edit-panel
+      <Permission :requires="TrellisPermission.EDIT_GEO">
+        <GeoEditPanel
           v-on:select-geo-done="selectGeoDone"
           v-on:up-one-level-done="upOneLevelDone"
           v-on:editing-done="editingDone"
@@ -61,8 +61,8 @@
           v-on:position-geo-done="positionGeoDone"
           v-on:editing-cancelled="editingCancelled"
           :selected-geo="selectedGeo"
-          :leaflet-map="trellisMap"></geo-edit-panel>
-      </permission>
+          :leaflet-map="trellisMap" />
+      </Permission>
     </div>
   </v-layout>
 </template>
@@ -454,8 +454,6 @@
   #leafletMap
     height: 400px /* Temporary height, replaced by actual container height via javascript */
     width: 100%
-    .leaflet-pane
-      z-index: 150
   .trellis-popup
     margin: 2px 2px
   .leaflet-tooltip

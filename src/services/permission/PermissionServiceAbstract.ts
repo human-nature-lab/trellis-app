@@ -1,5 +1,10 @@
 import User from "../../entities/trellis/User";
-import defaultPermissions, {PermissionMap, TrellisPermission, TrellisRole} from "../../static/permissions.base";
+import defaultPermissions, {
+  PermissionMap,
+  adminPermissions,
+  TrellisRole,
+  TrellisPermission
+} from "../../static/permissions.base";
 
 export default abstract class PermissionServiceAbstract {
 
@@ -12,13 +17,6 @@ export default abstract class PermissionServiceAbstract {
    * @param user
    */
   public async getUserPermissions (user: User): Promise<PermissionMap> {
-    const adminPermissions = [
-      TrellisPermission.ADD_USER,
-      TrellisPermission.CREATE_STUDY,
-      TrellisPermission.DELETE_RESPONDENT,
-      TrellisPermission.CHANGE_RESPONDENT_GEO_CURRENT,
-      TrellisPermission.EDIT_GEO
-    ]
 
     this.resetUserPermissions()
 
@@ -54,6 +52,23 @@ export default abstract class PermissionServiceAbstract {
     } else {
       return this.userPermissions
     }
+  }
+
+  /**
+   * Evaluates a set of permissions. Returns true if they have permission.
+   * @param userPermissions
+   * @param permissions
+   */
+  public hasPermission (userPermissions: PermissionMap, permissions: TrellisPermission | TrellisPermission[]): boolean {
+    if (!Array.isArray(permissions)) {
+      permissions = [permissions]
+    }
+    for (const perm of permissions) {
+      if (userPermissions[perm]) {
+        return true
+      }
+    }
+    return false
   }
 
 }

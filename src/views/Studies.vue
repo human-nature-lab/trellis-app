@@ -1,16 +1,18 @@
 <template>
-  <v-flex>
+  <v-flex xs12>
     <v-container>
       <v-toolbar flat>
         <v-toolbar-title>
           {{$t('studies')}}
         </v-toolbar-title>
         <v-spacer />
-        <v-btn
-          @click="isAdding=true"
-          icon>
-          <v-icon>add</v-icon>
-        </v-btn>
+        <Permission :requires="TrellisPermission.ADD_STUDY">
+          <v-btn
+            @click="isAdding=true"
+            icon>
+            <v-icon>add</v-icon>
+          </v-btn>
+        </Permission>
       </v-toolbar>
       <v-data-table
         :loading="isLoading"
@@ -45,6 +47,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import Permission from '../components/Permission.vue'
   import StudyForm from '../components/studies/StudyForm'
   import StudyRow from '../components/studies/StudyRow'
   import TrellisModal from '../components/TrellisModal'
@@ -53,7 +56,7 @@
   import StudyService from '../services/study/StudyService'
   export default Vue.extend({
     name: 'Studies',
-    components: {StudyRow, TrellisModal, StudyForm},
+    components: {StudyRow, TrellisModal, StudyForm, Permission},
     data () {
       return {
         isLoading: false,

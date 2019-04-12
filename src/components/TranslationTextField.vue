@@ -16,7 +16,7 @@
         item-text="languageTag"
         item-value="id"
         v-model="selectedLocale"
-        :disabled="saving" />
+        :disabled="saving || isEditing" />
     </v-layout>
   </v-container>
 </template>
@@ -54,6 +54,10 @@
       persist: {
         type: Boolean,
         default: true
+      },
+      editing: {
+        type: Boolean,
+        default: false
       }
     },
     created () {
@@ -63,7 +67,7 @@
       return {
         global: singleton as Singleton,
         saving: false,
-        isEditing: false,
+        isEditing: this.editing,
         selectedLocale: singleton.locale.id,
         isLoading: false,
         locales: studyLocales as () => Locale[]
@@ -110,7 +114,7 @@
         }
 
         // Save any changed translationText elements
-        for (const i = 0; i < this.memCopy.translationText.length; i++) {
+        for (let i = 0; i < this.memCopy.translationText.length; i++) {
           const mTt = this.memCopy.translationText[i]
           const tt = this.translation.translationText.find(t => t.localeId === mTt.localeId)
           if (!tt) {
