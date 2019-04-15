@@ -60,7 +60,7 @@ import Sync from '../../entities/trellis-config/Sync'
 import FileService from '../file/FileService'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 import PreloadAction from '../../entities/trellis/PreloadAction'
-import config from '../../config'
+import config from 'config'
 import {monekypatch} from './monekypatch'
 monekypatch()
 

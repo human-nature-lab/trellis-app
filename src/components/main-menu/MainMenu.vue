@@ -50,7 +50,7 @@
 </template>
 
 <script>
-  import config from '../../config'
+  import config from 'config'
   import menuBus from './MenuBus'
   import LoginService from '../../services/login'
   import router from '../../router'

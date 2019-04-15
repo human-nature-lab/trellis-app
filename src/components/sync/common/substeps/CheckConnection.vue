@@ -11,7 +11,7 @@
 
 <script>
     import axios from 'axios'
-    import config from '../../../../config'
+    import config from 'config'
     import SyncService from '../../../../services/SyncService'
     import DatabaseService from '../../../../services/database/DatabaseService'
     import TrellisAlert from '../../../TrellisAlert.vue'

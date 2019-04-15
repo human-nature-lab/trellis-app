@@ -6,6 +6,7 @@ var FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 var webpack = require('webpack')
 var SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
 var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const smp = new SpeedMeasurePlugin()
 const { VueLoaderPlugin } = require('vue-loader')
@@ -18,6 +19,9 @@ module.exports = smp.wrap({
   target: 'web',
   entry: {
     app: ['@babel/polyfill', './src/main.ts']
+  },
+  externals: {
+    config: 'config'
   },
   output: {
     path: config.build.assetsRoot,
@@ -165,6 +169,12 @@ module.exports = smp.wrap({
       analyzerMode: 'static',
       openAnalyzer: false
     }),
+    // copy custom static assets
+    new CopyWebpackPlugin([{
+      from: path.resolve(__dirname, '../static'),
+      to: config.build.assetsSubDirectory,
+      ignore: ['.*']
+    }]),
   ]
 })
 

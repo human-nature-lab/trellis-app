@@ -8,7 +8,7 @@ import i18n from '../i18n/index'
 import moment from 'moment'
 import DeviceService from "./device/DeviceService"
 import DatabaseService from './database/DatabaseService'
-import config from '../config'
+import config from 'config'
 import {APP_ENV} from '../static/constants'
 
 enum StorageKey {

@@ -111,7 +111,7 @@
   import SnackbarQueue from './components/SnackbarQueue'
   import DocsSidebar from './components/documentation/DocsSidebar'
   import UserService from './services/user/UserService'
-  import config from './config'
+  import config from 'config'
 
   export default {
     name: 'web-app',
