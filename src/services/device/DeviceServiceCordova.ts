@@ -82,4 +82,8 @@ export default class DeviceServiceCordova implements DeviceServiceInterface {
   async updateDevice (device: Device): Promise<Device> {
     throw new Error('Not implemented')
   }
+
+  async createDevice (device: Device): Promise<Device> {
+    throw new Error('Not implemented')
+  }
 }

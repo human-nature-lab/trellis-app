@@ -1,4 +1,3 @@
-import DatabaseService from '../database/DatabaseService'
 import AlertService from '../../services/AlertService'
 import LoggingServiceAbstract from './LoggingServiceAbstract'
 import Log from "../../entities/trellis-config/Log";
@@ -40,6 +39,7 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
     }
     console.info(`writing ${saving.length} logs to disk`)
     let succeeded = false
+    const DatabaseService = (await import('../database/DatabaseService')).default
     try {
       const connection = await DatabaseService.getConfigDatabase()
       await connection.manager.save(saving)
@@ -79,6 +79,7 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async getLogPage (page: number, limit: number, sortBy?: string, descending?: boolean): Promise<Log[]> {
+    const DatabaseService = (await import('../database/DatabaseService')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     let order = sortBy ? {
       [sortBy]: descending ? 'DESC' : 'ASC'
@@ -91,11 +92,13 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async getLogCount (): Promise<number> {
+    const DatabaseService = (await import('../database/DatabaseService')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.count()
   }
 
   public async getUploadedCount (): Promise<number> {
+    const DatabaseService = (await import('../database/DatabaseService')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.count({
       uploadedAt: Not(IsNull())
@@ -103,6 +106,7 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async deleteUploaded (): Promise<void> {
+    const DatabaseService = (await import('../database/DatabaseService')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.delete()
   }

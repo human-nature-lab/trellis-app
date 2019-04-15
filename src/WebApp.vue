@@ -95,7 +95,6 @@
 </template>
 
 <script>
-  // import SingletonService from './services/singleton/SingletonService'
   import MainMenu from './components/main-menu/MainMenu'
   import CensusFormChecker from './components/CensusFormChecker'
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
@@ -105,13 +104,14 @@
   import LocationFinder from './components/LocationFinder'
   import router from './router'
   import singleton from './static/singleton'
+  // Do not remove!
+  import SingletonService from './services/SingletonService'
   import {defaultLoggingService} from './services/logging/LoggingService'
   import GeoLocationService from './services/geolocation'
   import SnackbarQueue from './components/SnackbarQueue'
   import DocsSidebar from './components/documentation/DocsSidebar'
   import UserService from './services/user/UserService'
   import config from './config'
-  import translations from './i18n/translations'
 
   export default {
     name: 'web-app',

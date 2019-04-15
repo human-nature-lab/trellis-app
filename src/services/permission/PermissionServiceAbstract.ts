@@ -21,13 +21,15 @@ export default abstract class PermissionServiceAbstract {
     this.resetUserPermissions()
 
     // Enable admin permissions
-    let updatedPermissions = user.role === TrellisRole.ADMIN ? adminPermissions : []
+    let updatedPermissions = user && user.role === TrellisRole.ADMIN ? adminPermissions : []
     for (const p of updatedPermissions) {
       this.userPermissions[p] = true
     }
 
     this.hasLoadedOnce = true
-    console.log('permissions for', user.username, this.userPermissions)
+    if (user) {
+      console.log('permissions for', user.username, this.userPermissions)
+    }
     return this.userPermissions
   }
 
@@ -60,6 +62,9 @@ export default abstract class PermissionServiceAbstract {
    * @param permissions
    */
   public hasPermission (userPermissions: PermissionMap, permissions: TrellisPermission | TrellisPermission[]): boolean {
+    if (!userPermissions) {
+      return false
+    }
     if (!Array.isArray(permissions)) {
       permissions = [permissions]
     }

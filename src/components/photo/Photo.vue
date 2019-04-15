@@ -20,8 +20,6 @@
 <script>
   import PhotoService from '../../services/photo/PhotoService'
   import URL_PLACEHOLDER from '../../assets/baseline-image-24px.svg'
-  import PERSON_URL_PLACEHOLDER from '../../assets/baseline-person-24px.svg'
-  import BUILDING_URL_PLACEHOLDER from '../../assets/baseline-place-24px.svg'
   import TrellisLoadingCircle from '../TrellisLoadingCircle'
 
   const observer = new IntersectionObserver(handleIntersections, {
@@ -85,8 +83,8 @@
         imgLoading: false,
         imgLoaded: false,
         randId: Math.random().toString(16),
-        loadingPromise: null,
-        loadingError: null
+        loadingError: null,
+        cancel_: null
       }
     },
     mounted () {
@@ -154,34 +152,37 @@
         this.imgLoaded = true
         this.srcLoading = false
         this.imgLoading = false
-        this.loadingError = err
         this.setSrc(URL_PLACEHOLDER)
       },
-      load () {
+      async load () {
         if (this.isLoaded) return
         if (!this.id) {
           return this.setError(new Error('No id present for this photo'))
         }
         if (!this.srcLoaded && !this.loadingError) {
-          this.srcLoading = true
-          this.loadingPromise = PhotoService.getPhotoSrc(this.id).then(src => {
+          try {
+            this.srcLoading = true
+            const [p, cancel] = PhotoService.getPhotoSrc(this.id)
+            this.cancel_ = cancel
+            const src = await p
             this.setSrc(src)
-          }).catch(err => {
-            if (err && !(err.message && err.message === 'Canceled image load')) {
+          } catch (err) {
+            if (err && err.message !== 'Cancelled image load') {
+              this.log(err)
               this.setError(err)
+              throw err
             }
-            return true
-          })
+          }
         }
       },
       cancelLoad () {
         this.imgLoading = false
         this.srcLoading = false
         if (this.srcLoaded && this.imgLoaded) return
-        if (this.loadingPromise && this.loadingPromise.cancel) {
+        if (this.cancel_) {
           this.srcLoading = false
           this.srcLoaded = false
-          this.loadingPromise.cancel()
+          this.cancel_()
         }
         if (this.src && this.$refs && this.$refs.img) {
           this.src = null
