@@ -2,11 +2,13 @@
 
 > The trellis SPA for conducting interviews
 
-## Configuration
-- Add **config.js** file in **src/**. Look at **src/config.default.js** for template.
+## Development 
+
+### Configuration
+- Add **config.js** file in **static/**. Look at **static/config.default.js** for template.
 - Add **config.xml.js** file in **config/**. The template is **config/config.xml.default.js**.
 
-## Build Setup
+### Build Setup
 
 ``` bash
 # install dependencies
