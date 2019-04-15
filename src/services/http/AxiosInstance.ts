@@ -1,5 +1,5 @@
 import axios, {AxiosInstance} from 'axios'
-import config from '../../config'
+import config from 'config'
 import storage from '../StorageService'
 import router from '../../router'
 import singleton from '../../static/singleton'

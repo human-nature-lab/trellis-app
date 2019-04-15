@@ -81,7 +81,7 @@
   import GeoEditPanel from './GeoEditPanel.vue'
   import Permission from '../Permission'
   import StudyService from '../../services/study/StudyService'
-  import config from '../../config'
+  import config from 'config'
 
   const targetMapWidth = 600
 

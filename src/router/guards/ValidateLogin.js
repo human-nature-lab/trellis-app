@@ -1,7 +1,7 @@
 import User from '../../entities/trellis/User'
 import UserService from '../../services/user/UserService'
 import LoginService from '../../services/login'
-import config from '../../config'
+import config from 'config'
 
 export default async function (to, from, next) {
   const user = await UserService.getCurrentUser()

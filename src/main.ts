@@ -16,7 +16,7 @@ import Debug from './components/Debug'
 import WebApp from './WebApp'
 import router from './router'
 
-import config from './config'
+import config from 'config'
 import theme from './static/theme'
 import {APP_ENV} from './static/constants'
 import './logging'

@@ -1,4 +1,4 @@
-import config from '../config'
+import config from 'config'
 import {APP_ENV} from '../static/constants'
 import Vue, {Component} from 'vue'
 import {defaultLoggingService} from '../services/logging/LoggingService'

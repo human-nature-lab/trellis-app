@@ -1,4 +1,4 @@
-import config from '../config'
+import config from 'config'
 import {APP_ENV, APP_MODE} from '../static/constants'
 import storage from './StorageService'
 

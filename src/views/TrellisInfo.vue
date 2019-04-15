@@ -42,7 +42,7 @@
   import formatBytesFilter from '../filters/format-bytes.filter'
   import SyncService from "../services/SyncService"
   import moment from 'moment'
-  import config from '../config'
+  import config from 'config'
 
   declare const VERSION: string
 

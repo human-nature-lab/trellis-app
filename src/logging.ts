@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/browser'
 import Locale from "./entities/trellis/Locale";
 import Vue from 'vue'
-import config from './config'
+import config from 'config'
 import Study from "./entities/trellis/Study";
 import DeviceService from "./services/device/DeviceService";
 import SentryOfflineTransport from "./services/logging/SentryOfflineTransport";
