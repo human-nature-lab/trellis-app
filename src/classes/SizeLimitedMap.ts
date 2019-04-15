@@ -1,4 +1,5 @@
 import debounce from 'lodash/debounce'
+import {roughSizeOf} from "./M";
 
 interface SizeMeta {
   touched: number,
@@ -66,7 +67,7 @@ export default class SizeLimitedMap<T> {
   set (key: any, val: T) {
     const existingMeta = this.meta.get(key)
     this.map.set(key, val)
-    let size = SizeLimitedMap.roughSizeOfObject(key) + SizeLimitedMap.roughSizeOfObject(val)
+    let size = roughSizeOf(key) + roughSizeOf(val)
     this.meta.set(key, {
       touched: Date.now(),
       size: size
@@ -109,35 +110,6 @@ export default class SizeLimitedMap<T> {
       count++
     }
     console.log(`evicting ${count} members`)
-  }
-
-  /**
-   * Returns the rough size of anything in bytes
-   * @param object
-   * @returns {number}
-   */
-  static roughSizeOfObject (object: any) {
-    let objectList = []
-    let stack = [object]
-    let bytes = 0
-
-    while (stack.length) {
-      let value = stack.pop()
-
-      if (typeof value === 'boolean') {
-        bytes += 4
-      } else if (typeof value === 'string') {
-        bytes += value.length * 2
-      } else if (typeof value === 'number') {
-        bytes += 8
-      } else if (typeof value === 'object' && objectList.indexOf(value) === -1) {
-        objectList.push(value)
-        for (let i in value) {
-          stack.push(value[i])
-        }
-      }
-    }
-    return bytes
   }
 
   get length () {

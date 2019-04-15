@@ -389,6 +389,25 @@ class FileServiceCordova {
     })
   }
 
+  /**
+   * Read a file as Data URL promise wrapper
+   * @param entry
+   */
+  readFileAsDataURL (entry: FileEntry): Promise<string> {
+    return new Promise((resolve, reject) => {
+      entry.file((blob) => {
+        const reader = new FileReader()
+        reader.onloadend = function () {
+          resolve(reader.result as string)
+        }
+        reader.onerror = function(err) {
+          reject(err)
+        }
+        reader.readAsDataURL(blob)
+      })
+    })
+  }
+
   static getDefaultRequestFileSystemOptions (): FileSystemOptions {
     return {
       storageType: StorageType.PERSISTENT,

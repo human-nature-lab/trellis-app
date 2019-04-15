@@ -1,13 +1,18 @@
-import http from '../http/AxiosInstance'
+import {roughSizeOf} from "../../classes/M";
+import http, {Token} from '../http/AxiosInstance'
 import axios from 'axios'
-import SizeLimitedMap from '../../classes/SizeLimitedMap'
-const cache = new SizeLimitedMap(1024 * 10000)
-import CancellablePromise from '../../classes/CancellablePromise'
-import PhotoServiceAbstract from './PhotoServiceAbstract'
+import LRU from 'lru-cache'
+const cache = new LRU({
+  max: 1024 * 10000,
+  length: function (n, key) {
+    return roughSizeOf(n) + roughSizeOf(key)
+  }
+})
+import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'
 import Photo from "../../entities/trellis/Photo";
 
 export default class PhotoServiceWeb extends PhotoServiceAbstract {
-
+l
   private existingCancelTokens = new Set()
 
   async getPhotosByIds (photoIds: string[]): Promise<Photo[]> {
@@ -28,33 +33,30 @@ export default class PhotoServiceWeb extends PhotoServiceAbstract {
     console.log(`cancelled ${count} outstanding photo requests`)
   }
 
-  getPhotoSrc (photoId) {
-    let source
-    // Get the base64 encoded photo and return the url. This method is cached
-    const p = new CancellablePromise(async (resolve, reject) => {
-      if (cache.has(photoId)) {
-        resolve(cache.get(photoId))
-      } else {
+  getPhotoSrc (photoId: string): [Promise<string>, CancelFunction] {
+    if (cache.has(photoId)) {
+      return [
+        new Promise(resolve => resolve(cache.get(photoId) as string)),
+        () => {}
+      ]
+    } else {
+      const source = axios.CancelToken.source()
+      const p: Promise<string> = new Promise(async (resolve, reject) => {
         try {
-          source = axios.CancelToken.source()
+          this.existingCancelTokens.add(source)
           const res = await http().get(`photo/${photoId}`, {
             cancelToken: source.token
           })
+          this.existingCancelTokens.delete(source)
           let src = `data:${res.headers['content-type']};base64,` + res.data
           cache.set(photoId, src)
           resolve(src)
         } catch (err) {
           reject(err)
-        } finally {
-          this.existingCancelTokens.delete(source)
         }
-      }
-    }, () => {
-      if (source && source.cancel) {
-        source.cancel('Canceled image load')
-      }
-    })
-    return p
+      })
+      return [p, () => {source.cancel('Cancelled image load')}]
+    }
   }
 
   async takePhoto (): Promise<Photo> {
