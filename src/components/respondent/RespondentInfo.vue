@@ -36,6 +36,9 @@
               :conditionTags="respondentConditionTags"></respondent-condition-tags>
             <respondent-names
               :respondent="respondent"></respondent-names>
+            <respondent-fill
+              :respondent="respondent"></respondent-fill>
+
             <v-flex v-if="isAdmin">
               <v-toolbar flat>
                 <v-toolbar-title>{{$t('admin')}}</v-toolbar-title>
@@ -68,6 +71,8 @@
   import PhotoAlbum from '../photo/PhotoAlbum'
   // @ts-ignore
   import RespondentConditionTags from './RespondentConditionTags'
+  // @ts-ignore
+  import RespondentFill from './RespondentFill'
 
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import RespondentService from '../../services/respondent/RespondentService'
@@ -172,6 +177,7 @@
       }
     },
     components: {
+      RespondentFill,
       RespondentNames,
       RespondentConditionTags,
       Permission,
