@@ -39,3 +39,4 @@ src/entities/**/*.js
 src/entities/**/*.map
 
 releases
+*.jks
