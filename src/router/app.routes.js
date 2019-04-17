@@ -1,6 +1,7 @@
-const Sync = () => import(/* webpackChunkName: "sync" */'../components/sync/Sync')
+const Sync = () => import(/* webpackChunkName: "sync" */'../views/Sync')
 const Logs = () => import(/* webpackChunkName: "logs" */'../views/Logs')
-const Storage = () => import(/* webpackChunkName: "storage" */'../components/Storage')
+const Storage = () => import(/* webpackChunkName: "storage" */'../views/Storage')
+const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'../views/RegisterDevice')
 
 export default [{
   path: '/',
@@ -18,4 +19,8 @@ export default [{
   path: '/storage',
   name: 'Storage',
   component: Storage
+}, {
+  path: '/register-device',
+  name: 'RegisterDevice',
+  component: RegisterDevice
 }]

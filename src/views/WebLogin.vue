@@ -54,9 +54,9 @@
 </template>
 
 <script>
-  import LoginService from '../../services/login'
-  import UserService from '../../services/user/UserService'
-  import router from '../../router'
+  import LoginService from '../services/login'
+  import UserService from '../services/user/UserService'
+  import router from '../router'
 
   export default {
     name: 'web-login',

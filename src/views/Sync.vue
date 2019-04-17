@@ -67,14 +67,14 @@
 </template>
 
 <script>
-  import AlertService from '../../services/AlertService'
-  import SyncStatus from './SyncStatus'
-  import DatabaseService from '../../services/database/DatabaseService'
-  import Download from './download/Download'
-  import Upload from './upload/Upload'
-  import ServerIpConfig from './ServerIPConfig.vue'
-  import DocsLinkMixin from '../../mixins/DocsLinkMixin'
-  import DocsFiles from '../documentation/DocsFiles'
+  import AlertService from '../services/AlertService'
+  import SyncStatus from '../components/sync/SyncStatus'
+  import DatabaseService from '../services/database/DatabaseService'
+  import Download from '../components/sync/download/Download'
+  import Upload from '../components/sync/upload/Upload'
+  import ServerIpConfig from '../components/sync/ServerIPConfig.vue'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
+  import DocsFiles from '../components/documentation/DocsFiles'
 
   export default {
     name: 'sync',
