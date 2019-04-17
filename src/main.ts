@@ -21,6 +21,7 @@ import theme from './static/theme'
 import {APP_ENV} from './static/constants'
 import './logging'
 import './filters/toFixed.filter'
+import './checkWebviewVersion'
 
 Vue.use(Vuetify, theme)
 Vue.config.productionTip = false
