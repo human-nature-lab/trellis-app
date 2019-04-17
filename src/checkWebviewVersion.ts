@@ -1,5 +1,5 @@
 const updateWebview = '/update-webview.html'
-if (cordova && navigator) {
+if ((typeof window['cordova'] === 'object') && navigator) {
   const chromeVersionReg = /Chrome\/(.*) /g
   const match = chromeVersionReg.exec(navigator.userAgent)
   if (match && match.length > 1) {
@@ -9,5 +9,4 @@ if (cordova && navigator) {
       window.open(updateWebview)
     }
   }
-  console.log('match', match)
 }
