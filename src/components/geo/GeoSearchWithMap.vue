@@ -2,19 +2,6 @@
   <v-layout
     column
     fill-height>
-    <v-snackbar
-      v-model="snackbar"
-      bottom
-      absolute
-      :timeout="2000">
-      No child locations found.
-      <v-btn
-        icon
-        flat
-        @click="snackbar = false">
-        <v-icon>close</v-icon>
-      </v-btn>
-    </v-snackbar>
     <v-toolbar>
       <v-btn icon v-if="parentGeo !== null" @click.stop="upOneLevelDone">
         <v-icon>arrow_back</v-icon>
@@ -26,6 +13,7 @@
       ref="mapContainer"
       id="leafletMap"
       style="position: relative;">
+      <v-progress-linear id="loading-progress" v-if="isLoading" indeterminate />
       <v-btn
         class="floating-button"
         @click.stop="printMap"
@@ -129,14 +117,20 @@
         markerPositions: [],
         minZoom: undefined,
         selectedGeo: null,
-        snackbar: false,
         layout: null,
-        graph: null
+        graph: null,
+        isLoading: false
       }
     },
     async created () {
-      let curGeo = this.$router.currentRoute.params.geoId ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
-      this.selectGeo(curGeo)
+      try {
+        this.isLoading = true
+        let curGeo = this.$router.currentRoute.params.geoId ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
+        this.selectGeo(curGeo)
+      } catch (err) {
+        this.log(err)
+        this.alert('error', this.$t('no_locations_found'), {timeout: 0})
+      }
     },
     mounted () {
       this.setUpMap()
@@ -148,13 +142,21 @@
     methods: {
       selectGeo: async function (geo) {
         const geoId = (geo && geo.id) ? geo.id : null
-        const geoResults = await GeoService.getGeosByParentId(geoId)
-        if (geoResults.length > 0) {
-          this.parentGeo = geo
-          this.geoResults = geoResults
-          this.displayResults(this.geoResults)
-        } else {
-          this.snackbar = true
+        try {
+          this.isLoading = true
+          const geoResults = await GeoService.getGeosByParentId(this.global.study.id, geoId)
+          if (geoResults.length > 0) {
+            this.parentGeo = geo
+            this.geoResults = geoResults
+            this.displayResults(this.geoResults)
+          } else {
+            this.alert('default', this.$t('no_locations_found'))
+          }
+        } catch (err) {
+          this.log(err)
+          this.alert('error', 'Unable to load child locations', {timeout: 0})
+        } finally {
+          this.isLoading = false
         }
       },
       setUpMap: function () {
@@ -458,4 +460,9 @@
     margin: 2px 2px
   .leaflet-tooltip
     padding: 0px !important
+
+  #loading-progress
+    position: absolute
+    top: -15px
+    z-index: 1000
 </style>
