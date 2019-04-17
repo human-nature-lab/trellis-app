@@ -7,6 +7,7 @@
     <v-spacer />
     </v-toolbar>
     <v-data-table
+      v-if="respondentFills !== undefined"
       class="mb-3"
       :headers="fillHeaders"
       :items="respondentFills"
@@ -29,6 +30,7 @@
   export default Vue.extend({
     data () {
       return {
+        respondentFills : undefined,
         fillHeaders: [{
           text: 'Name',
           value: 'name',
