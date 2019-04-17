@@ -51,7 +51,8 @@
     async created() {
       // TODO: Load respondent condition tags if they aren't passed inawait RespondentService.getRespondentFillsById(respond.id)
       try {
-        this.respondentFills = await RespondentService.getRespondentFillsById(this.respondent.id)
+        let respondentFills = await RespondentService.getRespondentFillsById(this.respondent.id)
+        this.respondentFills = respondentFills
       } catch (err) {
         this.log(err)
       }
