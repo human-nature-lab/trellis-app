@@ -46,7 +46,7 @@
                 // Expected result if the device hasn't been added to the server
                 this.loggingService.log({
                   severity: 'warn',
-                  message: this.$t('server_device_not_found')
+                  message: err.response.data.msg
                 }).then((result) => { this.currentLog = result })
               } else {
                 this.loggingService.log(err).then((result) => { this.currentLog = result })

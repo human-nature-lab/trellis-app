@@ -15,63 +15,65 @@
             <sync-step
               :title="$t('creating')"
               v-if="uploadStep === 1"
-              v-bind:continue-status="continueStatusArray[0]"
-              v-on:continue-clicked="onContinue"
-              v-on:cancel-clicked="onCancel">
+              :continue-status="continueStatusArray[0]"
+              @continue-clicked="onContinue"
+              @cancel-clicked="onCancel">
               <empty-uploads-directory
                 v-if="uploadSubStep > 0"
                 :logging-service="loggingService"
-                v-on:empty-uploads-directory-done="emptyUploadsDirectoryDone"></empty-uploads-directory>
+                @empty-uploads-directory-done="emptyUploadsDirectoryDone"></empty-uploads-directory>
               <create-upload
                 v-if="uploadSubStep > 1"
                 :logging-service="loggingService"
-                v-on:create-upload-done="createUploadDone"></create-upload>
+                @create-upload-done="createUploadDone"></create-upload>
               <compress-upload
                 v-if="uploadSubStep > 2"
                 :logging-service="loggingService"
                 :file-entry="uploadFile"
-                v-on:compress-upload-done="compressUploadDone"></compress-upload>
+                @compress-upload-done="compressUploadDone"></compress-upload>
               <calculate-hash
                 v-if="uploadSubStep > 3"
                 :logging-service="loggingService"
                 :file-entry="compressedUploadFile"
-                v-on:calculate-hash-done="calculateHashDone"></calculate-hash>
+                @calculate-hash-done="calculateHashDone"></calculate-hash>
             </sync-step>
           </v-stepper-content>
           <v-stepper-content step="2">
             <sync-step
               :title="$t('uploading')"
               v-if="uploadStep === 2"
-              v-bind:continue-status="continueStatusArray[1]"
-              v-on:continue-clicked="onContinue"
-              v-on:cancel-clicked="onCancel">
+              :continue-status="continueStatusArray[1]"
+              @continue-clicked="onContinue"
+              @cancel-clicked="onCancel">
               <check-connection
                 v-if="uploadStep > 1"
                 :logging-service="loggingService"
-                v-on:connection-ok="uploadSubStep = 2"></check-connection>
+                @connection-ok="uploadSubStep = 2"></check-connection>
               <authenticate-device
                 v-if="uploadStep > 1 && uploadSubStep > 1"
                 :logging-service="loggingService"
-                v-on:authentication-ok="uploadSubStep = 3"></authenticate-device>
+                @authentication-ok="uploadSubStep = 3"></authenticate-device>
               <upload-snapshot
                 v-if="uploadStep > 1 && uploadSubStep > 2"
                 :logging-service="loggingService"
                 :md5hash="compressedUploadFileHash"
                 :file-entry="compressedUploadFile"
-                v-on:upload-snapshot-done="uploadSnapshotDone">
+                :username="username"
+                :password="password"
+                @upload-snapshot-done="uploadSnapshotDone">
               </upload-snapshot>
               <verify-upload
                 v-if="uploadStep > 1 && uploadSubStep > 3"
                 :logging-service="loggingService"
                 :md5hash="compressedUploadFileHash"
                 :file-entry="compressedUploadFile"
-                v-on:verify-upload-done="verifyUploadDone">
+                @verify-upload-done="verifyUploadDone">
               </verify-upload>
               <register-upload
                 v-if="uploadStep > 1 && uploadSubStep > 4"
                 :logging-service="loggingService"
                 :sync="sync"
-                v-on:register-upload-done="registerUploadDone">
+                @register-upload-done="registerUploadDone">
               </register-upload>
             </sync-step>
           </v-stepper-content>
@@ -79,26 +81,26 @@
             <sync-step
               :title="$t('uploading_images')"
               v-if="uploadStep === 3"
-              v-bind:continue-status="continueStatusArray[2]"
-              v-on:continue-clicked="onContinue"
-              v-on:cancel-clicked="onCancel">
+              :continue-status="continueStatusArray[2]"
+              @continue-clicked="onContinue"
+              @cancel-clicked="onCancel">
               <request-image-list
                 v-if="uploadStep > 2"
                 :logging-service="loggingService"
                 :updated-photos="updatedPhotos"
-                v-on:request-image-list-done="requestImageListDone">
+                @request-image-list-done="requestImageListDone">
               </request-image-list>
               <find-images
                 v-if="uploadStep > 2 && uploadSubStep > 1"
                 :logging-service="loggingService"
                 :image-list="imageList"
-                v-on:find-images-done="findImagesDone">
+                @find-images-done="findImagesDone">
               </find-images>
               <upload-images
                 v-if="uploadStep > 2 && uploadSubStep > 2"
                 :logging-service="loggingService"
                 :images-to-upload="fileList"
-                v-on:upload-images-done="uploadImagesDone">
+                @upload-images-done="uploadImagesDone">
               </upload-images>
             </sync-step>
           </v-stepper-content>
@@ -173,13 +175,21 @@
       initUploadStep: {
         type: Number,
         required: true
+      },
+      username: {
+        type: String,
+        required: true
+      },
+      password: {
+        type: String,
+        required: true
       }
     },
     methods: {
-      showLog: function () {
+      showLog () {
         return (this.currentLog !== undefined && this.currentLog instanceof Log)
       },
-      onContinue: function () {
+      onContinue () {
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
@@ -190,7 +200,7 @@
           this.$emit('upload-done')
         }
       },
-      onCancel: function () {
+      onCancel () {
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         } else {
@@ -211,10 +221,10 @@
           }
         }
       },
-      emptyUploadsDirectoryDone: function () {
+      emptyUploadsDirectoryDone () {
         this.uploadSubStep = 2
       },
-      createUploadDone: async function (fileEntry, updatedPhotos) {
+      async createUploadDone (fileEntry, updatedPhotos) {
         // At this point updatedPhotos is a list of fileNames and
         // needs to be converted to FileEntries
         for (let i = 0; i < updatedPhotos.length; i++) {
@@ -229,42 +239,42 @@
         this.uploadFile = fileEntry
         this.uploadSubStep = 3
       },
-      compressUploadDone: function (fileEntry) {
+      compressUploadDone (fileEntry) {
         this.compressedUploadFile = fileEntry
         this.uploadSubStep = 4
       },
-      calculateHashDone: function (md5hash) {
+      calculateHashDone (md5hash) {
         this.compressedUploadFileHash = md5hash
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
-      uploadSnapshotDone: function () {
+      uploadSnapshotDone () {
         this.uploadSubStep = 4
       },
-      verifyUploadDone: function () {
+      verifyUploadDone () {
         this.uploadSubStep = 5
       },
-      registerUploadDone: function () {
+      registerUploadDone () {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
-      requestImageListDone: function (imageList) {
+      requestImageListDone (imageList) {
         this.imageList = imageList
         this.uploadSubStep = 2
       },
-      findImagesDone: function (fileList) {
+      findImagesDone (fileList) {
         // Add found images to existing fileList
         this.fileList = this.fileList.concat(fileList)
         this.uploadSubStep = 3
       },
-      uploadImagesDone: function () {
+      uploadImagesDone () {
         this.continueStatus = BUTTON_STATUS.DONE
       }
     },
     computed: {
       continueStatus: {
-        get: function () {
+        get () {
           return this.continueStatusArray[this.uploadStep - 1]
         },
-        set: function (status) {
+        set (status) {
           this.continueStatusArray.splice(this.uploadStep - 1, 1, status)
         }
       }

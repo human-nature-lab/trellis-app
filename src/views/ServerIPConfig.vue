@@ -36,12 +36,14 @@
 </template>
 
 <script>
-  import { heartbeatInstance } from '../../services/http/AxiosInstance'
-  import DatabaseService from '../../services/database/DatabaseService'
-  import AlertService from '../../services/AlertService'
+  import { heartbeatInstance } from '../services/http/AxiosInstance'
+  import DatabaseService from '../services/database/DatabaseService'
+  import AlertService from '../services/AlertService'
+  import router, { replaceWithNextOr } from '../router'
+  import global from '../static/singleton'
 
   export default {
-    name: 'server-ip-config',
+    name: 'ServerIpConfig',
     data: function () {
       return {
         loading: false,
@@ -58,13 +60,18 @@
           const http = await heartbeatInstance(combinedAddress)
           await http.get(`heartbeat`)
           await DatabaseService.setServerIPAddress(combinedAddress)
-          this.$emit('server-ip-config-done')
+          replaceWithNextOr(() => {
+            router.replace({name: 'Home'})
+          })
         } catch (err) {
           AlertService.addAlert(err)
         } finally {
           this.loading = false
         }
       }
+    },
+    beforeRouteUpdate (to, from, next) {
+      global.loading.active = false
     }
   }
 

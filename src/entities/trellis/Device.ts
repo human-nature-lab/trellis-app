@@ -1,6 +1,8 @@
 import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Serializable} from '../decorators/WebOrmDecorators'
+import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import Translation from "./Translation";
+import User from "./User";
 
 @Entity()
 export default class Device extends TimestampedSoftDelete {
@@ -10,4 +12,9 @@ export default class Device extends TimestampedSoftDelete {
   deviceId: string
   @Column() @Serializable
   name: string
+  @Column() @Serializable
+  key!: string
+
+  @Relationship(type => User)
+  addedByUser!: User
 }

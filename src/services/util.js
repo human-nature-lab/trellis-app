@@ -20,4 +20,8 @@ export function switchByModeEnv (args) {
     }
   }
 }
+
+export function makeBasicAuthHeader (username, password) {
+  return 'Basic ' + btoa(`${username}:${password}`)
+}
 export default switchByModeEnv
