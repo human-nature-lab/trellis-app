@@ -4,6 +4,8 @@ import storage from '../StorageService'
 import router from '../../router'
 import singleton from '../../static/singleton'
 import DatabaseService from '../database/DatabaseService'
+import DeviceService from '../device/DeviceService'
+import { makeBasicAuthHeader } from '../util'
 
 export interface Token {
   hash: string
@@ -85,16 +87,33 @@ export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance
   })
 }
 
-export async function syncInstance (): Promise<AxiosInstance>  {
+export async function syncInstance (): Promise<AxiosInstance> {
   if (syncInst === undefined) {
     const apiRoot = await DatabaseService.getServerIPAddress()
+    const deviceKey = await DeviceService.getDeviceKey()
     syncInst = axios.create({
       baseURL: apiRoot + '/sync',
       timeout: 0,
-      headers: {'X-Key': config.xKey}
+      headers: {
+        'X-Key': deviceKey
+      }
     })
   }
   return syncInst
+}
+
+let syncAuthInterceptor
+export async function setSyncCredentials (username: string, password: string) {
+  const sync = await syncInstance()
+  syncAuthInterceptor = sync.interceptors.request.use(function (config) {
+    config.headers['Authorization'] = makeBasicAuthHeader(username, password)
+    return config
+  })
+}
+
+export async function resetSyncCredentials () {
+  const sync = await syncInstance()
+  sync.interceptors.request.eject(syncAuthInterceptor)
 }
 
 export const adminInst = axios.create({

@@ -42,7 +42,7 @@ class FileServiceCordova {
     })
   }
 
-  getFileEntry (directoryEntry: DirectoryEntry, fileName: string, options?: FileEntryOptions) {
+  getFileEntry (directoryEntry: DirectoryEntry, fileName: string, options?: FileEntryOptions): Promise<FileEntry> {
     return new Promise((resolve, reject) => {
       options = merge(FileServiceCordova.getDefaultGetFileEntryOptions(), options)
       directoryEntry.getFile(fileName, options, resolve, reject)
@@ -162,8 +162,7 @@ class FileServiceCordova {
   }
 
   listPhotos () {
-    return this.requestFileSystem()
-      .then((fileSystem: FileSystem) => this.getDirectoryEntry(fileSystem, PHOTOS_DIR))
+    return this.getPhotosDir()
       .then((directoryEntry: DirectoryEntry) => {
         return new Promise((resolve, reject) => {
           let reader: DirectoryReader = directoryEntry.createReader()
@@ -172,10 +171,9 @@ class FileServiceCordova {
       })
   }
 
-  getPhoto (fileName) {
-    return this.requestFileSystem()
-      .then((fileSystem) => this.getDirectoryEntry(fileSystem, PHOTOS_DIR))
-      .then((directoryEntry) => this.getFileEntry(directoryEntry, fileName, {create: false, exclusive: false}))
+  async getPhoto (fileName): Promise<FileEntry> {
+    const pDir = await this.getPhotosDir()
+    return this.getFileEntry(pDir, fileName, {create: false, exclusive: false})
   }
 
   emptyDirectory (directoryEntry) {
@@ -202,10 +200,10 @@ class FileServiceCordova {
     })
   }
 
-  download (uri, fileEntry, onDownloadProgress) {
+  download (uri, fileEntry, onDownloadProgress, authHeader?: string) {
     const promise = new Promise((resolve, reject) => {
-      DeviceService.isDeviceReady()
-        .then(() => {
+      DeviceService.getDeviceKey()
+        .then(deviceKey => {
           try {
             const fileTransfer = new FileTransfer()
             // @ts-ignore
@@ -227,7 +225,10 @@ class FileServiceCordova {
                   reject(err)
                 }
               },
-              false, { headers: { 'X-Key': config.xKey } })
+              false, { headers: {
+                'X-Key': deviceKey,
+                'Authorization': authHeader
+              } })
           } catch (err) {
             reject(err)
           }
@@ -236,10 +237,10 @@ class FileServiceCordova {
     return promise
   }
 
-  upload (uri: string, fileEntry: FileEntry, onUploadProgress: () => any) {
+  upload (uri: string, fileEntry: FileEntry, onUploadProgress: () => any, authHeader?: string) {
     const promise = new Promise((resolve, reject) => {
-      DeviceService.isDeviceReady()
-        .then(() => {
+      DeviceService.getDeviceKey()
+        .then(deviceKey => {
           try {
             const fileTransfer = new FileTransfer()
             const encodedUri = encodeURI(uri)
@@ -262,7 +263,7 @@ class FileServiceCordova {
                   reject(err)
                 }
               },
-              { params: { fileName: fileEntry.name }, headers: { 'X-Key': config.xKey } })
+              { params: { fileName: fileEntry.name }, headers: { 'X-Key': deviceKey, 'Authorization': authHeader } })
           } catch (err) {
             reject(err)
           }
@@ -386,6 +387,29 @@ class FileServiceCordova {
     }, () => {
       console.log('cancelling')
       isCancelled = true
+    })
+  }
+
+  /**
+   * Iterate over all of the entries in a directory
+   * @param dir
+   * @param cb
+   */
+  async entriesForEach (dir: DirectoryEntry, cb: (entry: FileEntry, index?: number) => any): Promise<void> {
+    const entries = await this.readEntries(dir)
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i]
+      await cb(entry, i)
+    }
+  }
+
+  /**
+   * Read all file entries in a directory as a promise
+   * @param dir
+   */
+  readEntries (dir: DirectoryEntry): Promise<FileEntry[]> {
+    return new Promise((resolve, reject) => {
+      dir.createReader().readEntries(resolve, reject)
     })
   }
 

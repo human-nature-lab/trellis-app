@@ -8,46 +8,11 @@
       </v-flex>
     </v-layout>
     <v-layout justify-space-around>
-      <v-alert v-show="error">
-        {{error}}
-      </v-alert>
-    </v-layout>
-    <v-layout justify-space-around>
       <v-flex xs8>
-        <v-form
-          ref="form"
-          v-model="valid"
-          lazy-validation
-          @submit="login()">
-          <v-text-field
-            name="username"
-            :label="$t('username')"
-            autocapitalize="off"
-            autocorrect="off"
-            :rules="rules.username"
-            required
-            autofocus
-            @keyup.enter="login()"
-            v-model="username" />
-          <v-text-field
-            :label="$t('password')"
-            autocapitalize="off"
-            autocorrect="off"
-            required
-            :rules="rules.password"
-            @keyup.enter="login()"
-            :append-icon="e1 ? 'visibility' : 'visibility_off'"
-            :append-icon-cb="() => (e1 = !e1)"
-            :type="e1 ? 'password' : 'text'"
-            v-model="password"/>
-          <v-alert :value="showError()">{{ errorMessage }}</v-alert>
-          <v-btn
-            @click="login"
-            :disabled="isWorking || !valid">
-            <TrellisLoadingCircle v-if="isWorking" />
-            <span v-else>{{ $t('login') }}</span>
-          </v-btn>
-        </v-form>
+        <LoginForm
+          :clearCredentials="false"
+          :isWorking="isWorking"
+          @login="login"/>
       </v-flex>
     </v-layout>
   </v-container>
@@ -56,43 +21,27 @@
 <script>
   import LoginService from '../services/login'
   import UserService from '../services/user/UserService'
+  import LoginForm from '../components/LoginForm'
   import router from '../router'
 
   export default {
     name: 'web-login',
+    components: { LoginForm },
     head: {
       title: {
         inner: 'Login'
       }
     },
-    data: function () {
+    data () {
       return {
-        errorMessage: undefined,
-        username: '',
-        password: '',
-        e1: true,
-        error: null,
-        valid: false,
-        isWorking: false,
-        rules: {
-          username: [
-            v => !!v || this.$t('required_field')
-          ],
-          password: [
-            v => !!v || this.$t('required_field')
-          ]
-        }
+        isWorking: false
       }
     },
     methods: {
-      login: async function () {
-        this.errorMessage = undefined
-        if (!this.$refs.form.validate()) return
-        let params = {
-          form: this.$route.query.form
-        }
+      async login (username, password) {
         try {
-          await LoginService.login(this.username, this.password, params)
+          this.isWorking = true
+          await LoginService.login(username, password)
           await UserService.loadCurrentUser()
           if (this.$route.query.to) {
             router.push({path: this.$route.query.to})
@@ -101,17 +50,14 @@
           }
         } catch (err) {
           if (err.response && err.response.status && err.response.status === 403) {
-            this.errorMessage = 'Invalid username or password'
+            this.alert('error', 'Invalid username or password')
           } else {
-            console.error(err)
-            this.errorMessage = err.message
+            this.log(err)
+            this.alert('error', err.message, {timeout: 0})
           }
         } finally {
           this.isWorking = false
         }
-      },
-      showError: function () {
-        return (this.errorMessage !== undefined)
       }
     }
   }

@@ -12,6 +12,8 @@ import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
 import {AddSnack} from '../components/SnackbarQueue'
 
+const defaultRoute = {name: 'Home'}
+
 let routes = sharedRoutes
 if (singleton.offline) {
   routes = routes.concat(appRoutes)
@@ -114,7 +116,24 @@ export function pushRoute (route, queued) {
  * @param {Function} cb
  */
 export function moveToNextOr (cb) {
-  let current = router.currentRoute
+  const nextRoute = getNextRoute()
+  if (nextRoute) {
+    router.push(nextRoute)
+  } else {
+    cb()
+  }
+}
+
+export function goToNext () {
+  router.push(getNextRouteOrDefault())
+}
+
+export function replaceWithNext () {
+  router.replace(getNextRouteOrDefault())
+}
+
+export function getNextRoute () {
+  const current = router.currentRoute
   if (current.query.to) {
     let to
     try {
@@ -122,10 +141,14 @@ export function moveToNextOr (cb) {
     } catch (err) {
       to = current.query.to
     }
-    router.push(to)
-  } else {
-    cb()
+    return to
   }
+  return null
+}
+
+export function getNextRouteOrDefault () {
+  const nextRoute = getNextRoute()
+  return nextRoute || defaultRoute
 }
 
 /**
@@ -133,15 +156,9 @@ export function moveToNextOr (cb) {
  * @param {Function} cb
  */
 export function replaceWithNextOr (cb) {
-  let current = router.currentRoute
-  if (current.query.to) {
-    let to
-    try {
-      to = JSON.parse(current.query.to)
-    } catch (err) {
-      to = current.query.to
-    }
-    router.replace(to)
+  const nextRoute = getNextRoute()
+  if (nextRoute) {
+    router.replace(nextRoute)
   } else {
     cb()
   }

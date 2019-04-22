@@ -4,14 +4,16 @@ import LoginService from '../../services/login'
 import config from 'config'
 
 export default async function (to, from, next) {
-  const user = await UserService.getCurrentUser()
-  if (to.name === 'Sync' || to.name === 'Info' || to.name === 'Documentation') {
+  if (['Sync', 'Info', 'Documentation', 'ConfigureServer', 'RegisterDevice'].indexOf(to.name) > -1) {
     // Whitelisted pages
-    next()
-  } else if (!user && config && config.user) {
+    return next()
+  }
+  const user = await UserService.getCurrentUser()
+  if (!user && config && config.user) {
     await LoginService.login(config.user.username, config.user.password)
     next()
   } else if (!(user instanceof User) && to.name !== 'Login') {
+    console.log('redirecting to login')
     next({name: 'Login', query: {to: to.fullPath}})
   } else {
     next()
