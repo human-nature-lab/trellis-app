@@ -409,6 +409,7 @@ class FileServiceCordova {
    */
   readEntries (dir: DirectoryEntry): Promise<FileEntry[]> {
     return new Promise((resolve, reject) => {
+      // @ts-ignore
       dir.createReader().readEntries(resolve, reject)
     })
   }

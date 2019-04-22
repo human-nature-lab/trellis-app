@@ -128,4 +128,13 @@ export default class DeviceServiceCordova implements DeviceServiceInterface {
     this.deviceKey = device.key
   }
 
+  async removeDeviceKey (): Promise<void> {
+    const DatabaseService = (await import('../database/DatabaseService')).default
+    const repo = await DatabaseService.getConfigRepository(Config)
+    const entry = new Config()
+    entry.name = deviceKeyKey
+    await repo.delete(entry)
+    this.deviceKey = null
+  }
+
 }
