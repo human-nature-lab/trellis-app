@@ -152,6 +152,7 @@
     "tapable": "^1.0.0",
     "thread-loader": "^2.1.2",
     "ts-loader": "^4.4.1",
+    "tslint": "^5.16.0",
     "tslint-config-standard": "^7.1.0",
     "typescript": "^3.0.1",
     "typescript-eslint-parser": "^18.0.0",

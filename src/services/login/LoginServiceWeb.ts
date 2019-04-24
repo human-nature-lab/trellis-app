@@ -2,6 +2,7 @@
 import UserService, {webService as userService} from '../user/UserService'
 import http, {setToken, removeToken, Token} from '../http/AxiosInstance'
 import LoginServiceInterface from './LoginServiceInterface'
+import ConfigService from '../config'
 
 export default class LoginServiceWeb implements LoginServiceInterface {
 
@@ -12,7 +13,7 @@ export default class LoginServiceWeb implements LoginServiceInterface {
     })
     if (res.status >= 200 && res.status < 300) {
       setToken(res.data.token as Token)
-      const user = await userService.loadCurrentUser()
+      const [user, _] = await Promise.all([userService.loadCurrentUser(), ConfigService.load()])
       await UserService.setCurrentUser(user)
     } else {
       throw Error('Unable to log in to this form with the provided credentials')
