@@ -16,6 +16,9 @@
     "baseUrl": ".",
     "jsx": "preserve"
   },
+  "include": [
+    "./src/**/*"
+  ],
   "exclude": [
     "build",
     "node_modules",

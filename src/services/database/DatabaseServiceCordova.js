@@ -2,66 +2,12 @@ import DeviceService from '@/services/device/DeviceService'
 import 'reflect-metadata'
 import { createConnection, getConnection } from 'typeorm'
 import Config from '../../entities/trellis-config/Config'
-import Action from '../../entities/trellis/Action'
-import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
-import CensusType from '../../entities/trellis/CensusType'
-import Choice from '../../entities/trellis/Choice'
-import ConditionTag from '../../entities/trellis/ConditionTag'
-import Datum from '../../entities/trellis/Datum'
-import DatumType from '../../entities/trellis/DatumType'
-import Edge from '../../entities/trellis/Edge'
-import Form from '../../entities/trellis/Form'
-import FormSection from '../../entities/trellis/FormSection'
-import FormSkip from '../../entities/trellis/FormSkip'
-import FormType from '../../entities/trellis/FormType'
-import Geo from '../../entities/trellis/Geo'
-import GeoPhoto from '../../entities/trellis/GeoPhoto'
-import GeoType from '../../entities/trellis/GeoType'
-import Interview from '../../entities/trellis/Interview'
-import Locale from '../../entities/trellis/Locale'
-import Parameter from '../../entities/trellis/Parameter'
-import Photo from '../../entities/trellis/Photo'
-import PhotoTag from '../../entities/trellis/PhotoTag'
-import Question from '../../entities/trellis/Question'
-import QuestionAssignConditionTag from '../../entities/trellis/QuestionAssignConditionTag'
-import QuestionChoice from '../../entities/trellis/QuestionChoice'
-import QuestionDatum from '../../entities/trellis/QuestionDatum'
-import QuestionGroup from '../../entities/trellis/QuestionGroup'
-import QuestionGroupSkip from '../../entities/trellis/QuestionGroupSkip'
-import QuestionParameter from '../../entities/trellis/QuestionParameter'
-import QuestionType from '../../entities/trellis/QuestionType'
-import Respondent from '../../entities/trellis/Respondent'
-import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
-import RespondentFill from '../../entities/trellis/RespondentFill'
-import RespondentGeo from '../../entities/trellis/RespondentGeo'
-import RespondentName from '../../entities/trellis/RespondentName'
-import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
-import Roster from '../../entities/trellis/Roster'
-import Section from '../../entities/trellis/Section'
-import SectionConditionTag from '../../entities/trellis/SectionConditionTag'
-import SectionQuestionGroup from '../../entities/trellis/SectionQuestionGroup'
-import SectionSkip from '../../entities/trellis/SectionSkip'
-import Skip from '../../entities/trellis/Skip'
-import SkipConditionTag from '../../entities/trellis/SkipConditionTag'
-import Study from '../../entities/trellis/Study'
-import StudyForm from '../../entities/trellis/StudyForm'
-import StudyLocale from '../../entities/trellis/StudyLocale'
-import StudyParameter from '../../entities/trellis/StudyParameter'
-import StudyRespondent from '../../entities/trellis/StudyRespondent'
-import Survey from '../../entities/trellis/Survey'
-import SurveyConditionTag from '../../entities/trellis/SurveyConditionTag'
-import Tag from '../../entities/trellis/Tag'
-import Translation from '../../entities/trellis/Translation'
-import TranslationText from '../../entities/trellis/TranslationText'
-import User from '../../entities/trellis/User'
-import UserStudy from '../../entities/trellis/UserStudy'
-import Log from '../../entities/trellis-config/Log'
 import Sync from '../../entities/trellis-config/Sync'
 import FileService from '../file/FileService'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
-import PreloadAction from '../../entities/trellis/PreloadAction'
 import config from 'config'
-import {monekypatch} from './monekypatch'
+import { monekypatch } from './monekypatch'
+import { requireAllModules } from '../../classes/requireAll'
 monekypatch()
 
 const trellisConfigConnection = {
@@ -69,78 +15,17 @@ const trellisConfigConnection = {
   database: 'trellis-config',
   name: 'trellis-config',
   location: 'default',
-  entities: [
-    Config,
-    Log,
-    Sync
-  ],
+  entities: requireAllModules(require.context('../../entities/trellis-config'), true, /\.[tj]s$/),
   logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error'],
   synchronize: true
 }
-
-const entities = [
-  Action,
-  AssignConditionTag,
-  CensusType,
-  Choice,
-  ConditionTag,
-  Datum,
-  DatumType,
-  Edge,
-  Form,
-  FormSection,
-  FormSkip,
-  FormType,
-  Geo,
-  GeoPhoto,
-  GeoType,
-  Interview,
-  Locale,
-  Parameter,
-  Photo,
-  PhotoTag,
-  PreloadAction,
-  Question,
-  QuestionAssignConditionTag,
-  QuestionChoice,
-  QuestionDatum,
-  QuestionGroup,
-  QuestionGroupSkip,
-  QuestionParameter,
-  QuestionType,
-  Respondent,
-  RespondentConditionTag,
-  RespondentFill,
-  RespondentGeo,
-  RespondentName,
-  RespondentPhoto,
-  Roster,
-  Section,
-  SectionConditionTag,
-  SectionQuestionGroup,
-  SectionSkip,
-  Skip,
-  SkipConditionTag,
-  Study,
-  StudyForm,
-  StudyLocale,
-  StudyParameter,
-  StudyRespondent,
-  Survey,
-  SurveyConditionTag,
-  Tag,
-  Translation,
-  TranslationText,
-  User,
-  UserStudy
-]
 
 const trellisConnection = {
   type: 'cordova',
   database: 'trellis',
   name: 'trellis',
   location: 'default',
-  entities,
+  entities: requireAllModules(require.context('../../entities/trellis', true, /\.[tj]s$/)),
   namingStrategy: new SnakeCaseNamingStrategy(),
   // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging

@@ -257,10 +257,11 @@
             click: this.changePassword,
             icon: 'settings_backup_restore',
             title: 'change_password'
-          }, {
-            click: this.copyCurrentLocation,
-            icon: 'location_searching',
-            title: 'copy_url'
+          },{
+            to: {name: 'ServerConfig'},
+            icon: 'build',
+            title: 'server_config',
+            showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_CONFIG)
           }, {
             click: this.refresh,
             icon: 'refresh',
@@ -268,7 +269,7 @@
           }, {
             showIf: this.isDebug,
             to: { name: 'ServiceTesting' },
-            icon: 'build',
+            icon: 'done_all',
             title: 'Service Testing'
           }]
         }]

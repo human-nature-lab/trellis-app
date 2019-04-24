@@ -3,14 +3,15 @@
     <v-text-field
       ref="textField"
       :disabled="disabled"
-      :readonly="!editing"
-      dense
-      solo
-      :flat="!editing"
+      :readonly="!internal.editing"
+      :dense="dense"
+      :solo="solo"
+      :label="label"
+      :flat="!internal.editing"
       :append-icon="appendIcon"
-      :prepend-icon="editing ? 'clear' : ''"
+      :prepend-icon="internal.editing ? 'clear' : ''"
       :prepend-icon-cb="resetEditorState"
-      :append-icon-cb="editing ? save : startEditing"
+      :append-icon-cb="internal.editing ? save : startEditing"
       v-model="memText"
       @keyup.enter="save"
       class="min-text-field" />
@@ -24,11 +25,6 @@
     props: {
       value: {
         type: String,
-        default: ''
-      },
-      text: {
-        type: String,
-        required: false,
         default: 'Empty'
       },
       disabled: {
@@ -46,16 +42,34 @@
       editing: {
         type: Boolean,
         default: false
+      },
+      label: {
+        type: String,
+        default: ''
+      },
+      dense: {
+        type: Boolean,
+        default: true
+      },
+      solo: {
+        type: Boolean,
+        default: true
       }
     },
     data() {
       return {
-        memText: this.value
+        memText: this.value,
+        internal: {
+          editing: this.editing
+        }
       }
     },
     watch: {
-      value() {
+      value () {
         this.resetEditorState()
+      },
+      editing (val) {
+        this.internal.editing = val
       }
     },
     computed: {
@@ -65,7 +79,7 @@
       appendIcon (): string {
         if (!this.editable) {
           return null
-        } else if (this.editing) {
+        } else if (this.internal.editing) {
           return 'save'
         } else {
           return 'edit'
@@ -75,7 +89,8 @@
     methods: {
       resetEditorState() {
         this.memText = this.value
-        this.$emit('update:editing', false)
+        this.internal.editing = false
+        this.$emit('update:editing', this.internal.editing)
       },
       save() {
         if (this.hasEdits) {
@@ -85,7 +100,8 @@
         }
       },
       startEditing() {
-        this.$emit('update:editing', true)
+        this.internal.editing = true
+        this.$emit('update:editing', this.internal.editing)
         // Focus on the input box
         if (this.autofocus && this.$refs.textField && this.$refs.textField.$el) {
           const input = this.$refs.textField.$el.querySelector('input')

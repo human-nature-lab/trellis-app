@@ -14,6 +14,7 @@ const FormBuilder = () => import(/* webpackChunkName: "form-builder" */'../views
 const Devices = () => import(/* webpackChunkName: "devices" */'../views/Devices')
 const Studies = () => import(/* webpackChunkName: "studies" */'../views/Studies')
 const GeoTypes = () => import(/* webpackChunkName: "geo-types" */'../views/GeoTypes')
+const ServerConfig = () => import(/* webpackChunkName: "server-config" */'../views/ServerConfig')
 
 export default [{
   path: '/',
@@ -64,4 +65,8 @@ export default [{
   name: 'GeoTypes',
   component: GeoTypes,
   beforeEnter: chain(ValidateStudy)
+}, {
+  path: '/server-config',
+  name: 'ServerConfig',
+  component: ServerConfig
 }]
