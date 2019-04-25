@@ -15,6 +15,7 @@ const Devices = () => import(/* webpackChunkName: "devices" */'../views/Devices'
 const Studies = () => import(/* webpackChunkName: "studies" */'../views/Studies')
 const GeoTypes = () => import(/* webpackChunkName: "geo-types" */'../views/GeoTypes')
 const ServerConfig = () => import(/* webpackChunkName: "server-config" */'../views/ServerConfig')
+const DemoSignUp = () => import(/* webpackChunkName: "signup" */'../views/DemoSignUp')
 
 export default [{
   path: '/',
@@ -69,4 +70,8 @@ export default [{
   path: '/server-config',
   name: 'ServerConfig',
   component: ServerConfig
+}, {
+  path: '/demo-signup',
+  name: 'DemoSignUp',
+  component: DemoSignUp
 }]

@@ -1,13 +1,14 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
-     <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demoBanner">
-       <span v-if="serverMode=='demo'">
-       {{ $t('demo_alert') }}
-       </span>
-       <span v-else-if="serverMode=='test'">
-       {{ $t('test_alert') }}
-       </span>
-     </v-alert>
+    <v-alert :value="serverMode === 'demo' || serverMode === 'test'" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demoBanner">
+      <span v-if="serverMode==='demo'">
+        {{ $t('demo_alert') }}
+        <v-btn :to="{name: 'DemoSignUp'}">Sign up</v-btn>
+      </span>
+      <span v-else-if="serverMode==='test'">
+        {{ $t('test_alert') }}
+      </span>
+    </v-alert>
     <v-dialog
       max-width="300"
       v-model="global.loading.fullscreen && global.loading.active"
@@ -234,9 +235,9 @@
     margin-top: 55px !important
   .demoBanner
     z-index: 1600
-    position: fixed
+    position: relative
     width: 100%
-    height: 55px
+    /*height: 55px*/
     margin-top: 0px
     font-weight: bold
     font-size: 20px
