@@ -20,6 +20,7 @@
             <v-text-field
               required
               :label="$t('password')"
+              type="password"
               v-model="password" />
           </v-flex>
           <v-flex>
@@ -40,10 +41,13 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import { adminInst } from '../services/http/AxiosInstance'
+  import router from '../router'
 
   export default Vue.extend({
     name: 'DemoSignUp',
+    components: { TrellisLoadingCircle },
     data () {
       return {
         email: '',
@@ -64,14 +68,17 @@
               username: this.username,
               password: this.password
             })
-            this.alert('success', 'Successfully submitted the signup form!')
+            this.alert('success', 'Successfully submitted the signup form!', {timeout: 0})
             this.submitted = true
+            setTimeout(() => {
+              router.replace({name: 'Login'})
+            }, 2000)
           } catch (err) {
             this.log(err)
             if (err.response && err.response.data && err.response.data.msg) {
               this.alert('error', err.response.data.msg, {timeout: 0})
             } else {
-              this.alert('error', 'Unable to submit the signup form.', {timeout: 0})
+              this.alert('error', err.message, {timeout: 0})
             }
           } finally {
             this.working = false

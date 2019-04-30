@@ -8,6 +8,7 @@
     <v-data-table
       :headers="headers"
       hide-actions
+      :loading="isLoading"
       :items="entries">
       <ConfigRow
         slot="items"
@@ -44,8 +45,16 @@
       }
     },
     async created () {
-      this.isLoading = true
-      this.entries = await ConfigService.getAll()
+      try {
+        this.isLoading = true
+        this.entries = await ConfigService.getAll()
+      } catch (err) {
+        this.log(err)
+        this.alert('error', err.message)
+      } finally {
+        this.isLoading = false
+      }
+
     },
     methods: {
       updateEntry (entry: Config) {
