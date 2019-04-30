@@ -136,4 +136,26 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
   async removeRespondent (respondentId: string): Promise<void> {
     const res = await adminInst.delete(uriTemplate('respondent/{id}', [respondentId]))
   }
+
+  async importRespondents (file: File, studyId: string): Promise<Respondent[]> {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await adminInst.post(uriTemplate('study/{studyId}/respondent/import', [studyId]), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    return res.data.respondents.map(r => new Respondent().fromSnakeJSON(r))
+  }
+
+  async importRespondentPhotos (file: File, studyId: string): Promise<void> {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await adminInst.post(uriTemplate('study/{studyId}/respondent-photo/import', [studyId]), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  }
+
 }

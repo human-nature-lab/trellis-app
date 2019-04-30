@@ -53,6 +53,6 @@ module.exports = merge(baseWebpackConfig, {
       entry: path.join(__dirname, '../src/config.xml.hbs'),
       output: path.join(__dirname, '../www/config.xml')
     }),
-    new HardSourceWebpackPlugin()
+    // new HardSourceWebpackPlugin()
   ]
 })
