@@ -46,12 +46,12 @@ function responseInterceptor (response) {
 
 function responseError (err) {
   if (err.response && err.response.status === 401) {
-    let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
+    let nextRoute = router.history.pending ? router.history.pending : router.currentRoute
     singleton.loading.active = false
     if (router.currentRoute.name === 'Login') {
       return Promise.reject(err.response)
     } else {
-      router.replace({name: 'Login', query: {to: nextRoute}})
+      router.replace({name: 'Login', query: (nextRoute.name === 'Login') ? null : {to: nextRoute.fullPath}})
       return Promise.resolve(err.response)
     }
   }
