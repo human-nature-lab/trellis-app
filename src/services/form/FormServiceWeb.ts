@@ -54,8 +54,8 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   async exportForm (formId: string) {
-    const form = await this.getForm(formId)
-    const blob = new Blob([JSON.stringify(form.toSnakeJSON({includeRelationships: true}), null, 2)], { type: 'text/json' })
+    const res = await http().get(uriTemplate('form/{form}', [formId]))
+    const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'text/json' })
     saveAs(blob, `form-${formId}.json`)
   }
 
