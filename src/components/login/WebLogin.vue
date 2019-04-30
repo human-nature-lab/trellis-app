@@ -93,7 +93,7 @@
         }
         try {
           await LoginService.login(this.username, this.password, params)
-          await UserService.loadCurrentUser()
+          // await UserService.loadCurrentUser()
           if (this.$route.query.to) {
             router.push({path: this.$route.query.to})
           } else {

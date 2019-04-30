@@ -1,8 +1,19 @@
 import StudyService from '../../services/study/StudyService'
 import SingletonService from '../../services/SingletonService'
+import StorageService from '../../services/StorageService'
 
 export default async function (to, from, next) {
-  await SingletonService.hasLoaded()
+  // If the user has previously selected a study, load the study into memory
+  let studyId = StorageService.get('current-study')
+  if (studyId) {
+    try {
+      let study = await StudyService.getStudy(studyId)
+      SingletonService.setCurrentStudy(study)
+    } catch (err) {
+      // The ID is no longer valid
+      StorageService.delete('current-study')
+    }
+  }
   let study
   if (to.params.studyId) {
     study = await StudyService.getStudy(to.params.studyId)
@@ -12,7 +23,6 @@ export default async function (to, from, next) {
   try {
     if (study) {
       StudyService.setCurrentStudy(study)
-      console.log('study valid')
       next()
     } else {
       next({name: 'StudySelector', query: {to: to.fullPath}})

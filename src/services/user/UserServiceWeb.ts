@@ -7,26 +7,24 @@ import Pagination from "../../types/Pagination";
 
 export class UserServiceWeb extends UserServiceAbstract {
 
-  private _currentUserRequest: Promise<any>
-
-  loadCurrentUser (): Promise<User|null> {
-    if (this._currentUserRequest) return this._currentUserRequest
-    this._currentUserRequest = new Promise(resolve => {
+  async loadCurrentUser (): Promise<User|null> {
+    try {
       if (this.user) {
-        return resolve(this.user)
+        return this.user
       } else {
-        return resolve(http().get(`/user/me`).then(res => {
-          if (res.data) {
+        try {
+          let res = await http().get(`/user/me`)
+          if (res.status && res.data && res.status >= 200 && res.status < 300) {
             this.user = new User().fromSnakeJSON(res.data)
             return this.user
+          } else {
+            return null
           }
-          return res.data
-        }))
+        } catch (err) {
+          return null
+        }
       }
-    }).finally(() => {
-      this._currentUserRequest = null
-    })
-    return this._currentUserRequest
+    }
   }
 
   async getPage (page: number = 0, size: number = 100, sortBy: string = 'name', descending: boolean = false): Promise<Pagination<User>> {
