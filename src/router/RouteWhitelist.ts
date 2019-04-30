@@ -1,1 +1,1 @@
-export default ['Documentation', 'Info']
+export default ['Documentation', 'Info', 'DemoSignup', 'UserConfirmation']
