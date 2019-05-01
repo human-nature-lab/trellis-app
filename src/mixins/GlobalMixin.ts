@@ -8,11 +8,6 @@ import {TrellisPermission} from '../static/permissions.base'
 import {AddSnack} from '../components/SnackbarQueue'
 
 export default Vue.mixin({
-  data () {
-    return {
-      TrellisPermission
-    }
-  },
   methods: {
     log (log: any): Promise<Log> {
       if (log && !log.component) {

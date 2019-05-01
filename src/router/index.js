@@ -79,6 +79,28 @@ router.onError(err => {
 })
 
 /**
+ * Returns a Promise that can be awaited to determine if the router is ready. This is used primarily to ensure that
+ */
+export function routerReady () {
+  return new Promise(resolve => {
+    function check () {
+      console.log('checking if router ready')
+      if (router.history.ready) {
+        clearInterval(intervalId)
+        clearTimeout(timeoutId)
+        resolve(true)
+      }
+    }
+    const intervalId = setInterval(check, 100)
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId)
+      resolve(false)
+    }, 4000)
+    check()
+  })
+}
+
+/**
  * Add element to browser history and try to return to the current location
  * @param {Object} route
  * @param {Object} query

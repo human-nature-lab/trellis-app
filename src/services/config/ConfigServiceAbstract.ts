@@ -1,6 +1,6 @@
 import Config from '../../entities/trellis/Config'
 import config from 'config'
-import { getDot, setDot } from '../JSONUtil'
+import { setDot } from '../JSONUtil'
 
 export default abstract class ConfigServiceAbstract {
 
@@ -9,7 +9,6 @@ export default abstract class ConfigServiceAbstract {
     const pairs: Config[] = await this.getAll()
 
     for (const pair of pairs) {
-      console.log('get before', pair.key, getDot(config, pair.key))
       let val: any = pair.value
       switch (pair.type) {
         case 'boolean':
@@ -24,8 +23,6 @@ export default abstract class ConfigServiceAbstract {
       }
 
       setDot(config, pair.key, val)
-
-      console.log('get after', pair.key, getDot(config, pair.key))
     }
 
   }

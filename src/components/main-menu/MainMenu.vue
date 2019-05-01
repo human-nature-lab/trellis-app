@@ -250,10 +250,12 @@
             icon: 'local_offer',
             title: 'condition_tags'
           }, {
+            showIf: this.isLoggedIn,
             click: this.logout,
             icon: 'exit_to_app',
             title: 'logout'
           }, {
+            showIf: this.isLoggedIn,
             click: this.changePassword,
             icon: 'settings_backup_restore',
             title: 'change_password'
