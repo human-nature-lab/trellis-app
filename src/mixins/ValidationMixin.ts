@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import Validators, {HasLength, Validator} from "../classes/Validators";
+import Validators, { HasLength, Validator } from '../classes/Validators'
 
 export default Vue.extend({
   methods: {
@@ -11,6 +11,9 @@ export default Vue.extend({
     },
     required (): Validator<any> {
       return Validators.required(this.$t('required_field') as string)
+    },
+    email (): Validator<string> {
+      return Validators.email(this.$t('valid_email') as string)
     }
   }
 })

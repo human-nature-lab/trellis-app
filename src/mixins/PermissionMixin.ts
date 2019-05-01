@@ -10,16 +10,19 @@ export default Vue.extend({
   },
   data () {
     return {
+      TrellisPermission,
       global: global as Singleton,
       userPermissions: PermissionService.userPermissions // This object is managed by the PermissionService
     }
   },
   async created () {
     if (this.global && !this.global.user) {
-      const user = await UserService.loadCurrentUser()
-      if (!this.global.user) {
-        this.global.user = user
-      }
+      try {
+        const user = await UserService.loadCurrentUser()
+        if (!this.global.user) {
+          this.global.user = user
+        }
+      } catch (err) {}
     }
     await PermissionService.loadIfNotLoaded(this.global.user)
   },

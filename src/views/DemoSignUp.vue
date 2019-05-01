@@ -7,21 +7,31 @@
           <v-flex>
             <v-text-field
               required
+              :rules="[required()]"
+              :label="$t('name')"
+              v-model="user.name"/>
+          </v-flex>
+          <v-flex>
+            <v-text-field
+              required
+              :rules="emailRules"
               :label="$t('email')"
-              v-model="email" />
+              v-model="user.email" />
           </v-flex>
           <v-flex>
             <v-text-field
               required
+              :rules="[required()]"
               :label="$t('username')"
-              v-model="username" />
+              v-model="user.username" />
           </v-flex>
           <v-flex>
             <v-text-field
               required
+              :ryles="[required(), minLength(5)]"
               :label="$t('password')"
               type="password"
-              v-model="password" />
+              v-model="user.password" />
           </v-flex>
           <v-flex>
             <v-btn
@@ -42,20 +52,26 @@
 <script lang="ts">
   import Vue from 'vue'
   import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
+  import ValidationMixin from '../mixins/ValidationMixin'
   import { adminInst } from '../services/http/AxiosInstance'
   import router from '../router'
 
   export default Vue.extend({
     name: 'DemoSignUp',
+    mixins: [ValidationMixin],
     components: { TrellisLoadingCircle },
     data () {
       return {
-        email: '',
-        username: '',
-        password: '',
+        user: {
+          name: '',
+          email: '',
+          username: '',
+          password: ''
+        },
         working: false,
         formValid: false,
-        submitted: false
+        submitted: false,
+        emailRules: [this.required(), this.email()]
       }
     },
     methods: {
@@ -64,9 +80,10 @@
           this.working = true
           try {
             const res = await adminInst.post('demo/create-user', {
-              email: this.email,
-              username: this.username,
-              password: this.password
+              name: this.user.name,
+              email: this.user.email,
+              username: this.user.username,
+              password: this.user.password
             })
             this.alert('success', 'Successfully submitted the signup form!', {timeout: 0})
             this.submitted = true
