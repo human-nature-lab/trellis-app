@@ -2,8 +2,7 @@
   <InfoBlock
     title="GPS"
     :items="items"
-    :to="{name: 'LocationHistory'}"
-  />
+    :to="{name: 'LocationHistory'}" />
 </template>
 
 <script lang="ts">

@@ -56,7 +56,7 @@
   import Form from '../../entities/trellis/Form'
   // @ts-ignore
   import AsyncTranslationText from '../AsyncTranslationText'
-  import Permission from "../Permission.vue"
+  import Permission from "../Permission"
   // @ts-ignore
   import TranslationTextField from '../TranslationTextField'
   // @ts-ignore

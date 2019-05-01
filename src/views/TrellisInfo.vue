@@ -4,21 +4,31 @@
         <v-flex xs12 sm12 md6 lg6 xl6>
           <DeviceInfo />
         </v-flex>
-        <v-flex xs12 sm12 md6 lg6 xl6>
-          <UploadsInfo />
-        </v-flex>
-        <v-flex xs12 sm12 md6 lg6 xl6>
-          <StorageInfo />
-        </v-flex>
-        <v-flex xs12 sm12 md6 lg6 xl6>
-          <GPSInfo />
-        </v-flex>
-        <v-flex xs12 sm12 md6 lg6 xl6>
-          <LogsInfo />
-        </v-flex>
-        <v-flex xs12 sm12 md6 lg6 xl6>
-          <DeviceAdmin />
-        </v-flex>
+        <Permission mobile-only>
+          <v-flex xs12 sm12 md6 lg6 xl6>
+            <UploadsInfo />
+          </v-flex>
+        </Permission>
+        <Permission mobile-only>
+          <v-flex xs12 sm12 md6 lg6 xl6>
+            <StorageInfo />
+          </v-flex>
+        </Permission>
+        <Permission mobile-only>
+          <v-flex xs12 sm12 md6 lg6 xl6>
+            <GPSInfo />
+          </v-flex>
+        </Permission>
+        <Permission mobile-only>
+          <v-flex xs12 sm12 md6 lg6 xl6>
+            <LogsInfo />
+          </v-flex>
+        </Permission>
+        <Permission mobile-only>
+          <v-flex xs12 sm12 md6 lg6 xl6>
+            <DeviceAdmin />
+          </v-flex>
+        </Permission>
       </v-layout>
     </v-container>
 </template>
@@ -32,6 +42,7 @@
   import Vue, {Component} from 'vue'
   import {RawLocation} from "vue-router/types/router"
   import LogsInfo from '../components/info/LogsInfo.vue'
+  import Permission from '../components/Permission.vue'
 
   declare const VERSION: string
 
@@ -50,7 +61,7 @@
 
   export default Vue.extend({
     name: 'TrellisInfo',
-    components: { LogsInfo, GPSInfo, DeviceInfo, StorageInfo, UploadsInfo, DeviceAdmin }
+    components: { LogsInfo, GPSInfo, DeviceInfo, StorageInfo, UploadsInfo, DeviceAdmin, Permission }
   })
 </script>
 
