@@ -56,7 +56,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from '../Permission.vue'
+  import Permission from '../Permission'
   import global from '../../static/singleton'
   import RespondentService from '../../services/respondent/RespondentService'
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'

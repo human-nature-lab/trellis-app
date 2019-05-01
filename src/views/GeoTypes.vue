@@ -46,7 +46,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import GeoTypeForm from "../components/geo/GeoTypeForm.vue"
-  import Permission from "../components/Permission.vue"
+  import Permission from "../components/Permission"
   import TrellisModal from "../components/TrellisModal.vue"
   import global from '../static/singleton'
   import GeoTypeRow from "../components/geo/GeoTypeRow.vue"

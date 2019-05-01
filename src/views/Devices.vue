@@ -41,7 +41,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from "../components/Permission.vue"
+  import Permission from "../components/Permission"
   import PermissionMixin from "../mixins/PermissionMixin"
   import DeviceService from "../services/device/DeviceService"
   import TrellisModal from '../components/TrellisModal'
