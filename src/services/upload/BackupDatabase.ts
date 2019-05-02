@@ -1,6 +1,6 @@
 import DatabaseService from '../database/DatabaseService'
 import config from 'config'
-import DeviceService from "../device/DeviceService";
+import DeviceService from '../device/DeviceService'
 
 export default async function BackupDatabase (progressCb?: (completed: number, total: number) => any) {
   const host: string = await DatabaseService.getServerIPAddress()
