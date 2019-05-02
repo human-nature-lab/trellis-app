@@ -14,7 +14,7 @@
           <v-flex>
             <v-text-field
               required
-              :rules="emailRules"
+              :rules="[required(), email()]"
               :label="$t('email')"
               v-model="user.email" />
           </v-flex>
@@ -28,7 +28,7 @@
           <v-flex>
             <v-text-field
               required
-              :ryles="[required(), minLength(5)]"
+              :rules="[required(), minLength(5)]"
               :label="$t('password')"
               type="password"
               v-model="user.password" />
@@ -70,13 +70,12 @@
         },
         working: false,
         formValid: false,
-        submitted: false,
-        emailRules: [this.required(), this.email()]
+        submitted: false
       }
     },
     methods: {
       async signup () {
-        if (this.isValid) {
+        if (this.isValid && this.$refs.form.validate()) {
           this.working = true
           try {
             const res = await adminInst.post('demo/create-user', {
@@ -105,7 +104,7 @@
     },
     computed: {
       isValid (): boolean {
-        return this.formValid && this.$refs.form.validate()
+        return this.formValid // && this.$refs.form.validate()
       }
     }
   })
