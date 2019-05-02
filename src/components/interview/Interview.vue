@@ -265,7 +265,7 @@
           interviewState.setSaveData(true)
           interviewState.setSaveActions(true)
         }
-        if (this.$route.query.location) {
+        if (this.$route.query.location && (this.type !== 'preview')) {
           interviewState.setInitialLocation(JSON.parse(this.$route.query.location))
         }
         await interviewState.initialize()
@@ -350,16 +350,14 @@
         this.alert('error', err.msg, { timeout: 0 })
       },
       async lockAndExit () {
-        if (this.type === 'preview') {
-          this.dialog.end = false
-          return
-        }
         try {
           await this.saveData()
           await this.completeInterview()
           await this.completeSurvey()
           this.dialog.end = false
-          this.exit()
+          if (this.type !== 'preview') {
+            this.exit()
+          }
         } catch (err) {
           this.log(err)
           this.error = err
@@ -380,9 +378,11 @@
         this.isSaving = false
       },
       async completeSurvey () {
+        if (this.type === 'preview') return
         return await SurveyService.complete(this.interview.surveyId)
       },
       async completeInterview () {
+        if (this.type === 'preview') return
         return await InterviewService.complete(this.interview.id)
       },
       async saveAndExit () {
