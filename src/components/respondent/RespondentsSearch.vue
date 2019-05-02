@@ -104,6 +104,7 @@
         </v-chip>
       </v-flex>
     </v-layout>
+    <ImportRespondents />
     <v-layout row wrap>
       <v-pagination
         class="pagination"
@@ -180,6 +181,7 @@
   import PhotoService from '../../services/photo/PhotoService'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import DocsFiles from '../documentation/DocsFiles'
+  import ImportRespondents from './ImportRespondents'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
@@ -224,6 +226,14 @@
   export default {
     name: 'respondents-search',
     mixins: [DocsLinkMixin(DocsFiles.respondents.search)],
+    components: {
+      RespondentListItem,
+      RespondentItem,
+      AddRespondentForm,
+      GeoBreadcrumbs,
+      TrellisLoadingCircular,
+      ImportRespondents
+    },
     props: {
       searchQuery: {
         type: String,
@@ -477,13 +487,6 @@
       showGeoFilterOptions () {
         return this.filters && !!this.filters.geos.length
       }
-    },
-    components: {
-      RespondentListItem,
-      RespondentItem,
-      AddRespondentForm,
-      GeoBreadcrumbs,
-      TrellisLoadingCircular
     }
   }
 </script>

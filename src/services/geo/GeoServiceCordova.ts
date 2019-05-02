@@ -45,15 +45,20 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     return geo
   }
 
-  async getGeosByParentId (parentId) {
-    const repository = await DatabaseService.getRepository(Geo)
-    return repository.find({
-      where: {
-        deletedAt: IsNull(),
-        parentId: parentId
-      },
-      relations: ['geoType', 'photos', 'nameTranslation', 'nameTranslation.translationText']
-    })
+  async getGeosByParentId (studyId: string, parentId: string): Promise<Geo[]> {
+    const repo = await DatabaseService.getRepository(Geo)
+    let qb = repo.createQueryBuilder('geo')
+      .where('geo_type.study_id = :studyId', { studyId })
+      .leftJoinAndSelect('geo.geoType', 'geo_type', 'geo_type.id = geo.geoTypeId')
+      .leftJoinAndSelect('geo.photos', 'photo')
+      .leftJoinAndSelect('geo.nameTranslation', 'translation')
+      .leftJoinAndSelect('translation.translationText', 'translation_text')
+    if (parentId === null) {
+      qb = qb.where('geo.parentId is null')
+    } else {
+      qb = qb.where('geo.parentId = :parentId', { parentId })
+    }
+    return qb.getMany()
   }
 
   async updatePhotos (photosWithPivotTable : Array<PhotoWithPivotTable>) {

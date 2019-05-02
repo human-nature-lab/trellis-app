@@ -38,7 +38,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from "../components/Permission.vue"
+  import Permission from "../components/Permission"
   import StudyForm from "../entities/trellis/StudyForm"
   import FormService from '../services/form/FormService'
   import TranslationService from "../services/TranslationService"

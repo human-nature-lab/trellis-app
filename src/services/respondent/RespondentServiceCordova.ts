@@ -425,4 +425,12 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       .where('id = :id', { id: respondentId })
       .execute()
   }
+
+  async importRespondents (file: File, studyId: string): Promise<Respondent[]> {
+    throw new Error('Not implemented')
+  }
+
+  async importRespondentPhotos (file: File, studyId: string): Promise<void> {
+    throw new Error('Not implemented')
+  }
 }

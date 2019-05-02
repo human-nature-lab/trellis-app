@@ -37,9 +37,12 @@ export default class DeviceServiceWeb implements DeviceServiceInterface {
     return new Device().fromSnakeJSON(res.data.device)
   }
 
-  async createDevice (device: Device): Promise<Device> {
-    const res = await adminInst.post('device', device.toSnakeJSON())
-    return new Device().fromSnakeJSON(res.data.device)
+  async createDevice (device: Device, username: string, password: string): Promise<Device> {
+    throw new Error('Not implemented')
+  }
+
+  async getDeviceKey (): Promise<string> {
+    throw new Error('Not implemented')
   }
 
 }

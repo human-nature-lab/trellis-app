@@ -156,4 +156,18 @@ export default interface RespondentServiceInterface {
    * @param respondentId
    */
   removeRespondent (respondentId: string): Promise<void>
+
+  /**
+   * Upload a csv file of respondents that we can import
+   * @param file
+   * @param studyId
+   */
+  importRespondents (file: File, studyId: string): Promise<Respondent[]>
+
+  /**
+   * Import a zip file of respondent photos
+   * @param file
+   * @param studyId
+   */
+  importRespondentPhotos (file: File, studyId: string): Promise<void>
 }

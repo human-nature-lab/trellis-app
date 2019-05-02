@@ -27,6 +27,7 @@
         </td>
         <td>{{device.name}}</td>
         <td>{{device.deviceId}}</td>
+        <td>{{device.addedByUser && device.addedByUser.name}}</td>
       </template>
     </v-data-table>
     <TrellisModal v-model="isAdding" :title="$t('new_device')">
@@ -40,7 +41,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from "../components/Permission.vue"
+  import Permission from "../components/Permission"
   import PermissionMixin from "../mixins/PermissionMixin"
   import DeviceService from "../services/device/DeviceService"
   import TrellisModal from '../components/TrellisModal'
@@ -64,8 +65,11 @@
           text: this.$t('device_name'),
           value: 'name'
         }, {
-          text: this.$t('android_device_id'),
+          text: this.$t('mobile_device_id'),
           value: 'deviceId'
+        }, {
+          text: this.$t('added_by_user'),
+          value: 'addedByUser.name'
         }],
         pagination: {
           rowsPerPage: 25
@@ -78,7 +82,7 @@
     },
     methods: {
       showAddDevice () {
-        this.isAdding = true
+        this.alert('info', 'Use the Trellis app on the device you want to add')
       },
       async createDevice (device: Device) {
         this.isBusy = true

@@ -12,6 +12,8 @@ import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
 import {AddSnack} from '../components/SnackbarQueue'
 
+const defaultRoute = {name: 'Home'}
+
 let routes = sharedRoutes
 if (singleton.offline) {
   routes = routes.concat(appRoutes)
@@ -77,6 +79,28 @@ router.onError(err => {
 })
 
 /**
+ * Returns a Promise that can be awaited to determine if the router is ready. This is used primarily to ensure that
+ */
+export function routerReady () {
+  return new Promise(resolve => {
+    function check () {
+      console.log('checking if router ready')
+      if (router.history.ready) {
+        clearInterval(intervalId)
+        clearTimeout(timeoutId)
+        resolve(true)
+      }
+    }
+    const intervalId = setInterval(check, 100)
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId)
+      resolve(false)
+    }, 20000)
+    check()
+  })
+}
+
+/**
  * Add element to browser history and try to return to the current location
  * @param {Object} route
  * @param {Object} query
@@ -114,7 +138,24 @@ export function pushRoute (route, queued) {
  * @param {Function} cb
  */
 export function moveToNextOr (cb) {
-  let current = router.currentRoute
+  const nextRoute = getNextRoute()
+  if (nextRoute) {
+    router.push(nextRoute)
+  } else {
+    cb()
+  }
+}
+
+export function goToNext () {
+  router.push(getNextRouteOrDefault())
+}
+
+export function replaceWithNext () {
+  router.replace(getNextRouteOrDefault())
+}
+
+export function getNextRoute () {
+  const current = router.currentRoute
   if (current.query.to) {
     let to
     try {
@@ -122,10 +163,14 @@ export function moveToNextOr (cb) {
     } catch (err) {
       to = current.query.to
     }
-    router.push(to)
-  } else {
-    cb()
+    return to
   }
+  return null
+}
+
+export function getNextRouteOrDefault () {
+  const nextRoute = getNextRoute()
+  return nextRoute || defaultRoute
 }
 
 /**
@@ -133,15 +178,9 @@ export function moveToNextOr (cb) {
  * @param {Function} cb
  */
 export function replaceWithNextOr (cb) {
-  let current = router.currentRoute
-  if (current.query.to) {
-    let to
-    try {
-      to = JSON.parse(current.query.to)
-    } catch (err) {
-      to = current.query.to
-    }
-    router.replace(to)
+  const nextRoute = getNextRoute()
+  if (nextRoute) {
+    router.replace(nextRoute)
   } else {
     cb()
   }

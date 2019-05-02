@@ -50,7 +50,7 @@
 </template>
 
 <script>
-  import config from '../../config'
+  import config from 'config'
   import menuBus from './MenuBus'
   import LoginService from '../../services/login'
   import router from '../../router'
@@ -250,17 +250,20 @@
             icon: 'local_offer',
             title: 'condition_tags'
           }, {
+            showIf: this.isLoggedIn,
             click: this.logout,
             icon: 'exit_to_app',
             title: 'logout'
           }, {
+            showIf: this.isLoggedIn,
             click: this.changePassword,
             icon: 'settings_backup_restore',
             title: 'change_password'
-          }, {
-            click: this.copyCurrentLocation,
-            icon: 'location_searching',
-            title: 'copy_url'
+          },{
+            to: {name: 'ServerConfig'},
+            icon: 'build',
+            title: 'server_config',
+            showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_CONFIG)
           }, {
             click: this.refresh,
             icon: 'refresh',
@@ -268,7 +271,7 @@
           }, {
             showIf: this.isDebug,
             to: { name: 'ServiceTesting' },
-            icon: 'build',
+            icon: 'done_all',
             title: 'Service Testing'
           }]
         }]

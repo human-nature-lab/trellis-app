@@ -1,11 +1,11 @@
 const APP_ENV = {
-  CORDOVA: 1, // Sync, local sqlite storage
-  WEB: 2 // No sync, REST
+  CORDOVA: 'CORDOVA', // Sync, local sqlite storage
+  WEB: 'WEB' // No sync, REST
 }
 
 const APP_MODE = {
-  TEST: 1, // Sync, local sqlite storage
-  PROD: 2
+  TEST: 'TEST', // Sync, local sqlite storage
+  PROD: 'PROD'
 }
 
 const COMPARE_SNAPSHOTS_RESULTS = {

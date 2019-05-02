@@ -30,6 +30,7 @@ l
       source.cancel('All outstanding requests cancelled')
       count++
     }
+    this.existingCancelTokens.clear()
     console.log(`cancelled ${count} outstanding photo requests`)
   }
 

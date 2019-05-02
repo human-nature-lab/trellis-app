@@ -1,8 +1,8 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
-     <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demoBanner">
+     <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demo-banner">
        <span v-if="serverMode=='demo'">
-       {{ $t('demo_alert') }}
+       {{ $t('demo_alert') }} <v-btn :to="{name: 'DemoSignUp'}">{{$t('sign_up')}}</v-btn>
        </span>
        <span v-else-if="serverMode=='test'">
        {{ $t('test_alert') }}
@@ -28,7 +28,7 @@
       app>
       <MainMenu />
     </v-navigation-drawer>
-    <v-toolbar fixed app :class="{'mainMenu': serverMode=='production', 'mainMenu-demo': serverMode=='demo' || serverMode=='test'}">
+    <v-toolbar fixed app :class="{'main-menu': serverMode=='production', 'main-menu-demo': serverMode=='demo' || serverMode=='test'}">
       <!-- MainMenu /-->
       <v-toolbar-side-icon
         @click.stop="global.menuDrawer.open = !global.menuDrawer.open"
@@ -111,10 +111,10 @@
   import SnackbarQueue from './components/SnackbarQueue'
   import DocsSidebar from './components/documentation/DocsSidebar'
   import UserService from './services/user/UserService'
-  import config from './config'
+  import config from 'config'
 
   export default {
-    name: 'web-app',
+    name: 'WebApp',
     data () {
       return {
         global: singleton,
@@ -140,8 +140,11 @@
         const user = await UserService.loadCurrentUser()
         this.$set(this.global, 'user', user)
       } catch (err) {
-        this.log(err)
-        this.alert('error', 'Unable to load user', {timeout: 0})
+        if (err && err.status !== 401) {
+          console.log(err)
+          this.log(err)
+          this.alert('error', 'Unable to load user', {timeout: 0})
+        }
       }
     },
     beforeDestroy () {
@@ -228,18 +231,24 @@
     /*margin-bottom: 50px*/
   .app-container-demo
     padding-top: 60px
-  .mainMenu
-    margin-top: 0px !important
-  .mainMenu-demo
+  .main-menu
+    margin-top: 0 !important
+  .main-menu-demo
     margin-top: 55px !important
-  .demoBanner
+  .demo-banner
     z-index: 1600
     position: fixed
     width: 100%
     height: 55px
-    margin-top: 0px
+    margin-top: 0
     font-weight: bold
     font-size: 20px
+  @media only screen and (max-width: 900px)
+    .demo-banner
+      font-size: 15px
+  @media only screen and (max-width: 700px)
+    .demo-banner
+      font-size: 11px
   .list--dense
     padding-top: 0
   .logo

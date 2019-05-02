@@ -1,11 +1,11 @@
-import config from '../config'
-import {APP_ENV} from '../static/constants'
-import Vue, {Component} from 'vue'
-import {defaultLoggingService} from '../services/logging/LoggingService'
+import config from 'config'
+import { APP_ENV } from '../static/constants'
+import Vue, { Component } from 'vue'
+import { defaultLoggingService } from '../services/logging/LoggingService'
 import Log from '../entities/trellis-config/Log'
-import {TrellisPermission} from '../static/permissions.base'
+import { TrellisPermission } from '../static/permissions.base'
 // @ts-ignore
-import {AddSnack} from '../components/SnackbarQueue'
+import { AddSnack } from '../components/SnackbarQueue'
 
 export default Vue.mixin({
   data () {
