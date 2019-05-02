@@ -28,7 +28,7 @@ export default abstract class PermissionServiceAbstract {
 
     this.hasLoadedOnce = true
     if (user) {
-      console.log('permissions for', user.username, this.userPermissions)
+      // console.log('permissions for', user, this.userPermissions)
     }
     return this.userPermissions
   }

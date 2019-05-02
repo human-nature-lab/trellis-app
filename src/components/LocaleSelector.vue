@@ -46,7 +46,7 @@
       async load () {
         try {
           this.isLoading = true
-          await SingletonService.hasLoaded()
+          // await SingletonService.hasLoaded()
           const study = await StudyService.getCurrentStudy()
           this.locales = await LocaleService.getStudyLocales(study.id)
           this.locale = await LocaleService.getCurrentLocale()

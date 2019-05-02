@@ -44,7 +44,7 @@
       load: async function () {
         try {
           this.isWorking = true
-          await SingletonService.hasLoaded()
+          // await SingletonService.hasLoaded()
           this.study = await StudyService.getCurrentStudy()
           this.studies = await StudyService.getMyStudies()
           this.studies.sort(function (a, b) {

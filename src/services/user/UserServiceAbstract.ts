@@ -1,9 +1,6 @@
-import * as Sentry from "@sentry/browser";
 import User from '../../entities/trellis/User'
 import UserStudy from "../../entities/trellis/UserStudy";
-import global from "../../static/singleton";
 import Pagination from "../../types/Pagination";
-import config from 'config'
 import PermissionService from "../permission";
 import SingletonService from "../SingletonService";
 
