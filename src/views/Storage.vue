@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-  import ModalTitle from './ModalTitle'
+  import ModalTitle from '../components/ModalTitle'
   import Vue from 'vue'
   import BackupDatabase from '../services/upload/BackupDatabase'
   import FormatBytes from "../filters/format-bytes.filter"

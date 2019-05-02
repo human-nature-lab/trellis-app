@@ -14,6 +14,9 @@ const FormBuilder = () => import(/* webpackChunkName: "form-builder" */'../views
 const Devices = () => import(/* webpackChunkName: "devices" */'../views/Devices')
 const Studies = () => import(/* webpackChunkName: "studies" */'../views/Studies')
 const GeoTypes = () => import(/* webpackChunkName: "geo-types" */'../views/GeoTypes')
+const ServerConfig = () => import(/* webpackChunkName: "server-config" */'../views/ServerConfig')
+const DemoSignUp = () => import(/* webpackChunkName: "signup" */'../views/DemoSignUp')
+const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'../views/EmailConfirmation')
 
 export default [{
   path: '/',
@@ -64,4 +67,16 @@ export default [{
   name: 'GeoTypes',
   component: GeoTypes,
   beforeEnter: chain(ValidateStudy)
+}, {
+  path: '/server-config',
+  name: 'ServerConfig',
+  component: ServerConfig
+}, {
+  path: '/demo-signup',
+  name: 'DemoSignUp',
+  component: DemoSignUp
+}, {
+  path: '/email-confirmation/:key',
+  name: 'EmailConfirmation',
+  component: EmailConfirmation
 }]

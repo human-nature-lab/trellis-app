@@ -30,7 +30,8 @@
       }
     },
     created () {
-      this.doWork()
+      // this.doWork()
+      this.compareEntriesToImageList()
     },
     props: {
       loggingService: {
@@ -64,6 +65,25 @@
         } catch (err) {
           console.error(err)
           this.loggingService.log(err).then((result) => { this.currentLog = result })
+          this.working = false
+        }
+      },
+      async compareEntriesToImageList () {
+        try {
+          this.working = true
+          this.progressIndeterminate = false
+          const photosDir = await FileService.getPhotosDir()
+          await FileService.entriesForEach(photosDir, (file, i) => {
+            if (this.imageList.indexOf(file.name) > -1) {
+              this.fileList.push(file)
+            }
+            this.progress = ((i / this.imageList.length) * 100)
+          })
+          this.success = true
+          this.$emit('find-images-done', this.fileList)
+        } catch (err) {
+          this.loggingService.log(err).then(res => this.currentLog = res)
+        } finally {
           this.working = false
         }
       },

@@ -19,7 +19,7 @@ export default class Validators {
   }
   static betweenLength (min: number, max: number, invalidResponse?: string): Validator<HasLength> {
     return function (val: HasLength) {
-      return val.length >= min && val.length <= max ? true : invalidResponse || false
+      return (val.length >= min && val.length <= max) ? true : invalidResponse || false
     }
   }
 
@@ -37,13 +37,20 @@ export default class Validators {
 
   static between (min: number, max: number, invalidResponse?: string): Validator<number> {
     return function (val: number) {
-      return val >= min && val <= max ? true : invalidResponse || false
+      return (val >= min && val <= max) ? true : invalidResponse || false
     }
   }
 
   static required (invalidResponse?: string): Validator<any> {
     return function (val: any) {
-      return val !== null && val !== undefined ? true : invalidResponse || false
+      return (val !== null && val !== undefined) ? true : invalidResponse || false
+    }
+  }
+
+  static email (invalidResponse?: string): Validator<string> {
+    return function (val: string) {
+      const emailRegEx = /\S+@\S+\.\S+/i
+      return (val != null && emailRegEx.test(val.toLowerCase())) ? true : invalidResponse || false
     }
   }
 }

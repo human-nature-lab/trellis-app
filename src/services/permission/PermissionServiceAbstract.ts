@@ -1,10 +1,10 @@
-import User from "../../entities/trellis/User";
+import User from '../../entities/trellis/User'
 import defaultPermissions, {
   PermissionMap,
   adminPermissions,
   TrellisRole,
   TrellisPermission
-} from "../../static/permissions.base";
+} from '../../static/permissions.base'
 
 export default abstract class PermissionServiceAbstract {
 

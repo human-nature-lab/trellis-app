@@ -31,7 +31,10 @@ export enum TrellisPermission {
   ADD_GEO_TYPE,
   EDIT_GEO_TYPE,
   REMOVE_GEO_TYPE,
-  VIEW_REPORTS
+  VIEW_REPORTS,
+  VIEW_CONFIG,
+  EDIT_CONFIG,
+  IMPORT_RESPONDENTS
 }
 
 export enum TrellisRole {
@@ -73,7 +76,10 @@ const defaultPermissions: PermissionMap = {
   [TrellisPermission.ADD_GEO_TYPE]: false,
   [TrellisPermission.EDIT_GEO_TYPE]: false,
   [TrellisPermission.REMOVE_GEO_TYPE]: false,
-  [TrellisPermission.VIEW_REPORTS]: false
+  [TrellisPermission.VIEW_REPORTS]: false,
+  [TrellisPermission.VIEW_CONFIG]: false,
+  [TrellisPermission.EDIT_CONFIG]: false,
+  [TrellisPermission.IMPORT_RESPONDENTS]: false
 }
 
 // These are set to true for admins
@@ -97,7 +103,10 @@ export const adminPermissions = [
   TrellisPermission.VIEW_STUDIES,
   TrellisPermission.VIEW_DEVICES,
   TrellisPermission.VIEW_USERS,
-  TrellisPermission.VIEW_REPORTS
+  TrellisPermission.VIEW_REPORTS,
+  TrellisPermission.VIEW_CONFIG,
+  TrellisPermission.EDIT_CONFIG,
+  TrellisPermission.IMPORT_RESPONDENTS
 ]
 
 export type PermissionMap = {

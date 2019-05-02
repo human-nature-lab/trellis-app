@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Outdated webview</title>
+</head>
+<body>
+  <div class="container">
+    <p>Please update your Android System Webview using <a href="https://play.google.com/store/apps/details?id=com.google.android.webview">Google Play.</a></p>
+    <p>After updating, reopen Trellis.</p>
+    <button id="exit">Exit</button>
+  </div>
+  <script type="text/javascript" src="cordova.js"></script>
+  <script>
+    function exit () {
+      navigator.app.exitApp()
+    }
+    document.addEventListener('deviceready', function () {
+      if (!cordova || !navigator.app) return
+      const button = document.getElementById('exit')
+      button.addEventListener('click', exit)
+    }, true)
+    document.addEventListener('pause', exit)
+  </script>
+  <style>
+    .container {
+      margin-top: 100px;
+      text-align: center;
+    }
+  </style>
+</body>
+</html>

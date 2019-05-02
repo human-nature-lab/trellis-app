@@ -6,7 +6,7 @@ import ValidateLocale from './guards/ValidateLocale'
 import ValidateCensusForm from './guards/ValidateCensusForm'
 import ValidateCompletedSurvey from './guards/ValidateCompletedSurvey'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage'
-import WebLogin from '../components/login/WebLogin'
+import WebLogin from '../views/WebLogin'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
 const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../views/ServiceTesting')

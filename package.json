@@ -1,6 +1,6 @@
 {
   "name": "trellis",
-  "version": "3.0.32",
+  "version": "3.0.33",
   "description": "The form view component of the Trellis platform.",
   "author": "wyattis <wyatt.israel@yale.edu>, disperse <mark.mcknight@yale.edu>",
   "private": true,
@@ -63,6 +63,7 @@
     "vue-cordova": "^0.1.2",
     "vue-head": "^2.0.12",
     "vue-router": "^2.3.1",
+    "vue-upload-component": "^2.8.20",
     "vuetify": "1.0.19"
   },
   "devDependencies": {
@@ -135,6 +136,7 @@
     "ora": "^1.2.0",
     "papaparse": "^4.5.0",
     "phantomjs-prebuilt": "^2.1.14",
+    "promptly": "^3.0.3",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.0",
     "sass-loader": "^6.0.7",
@@ -151,6 +153,7 @@
     "tapable": "^1.0.0",
     "thread-loader": "^2.1.2",
     "ts-loader": "^4.4.1",
+    "tslint": "^5.16.0",
     "tslint-config-standard": "^7.1.0",
     "typescript": "^3.0.1",
     "typescript-eslint-parser": "^18.0.0",
