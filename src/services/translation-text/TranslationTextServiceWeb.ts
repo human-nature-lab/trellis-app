@@ -18,7 +18,12 @@ export default class TranslationTextServiceWeb implements TranslationTextService
   }
 
   async getTranslatedTextByTranslationId (translationId: string): Promise<TranslationText[]> {
-    throw new Error("getTranslatedTextByTranslationId has not been implemented in the web yet")
+    const res = await http().get(uriTemplate('translation/{id}/translation-text', [translationId]))
+    let translationText = []
+    for (let i = 0; i < res.data.translation_text.length; i++) {
+      translationText.push(new TranslationText().fromSnakeJSON(res.data.translation_text[i]))
+    }
+    return translationText
   }
 
 }

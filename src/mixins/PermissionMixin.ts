@@ -10,7 +10,6 @@ export default Vue.extend({
   },
   data () {
     return {
-      TrellisPermission,
       global: global as Singleton,
       userPermissions: PermissionService.userPermissions // This object is managed by the PermissionService
     }
