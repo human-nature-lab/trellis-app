@@ -95,7 +95,7 @@ export function routerReady () {
     const timeoutId = setTimeout(() => {
       clearInterval(intervalId)
       resolve(false)
-    }, 4000)
+    }, 20000)
     check()
   })
 }
