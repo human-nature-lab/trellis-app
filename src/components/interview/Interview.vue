@@ -350,6 +350,10 @@
         this.alert('error', err.msg, { timeout: 0 })
       },
       async lockAndExit () {
+        if (this.type === 'preview') {
+          this.dialog.end = false
+          return
+        }
         try {
           await this.saveData()
           await this.completeInterview()
