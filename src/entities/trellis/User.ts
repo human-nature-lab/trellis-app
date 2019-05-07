@@ -17,6 +17,8 @@ export default class User extends TimestampedSoftDelete {
   @Column({ nullable: true }) @Serializable
   role: string
   @Column({ nullable: true }) @Serializable
+  roleId: string
+  @Column({ nullable: true }) @Serializable
   selectedStudyId: string
 
   @Relationship({generator: userStudyTransformer})
