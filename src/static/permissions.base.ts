@@ -34,7 +34,9 @@ export enum TrellisPermission {
   VIEW_REPORTS,
   VIEW_CONFIG,
   EDIT_CONFIG,
-  IMPORT_RESPONDENTS
+  IMPORT_RESPONDENTS,
+  VIEW_PERMISSIONS,
+  EDIT_PERMISSIONS
 }
 
 export enum TrellisRole {
@@ -43,74 +45,7 @@ export enum TrellisRole {
   SURVEYOR = 'SURVEYOR'
 }
 
-const defaultPermissions: PermissionMap = {
-  [TrellisPermission.REMOVE_RESPONDENT]: false,
-  [TrellisPermission.ADD_RESPONDENT]: false,
-  [TrellisPermission.ADD_OTHER_RESPONDENT]: true,
-  [TrellisPermission.CHANGE_RESPONDENT_GEO_CURRENT]: false,
-  [TrellisPermission.VIEW_STUDIES]: false,
-  [TrellisPermission.ADD_STUDY]: false,
-  [TrellisPermission.EDIT_STUDY]: false,
-  [TrellisPermission.REMOVE_STUDY]: false,
-  [TrellisPermission.ADD_USER]: false,
-  [TrellisPermission.EDIT_GEO]: false,
-  [TrellisPermission.ADD_GEO]: true,
-  [TrellisPermission.REMOVE_GEO]: true,
-  [TrellisPermission.ADD_RESPONDENT_NAME]: true,
-  [TrellisPermission.ADD_RESPONDENT_GEO]: true,
-  [TrellisPermission.EDIT_RESPONDENT_NAME]: true,
-  [TrellisPermission.MOVE_RESPONDENT]: true,
-  [TrellisPermission.REMOVE_RESPONDENT_NAME]: true,
-  [TrellisPermission.ADD_RESPONDENT_CONDITION_TAG]: false,
-  [TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG]: false,
-  [TrellisPermission.VIEW_USERS]: false,
-  [TrellisPermission.REMOVE_USER]: false,
-  [TrellisPermission.EDIT_USER]: false,
-  [TrellisPermission.ADD_FORM]: true,
-  [TrellisPermission.REMOVE_FORM]: true,
-  [TrellisPermission.EDIT_FORM]: true,
-  [TrellisPermission.VIEW_DEVICES]: false,
-  [TrellisPermission.ADD_DEVICE]: false,
-  [TrellisPermission.EDIT_DEVICE]: false,
-  [TrellisPermission.REMOVE_DEVICE]: false,
-  [TrellisPermission.ADD_GEO_TYPE]: false,
-  [TrellisPermission.EDIT_GEO_TYPE]: false,
-  [TrellisPermission.REMOVE_GEO_TYPE]: false,
-  [TrellisPermission.VIEW_REPORTS]: false,
-  [TrellisPermission.VIEW_CONFIG]: false,
-  [TrellisPermission.EDIT_CONFIG]: false,
-  [TrellisPermission.IMPORT_RESPONDENTS]: false
-}
-
-// These are set to true for admins
-export const adminPermissions = [
-  TrellisPermission.ADD_USER,
-  TrellisPermission.ADD_STUDY,
-  TrellisPermission.EDIT_STUDY,
-  TrellisPermission.REMOVE_STUDY,
-  TrellisPermission.REMOVE_RESPONDENT,
-  TrellisPermission.CHANGE_RESPONDENT_GEO_CURRENT,
-  TrellisPermission.EDIT_GEO,
-  TrellisPermission.ADD_RESPONDENT_CONDITION_TAG,
-  TrellisPermission.EDIT_USER,
-  TrellisPermission.REMOVE_USER,
-  TrellisPermission.ADD_DEVICE,
-  TrellisPermission.EDIT_DEVICE,
-  TrellisPermission.REMOVE_DEVICE,
-  TrellisPermission.ADD_GEO_TYPE,
-  TrellisPermission.EDIT_GEO_TYPE,
-  TrellisPermission.REMOVE_GEO_TYPE,
-  TrellisPermission.VIEW_STUDIES,
-  TrellisPermission.VIEW_DEVICES,
-  TrellisPermission.VIEW_USERS,
-  TrellisPermission.VIEW_REPORTS,
-  TrellisPermission.VIEW_CONFIG,
-  TrellisPermission.EDIT_CONFIG,
-  TrellisPermission.IMPORT_RESPONDENTS
-]
-
 export type PermissionMap = {
   [key in TrellisPermission]: boolean
 }
 
-export default defaultPermissions
