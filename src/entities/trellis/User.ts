@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Role from './Role'
-import UserStudy from "./UserStudy";
-import Study from "./Study";
+import UserStudy from './UserStudy'
+import Study from './Study'
 
 @Entity()
 export default class User extends TimestampedSoftDelete {
@@ -25,7 +25,7 @@ export default class User extends TimestampedSoftDelete {
   @OneToOne(type => Role)
   role: Role
 
-  @Relationship({generator: userStudyTransformer})
+  @Relationship({ generator: userStudyTransformer })
   @OneToMany(type => UserStudy, userStudy => userStudy.user)
   studies: UserStudy[]
 
@@ -36,7 +36,11 @@ export default class User extends TimestampedSoftDelete {
 }
 
 function userStudyTransformer (u) {
-  const userStudy = new UserStudy().fromSnakeJSON(u.pivot)
-  userStudy.study = new Study().fromSnakeJSON(u)
-  return userStudy
+  if (u.pivot) {
+    const userStudy = new UserStudy().fromSnakeJSON(u.pivot)
+    userStudy.study = new Study().fromSnakeJSON(u)
+    return userStudy
+  } else {
+    return new UserStudy().fromSnakeJSON(u)
+  }
 }

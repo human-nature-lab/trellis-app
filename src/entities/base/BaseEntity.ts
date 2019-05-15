@@ -69,6 +69,9 @@ export default class BaseEntity implements SnakeSerializable {
     if (!json) {
       console.log('JSON undefined', this, json)
       return null
+    } else if (typeof json !== 'object') {
+      console.log('expected to be object', this, json)
+      return json
     }
     let colMeta = getColumnMeta(this)
     for (let i = 0; i < colMeta.names.length; i++) {
