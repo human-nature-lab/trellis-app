@@ -22,4 +22,9 @@ export default class RoleServiceWeb implements RoleServiceInterface {
     return new Role().fromSnakeJSON(res.data.role)
   }
 
+  async all (): Promise<Role[]> {
+    const res = await adminInst.get('roles')
+    return res.data.roles.map(r => new Role().fromSnakeJSON(r))
+  }
+
 }

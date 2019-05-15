@@ -40,7 +40,6 @@
           }
           const isUserLoaded = this.global && !!this.global.user
           const hasPermissions = this.requires != null ? this.hasPermission(this.requires) : false
-          console.log(this._uid, 'permission calculated', isCorrectPlatform, isUserLoaded, hasPermissions)
           if (!isCorrectPlatform) {
             return false
           } else if (isCorrectPlatform && this.onlyHasPlatform) {

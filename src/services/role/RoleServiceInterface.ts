@@ -21,4 +21,9 @@ export default interface RoleServiceInterface {
    */
   copyPermissions (fromRole: Role, toRole: Role): PromiseLike<Role>
 
+  /**
+   * Get a list of all of the roles available on the server
+   */
+  all (): PromiseLike<Role[]>
+
 }
