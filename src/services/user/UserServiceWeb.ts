@@ -47,7 +47,7 @@ export class UserServiceWeb extends UserServiceAbstract {
   }
 
   async createUser (user: User): Promise<User> {
-    const res = await adminInst.post('user', user)
+    const res = await adminInst.post('user', user.toSnakeJSON())
     return new User().fromSnakeJSON(res.data.user)
   }
 
@@ -56,7 +56,7 @@ export class UserServiceWeb extends UserServiceAbstract {
   }
 
   async updateUser (user: User): Promise<User> {
-    const res = await adminInst.put(uriTemplate('user/{userId}', [user.id]), user)
+    const res = await adminInst.put(uriTemplate('user/{userId}', [user.id]), user.toSnakeJSON())
     return new User().fromSnakeJSON(res.data.user)
   }
 

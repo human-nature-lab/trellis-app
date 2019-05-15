@@ -15,4 +15,8 @@ export default class RoleServiceCordova implements RoleServiceInterface {
     throw new Error('Not implemented')
   }
 
+  async all (): Promise<Role[]> {
+    throw new Error('Not implemented')
+  }
+
 }

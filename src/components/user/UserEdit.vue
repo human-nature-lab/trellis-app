@@ -4,19 +4,19 @@
       v-model="newUser.name"
       :rules="nameRules"
       required
-      :disabled="!isAdmin"
       :label="$t('name')" />
     <v-text-field
       v-model="newUser.username"
       :rules="usernameRules"
       required
-      :disabled="!isAdmin"
       :label="$t('username')" />
     <v-select
-      v-model="newUser.role"
+      v-model="newUser.roleId"
       :items="roles"
+      item-text="name"
+      item-value="id"
+      :loading="isLoading"
       required
-      :disabled="!isAdmin"
       :label="$t('role')"/>
     <PasswordField
       v-if="isNewUser"
@@ -41,60 +41,60 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import User from "../../entities/trellis/User"
-  import TrellisModal from "../TrellisModal"
-  import UserPassword from './UserPassword'
+  import User from '../../entities/trellis/User'
+  import PermissionMixin from '../../mixins/PermissionMixin'
+  import ValidationMixin from '../../mixins/ValidationMixin'
+  import DiffService from '../../services/DiffService'
+  import { TrellisPermission, TrellisRole } from '../../static/permissions.base'
+  import TrellisModal from '../TrellisModal.vue'
+  import UserPassword from './UserPassword.vue'
   import global from '../../static/singleton'
-  import PasswordField from './PasswordField'
-  import Role from "./Role"
-  import IsAdminMixin from "../../mixins/IsAdminMixin"
+  import PasswordField from './PasswordField.vue'
+  import IsAdminMixin from '../../mixins/IsAdminMixin'
+  import RoleService from '../../services/role'
 
   interface UserLike {
     id?: string
     password?: string
     name: string
     username: string
-    role: string
+    roleId: string
   }
 
-  const defaultUser = {
+  const defaultUser = new User().fromSnakeJSON({
     id: null,
     password: null,
     name: '',
     username: '',
-    role: Role.SURVEYOR
-  }
+    role_id: null
+  })
 
   export default Vue.extend({
     name: 'UserEditModal',
-    mixins: [ IsAdminMixin ],
+    mixins: [ IsAdminMixin, PermissionMixin, ValidationMixin ],
     components: { UserPassword, PasswordField, TrellisModal },
+    props: {
+      user: Object as () => User
+    },
+    data () {
+      return {
+        global: global,
+        formIsValid: false as boolean,
+        usernameRules: [this.required(), this.minLength(3)],
+        nameRules: [this.required(), this.minLength(3)],
+        passwordModal: false,
+        isLoading: false,
+        roles: [],
+        newUser: this.user ? this.user.copy() : defaultUser.copy()
+      }
+    },
     created () {
       this.userChange(this.user)
+      this.loadRoles()
     },
     computed: {
       hasChanges (): boolean {
-        let r = false
-        for (let key of ['name', 'username', 'role']) {
-          if (this.user) {
-            if (this.newUser[key] !== this.user[key]) {
-              r = true
-              break
-            }
-          } else {
-            if (this.newUser[key].length) {
-              r = true
-              break
-            }
-          }
-        }
-        return r
-      },
-      nameRules (): Function[] {
-        return [() => !!this.newUser.name.length || this.$t('empty_value')]
-      },
-      usernameRules (): Function[] {
-        return [] // TODO: Verify that there aren't special characters
+        return !DiffService.objectsAreEqualByProps(this.user, this.newUser, ['name', 'username', 'roleId'])
       },
       isSameUser (): boolean {
         return !!this.global.user && !!this.newUser && this.global.user.id === this.newUser.id
@@ -103,48 +103,43 @@
         return !this.newUser || !this.newUser.id
       },
       canChangePassword (): boolean {
-        // @ts-ignore
-        const r = this.isAdmin || (!!this.newUser && !!this.global.user && this.newUser.id === this.global.user.id)
-        console.log('can change password', r)
-        return r
+        // If we're editing our own password
+        if (!!this.newUser && !!this.global.user && this.newUser.id === this.global.user.id) {
+          return true
+        } else if (this.hasPermission(TrellisPermission.EDIT_PASSWORDS)) {
+          return true
+        }
+        return false
       }
     },
     watch: {
       user: {
         handler (newUser): void {
           this.userChange(newUser)
-        },
-        deep: true
+        }
       }
-    },
-    data () {
-      return {
-        global: global,
-        formIsValid: false as boolean,
-        passwordModal: false,
-        roles: Object.keys(Role),
-        newUser: this.user ? {
-          id: this.user.id,
-          name: this.user.name,
-          username: this.user.username,
-          password: this.user.password,
-          role: this.user.role
-        } : Object.assign({}, defaultUser) as UserLike
-      }
-    },
-    props: {
-      user: Object as () => User
     },
     methods: {
+      async loadRoles (): Promise<void> {
+        try {
+          this.isLoading = true
+          this.roles = await RoleService.all()
+        } catch (err) {
+          this.log(err)
+          this.alert('error', 'Unable to load roles')
+        } finally {
+          this.isLoading = false
+        }
+      },
       canSave (): boolean {
         return this.formIsValid && this.hasChanges
       },
-      userChange (newUser) {
+      userChange (newUser): void {
         for (let key in this.newUser) {
           this.newUser[key] = newUser ? newUser[key] : defaultUser[key]
         }
       },
-      async save () {
+      async save (): Promise<void> {
         // @ts-ignore
         if (this.canSave && this.$refs.form.validate()) {
           this.$emit('save', this.newUser)
