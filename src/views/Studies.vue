@@ -52,10 +52,12 @@
   import StudyRow from '../components/studies/StudyRow'
   import TrellisModal from '../components/TrellisModal'
   import Study from '../entities/trellis/Study'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import LocaleService from '../services/locale/LocaleService'
   import StudyService from '../services/study/StudyService'
   export default Vue.extend({
     name: 'Studies',
+    mixins: [DocsLinkMixin('./Studies.md')],
     components: {StudyRow, TrellisModal, StudyForm, Permission},
     data () {
       return {

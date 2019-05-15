@@ -96,13 +96,14 @@
   import RolePermission from '../entities/trellis/RolePermission'
   import TitleCase from '../filters/TitleCase'
   import DebounceMixin from '../mixins/DebounceMixin'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import PermissionMixin from '../mixins/PermissionMixin'
   import RoleService from '../services/role'
   import PermissionService from '../services/permission'
 
   export default Vue.extend({
     name: 'Permissions',
-    mixins: [ PermissionMixin, DebounceMixin ],
+    mixins: [ PermissionMixin, DebounceMixin, DocsLinkMixin('./Permissions.md') ],
     components: { PermissionRow, TrellisModal, NewRoleForm },
     data () {
       return {
