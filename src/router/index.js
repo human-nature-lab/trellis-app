@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import {defaultLoggingService as logger} from '../services/logging/LoggingService'
+import { defaultLoggingService as logger } from '../services/logging/LoggingService'
 import singleton from '../static/singleton'
 import ValidateSync from './guards/ValidateSync'
 import ValidateLogin from './guards/ValidateLogin'
@@ -10,7 +10,7 @@ import appRoutes from './app.routes'
 import webRoutes from './web.routes'
 import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
-import {AddSnack} from '../components/SnackbarQueue'
+import { AddSnack } from '../components/SnackbarQueue'
 
 const defaultRoute = {name: 'Home'}
 
@@ -44,6 +44,7 @@ router.beforeEach((to, from, next) => {
     singleton.loading.active = true
     singleton.loading.fullscreen = true
   }
+  console.log('before route', to.name, from.name)
   logger.log({
     component: 'router/index.js@beforeEach',
     message: `before navigating to: ${to.fullPath}`,

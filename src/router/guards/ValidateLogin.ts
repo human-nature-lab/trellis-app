@@ -5,8 +5,8 @@ import config from 'config'
 import RouteWhitelist from '../RouteWhitelist'
 
 export default async function (to, from, next) {
+  // Whitelisted
   if (RouteWhitelist.indexOf(to.name) > -1) {
-    // Whitelisted pages
     return next()
   }
   const user = await UserService.getCurrentUser()
@@ -15,7 +15,6 @@ export default async function (to, from, next) {
     next()
   } else if (!(user instanceof User) && to.name !== 'Login') {
     console.log('redirecting to login')
-  } else if (!(user instanceof User)) {
     next({name: 'Login', query: {to: to.fullPath}})
   } else {
     next()

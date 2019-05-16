@@ -56,7 +56,6 @@
       } finally {
         this.isLoading = false
       }
-
     },
     methods: {
       updateEntry (entry: Config) {
