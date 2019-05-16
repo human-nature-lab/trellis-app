@@ -6,7 +6,6 @@ import { syncInstance } from './http/AxiosInstance'
 import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
 import {Connection, IsNull} from 'typeorm'
 import LoginService from '../services/login'
-import global from '../static/singleton'
 import SingletonService from "./SingletonService";
 
 /**

@@ -1,7 +1,7 @@
-import Config from "../../entities/trellis-config/Config";
-import Pagination from "../../types/Pagination";
-import {adminInst} from "../http/AxiosInstance";
-import DeviceServiceInterface from "./DeviceServiceInterface";
+import Config from '../../entities/trellis-config/Config'
+import Pagination from '../../types/Pagination'
+import { resetSyncCredentials, setSyncCredentials, syncInstance } from '../http/AxiosInstance'
+import DeviceServiceInterface from './DeviceServiceInterface'
 import Device from '../../entities/trellis/Device'
 
 declare const device
@@ -108,12 +108,18 @@ export default class DeviceServiceCordova implements DeviceServiceInterface {
   }
 
   async createDevice (device: Device, username: string, password: string): Promise<Device> {
-    const res = await adminInst.post('device', {
-      device: device.toSnakeJSON(),
-      username,
-      password
-    })
-    return new Device().fromSnakeJSON(res.data.device)
+    let r = null
+    try {
+      await setSyncCredentials(username, password)
+      const http = await syncInstance()
+      const res = await http.post('device', {
+        device: device.toSnakeJSON()
+      })
+      r = new Device().fromSnakeJSON(res.data.device)
+    } finally {
+      await resetSyncCredentials()
+    }
+    return r
   }
 
   async setDeviceKey (device: Device): Promise<void> {
@@ -123,7 +129,6 @@ export default class DeviceServiceCordova implements DeviceServiceInterface {
     const entry = new Config()
     entry.name = deviceKeyKey
     entry.val = device.key
-    debugger
     await repo.save(entry)
     this.deviceKey = device.key
   }
