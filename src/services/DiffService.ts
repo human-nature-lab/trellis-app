@@ -141,4 +141,21 @@ export default class DiffService {
     }
     return false
   }
+
+  /**
+   * Compare two objects by a list of properties
+   * @param objA
+   * @param objB
+   * @param props
+   */
+  static objectsAreEqualByProps (objA: object, objB: object, props: string[]): boolean {
+    if (objA === objB) return true
+    if ((objB && !objA) || (objA && !objB)) return false
+    for (const key of props) {
+      if (objA[key] !== objB[key]) {
+        return false
+      }
+    }
+    return true
+  }
 }

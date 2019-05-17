@@ -1,7 +1,7 @@
-import Pagination from "../../types/Pagination";
-import {adminInst} from "../http/AxiosInstance";
-import {uriTemplate} from "../http/WebUtils";
-import DeviceServiceInterface from "./DeviceServiceInterface";
+import Pagination from '../../types/Pagination'
+import { adminInst } from '../http/AxiosInstance'
+import { uriTemplate } from '../http/WebUtils'
+import DeviceServiceInterface from './DeviceServiceInterface'
 import Device from '../../entities/trellis/Device'
 
 export default class DeviceServiceWeb implements DeviceServiceInterface {
