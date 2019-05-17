@@ -1,13 +1,16 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
-     <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demo-banner">
-       <span v-if="serverMode=='demo'">
-       {{ $t('demo_alert') }} <v-btn :to="{name: 'DemoSignUp'}">{{$t('sign_up')}}</v-btn>
+    <v-alert :value="serverMode === 'demo' || serverMode === 'test'" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demo-banner">
+       <span v-if="serverMode === 'demo'">
+         {{ $t('demo_alert') }}
+         <v-btn
+           v-if="isWeb"
+           :to="{name: 'DemoSignUp'}">{{$t('sign_up')}}</v-btn>
        </span>
-       <span v-else-if="serverMode=='test'">
-       {{ $t('test_alert') }}
+      <span v-else-if="serverMode === 'test'">
+        {{ $t('test_alert') }}
        </span>
-     </v-alert>
+    </v-alert>
     <v-dialog
       max-width="300"
       v-model="global.loading.fullscreen && global.loading.active"
