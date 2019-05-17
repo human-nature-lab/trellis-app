@@ -21,7 +21,6 @@ export default abstract class ConfigServiceAbstract {
           val = parseFloat(val)
           break
       }
-
       setDot(config, pair.key, val)
     }
 

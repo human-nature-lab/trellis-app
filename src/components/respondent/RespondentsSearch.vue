@@ -150,7 +150,7 @@
         </v-container>
       </v-layout>
     </v-container>
-    <v-dialog
+    <TrellisModal
       v-model="showAssociatedRespondentDialog">
       <v-card>
         <AddRespondentForm
@@ -158,9 +158,9 @@
           :studyId="studyId"
           :redirectToRespondentInfo="false"
           :onRespondentAdded="onRespondentAdded"
-          :associatedRespondentId="respondentId"></AddRespondentForm>
+          :associatedRespondentId="respondentId" />
       </v-card>
-    </v-dialog>
+    </TrellisModal>
   </v-container>
 </template>
 
@@ -182,6 +182,7 @@
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import DocsFiles from '../documentation/DocsFiles'
   import ImportRespondents from './ImportRespondents'
+  import TrellisModal from '../TrellisModal'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
@@ -232,7 +233,8 @@
       AddRespondentForm,
       GeoBreadcrumbs,
       TrellisLoadingCircular,
-      ImportRespondents
+      ImportRespondents,
+      TrellisModal
     },
     props: {
       searchQuery: {
