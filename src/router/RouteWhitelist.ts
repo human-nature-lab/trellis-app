@@ -1,1 +1,1 @@
-export default ['Documentation', 'Info', 'DemoSignUp', 'EmailConfirmation', 'Login']
+export default ['Documentation', 'Info', 'DemoSignUp', 'EmailConfirmation', 'Sync', 'RegisterDevice', 'ConfigureServer']

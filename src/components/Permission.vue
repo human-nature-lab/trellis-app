@@ -34,9 +34,12 @@
       isVisible: {
         cache: false,
         get (): boolean {
-          const isCorrectPlatform = (this.webOnly !== false && this.isWeb) || (this.mobileOnly !== false && this.isCordova)
+          let isCorrectPlatform = true
+          if (this.webOnly || this.mobileOnly) {
+            isCorrectPlatform = (this.webOnly !== false && this.isWeb) || (this.mobileOnly !== false && this.isCordova)
+          }
           const isUserLoaded = this.global && !!this.global.user
-
+          const hasPermissions = this.requires != null ? this.hasPermission(this.requires) : false
           if (!isCorrectPlatform) {
             return false
           } else if (isCorrectPlatform && this.onlyHasPlatform) {
@@ -44,7 +47,7 @@
           } else if (!isUserLoaded) {
             return false
           } else if (this.requires != null) {
-            return this.hasPermission(this.requires)
+            return hasPermissions
           } else if (this.roleWhitelist.length) {
             return this.userInWhitelist()
           } else if (this.roleBlacklist.length) {

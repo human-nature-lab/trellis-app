@@ -1,15 +1,22 @@
+import Mutex from 'async-mutex/lib/Mutex'
+import Role from '../../entities/trellis/Role'
+import RolePermission from '../../entities/trellis/RolePermission'
 import User from '../../entities/trellis/User'
-import defaultPermissions, {
+import {
   PermissionMap,
-  adminPermissions,
-  TrellisRole,
   TrellisPermission
 } from '../../static/permissions.base'
 
 export default abstract class PermissionServiceAbstract {
 
   private hasLoadedOnce: boolean = false
-  public userPermissions: PermissionMap = Object.assign({}, defaultPermissions)    // A reactive memory object that Vue can observe
+  private mutex: Mutex = new Mutex()
+  public userPermissions: PermissionMap  // A reactive memory object that Vue can observe
+
+  constructor () {
+    this.userPermissions = {} as PermissionMap
+    this.resetUserPermissions()
+  }
 
   /**
    * Returns a valid permission map for the supplied user and updates the user permissions in memory.
@@ -20,16 +27,16 @@ export default abstract class PermissionServiceAbstract {
 
     this.resetUserPermissions()
 
-    // Enable admin permissions
-    let updatedPermissions = user && user.role === TrellisRole.ADMIN ? adminPermissions : []
-    for (const p of updatedPermissions) {
-      this.userPermissions[p] = true
+    // Get permissions for this user only if they've logged in
+    if (user) {
+      let updatedPermissions = await this.fetchUserPermissions(user)
+      for (const p of updatedPermissions) {
+        this.userPermissions[TrellisPermission[p]] = true
+      }
+      console.log('permissions for', user, this.userPermissions)
     }
 
     this.hasLoadedOnce = true
-    if (user) {
-      // console.log('permissions for', user, this.userPermissions)
-    }
     return this.userPermissions
   }
 
@@ -37,9 +44,10 @@ export default abstract class PermissionServiceAbstract {
    * Return the user permissions to their default values.
    */
   public resetUserPermissions (): PermissionMap {
-    // Reset to default permissions
-    for (const p in defaultPermissions) {
-      this.userPermissions[p] = defaultPermissions[p]
+    this.hasLoadedOnce = false
+    // Reset all permissions to false
+    for (const p in TrellisPermission) {
+      this.userPermissions[p] = false
     }
     return this.userPermissions
   }
@@ -49,11 +57,15 @@ export default abstract class PermissionServiceAbstract {
    * @param user
    */
   public async loadIfNotLoaded (user: User): Promise<PermissionMap> {
-    if (!this.hasLoadedOnce) {
-      return this.getUserPermissions(user)
-    } else {
-      return this.userPermissions
+    const release = await this.mutex.acquire()
+    try {
+      if (!this.hasLoadedOnce) {
+        await this.getUserPermissions(user)
+      }
+    } finally {
+      release()
     }
+    return this.userPermissions
   }
 
   /**
@@ -75,5 +87,17 @@ export default abstract class PermissionServiceAbstract {
     }
     return false
   }
+
+  /**
+   * This function is responsible for actually accessing the database.
+   * @param user
+   */
+  protected abstract fetchUserPermissions (user: User): PromiseLike<string[]>
+
+  /**
+   * Update a single permission for one role.
+   * @param rolePermission
+   */
+  abstract updateRolePermission (rolePermission: RolePermission): PromiseLike<RolePermission>
 
 }

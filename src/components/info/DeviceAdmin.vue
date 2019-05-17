@@ -20,9 +20,11 @@
 <script lang="ts">
   import Vue from 'vue'
   import DeviceService from '../../services/device/DeviceService'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 
   export default Vue.extend({
     name: "DeviceAdmin",
+    components: { TrellisLoadingCircle },
     data () {
       return {
         isWorking: false

@@ -67,7 +67,7 @@
   import Study from '../../entities/trellis/Study'
   import ValidationMixin from '../../mixins/ValidationMixin'
   import CompareService from '../../services/CompareService'
-  import TrellisLoadingCircle from "../TrellisLoadingCircle"
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
   export default Vue.extend({
     name: 'StudyForm',
     components: { TrellisLoadingCircle },

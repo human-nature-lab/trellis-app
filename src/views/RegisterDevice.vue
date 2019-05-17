@@ -31,14 +31,16 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import LoginForm from '../components/LoginForm'
-  import TrellisLoadingCircle from '../components/TrellisLoadingCircle'
+  import LoginForm from '../components/LoginForm.vue'
+  import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import Device from "../entities/trellis/Device"
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import DeviceService from "../services/device/DeviceService"
   import {replaceWithNext} from '../router'
 
   export default Vue.extend({
     name: 'RegisterDevice',
+    mixins: [DocsLinkMixin('./devices/RegisterDevice.md')],
     components: { LoginForm, TrellisLoadingCircle },
     data () {
       return {
@@ -61,12 +63,12 @@
           await DeviceService.setDeviceKey(storedDevice)
           replaceWithNext()
         } catch (err) {
-          let message = err.message
-          if (err && err.response && err.response.status === 403) {
-            message = `Cannot register device with this username and password`
+          if (err && err.response && err.response.status === 401) {
+            this.alert('error', 'Cannot register device with this username and password')
+          } else {
+            this.log(err)
+            this.alert('error', err.message, {timeout: 0})
           }
-          this.log(err)
-          this.alert('error', message, {timeout: 0})
         } finally {
           this.isWorking = false
         }

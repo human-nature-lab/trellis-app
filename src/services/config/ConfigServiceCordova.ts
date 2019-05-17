@@ -7,8 +7,7 @@ export default class ConfigServiceCordova extends ConfigServiceAbstract {
   public async getAll (): Promise<Config[]> {
     try {
       const repo = await DatabaseService.getRepository(Config)
-      const pairs = await repo.find()
-      return pairs
+      return repo.find()
     } catch (err) {
       return []
     }

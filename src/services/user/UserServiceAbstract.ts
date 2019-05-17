@@ -37,7 +37,8 @@ export abstract class UserServiceAbstract {
   async setCurrentUser(user: User): Promise<void> {
     this.user = user
     SingletonService.set('user', user)
-    await PermissionService.getUserPermissions(user)
+    PermissionService.resetUserPermissions()
+    await PermissionService.loadIfNotLoaded(user)
   }
 
   /**
