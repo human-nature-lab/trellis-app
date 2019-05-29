@@ -4,7 +4,7 @@
        <span v-if="serverMode === 'demo'">
          {{ $t('demo_alert') }}
          <v-btn
-           v-if="isWeb"
+           v-if="isWeb && !isLoggedIn"
            :to="{name: 'DemoSignUp'}">{{$t('sign_up')}}</v-btn>
        </span>
       <span v-else-if="serverMode === 'test'">
@@ -115,9 +115,11 @@
   import DocsSidebar from './components/documentation/DocsSidebar'
   import UserService from './services/user/UserService'
   import config from 'config'
+  import IsLoggedInMixin from './mixins/IsLoggedInMixin'
 
   export default {
     name: 'WebApp',
+    mixins: [IsLoggedInMixin],
     data () {
       return {
         global: singleton,
