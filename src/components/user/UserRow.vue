@@ -9,7 +9,7 @@
     </td>
     <td>{{user.name}}</td>
     <td>{{user.username}}</td>
-    <td>{{user.role}}</td>
+    <td>{{user.role && user.role.name}}</td>
     <td>
       <v-select
         :loading="loading"

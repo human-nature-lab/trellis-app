@@ -90,13 +90,13 @@ export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance
 export async function syncInstance (): Promise<AxiosInstance> {
   if (syncInst === undefined) {
     const apiRoot = await DatabaseService.getServerIPAddress()
-    const deviceKey = await DeviceService.getDeviceKey()
     syncInst = axios.create({
       baseURL: apiRoot + '/sync',
-      timeout: 0,
-      headers: {
-        'X-Key': deviceKey
-      }
+      timeout: 0
+    })
+    syncInst.interceptors.request.use(async function (config) {
+      config.headers['X-Key'] = await DeviceService.getDeviceKey()
+      return config
     })
   }
   return syncInst

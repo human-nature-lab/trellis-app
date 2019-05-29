@@ -111,6 +111,10 @@ export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpt
     }
   }
 
+  /**
+   * This function takes the possible arguments for the "Relationship" decorator and converts them into a 'generator'
+   * function which actually performs the unmarshalling.
+   */
   return function Assigner (to, from) {
     let generator
     let sourceKey = camelToSnake(targetKey)

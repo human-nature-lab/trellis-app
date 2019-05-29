@@ -17,6 +17,7 @@ const GeoTypes = () => import(/* webpackChunkName: "geo-types" */'../views/GeoTy
 const ServerConfig = () => import(/* webpackChunkName: "server-config" */'../views/ServerConfig')
 const DemoSignUp = () => import(/* webpackChunkName: "signup" */'../views/DemoSignUp')
 const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'../views/EmailConfirmation')
+const Permissions = () => import(/* webpackChunkName: "permissions" */'../views/Permissions')
 
 export default [{
   path: '/',
@@ -79,4 +80,8 @@ export default [{
   path: '/email-confirmation/:key',
   name: 'EmailConfirmation',
   component: EmailConfirmation
+}, {
+  path: '/permissions',
+  name: 'Permissions',
+  component: Permissions
 }]

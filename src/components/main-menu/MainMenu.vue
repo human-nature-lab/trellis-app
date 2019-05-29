@@ -259,11 +259,16 @@
             click: this.changePassword,
             icon: 'settings_backup_restore',
             title: 'change_password'
-          },{
+          }, {
             to: {name: 'ServerConfig'},
             icon: 'build',
             title: 'server_config',
             showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_CONFIG)
+          }, {
+            to: {name: 'Permissions'},
+            icon: 'lock',
+            title: 'permissions',
+            showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_PERMISSIONS)
           }, {
             click: this.refresh,
             icon: 'refresh',
