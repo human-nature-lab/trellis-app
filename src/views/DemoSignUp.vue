@@ -1,50 +1,63 @@
 <template>
   <v-layout justify-space-around>
-    <v-flex md6 xs12>
-      <v-form ref="form" v-model="formValid">
-        <h1>Sign up for a demo of Trellis</h1>
-        <v-layout column>
-          <v-flex>
-            <v-text-field
-              required
-              :rules="[required()]"
-              :label="$t('name')"
-              v-model="user.name"/>
-          </v-flex>
-          <v-flex>
-            <v-text-field
-              required
-              :rules="[required(), email()]"
-              :label="$t('email')"
-              v-model="user.email" />
-          </v-flex>
-          <v-flex>
-            <v-text-field
-              required
-              :rules="[required()]"
-              :label="$t('username')"
-              v-model="user.username" />
-          </v-flex>
-          <v-flex>
-            <v-text-field
-              required
-              :rules="[required(), minLength(5)]"
-              :label="$t('password')"
-              type="password"
-              v-model="user.password" />
-          </v-flex>
-          <v-flex>
-            <v-btn
-              @click="signup"
-              :disabled="!isValid || working">
-              <TrellisLoadingCircle
-                v-if="working"
-                size="25px" />
-              <span v-else>{{$t('sign_up')}}</span>
-            </v-btn>
-          </v-flex>
-        </v-layout>
-      </v-form>
+    <v-flex xs12>
+      <v-stepper v-model="step" vertical>
+        <v-stepper-step :complete="step > 1"  step="1">Sign up form</v-stepper-step>
+        <v-stepper-content step="1">
+          <v-form ref="form" v-model="formValid">
+            <v-layout column>
+              <v-flex>
+                <v-text-field
+                  required
+                  :rules="[required()]"
+                  :label="$t('name')"
+                  v-model="user.name"/>
+              </v-flex>
+              <v-flex>
+                <v-text-field
+                  required
+                  :rules="[required(), email()]"
+                  :label="$t('email')"
+                  v-model="user.email" />
+              </v-flex>
+              <v-flex>
+                <v-text-field
+                  required
+                  :rules="[required()]"
+                  :label="$t('username')"
+                  v-model="user.username" />
+              </v-flex>
+              <v-flex>
+                <v-text-field
+                  required
+                  :rules="[required(), minLength(5)]"
+                  :label="$t('password')"
+                  type="password"
+                  v-model="user.password" />
+              </v-flex>
+              <v-flex>
+                <v-btn
+                  @click="signup"
+                  :disabled="!isValid || working">
+                  <TrellisLoadingCircle
+                    v-if="working"
+                    size="25px" />
+                  <span v-else>{{$t('sign_up')}}</span>
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-form>
+        </v-stepper-content>
+        <v-stepper-step :complete="step > 2" step="2">Confirm Email</v-stepper-step>
+        <v-stepper-content step="2">
+          <v-layout column>
+            <v-flex class="ma-1">Successfully submitting the demo request form. You will receive an email to complete the account creation process soon.</v-flex>
+            <v-flex class="ma-1">
+              <v-btn :to="{name: 'Login'}">Login</v-btn>
+            </v-flex>
+          </v-layout>
+        </v-stepper-content>
+      </v-stepper>
     </v-flex>
   </v-layout>
 </template>
@@ -62,6 +75,7 @@
     components: { TrellisLoadingCircle },
     data () {
       return {
+        step: 1,
         user: {
           name: '',
           email: '',
@@ -84,11 +98,8 @@
               username: this.user.username,
               password: this.user.password
             })
-            this.alert('success', 'Successfully submitted the signup form!', {timeout: 0})
+            this.step++
             this.submitted = true
-            setTimeout(() => {
-              router.replace({name: 'Login'})
-            }, 2000)
           } catch (err) {
             this.log(err)
             if (err.response && err.response.data && err.response.data.msg) {
