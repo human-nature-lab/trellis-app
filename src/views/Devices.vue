@@ -41,16 +41,17 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from "../components/Permission"
-  import PermissionMixin from "../mixins/PermissionMixin"
-  import DeviceService from "../services/device/DeviceService"
+  import Permission from '../components/Permission'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
+  import PermissionMixin from '../mixins/PermissionMixin'
+  import DeviceService from '../services/device/DeviceService'
   import TrellisModal from '../components/TrellisModal'
   import DeviceForm from '../components/devices/DeviceForm'
-  import Pagination from "../types/Pagination"
+  import Pagination from '../types/Pagination'
   import CRUDMenu from '../components/CRUDMenu'
   export default Vue.extend({
     name: 'Devices',
-    mixins: [PermissionMixin],
+    mixins: [PermissionMixin, DocsLinkMixin('./devices/Devices.md')],
     components: { TrellisModal, DeviceForm, CRUDMenu, Permission },
     data () {
       return {

@@ -23,10 +23,12 @@
   import Vue from 'vue'
   import ConfigRow from '../components/config/ConfigRow.vue'
   import Config from '../entities/trellis/Config'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import ConfigService from '../services/config'
 
   export default Vue.extend({
     name: 'ServerConfig',
+    mixins: [DocsLinkMixin('./ServerConfiguration.md')],
     components: { ConfigRow },
     data () {
       return {
@@ -54,7 +56,6 @@
       } finally {
         this.isLoading = false
       }
-
     },
     methods: {
       updateEntry (entry: Config) {

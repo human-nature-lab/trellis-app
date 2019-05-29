@@ -15,8 +15,8 @@
 - [Repeating sections](form-builder/Repeated-sections.md)
 
 
-#### [Device installation](device-installation/Android.md)
-- [Android](device-installation/Android.md)
+#### [Devices](devices/Devices.md)
+- [Register Device](devices/RegisterDevice.md)
 
 #### Locations
 - [Search](locations/Search.md)
