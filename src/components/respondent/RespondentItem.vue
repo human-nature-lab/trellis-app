@@ -14,7 +14,7 @@
       </v-card-media>
       <v-card-actions class="respondent-name">
         <v-layout row wrap>
-          <v-flex>
+          <v-flex @click="onClick">
             {{name}}
           </v-flex>
           <v-spacer />
@@ -25,7 +25,8 @@
           </v-btn>
         </v-layout>
       </v-card-actions>
-      <v-card-text v-if="labels && labels.length">
+      <v-card-text
+        v-if="labels && labels.length">
         <v-chip
           label
           outline
