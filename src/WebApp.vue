@@ -1,16 +1,5 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
-    <v-alert :value="serverMode === 'demo' || serverMode === 'test'" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demo-banner">
-       <span v-if="serverMode === 'demo'">
-         {{ $t('demo_alert') }}
-         <v-btn
-           v-if="isWeb && !isLoggedIn"
-           :to="{name: 'DemoSignUp'}">{{$t('sign_up')}}</v-btn>
-       </span>
-      <span v-else-if="serverMode === 'test'">
-        {{ $t('test_alert') }}
-       </span>
-    </v-alert>
     <v-dialog
       max-width="300"
       v-model="global.loading.fullscreen && global.loading.active"
@@ -31,7 +20,25 @@
       app>
       <MainMenu />
     </v-navigation-drawer>
-    <v-toolbar fixed app :class="{'main-menu': serverMode=='production', 'main-menu-demo': serverMode=='demo' || serverMode=='test'}">
+    <v-toolbar
+      fixed app
+      :value="serverMode === 'demo' || serverMode === 'test'"
+      :color="serverMode === 'demo' ? demoBannerColor : testBannerColor">
+      <v-toolbar-title>
+       <span v-if="serverMode === 'demo'">
+         {{ $t('demo_alert') }}
+       </span>
+       <span v-else-if="serverMode === 'test'">
+        {{ $t('test_alert') }}
+       </span>
+      </v-toolbar-title>
+      <v-btn
+        v-if="serverMode === 'demo' && isWeb && !isLoggedIn"
+        :to="{name: 'DemoSignUp'}">{{$t('sign_up')}}</v-btn>
+    </v-toolbar>
+    <v-toolbar
+      fixed app
+      :class="{'main-menu': serverMode=='production', 'main-menu-demo': serverMode=='demo' || serverMode=='test'}">
       <!-- MainMenu /-->
       <v-toolbar-side-icon
         @click.stop="global.menuDrawer.open = !global.menuDrawer.open"
@@ -239,7 +246,7 @@
   .main-menu
     margin-top: 0 !important
   .main-menu-demo
-    margin-top: 55px !important
+    margin-top: 60px !important
   .demo-banner
     z-index: 1600
     position: fixed
