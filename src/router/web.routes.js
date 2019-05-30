@@ -52,7 +52,7 @@ export default [{
   path: '/forms',
   name: 'Forms',
   component: Forms,
-  beforeEnter: chain(ValidateStudy)
+  beforeEnter: chain(ValidateStudy, ValidateLocale)
 }, {
   path: '/devices',
   name: 'Devices',
@@ -67,7 +67,7 @@ export default [{
   path: '/geo-types',
   name: 'GeoTypes',
   component: GeoTypes,
-  beforeEnter: chain(ValidateStudy)
+  beforeEnter: chain(ValidateStudy, ValidateLocale)
 }, {
   path: '/server-config',
   name: 'ServerConfig',
