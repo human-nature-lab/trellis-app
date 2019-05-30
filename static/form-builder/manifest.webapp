@@ -1,0 +1,15 @@
+{
+	"name": "Trellis Relationship App",
+	"description": "",
+	"launch_path": "/index.html",
+	"icons": {
+	},
+	"developer": {
+		"name": "Pixel & Line",
+		"url": "http://pixelandline.com"
+	},
+	"default_locale": "en",
+	"chrome": {
+		"navigation": true
+	}
+}

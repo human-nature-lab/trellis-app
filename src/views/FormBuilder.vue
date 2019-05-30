@@ -13,9 +13,11 @@
   import config from 'config'
   import {Route} from 'vue-router/types/router'
   import {getToken} from '../services/http/AxiosInstance'
+  import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import global from '../static/singleton'
   export default Vue.extend({
     name: 'FormBuilder',
+    components: { TrellisLoadingCircle },
     data () {
       return {
         global,
