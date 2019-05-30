@@ -41,6 +41,7 @@
           .replace('{token}', JSON.stringify(getToken()))
           .replace('{study}', JSON.stringify(this.global.study.toSnakeJSON({includeRelationships: true})))
           .replace('{locale}', JSON.stringify(this.global.locale.toSnakeJSON({includeRelationships: true})))
+          .replace('{apiRoot}', JSON.stringify(config.apiRoot))
         return encodeURI(url)
       }
     }
