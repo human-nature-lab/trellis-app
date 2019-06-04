@@ -1,4 +1,5 @@
-# Adding questions
+# Form questions
+
 Before you can add a question, you have to add at least one section and page. This is done by clicking the "Add section" and "Add page" buttons in the form builder.
 
 Once you've created a page to hold the form you can add a question. 

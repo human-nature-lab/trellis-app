@@ -1,5 +1,5 @@
 # Respondent report
-The respondent report is a list of all of the respondents in a study. This report also includes all of the [respondent condition tags](../form-builder/ConditionTags.md) that have been assigned to a respondent.
+The respondent report is a list of all of the respondents in a study. This report also includes all of the [respondent condition tags](../form-builder/Condition-assignment.md) that have been assigned to a respondent.
 
 ## Base fields
 All respondent reports will have the following columns
