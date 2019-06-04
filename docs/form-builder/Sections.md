@@ -11,9 +11,14 @@ location. It may be easier to reorder sections after minimizing them by clicking
 corner.
 
 ## Repeated sections
-Click the "Repeat" checkbox in order to make a section a repeated section. At the end of a repeated section the surveyor 
-will be prompted to repeat the section if the maximum number of repetitions (if any) have not already been met. To 
-change the dialog text of the repeat prompt, type the text in the input provided changing the study language in the 
-drop-down to translate the prompt.
+Click the "Repeat" checkbox in order to make a section repeated. At the end of a repeated section the surveyor will be 
+asked if they want to repeat the section if the maximum number of repetitions (if any) have not already been 
+administered. To change the dialog text of the repeat prompt, type the text in the input provided changing the study 
+language in the drop-down to translate the prompt.
 
 ## Follow up sections
+Follow up sections allow you to ask a series of questions about answers given in preceding questions (most commonly 
+roster, relationship, and multiple-select). The question you are following up on must be in a different section. After 
+adding the question you want to follow up on, click the "Follow up" checkbox and select the variable name of the 
+question in the drop down list. Checking the "Randomize order" checkbox will randomize the order in which the responses 
+are followed up on.
