@@ -4,7 +4,7 @@ import DatabaseService from '../database/DatabaseService'
 
 export default class ConfigServiceCordova extends ConfigServiceAbstract {
 
-  public async getAll (): Promise<Config[]> {
+  protected async getAll (): Promise<Config[]> {
     try {
       const repo = await DatabaseService.getRepository(Config)
       return repo.find()
@@ -13,11 +13,11 @@ export default class ConfigServiceCordova extends ConfigServiceAbstract {
     }
   }
 
-  async set (key: string, value: string): Promise<void> {
+  protected async setRemote (key: string, value: string): Promise<Config> {
     throw Error('Not implemented')
   }
 
-  async reset (key: string): Promise<Config> {
+  protected async resetRemote (key: string): Promise<Config> {
     throw Error('Not implemented')
   }
 
