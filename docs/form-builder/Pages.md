@@ -21,7 +21,7 @@ responses to previous questions. The steps for adding a page skip are:
     conditions are present or if any one of the conditions exists.
 4.  Type one or more conditions in the tag field, available conditions will be autocompleted.
 
-For more information, go to the section on [condition assignment](Condition-assignment.md).
+For more information, go to the section on [condition assignment](Conditions.md).
  
 
 
