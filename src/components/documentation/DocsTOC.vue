@@ -5,7 +5,7 @@
           Table of contents
         </v-toolbar-title>
         <v-spacer />
-        <v-btn icon @click="$emit('close')">
+        <v-btn icon @click="close">
           <v-icon>arrow_forward</v-icon>
         </v-btn>
       </v-toolbar>
@@ -27,7 +27,8 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Markdown from '../Markdown'
+  import Markdown from '../Markdown.vue'
+  import { DocsEventTypes } from './DocsEventBus'
   export default Vue.extend({
     components: {Markdown},
     async created () {
@@ -49,6 +50,11 @@
       preventLinkPropagation: {
         type: Boolean,
         default: false
+      }
+    },
+    methods: {
+      close () {
+        this.$emit(DocsEventTypes.close)
       }
     }
   })
