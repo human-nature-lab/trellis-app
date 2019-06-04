@@ -6,6 +6,7 @@
       :currentFile="currentFile" />
     <v-navigation-drawer right app v-model="isTOCOpen">
       <DocsTOC
+        @close="isTOCOpen = false"
         :transformLinks="true" />
     </v-navigation-drawer>
   </v-flex>
