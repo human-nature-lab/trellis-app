@@ -13,7 +13,7 @@
 - [Form questions](form-builder/Questions.md)
   - [Question types](form-builder/Question-types.md)
   - [Question parameters](form-builder/Question-parameters.md)
-  - [Condition assignment](form-builder/Condition-assignment.md)
+  - [Conditions](form-builder/Conditions.md)
 
 #### [Devices](devices/Devices.md)
 - [Register Device](devices/RegisterDevice.md)
