@@ -1,4 +1,4 @@
-import config from '../config'
+import config from 'config'
 import {APP_ENV, APP_MODE} from '../static/constants'
 import storage from './StorageService'
 
@@ -19,5 +19,9 @@ export function switchByModeEnv (args) {
       return args.WEB && args.WEB.TEST ? args.WEB.TEST : args.WEB
     }
   }
+}
+
+export function makeBasicAuthHeader (username, password) {
+  return 'Basic ' + btoa(`${username}:${password}`)
 }
 export default switchByModeEnv

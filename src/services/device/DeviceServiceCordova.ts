@@ -1,16 +1,44 @@
+import Config from '../../entities/trellis-config/Config'
+import Pagination from '../../types/Pagination'
+import { resetSyncCredentials, setSyncCredentials, syncInstance } from '../http/AxiosInstance'
+import DeviceServiceInterface from './DeviceServiceInterface'
+import Device from '../../entities/trellis/Device'
+
 declare const device
 declare const cordova
 
-export default class DeviceServiceCordova {
+const deviceKeyKey = 'device-key'
+
+export default class DeviceServiceCordova implements DeviceServiceInterface {
   private isReady: boolean = false
   private platform: string
   private uuid: string
+  private deviceKey!: string
   constructor () {
     this.isReady = false
     this.uuid = undefined
     this.platform = undefined
     document.addEventListener('deviceready', () => { this.isReady = true }, false)
   }
+
+  public async getDeviceKey () {
+    if (this.deviceKey) {
+      return this.deviceKey
+    }
+    await this.isDeviceReady()
+    const DatabaseService = (await import('../database/DatabaseService')).default
+    const repo = await DatabaseService.getConfigRepository(Config)
+    const entry = await repo.findOne({
+      name: deviceKeyKey
+    })
+    if (entry) {
+      this.deviceKey = entry.val
+      return entry.val
+    } else {
+      return null
+    }
+  }
+
   getUUID (): Promise<string> {
     return new Promise((resolve) => {
       if (this.uuid !== undefined) {
@@ -37,7 +65,7 @@ export default class DeviceServiceCordova {
       }
     })
   }
-  getFreeDiskSpace () {
+  getFreeDiskSpace (): Promise<number> {
     return new Promise((resolve, reject) => {
       this.isDeviceReady()
         .then(() => {
@@ -54,7 +82,7 @@ export default class DeviceServiceCordova {
   setDeviceReady (isReady) {
     this.isReady = isReady
   }
-  isDeviceReady () {
+  isDeviceReady (): Promise<boolean> {
     return new Promise(resolve => {
       const checkReady = () => {
         if (this.isReady) {
@@ -66,4 +94,52 @@ export default class DeviceServiceCordova {
       checkReady()
     })
   }
+
+  getDevices (pagination: Pagination<Device>): Promise<Pagination<Device>> {
+    throw new Error('Not implemented')
+  }
+
+  async deleteDevice (deviceId: string): Promise<void> {
+    throw new Error('Not implemented')
+  }
+
+  async updateDevice (device: Device): Promise<Device> {
+    throw new Error('Not implemented')
+  }
+
+  async createDevice (device: Device, username: string, password: string): Promise<Device> {
+    let r = null
+    try {
+      await setSyncCredentials(username, password)
+      const http = await syncInstance()
+      const res = await http.post('device', {
+        device: device.toSnakeJSON()
+      })
+      r = new Device().fromSnakeJSON(res.data.device)
+    } finally {
+      await resetSyncCredentials()
+    }
+    return r
+  }
+
+  async setDeviceKey (device: Device): Promise<void> {
+    await this.isDeviceReady()
+    const DatabaseService = (await import('../database/DatabaseService')).default
+    const repo = await DatabaseService.getConfigRepository(Config)
+    const entry = new Config()
+    entry.name = deviceKeyKey
+    entry.val = device.key
+    await repo.save(entry)
+    this.deviceKey = device.key
+  }
+
+  async removeDeviceKey (): Promise<void> {
+    const DatabaseService = (await import('../database/DatabaseService')).default
+    const repo = await DatabaseService.getConfigRepository(Config)
+    const entry = new Config()
+    entry.name = deviceKeyKey
+    await repo.delete(entry)
+    this.deviceKey = null
+  }
+
 }

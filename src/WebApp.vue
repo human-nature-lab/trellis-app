@@ -1,13 +1,5 @@
 <template>
   <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
-     <v-alert :value="serverMode === 'demo' || serverMode === 'test' ? true : false" :color="serverMode === 'demo' ? demoBannerColor : testBannerColor" class="demoBanner">
-       <span v-if="serverMode=='demo'">
-       {{ $t('demo_alert') }}
-       </span>
-       <span v-else-if="serverMode=='test'">
-       {{ $t('test_alert') }}
-       </span>
-     </v-alert>
     <v-dialog
       max-width="300"
       v-model="global.loading.fullscreen && global.loading.active"
@@ -28,7 +20,25 @@
       app>
       <MainMenu />
     </v-navigation-drawer>
-    <v-toolbar fixed app :class="{'mainMenu': serverMode=='production', 'mainMenu-demo': serverMode=='demo' || serverMode=='test'}">
+    <v-toolbar
+      fixed app
+      :value="serverMode === 'demo' || serverMode === 'test'"
+      :color="serverMode === 'demo' ? demoBannerColor : testBannerColor">
+      <v-toolbar-title>
+       <span v-if="serverMode === 'demo'">
+         {{ $t('demo_alert') }}
+       </span>
+       <span v-else-if="serverMode === 'test'">
+        {{ $t('test_alert') }}
+       </span>
+      </v-toolbar-title>
+      <v-btn
+        v-if="serverMode === 'demo' && isWeb && !isLoggedIn"
+        :to="{name: 'DemoSignUp'}">{{$t('sign_up')}}</v-btn>
+    </v-toolbar>
+    <v-toolbar
+      fixed app
+      :class="{'main-menu': serverMode=='production', 'main-menu-demo': serverMode=='demo' || serverMode=='test'}">
       <!-- MainMenu /-->
       <v-toolbar-side-icon
         @click.stop="global.menuDrawer.open = !global.menuDrawer.open"
@@ -95,7 +105,6 @@
 </template>
 
 <script>
-  // import SingletonService from './services/singleton/SingletonService'
   import MainMenu from './components/main-menu/MainMenu'
   import CensusFormChecker from './components/CensusFormChecker'
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
@@ -105,16 +114,19 @@
   import LocationFinder from './components/LocationFinder'
   import router from './router'
   import singleton from './static/singleton'
+  // Do not remove!
+  import SingletonService from './services/SingletonService'
   import {defaultLoggingService} from './services/logging/LoggingService'
   import GeoLocationService from './services/geolocation'
   import SnackbarQueue from './components/SnackbarQueue'
   import DocsSidebar from './components/documentation/DocsSidebar'
   import UserService from './services/user/UserService'
-  import config from './config'
-  import translations from './i18n/translations'
+  import config from 'config'
+  import IsLoggedInMixin from './mixins/IsLoggedInMixin'
 
   export default {
-    name: 'web-app',
+    name: 'WebApp',
+    mixins: [IsLoggedInMixin],
     data () {
       return {
         global: singleton,
@@ -136,8 +148,16 @@
         document.addEventListener('backbutton', this.onBackButton)
         this.startGPSWatch()
       }
-      const user = await UserService.loadCurrentUser()
-      this.$set(this.global, 'user', user)
+      try {
+        const user = await UserService.loadCurrentUser()
+        this.$set(this.global, 'user', user)
+      } catch (err) {
+        if (err && err.status !== 401) {
+          console.log(err)
+          this.log(err)
+          this.alert('error', 'Unable to load user', {timeout: 0})
+        }
+      }
     },
     beforeDestroy () {
       if (this.withinCordova) {
@@ -223,18 +243,24 @@
     /*margin-bottom: 50px*/
   .app-container-demo
     padding-top: 60px
-  .mainMenu
-    margin-top: 0px !important
-  .mainMenu-demo
-    margin-top: 55px !important
-  .demoBanner
+  .main-menu
+    margin-top: 0 !important
+  .main-menu-demo
+    margin-top: 60px !important
+  .demo-banner
     z-index: 1600
     position: fixed
     width: 100%
     height: 55px
-    margin-top: 0px
+    margin-top: 0
     font-weight: bold
     font-size: 20px
+  @media only screen and (max-width: 900px)
+    .demo-banner
+      font-size: 15px
+  @media only screen and (max-width: 700px)
+    .demo-banner
+      font-size: 11px
   .list--dense
     padding-top: 0
   .logo

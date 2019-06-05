@@ -17,6 +17,7 @@
     import DatabaseService from '../../../../services/database/DatabaseService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import { makeBasicAuthHeader } from '../../../../services/util'
     export default {
       name: 'download-snapshot',
       data () {
@@ -47,6 +48,14 @@
           type: LoggingService,
           required: false,
           'default': function () { return defaultLoggingService }
+        },
+        username: {
+          type: String,
+          required: true
+        },
+        password: {
+          type: String,
+          required: true
         }
       },
       methods: {
@@ -60,7 +69,7 @@
             const fileSystem = await FileService.requestFileSystem()
             const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'snapshots')
             const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
-            this.fileServicePromise = FileService.download(uri, fileEntry, this.onDownloadProgress)
+            this.fileServicePromise = FileService.download(uri, fileEntry, this.onDownloadProgress, makeBasicAuthHeader(this.username, this.password))
             await this.fileServicePromise
             this.success = true
             this.$emit('download-snapshot-done', fileEntry)

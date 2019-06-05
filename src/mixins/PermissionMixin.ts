@@ -5,24 +5,29 @@ import global, {Singleton} from '../static/singleton'
 import Vue from 'vue'
 
 export default Vue.extend({
+  props: {
+    requires: Number as () => TrellisPermission
+  },
   data () {
     return {
       global: global as Singleton,
-      permissions: PermissionService.userPermissions // This object is managed by the PermissionService
+      userPermissions: PermissionService.userPermissions // This object is managed by the PermissionService
     }
   },
   async created () {
     if (this.global && !this.global.user) {
-      const user = await UserService.loadCurrentUser()
-      if (!this.global.user) {
-        this.global.user = user
-      }
+      try {
+        const user = await UserService.loadCurrentUser()
+        if (!this.global.user) {
+          this.global.user = user
+        }
+      } catch (err) {}
     }
     await PermissionService.loadIfNotLoaded(this.global.user)
   },
   methods: {
-    hasPermission (permission: TrellisPermission): boolean {
-      return this.permissions[permission]
+    hasPermission (permissions: TrellisPermission|TrellisPermission[]): boolean {
+      return PermissionService.hasPermission(this.userPermissions, permissions)
     },
     hasRole (roles: string|string[]): boolean {
       if (!Array.isArray(roles)) {

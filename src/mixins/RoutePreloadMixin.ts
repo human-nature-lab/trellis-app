@@ -3,7 +3,7 @@ import router from '../router'
 import {defaultLoggingService as logger} from '../services/logging/LoggingService'
 // @ts-ignore
 import {AddSnack} from '../components/SnackbarQueue'
-import {Vue} from "vue/types/vue";
+import Vue from 'vue'
 
 /**
  * Creates a mixin which takes a loadCallback and will call the hydrate method at the appropriate times. This mixin is
@@ -15,7 +15,7 @@ import {Vue} from "vue/types/vue";
  */
 export default function RoutePreloadMixin (loadCallback: Function, fullscreen: boolean = false) {
   let data
-  return {
+  return Vue.extend({
     router,
     created (this: Vue) {
       this.hydrate(data)
@@ -37,7 +37,7 @@ export default function RoutePreloadMixin (loadCallback: Function, fullscreen: b
         singleton.loading.active = false
       }
     },
-    async beforeRouteUpdate (this: Vue, to, from, next) {
+    async beforeRouteUpdate (to, from, next) {
       singleton.loading.active = true
       singleton.loading.indeterminate = true
       if (this.leaving) {
@@ -69,5 +69,5 @@ export default function RoutePreloadMixin (loadCallback: Function, fullscreen: b
         next()
       }
     }
-  }
+  })
 }

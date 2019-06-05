@@ -1,9 +1,12 @@
-import axios, {AxiosInstance} from 'axios'
-import config from '../../config'
+import axios, { AxiosInstance } from 'axios'
+import config from 'config'
+import RouteWhitelist from '../../router/RouteWhitelist'
 import storage from '../StorageService'
-import router from '../../router'
+import router, { routerReady } from '../../router'
 import singleton from '../../static/singleton'
 import DatabaseService from '../database/DatabaseService'
+import DeviceService from '../device/DeviceService'
+import { makeBasicAuthHeader } from '../util'
 
 export interface Token {
   hash: string
@@ -44,16 +47,15 @@ function responseInterceptor (response) {
   return response
 }
 
-function responseError (err) {
+async function responseError (err) {
   if (err.response && err.response.status === 401) {
+    await routerReady()
     let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
     singleton.loading.active = false
-    if (router.currentRoute.name === 'Login') {
-      return Promise.reject(err.response)
-    } else {
+    if (RouteWhitelist.indexOf(router.currentRoute.name) === -1) {
       router.replace({name: 'Login', query: {to: nextRoute}})
-      return Promise.resolve(err.response)
     }
+    return Promise.reject(err.response)
   }
   return Promise.reject(err)
 }
@@ -85,16 +87,33 @@ export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance
   })
 }
 
-export async function syncInstance (): Promise<AxiosInstance>  {
+export async function syncInstance (): Promise<AxiosInstance> {
   if (syncInst === undefined) {
     const apiRoot = await DatabaseService.getServerIPAddress()
     syncInst = axios.create({
       baseURL: apiRoot + '/sync',
-      timeout: 0,
-      headers: {'X-Key': config.xKey}
+      timeout: 0
+    })
+    syncInst.interceptors.request.use(async function (config) {
+      config.headers['X-Key'] = await DeviceService.getDeviceKey()
+      return config
     })
   }
   return syncInst
+}
+
+let syncAuthInterceptor
+export async function setSyncCredentials (username: string, password: string) {
+  const sync = await syncInstance()
+  syncAuthInterceptor = sync.interceptors.request.use(function (config) {
+    config.headers['Authorization'] = makeBasicAuthHeader(username, password)
+    return config
+  })
+}
+
+export async function resetSyncCredentials () {
+  const sync = await syncInstance()
+  sync.interceptors.request.eject(syncAuthInterceptor)
 }
 
 export const adminInst = axios.create({

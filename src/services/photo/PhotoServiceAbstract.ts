@@ -1,4 +1,6 @@
-import Photo from "../../entities/trellis/Photo";
+import Photo from '../../entities/trellis/Photo'
+
+export type CancelFunction = (msg: string) => void
 
 export default abstract class PhotoServiceAbstract {
 
@@ -14,7 +16,7 @@ export default abstract class PhotoServiceAbstract {
    * @param photoId
    * @returns {PromiseLike<string>}
    */
-  abstract getPhotoSrc (photoId: string): PromiseLike<any>
+  abstract getPhotoSrc (photoId: string): [PromiseLike<string>, CancelFunction]
 
   /**
    * Cancel any outstanding photos that are loading

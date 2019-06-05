@@ -2,9 +2,9 @@ import StudyServiceAbstract from './StudyServiceAbstract'
 import DatabaseService from '../database/DatabaseService'
 import Study from '../../entities/trellis/Study'
 import UserService from '../user/UserService'
-import UserStudy from "../../entities/trellis/UserStudy";
-import User from "../../entities/trellis/User";
-import {IsNull} from 'typeorm'
+import UserStudy from '../../entities/trellis/UserStudy'
+import User from '../../entities/trellis/User'
+import { IsNull } from 'typeorm'
 
 class StudyServiceCordova extends StudyServiceAbstract {
   async getStudy (studyId: string): Promise<Study> {
@@ -20,7 +20,7 @@ class StudyServiceCordova extends StudyServiceAbstract {
 
   async getUserStudies (userId: string): Promise<Study[]> {
     const repo = await DatabaseService.getRepository(Study)
-    return await repo.createQueryBuilder('study')
+    return repo.createQueryBuilder('study')
       .leftJoinAndSelect('study.locales', 'locale')
       .where(qb => 'study.id in ' + qb.subQuery()
         .select('user_study.studyId')
@@ -32,21 +32,33 @@ class StudyServiceCordova extends StudyServiceAbstract {
 
   async getMyStudies (): Promise<Study[]> {
     let user: User = UserService.getCurrentUser()
-    if (user.role.toLowerCase() === 'admin') {
+    if (user.roleId === 'admin') {
       let repo = await DatabaseService.getRepository(Study)
-      return await repo.find({
+      return repo.find({
         where: {
           deletedAt: IsNull()
         },
         relations: ['locales']
       })
     } else {
-      return await this.getUserStudies(user.id)
+      return this.getUserStudies(user.id)
     }
   }
 
   async getAllStudies (): Promise<Study[]> {
     throw Error('Not implemented')
+  }
+
+  createStudy (study: Study): Promise<Study> {
+    throw new Error('Not implemented')
+  }
+
+  updateStudy (study: Study): Promise<Study> {
+    throw new Error('Not implemented')
+  }
+
+  removeStudy (studyId: string): Promise<void> {
+    throw new Error('Not implemented')
   }
 }
 

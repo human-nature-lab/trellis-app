@@ -55,42 +55,49 @@ export default abstract class GeoServiceInterface {
    * @param {Photo} photo
    * @returns {Promise<GeoPhoto>}
    */
-  abstract addPhoto (geoId: string, photo: Photo): Promise<PhotoWithPivotTable>
+  abstract addPhoto (geoId: string, photo: Photo): PromiseLike<PhotoWithPivotTable>
 
   /**
    * Persist a Geo object to the database
    * @param {Geo} geo
    */
-  abstract createGeo (geo: Geo): Promise<any>
+  abstract createGeo (geo: Geo): PromiseLike<any>
 
   /**
    * Gets an array of geo types by study ID and, optionally, filtered by user addable geo types
    * @param {string} studyId
    * @param {boolean} getUserAddable
    */
-  abstract getGeoTypesByStudy (studyId: string, getUserAddable: boolean): Promise<GeoType[]>
+  abstract getGeoTypesByStudy (studyId: string, getUserAddable: boolean): PromiseLike<GeoType[]>
 
   /**
    * Get a single geo object by id
    * @param geoId
    */
-  abstract getGeoById (geoId: string): Promise<Geo>
+  abstract getGeoById (geoId: string): PromiseLike<Geo>
 
   /**
    * Get one or more geos by their ids
    * @param geoIds
    */
-  abstract getGeosById (geoIds: string[]): Promise<Geo[]>
+  abstract getGeosById (geoIds: string[]): PromiseLike<Geo[]>
 
   /**
    * Return an array of a geos ancestors in the correct order
    * @param {string} geoId
    */
-  abstract getGeoAncestors (geoId: string): Promise<Geo[]>
+  abstract getGeoAncestors (geoId: string): PromiseLike<Geo[]>
 
   /**
    * Run a query by the geo service with an object of parameters
    * @param {GeoSearchParams} params
    */
-  abstract search (params: GeoSearchParams): Promise<Geo[]>
+  abstract search (params: GeoSearchParams): PromiseLike<Geo[]>
+
+  /**
+   * Get a list of child geos for this given parent
+   * @param studyId
+   * @param parentId
+   */
+  abstract getGeosByParentId (studyId: string, parentId: string): PromiseLike<Geo[]>
 }

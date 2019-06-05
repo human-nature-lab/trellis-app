@@ -31,7 +31,8 @@ www/js/vendor.*.js
 *.swp
 
 config.js
-config.prod.*.js
+config.*.js
+!config.default.js
 config.dev.js
 config.xml.js
 
@@ -39,3 +40,4 @@ src/entities/**/*.js
 src/entities/**/*.map
 
 releases
+*.jks

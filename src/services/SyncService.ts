@@ -6,7 +6,6 @@ import { syncInstance } from './http/AxiosInstance'
 import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
 import {Connection, IsNull} from 'typeorm'
 import LoginService from '../services/login'
-import global from '../static/singleton'
 import SingletonService from "./SingletonService";
 
 /**
@@ -16,11 +15,6 @@ import SingletonService from "./SingletonService";
 const UPLOAD_NUM_ROWS_WRITE = 100
 
 class SyncService {
-  private deviceId: string
-
-  constructor () {
-    this.deviceId = DeviceService.getUUID()
-  }
 
   async createSync (type: string, deviceId: string): Promise<Sync> {
     const sync = new Sync()
