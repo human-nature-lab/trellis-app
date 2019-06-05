@@ -69,6 +69,9 @@
             </v-flex>
           </v-layout>
         </v-flex>
+        <v-flex>
+          <ImportRespondents />
+        </v-flex>
       </v-layout>
     </v-scale-transition>
     <v-divider v-if="filters.geos && filters.geos.length" />
@@ -104,7 +107,6 @@
         </v-chip>
       </v-flex>
     </v-layout>
-    <ImportRespondents />
     <v-layout row wrap>
       <v-pagination
         class="pagination"

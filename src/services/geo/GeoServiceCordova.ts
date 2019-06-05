@@ -248,4 +248,8 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       .leftJoinAndSelect('translation.translationText', 'translation_text')
     return await q.getMany()
   }
+
+  importGeos (studyId: string, file: File): Promise<Geo[]> {
+    throw new Error('Not implemented')
+  }
 }

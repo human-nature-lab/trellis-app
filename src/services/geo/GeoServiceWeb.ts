@@ -1,4 +1,5 @@
-import http from '../http/AxiosInstance'
+import Study from '../../entities/trellis/Study'
+import http, { adminInst } from '../http/AxiosInstance'
 import {uriTemplate} from "../http/WebUtils";
 import GeoServiceAbstract from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
@@ -112,5 +113,16 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
     }).then(res => {
       return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
     })
+  }
+
+  async importGeos (studyId: string, file: File): Promise<Geo[]> {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await adminInst.post(uriTemplate('study/{studyId}/geo/import', [studyId]), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    return res.data.geos.map(r => new Geo().fromSnakeJSON(r))
   }
 }

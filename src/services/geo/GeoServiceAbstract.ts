@@ -100,4 +100,11 @@ export default abstract class GeoServiceInterface {
    * @param parentId
    */
   abstract getGeosByParentId (studyId: string, parentId: string): PromiseLike<Geo[]>
+
+  /**
+   * Import multiple geos simultaneously by uploading a CSV file.
+   * @param studyId
+   * @param file
+   */
+  abstract importGeos (studyId: string, file: File): PromiseLike<Geo[]>
 }
