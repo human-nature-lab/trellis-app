@@ -194,14 +194,16 @@
         return TranslationService.getAny(geo.nameTranslation, this.global.locale)
       },
       loadAncestors () {
-        GeoService.getGeoAncestors(this.results[0].id).then(geos => {
-          geos.forEach(geo => {
-            this.geoCache_[geo.id] = geo
+        if (this.results && this.results.length) {
+          GeoService.getGeoAncestors(this.results[0].id).then(geos => {
+            geos.forEach(geo => {
+              this.geoCache_[geo.id] = geo
+            })
+            this.lastParentIds.push(null)
+            this.lastParentIds.push(...geos.map(g => g.id))
+            this.lastParentIds.pop()
           })
-          this.lastParentIds.push(null)
-          this.lastParentIds.push(...geos.map(g => g.id))
-          this.lastParentIds.pop()
-        })
+        }
       },
       updateRoute: function () {
         if (!this.shouldUpdateRoute) return

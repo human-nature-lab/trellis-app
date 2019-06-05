@@ -8,15 +8,15 @@
 
 #### Form builder
 - [Introduction](form-builder/Introduction.md)
-- [Adding questions](form-builder/Adding-questions.md)
-- [Question parameters](form-builder/Question-parameters.md)
-- [Question types](form-builder/Question-types.md)
-- [Skips](form-builder/Skips.md)
-- [Repeating sections](form-builder/Repeated-sections.md)
+- [Form sections](form-builder/Sections.md)
+- [Form pages](form-builder/Pages.md)
+- [Form questions](form-builder/Questions.md)
+  - [Question types](form-builder/Question-types.md)
+  - [Question parameters](form-builder/Question-parameters.md)
+  - [Conditions](form-builder/Conditions.md)
 
-
-#### [Device installation](device-installation/Android.md)
-- [Android](device-installation/Android.md)
+#### [Devices](devices/Devices.md)
+- [Register Device](devices/RegisterDevice.md)
 
 #### Locations
 - [Search](locations/Search.md)

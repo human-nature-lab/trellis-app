@@ -1,32 +1,36 @@
+import { Mutex } from 'async-mutex'
 import http from '../http/AxiosInstance'
 import User from '../../entities/trellis/User'
+import { uriTemplate } from '../http/WebUtils'
 import { UserServiceAbstract } from './UserServiceAbstract'
-import {adminInst} from "../http/AxiosInstance";
-import UserStudy from "../../entities/trellis/UserStudy";
-import Pagination from "../../types/Pagination";
+import { adminInst } from '../http/AxiosInstance'
+import UserStudy from '../../entities/trellis/UserStudy'
+import Pagination from '../../types/Pagination'
 
 export class UserServiceWeb extends UserServiceAbstract {
 
-  private _currentUserRequest: Promise<any>
+  private mutex: Mutex = new Mutex()
 
-  loadCurrentUser (): Promise<User|null> {
-    if (this._currentUserRequest) return this._currentUserRequest
-    this._currentUserRequest = new Promise(resolve => {
+  async loadCurrentUser (): Promise<User | null> {
+
+    const release = await this.mutex.acquire()
+    let user: User = null
+    try {
       if (this.user) {
-        return resolve(this.user)
+        user = this.user
       } else {
-        return resolve(http().get(`/user/me`).then(res => {
-          if (res.data) {
-            this.user = new User().fromSnakeJSON(res.data)
-            return this.user
-          }
-          return res.data
-        }))
+        let res = await http().get(`/user/me`)
+        if (res.status && res.data && res.status >= 200 && res.status < 300) {
+          user = new User().fromSnakeJSON(res.data)
+          this.user = user
+        }
       }
-    }).finally(() => {
-      this._currentUserRequest = null
-    })
-    return this._currentUserRequest
+    } catch (err) {
+      // Do nothing just return null
+    } finally {
+      release()
+    }
+    return user
   }
 
   async getPage (page: number = 0, size: number = 100, sortBy: string = 'name', descending: boolean = false): Promise<Pagination<User>> {
@@ -43,37 +47,30 @@ export class UserServiceWeb extends UserServiceAbstract {
   }
 
   async createUser (user: User): Promise<User> {
-    const res = await adminInst.post('user', user)
+    const res = await adminInst.post('user', user.toSnakeJSON())
     return new User().fromSnakeJSON(res.data.user)
   }
 
   async deleteUser (userId: string): Promise<void> {
-    userId = encodeURIComponent(userId)
-    await adminInst.delete(`user/${userId}`)
+    await adminInst.delete(uriTemplate('user/{userId}', [userId]))
   }
 
   async updateUser (user: User): Promise<User> {
-    const userId = encodeURIComponent(user.id)
-    const res = await adminInst.put(`user/${userId}`, user)
+    const res = await adminInst.put(uriTemplate('user/{userId}', [user.id]), user.toSnakeJSON())
     return new User().fromSnakeJSON(res.data.user)
   }
 
   async addStudy (user: User, studyId: string): Promise<UserStudy> {
-    const userId = encodeURIComponent(user.id)
-    studyId = encodeURIComponent(studyId)
-    const res = await adminInst.post(`user/${userId}/studies/${studyId}`)
+    const res = await adminInst.post(uriTemplate('user/{userId}/studies/{studyId}', [user.id, studyId]))
     return new UserStudy().fromSnakeJSON(res.data.user_study)
   }
 
   async removeStudy (user: User, studyId: string): Promise<void> {
-    const userId = encodeURIComponent(user.id)
-    studyId = encodeURIComponent(studyId)
-    await adminInst.delete(`user/${userId}/studies/${studyId}`)
+    await adminInst.delete(uriTemplate('user/{userId}/studies/{studyId}', [user.id, studyId]))
   }
 
   async updatePassword (user: User, oldPass: string, newPass: string): Promise<void> {
-    const userId = encodeURIComponent(user.id)
-    const res = await adminInst.put(`user/${userId}/update-password`, {
+    const res = await adminInst.put(uriTemplate('user/{userId}/update-password', [user.id]), {
       oldPassword: oldPass,
       newPassword: newPass
     })

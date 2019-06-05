@@ -104,6 +104,7 @@
         </v-chip>
       </v-flex>
     </v-layout>
+    <ImportRespondents />
     <v-layout row wrap>
       <v-pagination
         class="pagination"
@@ -149,7 +150,7 @@
         </v-container>
       </v-layout>
     </v-container>
-    <v-dialog
+    <TrellisModal
       v-model="showAssociatedRespondentDialog">
       <v-card>
         <AddRespondentForm
@@ -157,9 +158,9 @@
           :studyId="studyId"
           :redirectToRespondentInfo="false"
           :onRespondentAdded="onRespondentAdded"
-          :associatedRespondentId="respondentId"></AddRespondentForm>
+          :associatedRespondentId="respondentId" />
       </v-card>
-    </v-dialog>
+    </TrellisModal>
   </v-container>
 </template>
 
@@ -180,6 +181,8 @@
   import PhotoService from '../../services/photo/PhotoService'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import DocsFiles from '../documentation/DocsFiles'
+  import ImportRespondents from './ImportRespondents'
+  import TrellisModal from '../TrellisModal'
 
   function hasAnyFilter (filters) {
     for (let key in filters) {
@@ -224,6 +227,15 @@
   export default {
     name: 'respondents-search',
     mixins: [DocsLinkMixin(DocsFiles.respondents.search)],
+    components: {
+      RespondentListItem,
+      RespondentItem,
+      AddRespondentForm,
+      GeoBreadcrumbs,
+      TrellisLoadingCircular,
+      ImportRespondents,
+      TrellisModal
+    },
     props: {
       searchQuery: {
         type: String,
@@ -377,8 +389,7 @@
           this.error = null
         } catch (err) {
           this.log(err)
-          this.error = err
-          this.alert('error', 'Unable to load respondents')
+          this.alert('error', 'Unable to load respondents', {timeout: 0})
         } finally {
           this.isLoading = false
         }
@@ -478,13 +489,6 @@
       showGeoFilterOptions () {
         return this.filters && !!this.filters.geos.length
       }
-    },
-    components: {
-      RespondentListItem,
-      RespondentItem,
-      AddRespondentForm,
-      GeoBreadcrumbs,
-      TrellisLoadingCircular
     }
   }
 </script>

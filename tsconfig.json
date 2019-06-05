@@ -1,5 +1,4 @@
 {
-  "version": "2.0.2",
   "compilerOptions": {
     "lib": ["es6", "es2015.promise", "dom", "es2015", "es2018.promise"],
     "target": "es5",
@@ -16,6 +15,9 @@
     "baseUrl": ".",
     "jsx": "preserve"
   },
+  "include": [
+    "./src/**/*"
+  ],
   "exclude": [
     "build",
     "node_modules",

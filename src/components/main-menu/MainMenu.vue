@@ -50,7 +50,7 @@
 </template>
 
 <script>
-  import config from '../../config'
+  import config from 'config'
   import menuBus from './MenuBus'
   import LoginService from '../../services/login'
   import router from '../../router'
@@ -64,9 +64,11 @@
   import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
   import GeoLocationService from '../../services/geolocation'
   import Vue from 'vue'
+  import PermissionMixin from '../../mixins/PermissionMixin'
+  import {TrellisPermission} from '../../static/permissions.base'
 
   export default {
-    mixins: [ IsAdminMixin, IsLoggedInMixin],
+    mixins: [ IsAdminMixin, IsLoggedInMixin, PermissionMixin],
     components: { UserPassword, TrellisModal},
     name: 'dropdown-menu',
     data: () => ({
@@ -168,11 +170,12 @@
           }]
         }, {
           title: 'admin',
-          showIf: this.isWeb && this.isAdmin && this.isDebug,
+          showIf: this.isWeb && this.isDebug,
           items: [{
             to: {name: 'Users'},
             icon: 'recent_actors',
-            title: 'users'
+            title: 'users',
+            showIf: this.hasPermission(TrellisPermission.VIEW_USERS)
           }, {
             to: {name: 'Forms'},
             icon: 'library_books',
@@ -180,7 +183,22 @@
           }, {
             to: {name: 'Reports'},
             icon: 'save',
-            title: 'reports'
+            title: 'reports',
+            showIf: this.hasPermission(TrellisPermission.VIEW_REPORTS)
+          }, {
+            to: {name: 'Devices'},
+            icon: 'devices',
+            title: 'devices',
+            showIf: this.hasPermission(TrellisPermission.VIEW_DEVICES)
+          }, {
+            to: {name: 'Studies'},
+            icon: 'import_contacts',
+            title: 'studies',
+            showIf: this.hasPermission(TrellisPermission.VIEW_STUDIES)
+          }, {
+            to: {name: 'GeoTypes'},
+            icon: 'edit_location',
+            title: 'geo_types'
           }]
         }, {
           title: 'settings',
@@ -232,17 +250,25 @@
             icon: 'local_offer',
             title: 'condition_tags'
           }, {
+            showIf: this.isLoggedIn,
             click: this.logout,
             icon: 'exit_to_app',
             title: 'logout'
           }, {
+            showIf: this.isLoggedIn,
             click: this.changePassword,
             icon: 'settings_backup_restore',
             title: 'change_password'
           }, {
-            click: this.copyCurrentLocation,
-            icon: 'location_searching',
-            title: 'copy_url'
+            to: {name: 'ServerConfig'},
+            icon: 'build',
+            title: 'server_config',
+            showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_CONFIG)
+          }, {
+            to: {name: 'Permissions'},
+            icon: 'lock',
+            title: 'permissions',
+            showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_PERMISSIONS)
           }, {
             click: this.refresh,
             icon: 'refresh',
@@ -250,7 +276,7 @@
           }, {
             showIf: this.isDebug,
             to: { name: 'ServiceTesting' },
-            icon: 'build',
+            icon: 'done_all',
             title: 'Service Testing'
           }]
         }]

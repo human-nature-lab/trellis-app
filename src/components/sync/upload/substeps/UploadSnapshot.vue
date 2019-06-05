@@ -18,6 +18,7 @@
   import FileService from '../../../../services/file/FileService'
   import DatabaseService from '../../../../services/database/DatabaseService'
   import DeviceService from '../../../../services/device/DeviceService'
+  import { makeBasicAuthHeader } from '../../../../services/util'
 
   export default {
     name: 'upload-snapshot',
@@ -45,10 +46,18 @@
       md5hash: {
         type: String,
         required: true
+      },
+      username: {
+        type: String,
+        required: true
+      },
+      password: {
+        type: String,
+        required: true
       }
     },
     methods: {
-      doWork: async function () {
+      async doWork () {
         this.working = true
         console.log('fileEntry', this.fileEntry)
         console.log('md5hash', this.md5hash)
@@ -56,7 +65,7 @@
         const apiRoot = await DatabaseService.getServerIPAddress()
         const uri = apiRoot + `/sync/device/${deviceId}/upload`
         try {
-          await FileService.upload(uri, this.fileEntry, this.onUploadProgress)
+          await FileService.upload(uri, this.fileEntry, this.onUploadProgress, makeBasicAuthHeader(this.username, this.password))
           this.working = false
           this.success = true
           this.$emit('upload-snapshot-done')
@@ -65,7 +74,7 @@
           this.working = false
         }
       },
-      onUploadProgress: function (progressEvent) {
+      onUploadProgress (progressEvent) {
         console.log(progressEvent)
         let curProgress = (progressEvent.loaded / progressEvent.total) * 100
         // Only update at 5% increments, without this the progress bar does not update
@@ -73,10 +82,10 @@
           this.progress = curProgress
         }
       },
-      stopWorking: function () {
+      stopWorking () {
         this.working = false
       },
-      retry: function () {
+      retry () {
         this.currentLog = undefined
         this.doWork()
       }

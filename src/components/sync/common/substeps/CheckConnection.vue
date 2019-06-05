@@ -11,7 +11,6 @@
 
 <script>
     import axios from 'axios'
-    import config from '../../../../config'
     import SyncService from '../../../../services/SyncService'
     import DatabaseService from '../../../../services/database/DatabaseService'
     import TrellisAlert from '../../../TrellisAlert.vue'
@@ -19,6 +18,7 @@
     import SyncSubStep from '../../SyncSubStep.vue'
     export default {
       name: 'check-connection',
+      components: { TrellisAlert, SyncSubStep },
       data () {
         return {
           currentLog: undefined,
@@ -35,11 +35,11 @@
         loggingService: {
           type: LoggingService,
           required: false,
-          'default': function () { return defaultLoggingService }
+          'default': () => defaultLoggingService
         }
       },
       methods: {
-        checkConnection: async function () {
+        async checkConnection () {
           this.checking = true
           try {
             const CancelToken = axios.CancelToken
@@ -57,7 +57,7 @@
             })
           }
         },
-        stopChecking: function () {
+        stopChecking () {
           if (this.source) {
             this.source.cancel(this.$t('operation_cancelled'))
           }
@@ -67,16 +67,10 @@
           })
           this.checking = false
         },
-        retry: function () {
+        retry () {
           this.currentLog = undefined
           this.checkConnection()
         }
-      },
-      computed: {
-      },
-      components: {
-        TrellisAlert,
-        SyncSubStep
       }
     }
 </script>

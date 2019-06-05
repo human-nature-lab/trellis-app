@@ -16,36 +16,44 @@ import Debug from './components/Debug'
 import WebApp from './WebApp'
 import router from './router'
 
-import config from './config'
+import config from 'config'
+import ConfigService from './services/config'
 import theme from './static/theme'
 import {APP_ENV} from './static/constants'
 import './logging'
 import './filters/toFixed.filter'
+import './checkWebviewVersion'
 
-Vue.use(Vuetify, theme)
-Vue.config.productionTip = false
-Vue.use(VueHead)
-if (config.appEnv === APP_ENV.CORDOVA) {
-  Vue.use(VueCordova)
-}
-Vue.component('debug', Debug)
+async function init () {
+  // Wait for the configuration to load before doing anything else
+  await ConfigService.load()
 
-/* eslint-disable no-new */
-export default new Vue({
-  el: '#app',
-  router,
-  i18n,
-  template: '<WebApp />',
-  components: {
-    WebApp
-  },
-  // @ts-ignore
-  head: {
-    meta: [
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'
-      }
-    ]
+  Vue.use(Vuetify, theme)
+  Vue.config.productionTip = false
+  Vue.use(VueHead)
+  if (config.appEnv === APP_ENV.CORDOVA) {
+    Vue.use(VueCordova)
   }
-})
+  Vue.component('debug', Debug)
+
+  new Vue({
+    el: '#app',
+    router,
+    i18n,
+    template: '<WebApp />',
+    components: {
+      WebApp
+    },
+    // @ts-ignore
+    head: {
+      meta: [
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'
+        }
+      ]
+    }
+  })
+}
+
+init()

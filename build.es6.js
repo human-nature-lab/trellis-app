@@ -6,40 +6,46 @@ import fs from 'fs'
 import mv from 'mv'
 import path from 'path'
 import pkg from './package.json'
+import {prompt} from 'promptly'
 import {sentryRelease} from './build/utils'
 
 const argv = parseArgs(process.argv)
 
+const release = !!argv['release'] || !!argv['r']
+
 const opts = {
-  apkPath: argv['apk-path'] ? argv['apk-path'] : 'platforms/android/app/build/outputs/apk/debug/',
-  apkOutPath: argv['apk-out-path'] ? argv['apk-out-path'] : 'releases/',
+  apkPath: argv['apk-path'] ? argv['apk-path'] : (release ? 'platforms/android/app/build/outputs/apk/release/' : 'platforms/android/app/build/outputs/apk/debug/'),
+  apkOutPath: argv['apk-out-path'] ? argv['apk-out-path'] : (release ? 'releases' : 'dev-releases/'),
   configPath: argv['config'],
-  apkName: argv['apk-name'] ? argv['apk-name'] : 'app-debug.apk',
+  apkName: argv['apk-name'] ? argv['apk-name'] : (release ? 'app-release.apk' : 'app-debug.apk'),
   outName: argv['out-name'] ? argv['out-name'] : 'Trellis',
   apk: !!argv['apk'],
   web: !!argv['web'],
+  release,
   skipBuild: !!argv['skip-build'],
   skipSentry: !!argv['skip-sentry'],
   sentryProject: argv['sentry-project'] ? argv['sentry-project'] : 'trellis',
   sentryToken: argv['sentry-token'],
-  sentryOrg: argv['sentry-org']
+  sentryOrg: argv['sentry-org'] ? argv['sentry-org'] : 'human-nature-lab',
+  keystorePath: argv['keystore-path'] ? argv['keystore-path'] : 'trellis-keystore.jks',
+  keyAlias: argv['key-alias'] ? argv['key-alias'] : (release ? 'trellis-web' : 'trellis-web-dev')
 }
 
 const buildConfigPath = 'src/config.js'
 const version = pkg.version
 
-if (!opts.configPath) throw Error('Need to have the config argument supplied')
+// if (!opts.configPath) throw Error('Need to have the config argument supplied')
 
-console.log(argv, opts)
+// console.log(argv, opts)
 
 async function exec (cmd, opts, envOpts) {
-  if (cmd === 'npm' || cmd === 'sentry-cli') {
+  if (['npm', 'sentry-cli', 'cordova'].indexOf(cmd) > -1) {
     cmd = /^win/.test(process.platform) ? cmd + '.cmd' : cmd
   }
   return new Promise((resolve, reject) => {
     const p = spawn(cmd, opts, envOpts)
     p.stdout.on('data', data => {
-      console.log(`${cmd}: ${data.toString()}`)
+      console.log(`\r${cmd}: ${data.toString()}`)
     })
     p.stderr.on('data', data => {
       console.error(`${cmd}: ${data.toString()}`)
@@ -99,14 +105,26 @@ async function buildWeb () {
   // TODO: Push to server
 }
 
+async function buildRelease (keystorePassword, keyPassword) {
+  console.log('building release APK')
+  const env = getEnv()
+  try {
+    await exec('cordova', [
+      'build', 'android', '--release', '--', '--storePassword', keystorePassword, '--password', keyPassword, '--keystore', opts.keystorePath, '--alias', opts.keyAlias
+    ], {
+      env
+    })
+  } catch (err) {
+    console.error(err)
+  }
+}
+
 /**
  * Based on the documentation here https://docs.sentry.io/workflow/releases/?platform=browser#associate-commits-with-a-release.
  * @returns {Promise<void>}
  */
 async function createSentryRelease () {
-  const config = require('./' + buildConfigPath).default
-  console.log('config', config)
-  const version = sentryRelease(config)
+  const version = sentryRelease()
   console.log('version', version)
   const env = getEnv()
   await exec('sentry-cli', ['releases', '--org', opts.sentryOrg, 'new', '-p', opts.sentryProject, '--log-level=debug', version], {
@@ -130,8 +148,18 @@ async function cleanUpConfig () {
 }
 
 async function earlyExit () {
-  await cleanUpConfig()
+  // await cleanUpConfig()
   process.exit()
+}
+
+async function getPasswords () {
+  try {
+    const keystorePassword = await prompt('Keystore password: ', {silent: true})
+    const keyPassword = await prompt('Key password: ', {silent: true})
+    return [keystorePassword, keyPassword]
+  } catch (err) {
+    earlyExit()
+  }
 }
 
 process.onunhandledrejection = function (err) {
@@ -144,9 +172,14 @@ process.on('SIGINT', function () {
 })
 
 async function main () {
-  await swapFiles(buildConfigPath, opts.configPath)
+  // await swapFiles(buildConfigPath, opts.configPath)
   if (opts.apk) {
-    if (!opts.skipBuild) {
+    if (opts.release) {
+      const [keystorePassword, keyPassword] = await getPasswords()
+      await buildWeb()
+      await buildRelease(keystorePassword, keyPassword)
+      await moveApk()
+    } else if (!opts.skipBuild) {
       await buildApk()
       await moveApk()
     }
@@ -162,7 +195,7 @@ async function main () {
       await createSentryRelease()
     }
   }
-  await cleanUpConfig()
+  // await cleanUpConfig()
 }
 
 main()

@@ -1,103 +1,51 @@
 <template>
-  <v-container grid-list-xl fluid>
-    <v-layout wrap>
-      <v-flex xs9>
-        <v-text-field
-          v-on:keyup="onChangeTranslation"
-          v-model="textFieldValue"
-          :placeholder="$t('new_location')"
-          :autofocus="true"
-          :disabled="saving">
-        </v-text-field>
-      </v-flex>
-      <v-flex xs3>
-        <v-select
-          v-on:change="onChangeLocale"
-          :items="languageTags"
-          v-model="selectedLanguageTag"
-          :disabled="saving">
-        </v-select>
-      </v-flex>
-      <v-btn flat @click="onSave" :disabled="!enableSave || saving">{{ $t('save') }}</v-btn>
-      <v-btn flat @click="onCancel" :disabled="saving">{{ $t('cancel') }}</v-btn>
+  <v-container @click.stop>
+    <v-layout row wrap>
+      <ClickToEdit
+        v-model="editingText"
+        :editing="isEditing"
+        :editable="persist"
+        @update:editing="isEditing = $event"
+        :disabled="saving"
+        @save="onSave" />
+      <v-spacer />
+      <v-select
+        dense
+        class="small-select"
+        :items="locales"
+        item-text="languageTag"
+        item-value="id"
+        v-model="selectedLocale"
+        :disabled="saving || isEditing" />
     </v-layout>
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+  import {Mutex} from "async-mutex"
+  import Locale from "../entities/trellis/Locale"
+  import TranslationText from "../entities/trellis/TranslationText"
+  import LocaleService from "../services/locale/LocaleService"
+  import SingletonService from "../services/SingletonService"
   import TranslationTextService from '../services/translation-text/TranslationTextService'
-  import singleton from '../static/singleton'
-  export default {
-    name: 'translation-text-field',
-    created: function () {
-      this.translation.translationText.forEach((translationText) => {
-        this.languageTags.push(translationText.locale.languageTag)
-        this.textFieldValues[translationText.locale.languageTag] = translationText.translatedText
-      })
-      this.selectedLanguageTag = this.global.locale.languageTag
-      this.textFieldValue = this.textFieldValues[this.selectedLanguageTag]
-    },
-    data: function () {
-      return {
-        global: singleton,
-        textFieldValues: {},
-        textFieldValue: '',
-        languageTags: [],
-        selectedLanguageTag: '',
-        enableSave: false,
-        saving: false
-      }
-    },
-    methods: {
-      onSave: async function () {
-        this.saving = true
-        // Persist any changes to the current translation
-        this.textFieldValues[this.selectedLanguageTag] = this.textFieldValue
-        // If any other language has an empty string, use the current string field for the value
-        for (let languageTag in this.textFieldValues) {
-          if (this.textFieldValues.hasOwnProperty(languageTag)) {
-            if (this.textFieldValues[languageTag] === '') {
-              this.textFieldValues[languageTag] = this.textFieldValue
-            }
-          }
-        }
+  import ClickToEdit from './ClickToEdit'
+  import singleton, {Singleton} from '../static/singleton'
+  import Vue from 'vue'
 
-        // Save any changed translationText elements
-        for (const translationText of this.translation.translationText) {
-          if (translationText.translatedText !== this.textFieldValues[translationText.locale.languageTag]) {
-            translationText.translatedText = this.textFieldValues[translationText.locale.languageTag]
-            if (this.persist) {
-              await TranslationTextService.updateTranslatedTextById(translationText.id, this.textFieldValues[translationText.locale.languageTag])
-            }
-          }
-        }
-        this.$emit('editing-done', this.translation)
-      },
-      onCancel: async function () {
-        this.$emit('editing-cancelled')
-      },
-      onChangeLocale: function (locale) {
-        // Persist any changes to the current translation
-        this.textFieldValues[this.selectedLanguageTag] = this.textFieldValue
-        // Retrieve the text for the new locale
-        this.textFieldValue = this.textFieldValues[locale]
-      },
-      onChangeTranslation: function () {
-        this.enableSave = this.isEdited()
-      },
-      isEdited: function () {
-        let edited = false
-        this.translation.translationText.forEach((translationText) => {
-          if ( (translationText.locale.languageTag === this.selectedLanguageTag &&
-                this.textFieldValue !== translationText.translatedText) ||
-               (translationText.locale.languageTag !== this.selectedLanguageTag &&
-                 (this.textFieldValues[translationText.locale.languageTag] !== translationText.translatedText)) ) {
-            edited = true
-          }
-        })
-        return edited
-      }
-    },
+  // Hoist studyLocales show it can be shared by all instances of this component
+  const studyLocales = []
+  let localesMutex = new Mutex()
+
+  // React to the study being changed
+  SingletonService.on('study', () => {
+    if (studyLocales.length) {
+      studyLocales.splice(0, studyLocales.length)
+    }
+  })
+
+  export default Vue.extend({
+    name: 'TranslationTextField',
+    components: { ClickToEdit },
     props: {
       translation: {
         type: Object,
@@ -105,13 +53,109 @@
       },
       persist: {
         type: Boolean,
-        required: false,
-        'default': true
+        default: true
+      },
+      editing: {
+        type: Boolean,
+        default: false
+      }
+    },
+    created () {
+      this.loadLocales()
+    },
+    data () {
+      return {
+        global: singleton as Singleton,
+        saving: false,
+        isEditing: this.editing,
+        selectedLocale: singleton.locale.id,
+        isLoading: false,
+        locales: studyLocales as () => Locale[]
+      }
+    },
+    computed: {
+      tt () {
+        for (const tt of this.memCopy.translationText) {
+          if (tt.localeId === this.selectedLocale) {
+            return tt
+          }
+        }
+        // Create a new TranslationText for the locale if it doesn't exist yet. Will not be persisted unless changes are made.
+        const tt = new TranslationText()
+        tt.localeId = this.selectedLocale
+        tt.translatedText = ''
+        this.memCopy.translationText.push(tt)
+        return tt
+      },
+      editingText: {
+        get (): string {
+          return this.tt.translatedText
+        },
+        set (val): string {
+          this.tt.translatedText = val
+        }
+      },
+      memCopy () {
+        return this.translation.copy()
+      }
+    },
+    methods: {
+      async onSave (newText) {
+        if (!this.persist) return
+
+        this.saving = true
+        this.tt.translatedText = newText
+
+        // If any other language has an empty string, use the current string field for the value
+        for (let tt of this.memCopy.translationText) {
+          if (!tt.translatedText || !tt.translatedText.length) {
+            tt.translatedText = newText
+          }
+        }
+
+        // Save any changed translationText elements
+        for (let i = 0; i < this.memCopy.translationText.length; i++) {
+          const mTt = this.memCopy.translationText[i]
+          const tt = this.translation.translationText.find(t => t.localeId === mTt.localeId)
+          if (!tt) {
+            // Save a new translation text
+            this.memCopy.translationText[i] = await TranslationTextService.createTranslationText(this.translation.id, mTt)
+          } else if (tt.translatedText !== mTt.translatedText) {
+            // Update an existing translation text
+            this.memCopy.translationText[i] = await TranslationTextService.updateTranslatedTextById(mTt.id, mTt.translatedText)
+          }
+        }
+        this.$emit('save', this.memCopy)
+        this.saving = false
+        this.isEditing = false
+      },
+      async loadLocales (): Promise<void> {
+        // To avoid making multiple requests for the same resource, we add a caching layer and a mutex
+        if (this.locales.length) return
+        try {
+          let release = await localesMutex.acquire()
+          // If we are the first component we should actually get the locales. Otherwise, don't make a request
+          if (!this.locales.length) {
+            const locales = await LocaleService.getStudyLocales(this.global.study.id)
+            this.locales.splice(0, 0, ...locales) // keep the shared reference here
+          }
+          release()
+        } catch (err) {
+          this.log(err)
+          this.alert('error', 'Unable to load locales', {timeout: 0})
+        }
       }
     }
-  }
+  })
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  $width: 60px
+  .small-select
+    display: inline-block
+    max-width: $width
+    padding-top: 0
+    min-width: $width
+    .input-group__details
+      display: none
 </style>

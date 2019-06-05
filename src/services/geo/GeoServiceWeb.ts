@@ -1,4 +1,5 @@
 import http from '../http/AxiosInstance'
+import {uriTemplate} from "../http/WebUtils";
 import GeoServiceAbstract from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import GeoType from '../../entities/trellis/GeoType'
@@ -40,20 +41,18 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
     return this.getGeosById([geoId]).then(geoIds => geoIds[0])
   }
 
-  getGeosById (geoIds) {
+  async getGeosById (geoIds: string[]): Promise<Geo[]> {
     geoIds = geoIds.map(g => encodeURIComponent(g))
     if (!geoIds.length) {
-      return new Promise(resolve => resolve([]))
+      return []
     }
-    return http().get(`/geos/${geoIds.join(',')}`).then(res => {
-      return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
-    })
+    const res = await http().get(`/geos/${geoIds.join(',')}`)
+    return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
   }
 
-  async getGeosByParentId (parentId) {
-    return http().get(`/geos/parent/${parentId}`).then(res => {
-      return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
-    })
+  async getGeosByParentId (studyId: string, parentId: string): Promise<Geo[]> {
+    const res = await http().get(uriTemplate(`study/{studyId}/geos/parent/{parentId}`, [studyId, parentId]))
+    return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
   }
 
   async createGeo (geo: Geo): Promise<any> {

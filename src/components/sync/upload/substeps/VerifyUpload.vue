@@ -14,7 +14,7 @@
   import SyncSubStep from '../../SyncSubStep.vue'
   import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
   import FileService from '../../../../services/file/FileService'
-  import config from '../../../../config'
+  import config from 'config'
   import DeviceService from '../../../../services/device/DeviceService'
   import SyncService from '../../../../services/SyncService'
 

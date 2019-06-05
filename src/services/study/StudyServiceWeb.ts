@@ -1,3 +1,4 @@
+import {uriTemplate} from "../http/WebUtils";
 import StudyServiceAbstract from './StudyServiceAbstract'
 import Study from '../../entities/trellis/Study'
 import http, {adminInst} from '../http/AxiosInstance'
@@ -32,5 +33,22 @@ export default class StudyServiceWeb extends StudyServiceAbstract {
     })
 
     return await this.allStudiesPromise
+  }
+
+  async createStudy (study: Study): Promise<Study> {
+    const res = await adminInst.post('study', study.toSnakeJSON())
+    return new Study().fromSnakeJSON(res.data.study)
+  }
+
+  async updateStudy (study: Study): Promise<Study> {
+    const res = await adminInst.put(uriTemplate('study/{study}', [study.id]), study.toSnakeJSON())
+    return new Study().fromSnakeJSON(res.data.study)
+  }
+
+  async removeStudy (studyId: string): Promise<void> {
+    const res = await adminInst.delete(uriTemplate('study/{study}', [studyId]))
+    if (res.status > 205) {
+      throw new Error(`Unable to remove study ${studyId}`)
+    }
   }
 }

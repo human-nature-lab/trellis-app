@@ -111,6 +111,10 @@ export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpt
     }
   }
 
+  /**
+   * This function takes the possible arguments for the "Relationship" decorator and converts them into a 'generator'
+   * function which actually performs the unmarshalling.
+   */
   return function Assigner (to, from) {
     let generator
     let sourceKey = camelToSnake(targetKey)
@@ -197,5 +201,53 @@ export function deepCopy (obj: any, copySelf: boolean = false): any {
     }
   } else {
     return obj
+  }
+}
+
+/**
+ * Get a value using "dot" access for a JSON object.
+ * @param obj
+ * @param key
+ * @param val
+ */
+export function getDot (obj: object, key: string) {
+  const parts = key.split('.')
+  let ref = obj
+  for (let i = 0; i < parts.length; i++) {
+    const key = parts[i]
+    if (typeof ref === 'object' && key in ref) {
+      ref = ref[key]
+    } else if (ref[key] === undefined) {
+      return
+    }
+  }
+  return ref
+}
+
+/**
+ * Enable "dot" access to nested values in a JSON object.
+ * @param obj
+ * @param key
+ * @param val
+ */
+export function setDot (obj: object, key: string, val: any) {
+  const parts = key.split('.')
+  let ref = obj
+  let i
+  for (i = 0; i < parts.length - 1; i++) {
+    const key = parts[i]
+    if (typeof ref === 'object') {
+      if (key in ref) {
+        ref = ref[key]
+      } else {
+        ref[key] = {}
+        ref = ref[key]
+      }
+    } else {
+      throw Error('invalid dot access')
+    }
+  }
+  if (typeof ref === 'object') {
+    ref[parts[i]] = val
   }
 }

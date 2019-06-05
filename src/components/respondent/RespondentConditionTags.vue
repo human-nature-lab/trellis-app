@@ -5,7 +5,7 @@
         {{ $t('condition_tags') }}
       </v-toolbar-title>
       <v-spacer />
-      <permission :role-whitelist="['admin','manager']">
+      <Permission :requires="TrellisPermission.ADD_RESPONDENT_CONDITION_TAG">
         <v-tooltip left>
           <v-btn
             slot="activator"
@@ -16,7 +16,7 @@
           </v-btn>
           <span>{{$t('add_condition_tag')}}</span>
         </v-tooltip>
-      </permission>
+      </Permission>
     </v-toolbar>
     <v-data-table
       class="mb-3"
@@ -26,7 +26,7 @@
       <template slot="items" slot-scope="props">
         <td>{{ props.item.conditionTag.name }}</td>
         <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
-        <permission :role-whitelist="['admin', 'manager']">
+        <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG">
           <td>
             <v-btn
               icon
@@ -37,7 +37,7 @@
               <v-icon v-else>delete</v-icon>
             </v-btn>
           </td>
-        </permission>
+        </Permission>
       </template>
     </v-data-table>
     <RespondentConditionTagForm

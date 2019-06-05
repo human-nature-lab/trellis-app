@@ -17,71 +17,73 @@
               <sync-step
                 :title="$t('connecting')"
                 v-if="downloadStep === 1"
-                v-bind:continue-status="continueStatusArray[0]"
-                v-on:continue-clicked="onContinue"
-                v-on:cancel-clicked="onCancel">
+                :continue-status="continueStatusArray[0]"
+                @continue-clicked="onContinue"
+                @cancel-clicked="onCancel">
                 <check-connection
                   v-if="downloadSubStep > 0"
                   :logging-service="loggingService"
-                  v-on:connection-ok="downloadSubStep = 2"></check-connection>
+                  @connection-ok="downloadSubStep = 2"></check-connection>
                 <authenticate-device
                   v-if="downloadSubStep > 1"
                   :logging-service="loggingService"
-                  v-on:authentication-ok="downloadSubStep = 3"></authenticate-device>
+                  @authentication-ok="downloadSubStep = 3"></authenticate-device>
                 <check-latest-snapshot
                   v-if="downloadSubStep > 2"
                   :logging-service="loggingService"
-                  v-on:check-latest-snapshot-done="checkLatestSnapshotDone"></check-latest-snapshot>
+                  @check-latest-snapshot-done="checkLatestSnapshotDone"></check-latest-snapshot>
                 <compare-download
                   v-if="downloadSubStep > 3"
                   :logging-service="loggingService"
-                  v-bind:server-snapshot="serverSnapshot"
-                  v-on:compare-download-done="compareDownloadDone"></compare-download>
+                  :server-snapshot="serverSnapshot"
+                  @compare-download-done="compareDownloadDone"></compare-download>
                 <compare-upload
                   v-if="downloadSubStep > 4"
                   :logging-service="loggingService"
-                  v-bind:server-snapshot="serverSnapshot"
-                  v-on:compare-upload-done="compareUploadDone"></compare-upload>
+                  :server-snapshot="serverSnapshot"
+                  @compare-upload-done="compareUploadDone"></compare-upload>
               </sync-step>
             </v-stepper-content>
             <v-stepper-content step="2">
               <sync-step
                 :title="$t('downloading')"
                 v-if="downloadStep === 2"
-                v-bind:continue-status="continueStatusArray[1]"
-                v-on:continue-clicked="onContinue"
-                v-on:cancel-clicked="onCancel">
+                :continue-status="continueStatusArray[1]"
+                @continue-clicked="onContinue"
+                @cancel-clicked="onCancel">
                 <empty-snapshots-directory
                   v-if="downloadStep > 1"
                   :logging-service="loggingService"
-                  v-bind:snapshotId="serverSnapshotId"
-                  v-on:empty-snapshots-directory-done="emptySnapshotsDirectoryDone">
+                  :snapshotId="serverSnapshotId"
+                  @empty-snapshots-directory-done="emptySnapshotsDirectoryDone">
                 </empty-snapshots-directory>
                 <check-download-size
                   v-if="downloadStep > 1 && downloadSubStep > 1"
                   :logging-service="loggingService"
-                  v-bind:snapshotId="serverSnapshotId"
-                  v-on:check-download-size-done="checkDownloadSizeDone">
+                  :snapshotId="serverSnapshotId"
+                  @check-download-size-done="checkDownloadSizeDone">
                 </check-download-size>
                 <download-snapshot
                   v-if="downloadStep > 1 && downloadSubStep > 2"
                   :logging-service="loggingService"
-                  v-bind:snapshotId="serverSnapshotId"
-                  v-bind:snapshotFileSize="snapshotFileSize"
-                  v-on:download-snapshot-done="downloadSnapshotDone">
+                  :snapshotId="serverSnapshotId"
+                  :snapshotFileSize="snapshotFileSize"
+                  :username="username"
+                  :password="password"
+                  @download-snapshot-done="downloadSnapshotDone">
                 </download-snapshot>
                 <verify-download
                   v-if="downloadStep > 1 && downloadSubStep > 3"
                   :logging-service="loggingService"
-                  v-bind:fileEntry="downloadedSnapshotFileEntry"
-                  v-bind:fileHash="serverSnapshot.hash"
-                  v-on:verify-download-done="verifyDownloadDone">
+                  :fileEntry="downloadedSnapshotFileEntry"
+                  :fileHash="serverSnapshot.hash"
+                  @verify-download-done="verifyDownloadDone">
                 </verify-download>
                 <extract-snapshot
                   v-if="downloadStep > 1 && downloadSubStep > 4"
                   :logging-service="loggingService"
-                  v-bind:fileEntry="downloadedSnapshotFileEntry"
-                  v-on:extract-snapshot-done="extractSnapshotDone">
+                  :fileEntry="downloadedSnapshotFileEntry"
+                  @extract-snapshot-done="extractSnapshotDone">
                 </extract-snapshot>
               </sync-step>
             </v-stepper-content>
@@ -89,38 +91,38 @@
               <sync-step
                 :title="$t('inserting')"
                 v-if="downloadStep === 3"
-                v-bind:continue-status="continueStatusArray[2]"
-                v-on:continue-clicked="onContinue"
-                v-on:cancel-clicked="onCancel">
+                :continue-status="continueStatusArray[2]"
+                @continue-clicked="onContinue"
+                @cancel-clicked="onCancel">
                 <remove-database
                   v-if="downloadStep > 2"
                   :logging-service="loggingService"
-                  v-on:remove-database-done="removeDatabaseDone">
+                  @remove-database-done="removeDatabaseDone">
                 </remove-database>
                 <insert-rows
                   v-if="downloadStep > 2 && downloadSubStep > 1"
                   :logging-service="loggingService"
                   :query-runner="queryRunner"
-                  v-on:insert-rows-done="insertRowsDone"
-                  v-bind:extracted-snapshot="extractedSnapshot">
+                  @insert-rows-done="insertRowsDone"
+                  :extracted-snapshot="extractedSnapshot">
                 </insert-rows>
                 <configure-database
                   v-if="downloadStep > 2 && downloadSubStep > 2"
                   :logging-service="loggingService"
                   :query-runner="queryRunner"
-                  v-on:configure-database-done="configureDatabaseDone">
+                  @configure-database-done="configureDatabaseDone">
                 </configure-database>
                 <check-foreign-keys
                   v-if="downloadStep > 2 && downloadSubStep > 3"
                   :logging-service="loggingService"
                   :query-runner="queryRunner"
-                  v-on:check-foreign-keys-done="checkForeignKeysDone">
+                  @check-foreign-keys-done="checkForeignKeysDone">
                 </check-foreign-keys>
                 <register-download
                   v-if="downloadStep > 2 && downloadSubStep > 4"
                   :logging-service="loggingService"
                   :sync="sync"
-                  v-on:register-download-done="registerDownloadDone">
+                  @register-download-done="registerDownloadDone">
                 </register-download>
               </sync-step>
             </v-stepper-content>
@@ -128,34 +130,34 @@
               <sync-step
                 :title="$t('images')"
                 v-if="downloadStep === 4"
-                v-bind:continue-status="continueStatusArray[3]"
-                v-on:continue-clicked="onContinue"
-                v-on:cancel-clicked="onCancel">
+                :continue-status="continueStatusArray[3]"
+                @continue-clicked="onContinue"
+                @cancel-clicked="onCancel">
                 <check-connection
                   v-if="downloadStep > 3"
                   :logging-service="loggingService"
-                  v-on:connection-ok="downloadSubStep = 2"></check-connection>
+                  @connection-ok="downloadSubStep = 2"></check-connection>
                 <authenticate-device
                   v-if="downloadStep > 3 && downloadSubStep > 1"
                   :logging-service="loggingService"
-                  v-on:authentication-ok="downloadSubStep = 3"></authenticate-device>
+                  @authentication-ok="downloadSubStep = 3"></authenticate-device>
                 <generate-image-list
                   v-if="downloadStep > 3 && downloadSubStep > 2"
                   :logging-service="loggingService"
-                  v-on:generate-image-list-done="generateImageListDone">
+                  @generate-image-list-done="generateImageListDone">
                 </generate-image-list>
                 <calculate-image-size
-                  v-bind:images-to-download="imagesToDownload"
+                  :images-to-download="imagesToDownload"
                   v-if="downloadStep > 3 && downloadSubStep > 3"
                   :logging-service="loggingService"
-                  v-on:calculate-image-size-done="calculateImageSizeDone">
+                  @calculate-image-size-done="calculateImageSizeDone">
                 </calculate-image-size>
                 <download-images
-                  v-bind:images-to-download="imagesToDownload"
-                  v-bind:num-images-found="numImagesFound"
+                  :images-to-download="imagesToDownload"
+                  :num-images-found="numImagesFound"
                   v-if="downloadStep > 3 && downloadSubStep > 4"
                   :logging-service="loggingService"
-                  v-on:download-images-done="downloadImagesDone">
+                  @download-images-done="downloadImagesDone">
                 </download-images>
               </sync-step>
             </v-stepper-content>
@@ -243,6 +245,14 @@
     props: {
       initDownloadStep: {
         type: Number,
+        required: true
+      },
+      username: {
+        type: String,
+        required: true
+      },
+      password: {
+        type: String,
         required: true
       }
     },

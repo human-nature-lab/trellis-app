@@ -1,4 +1,4 @@
-import config from '@/config'
+import config from 'config'
 export default class GeneratorService {
   delayPromise () {
     return new Promise(function (resolve) {

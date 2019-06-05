@@ -39,12 +39,12 @@ module.exports = merge(baseWebpackConfig, {
       serviceWorkerLoader: `<script>${fs.readFileSync(path.join(__dirname,
         './service-worker-dev.js'), 'utf-8')}</script>`
     }),
-    new FriendlyErrorsPlugin(),
+    new FriendlyErrorsPlugin()/*,
     new HardSourceWebpackPlugin({
       environmentHash: {
         root: process.cwd(),
         files: ['package-lock.json', '.babelrc', '.postcssrc.js', '.eslintrc.js']
       }
-    })
+    })*/
   ]
 })

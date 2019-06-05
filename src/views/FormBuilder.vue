@@ -1,5 +1,5 @@
 <template>
-  <v-flex>
+  <v-flex xs12>
     <TrellisLoadingCircle v-if="isLoading"/>
     <iframe
       v-show="!isLoading"
@@ -10,12 +10,14 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import config from '../config'
+  import config from 'config'
   import {Route} from 'vue-router/types/router'
   import {getToken} from '../services/http/AxiosInstance'
+  import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import global from '../static/singleton'
   export default Vue.extend({
     name: 'FormBuilder',
+    components: { TrellisLoadingCircle },
     data () {
       return {
         global,
@@ -39,6 +41,7 @@
           .replace('{token}', JSON.stringify(getToken()))
           .replace('{study}', JSON.stringify(this.global.study.toSnakeJSON({includeRelationships: true})))
           .replace('{locale}', JSON.stringify(this.global.locale.toSnakeJSON({includeRelationships: true})))
+          .replace('{apiRoot}', JSON.stringify(config.apiRoot))
         return encodeURI(url)
       }
     }

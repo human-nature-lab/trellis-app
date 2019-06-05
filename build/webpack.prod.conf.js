@@ -2,18 +2,16 @@ var path = require('path')
 var utils = require('./utils')
 var webpack = require('webpack')
 var config = require('../config')
-var srcConfig = require('../src/config')
 var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
-var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 var SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin')
 var loadMinified = require('./load-minified')
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-var MiniCssExtractPlugin = require("mini-css-extract-plugin");
+var MiniCssExtractPlugin = require("mini-css-extract-plugin")
 var SentryPlugin = require('@sentry/webpack-plugin')
-var sentryRelease = require('./utils').sentryRelease(srcConfig)
+var sentryRelease = require('./utils').sentryRelease()
 var HandlebarsPlugin = require('handlebars-webpack-plugin')
 
 console.log('release', sentryRelease)
@@ -94,12 +92,6 @@ var webpackConfig = merge(baseWebpackConfig, {
       serviceWorkerLoader: `<script>${loadMinified(path.join(__dirname,
         './service-worker-prod.js'))}</script>`
     }),
-    // copy custom static assets
-    new CopyWebpackPlugin([{
-      from: path.resolve(__dirname, '../static'),
-      to: config.build.assetsSubDirectory,
-      ignore: ['.*']
-    }]),
     // service worker caching
     new SWPrecacheWebpackPlugin({
       cacheId: 'trellis-2',

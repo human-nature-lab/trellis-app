@@ -2,7 +2,7 @@ import FileService from '../file/FileService'
 import DatabaseService from '../database/DatabaseService'
 import Photo from '../../entities/trellis/Photo'
 import uuid from 'uuid/v4'
-import PhotoServiceAbstract from './PhotoServiceAbstract'
+import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'
 import {In, IsNull} from 'typeorm'
 import CancellablePromise from "../../classes/CancellablePromise";
 
@@ -22,36 +22,22 @@ export default class PhotoServiceCordova extends PhotoServiceAbstract {
     })
   }
 
-   async getPhotoSrc (photoId: string): Promise<any> {
-     // if (cache.has(photoId)) {
-     //   return cache.get(photoId)
-     // }
-
-     const connection = await DatabaseService.getDatabase()
-     const repository = await connection.getRepository(Photo)
-     const photo = await repository.findOne(photoId)
-     if (!photo) {
-       throw new Error('Invalid photo ID')
-     }
-
-     const fileEntry = await FileService.getPhoto(photo.fileName)
-
-     return new Promise((resolve, reject) => {
-       fileEntry.file((blob) => {
-         const reader = new FileReader()
-         reader.onloadend = function () {
-           let src = reader.result
-           // cache.set(photoId, src)
-           resolve(src)
-         }
-
-         reader.onerror = function(err) {
-           reject(err)
-         }
-
-         reader.readAsDataURL(blob)
-       })
-     })
+  getPhotoSrc (photoId: string): [Promise<string>, CancelFunction] {
+    const p: Promise<string> = new Promise(async (resolve, reject) => {
+      try {
+        const connection = await DatabaseService.getDatabase()
+        const repository = await connection.getRepository(Photo)
+        const photo = await repository.findOne(photoId)
+        if (!photo) {
+          throw new Error('Invalid photo ID')
+        }
+        const fileEntry = await FileService.getPhoto(photo.fileName)
+        resolve(FileService.readFileAsDataURL(fileEntry))
+      } catch (err) {
+        reject(err)
+      }
+    })
+    return [p, () => {}]
   }
 
   cancelAllOutstanding () {}

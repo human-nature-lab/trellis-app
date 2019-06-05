@@ -2,13 +2,11 @@ import * as Sentry from "@sentry/browser";
 import Emitter from "../classes/Emitter";
 import singleton from '../static/singleton'
 import storage from './StorageService'
-import LocaleService from './locale/LocaleService'
-import StudyService from './study/StudyService'
 import i18n from '../i18n/index'
 import moment from 'moment'
 import DeviceService from "./device/DeviceService"
 import DatabaseService from './database/DatabaseService'
-import config from '../config'
+import config from 'config'
 import {APP_ENV} from '../static/constants'
 
 enum StorageKey {
@@ -34,12 +32,15 @@ class SingletonService extends Emitter {
     if (storage.get(StorageKey.theme)) {
       singleton.darkTheme = storage.get(StorageKey.theme)
     }
+    /* Moved to ValidateStudy Guard
     if (storage.get(StorageKey.study)) {
       const studyId = storage.get(StorageKey.study)
       if (!studyId) return
       singleton.study = await StudyService.getStudy(studyId)
       this.dispatch('study', singleton.study)
     }
+    */
+    /* Moved to ValidateLocale Guard
     if (storage.get(StorageKey.locale)) {
       const localeId = storage.get(StorageKey.locale)
       if (!localeId) return
@@ -49,6 +50,7 @@ class SingletonService extends Emitter {
       }
       console.log('loaded locale', singleton.locale)
     }
+    */
     singleton.deviceId = await DeviceService.getUUID()
     if (config.appEnv === APP_ENV.CORDOVA && config.sentry) {
       const server = await DatabaseService.getServerIPAddress()

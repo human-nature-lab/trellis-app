@@ -2,7 +2,7 @@ import merge from 'lodash/merge'
 import uuid from 'uuid/v4'
 import Log from '../../entities/trellis-config/Log'
 import defaultConfig from './DefaultLoggingConfig'
-import config from '../../config'
+import config from 'config'
 import {LoggingConfig, LoggingLevel, LogRequest} from "./LoggingTypes";
 import singleton from "../../static/singleton";
 import {now} from '../DateService'
