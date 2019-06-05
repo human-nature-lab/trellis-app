@@ -5,11 +5,13 @@
         <v-container fluid class="pb-0">
           <v-layout row wrap>
             <v-text-field
+              xs11
               v-model="query"
               :placeholder="$t('search')"
               :loading="isSearching"
               @input="queryChange">
             </v-text-field>
+            <GeoImport />
           </v-layout>
           <v-layout class="geo-breadcrumbs">
             <span
@@ -99,10 +101,15 @@
   import singleton from '../../static/singleton'
   import router from '../../router'
   import global from '../../static/singleton'
+  import GeoImport from './GeoImport'
 
   export default {
-    router,
     name: 'geo-search',
+    components: {
+      GeoListTile,
+      Cart,
+      GeoImport
+    },
     props: {
       selectedGeos: {
         type: Array,
@@ -292,10 +299,6 @@
       isGeoSelected (geo) {
         return this.selectedIds.indexOf(geo.id) > -1
       }
-    },
-    components: {
-      GeoListTile,
-      Cart
     },
     watch : {
       'userFilters.parent': function (newParentId, oldParentId) {
