@@ -11,6 +11,7 @@ import webRoutes from './web.routes'
 import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
 import { AddSnack } from '../components/SnackbarQueue'
+import PhotoService from '../services/photo/PhotoService'
 
 const defaultRoute = {name: 'Home'}
 
@@ -38,6 +39,8 @@ if (singleton.offline) {
 }
 
 router.beforeEach((to, from, next) => {
+  // Don't let photo requests prevent navigation from happening by cancelling outstanding requests
+  PhotoService.cancelAllOutstanding()
   if (to.name !== from.name) {
     // Moving to new page, loading
     singleton.loading.indeterminate = true

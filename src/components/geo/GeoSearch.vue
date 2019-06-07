@@ -3,7 +3,7 @@
     <v-layout column class="h100">
       <div class="search-header">
         <v-container fluid class="pb-0">
-          <v-layout row wrap>
+          <v-layout row>
             <v-text-field
               xs11
               v-model="query"
@@ -11,7 +11,6 @@
               :loading="isSearching"
               @input="queryChange">
             </v-text-field>
-            <GeoImport />
           </v-layout>
           <v-layout class="geo-breadcrumbs">
             <span
@@ -101,14 +100,12 @@
   import singleton from '../../static/singleton'
   import router from '../../router'
   import global from '../../static/singleton'
-  import GeoImport from './GeoImport'
 
   export default {
     name: 'geo-search',
     components: {
       GeoListTile,
-      Cart,
-      GeoImport
+      Cart
     },
     props: {
       selectedGeos: {
@@ -120,8 +117,7 @@
         default () {
           return {
             'no-parent': true,
-            includeChildren: false,
-            study: singleton.study ? singleton.study.id : null
+            includeChildren: false
           }
         }
       },
@@ -280,7 +276,7 @@
             filters[key] = this.filters[key]
           }
         }
-        return GeoService.search(filters).then(results => {
+        return GeoService.search(this.global.study.id, filters).then(results => {
           this.results = results
           for (let geo of results) {
             this.geoCache_[geo.id] = geo

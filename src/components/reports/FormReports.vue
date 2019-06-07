@@ -4,13 +4,6 @@
       <v-toolbar-title>
         {{$t('form_reports')}}
       </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn :disabled="!hasSelected" icon @click="">
-        <v-icon>refresh</v-icon>
-      </v-btn>
-      <v-btn :disabled="!hasSelected" icon @click="">
-        <v-icon>get_app</v-icon>
-      </v-btn>
     </v-toolbar>
     <v-data-table
       :loading="formsAreLoading"
@@ -36,7 +29,7 @@
         </td>
         <td>
           <span v-if="reportIsLoading(props.item)">
-            <v-progress-circular indeterminate />
+            <TrellisLoadingCircle size="25px" />
           </span>
           <span v-else-if="props.item.report">
             {{props.item.report.createdAt}}
@@ -57,6 +50,7 @@
   import global from '../../static/singleton'
   import Report from "../../entities/web/Report"
   import Vue, {PropOptions} from 'vue'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 
   interface FormWithReport extends Form {
     report?: Report
@@ -64,6 +58,7 @@
 
   export default Vue.extend({
     name: 'FormReports',
+    components: { TrellisLoadingCircle },
     mixins: [ TranslateMixin ],
     props: {
       value: <PropOptions<string[]>>{

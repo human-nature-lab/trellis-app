@@ -1,10 +1,9 @@
-import Study from '../../entities/trellis/Study'
 import http, { adminInst } from '../http/AxiosInstance'
-import {uriTemplate} from "../http/WebUtils";
-import GeoServiceAbstract from './GeoServiceAbstract'
+import { uriTemplate } from '../http/WebUtils'
+import GeoServiceAbstract, { GeoSearchParams } from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import GeoType from '../../entities/trellis/GeoType'
-import Photo from "../../entities/trellis/Photo";
+import Photo from '../../entities/trellis/Photo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 import GeoPhoto from '../../entities/trellis/GeoPhoto'
 
@@ -12,30 +11,24 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
 
   async addPhoto (geoId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     // TODO: Add geo photo on web side
-    throw new Error("Can't add photos on web side yet")
+    throw new Error(`Can't add photos on web side yet`)
   }
 
-  async updatePhotos (photos: Array<PhotoWithPivotTable>) {
-    return http().post(`geo-photos`, { photos: photos })
+  updatePhotos (photos: Array<PhotoWithPivotTable>): Promise<any> {
+    return http().post('geo-photos', { photos: photos })
   }
 
-  async removePhoto (photo: PhotoWithPivotTable) {
-    let geoPhotoId = encodeURIComponent(photo.pivot.id)
-    return http().delete(`geo-photo/${geoPhotoId}`)
+  removePhoto (photo: PhotoWithPivotTable): Promise<any> {
+    return http().delete(uriTemplate('geo-photo/{geoPhotoId}', [photo.pivot.id]))
   }
 
   async getGeoPhotos (geoId: string): Promise<Array<PhotoWithPivotTable>> {
-    let photos: PhotoWithPivotTable[]  = []
-    geoId = encodeURIComponent(geoId)
-    let res = await http().get(`geo/${geoId}/photos`)
-    for (let i = 0; i < res.data.photos.length; i++) {
-      let geoPhoto = new GeoPhoto().fromSnakeJSON(res.data.photos[i])
-      let photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
-      geoPhoto.photo = photo
-      photos.push(new PhotoWithPivotTable(geoPhoto))
-    }
-
-    return photos
+    const res = await http().get(uriTemplate('geo/{geoId}/photos', [geoId]))
+    return res.data.photos.map(p => {
+      const geoPhoto = new GeoPhoto().fromSnakeJSON(p)
+      geoPhoto.photo = new Photo().fromSnakeJSON(p.photo)
+      return new PhotoWithPivotTable(geoPhoto)
+    })
   }
 
   getGeoById (geoId) {
@@ -56,14 +49,14 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
     return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
   }
 
-  async createGeo (geo: Geo): Promise<any> {
+  createGeo (geo: Geo): Promise<any> {
     return http().put('/geo', {
       geo: geo
     })
   }
 
-  async updateGeo (geo: Geo) {
-    return http().post(`/geo/${geo.id}`, {
+  updateGeo (geo: Geo): Promise<any> {
+    return http().post(uriTemplate('/geo/{geo}', [geo.id]), {
       'geo_type_id' : geo.geoTypeId,
       'parent_id' : geo.parentId,
       'latitude' : geo.latitude,
@@ -80,39 +73,35 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
         get_user_addable: getUserAddable
       }
     })
-    return res.data.geoTypes.map((geoType) => {
-      return new GeoType().fromSnakeJSON(geoType)
-    })
+    return res.data.geoTypes.map((geoType) => new GeoType().fromSnakeJSON(geoType))
   }
 
-  async removeGeo (geoId) {
-    return http().delete(`/geo/${geoId}`)
+  async removeGeo (geoId: string): Promise<any> {
+    return http().delete(uriTemplate('/geo/{geoId}', [geoId]))
   }
 
   async moveGeo (geoId, latitude, longitude, moveChildren) {
-    return http().post(`/geo/${geoId}/move`, {
+    return http().post(uriTemplate('/geo/{geoId}/move', [geoId]), {
       latitude: latitude,
       longitude: longitude,
       moveChildren: moveChildren
     })
   }
 
-  getGeoAncestors (geoId) {
-    geoId = encodeURIComponent(geoId)
-    return http().get(`/geo/${geoId}/ancestors`).then(res => {
-      return res.data.ancestors.map(g => new Geo().fromSnakeJSON(g))
-    })
+  async getGeoAncestors (geoId: string): Promise<Geo[]> {
+    const res = await http().get(uriTemplate('/geo/{geoId}/ancestors', [geoId]))
+    return res.data.ancestors.map(g => new Geo().fromSnakeJSON(g))
   }
 
-  search (params) {
-    if (params.types) {
+  async search (studyId: string, params: GeoSearchParams): Promise<Geo[]> {
+    if (params.types && Array.isArray(params.types)) {
       params.types = params.types.join(',')
     }
-    return http().get('/geo/search', {
+    params.study = studyId
+    const res = await http().get('/geo/search', {
       params: params
-    }).then(res => {
-      return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
     })
+    return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
   }
 
   async importGeos (studyId: string, file: File): Promise<Geo[]> {
@@ -125,4 +114,15 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
     })
     return res.data.geos.map(r => new Geo().fromSnakeJSON(r))
   }
+
+  async importGeoPhotos (studyId: string, file: File): Promise<void> {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await adminInst.post(uriTemplate('study/{studyId}/geo-photo/import', [studyId]), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  }
+
 }

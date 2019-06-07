@@ -40,14 +40,20 @@
             :studyId="global.study.id" />
         </v-card>
       </v-container>
+      <v-container>
+        <v-card>
+          <DataImport />
+        </v-card>
+      </v-container>
     </v-card>
   </v-flex>
 </template>
 
 <script lang="ts">
+  import DataImport from '../components/reports/DataImport.vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
-  import StudyReports from '../components/reports/StudyReports'
-  import FormReports from '../components/reports/FormReports'
+  import StudyReports from '../components/reports/StudyReports.vue'
+  import FormReports from '../components/reports/FormReports.vue'
   import global from '../static/singleton'
   import Vue from 'vue'
   import ReportService from "../services/report/ReportService"
@@ -70,7 +76,8 @@
     mixins: [ DocsLinkMixin('reports/Introduction') ],
     components: {
       StudyReports,
-      FormReports
+      FormReports,
+      DataImport
     },
     data () {
       return {

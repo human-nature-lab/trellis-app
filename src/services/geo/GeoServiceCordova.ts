@@ -1,5 +1,5 @@
 import DatabaseService from '../database/DatabaseService'
-import GeoServiceAbstract from './GeoServiceAbstract'
+import GeoServiceAbstract, { GeoSearchParams } from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import {In, IsNull} from 'typeorm'
 import GeoType from '../../entities/trellis/GeoType'
@@ -202,11 +202,10 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     return ancestors.reverse()
   }
 
-  async search (params) {
+  async search (studyId: string, params: GeoSearchParams): Promise<Geo[]> {
     const query = (params.hasOwnProperty('query')) ? params.query : null
     const limit = (params.hasOwnProperty('limit')) ? params.limit : GeoServiceCordova.DEFAULT_SEARCH_RESULTS_LIMIT
     const offset = (params.hasOwnProperty('offset')) ? params.offset : 0
-    const studyId = (params.hasOwnProperty('study')) ? params.study : null
     const parentGeoId = (params.hasOwnProperty('parent')) ? params.parent : null
     const onlyNoParent = params.hasOwnProperty('no-parent')
     const geoTypeIds =  (params.hasOwnProperty('types')) ? params.types : null
@@ -228,7 +227,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       q = q.andWhere('"geo"."parent_id" is null')
     }
 
-    if (geoTypeIds !== null) {
+    if (geoTypeIds !== null && Array.isArray(geoTypeIds)) {
       let geoTypeIdString = geoTypeIds.map((geoTypeId) => { return '"' + geoTypeId + '"' }).join(',')
       q = q.andWhere('"geo"."geo_type_id" in (:geoTypeIdString)', {geoTypeIdString: geoTypeIdString})
     }
@@ -246,10 +245,14 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       .leftJoinAndSelect('geo.photos', 'photo', 'geo_photo.deleted_at is null and geo_photo.sort_order = 0')
       .leftJoinAndSelect('geo.nameTranslation', 'translation')
       .leftJoinAndSelect('translation.translationText', 'translation_text')
-    return await q.getMany()
+    return q.getMany()
   }
 
   importGeos (studyId: string, file: File): Promise<Geo[]> {
+    throw new Error('Not implemented')
+  }
+
+  importGeoPhotos (studyId: string, file: File): PromiseLike<void> {
     throw new Error('Not implemented')
   }
 }

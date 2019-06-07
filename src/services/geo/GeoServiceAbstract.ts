@@ -3,20 +3,18 @@ import Translation from '../../entities/trellis/Translation'
 import Locale from '../../entities/trellis/Locale'
 import TranslationText from '../../entities/trellis/TranslationText'
 import GeoType from '../../entities/trellis/GeoType'
-import GeoPhoto from "../../entities/trellis/GeoPhoto";
-import Photo from "../../entities/trellis/Photo";
+import GeoPhoto from '../../entities/trellis/GeoPhoto'
+import Photo from '../../entities/trellis/Photo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
-export abstract class GeoSearchParams {
-  constructor (
-    public query: string,
-    public studyId: string,
-    public typeIds: string[] = [],
-    public parentId: string = null,
-    public onlyNoParent: boolean = false,
-    public limit: number = 25,
-    public offset: number = 0
-  ) {}
+export interface GeoSearchParams {
+  query: string
+  study: string
+  types: string[] | string,
+  parent: string,
+  onlyNoParent: boolean,
+  limit: number,
+  offset: number
 }
 
 export default abstract class GeoServiceInterface {
@@ -92,7 +90,7 @@ export default abstract class GeoServiceInterface {
    * Run a query by the geo service with an object of parameters
    * @param {GeoSearchParams} params
    */
-  abstract search (params: GeoSearchParams): PromiseLike<Geo[]>
+  abstract search (studyId: string, params: GeoSearchParams): PromiseLike<Geo[]>
 
   /**
    * Get a list of child geos for this given parent
@@ -107,4 +105,11 @@ export default abstract class GeoServiceInterface {
    * @param file
    */
   abstract importGeos (studyId: string, file: File): PromiseLike<Geo[]>
+
+  /**
+   * Import multiple photos and assign them to photos by uploading a ZIP file.
+   * @param studyId
+   * @param file
+   */
+  abstract importGeoPhotos (studyId: string, file: File): PromiseLike<void>
 }

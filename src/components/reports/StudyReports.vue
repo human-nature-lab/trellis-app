@@ -29,7 +29,7 @@ import { StudyReportType } from '../../services/report/ReportService'
         </td>
         <td>
           <span v-if="reportIsLoading(props.item)">
-            <v-progress-circular indeterminate />
+            <TrellisLoadingCircle size="20px" />
           </span>
           <span v-else-if="props.item.report">
             {{props.item.report.createdAt}}
@@ -47,6 +47,7 @@ import { StudyReportType } from '../../services/report/ReportService'
   import Vue, {PropOptions} from 'vue'
   import Report from "../../entities/web/Report"
   import {StudyReportType} from "../../services/report/ReportService"
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 
   interface StudyReportTypeObj {
     title: string
@@ -56,6 +57,7 @@ import { StudyReportType } from '../../services/report/ReportService'
 
   export default Vue.extend({
     name: 'StudyReports',
+    components: { TrellisLoadingCircle },
     props: {
       value: <PropOptions<string[]>>{
         type: Array,

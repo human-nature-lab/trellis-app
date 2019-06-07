@@ -69,9 +69,6 @@
             </v-flex>
           </v-layout>
         </v-flex>
-        <v-flex>
-          <ImportRespondents />
-        </v-flex>
       </v-layout>
     </v-scale-transition>
     <v-divider v-if="filters.geos && filters.geos.length" />
@@ -183,7 +180,6 @@
   import PhotoService from '../../services/photo/PhotoService'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import DocsFiles from '../documentation/DocsFiles'
-  import ImportRespondents from './ImportRespondents'
   import TrellisModal from '../TrellisModal'
 
   function hasAnyFilter (filters) {
@@ -235,7 +231,6 @@
       AddRespondentForm,
       GeoBreadcrumbs,
       TrellisLoadingCircular,
-      ImportRespondents,
       TrellisModal
     },
     props: {
