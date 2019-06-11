@@ -35,19 +35,11 @@
         try {
           this.isWorking = true
           const respondents = await RespondentService.importRespondents(files[0]['file'], this.global.study.id)
-<<<<<<< HEAD
-          this.alert('success', `Imported ${respondents.length} respondents!`)
-          this.$emit('import-respondents', respondents)
-        } catch (err) {
-          this.log(err)
-          let message = err.message
-=======
           this.alert('success', this.$t('import_success'))
           this.$emit('import-respondents', respondents)
         } catch (err) {
           this.log(err)
           let message = this.$t('import_failed')
->>>>>>> Added importing of respondent locations and respondent condition tags. Removed login button from user sign up confirmation. Updated translations. Moved imports to the reports view.
           if (err && err.response && err.response.data && err.response.data.msg) {
             message = err.response.data.msg
           }

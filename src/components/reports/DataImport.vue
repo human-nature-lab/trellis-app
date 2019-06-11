@@ -1,16 +1,11 @@
 <template>
   <v-flex>
     <v-toolbar flat>
-      <v-toolbar-title>{{$t('data_import')}}</v-toolbar-title>
+      <v-toolbar-title >
+        <DocsLinkBadge to="Importing.md">{{$t('data_import')}}</DocsLinkBadge>
+      </v-toolbar-title>
     </v-toolbar>
     <v-container>
-<<<<<<< HEAD
-      <v-layout wrap>
-        <GeoImport />
-        <GeoPhotoImport />
-        <RespondentImport />
-        <RespondentPhotoImport />
-=======
       <v-layout>
         <v-flex>
           <v-layout column>
@@ -26,7 +21,6 @@
             <RespondentConditionTagImport />
           </v-layout>
         </v-flex>
->>>>>>> Added importing of respondent locations and respondent condition tags. Removed login button from user sign up confirmation. Updated translations. Moved imports to the reports view.
       </v-layout>
     </v-container>
   </v-flex>
@@ -55,3 +49,8 @@
     }
   })
 </script>
+
+<style lang="sass" scoped>
+  .toolbar__title
+    overflow: visible
+</style>
