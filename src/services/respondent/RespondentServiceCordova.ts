@@ -433,4 +433,9 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   async importRespondentPhotos (file: File, studyId: string): Promise<void> {
     throw new Error('Not implemented')
   }
+
+  importRespondentGeos (file: File, studyId: string): Promise<any> {
+    throw new Error('Not implemented')
+  }
+
 }

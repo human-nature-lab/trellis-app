@@ -35,4 +35,11 @@ export default interface ConditionTagInterface {
    * @returns {Promise<Object[]>}
    */
   all (): Promise<ConditionTag[]>
+
+  /**
+   * Import a CSV of respondent condition tags
+   * @param file
+   * @param studyId
+   */
+  importRespondentConditionTags (file: File, studyId: string): Promise<any>
 }

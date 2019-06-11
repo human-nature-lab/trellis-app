@@ -2,7 +2,7 @@
     <v-flex>
       <file-upload
         input-id="geo-photo"
-        class="btn"
+        class="btn primary"
         extensions="zip"
         :drop="true"
         v-model="files"
@@ -37,11 +37,19 @@
         try {
           this.isWorking = true
           await GeoService.importGeoPhotos(this.global.study.id, files[0]['file'])
+<<<<<<< HEAD
           this.alert('success', 'Imported photos!')
           this.$emit('import-photos')
         } catch (err) {
           this.log(err)
           let message = err.message
+=======
+          this.alert('success', this.$t('import_success'))
+          this.$emit('import-photos')
+        } catch (err) {
+          this.log(err)
+          let message = this.$t('import_failed')
+>>>>>>> Added importing of respondent locations and respondent condition tags. Removed login button from user sign up confirmation. Updated translations. Moved imports to the reports view.
           if (err && err.response && err.response.data && err.response.data.msg) {
             message = err.response.data.msg
           }
@@ -53,7 +61,10 @@
     }
   })
 </script>
+<<<<<<< HEAD
 
 <style lang="sass" scoped>
 
 </style>
+=======
+>>>>>>> Added importing of respondent locations and respondent condition tags. Removed login button from user sign up confirmation. Updated translations. Moved imports to the reports view.

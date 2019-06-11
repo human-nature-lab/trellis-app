@@ -2,7 +2,7 @@
   <v-flex>
     <file-upload
       input-id="geo"
-      class="btn"
+      class="btn primary"
       extensions="csv"
       v-model="files"
       :drop="true"
@@ -41,7 +41,11 @@
           this.alert('success', this.$t('import_success'))
         } catch (err) {
           this.log(err)
+<<<<<<< HEAD
           this.alert('error', err, { timeout: 0 })
+=======
+          this.alert('error', this.$t('import_failed'), { timeout: 0 })
+>>>>>>> Added importing of respondent locations and respondent condition tags. Removed login button from user sign up confirmation. Updated translations. Moved imports to the reports view.
         } finally {
           this.isWorking = false
         }
@@ -49,7 +53,10 @@
     }
   })
 </script>
+<<<<<<< HEAD
 
 <style lang="sass" scoped>
 
 </style>
+=======
+>>>>>>> Added importing of respondent locations and respondent condition tags. Removed login button from user sign up confirmation. Updated translations. Moved imports to the reports view.

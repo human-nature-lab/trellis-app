@@ -151,7 +151,17 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
   async importRespondentPhotos (file: File, studyId: string): Promise<void> {
     const formData = new FormData()
     formData.append('file', file)
-    const res = await adminInst.post(uriTemplate('study/{studyId}/respondent-photo/import', [studyId]), formData, {
+    await adminInst.post(uriTemplate('study/{studyId}/respondent-photo/import', [studyId]), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  }
+
+  async importRespondentGeos (file: File, studyId: string): Promise<any> {
+    const formData = new FormData()
+    formData.append('file', file)
+    await adminInst.post(uriTemplate('study/{studyId}/respondent-geo/import', [studyId]), formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
