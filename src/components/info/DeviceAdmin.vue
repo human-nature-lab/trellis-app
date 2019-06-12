@@ -32,7 +32,7 @@
     },
     methods: {
       async unregister () {
-        if (!confirm(this.$t('confirm_unregister_device'))) return
+        if (!confirm(this.$t('confirm_unregister_device') as string)) return
         try {
           this.isWorking = true
           await DeviceService.removeDeviceKey()
