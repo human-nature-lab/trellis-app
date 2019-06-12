@@ -38,7 +38,25 @@ an argument, in our examples we name this argument `vars`.
 
 ### Examples
 
-The simplest function, which always assigns the condition, always returns true:
+The boilerplate function for condition assignment is:
+
+```
+  function (vars) {
+    // Code that returns true or false
+  }
+```
+
+An example vars object passed to the function might be:
+
+```
+  {
+    'q0100': '1', // Response 1 chosen for a multiple-choice question
+    'q0200': ['a', 'f', 'g'], // Responses a, f, and g chosen for a multiple-select question 
+  }
+
+```
+
+A simple function, which always assigns the condition, always returns true:
 
 ```
   function (vars) {
@@ -55,12 +73,15 @@ function:
   }
 ```
 
-To assign a condition for respondents who chose option 'a', 'b', or 'c' for the multiple-select question q0200, you 
+To assign a condition for respondents who chose option 'a', or 'c' for the multiple-select question q0200, you 
 would use the function:
 
 ```
   function(vars) { 
-    return (vars['q0200'].indexOf('a') > -1 || vars['q0200'].indexOf('b') > -1 || vars['q0200'].indexOf('c') > -1);
+    return (vars['q0200'].indexOf('a') > -1 || vars['q0200'].indexOf('c') > -1);
   }
 ```
+
+*Note: Condition assignment functions must be idempotent: given the same input, the function should always return the 
+same results.*
 

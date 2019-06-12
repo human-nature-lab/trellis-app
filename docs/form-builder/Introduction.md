@@ -1,8 +1,20 @@
 # Form builder
 
-A form is a collection of questions arranged into pages and sections. The questions collect data while the pages and 
-sections control which questions are presented to the respondent. Specifically, pages control the visibility of 
-questions on a per-page basis while sections control how many times a questions are repeated.
+A form is divided into one or more sections, each section contains one or more pages, and each page contains one or more 
+questions. A single page of questions is presented to the surveyor at once and clicking the 'Next' button will advance 
+the form from one page to the next.
+
+### Example form structure
++ **Section 1**
+  + Page 1
+    + Question 1
+    + Question 2
+  + Page 2
+    + Question 3
++ **Section 2**
+  + Page 1
+    + Question 4
+    + ...
 
 ## Getting started
 1. Click the "Add Section" button and enter the name of your first section. A section is used to organize questions by 
@@ -16,5 +28,5 @@ questions on a per-page basis while sections control how many times a questions 
 3. Click the "Add Question" button at the bottom of the page and fill out the dialog with the question text, variable 
    name, and question type in order to add your first question to your form. You may want to add multiple questions to 
    the same page if they are shorter or related questions, otherwise, click the "Add Page" button to separate questions 
-   by a "Next" button in the app. [Click for more about questions.](Pages.md) 
+   by a "Next" button in the app. [Click for more about questions.](Questions.md) 
 
