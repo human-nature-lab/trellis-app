@@ -242,11 +242,11 @@
     /*margin-top: 50px*/
     /*margin-bottom: 50px*/
   .app-container-demo
-    padding-top: 60px
+    padding-top: 56px
   .main-menu
     margin-top: 0 !important
   .main-menu-demo
-    margin-top: 60px !important
+    margin-top: 56px !important
   .demo-banner
     z-index: 1600
     position: fixed

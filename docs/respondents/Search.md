@@ -18,7 +18,7 @@ Click the **Add respondent** button to open a dialog to [[add a new respondent |
 
 ### Filtering by condition tag
 
-You can filter respondents by condition tags:
+You can filter respondents by [condition tags](../form-builder/Conditions.md):
 1. Click the down arrow (&caron;) to the right of the **Search** field to expand the advanced search options
 2. Either enter the name of the condition tag in the **Condition tags** field, or click the down arrow (▼) to the right 
 of the **Condition tags** search field to expand a selectable list of assigned condition tags.
