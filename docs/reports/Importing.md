@@ -8,7 +8,7 @@ Respondents can be imported in bulk using a CSV file. The columns for the CSV sh
 Respondent photos can be imported in bulk by uploading a ZIP file filled with JPGs. Each image filename should match the `id` of the respondent they belong to. This id can either be the same id used when importing the respondents or it can be the internal id used by Trellis.
           
 ## Respondent condition tags
-Respondent condition tags can be assigned in bulk by uploading a CSV file with the following columns: `respondent_id, condition_tag`. The `respondent_id` should be the id used when importing the respondents or it can be the internal id used by Trellis. The `condition_tag` column can be any alphanumeric text which classifies a respondent in some way. See [Conditions](form-builder/Conditions.md) for more information.
+Respondent condition tags can be assigned in bulk by uploading a CSV file with the following columns: `respondent_id, condition_tag`. The `respondent_id` should be the id used when importing the respondents or it can be the internal id used by Trellis. The `condition_tag` column can be any alphanumeric text which classifies a respondent in some way. See [Conditions](../form-builder/Conditions.md) for more information.
           
 ## Locations
 Locations can be imported in bulk using a CSV file. The CSV should have the following columns: `id, name, geo_type, latitude, longitude, altitude`. Optionally include the `parent_id` column to assign a location to a parent location. All of the supplied ids must be unique for each study.

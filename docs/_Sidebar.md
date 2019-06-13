@@ -15,8 +15,14 @@
   - [Question parameters](form-builder/Question-parameters.md)
   - [Conditions](form-builder/Conditions.md)
 
-#### [Devices](devices/Devices.md)
-- [Register Device](devices/RegisterDevice.md)
+### General
+- [Server Configuration](ServerConfiguration.md)
+- [Permissions](Permissions.md)
+- [Studies](Studies)
+- [Devices](devices/Devices.md)
+  - [Registering devices](devices/RegisterDevice.md)
+- [Logs](Logs.md)
+- [Information](Information.md)
 
 #### Locations
 - [Search](locations/Search.md)
@@ -33,6 +39,7 @@
 
 #### Reports
 - [Introduction](reports/Introduction.md)
+- [Importing](reports/Importing.md)
 - [Survey reports](reports/SurveyReports.md)
 - [Respondent reports](reports/RespondentReport.md)
 - [Location reports](reports/LocationReport.md)
