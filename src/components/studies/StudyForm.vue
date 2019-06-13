@@ -15,7 +15,7 @@
             <v-flex xs9>
               <v-slider
                 :disabled="isWorking"
-                :step="5"
+                :step="1"
                 :label="$t('photo_quality')"
                 v-model="memStudy.photoQuality" />
             </v-flex>
