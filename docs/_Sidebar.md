@@ -8,30 +8,25 @@
 
 #### Form builder
 - [Introduction](form-builder/Introduction.md)
+- [Form types](form-builder/FormTypes.md)
 - [Form sections](form-builder/Sections.md)
 - [Form pages](form-builder/Pages.md)
 - [Form questions](form-builder/Questions.md)
   - [Question types](form-builder/Question-types.md)
   - [Question parameters](form-builder/Question-parameters.md)
   - [Conditions](form-builder/Conditions.md)
-
-### General
-- [Server Configuration](ServerConfiguration.md)
-- [Permissions](Permissions.md)
-- [Studies](Studies)
-- [Devices](devices/Devices.md)
-  - [Registering devices](devices/RegisterDevice.md)
-- [Logs](Logs.md)
-- [Information](Information.md)
+  - [Interpolated values](form-builder/InterpolatedValues.md)
 
 #### Locations
 - [Search](locations/Search.md)
 - [Location info](locations/Geo-info.md)
 - [Map](locations/Map.md)
+- [Location types](location/LocationTypes.md)
 
 #### Respondents
 - [Search](respondents/Search.md)
 - [Add a new respondent](respondents/Add-new-respondent.md)
+- [Respondent info](respondents/RespondentInfo.md)
 
 #### Sync
 - [Introduction](sync/Introduction.md)
@@ -47,5 +42,16 @@
 - [Edge reports](reports/EdgeReport.md)
 - [Action reports](reports/ActionReport.md)
 - [Respondent location reports](reports/RespondentLocationReport.md)
+- [Metadata reports](reports/MetadataReports.md)
+
+### General
+- [Server Configuration](ServerConfiguration.md)
+- [Permissions](Permissions.md)
+- [Studies](Studies)
+- [Devices](devices/Devices.md)
+  - [Registering devices](devices/RegisterDevice.md)
+- [Logs](Logs.md)
+- [Information](Information.md)
+
 
 ##### [Glossary](Glossary.md)
