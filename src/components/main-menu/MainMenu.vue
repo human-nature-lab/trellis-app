@@ -286,5 +286,8 @@
 </script>
 
 <style scoped>
+  .list__tile__title {
+    line-height: 30px;
+  }
 
 </style>
