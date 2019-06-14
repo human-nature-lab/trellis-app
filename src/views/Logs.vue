@@ -110,7 +110,7 @@
   export default Vue.extend({
     name: 'Logs',
     components: { ModalTitle },
-    mixins: [DocsLinkMixin('./Logs.md')],
+    mixins: [DocsLinkMixin('./admin/Logs.md')],
     data () {
       return {
         headers: [{

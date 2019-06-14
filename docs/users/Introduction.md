@@ -11,7 +11,7 @@ The real name of the user.
 #### Username
 The unique name used to login to Trellis.
 #### Role
-The role of the user controls what they have access to. These roles can be modified and changed. See [permissions](../Permissions.md) for more information.
+The role of the user controls what they have access to. These roles can be modified and changed. See [permissions](../admin/Permissions.md) for more information.
 #### Password
 The initial password for that surveyor. All users can change their password to whatever they would like.
 

@@ -23,10 +23,12 @@
 
 <script>
   import GeoLocationService from '../services/geolocation'
-  import {interpolateHeatmap} from '../classes/M'
+  import { interpolateHeatmap } from '../classes/M'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
 
   export default {
     name: 'LocationHistory',
+    mixins: [DocsLinkMixin('./admin/LocationHistory.md')],
     data () {
       return {
         geolocation: GeoLocationService,
@@ -66,7 +68,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

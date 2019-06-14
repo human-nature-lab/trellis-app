@@ -10,7 +10,7 @@ import WebLogin from '../views/WebLogin'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')
 const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../views/ServiceTesting')
-const LocationHistory = () => import(/* webpackChunkName: "location-history" */'../components/LocationHistory')
+const LocationHistory = () => import(/* webpackChunkName: "location-history" */'../views/LocationHistory')
 const TrellisInfo = () => import(/* webpackChunkName: "trellis-info" */'../views/TrellisInfo')
 const GeoSearchWithMap = () => import(/* webpackChunkName: "geo-search" */'../components/geo/GeoSearchWithMap')
 const LocaleSelectorPage = () => import(/* webpackChunkName: "locale-selector" */'../views/LocaleSelectorPage')

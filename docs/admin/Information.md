@@ -9,6 +9,7 @@ On the web, the information module will only show the current server configured 
 In the mobile app, the information module will be broken into submodules with useful information in each of them.
 
 ### Device
+Click on this module to view the version history of Trellis.
 - Version
   - The current version of Trellis
 - Device ID
@@ -23,6 +24,7 @@ In the mobile app, the information module will be broken into submodules with us
   - The number of database rows in this database that have not been synced with the server
   
 ### Storage
+Click on this module to view the full [storage information](./Storage.md).
 - Device photos
   - The number of photos present on this device
 - Database photos
@@ -31,6 +33,7 @@ In the mobile app, the information module will be broken into submodules with us
   - The amount of storage that the photos are currently using on this device
   
 ### GPS
+Click on this module for access to the device [location history](./LocationHistory.md).
 - Status
   - The current status of the GPS on this device. After GPS has been turned on, it can take some time for the 
     GPS to actually acquire a "fix". A "fix" occurs once the device has successfully locked in communication with 
@@ -40,7 +43,7 @@ In the mobile app, the information module will be broken into submodules with us
   - How long it has been since the last GPS update happened.
 
 ### Logs
-Click on this module for more detailed logging information.
+Click on this module for more detailed [logging information](./Logs.md).
 - Logs
   - The total number of logs stored currently on this device. Each device keeps separate logs for errors and other 
     debug information.
@@ -51,4 +54,5 @@ Click on this module for more detailed logging information.
 ### Admin
 - Unregister device
   - This is the button to click if you want the device to revoke its own access to the server which it is configured
-    to communicate with.
+    to communicate with. If this action is performed, the device will need to be [registered again](../devices/RegisterDevice.md)
+    before it can be used to upload or download data.

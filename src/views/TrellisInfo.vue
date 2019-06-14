@@ -63,7 +63,7 @@
   export default Vue.extend({
     name: 'TrellisInfo',
     components: { LogsInfo, GPSInfo, DeviceInfo, StorageInfo, UploadsInfo, DeviceAdmin, Permission },
-    mixins: [DocsLinkMixin('./Information.md')]
+    mixins: [DocsLinkMixin('./admin/Information.md')]
   })
 </script>
 

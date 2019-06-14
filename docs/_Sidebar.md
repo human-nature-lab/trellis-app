@@ -45,13 +45,13 @@
 - [Metadata reports](reports/MetadataReports.md)
 
 ### General
-- [Server Configuration](ServerConfiguration.md)
-- [Permissions](Permissions.md)
+- [Server Configuration](admin/ServerConfiguration.md)
+- [Permissions](admin/Permissions.md)
 - [Studies](Studies)
 - [Devices](devices/Devices.md)
   - [Registering devices](devices/RegisterDevice.md)
-- [Logs](Logs.md)
-- [Information](Information.md)
+- [Logs](admin/Logs.md)
+- [Information](admin/Information.md)
 
 
 ##### [Glossary](Glossary.md)
