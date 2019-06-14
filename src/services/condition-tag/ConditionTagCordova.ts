@@ -62,6 +62,10 @@ export class ConditionTagCordova implements ConditionTagInterface {
     const repo = await DatabaseService.getRepository(ConditionTag)
     return await repo.find()
   }
+
+  importRespondentConditionTags (file: File, studyId: string): Promise<any> {
+    throw new Error('Not implemented')
+  }
 }
 
 export default new ConditionTagCordova()

@@ -1,15 +1,14 @@
 <template>
   <v-flex>
     <file-upload
-      input-id="geo"
+      input-id="respondent-condition-tag"
       class="btn primary"
       extensions="csv"
-      v-model="files"
       :drop="true"
-      @input="importGeos" >
+      @input="importConditionTags" >
       <TrellisLoadingCircle size="25px" v-if="isWorking" />
       <div class="btn__content" v-else>
-        {{$t('import_locations')}}
+        {{$t('import_respondent_tags')}}
       </div>
     </file-upload>
   </v-flex>
@@ -17,31 +16,33 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import GeoService from '../../services/geo/GeoService'
   import global from '../../static/singleton'
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
   import FileUpload from 'vue-upload-component'
+  import ConditionTagService from '../../services/condition-tag'
 
   export default Vue.extend({
-    name: 'GeoImport',
-    components: { TrellisLoadingCircle, FileUpload },
+    name: 'RespondentConditionTagImport',
+    components: { FileUpload, TrellisLoadingCircle },
     data () {
       return {
-        global,
         isWorking: false,
-        files: []
+        global
       }
     },
     methods: {
-      async importGeos (files: object[]) {
+      async importConditionTags (files: File[]) {
         try {
           this.isWorking = true
-          const geos = await GeoService.importGeos(this.global.study.id, files[0]['file'])
-          this.$emit('updateGeos', geos)
-          this.alert('success', this.$t('import_success'))
+          await ConditionTagService.importRespondentConditionTags(files[0]['file'], this.global.study.id)
+          this.alert('success', 'Imported respondent condition tags successfully')
         } catch (err) {
           this.log(err)
-          this.alert('error', this.$t('import_failed'), { timeout: 0 })
+          let msg = err.msg
+          if (!msg) {
+            msg = this.$t('import_failed')
+          }
+          this.alert('error', msg, {timeout: 0})
         } finally {
           this.isWorking = false
         }

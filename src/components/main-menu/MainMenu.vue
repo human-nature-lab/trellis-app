@@ -170,7 +170,7 @@
           }]
         }, {
           title: 'admin',
-          showIf: this.isWeb && this.isDebug,
+          showIf: this.isWeb,
           items: [{
             to: {name: 'Users'},
             icon: 'recent_actors',
@@ -236,7 +236,6 @@
         }, {
           title: 'general',
           items: [{
-            showIf: this.isDebug,
             to: {name: 'Documentation'},
             icon: 'help',
             title: 'documentation'

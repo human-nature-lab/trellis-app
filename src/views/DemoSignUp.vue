@@ -52,9 +52,6 @@
         <v-stepper-content step="2">
           <v-layout column>
             <v-flex class="ma-1">Successfully submitting the demo request form. You will receive an email to complete the account creation process soon.</v-flex>
-            <v-flex class="ma-1">
-              <v-btn :to="{name: 'Login'}">Login</v-btn>
-            </v-flex>
           </v-layout>
         </v-stepper-content>
       </v-stepper>
