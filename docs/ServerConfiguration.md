@@ -1,5 +1,6 @@
 # Server Configuration
-The server configuration controls all of the frontend variables that may change with the environment that Trellis is deployed in. Many of them apply to both the Trellis mobile app and the web application.
+The server configuration controls all of the frontend variables that may change with the environment that Trellis 
+is deployed in. Many of them apply to both the Trellis mobile app and the web application.
 
 
 ## Configuration options

@@ -1,5 +1,6 @@
 # Information
-The information module in Trellis presents general information about the current version of Trellis and the system running it. This module shows different things depending on whether it is the mobile or web version of Trellis. 
+The information module in Trellis presents general information about the current version of Trellis and the system 
+running it. This module shows different things depending on whether it is the mobile or web version of Trellis. 
 
 ## Web
 On the web, the information module will only show the current server configured and the current version of Trellis.
@@ -31,17 +32,23 @@ In the mobile app, the information module will be broken into submodules with us
   
 ### GPS
 - Status
-  - The current status of the GPS on this device. After GPS has been turned on, it can take some time for the GPS to actually acquire a "fix". A "fix" occurs once the device has successfully locked in communication with three or more GPS satellites so that the device can calculate its position. Acquiring a "fix" my take longer or be impossible indoors or even in some outdoor locations.
+  - The current status of the GPS on this device. After GPS has been turned on, it can take some time for the 
+    GPS to actually acquire a "fix". A "fix" occurs once the device has successfully locked in communication with 
+    three or more GPS satellites so that the device can calculate its position. Acquiring a "fix" my take longer 
+    or be impossible indoors or even in some outdoor locations.
 - Last update
   - How long it has been since the last GPS update happened.
 
 ### Logs
 Click on this module for more detailed logging information.
 - Logs
-  - The total number of logs stored currently on this device. Each device keeps separate logs for errors and other debug information.
+  - The total number of logs stored currently on this device. Each device keeps separate logs for errors and other 
+    debug information.
 - Uploaded
-  - The number of logs that have been uploaded to the server. Logs are not uploaded by default, but can be uploaded via the [logs](Logs.md) module.
+  - The number of logs that have been uploaded to the server. Logs are not uploaded by default, but can be uploaded 
+    via the [logs](Logs.md) module.
   
 ### Admin
 - Unregister device
-  - This is the button to click if you want the device to revoke its own access to the server which it is configured to communicate with.
+  - This is the button to click if you want the device to revoke its own access to the server which it is configured
+    to communicate with.
