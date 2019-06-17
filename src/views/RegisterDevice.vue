@@ -33,10 +33,10 @@
   import Vue from 'vue'
   import LoginForm from '../components/LoginForm.vue'
   import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
-  import Device from "../entities/trellis/Device"
+  import Device from '../entities/trellis/Device'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
-  import DeviceService from "../services/device/DeviceService"
-  import {replaceWithNext} from '../router'
+  import DeviceService from '../services/device/DeviceService'
+  import { replaceWithNext } from '../router'
 
   export default Vue.extend({
     name: 'RegisterDevice',

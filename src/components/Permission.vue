@@ -7,7 +7,6 @@
   import Vue, { VNode } from 'vue'
   import { TrellisPermission } from '../static/permissions.base'
 
-  // @ts-ignore
   export default Vue.extend({
     name: 'permission',
     mixins: [PermissionMixin],

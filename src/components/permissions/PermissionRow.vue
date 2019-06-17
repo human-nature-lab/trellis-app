@@ -1,6 +1,14 @@
 <template>
   <tr>
-    <td>{{permission.id}}</td>
+    <td>
+      <v-badge right color="white">
+        <v-tooltip slot="badge" lazy right>
+          <v-icon slot="activator">info_outline</v-icon>
+          {{permission.description}}
+        </v-tooltip>
+        {{permission.id}}
+      </v-badge>
+    </td>
     <td>{{permission.type}}</td>
     <td v-for="rolePermission in rolePermissions">
       <TrellisLoadingCircle v-if="rolePermission.isWorking" size="25px" />

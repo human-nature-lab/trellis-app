@@ -28,7 +28,7 @@
 
   export default Vue.extend({
     name: 'ServerConfig',
-    mixins: [DocsLinkMixin('./ServerConfiguration.md')],
+    mixins: [DocsLinkMixin('./admin/ServerConfiguration.md')],
     components: { ConfigRow },
     data () {
       return {

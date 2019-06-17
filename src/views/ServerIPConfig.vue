@@ -44,6 +44,7 @@
 
   export default {
     name: 'ServerIpConfig',
+    mixins: [DocsLinkMixin('./admin/ServerIPConfig.md')],
     data: function () {
       return {
         loading: false,

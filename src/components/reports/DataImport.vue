@@ -2,7 +2,7 @@
   <v-flex>
     <v-toolbar flat>
       <v-toolbar-title >
-        <DocsLinkBadge to="Importing.md">{{$t('data_import')}}</DocsLinkBadge>
+        <DocsLinkBadge to="reports/Importing.md">{{$t('data_import')}}</DocsLinkBadge>
       </v-toolbar-title>
     </v-toolbar>
     <v-container>
