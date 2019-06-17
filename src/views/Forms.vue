@@ -3,7 +3,7 @@
     <v-progress-linear
       v-if="isLoading"
       indeterminate />
-    <v-card v-for="(studyForms, formType) in formBins">
+    <v-card v-for="formType in numericFormTypes">
       <v-toolbar flat>
         <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
         <v-spacer />
@@ -18,7 +18,7 @@
       <v-data-table
         :headers="headers"
         hide-actions
-        :items="studyForms">
+        :items="studyFormsByType(formType)">
         <template slot="items" slot-scope="props">
           <FormListTile
             :form="props.item.form"
@@ -55,14 +55,13 @@
     async created () {
       this.isLoading = true
       this.studyForms = await FormService.getAllStudyForms(global.study.id)
-      this.makeBins()
       this.isLoading = false
     },
     data () {
       return {
+        formTypes,
         global: global as Singleton,
         studyForms: null,
-        formBins: {} as {[key: string]: Form[]},
         isAddingNewForm: false,
         isLoading: false,
         headers: [{
@@ -82,14 +81,25 @@
         })
       }
     },
+    computed: {
+      numericFormTypes: function() {
+        return Object.keys(formTypes).filter(formType => {
+          return !isNaN(Number(formType))
+        })
+      }
+    },
     methods: {
+      studyFormsByType(formType) {
+        return (this.studyForms || []).filter(studyForm => {
+          return studyForm.formTypeId == formType
+        })
+      },
       formName (form: Form) {
         return TranslationService.getAny(form.nameTranslation, this.global.locale)
       },
       async addForm (type: formTypes) {
         try {
           const form = await FormService.createForm(this.global.study.id, type)
-          this.formBins[type].push(form)
           this.alert('success', this.$t('resource_created', [this.formName(form)]))
         } catch (err) {
           this.alert('error', this.$t('failed_resource_create', [this.$t('form')]))
@@ -105,21 +115,6 @@
           this.alert('error', this.$t('failed_resource_update', [this.formName(form)]))
           this.log(err)
         }
-      },
-      makeBins () {
-        this.isLoading = true
-        const formBins = {}
-        for (const studyForm of this.studyForms) {
-          if (!formBins[studyForm.formTypeId]) {
-            formBins[studyForm.formTypeId] = []
-          }
-          formBins[studyForm.formTypeId].push(studyForm)
-        }
-        for (const key in formBins) {
-          formBins[key].sort((a, b) => a.sortOrder - b.sortOrder )
-        }
-        this.formBins = formBins
-        this.isLoading = false
       },
       formTypeName (formType: formTypes) {
         formType = +formType  // convert to int
@@ -138,7 +133,6 @@
             await FormService.deleteForm(this.global.study.id, studyForm.id)
             const index = this.studyForms.findIndex(sf => sf.id === studyForm.id)
             this.studyForms.splice(index, 1)
-            this.makeBins()
             this.alert('success', this.$t('resource_deleted', [this.formName(studyForm.form)]))
           } catch (err) {
             this.alert('error', this.$t('failed_resource_delete', [this.formName(studyForm.form)]))

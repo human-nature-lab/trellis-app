@@ -1,11 +1,11 @@
-import formTypes from "../../static/form.types";
+import formTypes from '../../static/form.types'
 import http from '../http/AxiosInstance'
 import {adminInst} from '../http/AxiosInstance'
 import FormServiceInterface from './FormServiceInterface'
 import StudyForm from '../../entities/trellis/StudyForm'
 import {saveAs} from 'file-saver'
 import Form from '../../entities/trellis/Form'
-import {uriTemplate} from "../http/WebUtils";
+import {uriTemplate} from '../http/WebUtils'
 export class FormServiceWeb implements FormServiceInterface {
 
   getStudyForms (studyId: string): Promise<StudyForm[]> {
