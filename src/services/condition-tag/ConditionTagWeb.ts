@@ -1,4 +1,5 @@
-import http from '../http/AxiosInstance'
+import http, { adminInst } from '../http/AxiosInstance'
+import { uriTemplate } from '../http/WebUtils'
 import ConditionTagInterface from './ConditionTagInterface'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'
@@ -37,6 +38,16 @@ export class ConditionTagWeb implements ConditionTagInterface {
   all () {
     return http().get('/condition-tags')
       .then(res => res.data.condition_tags.map(c => new ConditionTag().fromSnakeJSON(c)))
+  }
+
+  async importRespondentConditionTags (file: File, studyId: string): Promise<void> {
+    const formData = new FormData()
+    formData.append('file', file)
+    await adminInst.post(uriTemplate('study/{studyId}/respondent-tag/import', [studyId]), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
   }
 }
 

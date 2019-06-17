@@ -2,7 +2,7 @@
     <v-flex>
       <file-upload
         input-id="geo-photo"
-        class="btn"
+        class="btn primary"
         extensions="zip"
         :drop="true"
         v-model="files"
@@ -37,11 +37,11 @@
         try {
           this.isWorking = true
           await GeoService.importGeoPhotos(this.global.study.id, files[0]['file'])
-          this.alert('success', 'Imported photos!')
+          this.alert('success', this.$t('import_success'))
           this.$emit('import-photos')
         } catch (err) {
           this.log(err)
-          let message = err.message
+          let message = this.$t('import_failed')
           if (err && err.response && err.response.data && err.response.data.msg) {
             message = err.response.data.msg
           }
@@ -53,7 +53,3 @@
     }
   })
 </script>
-
-<style lang="sass" scoped>
-
-</style>

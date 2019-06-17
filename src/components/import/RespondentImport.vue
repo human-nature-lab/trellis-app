@@ -2,7 +2,7 @@
   <v-flex>
     <file-upload
       input-id="respondent"
-      class="btn"
+      class="btn primary"
       extensions="csv"
       :drop="true"
       @input="importRespondents" >
@@ -35,11 +35,11 @@
         try {
           this.isWorking = true
           const respondents = await RespondentService.importRespondents(files[0]['file'], this.global.study.id)
-          this.alert('success', `Imported ${respondents.length} respondents!`)
+          this.alert('success', this.$t('import_success'))
           this.$emit('import-respondents', respondents)
         } catch (err) {
           this.log(err)
-          let message = err.message
+          let message = this.$t('import_failed')
           if (err && err.response && err.response.data && err.response.data.msg) {
             message = err.response.data.msg
           }

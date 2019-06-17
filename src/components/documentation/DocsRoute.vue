@@ -14,9 +14,9 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Documentation from './Documentation'
-  import DocsTOC from './DocsTOC'
-  import {Route} from "vue-router/types/router"
+  import Documentation from './Documentation.vue'
+  import DocsTOC from './DocsTOC.vue'
+  import { Route } from 'vue-router/types/router'
   import global from '../../static/singleton'
   export default Vue.extend({
     components: {Documentation, DocsTOC},
@@ -40,7 +40,7 @@
       global.secondaryDrawer.onClick = this.toggleTOC
       const docs = (await import('./docs')).default
       this.names = docs.names
-      this.currentFile = this.$route.params.filePath ? './' + this.$route.params.filePath : docs.names[0]
+      this.currentFile = this.$route.params.filePath ? './' + this.$route.params.filePath : './Home.md'
     },
     data () {
       return {

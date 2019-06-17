@@ -100,15 +100,17 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import {defaultLoggingService} from "../services/logging/LoggingService"
-  import Log from "../entities/trellis-config/Log"
-  import ModalTitle from '../components/ModalTitle'
-  import uploadLogs from "../services/upload/UploadLogs"
-  import DeleteLogs from "../services/upload/DeleteLogs"
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
+  import { defaultLoggingService } from '../services/logging/LoggingService'
+  import Log from '../entities/trellis-config/Log'
+  import ModalTitle from '../components/ModalTitle.vue'
+  import uploadLogs from '../services/upload/UploadLogs'
+  import DeleteLogs from '../services/upload/DeleteLogs'
 
   export default Vue.extend({
     name: 'Logs',
     components: { ModalTitle },
+    mixins: [DocsLinkMixin('./admin/Logs.md')],
     data () {
       return {
         headers: [{

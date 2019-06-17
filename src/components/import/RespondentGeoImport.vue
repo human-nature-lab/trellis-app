@@ -1,15 +1,14 @@
 <template>
   <v-flex>
     <file-upload
-      input-id="geo"
+      input-id="respondent-geo"
       class="btn primary"
       extensions="csv"
-      v-model="files"
       :drop="true"
-      @input="importGeos" >
+      @input="importRespondentGeos" >
       <TrellisLoadingCircle size="25px" v-if="isWorking" />
       <div class="btn__content" v-else>
-        {{$t('import_locations')}}
+        {{$t('import_respondent_geos')}}
       </div>
     </file-upload>
   </v-flex>
@@ -17,31 +16,29 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import GeoService from '../../services/geo/GeoService'
   import global from '../../static/singleton'
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
   import FileUpload from 'vue-upload-component'
+  import RespondentService from '../../services/respondent/RespondentService'
 
   export default Vue.extend({
-    name: 'GeoImport',
-    components: { TrellisLoadingCircle, FileUpload },
+    name: 'RespondentGeoImport',
+    components: { FileUpload, TrellisLoadingCircle },
     data () {
       return {
-        global,
         isWorking: false,
-        files: []
+        global
       }
     },
     methods: {
-      async importGeos (files: object[]) {
+      async importRespondentGeos (files: File[]) {
         try {
           this.isWorking = true
-          const geos = await GeoService.importGeos(this.global.study.id, files[0]['file'])
-          this.$emit('updateGeos', geos)
+          await RespondentService.importRespondentGeos(files[0]['file'], this.global.study.id)
           this.alert('success', this.$t('import_success'))
         } catch (err) {
           this.log(err)
-          this.alert('error', this.$t('import_failed'), { timeout: 0 })
+          this.alert('error', this.$t('import_failed'), {timeout: 0})
         } finally {
           this.isWorking = false
         }

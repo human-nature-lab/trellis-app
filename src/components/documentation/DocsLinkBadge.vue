@@ -1,27 +1,27 @@
 <template>
   <span>
-    <v-badge
-         color="white"
-         right
-         v-if="isDebug">
+    <v-badge :color="global.darkTheme ? 'primary' : 'white'" right>
       <v-icon
-        dark
         small
-        color="primary"
-        slot="badge"
-        @click="openDocs">help_outline</v-icon>
+        :color="global.darkTheme ? 'white' : 'primary'"
+        @click="openDocs"
+        slot="badge">help_outline</v-icon>
       <slot />
     </v-badge>
-    <slot v-else/>
   </span>
-
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
   import bus, {DocsEventTypes} from './DocsEventBus'
+  import global from '../../static/singleton'
   export default Vue.extend({
     name: 'DocsLinkBadge',
+    data () {
+      return {
+        global
+      }
+    },
     props: {
       to: {
         type: String
@@ -35,6 +35,7 @@
   })
 </script>
 
-<style scoped>
-
+<style scoped lang="sass">
+  .badge
+    cursor: pointer
 </style>

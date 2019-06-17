@@ -45,16 +45,18 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import GeoTypeForm from "../components/geo/GeoTypeForm.vue"
-  import Permission from "../components/Permission"
-  import TrellisModal from "../components/TrellisModal.vue"
+  import GeoTypeForm from '../components/geo/GeoTypeForm.vue'
+  import Permission from '../components/Permission.vue'
+  import TrellisModal from '../components/TrellisModal.vue'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import global from '../static/singleton'
-  import GeoTypeRow from "../components/geo/GeoTypeRow.vue"
+  import GeoTypeRow from '../components/geo/GeoTypeRow.vue'
   import GeoType from '../entities/trellis/GeoType'
   import GeoTypeService from '../services/geotype'
   export default Vue.extend({
     name: 'GeoTypes',
     components: { GeoTypeRow, TrellisModal, GeoTypeForm, Permission },
+    mixins: [DocsLinkMixin('./locations/LocationTypes.md')],
     data () {
       return {
         geoTypes: [],

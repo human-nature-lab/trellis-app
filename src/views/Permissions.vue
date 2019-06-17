@@ -103,7 +103,7 @@
 
   export default Vue.extend({
     name: 'Permissions',
-    mixins: [ PermissionMixin, DebounceMixin, DocsLinkMixin('./Permissions.md') ],
+    mixins: [ PermissionMixin, DebounceMixin, DocsLinkMixin('./admin/Permissions.md') ],
     components: { PermissionRow, TrellisModal, NewRoleForm },
     data () {
       return {

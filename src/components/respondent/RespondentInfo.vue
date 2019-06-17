@@ -60,6 +60,7 @@
 </template>
 
 <script lang="ts">
+  import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import {replaceWithNextOr} from '../../router'
 
   // @ts-ignore
@@ -96,7 +97,7 @@
 
   export default Vue.extend({
     name: 'respondent-info',
-    mixins: [RouteMixinFactory(preloadRespondent, true), PermissionMixin],
+    mixins: [RouteMixinFactory(preloadRespondent, true), PermissionMixin, DocsLinkMixin('./respondents/RespondentInfo.md')],
     data () {
       return {
         global: singleton,

@@ -51,7 +51,8 @@
 </template>
 
 <script lang="ts">
-  import FormsView from './FormsView'
+  import DocsLinkMixin from '../../mixins/DocsLinkMixin'
+  import FormsView from './FormsView.vue'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import SurveyService from '../../services/survey'
   import FormService from '../../services/form/FormService'
@@ -62,9 +63,9 @@
   import StudyForm from '../../entities/trellis/StudyForm'
   import Respondent from '../../entities/trellis/Respondent'
   import Translation from '../../entities/trellis/Translation'
-  import SkipService from "../../services/SkipService"
-  import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag"
-  import {pushRouteAndQueueCurrent} from '../../router'
+  import SkipService from '../../services/SkipService'
+  import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
+  import { pushRouteAndQueueCurrent } from '../../router'
   import Interview from '../../entities/trellis/Interview'
 
   export class DisplayForm {
@@ -111,7 +112,7 @@
 
   export default Vue.extend({
     name: 'respondent-forms',
-    mixins: [RouteMixinFactory(load)],
+    mixins: [RouteMixinFactory(load), DocsLinkMixin('./respondents/RespondentForms.md')],
     data () {
       return {
         global,

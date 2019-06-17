@@ -1,7 +1,7 @@
 <template>
   <v-form ref="form" v-model="formValid" lazy-validation>
     <v-text-field
-      v-if="(global.user && global.user.role !== 'ADMIN')"
+      v-if="!hasPermission(TrellisPermission.EDIT_PASSWORDS)"
       v-model="oldPassword"
       :append-icon="showOldPass ? 'visibility' : 'visibility_off'"
       :append-icon-cb="() => (showOldPass = !showOldPass)"
@@ -21,15 +21,17 @@
 </template>
 
 <script lang="ts">
+  import PermissionMixin from '../../mixins/PermissionMixin'
   import global from '../../static/singleton'
-  import User from "../../entities/trellis/User"
-  import UserService from "../../services/user/UserService"
-  import PasswordField from './PasswordField'
+  import User from '../../entities/trellis/User'
+  import UserService from '../../services/user/UserService'
+  import PasswordField from './PasswordField.vue'
   import Vue from 'vue'
 
   export default Vue.extend({
     name: 'UserPassword',
-    components: {PasswordField},
+    components: { PasswordField },
+    mixins: [PermissionMixin],
     props: {
       user: Object as () => User
     },

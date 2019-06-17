@@ -49,12 +49,14 @@
 </template>
 
 <script lang="ts">
-  import ModalTitle from '../components/ModalTitle'
   import Vue from 'vue'
+  import ModalTitle from '../components/ModalTitle.vue'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import BackupDatabase from '../services/upload/BackupDatabase'
-  import FormatBytes from "../filters/format-bytes.filter"
+  import FormatBytes from '../filters/format-bytes.filter'
   export default Vue.extend({
-    components: {ModalTitle},
+    components: { ModalTitle },
+    mixins: [DocsLinkMixin('./admin/Storage.md')],
     name: 'Storage',
     data () {
       return {

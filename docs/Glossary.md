@@ -8,4 +8,9 @@
 1. The act of synchronizing databases.
 
 #### Snapshot
-1. A file representing the state of the database at a single point in time. In Trellis, this is used to copy the database to mobile devices.
+1. A file representing the state of the database at a single point in time. In Trellis, this is used to copy the 
+   database to mobile devices.
+
+#### Associated respondent
+1. A respondent that is created in the context of an ongoing survey. These respondents are visible only for that
+   respondent and cannot be accessed otherwise.

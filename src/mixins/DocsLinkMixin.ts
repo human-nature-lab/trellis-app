@@ -33,9 +33,7 @@ export default function DocsLinkMixin (docLink: any) {
       }
     },
     beforeRouteEnter (to, from, next) {
-      if (config.debug) {
-        attachDocLink()
-      }
+      attachDocLink()
       next()
     },
     beforeRouteLeave (to, from, next) {
@@ -44,11 +42,11 @@ export default function DocsLinkMixin (docLink: any) {
     },
     watch: {
       'config.debug' (newVal, oldVal) {
-        if (newVal && newVal !== oldVal) {
-          attachDocLink()
-        } else if (!newVal) {
-          detachDocLink()
-        }
+        // if (newVal && newVal !== oldVal) {
+        //   attachDocLink()
+        // } else if (!newVal) {
+        //   detachDocLink()
+        // }
       }
     }
   }

@@ -1,7 +1,7 @@
 <template>
   <file-upload
     input-id="respondent-photo"
-    class="btn"
+    class="btn primary"
     extensions="zip"
     :drop="true"
     @input="importPhotos">
@@ -33,11 +33,11 @@
         try {
           this.isWorking = true
           await RespondentService.importRespondentPhotos(files[0]['file'], this.global.study.id)
-          this.alert('success', 'Imported photos!')
+          this.alert('success', this.$t('import_success'))
           this.$emit('import-photos')
         } catch (err) {
           this.log(err)
-          let message = err.message
+          let message = this.$t('import_failed')
           if (err && err.response && err.response.data && err.response.data.msg) {
             message = err.response.data.msg
           }
