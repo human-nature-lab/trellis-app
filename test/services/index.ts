@@ -12,5 +12,6 @@ export default {
   'ConditionAssignment': require('./condition-assignment.spec'),
   'SkipService': require('./skip-service.test'),
   'Transactions': require('./transactions.test'),
-  'DiffService': require('./diff-service.test')
+  'DiffService': require('./diff-service.test'),
+  'Validators': require('./validation.test')
 }
