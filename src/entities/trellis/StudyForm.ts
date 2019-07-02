@@ -23,7 +23,7 @@ export default class StudyForm extends TimestampedSoftDelete {
   @JoinColumn({ name : 'form_master_id' })
   form: Form
 
-  fromSnakeJSON(json: any) {
+  fromSnakeJSON (json: any) {
     if (json.study_form && json.study_form.length) {
       super.fromSnakeJSON(json.study_form[0])
       this.form = new Form().fromSnakeJSON(json)

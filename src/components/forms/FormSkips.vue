@@ -19,7 +19,7 @@
   import FormSkip from "../../entities/trellis/FormSkip"
 
   export default Vue.extend({
-    name: 'FormSkips',
+    name: 'form-skips',
     components: {SkipEditor},
     props: {
       form: Object as () => Form

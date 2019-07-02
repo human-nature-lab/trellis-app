@@ -1,11 +1,10 @@
 import formTypes from '../../static/form.types'
-import http from '../http/AxiosInstance'
-import {adminInst} from '../http/AxiosInstance'
+import { http, adminInst } from '../http/AxiosInstance'
 import FormServiceInterface from './FormServiceInterface'
 import StudyForm from '../../entities/trellis/StudyForm'
-import {saveAs} from 'file-saver'
+import { saveAs } from 'file-saver'
 import Form from '../../entities/trellis/Form'
-import {uriTemplate} from '../http/WebUtils'
+import { uriTemplate } from '../http/WebUtils'
 export class FormServiceWeb implements FormServiceInterface {
 
   getStudyForms (studyId: string): Promise<StudyForm[]> {
@@ -49,7 +48,7 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   async updateStudyForm (studyId: string, studyForm: StudyForm): Promise<StudyForm> {
-    const res = await adminInst.put(uriTemplate('study/{}/form/{}', [studyId, studyForm.id]), studyForm.toSnakeJSON())
+    const res = await adminInst.put(uriTemplate('study/{}/form/{}', [studyId, studyForm.form.id]), studyForm.toSnakeJSON())
     return new StudyForm().fromSnakeJSON(res.data.study_form)
   }
 
