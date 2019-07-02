@@ -67,7 +67,7 @@ type,Type,Tipo,
 created_at,Created at,Creado en ,
 no_condition_tags,No condition tags have been assigned,No se han asignado etiquetas,
 reason,Reason,Razón,For don't know/refused explanation
-required_response,A response is required,Se requiere una respuesta,
+response_required,A response is required,Se requiere una respuesta,
 required_field,This field is required,Este campo es requerido,
 all_data_saved,All data has been saved.,Los datos se han guardado,
 form_empty,The form is empty,La forma está vacía ,

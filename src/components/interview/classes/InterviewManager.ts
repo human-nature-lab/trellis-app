@@ -1,24 +1,25 @@
 import uuidv4 from 'uuid/v4'
 import actionManager from '../services/actions/InterviewActionDefinitions'
+import validateParameters from '../services/ValidatorService'
 import ActionStore from './ActionStore'
 import DataStore from './DataStore'
 import AT from '../../../static/action.types'
 
-import {InterviewLocation} from '../services/InterviewAlligator'
+import { InterviewLocation } from '../services/InterviewAlligator'
 import Form from '../../../entities/trellis/Form'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import Action from '../../../entities/trellis/Action'
-import {ConditionTagInterface} from '../../../services/interview/InterviewDataInterface'
+import { ConditionTagInterface } from '../../../services/interview/InterviewDataInterface'
 import RespondentFill from '../../../entities/trellis/RespondentFill'
 import Interview from '../../../entities/trellis/Interview'
-import InterviewManagerBase from "./InterviewManagerBase";
-import Question from "../../../entities/trellis/Question";
+import InterviewManagerBase from './InterviewManagerBase'
+import Question from '../../../entities/trellis/Question'
 import QT from '../../../static/question.types'
 import PT from '../../../static/parameter.types'
-import {locToNumber} from "../services/LocationHelpers";
-import InterviewAlligator from "../services/InterviewAlligator";
+import { locToNumber } from '../services/LocationHelpers'
+import InterviewAlligator from '../services/InterviewAlligator'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
-import Section from "../../../entities/trellis/Section";
+import Section from '../../../entities/trellis/Section'
 
 export default class InterviewManager extends InterviewManagerBase {
 
@@ -350,8 +351,7 @@ export default class InterviewManager extends InterviewManagerBase {
         } else if (question.datum.noOne) {
           return true
         } else {
-          // TODO: Maybe actually validate responses as well???
-          return question.datum.data.length > 0
+          return validateParameters(question, question.questionParameters, question.datum) === true
         }
       }
     }

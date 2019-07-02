@@ -1,16 +1,16 @@
 import InterviewService from '../../src/services/interview/InterviewService'
 import RosterService from '../../src/services/roster/RosterService'
-import SurveyService from "../../src/services/survey";
-import {forms, respondentId2, studyId} from "../testing-ids";
+import SurveyService from '../../src/services/survey'
+import { forms, respondentId2, studyId } from '../testing-ids'
 import InterviewDeltaInterface, {
   AddedRemovedDelta,
   ConditionTagDelta,
   DataDelta, ModifiedDelta
-} from "../../src/services/interview/InterviewDeltaInterface";
-import Datum from "../../src/entities/trellis/Datum";
-import QuestionDatum from "../../src/entities/trellis/QuestionDatum";
-import {expect} from 'chai'
-import FormService from "../../src/services/form/FormService";
+} from '../../src/services/interview/InterviewDeltaInterface'
+import Datum from '../../src/entities/trellis/Datum'
+import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
+import { expect } from 'chai'
+import FormService from '../../src/services/form/FormService'
 import uuid from 'uuid/v4'
 
 export default function () {
