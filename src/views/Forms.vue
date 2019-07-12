@@ -2,32 +2,35 @@
   <v-flex xs12>
     <v-progress-linear
       v-if="isLoading"
-      indeterminate />
+      indeterminate></v-progress-linear>
     <v-card v-for="formType in numericFormTypes">
       <v-toolbar flat>
         <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
-        <v-spacer />
-        <Permission :requires="TrellisPermission.ADD_FORM">
+        <v-spacer></v-spacer>
+        <permission :requires="TrellisPermission.ADD_FORM">
           <v-btn
             icon
             @click="addForm(formType)">
             <v-icon>add</v-icon>
           </v-btn>
-        </Permission>
+        </permission>
       </v-toolbar>
       <v-data-table
-        :headers="headers"
+        :headers="headers(formType)"
         hide-actions
         :items="studyFormsByType(formType)">
         <template slot="items" slot-scope="props">
-          <FormListTile
+          <form-list-tile
             :form="props.item.form"
+            :study-form="props.item"
+            :form-type="formType"
             v-model="props.item.showHidden"
             @save="updateForm"
-            @delete="deleteForm(studyForm)" />
+            @updateStudyForm="updateStudyForm"
+            @delete="deleteForm(studyForm)"></form-list-tile>
            <tr v-if="props.item.showHidden">
             <td colspan="4">
-              <FormSkips :form="props.item.form" />
+              <form-skips :form="props.item.form"></form-skips>
             </td>
           </tr>
         </template>
@@ -63,22 +66,7 @@
         global: global as Singleton,
         studyForms: null,
         isAddingNewForm: false,
-        isLoading: false,
-        headers: [{
-          text: 'Actions'
-        }, {
-          text: 'Form',
-          class: 'max-width'
-        }, {
-          text: 'Published'
-        }, {
-          text: ''
-        }].map((h, i) => {
-          h.sortable = false
-          h.value = i
-          h.class = h.class || 'small'
-          return h
-        })
+        isLoading: false
       }
     },
     computed: {
@@ -89,6 +77,33 @@
       }
     },
     methods: {
+      headers(formType) {
+        let hdr = [{
+          text: 'Actions'
+        }, {
+          text: 'Form',
+          class: 'max-width'
+        }]
+
+        if (formType == formTypes.CENSUS) {
+          hdr.push({
+            text: 'Census type'
+          })
+        }
+
+        hdr = hdr.concat([{
+          text: 'Published'
+        }, {
+          text: ''
+        }])
+
+        return hdr.map((h, i) => {
+          h.sortable = false
+          h.value = i
+          h.class = h.class || 'small'
+          return h
+        });
+      },
       studyFormsByType(formType) {
         return (this.studyForms || []).filter(studyForm => {
           return studyForm.formTypeId == formType
@@ -113,6 +128,17 @@
           this.alert('success', this.$t('resource_updated', [this.formName(form)]))
         } catch (err) {
           this.alert('error', this.$t('failed_resource_update', [this.formName(form)]))
+          this.log(err)
+        }
+      },
+      async updateStudyForm (studyForm: StudyForm) {
+        try {
+          const newStudyForm = await FormService.updateStudyForm(studyForm.studyId, studyForm)
+          const sf = this.studyForms.find((sf: StudyForm) => sf.id === newStudyForm.id)
+          Object.assign(sf.form, newStudyForm)
+          this.alert('success', this.$t('resource_updated', [this.formName(studyForm.form)]))
+        } catch (err) {
+          this.alert('error', this.$t('failed_resource_update', [this.formName(studyForm.form)]))
           this.log(err)
         }
       },

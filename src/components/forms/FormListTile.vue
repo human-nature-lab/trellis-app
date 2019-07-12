@@ -13,7 +13,7 @@
             icon>
             <TrellisLoadingCircle
               v-if="isBusy"
-              size="100%"/>
+              size="100%"></TrellisLoadingCircle>
             <v-icon v-else>more_vert</v-icon>
           </v-btn>
         </v-list-tile-action>
@@ -37,10 +37,18 @@
       </v-menu>
     </td>
     <td>
-      <TranslationTextField :translation="memForm.nameTranslation" @click.stop.prevent />
+      <TranslationTextField :translation="memForm.nameTranslation" @click.stop.prevent></TranslationTextField>
+    </td>
+    <td v-if="formType == formTypes.CENSUS" style="min-width: 20em;">
+      <v-select
+        :items="censusTypes"
+        v-model="studyForm.censusTypeId"
+        @change="changeCensusType"
+        box
+        label="Census type"></v-select>
     </td>
     <td>
-      <v-checkbox v-model="memForm.isPublished" @change="save" />
+      <v-checkbox v-model="memForm.isPublished" @change="save"></v-checkbox>
     </td>
     <td>
       <v-btn icon @click="$emit('input', !value)">
@@ -56,16 +64,19 @@
   import Form from '../../entities/trellis/Form'
   // @ts-ignore
   import AsyncTranslationText from '../AsyncTranslationText'
-  import Permission from "../Permission"
+  import Permission from '../Permission'
   // @ts-ignore
   import TranslationTextField from '../TranslationTextField'
   // @ts-ignore
   import TrellisLoadingCircle from '../TrellisLoadingCircle'
-  import FormService from "../../services/form/FormService"
+  import FormService from '../../services/form/FormService'
   import debounce from 'lodash/debounce'
+  import formTypes from '../../static/form.types'
+  import censusTypes from '../../static/census.types'
+  import StudyForm from '../../entities/trellis/StudyForm'
 
   export default Vue.extend({
-    name: 'FormListTile',
+    name: 'form-list-tile',
     components: {
       AsyncTranslationText,
       TranslationTextField,
@@ -74,6 +85,7 @@
     },
     data () {
       return {
+        formTypes,
         showMenu: false,
         isOpen: false,
         memForm: this.form.copy(),
@@ -84,6 +96,8 @@
     },
     props: {
       form: Object as () => Form,
+      studyForm: Object as () => StudyForm,
+      formType: String,
       value: {
         type: Boolean
       },
@@ -95,6 +109,18 @@
     watch: {
       form (newForm: Form) {
         this.memForm = newForm.copy()
+      }
+    },
+    computed: {
+      censusTypes: function() {
+        let returnTypes = []
+        for (let censusType in censusTypes) {
+          returnTypes.push({
+            text: this.$t(censusType),
+            value: censusTypes[censusType]
+          })
+        }
+        return returnTypes
       }
     },
     methods: {
@@ -109,6 +135,11 @@
       },
       save () {
         this.$emit('save', this.memForm)
+      },
+      changeCensusType (censusTypeId) {
+        let sf = this.studyForm.copy()
+        sf.censusTypeId = censusTypeId
+        this.$emit('updateStudyForm', sf)
       }
     }
   })
