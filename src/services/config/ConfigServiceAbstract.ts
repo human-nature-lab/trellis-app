@@ -1,6 +1,6 @@
 import Config from '../../entities/trellis/Config'
 import config from 'config'
-import { setDot } from '../JSONUtil'
+import { safeParse, setDot } from '../JSONUtil'
 
 export default abstract class ConfigServiceAbstract {
 
@@ -26,14 +26,13 @@ export default abstract class ConfigServiceAbstract {
   private castValue (type: string, val: any): any {
     switch (type) {
       case 'boolean':
-        val = !!+val
-        break
+        return !!+val
       case 'integer':
-        val = parseInt(val, 10)
-        break
+        return parseInt(val, 10)
       case 'float':
-        val = parseFloat(val)
-        break
+        return parseFloat(val)
+      case 'object':
+        return safeParse(val)
     }
     return val
   }

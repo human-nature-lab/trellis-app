@@ -4,6 +4,10 @@
       <v-toolbar-title>
         {{$t('server_config')}}
       </v-toolbar-title>
+      <v-spacer />
+      <v-btn icon @click="showAddDialog = true">
+        <v-icon>add</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-data-table
       :headers="headers"
@@ -33,6 +37,7 @@
     data () {
       return {
         isLoading: false,
+        showAddDialog: false,
         entries: [] as Config[],
         headers: [{
           text: this.$t('key'),

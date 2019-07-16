@@ -1,14 +1,14 @@
 import DatabaseService from '../database/DatabaseService'
 import GeoServiceAbstract, { GeoSearchParams } from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
-import {In, IsNull} from 'typeorm'
+import { In, IsNull } from 'typeorm'
 import GeoType from '../../entities/trellis/GeoType'
 import uuid from 'uuid/v4'
-import GeoPhoto from "../../entities/trellis/GeoPhoto";
-import Photo from "../../entities/trellis/Photo";
+import GeoPhoto from '../../entities/trellis/GeoPhoto'
+import Photo from '../../entities/trellis/Photo'
 import geoCache from './GeoCache'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
-import {removeSoftDeleted} from '../database/SoftDeleteHelper'
+import { removeSoftDeleted } from '../database/SoftDeleteHelper'
 
 export default class GeoServiceCordova extends GeoServiceAbstract {
 
@@ -17,7 +17,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     let gPhoto = new GeoPhoto()
     gPhoto.photoId = photo.id
     gPhoto.geoId = geoId
-    gPhoto.sortOrder = await repo.createQueryBuilder('gp').where('gp.geoId = :geoId', {geoId}).getCount()
+    gPhoto.sortOrder = await repo.createQueryBuilder('gp').where('gp.geoId = :geoId', { geoId }).getCount()
     await repo.save(gPhoto)
     let geoPhoto = await repo.findOne({
       where: {
@@ -61,7 +61,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     return qb.getMany()
   }
 
-  async updatePhotos (photosWithPivotTable : Array<PhotoWithPivotTable>) {
+  async updatePhotos (photosWithPivotTable: PhotoWithPivotTable[]) {
     const repository = await DatabaseService.getRepository(GeoPhoto)
     for (let photoWithPivotTable of photosWithPivotTable) {
       await repository.update({
@@ -82,7 +82,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     })
   }
 
-  async getGeoPhotos (geoId: string): Promise<Array<PhotoWithPivotTable>> {
+  async getGeoPhotos (geoId: string): Promise<PhotoWithPivotTable[]> {
     const geoPhotoRepository = await DatabaseService.getRepository(GeoPhoto)
     let geoPhotos = await geoPhotoRepository.find({
       where: {
@@ -162,7 +162,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
   async removeGeo (geoId) {
     const repository = await DatabaseService.getRepository(Geo)
     geoCache.del(geoId)
-    return repository.update({id: geoId}, {deletedAt: new Date()})
+    return repository.update({ id: geoId }, { deletedAt: new Date() })
   }
 
   async moveGeo (geoId, latitude, longitude, moveChildren) {
@@ -171,10 +171,10 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
 
     q = q.update(Geo)
       .set({ latitude: latitude, longitude: longitude })
-      .where("id = :id", { id: geoId })
+      .where('id = :id', { id: geoId })
 
     if (moveChildren) {
-      q = q.orWhere("parent_id = :id", { id: geoId })
+      q = q.orWhere('parent_id = :id', { id: geoId })
     }
 
     return q.execute()
@@ -203,12 +203,12 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
   }
 
   async search (studyId: string, params: GeoSearchParams): Promise<Geo[]> {
-    const query = (params.hasOwnProperty('query')) ? params.query : null
-    const limit = (params.hasOwnProperty('limit')) ? params.limit : GeoServiceCordova.DEFAULT_SEARCH_RESULTS_LIMIT
-    const offset = (params.hasOwnProperty('offset')) ? params.offset : 0
-    const parentGeoId = (params.hasOwnProperty('parent')) ? params.parent : null
+    const query = params.hasOwnProperty('query') ? params.query : null
+    const limit = params.hasOwnProperty('limit') ? params.limit : GeoServiceCordova.DEFAULT_SEARCH_RESULTS_LIMIT
+    const offset = params.hasOwnProperty('offset') ? params.offset : 0
+    const parentGeoId = params.hasOwnProperty('parent') ? params.parent : null
     const onlyNoParent = params.hasOwnProperty('no-parent')
-    const geoTypeIds =  (params.hasOwnProperty('types')) ? params.types : null
+    const geoTypeIds =  params.hasOwnProperty('types') ? params.types : null
 
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Geo)
@@ -216,11 +216,11 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     let q = queryBuilder.where('"geo"."deleted_at" is null')
 
     if (studyId !== null) {
-      q = q.andWhere('"geo"."geo_type_id" in (select id from geo_type where study_id = :studyId)', {studyId: studyId})
+      q = q.andWhere('"geo"."geo_type_id" in (select id from geo_type where study_id = :studyId)', { studyId })
     }
 
     if (parentGeoId !== null) {
-      q = q.andWhere('"geo"."parent_id" = :parentGeoId', {parentGeoId: parentGeoId})
+      q = q.andWhere('"geo"."parent_id" = :parentGeoId', { parentGeoId })
     }
 
     if (parentGeoId === null && onlyNoParent) {
@@ -229,14 +229,14 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
 
     if (geoTypeIds !== null && Array.isArray(geoTypeIds)) {
       let geoTypeIdString = geoTypeIds.map((geoTypeId) => { return '"' + geoTypeId + '"' }).join(',')
-      q = q.andWhere('"geo"."geo_type_id" in (:geoTypeIdString)', {geoTypeIdString: geoTypeIdString})
+      q = q.andWhere('"geo"."geo_type_id" in (:geoTypeIdString)', { geoTypeIdString })
     }
 
     if (typeof query === 'string' && query.trim().length > 0) {
       const searchTerms = query.split(' ')
       for (let i = 0; i < searchTerms.length; i++) {
         let searchTerm = '%' + searchTerms[i].trim() + '%'
-        q = q.andWhere(`"geo"."name_translation_id" in (select translation_id from translation_text where translated_text like :searchTerm${i})`, {[`searchTerm${i}`]: searchTerm})
+        q = q.andWhere(`"geo"."name_translation_id" in (select translation_id from translation_text where translated_text like :searchTerm${i})`, { [`searchTerm${i}`]: searchTerm })
       }
     }
 
