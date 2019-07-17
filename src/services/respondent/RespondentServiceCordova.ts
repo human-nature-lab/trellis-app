@@ -58,7 +58,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
   async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentFill)
-    return await repository.find({ deletedAt: null, respondentId: respondentId })
+    return repository.find({ deletedAt: null, respondentId: respondentId })
   }
 
   async getRespondentPhotos (respondentId: string): Promise<Array<PhotoWithPivotTable>> {
@@ -329,7 +329,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
       await queryRunner.commitTransaction()
 
       const repository = connection.getRepository(Respondent)
-      return await repository.findOne({
+      return repository.findOne({
         where: {
           id: respondent.id
         },
@@ -384,7 +384,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
     await repository.update({id: respondentGeoId}, {isCurrent: isCurrent})
-    return await repository.findOne({ deletedAt: null, id: respondentGeoId })
+    return repository.findOne({ deletedAt: null, id: respondentGeoId })
   }
 
   async moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string, isCurrent?: boolean, notes?: string) {

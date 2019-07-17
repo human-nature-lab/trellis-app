@@ -81,7 +81,7 @@ export default class PersistentQueue<T> {
    * Peek at the next item on the queue.
    */
   async peek (): Promise<T> {
-    return await this.get(0)
+    return this.get(0)
   }
 
   /**
@@ -134,7 +134,7 @@ export default class PersistentQueue<T> {
     if (!meta) {
       meta = await this.getMetadata()
     }
-    return await this.storage.getItem(this.makeItemKey(meta, index))
+    return this.storage.getItem(this.makeItemKey(meta, index))
   }
 
   private async set (index: number, item: any, meta?: Metadata): Promise<any> {

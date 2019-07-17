@@ -379,11 +379,11 @@
       },
       async completeSurvey () {
         if (this.type === 'preview') return
-        return await SurveyService.complete(this.interview.surveyId)
+        return SurveyService.complete(this.interview.surveyId)
       },
       async completeInterview () {
         if (this.type === 'preview') return
-        return await InterviewService.complete(this.interview.id)
+        return InterviewService.complete(this.interview.id)
       },
       async saveAndExit () {
         await this.saveData()
