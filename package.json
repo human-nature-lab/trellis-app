@@ -78,6 +78,7 @@
     "@sentry/cli": "^1.37.4",
     "@sentry/typescript": "^4.5.3",
     "@sentry/webpack-plugin": "^1.6.2",
+    "@types/cordova-plugin-file": "^4.3.2",
     "@types/file-saver": "^2.0.0",
     "@types/lru-cache": "^4.1.1",
     "@types/phonegap-plugin-barcodescanner": "0.0.3",

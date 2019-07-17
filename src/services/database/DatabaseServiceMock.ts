@@ -1,8 +1,7 @@
 
 export default class DatabaseServiceMock {
-  constructor () {
-    this.isReady = false
-  }
+  constructor (public isReady = false) {}
+
 
   async getDatabase () {}
 

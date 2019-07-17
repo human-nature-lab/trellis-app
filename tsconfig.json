@@ -13,10 +13,14 @@
     "downlevelIteration": true,
     "importHelpers": true,
     "baseUrl": ".",
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "paths": {
+      "@": ["./src"]
+    }
   },
   "include": [
-    "./src/**/*"
+    "./src/**/*",
+    "plugins/cordova-plugin-file/types/index.d.ts"
   ],
   "exclude": [
     "build",

@@ -55,12 +55,12 @@ export class ConditionTagCordova implements ConditionTagInterface {
     const queryBuilder = await repo.createQueryBuilder('condition_tag')
     let q = queryBuilder.where('id in (select condition_tag_id from respondent_condition_tag)')
       .orWhere(`id in (select condition_tag_id from assign_condition_tag where scope='respondent')`)
-    return await q.getMany()
+    return q.getMany()
   }
 
   async all (): Promise<ConditionTag[]> {
     const repo = await DatabaseService.getRepository(ConditionTag)
-    return await repo.find()
+    return repo.find()
   }
 
   importRespondentConditionTags (file: File, studyId: string): Promise<any> {

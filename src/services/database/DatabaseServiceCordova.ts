@@ -1,6 +1,7 @@
 import DeviceService from '@/services/device/DeviceService'
 import 'reflect-metadata'
-import { createConnection, getConnection } from 'typeorm'
+import { createConnection, Entity, getConnection, QueryRunner } from 'typeorm'
+import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'
 import Sync from '../../entities/trellis-config/Sync'
 import FileService from '../file/FileService'
@@ -15,7 +16,7 @@ const trellisConfigConnection = {
   database: 'trellis-config',
   name: 'trellis-config',
   location: 'default',
-  entities: requireAllModules(require.context('../../entities/trellis-config'), true, /\.[tj]s$/),
+  entities: requireAllModules(require.context('../../entities/trellis-config', true, /\.[tj]s$/)),
   logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error'],
   synchronize: true
 }
@@ -32,7 +33,16 @@ const trellisConnection = {
   logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error']
 }
 
+interface SnapshotProgress {
+  inserted: number
+  total: number
+}
+
+type SnapshotProgressCallback = (progress: SnapshotProgress) => any
+
 export default class DatabaseServiceCordova {
+  private databaseCreated: Promise<void>
+  private configDatabaseCreated: Promise<void>
   constructor () {
     this.databaseCreated = this.createDatabase()
     this.configDatabaseCreated = this.createConfigDatabase()
@@ -42,7 +52,7 @@ export default class DatabaseServiceCordova {
     return DeviceService.isDeviceReady()
       .then(() => createConnection(trellisConnection))
       .then((connection) => connection.createQueryRunner())
-      .then((queryRunner) => this.createUpdatedRecordsTable(queryRunner, {}))
+      .then((queryRunner) => this.createUpdatedRecordsTable(queryRunner, { message: null }))
   }
 
   async getDatabase () {
@@ -50,9 +60,9 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis')
   }
 
-  async getRepository (...args) {
+  async getRepository (entity: typeof Entity) {
     const conn = await this.getDatabase()
-    return conn.getRepository(...args)
+    return conn.getRepository(entity)
   }
 
   createConfigDatabase () {
@@ -65,12 +75,12 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis-config')
   }
 
-  async getConfigRepository (...args) {
+  async getConfigRepository (entity: typeof Entity) {
     const conn = await this.getConfigDatabase()
-    return conn.getRepository(...args)
+    return conn.getRepository(entity)
   }
 
-  async createUpdatedRecordsTable (queryRunner, status) {
+  async createUpdatedRecordsTable (queryRunner: QueryRunner, status: { message: string }) {
     try {
       await queryRunner.query(`create table if not exists updated_records (table_name text, updated_record_id text, uploaded_at datetime);`)
     } catch (err) {
@@ -80,15 +90,15 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  async addTriggers (queryRunner, status) {
+  async addTriggers (queryRunner: QueryRunner, status: { message: string }): Promise<void> {
     try {
       const operations = ['update', 'insert']
       const tableNameResults = await queryRunner.query('select tbl_name from SQLite_master where type = "table"')
-      const tableNames = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] })
+      const tableNames: string[] = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] })
       console.log('tableNames', tableNames)
-      tableNames.forEach(async (tableName) => {
+      await asyncForEach(tableNames, async tableName => {
         if (tableName !== 'updated_records') {
-          operations.forEach(async (operation) => {
+          await asyncForEach(operations, async operation => {
             await queryRunner.query(
               `create trigger if not exists trigger__updated_records__${operation}__${tableName} 
                after ${operation} on ${tableName} 
@@ -106,7 +116,7 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  async removeDatabase (status) {
+  async removeDatabase (status: { message: string }): Promise<QueryRunner> {
     const connection = await this.getDatabase()
     const queryRunner = await connection.createQueryRunner()
     await queryRunner.connect()
@@ -125,7 +135,7 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  async executeSnapshot (queryRunner, file, trackProgress, isCancelled) {
+  async executeSnapshot (queryRunner: QueryRunner, file: File, trackProgress: SnapshotProgressCallback , isCancelled: () => boolean): Promise<void> {
     return new Promise((resolve, reject) => {
       const decoder = new TextDecoder()
       const fileReader = new FileReader(file)
@@ -138,7 +148,7 @@ export default class DatabaseServiceCordova {
       let buffer = ''
       fileReader.onload = async function (event) {
         try {
-          trackProgress({inserted: start, total: fileSize})
+          trackProgress({ inserted: start, total: fileSize })
           buffer += decoder.decode(event.target.result, {stream: true})
           for (let curChar = 0; curChar < buffer.length; curChar++) {
             let char = buffer.charAt(curChar)
@@ -187,7 +197,7 @@ export default class DatabaseServiceCordova {
     })
   }
 
-  async importDatabase (queryRunner, extractedSnapshot, trackProgress, isCancelled, status) {
+  async importDatabase (queryRunner: QueryRunner, extractedSnapshot: string, trackProgress: SnapshotProgressCallback, isCancelled: () => boolean, status: { message: string }) {
     const file = await FileService.fileFromFileEntry(extractedSnapshot)
     try {
       await this.executeSnapshot(queryRunner, file, trackProgress, isCancelled)
@@ -200,7 +210,7 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  async checkForeignKeys (queryRunner, status) {
+  async checkForeignKeys (queryRunner: QueryRunner, status: { message: string }) {
     try {
       await queryRunner.query('PRAGMA foreign_key_check;')
       await queryRunner.commitTransaction()
@@ -211,14 +221,14 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  async getServerIPAddress () {
+  async getServerIPAddress (): Promise<string> {
     const connection = await this.getConfigDatabase()
     const repository = await connection.getRepository(Config)
     const config = await repository.findOne({name: 'serverIP'})
     return (config === undefined) ? undefined : config.val
   }
 
-  async setServerIPAddress (combinedAddress) {
+  async setServerIPAddress (combinedAddress: string): Promise<void> {
     const connection = await this.getConfigDatabase()
     const repository = await connection.getRepository(Config)
     const config = await this.getServerIPAddress()
@@ -229,7 +239,7 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  async getLatestDownload () {
+  async getLatestDownload (): Promise<Sync> {
     const connection = await this.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     const queryBuilder = await repository.createQueryBuilder('sync')
@@ -241,7 +251,7 @@ export default class DatabaseServiceCordova {
       .getOne()
   }
 
-  async getLatestUpload () {
+  async getLatestUpload (): Promise<Sync> {
     const connection = await this.getConfigDatabase()
     const repository = await connection.getRepository(Sync)
     const queryBuilder = await repository.createQueryBuilder('sync')
@@ -253,7 +263,7 @@ export default class DatabaseServiceCordova {
       .getOne()
   }
 
-  async getUpdatedRecordsCount () {
+  async getUpdatedRecordsCount (): Promise<number> {
     const connection = await this.getDatabase()
     /*
     const updatedRecords = await connection.query(
@@ -269,11 +279,11 @@ export default class DatabaseServiceCordova {
     return totalRowResults[0]['total_rows']
   }
 
-  async getDatabaseFileUri () {
+  async getDatabaseFileUri (): Promise<string> {
     return `/data/data/edu.yale.trellis.surveyview/databases/${trellisConnection.database}`
   }
 
-  async getConfigDatabaseFileUri () {
+  async getConfigDatabaseFileUri (): Promise<string> {
     return `/data/data/edu.yale.trellis.surveyview/databases/${trellisConfigConnection.database}`
   }
 }
