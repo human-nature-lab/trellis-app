@@ -251,3 +251,11 @@ export function setDot (obj: object, key: string, val: any) {
     ref[parts[i]] = val
   }
 }
+
+export function safeParse (str: string, reviver?: (this: any, key: string, val: any) => any): object | string {
+  try {
+    return JSON.parse(str, reviver)
+  } catch (err) {
+    return str
+  }
+}

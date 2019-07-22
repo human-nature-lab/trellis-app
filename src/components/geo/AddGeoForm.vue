@@ -138,7 +138,6 @@
 </template>
 
 <script>
-  import Geo from '../../entities/trellis/Geo'
   import StudyService from '../../services/study/StudyService'
   import GeoService from '../../services/geo/GeoService'
   import CensusFormService from '../../services/census/index'

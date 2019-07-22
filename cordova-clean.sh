@@ -9,7 +9,6 @@ cordova plugin rm cordova-sqlite-storage
 cordova plugin rm cordova-plugin-file-transfer
 cordova plugin rm cordova-plugin-geolocation
 cordova plugin rm cordova-plugin-zeep
-cordova plugin rm cordova-plugin-simple-image-resizer
 cordova plugin rm phonegap-plugin-barcodescanner
 
 cordova platform rm android
@@ -30,5 +29,4 @@ cordova plugin add cordova-sqlite-storage
 cordova plugin add cordova-plugin-file-transfer
 cordova plugin add cordova-plugin-geolocation
 cordova plugin add cordova-plugin-zeep
-cordova plugin add https://github.com/protonet/cordova-plugin-image-resizer.git
 cordova plugin add phonegap-plugin-barcodescanner
