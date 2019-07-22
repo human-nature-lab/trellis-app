@@ -1,8 +1,8 @@
 import Form from '../../entities/trellis/Form'
 import StudyForm from '../../entities/trellis/StudyForm'
-import Skip from "../../entities/trellis/Skip";
-import FormSkip from "../../entities/trellis/FormSkip";
-import formTypes from "../../static/form.types";
+import Skip from '../../entities/trellis/Skip'
+import FormSkip from '../../entities/trellis/FormSkip'
+import formTypes from '../../static/form.types'
 
 export default interface FormServiceInterface {
 
@@ -32,7 +32,7 @@ export default interface FormServiceInterface {
    * @param studyId
    * @param formType
    */
-  createForm (studyId: string, formType: formTypes): PromiseLike<Form>
+  createForm (studyId: string, formType: formTypes): PromiseLike<StudyForm>
 
   /**
    * Update an existing form in the database
