@@ -135,7 +135,7 @@
       },
       timerDuration () {
         if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return 0
-        const qp = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.allowed_time && qp.val != 0)
+        const qp = this.question.questionParameters.find(qp => qp.parameterId == PT.allowed_time)
         return qp ? +qp.val : 0
       },
       showTimer () {
@@ -143,7 +143,8 @@
       },
       showTimerControls () {
         if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return true
-        return this.question.questionParameters.findIndex(qp => qp.parameterId == ParameterType.show_timer_controls && qp.val != false) > -1
+        const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == PT.show_timer_controls)
+        return questionParameter ? !!questionParameter.val : true
       }
     },
     components: {
