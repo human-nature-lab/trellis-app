@@ -27,7 +27,7 @@
             v-model="props.item.showHidden"
             @save="updateForm"
             @updateStudyForm="updateStudyForm"
-            @delete="deleteForm(studyForm)"></form-list-tile>
+            @delete="deleteForm(props.item)"></form-list-tile>
            <tr v-if="props.item.showHidden">
             <td colspan="4">
               <form-skips :form="props.item.form"></form-skips>
@@ -114,8 +114,9 @@
       },
       async addForm (type: formTypes) {
         try {
-          const form = await FormService.createForm(this.global.study.id, type)
-          this.alert('success', this.$t('resource_created', [this.formName(form)]))
+          const studyForm = await FormService.createForm(this.global.study.id, type)
+          this.studyForms.push(studyForm)
+          this.alert('success', this.$t('resource_created', [this.formName(studyForm.form)]))
         } catch (err) {
           this.alert('error', this.$t('failed_resource_create', [this.$t('form')]))
         }
@@ -156,7 +157,7 @@
       async deleteForm (studyForm: StudyForm) {
         if (confirm(this.$t('confirm_resource_delete', [this.formName(studyForm.form)]))) {
           try {
-            await FormService.deleteForm(this.global.study.id, studyForm.id)
+            await FormService.deleteForm(this.global.study.id, studyForm.form.id)
             const index = this.studyForms.findIndex(sf => sf.id === studyForm.id)
             this.studyForms.splice(index, 1)
             this.alert('success', this.$t('resource_deleted', [this.formName(studyForm.form)]))

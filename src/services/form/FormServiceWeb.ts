@@ -35,11 +35,11 @@ export class FormServiceWeb implements FormServiceInterface {
       })
   }
 
-  async createForm (studyId: string, formType: formTypes): Promise<Form> {
+  async createForm (studyId: string, formType: formTypes): Promise<StudyForm> {
     const res = await adminInst.post(uriTemplate('study/{study}/form', [studyId]), {
       form_type: formType
     })
-    return new Form().fromSnakeJSON(res.data.form)
+    return new StudyForm().fromSnakeJSON(res.data.form)
   }
 
   async updateForm (form: Form): Promise<Form> {
@@ -58,7 +58,7 @@ export class FormServiceWeb implements FormServiceInterface {
     saveAs(blob, `form-${formId}.json`)
   }
 
-  async deleteForm (studyId: string,formId: string) {
+  async deleteForm (studyId: string, formId: string) {
     await adminInst.delete(uriTemplate('study/{study}/form/{form}', [studyId, formId]))
   }
 
