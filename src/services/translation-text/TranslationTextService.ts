@@ -1,4 +1,4 @@
-import switchByModeEnv from '../../services/util'
+import switchByModeEnv from '../util'
 import TranslationTextServiceWeb from './TranslationTextServiceWeb'
 import TranslationTextServiceCordova from './TranslationTextServiceCordova'
 

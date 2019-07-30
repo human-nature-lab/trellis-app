@@ -1,5 +1,6 @@
 import Emitter from "../../../classes/Emitter";
 import Form from "../../../entities/trellis/Form";
+import { createConditionAssignmentAPI } from './ConditionAssignmentAPI'
 import ConditionTagStore from "./ConditionTagStore";
 import Page from "../../../entities/trellis/QuestionGroup";
 import {InterviewLocation} from "../services/InterviewAlligator";
@@ -274,10 +275,12 @@ export default class InterviewManagerBase extends Emitter {
       return vars
     }, {})
 
+    const api = createConditionAssignmentAPI(this.data, this.navigator)
+
     for (let question of questionsWithData) {
       for (let act of question.assignConditionTags) {
         try {
-          if (this.conditionAssigner.run(act.id, vars)) {
+          if (this.conditionAssigner.run(act.id, vars, api)) {
             this.assignConditionTag(act)
           }
         } catch (err) {

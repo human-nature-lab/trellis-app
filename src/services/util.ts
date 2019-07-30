@@ -24,4 +24,9 @@ export function switchByModeEnv (args) {
 export function makeBasicAuthHeader (username, password) {
   return 'Basic ' + btoa(`${username}:${password}`)
 }
+
+export function isUndefined (val: any): boolean {
+  return val === null || val === undefined
+}
+
 export default switchByModeEnv

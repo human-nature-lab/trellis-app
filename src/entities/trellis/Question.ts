@@ -9,17 +9,16 @@ import {
   ManyToMany,
   JoinColumn
 } from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
-import {mapFromSnakeJSON} from '../../services/JSONUtil'
 import QuestionType from './QuestionType'
 import Translation from './Translation'
-import Choice from './Choice'
 import AssignConditionTag from './AssignConditionTag'
 import QuestionParameter from './QuestionParameter'
 import QuestionChoice from './QuestionChoice'
 import QuestionDatum from './QuestionDatum'
 import QuestionGroup from './QuestionGroup'
+import QT from '../../static/question.types'
 
 @Entity()
 export default class Question extends SparseTimestampedSoftDelete {
