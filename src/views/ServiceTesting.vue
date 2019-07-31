@@ -10,6 +10,17 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
+              <v-list-tile>
+                <v-list-tile-content>
+                  <file-upload
+                    input-id="convert-template"
+                    extensions="json"
+                    v-model="forms"
+                    @input="convertForm">
+                    Convert form
+                  </file-upload>
+                </v-list-tile-content>
+              </v-list-tile>
               <v-list-tile @click="addAlert">
                 <v-list-tile-action>
                   <v-icon>add_alert</v-icon>
@@ -81,13 +92,20 @@
   import LoginServiceCordova from '../services/login/LoginServiceCordova'
   import LoginServiceWeb from '../services/login/LoginServiceWeb'
   import config from 'config'
-  import {randomFrom} from '../classes/M'
+  import { randomFrom } from '../classes/M'
   import 'mocha/mocha.js'
   import testModules from '../../test/services/index'
+  import { FormBuilder } from '../../test/FormBuilder'
+  import FileUpload from 'vue-upload-component'
+  import Form from '../entities/trellis/Form'
+  import { saveAs } from 'file-saver'
 
   let runner
   export default {
     name: 'service-testing',
+    components: {
+      FileUpload
+    },
     data () {
       const d = {
         testSelectorOpen: [true],
@@ -99,7 +117,8 @@
         testModules: Object.keys(testModules),
         modulesToRun: [],
         tests: [],
-        debugErrors: false
+        debugErrors: false,
+        forms: []
       }
       d.state = d.WAITING
       return d
@@ -179,6 +198,28 @@
         runner.on('end', () => {
           this.state = this.WAITING
         })
+      },
+      convertForm () {
+        if (!this.forms.length) return
+        const file = this.forms[0].file
+        console.log(file)
+        const reader = new FileReader()
+        let content
+        reader.onload = function (evt) {
+          if (evt.target.readyState !== 2) {
+            return
+          } else if (evt.target.error) {
+            throw evt.target.error
+          } else {
+            content = evt.target.result
+            const o = JSON.parse(content)
+            const form = new Form().fromSnakeJSON(o.form)
+            const template = FormBuilder.formToTemplate(form)
+            const str = JSON.stringify(template, null, 2)
+            saveAs(new Blob([str]), file.name)
+          }
+        }
+        reader.readAsText(file)
       }
     },
   }
