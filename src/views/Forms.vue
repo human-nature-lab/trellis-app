@@ -8,11 +8,36 @@
         <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <permission :requires="TrellisPermission.ADD_FORM">
-          <v-btn
-            icon
-            @click="addForm(formType)">
-            <v-icon>add</v-icon>
-          </v-btn>
+          <v-menu
+            offset-x
+            lazy>
+            <v-btn icon slot="activator">
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+            <v-list>
+              <v-list-tile @click="addForm(formType)">
+                <v-list-tile-action>
+                  <v-icon>add</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  Add Form
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile @click="showFormImport = true">
+                <v-list-tile-action>
+                  <v-icon>import_export</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  Import Form
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+<!--          <v-btn-->
+<!--            icon-->
+<!--            @click="addForm(formType)">-->
+<!--            <-->
+<!--          </v-btn>-->
         </permission>
       </v-toolbar>
       <v-data-table
@@ -66,7 +91,8 @@
         global: global as Singleton,
         studyForms: null,
         isAddingNewForm: false,
-        isLoading: false
+        isLoading: false,
+        showImportForm: false
       }
     },
     computed: {
