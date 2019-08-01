@@ -51,9 +51,12 @@
   import FormListTile from "../components/forms/FormListTile"
   import TrellisModal from '../components/TrellisModal'
   import FormSkips from '../components/forms/FormSkips'
+  import DocsFiles from '../components/documentation/DocsFiles'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
 
   export default Vue.extend({
     name: 'Forms',
+    mixins: [DocsLinkMixin(DocsFiles.getting_started.create_form)],
     components: {FormListTile, TrellisModal, FormSkips, Permission},
     async created () {
       this.isLoading = true
