@@ -17,7 +17,7 @@
                     extensions="json"
                     v-model="forms"
                     @input="convertForm">
-                    Convert form
+                    Convert form to TypeScript
                   </file-upload>
                 </v-list-tile-content>
               </v-list-tile>
@@ -215,8 +215,8 @@
             const o = JSON.parse(content)
             const form = new Form().fromSnakeJSON(o.form)
             const template = FormBuilder.formToTemplate(form)
-            const str = JSON.stringify(template, null, 2)
-            saveAs(new Blob([str]), file.name)
+            const str = FormBuilder.templateToTSFile(template)
+            saveAs(new Blob([str]), file.name.replace('.json', '') + '.ts')
           }
         }
         reader.readAsText(file)

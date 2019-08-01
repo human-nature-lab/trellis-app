@@ -1,4 +1,9 @@
+import { ConditionAssignmentAPI } from '../src/components/interview/classes/ConditionAssignmentAPI'
 import { ConditionTagScope } from '../src/services/interview/InterviewDataInterface'
+
+export interface ConditionLogic {
+  (vars: {[key: string]: string | string[]}, api: ConditionAssignmentAPI): boolean
+}
 
 export enum ShowHide {
   SHOW = 'show',
@@ -11,7 +16,7 @@ export enum AnyAll {
 }
 
 export interface Sortable {
-  sortOrder: number
+  sortOrder?: number
 }
 
 export interface ConditionTagTemplate {
@@ -25,14 +30,15 @@ export interface SkipTemplate extends Sortable {
 }
 
 export interface ChoiceTemplate extends Sortable {
+  id?: string
   label: string
   val: string | number
 }
 
 export interface AssignConditionTagTemplate {
   conditionTag: string
-  scope: ConditionTagScope
-  logic: string
+  scope?: ConditionTagScope
+  logic: string | ConditionLogic
 }
 
 export interface ParameterTemplate {
@@ -41,10 +47,11 @@ export interface ParameterTemplate {
 }
 
 export interface QuestionTemplate extends Sortable {
+  id?: string
   label: string
   questionType: string,
   varName: string,
-  choices: ChoiceTemplate[],
+  choices: (ChoiceTemplate | string)[],
   parameters: ParameterTemplate[]
   assignConditionTags: AssignConditionTagTemplate[]
 }

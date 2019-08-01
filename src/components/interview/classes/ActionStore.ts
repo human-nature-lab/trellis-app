@@ -17,7 +17,7 @@ import {Mutex, MutexInterface}from "async-mutex";
  */
 export default class ActionStore extends Emitter {
   public store: any[]
-  public lastRealAction: Action|null = null
+  public lastRealAction: Action | null = null
   public questionBins: Map<string, Action[]> = new Map()
   private lastRealActionLocNum: number = -1
   private questionIndex: Map<string, Action[]> = new Map()
@@ -68,6 +68,10 @@ export default class ActionStore extends Emitter {
       this.releaseMutex()
     }
 
+  }
+
+  public hasActions (): boolean {
+    return this.store.length > 0
   }
 
   /**

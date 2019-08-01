@@ -11,9 +11,9 @@ interface SimpleLocation {
   sectionFollowUpRepetition: number
 }
 
-interface ConditionAssignmentAPI {
+export interface ConditionAssignmentAPI {
   data: {
-    get (varName: string, sectionFollowRepetition?: number, sectionRepetition?: number): string | string[] | null
+    get (varName: string, sectionFollowUpRepetition?: number, sectionRepetition?: number): string | string[] | null
   },
   conditionTag: {
     exists (tagName: string): boolean

@@ -1,7 +1,9 @@
-import { now } from 'moment'
+import QuestionType from '../src/entities/trellis/QuestionType'
+import { now } from '../src/services/DateService'
 import uuidv4 from 'uuid/v4'
 import AssignConditionTag from '../src/entities/trellis/AssignConditionTag'
 import Choice from '../src/entities/trellis/Choice'
+import ConditionTag from '../src/entities/trellis/ConditionTag'
 import Form from '../src/entities/trellis/Form'
 import FormSection from '../src/entities/trellis/FormSection'
 import Locale from '../src/entities/trellis/Locale'
@@ -15,8 +17,11 @@ import SectionQuestionGroup from '../src/entities/trellis/SectionQuestionGroup'
 import Skip from '../src/entities/trellis/Skip'
 import SkipConditionTag from '../src/entities/trellis/SkipConditionTag'
 import Translation from '../src/entities/trellis/Translation'
+import { ConditionTagScope } from '../src/services/interview/InterviewDataInterface'
 import TranslationService from '../src/services/TranslationService'
+import { isUndefined } from '../src/services/util'
 import PT from '../src/static/parameter.types'
+import QT from '../src/static/question.types'
 import {
   AnyAll,
   FormTemplate,
@@ -30,7 +35,8 @@ import {
 const english = new Locale().fromSnakeJSON({ id: '48984fbe-84d4-11e5-ba05-0800279114ca', language_tag: 'en' })
 
 export class FormBuilder {
-  private form: Form
+
+  readonly form: Form
 
   constructor (form?: Form) {
     this.form = form || new Form()
@@ -48,7 +54,9 @@ export class FormBuilder {
     this.form.formMasterId = this.form.id
     this.form.version = 1
     this.form.isPublished = true
-    this.form.sections = []
+    if (!this.form.sections) {
+      this.form.sections = []
+    }
     this.timestamp(this.form)
   }
 
@@ -56,7 +64,7 @@ export class FormBuilder {
     const s = new Skip()
     s.anyAll = skip.anyAll === AnyAll.ANY
     s.showHide = skip.showHide === ShowHide.SHOW
-    s.precedence = skip.sortOrder
+    s.precedence = skip.sortOrder || page.skips.length
     s.conditionTags = []
     for (const c of skip.conditions) {
       const sct = new SkipConditionTag()
@@ -68,54 +76,93 @@ export class FormBuilder {
   }
 
   addQuestion (page: QuestionGroup, question: QuestionTemplate) {
+    if (!page.questions) {
+      page.questions = []
+    }
     const q = new Question()
-    q.sortOrder = question.sortOrder
-    q.assignConditionTags = question.assignConditionTags.map(act => {
-      const a = new AssignConditionTag()
-      a.scope = act.scope
-      a.logic = act.logic
-      a.conditionTagId = act.conditionTag
-      this.timestamp(a)
-      return a
-    })
-    q.choices = question.choices.map(c => {
-      const qc = new QuestionChoice()
-      qc.choice = new Choice()
-      qc.choice.choiceTranslation = this.makeTranslation(c.label, null)
-      qc.choice.val = c.val as string
-      qc.sortOrder = c.sortOrder
-      this.timestamp(qc)
-      this.timestamp(qc.choice)
-      return qc
-    })
-    q.questionParameters = question.parameters.map(p => {
-      const qp = new QuestionParameter()
-      this.timestamp(qp)
-      qp.parameter = new Parameter()
-      qp.parameter.name = p.type
-      qp.parameter.id = PT[p.type]
-      qp.parameterId = PT[p.type]
-      qp.val = p.val as string
-      return qp
-    })
+    q.id = question.id || uuidv4()
+    q.sortOrder = question.sortOrder || page.questions.length
+    q.varName = question.varName
+    q.assignConditionTags = []
+    q.questionTypeId = QT[question.questionType]
+    q.questionType = new QuestionType()
+    q.questionType.id = q.questionTypeId
+    q.questionType.name = question.questionType
+    this.timestamp(q.questionType)
+    if (question.assignConditionTags) {
+      q.assignConditionTags = question.assignConditionTags.map(act => {
+        const a = new AssignConditionTag()
+        a.scope = act.scope || ConditionTagScope.SURVEY
+        a.logic = typeof act.logic === 'string' ? act.logic : act.logic.toString()
+        a.conditionTagId = act.conditionTag
+        a.conditionTag = new ConditionTag()
+        a.conditionTag.name = act.conditionTag
+        a.conditionTag.id = a.conditionTagId
+        this.timestamp(a)
+        this.timestamp(a.conditionTag)
+        return a
+      })
+    }
+    q.choices = []
+    if (question.choices) {
+      q.choices = question.choices.map((c, i) => {
+        const qc = new QuestionChoice()
+        qc.choice = new Choice()
+        if (typeof c === 'string') {
+          qc.choice.id = uuidv4()
+          qc.choice.choiceTranslation = this.makeTranslation(c)
+          qc.choice.val = c
+        } else {
+          qc.choice.id = c.id || uuidv4()
+          qc.choice.choiceTranslation = this.makeTranslation(c.label)
+          qc.choice.val = c.val as string
+          qc.sortOrder = c.sortOrder || i
+        }
+        this.timestamp(qc)
+        this.timestamp(qc.choice)
+        return qc
+      })
+    }
+    q.questionParameters = []
+    if (question.parameters) {
+      q.questionParameters = question.parameters.map(p => {
+        const qp = new QuestionParameter()
+        this.timestamp(qp)
+        qp.parameter = new Parameter()
+        qp.parameter.name = p.type
+        // @ts-ignore
+        qp.parameter.id = PT[p.type]
+        // @ts-ignore
+        qp.parameterId = PT[p.type]
+        qp.val = p.val as string
+        return qp
+      })
+    }
     this.timestamp(q)
     page.questions.push(q)
   }
 
   addPage (section: Section, page: PageTemplate) {
+    if (!section.questionGroups) {
+      section.questionGroups = []
+    }
     const p = new QuestionGroup()
-    p.questions = []
     p.skips = []
     p.sectionQuestionGroup = new SectionQuestionGroup()
-    p.sectionQuestionGroup.questionGroupOrder = page.sortOrder
+    p.sectionQuestionGroup.questionGroupOrder = page.sortOrder || section.questionGroups.length
+    this.timestamp(p.sectionQuestionGroup)
     this.timestamp(p)
-    for (const q of page.questions) {
-      this.addQuestion(p, q)
+    if (page.questions) {
+      for (const q of page.questions) {
+        this.addQuestion(p, q)
+      }
     }
-    for (const s of page.skips) {
-      this.addSkip(p, s)
+    if (page.skips) {
+      for (const s of page.skips) {
+        this.addSkip(p, s)
+      }
     }
-    section.pages.push(p)
+    section.questionGroups.push(p)
   }
 
   makeTranslation (text: string, localeId: string = english.id): Translation {
@@ -132,32 +179,44 @@ export class FormBuilder {
   }
 
   addSection (section: SectionTemplate) {
+    if (!this.form.sections) {
+      this.form.sections = []
+    }
     const s = new Section().fromSnakeJSON(section)
     s.formSections = []
     this.timestamp(s)
-    s.nameTranslation = this.makeTranslation(section.label, null)
+    s.nameTranslation = this.makeTranslation(section.label || '', null)
+    s.followUpQuestionId = section.followUpQuestionId
     s.formSections.push(new FormSection())
-    s.formSections[0].randomizeFollowUp = section.randomizeFollowUp
+    s.formSections[0].sortOrder = section.sortOrder || this.form.sections.length
+    s.formSections[0].randomizeFollowUp = !!section.randomizeFollowUp
     s.formSections[0].followUpQuestionId = section.followUpQuestionId
     s.formSections[0].isRepeatable = section.isRepeatable
     s.formSections[0].maxRepetitions = section.maxRepetitions || 0
+    this.timestamp(s.formSections[0])
     for (const p of section.pages) {
       this.addPage(s, p)
     }
     this.form.sections.push(s)
   }
 
-  static formToTemplate (form: Form): { form: FormTemplate } {
+  static formToTemplate (form: Form): FormTemplate {
     const f = { sections: [] }
+    const questionIdMap: Map<string, QuestionTemplate> = new Map()
+    form.sections.sort((a, b) => a.formSections[0].sortOrder - b.formSections[0].sortOrder)
     for (const section of form.sections) {
       const s = {
         label: TranslationService.getAny(section.nameTranslation, english),
         pages: [],
-        sortOrder: section.formSections[0].sortOrder,
-        isRepeatable: section.formSections[0].isRepeatable,
-        maxRepetitions: section.formSections[0].maxRepetitions,
+        sortOrder: +section.formSections[0].sortOrder,
+        isRepeatable: !!section.formSections[0].isRepeatable,
+        maxRepetitions: +section.formSections[0].maxRepetitions,
         followUpQuestionId: section.formSections[0].followUpQuestionId,
-        randomizeFollowUp: section.formSections[0].randomizeFollowUp
+        randomizeFollowUp: !!section.formSections[0].randomizeFollowUp
+      }
+      if (s.followUpQuestionId) {
+        const q = questionIdMap.get(s.followUpQuestionId)
+        q.id = s.followUpQuestionId
       }
       for (const page of section.questionGroups) {
         const p = {
@@ -175,6 +234,7 @@ export class FormBuilder {
             parameters: [],
             assignConditionTags: []
           }
+          questionIdMap.set(question.id, q)
           p.questions.push(q)
           for (const choice of question.choices) {
             q.choices.push({
@@ -196,6 +256,7 @@ export class FormBuilder {
               logic: act.scope
             })
           }
+          q.choices.sort((a, b) => a.sortOrder - b.sortOrder)
         }
         for (const skip of page.skips) {
           p.skips.push({
@@ -207,12 +268,37 @@ export class FormBuilder {
             }))
           })
         }
+        p.questions.sort((a, b) => a.sortOrder - b.sortOrder)
+        p.skips.sort((a, b) => a.sortOrder - b.sortOrder)
         s.pages.push(p)
       }
+      s.pages.sort((a, b) => a.sortOrder - b.sortOrder)
       f.sections.push(s)
     }
+    f.sections.sort((a, b) => a.sortOrder - b.sortOrder)
+    return f
+  }
 
-    return { form: f }
+  static stringify (obj: any, indents = 2, depth = 1): string {
+    if (Array.isArray(obj)) {
+      return '[' + obj.map(o => FormBuilder.stringify(o, indents, depth)).join(', ') + ']'
+    } else if (typeof obj !== 'object' || isUndefined(obj)) {
+      if (typeof obj === 'string') {
+        return `'${obj}'`
+      } else {
+        return obj
+      }
+    } else {
+      let props = Object
+        .keys(obj)
+        .map(key => `${' '.repeat(indents * depth)}${key}: ${FormBuilder.stringify(obj[key], indents, depth + 1)}`)
+        .join(',\n')
+      return `{\n${props}\n${' '.repeat(indents * (depth - 1))}}`
+    }
+  }
+
+  static templateToTSFile (template: FormTemplate) {
+    return `import { FormTemplate } from '../FormBuilderTypes'\nexport default ${FormBuilder.stringify(template)} as FormTemplate\n`
   }
 
   static fromTemplate (template: FormTemplate): FormBuilder {

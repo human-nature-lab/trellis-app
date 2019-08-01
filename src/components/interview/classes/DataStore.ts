@@ -5,7 +5,7 @@ import DatumRecycler from '../services/recyclers/DatumRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
-import ConditionTagStore from './/ConditionTagStore'
+import cts, { ConditionTagStore } from './ConditionTagStore'
 import Datum from '../../../entities/trellis/Datum'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
@@ -44,7 +44,7 @@ export default class DataStore extends Emitter {
   private questionDatumQuestionIdIndex: Map<string, QuestionDatum[]> = new Map()
   private actionIdMap: Map<string, Datum> = new Map()
   private followUpDatumIdMap: Map<string, Datum> = new Map()
-
+  private conditionTagStore: ConditionTagStore = cts
   private previousState!: InterviewDataInterface
   private mutex = new Mutex()
   private releaseMutex!: MutexInterface.Releaser
@@ -289,10 +289,10 @@ export default class DataStore extends Emitter {
     // @ts-ignore
     this.conditionTags[type].push(tag)
     if (tag.conditionTag) {
-      ConditionTagStore.add(tag.conditionTag)
+      this.conditionTagStore.add(tag.conditionTag)
     }
     if (conditionTag) {
-      ConditionTagStore.add(conditionTag)
+      this.conditionTagStore.add(conditionTag)
     }
     this.emitChange()
   }
@@ -342,24 +342,24 @@ export default class DataStore extends Emitter {
   public getAllConditionTagsForLocation (sectionRepetition: number, sectionFollowUpDatumId: string): ConditionTag[] {
     const tags = []
     for (let rct of this.conditionTags.respondent) {
-      tags.push(ConditionTagStore.getTagById(rct.conditionTagId))
+      tags.push(this.conditionTagStore.getTagById(rct.conditionTagId))
     }
     for (let sct of this.conditionTags.survey) {
-      tags.push(ConditionTagStore.getTagById(sct.conditionId))
+      tags.push(this.conditionTagStore.getTagById(sct.conditionId))
     }
     for (let sct of this.conditionTags.section) {
       if (sct.repetition === sectionRepetition &&
         sct.followUpDatumId === sectionFollowUpDatumId) {
-        tags.push(ConditionTagStore.getTagById(sct.conditionId))
+        tags.push(this.conditionTagStore.getTagById(sct.conditionId))
       }
     }
     return tags
   }
 
   public getAllConditionTags (): ConditionTag[] {
-    let tags: ConditionTag[] = this.conditionTags.respondent.map(rct => ConditionTagStore.getTagById(rct.conditionTagId))
-    tags = tags.concat(this.conditionTags.survey.map(sct => ConditionTagStore.getTagById(sct.conditionId)))
-    tags = tags.concat(this.conditionTags.section.map(sct => ConditionTagStore.getTagById(sct.conditionId)))
+    let tags: ConditionTag[] = this.conditionTags.respondent.map(rct => this.conditionTagStore.getTagById(rct.conditionTagId))
+    tags = tags.concat(this.conditionTags.survey.map(sct => this.conditionTagStore.getTagById(sct.conditionId)))
+    tags = tags.concat(this.conditionTags.section.map(sct => this.conditionTagStore.getTagById(sct.conditionId)))
     return tags
   }
 

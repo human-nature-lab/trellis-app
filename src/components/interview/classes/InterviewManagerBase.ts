@@ -335,8 +335,8 @@ export default class InterviewManagerBase extends Emitter {
     return this.data.getLocationConditionTagNames(sectionRepetition, sectionFollowUpDatumId)
   }
 
-  getConditionTagSet (sectionReptition: number, sectionFollowUpDatumId: string): Set<string> {
-    return new Set(this.getConditionTags(sectionReptition, sectionFollowUpDatumId))
+  getConditionTagSet (sectionRepetition: number, sectionFollowUpDatumId: string): Set<string> {
+    return new Set(this.getConditionTags(sectionRepetition, sectionFollowUpDatumId))
   }
 
   getAllConditionTags () {
