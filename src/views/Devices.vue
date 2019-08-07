@@ -49,6 +49,7 @@
   import DeviceForm from '../components/devices/DeviceForm'
   import Pagination from '../types/Pagination'
   import CRUDMenu from '../components/CRUDMenu'
+  import Device from '../entities/trellis/Device'
   export default Vue.extend({
     name: 'Devices',
     mixins: [PermissionMixin, DocsLinkMixin('./devices/Devices.md')],
@@ -93,8 +94,9 @@
           this.isAdding = false
           this.alert('success', this.$t('resource_created', [d.name]))
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_create', [d.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_create', [device.name]))
+          }
         } finally {
           this.isBusy = false
         }
@@ -108,7 +110,9 @@
           this.pagination.count = page.count
           this.devices = page.data
         } catch (err) {
-          this.alert('error', err.message, {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         } finally {
           this.isBusy = false
         }
@@ -128,8 +132,9 @@
           }
           this.alert('success', this.$t('resource_deleted', [device.name]))
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_delete', [device.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_delete', [device.name]))
+          }
         } finally {
           this.isBusy = false
         }
@@ -146,8 +151,9 @@
           this.editingDevice = null
           this.alert('success', this.$t('resource_updated', [device.name]))
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_update', [device.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [device.name]))
+          }
         } finally {
           this.isBusy = false
         }

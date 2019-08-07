@@ -186,9 +186,10 @@
           try {
             survey = await SurveyService.create(this.global.study.id, this.respondent.id, this.form.id)
           } catch (err) {
-            err.component = 'FormListItem.vue@tryCreatingSurvey'
-            logger.log(err)
-            this.alert('error', this.$t('create_survey_failed', [err]))
+            if (this.isNotAuthError(err)) {
+              err.component = 'FormListItem.vue@tryCreatingSurvey'
+              this.logError(err, this.$t('create_survey_failed', [err.message]))
+            }
           }
           if (survey) {
             this.tryStartingSurvey(survey)

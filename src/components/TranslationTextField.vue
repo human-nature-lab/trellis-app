@@ -141,8 +141,9 @@
           }
           release()
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to load locales', {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load locales')
+          }
         }
       }
     }

@@ -102,9 +102,10 @@
         try {
           this.reports = (await ReportService.getLatestReports(this.global.study.id))
         } catch (err) {
-          err.component = 'Reports.vue@loadLatestReports'
-          this.log(err)
-          this.alert('error', 'Unable to load latest reports')
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', 'Unable to load latest reports')
+          }
         } finally {
           this.startPolling()
           this.isLoading = false
@@ -118,9 +119,10 @@
           this.startPolling()
           this.clearSelected()
         } catch (err) {
-          err.component = 'Reports.vue@dispatchReports'
-          this.log(err)
-          this.alert('error', this.$t('error'))
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', this.$t('error'))
+          }
         } finally {
           this.isDispatching = false
         }
@@ -161,6 +163,9 @@
               }
             } catch (err) {
               this.isPolling = false
+              if (this.isNotAuthError(err)) {
+                throw err
+              }
             }
           } else {
             this.isPolling = false
@@ -197,11 +202,12 @@
             this.isDownloading = false
           }, 1000)
         } catch (err) {
-          err.component = 'Reports.vue@downloadReports'
-          this.log(err)
-          this.alert('error', 'Unable to download reports')
-          this.isDownloading = false
+          if (this.isNotAuthError(err)) {
+            err.component = 'Reports.vue@downloadReports'
+            this.logError(err, 'Unable to download reports')
+          }
         } finally {
+          this.isDownloading = false
           this.clearSelected()
         }
       }

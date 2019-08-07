@@ -116,7 +116,9 @@
           let index = this.conditionTags.findIndex((t: RespondentConditionTag) => t.id === respondentConditionTagId)
           this.conditionTags.splice(index, 1)
         } catch (err) {
-          this.error = err
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         } finally {
           this.deleting[respondentConditionTagId] = false
         }

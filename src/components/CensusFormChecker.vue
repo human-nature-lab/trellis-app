@@ -62,6 +62,9 @@
             this.message = this.$t('no_census_defined_for_study')
           }
         } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
           this.reject(err)
         } finally {
           this.isOpen = false

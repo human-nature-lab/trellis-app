@@ -54,7 +54,6 @@
 <script>
   import Geo from '../../entities/trellis/Geo'
   import Photo from '../photo/Photo.vue'
-  import AlertService from '../../services/AlertService'
   import TranslationService from '../../services/TranslationService'
   import GeoService from '../../services/geo/GeoService'
   import global from '../../static/singleton'
@@ -122,10 +121,16 @@
         this.curStatus = STATUS.NEW_EDIT_NAME
       },
       clickMap: async function (evt) {
-        this.cancelMoveGeo()
-        await GeoService.moveGeo(this.selectedGeo.id, evt.latlng.lat, evt.latlng.lng, this.moveChildren)
-        const movedGeo = await GeoService.getGeoById(this.selectedGeo.id)
-        this.$emit('move-geo-done', movedGeo)
+        try {
+          this.cancelMoveGeo()
+          await GeoService.moveGeo(this.selectedGeo.id, evt.latlng.lat, evt.latlng.lng, this.moveChildren)
+          const movedGeo = await GeoService.getGeoById(this.selectedGeo.id)
+          this.$emit('move-geo-done', movedGeo)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       selectGeo: function () {
         this.$emit('select-geo-done', this.selectedGeo)
@@ -156,19 +161,26 @@
           await GeoService.removeGeo(this.selectedGeo.id)
           this.$emit('remove-geo-done', this.selectedGeo.id)
         } catch (err) {
-          this.log(err)
-          this.alert('error', `Unable to remove geo: ${this.selectedGeo.id}`, {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, `Unable to remove geo: ${this.selectedGeo.id}`)
+          }
         }
       },
       onEditingDone: async function () {
         let editedGeo
-        if (this.curStatus === STATUS.NEW_EDIT_NAME) {
-          editedGeo = await GeoService.createGeo(this.selectedGeo)
-        } else {
-          editedGeo = await GeoService.getGeoById(this.selectedGeo.id)
+        try {
+          if (this.curStatus === STATUS.NEW_EDIT_NAME) {
+            editedGeo = await GeoService.createGeo(this.selectedGeo)
+          } else {
+            editedGeo = await GeoService.getGeoById(this.selectedGeo.id)
+          }
+          this.curStatus = STATUS.SELECTED
+          this.$emit('editing-done', editedGeo)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
-        this.curStatus = STATUS.SELECTED
-        this.$emit('editing-done', editedGeo)
       },
       onEditingCancelled: function () {
         if (this.curStatus === STATUS.EDIT_NAME) {
@@ -213,7 +225,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

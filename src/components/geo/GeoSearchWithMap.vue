@@ -100,7 +100,7 @@
         default: () => []
       }
     },
-    data: function () {
+    data () {
       return {
         alwaysReposition: true,
         global: global,
@@ -128,8 +128,9 @@
         let curGeo = this.$router.currentRoute.params.geoId ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
         this.selectGeo(curGeo)
       } catch (err) {
-        this.log(err)
-        this.alert('error', this.$t('no_locations_found'), {timeout: 0})
+        if (this.isNotAuthError(err)) {
+          this.logError(err, this.$t('no_locations_found'))
+        }
       }
     },
     mounted () {
@@ -140,7 +141,7 @@
       this.trellisMap.off('zoomend resize')
     },
     methods: {
-      selectGeo: async function (geo) {
+      async selectGeo (geo) {
         const geoId = (geo && geo.id) ? geo.id : null
         try {
           this.isLoading = true
@@ -153,13 +154,14 @@
             this.alert('default', this.$t('no_locations_found'))
           }
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to load child locations', {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load child locations')
+          }
         } finally {
           this.isLoading = false
         }
       },
-      setUpMap: function () {
+      setUpMap () {
         this.trellisMap = L.map('leafletMap').setView([0.0, 0.0], 1)
         delete L.Icon.Default.prototype._getIconUrl
         L.Icon.Default.mergeOptions({
@@ -179,14 +181,14 @@
           this.repositionMarkers()
         })
       },
-      displayResults: function (results) {
+      displayResults (results) {
         this.geoResults = results
         this.clearMarkers()
         this.addMarkers(results)
         this.centerMap()
         this.repositionMarkers()
       },
-      clearMarkers: function () {
+      clearMarkers () {
         this.clearPaths()
         this.clearTooltips()
         this.tooltipMarkers.forEach((marker) => {
@@ -199,29 +201,35 @@
         this.geoMarkers = []
         this.markerPositions = []
       },
-      clearPaths: function () {
+      clearPaths () {
         this.paths.forEach((path) => {
           this.trellisMap.removeLayer(path)
         })
         this.paths = []
       },
-      clearTooltips: function () {
+      clearTooltips () {
         this.tooltipMarkers.forEach((tooltip) => {
           tooltip.remove()
         })
         this.tooltipMarkers = []
       },
       upOneLevelDone: async function () {
-        const parentGeoId = (this.parentGeo) ? this.parentGeo.parentId : null
-        const parentGeo = (parentGeoId) ? await GeoService.getGeoById(parentGeoId) : null
-        this.selectedGeo = null
-        this.selectGeo(parentGeo)
+        try {
+          const parentGeoId = (this.parentGeo) ? this.parentGeo.parentId : null
+          const parentGeo = (parentGeoId) ? await GeoService.getGeoById(parentGeoId) : null
+          this.selectedGeo = null
+          this.selectGeo(parentGeo)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
-      selectGeoDone: function (newParentGeo) {
+      selectGeoDone (newParentGeo) {
         this.selectedGeo = null
         this.selectGeo(newParentGeo)
       },
-      editingDone: function (editedGeo) {
+      editingDone (editedGeo) {
         this.selectedGeo = null
         for (let i = 0; i < this.geoResults.length; i++) {
           let geo = this.geoResults[i]
@@ -231,16 +239,22 @@
         }
         this.displayResults(this.geoResults)
       },
-      addNewGeo: async function () {
-        const study = await StudyService.getCurrentStudy()
-        const parentGeoId = (this.parentGeo === null) ? null : this.parentGeo.id
-        this.selectedGeo = GeoService.createNewGeo(parentGeoId, study.locales)
+      async addNewGeo () {
+        try {
+          const study = await StudyService.getCurrentStudy()
+          const parentGeoId = (this.parentGeo === null) ? null : this.parentGeo.id
+          this.selectedGeo = GeoService.createNewGeo(parentGeoId, study.locales)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
-      printMap: function () {
+      printMap () {
         this.global.menuDrawer.open = false
         this.global.printMode = !this.global.printMode
       },
-      removeGeoDone: function (removedGeoId) {
+      removeGeoDone (removedGeoId) {
         this.selectedGeo = null
         for (let i = 0; i < this.geoResults.length; i++) {
           let geo = this.geoResults[i]
@@ -250,11 +264,11 @@
         }
         this.displayResults(this.geoResults)
       },
-      positionGeoDone: function (positionedGeo) {
+      positionGeoDone (positionedGeo) {
         this.geoResults.push(positionedGeo)
         this.displayResults(this.geoResults)
       },
-      moveGeoDone: function (movedGeo) {
+      moveGeoDone (movedGeo) {
         this.selectedGeo = null
         for (let i = 0; i < this.geoResults.length; i++) {
           let geo = this.geoResults[i]
@@ -264,7 +278,7 @@
         }
         this.displayResults(this.geoResults)
       },
-      editingCancelled: function () {
+      editingCancelled () {
         // Remove geo elements with null IDs
         let removed = false
         for (let i = 0; i < this.geoResults.length; i++) {
@@ -279,7 +293,7 @@
         }
         this.selectedGeo = null
       },
-      addMarkers: async function (geoResults) {
+      async addMarkers (geoResults) {
         let tooltipsToDisplay = geoResults.length
         return new Promise((resolve) => {
           geoResults.forEach((geo) => {
@@ -308,21 +322,21 @@
           })
         })
       },
-      latLngToPos: function (lat, lng, bounds) {
+      latLngToPos (lat, lng, bounds) {
         let width = Math.abs(bounds._northEast.lat - bounds._southWest.lat)
         let scale = targetMapWidth / width
         let x = (lat - bounds._southWest.lat) * scale
         let y = (lng - bounds._southWest.lng) * scale
         return [x, y]
       },
-      posToLatLng: function (pos, bounds) {
+      posToLatLng (pos, bounds) {
         let width = Math.abs(bounds._northEast.lat - bounds._southWest.lat)
         let scale = targetMapWidth / width
         let lat = pos.x / scale + bounds._southWest.lat
         let lng = pos.y / scale + bounds._southWest.lng
         return [lat, lng]
       },
-      repositionMarkers: function () {
+      repositionMarkers () {
         this.clearPaths()
         this.graph = createGraph()
         let bounds = this.trellisMap.getBounds()
@@ -383,7 +397,7 @@
           return (diffLng < 0) ? 'right' : 'left'
         }
       },
-      findOverlappingTooltips: function () {
+      findOverlappingTooltips () {
         const tooltips = document.getElementsByClassName('leaflet-tooltip')
         for (let i = 0; i < (tooltips.length - 1); i++) {
           let tooltipA = tooltips[i]
@@ -396,7 +410,7 @@
         }
         return false
       },
-      isOverlapping: function (elementA, elementB) {
+      isOverlapping (elementA, elementB) {
         let rectA = elementA.getBoundingClientRect()
         let rectB = elementB.getBoundingClientRect()
         return ! (rectA.right  < rectB.left  ||
@@ -404,13 +418,13 @@
                   rectA.bottom < rectB.top   ||
                   rectA.top    > rectB.bottom)
       },
-      centerMap: function () {
+      centerMap () {
         if (this.markerPositions.length === 0) return
         this.trellisMap.fitBounds(L.latLngBounds(this.markerPositions))
       }
     },
     computed: {
-      parentGeoName: function () {
+      parentGeoName () {
         if (this.parentGeo === null) {
           return this.$t('locations')
         }

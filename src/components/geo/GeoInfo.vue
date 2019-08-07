@@ -155,20 +155,34 @@
         })
       },
       async addPhoto (photo: Photo) {
-        let photoWithPivotTable = await GeoService.addPhoto(this.geo.id, photo)
-        this.geoPhotos.push(photoWithPivotTable)
+        try {
+          let photoWithPivotTable = await GeoService.addPhoto(this.geo.id, photo)
+          this.geoPhotos.push(photoWithPivotTable)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
-      onUpdatePhotos: async function (photos) {
-        await GeoService.updatePhotos(photos)
+      async onUpdatePhotos (photos) {
+        try {
+          await GeoService.updatePhotos(photos)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
-      onDeletePhoto: async function (photo) {
+      async onDeletePhoto (photo) {
         let confirmMessage = this.$t('remove_photo_confirm') + ''
         if (!window.confirm(confirmMessage)) return
         try {
           await GeoService.removePhoto(photo)
           this.geoPhotos.splice(this.geoPhotos.indexOf(photo), 1)
         } catch (err) {
-          console.error(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       },
       onGeoTypeSelected: async function (geoType) {

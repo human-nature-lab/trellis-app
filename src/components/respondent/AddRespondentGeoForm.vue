@@ -83,10 +83,16 @@
         this.showGeoSearch = false
       },
       async done () {
-        if (this.respondent && this.selectedGeo) {
-          const rGeo: RespondentGeo = await RespondentService.addRespondentGeo(this.respondent.id, this.selectedGeo.id, this.isCurrent)
-          this.$emit('added', rGeo)
-          this.close()
+        try {
+          if (this.respondent && this.selectedGeo) {
+            const rGeo: RespondentGeo = await RespondentService.addRespondentGeo(this.respondent.id, this.selectedGeo.id, this.isCurrent)
+            this.$emit('added', rGeo)
+            this.close()
+          }
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       },
       close () {

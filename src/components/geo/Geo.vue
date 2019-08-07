@@ -79,12 +79,15 @@
         this.setCanUserAddChild()
       },
       async setCanUserAddChild () {
-        let parentGeo = await GeoService.getGeoById(this.parentGeoId)
-        this.canUserAddChild = (parentGeo && parentGeo.hasOwnProperty('geoType')) ? parentGeo.geoType.canUserAddChild : false
+        try {
+          let parentGeo = await GeoService.getGeoById(this.parentGeoId)
+          this.canUserAddChild = (parentGeo && parentGeo.hasOwnProperty('geoType')) ? parentGeo.geoType.canUserAddChild : false
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       }
     }
   }
 </script>
-
-<style lang="sass">
-</style>

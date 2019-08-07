@@ -66,24 +66,22 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from "../components/Permission"
-  import StudyForm from "../entities/trellis/StudyForm"
+  import Permission from '../components/Permission.vue'
+  import StudyForm from '../entities/trellis/StudyForm'
   import FormService from '../services/form/FormService'
-  import TranslationService from "../services/TranslationService"
-  import formTypes from "../static/form.types"
-  import global, {Singleton} from '../static/singleton'
-  import Form from "../entities/trellis/Form"
-  import FormListTile from "../components/forms/FormListTile"
-  import TrellisModal from '../components/TrellisModal'
-  import FormSkips from '../components/forms/FormSkips'
+  import TranslationService from '../services/TranslationService'
+  import formTypes from '../static/form.types'
+  import global, { Singleton } from '../static/singleton'
+  import Form from '../entities/trellis/Form'
+  import FormListTile from '../components/forms/FormListTile.vue'
+  import TrellisModal from '../components/TrellisModal.vue'
+  import FormSkips from '../components/forms/FormSkips.vue'
 
   export default Vue.extend({
     name: 'Forms',
     components: {FormListTile, TrellisModal, FormSkips, Permission},
-    async created () {
-      this.isLoading = true
-      this.studyForms = await FormService.getAllStudyForms(global.study.id)
-      this.isLoading = false
+    created () {
+      this.loadForms()
     },
     data () {
       return {
@@ -144,7 +142,9 @@
           this.studyForms.push(studyForm)
           this.alert('success', this.$t('resource_created', [this.formName(studyForm.form)]))
         } catch (err) {
-          this.alert('error', this.$t('failed_resource_create', [this.$t('form')]))
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_create', [this.$t('form')]))
+          }
         }
       },
       async updateForm (form: Form) {
@@ -154,8 +154,9 @@
           Object.assign(sf.form, newForm)
           this.alert('success', this.$t('resource_updated', [this.formName(form)]))
         } catch (err) {
-          this.alert('error', this.$t('failed_resource_update', [this.formName(form)]))
-          this.log(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [this.formName(form)]))
+          }
         }
       },
       async updateStudyForm (studyForm: StudyForm) {
@@ -165,8 +166,21 @@
           Object.assign(sf.form, newStudyForm)
           this.alert('success', this.$t('resource_updated', [this.formName(studyForm.form)]))
         } catch (err) {
-          this.alert('error', this.$t('failed_resource_update', [this.formName(studyForm.form)]))
-          this.log(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [this.formName(studyForm.form)]))
+          }
+        }
+      },
+      async loadForms () {
+        this.isLoading = true
+        try {
+          this.studyForms = await FormService.getAllStudyForms(global.study.id)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load forms')
+          }
+        } finally {
+          this.isLoading = false
         }
       },
       formTypeName (formType: formTypes) {
@@ -188,7 +202,9 @@
             this.studyForms.splice(index, 1)
             this.alert('success', this.$t('resource_deleted', [this.formName(studyForm.form)]))
           } catch (err) {
-            this.alert('error', this.$t('failed_resource_delete', [this.formName(studyForm.form)]))
+            if (this.isNotAuthError(err)) {
+              this.logError(err, this.$t('failed_resource_delete', [this.formName(studyForm.form)]))
+            }
           }
         }
       }

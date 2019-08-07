@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios'
+
 export function allMatches (str: string, exp: RegExp) {
   const res = []
   let m

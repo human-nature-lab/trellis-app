@@ -1,6 +1,7 @@
 import merge from 'lodash/merge'
 import uuid from 'uuid/v4'
 import Log from '../../entities/trellis-config/Log'
+import { isUndefined } from '../util'
 import defaultConfig from './DefaultLoggingConfig'
 import config from 'config'
 import {LoggingConfig, LoggingLevel, LogRequest} from "./LoggingTypes";
@@ -101,7 +102,7 @@ export default abstract class LoggingServiceAbstract {
   }
 
   protected createLog (_request: LogRequest): Log {
-    if (_request === null || _request === undefined) {
+    if (isUndefined(_request)) {
       throw new Error('Invalid logger request')
     }
     const request = merge(_request, this.defaultOptions)

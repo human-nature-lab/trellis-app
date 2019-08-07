@@ -125,8 +125,9 @@
           this.isLoading = true
           this.roles = await RoleService.all()
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to load roles')
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load roles')
+          }
         } finally {
           this.isLoading = false
         }

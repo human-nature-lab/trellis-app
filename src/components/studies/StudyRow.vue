@@ -82,8 +82,9 @@
           const studyLocale: StudyLocale = await LocaleService.addStudyLocale(this.study.id, locale)
           this.alert('success', this.$t('resource_updated', [this.study.name]))
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to add study locale', {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to add study locale')
+          }
         } finally {
           this.isWorking = false
         }
@@ -93,8 +94,9 @@
           this.isWorking = true
           await LocaleService.removeStudyLocale(this.study.id, locale)
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to remove study locale', {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to remove study locale')
+          }
         } finally {
           this.isWorking = false
         }

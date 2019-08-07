@@ -112,8 +112,9 @@
           let index = this.respondent.names.findIndex(name => name.id === nameId)
           this.respondent.names.splice(index, 1)
         } catch (err) {
-          this.log(err)
-          this.alert('error', `Failed to delete the respondent name -> ${name.name}`, {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, `Failed to delete the respondent name -> ${name.name}`)
+          }
         } finally {
           this.deleting[nameId] = false
           this.$forceUpdate()

@@ -145,14 +145,20 @@
 
   function load (to) {
     return new Promise(async (resolve, reject) => {
-      global.loading.active = true
-      global.loading.indeterminate = true
-      global.loading.fullscreen = true
-      interviewData = await InterviewLoader.load(to)
-      resolve()
-      setTimeout(() => {
-        global.loading.active = false
-      })
+      try {
+        global.loading.active = true
+        global.loading.indeterminate = true
+        global.loading.fullscreen = true
+        interviewData = await InterviewLoader.load(to)
+        resolve()
+        setTimeout(() => {
+          global.loading.active = false
+        })
+      } catch (err) {
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
+      }
     })
   }
 

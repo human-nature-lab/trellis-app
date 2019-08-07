@@ -25,7 +25,13 @@
       form: Object as () => Form
     },
     async created () {
-      this.respondentConditionTags = await ConditionTagService.respondent()
+      try {
+        this.respondentConditionTags = await ConditionTagService.respondent()
+      } catch (err) {
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
+      }
     },
     data () {
       return {
@@ -38,7 +44,9 @@
           const formSkip: FormSkip = await SkipService.createFormSkip(this.form.id, skip)
           this.form.skips.push(formSkip.skip)
         } catch (err) {
-          this.alert('error', 'Failed to create skip')
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Failed to create skip')
+          }
         }
       },
       async deleteFormSkip (skip: Skip) {
@@ -47,7 +55,9 @@
           const index = this.form.skips.findIndex(s => s.id === skip.id)
           this.form.skips.splice(index, 1)
         } catch (err) {
-          this.alert('error', 'Failed to delete form skip')
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Failed to delete form skip')
+          }
         }
       },
       skipUpdated (skip: Skip) {

@@ -120,7 +120,3 @@ import { StudyReportType } from '../../services/report/ReportService'
     }
   })
 </script>
-
-<style scoped>
-
-</style>

@@ -127,9 +127,6 @@
         </span>
       </v-btn>
     </v-layout>
-    <v-alert v-show="error">
-      {{error}}
-    </v-alert>
     <v-container class="respondents" fluid grid-list-sm>
       <v-layout row wrap>
         <RespondentItem
@@ -292,10 +289,9 @@
         inner: 'Respondent search'
       }
     },
-    data: function () {
+    data () {
       return {
         global: singleton,
-        error: null,
         results: [],
         conditionTags: [],
         query: '',
@@ -352,18 +348,20 @@
         this.pagination.maxPages = 0
         return this.getCurrentPage()
       },
-      loadConditionTags () {
+      async loadConditionTags () {
         if (this.conditionTagsLoaded) return
         this.conditionTagsLoading = true
-        return ConditionTagService.respondent().then(tags => {
+        try {
+          const tags = await ConditionTagService.respondent()
           this.conditionTags = tags.map(c => c.name)
           this.conditionTagsLoaded = true
-        }).catch(err => {
-          this.log(err)
-          this.error = err
-        }).then(() => {
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        } finally {
           this.conditionTagsLoading = false
-        })
+        }
       },
       clearFilters () {
         this.filters.conditionTags = []
@@ -383,10 +381,10 @@
           const page = await RespondentService.getSearchPage(study.id, this.query, this.filters, this.pagination, this.respondentId)
           this.pagination.seed = page.seed
           this.results = page.data
-          this.error = null
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to load respondents', {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         } finally {
           this.isLoading = false
         }

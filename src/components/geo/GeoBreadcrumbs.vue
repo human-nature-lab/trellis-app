@@ -74,8 +74,9 @@
             this.ancestors.splice(0, this.ancestors.length - this.maxDepth)
           }
         }).catch(err => {
-          this.log(err)
-          this.alert('error', `Unable to load ancestors for geo: ${this.geoId}`)
+          if (this.isNotAuthError(err)) {
+            this.logError(err, `Unable to load ancestors for geo: ${this.geoId}`)
+          }
         }).finally(() => {
           this.isLoading = false
         })

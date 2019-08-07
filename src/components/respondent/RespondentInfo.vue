@@ -121,31 +121,39 @@
       }
     },
     methods: {
-      hydrate: async function (respondent: Respondent) {
-        this.respondent = respondent
-        this.respondentConditionTags = await respondent.respondentConditionTags
-        this.respondentPhotos = await RespondentService.getRespondentPhotos(respondent.id)
-        this.respondentPhotosLoading = false
+      async hydrate (respondent: Respondent) {
+        try {
+          this.respondent = respondent
+          this.respondentConditionTags = await respondent.respondentConditionTags
+          this.respondentPhotos = await RespondentService.getRespondentPhotos(respondent.id)
+          this.respondentPhotosLoading = false
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
-      leaving: function () {
+      leaving () {
         this.respondentConditionTags = []
       },
-      onNewPhoto: async function (photo) {
+      async onNewPhoto (photo) {
         let photoWithPivotTable = await RespondentService.addPhoto(this.respondent.id, photo)
         this.respondentPhotos.push(photoWithPivotTable)
         this.isAddingPhoto = false
       },
-      onUpdatePhotos: async function (photos) {
+      async onUpdatePhotos (photos) {
         await RespondentService.updatePhotos(photos)
       },
-      onDeletePhoto: async function (photo) {
+      async onDeletePhoto (photo) {
         let confirmMessage = this.$t('remove_photo_confirm') + ''
         if (!window.confirm(confirmMessage)) return
         try {
           await RespondentService.removePhoto(photo)
           this.respondentPhotos.splice(this.respondentPhotos.indexOf(photo), 1)
         } catch (err) {
-          console.error(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       },
       async deleteRespondent () {
@@ -158,8 +166,9 @@
             router.go(-1)
           })
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_delete', [this.name]))
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_delete', [this.name]))
+          }
         } finally {
           this.isLoading = false
         }

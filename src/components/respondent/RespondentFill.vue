@@ -55,7 +55,9 @@
         let respondentFills = await RespondentService.getRespondentFillsById(this.respondent.id)
         this.respondentFills = respondentFills
       } catch (err) {
-        this.log(err)
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
       }
     },
     props: {

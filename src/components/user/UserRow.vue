@@ -58,8 +58,15 @@
     },
     async created () {
       this.loading = true
-      this.allStudies = await StudyService.getAllStudies()
-      this.loading = false
+      try {
+        this.allStudies = await StudyService.getAllStudies()
+      } catch (err) {
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
+      } finally {
+        this.loading = false
+      }
     },
     data () {
       return {
@@ -84,13 +91,25 @@
         }
       },
       async addUserStudy (studyId: string) {
-        let userStudy = await UserService.addStudy(this.user, studyId)
-        this.user.studies.push(userStudy)
+        try {
+          let userStudy = await UserService.addStudy(this.user, studyId)
+          this.user.studies.push(userStudy)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async removeUserStudy (userStudyId: String ) {
-        await UserService.removeStudy(this.user, userStudyId)
-        const index = this.user.studies.findIndex(s => s.id === userStudyId)
-        this.user.studies.splice(index, 1)
+        try {
+          await UserService.removeStudy(this.user, userStudyId)
+          const index = this.user.studies.findIndex(s => s.id === userStudyId)
+          this.user.studies.splice(index, 1)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       }
     }
   })

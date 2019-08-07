@@ -141,7 +141,7 @@
   export default {
     name: 'sync-admin',
     mixins: [DocsLinkMixin(DocsFiles.sync.admin)],
-    components: {UploadLogs},
+    components: { UploadLogs },
     data () {
       return {
         uploadPagination: {
@@ -154,7 +154,7 @@
         },
         generatingSnapshot: false,
         search: '',
-        snapshotsLoading: true,
+        snapshotsLoading: false,
         snapshots: [],
         snapshotColumns: [
           {
@@ -167,7 +167,7 @@
           }
         ],
         uploadsProcessing: false,
-        uploadsLoading: true,
+        uploadsLoading: false,
         uploads: [],
         uploadColumns: [{
           text: '',
@@ -209,38 +209,61 @@
     },
     methods: {
       getUploads: async function () {
-        const uploads = await SyncAdminService.listUploads()
-        this.uploads = uploads.map(u => {
-          u.isOpen = false
-          return u
-        })
-        this.uploadsLoading = false;
+        this.uploadsLoading = true
+        try {
+          const uploads = await SyncAdminService.listUploads()
+          this.uploads = uploads.map(u => {
+            u.isOpen = false
+            return u
+          })
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', 'Unable to fetch uploads')
+          }
+        } finally {
+          this.uploadsLoading = false
+        }
       },
       getSnapshots: async function () {
-        const snapshots = await SyncAdminService.listSnapshots()
-        this.snapshots = snapshots
-        this.snapshotsLoading = false;
+        this.snapshotsLoading = true
+        try {
+          this.snapshots = await SyncAdminService.listSnapshots()
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', 'Unable to fetch snapshots')
+          }
+        } finally {
+          this.snapshotsLoading = false
+        }
       },
       processUploads: async function () {
         this.uploadsProcessing = true
         try {
-          await SyncAdminService.processUploads()
-          this.uploadsProcessing = false
+          await withAuth(SyncAdminService.processUploads())
           this.getUploads()
         } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', 'Unable to process uploads')
+          }
+        } finally {
           this.uploadsProcessing = false
-          console.error(err)
         }
       },
       generateSnapshot: async function () {
         this.generatingSnapshot = true
         try {
           await SyncAdminService.generateSnapshot()
-          this.generatingSnapshot = false
           this.getSnapshots()
         } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', 'Unable to generate a snapshot')
+          }
+        } finally {
           this.generatingSnapshot = false
-          console.error(err)
         }
       }
     }
