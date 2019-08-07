@@ -147,6 +147,7 @@
       </v-layout>
     </v-container>
     <TrellisModal
+      :title="respondentId ? $t('add_other_respondent') : $t('add_respondent')"
       v-model="showAssociatedRespondentDialog">
       <v-card>
         <AddRespondentForm
