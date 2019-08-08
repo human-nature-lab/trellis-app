@@ -1,4 +1,4 @@
-import DeviceService from '@/services/device/DeviceService'
+import DeviceService from '../device/DeviceService'
 import 'reflect-metadata'
 import { createConnection, Entity, getConnection, QueryRunner } from 'typeorm'
 import asyncForEach from '../../classes/AsyncForEach'

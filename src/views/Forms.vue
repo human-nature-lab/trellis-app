@@ -3,7 +3,7 @@
     <v-progress-linear
       v-if="isLoading"
       indeterminate></v-progress-linear>
-    <v-card v-for="formType in numericFormTypes">
+    <v-card v-for="formType in numericFormTypes" :key="formType">
       <v-toolbar flat>
         <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
         <v-spacer></v-spacer>
