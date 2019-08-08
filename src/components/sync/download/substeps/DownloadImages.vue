@@ -154,7 +154,9 @@
         ignore: function () {
           this.currentLog = undefined
         },
-        stopDownload: function () {
+        stopDownload () {
+          // Make this cancel button idempotent
+          if (this.isCancelling) return
           this.isCancelling = true
           if (this && this.sources) {
             console.log('cancelling', this.sources)
