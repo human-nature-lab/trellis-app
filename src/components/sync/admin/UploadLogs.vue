@@ -20,8 +20,8 @@
 
 <script lang="ts">
   import UploadLogService from '../../../services/upload/index'
-  import Vue from "vue"
-  import UploadLog from "../../../entities/web/UploadLog"
+  import Vue from 'vue'
+  import UploadLog from '../../../entities/web/UploadLog'
 
   interface MetaBlock {
     name: string

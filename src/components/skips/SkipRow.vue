@@ -72,7 +72,7 @@
   import TrellisModal from '../TrellisModal'
   import debounce from 'lodash/debounce'
   import SkipConditionTag from '../../entities/trellis/SkipConditionTag'
-  import CompareService from "../../services/CompareService"
+  import CompareService from '../../services/CompareService'
 
   export default Vue.extend({
     name: 'SkipRow',

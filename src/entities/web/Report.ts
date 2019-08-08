@@ -1,6 +1,6 @@
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import ReportFile from "./ReportFile";
+import ReportFile from './ReportFile'
 
 export default class Report extends TimestampedSoftDelete {
   @Serializable

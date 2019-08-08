@@ -10,13 +10,13 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Form from "../../entities/trellis/Form"
-  import Skip from "../../entities/trellis/Skip"
+  import Form from '../../entities/trellis/Form'
+  import Skip from '../../entities/trellis/Skip'
   import SkipEditor from '../skips/SkipEditor'
-  import ConditionTag from "../../entities/trellis/ConditionTag"
+  import ConditionTag from '../../entities/trellis/ConditionTag'
   import ConditionTagService from '../../services/condition-tag'
-  import SkipService from "../../services/skip"
-  import FormSkip from "../../entities/trellis/FormSkip"
+  import SkipService from '../../services/skip'
+  import FormSkip from '../../entities/trellis/FormSkip'
 
   export default Vue.extend({
     name: 'form-skips',

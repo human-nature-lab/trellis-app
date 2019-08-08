@@ -35,7 +35,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
-  import {adminInst} from '../services/http/AxiosInstance'
+  import { adminInst } from '../services/http/AxiosInstance'
   import { uriTemplate } from '../services/http/WebUtils'
   import StorageService from '../services/StorageService'
 

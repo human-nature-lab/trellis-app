@@ -120,9 +120,9 @@
 
   import Vue from 'vue'
   import global from '../../static/singleton'
-  import SurveyService from "../../services/survey"
-  import InterviewService from "../../services/interview/InterviewService"
-  import {getCurrentPosition} from '../LocationFinder'
+  import SurveyService from '../../services/survey'
+  import InterviewService from '../../services/interview/InterviewService'
+  import { getCurrentPosition } from '../LocationFinder'
   import {defaultLoggingService as logger} from '../../services/logging/LoggingService'
   import singleton from '../../static/singleton'
 

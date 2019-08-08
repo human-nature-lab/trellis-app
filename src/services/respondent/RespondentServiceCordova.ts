@@ -1,5 +1,5 @@
-import {randomIntBits} from "../../classes/M";
-import {RandomPagination, RandomPaginationResult} from "../../types/Pagination";
+import { randomIntBits } from '../../classes/M'
+import { RandomPagination, RandomPaginationResult } from '../../types/Pagination'
 import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
@@ -7,11 +7,11 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
-import {Brackets, Connection, EntityManager, IsNull} from 'typeorm'
-import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
-import Photo from "../../entities/trellis/Photo";
-import {removeSoftDeleted} from "../database/SoftDeleteHelper";
-import Geo from "../../entities/trellis/Geo";
+import { Brackets, Connection, EntityManager, IsNull } from 'typeorm'
+import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
+import Photo from '../../entities/trellis/Photo'
+import { removeSoftDeleted } from '../database/SoftDeleteHelper'
+import Geo from '../../entities/trellis/Geo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {

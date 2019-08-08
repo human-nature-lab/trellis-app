@@ -1,5 +1,5 @@
-import StudyLocale from "../../entities/trellis/StudyLocale";
-import {uriTemplate} from "../http/WebUtils";
+import StudyLocale from '../../entities/trellis/StudyLocale'
+import { uriTemplate } from '../http/WebUtils'
 import LocaleServiceAbstract from './LocaleServiceAbstract'
 import Locale from '../../entities/trellis/Locale'
 import http, {adminInst} from '../http/AxiosInstance'

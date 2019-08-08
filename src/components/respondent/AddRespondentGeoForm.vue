@@ -51,8 +51,8 @@
   // @ts-ignore
   import AsyncTranslationText from '../AsyncTranslationText'
 
-  import RespondentService from "../../services/respondent/RespondentService"
-  import RespondentGeo from "../../entities/trellis/RespondentGeo"
+  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentGeo from '../../entities/trellis/RespondentGeo'
   export default Vue.extend({
     components: {GeoSearch, ModalTitle, AsyncTranslationText},
     name: 'AddRespondentGeoForm',

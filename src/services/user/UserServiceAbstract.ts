@@ -1,8 +1,8 @@
 import User from '../../entities/trellis/User'
-import UserStudy from "../../entities/trellis/UserStudy";
-import Pagination from "../../types/Pagination";
-import PermissionService from "../permission";
-import SingletonService from "../SingletonService";
+import UserStudy from '../../entities/trellis/UserStudy'
+import Pagination from '../../types/Pagination'
+import PermissionService from '../permission'
+import SingletonService from '../SingletonService'
 
 export abstract class UserServiceAbstract {
 

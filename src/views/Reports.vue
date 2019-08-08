@@ -56,9 +56,9 @@
   import FormReports from '../components/reports/FormReports.vue'
   import global from '../static/singleton'
   import Vue from 'vue'
-  import ReportService from "../services/report/ReportService"
-  import Report from "../entities/web/Report"
-  import {saveAs} from 'file-saver'
+  import ReportService from '../services/report/ReportService'
+  import Report from '../entities/web/Report'
+  import { saveAs } from 'file-saver'
 
   interface HasReport {
     [key: string]: any

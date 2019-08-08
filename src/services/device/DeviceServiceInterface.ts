@@ -1,4 +1,4 @@
-import Pagination from "../../types/Pagination";
+import Pagination from '../../types/Pagination'
 import Device from '../../entities/trellis/Device'
 
 export default interface DeviceServiceInterface {

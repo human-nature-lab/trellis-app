@@ -24,7 +24,7 @@
   // @ts-ignore
   import Vue from 'vue'
 
-  import RespondentFill from "../../entities/trellis/RespondentFill"
+  import RespondentFill from '../../entities/trellis/RespondentFill'
   import RespondentService from '../../services/respondent/RespondentService'
 
   export default Vue.extend({

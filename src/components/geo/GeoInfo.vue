@@ -81,10 +81,10 @@
 </template>
 
 <script lang="ts">
-  import Translation from "../../entities/trellis/Translation"
-  import PermissionMixin from "../../mixins/PermissionMixin"
-  import TranslationTextField from "../TranslationTextField"
-  import TrellisModal from "../TrellisModal"
+  import Translation from '../../entities/trellis/Translation'
+  import PermissionMixin from '../../mixins/PermissionMixin'
+  import TranslationTextField from '../TranslationTextField'
+  import TrellisModal from '../TrellisModal'
 
   // @ts-ignore
   import GeoBreadcrumbs from './GeoBreadcrumbs'
@@ -102,10 +102,10 @@
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import GeoService from '../../services/geo/GeoService'
   import router from '../../router'
-  import {Route} from 'vue-router'
+  import { Route } from 'vue-router'
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
-  import {SearchFilter} from '../../services/respondent/RespondentServiceInterface'
+  import { SearchFilter } from '../../services/respondent/RespondentServiceInterface'
   import DocsFiles from '../documentation/DocsFiles'
 
   export default Vue.extend({

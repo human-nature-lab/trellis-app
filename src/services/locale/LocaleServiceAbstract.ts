@@ -1,4 +1,4 @@
-import StudyLocale from "../../entities/trellis/StudyLocale";
+import StudyLocale from '../../entities/trellis/StudyLocale'
 import SingletonService from '../SingletonService'
 import Locale from '../../entities/trellis/Locale'
 import Study from '../../entities/trellis/Study'

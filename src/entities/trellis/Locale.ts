@@ -1,7 +1,7 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm'
-import {Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import Study from "./Study";
+import Study from './Study'
 
 @Entity()
 export default class Locale extends TimestampedSoftDelete {

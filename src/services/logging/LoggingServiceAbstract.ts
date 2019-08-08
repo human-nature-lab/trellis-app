@@ -4,9 +4,9 @@ import Log from '../../entities/trellis-config/Log'
 import { isUndefined } from '../util'
 import defaultConfig from './DefaultLoggingConfig'
 import config from 'config'
-import {LoggingConfig, LoggingLevel, LogRequest} from "./LoggingTypes";
-import singleton from "../../static/singleton";
-import {now} from '../DateService'
+import { LoggingConfig, LoggingLevel, LogRequest } from './LoggingTypes'
+import singleton from '../../static/singleton'
+import { now } from '../DateService'
 
 declare const VERSION: string
 const version: string = VERSION

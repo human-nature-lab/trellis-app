@@ -1,4 +1,4 @@
-import {LoggingConfig} from "./LoggingTypes";
+import { LoggingConfig } from './LoggingTypes'
 
 export default {
   console: true,

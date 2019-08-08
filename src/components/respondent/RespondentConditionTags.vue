@@ -55,7 +55,7 @@
   import RespondentConditionTagForm from './RespondentConditionTagForm'
   import Vue from 'vue'
 
-  import RespondentConditionTag from "../../entities/trellis/RespondentConditionTag"
+  import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
   import ConditionTagService from '../../services/condition-tag'
 
   export default Vue.extend({

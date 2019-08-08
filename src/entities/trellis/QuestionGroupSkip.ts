@@ -1,5 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Skip from './Skip'
 

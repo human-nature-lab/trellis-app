@@ -1,4 +1,4 @@
-import {switchByModeEnv} from '../util'
+import { switchByModeEnv } from '../util'
 import LocaleServiceWeb from './LocaleServiceWeb'
 import LocaleServiceCordova from './LocaleServiceCordova'
 import LocaleServiceAbstract from './LocaleServiceAbstract'

@@ -2,7 +2,7 @@ import singleton from '../static/singleton'
 import router from '../router'
 import {defaultLoggingService as logger} from '../services/logging/LoggingService'
 // @ts-ignore
-import {AddSnack} from '../components/SnackbarQueue'
+import { AddSnack } from '../components/SnackbarQueue'
 import Vue from 'vue'
 
 /**

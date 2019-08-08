@@ -28,13 +28,13 @@
 </template>
 
 <script lang="ts">
-  import Vue from "vue"
-  import User from "../../entities/trellis/User"
+  import Vue from 'vue'
+  import User from '../../entities/trellis/User'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import StudyService from "../../services/study/StudyService"
-  import UserService from "../../services/user/UserService"
+  import StudyService from '../../services/study/StudyService'
+  import UserService from '../../services/user/UserService'
   import global from '../../static/singleton'
-  import IsAdminMixin from "../../mixins/IsAdminMixin"
+  import IsAdminMixin from '../../mixins/IsAdminMixin'
   import CRUDMenu from '../CRUDMenu'
 
   export default Vue.extend({

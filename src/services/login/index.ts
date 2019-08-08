@@ -1,4 +1,4 @@
-import {switchByModeEnv} from '../util'
+import { switchByModeEnv } from '../util'
 import LoginServiceWeb from './LoginServiceWeb'
 import LoginServiceCordova from './LoginServiceCordova'
 

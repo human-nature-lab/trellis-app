@@ -1,4 +1,4 @@
-import {uriTemplate} from "../http/WebUtils";
+import { uriTemplate } from '../http/WebUtils'
 import StudyServiceAbstract from './StudyServiceAbstract'
 import Study from '../../entities/trellis/Study'
 import http, {adminInst} from '../http/AxiosInstance'

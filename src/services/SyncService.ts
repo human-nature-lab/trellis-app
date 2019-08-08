@@ -3,10 +3,10 @@ import uuid from 'uuid/v4'
 import DatabaseService from './database/DatabaseService'
 import DeviceService from './device/DeviceService'
 import { syncInstance } from './http/AxiosInstance'
-import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
-import {Connection, IsNull} from 'typeorm'
+import { AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios'
+import { Connection, IsNull } from 'typeorm'
 import LoginService from '../services/login'
-import SingletonService from "./SingletonService";
+import SingletonService from './SingletonService'
 
 /**
  * Max number of rows to write to upload file at a time.

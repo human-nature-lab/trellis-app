@@ -57,7 +57,7 @@
   import SingletonService from '../../services/SingletonService'
   import storage from '../../services/StorageService'
   import global from '../../static/singleton'
-  import {APP_ENV} from '../../static/constants'
+  import { APP_ENV } from '../../static/constants'
   import UserPassword from '../user/UserPassword'
   import TrellisModal from '../TrellisModal'
   import IsAdminMixin from '../../mixins/IsAdminMixin'
@@ -65,7 +65,7 @@
   import GeoLocationService from '../../services/geolocation'
   import Vue from 'vue'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import {TrellisPermission} from '../../static/permissions.base'
+  import { TrellisPermission } from '../../static/permissions.base'
 
   export default {
     mixins: [ IsAdminMixin, IsLoggedInMixin, PermissionMixin],

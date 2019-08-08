@@ -31,7 +31,7 @@
   import Vue from 'vue'
   import Skip from '../../entities/trellis/Skip'
   import SkipRow from './SkipRow'
-  import ConditionTag from "../../entities/trellis/ConditionTag"
+  import ConditionTag from '../../entities/trellis/ConditionTag'
   import SkipService from '../../services/skip'
   export default Vue.extend({
     name: 'SkipEditor',

@@ -1,10 +1,9 @@
-import {Entity, Column, PrimaryGeneratedColumn, JoinColumn, OneToMany, JoinTable, ManyToMany} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, JoinTable, ManyToMany, OneToOne } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Section from './Section'
 import Skip from './Skip'
 import Translation from './Translation'
-import {OneToOne} from 'typeorm'
 
 @Entity()
 export default class Form extends TimestampedSoftDelete {

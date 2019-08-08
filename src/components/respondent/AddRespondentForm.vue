@@ -80,7 +80,7 @@
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum'
-  import {pushRoute, pushRouteAndQueueCurrent} from '../../router'
+  import { pushRoute, pushRouteAndQueueCurrent } from '../../router'
   export default {
     components: { PhotoAlbum },
     name: 'add-respondent-form',

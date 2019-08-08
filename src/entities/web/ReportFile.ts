@@ -1,4 +1,4 @@
-import { Serializable} from '../decorators/WebOrmDecorators'
+import { Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 export default class ReportFile extends TimestampedSoftDelete {

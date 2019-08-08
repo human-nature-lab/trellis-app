@@ -45,10 +45,10 @@
 
 <script lang="ts">
   import FormService from '../../services/form/FormService'
-  import Form from "../../entities/trellis/Form"
+  import Form from '../../entities/trellis/Form'
   import TranslateMixin from '../../mixins/TranslateMixin'
   import global from '../../static/singleton'
-  import Report from "../../entities/web/Report"
+  import Report from '../../entities/web/Report'
   import Vue, {PropOptions} from 'vue'
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 

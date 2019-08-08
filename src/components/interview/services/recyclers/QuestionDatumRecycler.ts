@@ -1,6 +1,6 @@
 import Recycler, {Recyclable} from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
-import {now} from '../../../../services/DateService'
+import { now } from '../../../../services/DateService'
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import Question from '../../../../entities/trellis/Question'
 import InterviewManagerOld from '../../classes/InterviewManager'

@@ -1,6 +1,7 @@
-import {AssignerFunction, RelationshipOpts} from '../entities/decorators/WebOrmDecorators'
-import {copyDate} from './DateService'
+import { AssignerFunction, RelationshipOpts } from '../entities/decorators/WebOrmDecorators'
+import { copyDate } from './DateService'
 import moment from 'moment'
+import { isUndefined } from './util'
 
 /**
  * Convert a camel case string into snake case
@@ -179,7 +180,7 @@ export function mapCamelToPlain (source: any, skipSnakeJSON = false, keyMap?: st
  * @returns {any}
  */
 export function deepCopy (obj: any, copySelf: boolean = false): any {
-  if (obj === null || obj === undefined) {
+  if (isUndefined(obj)) {
     return obj
   } else if (Array.isArray(obj)) {
     return obj.map(o => deepCopy(o, true))

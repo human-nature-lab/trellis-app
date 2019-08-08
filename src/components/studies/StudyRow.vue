@@ -34,9 +34,9 @@
   import Vue from 'vue'
   import Locale from '../../entities/trellis/Locale'
   import Study from '../../entities/trellis/Study'
-  import StudyLocale from "../../entities/trellis/StudyLocale"
-  import PermissionMixin from "../../mixins/PermissionMixin"
-  import LocaleService from "../../services/locale/LocaleService"
+  import StudyLocale from '../../entities/trellis/StudyLocale'
+  import PermissionMixin from '../../mixins/PermissionMixin'
+  import LocaleService from '../../services/locale/LocaleService'
   import CRUDMenu from '../CRUDMenu'
   export default Vue.extend({
     name: 'StudyRow',

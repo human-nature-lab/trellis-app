@@ -18,7 +18,6 @@ import QuestionParameter from './QuestionParameter'
 import QuestionChoice from './QuestionChoice'
 import QuestionDatum from './QuestionDatum'
 import QuestionGroup from './QuestionGroup'
-import QT from '../../static/question.types'
 
 @Entity()
 export default class Question extends SparseTimestampedSoftDelete {

@@ -65,8 +65,8 @@
   // @ts-ignore
   import RespondentNameForm from './RespondentNameForm'
   import Vue from 'vue'
-  import RespondentName from "../../entities/trellis/RespondentName"
-  import RespondentService from "../../services/respondent/RespondentService"
+  import RespondentName from '../../entities/trellis/RespondentName'
+  import RespondentService from '../../services/respondent/RespondentService'
 
   export default Vue.extend({
     data () {

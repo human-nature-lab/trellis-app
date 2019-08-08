@@ -1,8 +1,8 @@
 import Recycler from '../../../../classes/Recycler'
 import Datum from '../../../../entities/trellis/Datum'
-import {now} from '../../../../services/DateService';
+import { now } from '../../../../services/DateService';
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
-import Action from "../../../../entities/trellis/Action";
+import Action from '../../../../entities/trellis/Action'
 
 export interface DatumPayload {
   name?: string

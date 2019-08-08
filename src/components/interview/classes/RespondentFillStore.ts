@@ -1,4 +1,4 @@
-import RespondentFill from "../../../entities/trellis/RespondentFill";
+import RespondentFill from '../../../entities/trellis/RespondentFill'
 
 export default class RespondentFillStore {
   private map: Map<string, string> = new Map()

@@ -1,10 +1,10 @@
-import {snakeToCamel} from '../../../../services/JSONUtil'
+import { snakeToCamel } from '../../../../services/JSONUtil'
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import Datum from '../../../../entities/trellis/Datum'
-import InterviewManager from "../../classes/InterviewManager";
-import {ActionHandler} from "./ActionManager";
-import Action from "../../../../entities/trellis/Action";
-import {defaultLoggingService} from "../../../../services/logging/LoggingService";
+import InterviewManager from '../../classes/InterviewManager'
+import { ActionHandler } from './ActionManager'
+import Action from '../../../../entities/trellis/Action'
+import { defaultLoggingService } from '../../../../services/logging/LoggingService'
 
 interface DatumFindFunc {
   (value: Datum, payload: ActionPayload): boolean

@@ -61,7 +61,7 @@
 
 <script lang="ts">
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
-  import {replaceWithNextOr} from '../../router'
+  import { replaceWithNextOr } from '../../router'
 
   // @ts-ignore
   import Permission from '../Permission'

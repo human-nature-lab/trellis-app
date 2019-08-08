@@ -1,6 +1,6 @@
 import TranslationService from '../services/TranslationService'
-import Translation from "../entities/trellis/Translation";
-import Locale from "../entities/trellis/Locale";
+import Translation from '../entities/trellis/Translation'
+import Locale from '../entities/trellis/Locale'
 
 export default {
   methods: {

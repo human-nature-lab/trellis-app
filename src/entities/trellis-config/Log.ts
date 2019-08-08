@@ -1,40 +1,40 @@
-import {PrimaryColumn, Entity, Column} from 'typeorm'
-import {Serializable} from '../decorators/WebOrmDecorators'
-import MomentTransformer from "../base/MomentTransformer";
-import BaseEntity from "../base/BaseEntity";
-import {Moment} from "moment";
+import { PrimaryColumn, Entity, Column } from 'typeorm'
+import { Serializable } from '../decorators/WebOrmDecorators'
+import MomentTransformer from '../base/MomentTransformer'
+import BaseEntity from '../base/BaseEntity'
+import { Moment } from 'moment'
 
-@Entity("log")
+@Entity('log')
 export default class Log extends BaseEntity {
-  @PrimaryColumn({ name: "id" }) @Serializable
-  id: string;
+  @PrimaryColumn({ name: 'id' }) @Serializable
+  id: string
 
-  @Column({ name: "message" }) @Serializable
-  message: string;
+  @Column({ name: 'message' }) @Serializable
+  message: string
 
-  @Column({ name: "full_message" }) @Serializable
-  fullMessage: string;
+  @Column({ name: 'full_message' }) @Serializable
+  fullMessage: string
 
-  @Column({ name: "severity", comment: "error, warn, info, verbose, debug, trace" }) @Serializable
-  severity: string;
+  @Column({ name: 'severity', comment: 'error, warn, info, verbose, debug, trace' }) @Serializable
+  severity: string
 
-  @Column({ name: "component", nullable: true }) @Serializable
-  component: string;
+  @Column({ name: 'component', nullable: true }) @Serializable
+  component: string
 
-  @Column({ name: "sync_id", nullable: true }) @Serializable
-  syncId: string;
+  @Column({ name: 'sync_id', nullable: true }) @Serializable
+  syncId: string
 
-  @Column({ name: "interview_id", nullable: true }) @Serializable
-  interviewId: string;
+  @Column({ name: 'interview_id', nullable: true }) @Serializable
+  interviewId: string
 
-  @Column({ name: "device_id", nullable: true }) @Serializable
-  deviceId: string;
+  @Column({ name: 'device_id', nullable: true }) @Serializable
+  deviceId: string
 
-  @Column({ name: "user_id", nullable: true }) @Serializable
-  userId: string;
+  @Column({ name: 'user_id', nullable: true }) @Serializable
+  userId: string
 
-  @Column({ name: "created_at", type: 'datetime', transformer: MomentTransformer }) @Serializable
-  createdAt: Moment;
+  @Column({ name: 'created_at', type: 'datetime', transformer: MomentTransformer }) @Serializable
+  createdAt: Moment
 
   @Column({name: 'version', nullable: true}) @Serializable
   version: string

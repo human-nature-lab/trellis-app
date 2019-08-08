@@ -5,7 +5,7 @@ import { Driver } from 'typeorm/browser/driver/Driver'
 import { DriverFactory } from 'typeorm/browser/driver/DriverFactory'
 import { AlreadyHasActiveConnectionError } from 'typeorm/error/AlreadyHasActiveConnectionError'
 import { QueryRunnerProviderAlreadyReleasedError } from 'typeorm/error/QueryRunnerProviderAlreadyReleasedError'
-import {CordovaDriver} from 'typeorm/browser/driver/cordova/CordovaDriver'
+import { CordovaDriver } from 'typeorm/browser/driver/cordova/CordovaDriver'
 import { CordovaQueryRunner } from 'typeorm/browser/driver/cordova/CordovaQueryRunner'
 // TODO: Fix me ASAP. Submit a PR to typeorm implemeting proper transaction handling for sqlite
 

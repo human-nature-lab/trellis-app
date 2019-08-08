@@ -1,5 +1,5 @@
-import Report from "../../entities/web/Report";
-import {adminInst} from '../http/AxiosInstance'
+import Report from '../../entities/web/Report'
+import { adminInst } from '../http/AxiosInstance'
 
 export enum StudyReportType {
   RESPONDENT = 'respondent',

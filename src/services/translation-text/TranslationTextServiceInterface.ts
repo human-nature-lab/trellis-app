@@ -1,4 +1,4 @@
-import TranslationText from "../../entities/trellis/TranslationText";
+import TranslationText from '../../entities/trellis/TranslationText'
 
 export default interface TranslationTextServiceInterface {
 
