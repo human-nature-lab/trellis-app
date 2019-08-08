@@ -90,16 +90,15 @@
       this.loadLocales()
     },
     methods: {
-      loadLocales () {
+      async loadLocales () {
         this.localesAreLoading = true
-        LocaleService.getStudyLocales(this.global.study.id).then(locales => {
-          this.localesAreLoading = false
-          this.locales = locales
-          console.log('locales', locales)
-        }).catch(err => {
+        try {
+          this.locales = await LocaleService.getStudyLocales(this.global.study.id)
+        } catch (err) {
           this.error = err
+        } finally {
           this.localesAreLoading = false
-        })
+        }
       },
       async save () {
         if (this.isSaving) return
@@ -109,7 +108,7 @@
           let isEditingName = this.name.id !== null && this.name.id !== undefined
           if (isEditingName) {
             let isDisplayName = !!this.name.isDisplayName
-            name = await  RespondentService.editName(
+            name = await RespondentService.editName(
               this.respondent.id,
               this.name.id,
               this.name.name,
@@ -136,8 +135,10 @@
             this.$emit('close', name)
           }
         } catch (err) {
-          this.error = err
-          this.$emit('error', err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+            this.$emit('error', err)
+          }
         } finally {
           this.isSaving = false
         }

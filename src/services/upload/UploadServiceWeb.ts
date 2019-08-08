@@ -1,4 +1,4 @@
-import UploadLog from "../../entities/web/UploadLog";
+import UploadLog from '../../entities/web/UploadLog'
 import http from '../http/AxiosInstance'
 
 export default class UploadServiceWeb {

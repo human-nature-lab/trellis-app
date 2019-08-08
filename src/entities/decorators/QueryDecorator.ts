@@ -1,7 +1,7 @@
-import {Entity, EntitySchema, Repository} from 'typeorm'
+import { Repository } from 'typeorm'
 
 export interface QueryCallback<T> {
-  (repo: Repository<T>, obj: T): Promise<T|T[]>|T|T[]
+  (repo: Repository<T>, obj: T): Promise<T | T[]> | T | T[]
 }
 
 export interface AsyncQueryOptions {

@@ -1,4 +1,4 @@
-import {pushRouteAndQueueCurrent} from '../../router'
+import { pushRouteAndQueueCurrent } from '../../router'
 import Form from '../../entities/trellis/Form'
 export default abstract class CensusServiceAbstract {
   /**

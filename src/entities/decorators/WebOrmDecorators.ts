@@ -1,4 +1,4 @@
-import {camelToSnake, getSnakeAssignmentFunc} from '../../services/JSONUtil'
+import { camelToSnake, getSnakeAssignmentFunc } from '../../services/JSONUtil'
 
 const columnMetaMap: Map<any, ColumnMeta> = new Map()
 
@@ -105,7 +105,7 @@ export function Serializable (target: any, propertyKey: string): any {
  * @returns {(target: any) => void}
  * @constructor
  */
-export function Relationship (optsOrConstructorGenerator: object|Function) {
+export function Relationship (optsOrConstructorGenerator: object | Function) {
   return function (target: any, propertyKey: string) {
     let columnMeta = getOrCreateMeta(target)
     if (typeof optsOrConstructorGenerator === 'object') {
@@ -124,8 +124,8 @@ export function Relationship (optsOrConstructorGenerator: object|Function) {
  * @param {boolean} value
  * @returns {(target: any, propertyKey: string, descriptor: PropertyDescriptor) => void}
  */
-export function enumerable(value: boolean) {
+export function enumerable (value: boolean) {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    descriptor.enumerable = value;
-  };
+    descriptor.enumerable = value
+  }
 }

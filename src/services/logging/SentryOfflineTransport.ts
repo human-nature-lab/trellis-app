@@ -1,6 +1,6 @@
 import PersistentQueue from '../../classes/PersistentQueue'
 import storage from '../StorageService'
-import {setAsyncInterval} from '../../classes/AsyncInterval'
+import { setAsyncInterval } from '../../classes/AsyncInterval'
 import { serialize } from '@sentry/utils/object'
 import { SentryEvent, SentryResponse, Status } from '@sentry/types'
 import * as Sentry from '@sentry/browser'

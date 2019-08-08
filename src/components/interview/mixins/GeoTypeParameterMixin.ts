@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import PT from '../../../static/parameter.types'
-import Geo from "../../../entities/trellis/Geo";
+import Geo from '../../../entities/trellis/Geo'
 const geoTypeNameReplacer = /[\W_]/g
 export default Vue.extend({
   props: ['question'],

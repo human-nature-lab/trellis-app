@@ -1,5 +1,5 @@
 import Interview from '../../entities/trellis/Interview'
-import {now} from '../DateService'
+import { now } from '../DateService'
 import DatabaseService from '../database/DatabaseService'
 import InterviewServiceAbstract from './InterviewServiceAbstract'
 import Action from '../../entities/trellis/Action'
@@ -10,11 +10,11 @@ import UserService from '../user/UserService'
 import SurveyConditionTag from '../../entities/trellis/SurveyConditionTag'
 import SectionConditionTag from '../../entities/trellis/SectionConditionTag'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
-import {IsNull, Repository, SelectQueryBuilder} from 'typeorm'
+import { IsNull, Repository, SelectQueryBuilder } from 'typeorm'
 import Survey from '../../entities/trellis/Survey'
 import Datum from '../../entities/trellis/Datum'
 import InterviewDataInterface from './InterviewDataInterface'
-import {randomIntBits} from "../../classes/M";
+import { randomIntBits } from '../../classes/M'
 
 export default class InterviewServiceCordova extends InterviewServiceAbstract {
 

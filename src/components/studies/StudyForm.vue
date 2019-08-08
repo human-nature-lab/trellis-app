@@ -122,8 +122,3 @@
     }
   })
 </script>
-
-<style lang="sass" scoped>
-  .small
-
-</style>

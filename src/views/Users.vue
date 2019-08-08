@@ -118,8 +118,9 @@
           this.users = page.data
           console.log('users', this.users)
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to load users')
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load users')
+          }
         } finally {
           this.isLoading = false
         }
@@ -135,7 +136,9 @@
             }
             this.alert('success', this.$t('resource_deleted', [user.name]))
           } catch (err) {
-            this.alert('error', this.$t('failed_resource_delete', [user.name]))
+            if (this.isNotAuthError(err)) {
+              this.logError(err, this.$t('failed_resource_delete', [user.name]))
+            }
           } finally {
             this.isLoading = false
           }
@@ -149,7 +152,9 @@
           this.alert('success', this.$t('resource_created', [user.name]))
           this.showEditUser = false
         } catch (err) {
-          this.alert('error', this.$t('failed_resource_create', [user.name]))
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_create', [user.name]))
+          }
         } finally {
           this.isLoading = false
         }
@@ -163,7 +168,9 @@
           this.alert('success', this.$t('resource_updated', [user.name]))
           this.showEditUser = false
         } catch (err) {
-          this.alert('error', this.$t('failed_resource_update', [user.name]))
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [user.name]))
+          }
         } finally {
           this.isLoading = false
         }

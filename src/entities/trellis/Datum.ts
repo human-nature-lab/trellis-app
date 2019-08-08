@@ -1,10 +1,10 @@
 import uuidv4 from 'uuid/v4'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import {Serializable} from '../decorators/WebOrmDecorators'
-import {Column, Entity, ManyToOne, PrimaryColumn} from 'typeorm'
+import { Serializable } from '../decorators/WebOrmDecorators'
+import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
-import {now} from '../../services/DateService'
-import QuestionDatum from "./QuestionDatum";
+import { now } from '../../services/DateService'
+import QuestionDatum from './QuestionDatum'
 
 export interface DatumRecyclerData {
   surveyId: string

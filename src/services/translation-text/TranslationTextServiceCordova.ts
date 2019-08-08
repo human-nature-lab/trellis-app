@@ -1,7 +1,7 @@
 import DatabaseService from '../database/DatabaseService'
 import TranslationText from '../../entities/trellis/TranslationText'
 import TranslationTextServiceInterface from './TranslationTextServiceInterface'
-import {IsNull} from 'typeorm'
+import { IsNull } from 'typeorm'
 
 export default class TranslationTextServiceCordova implements TranslationTextServiceInterface {
 

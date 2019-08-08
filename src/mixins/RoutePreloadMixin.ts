@@ -2,7 +2,7 @@ import singleton from '../static/singleton'
 import router from '../router'
 import {defaultLoggingService as logger} from '../services/logging/LoggingService'
 // @ts-ignore
-import {AddSnack} from '../components/SnackbarQueue'
+import { AddSnack } from '../components/SnackbarQueue'
 import Vue from 'vue'
 
 /**
@@ -31,8 +31,7 @@ export default function RoutePreloadMixin (loadCallback: Function, fullscreen: b
         next()
       } catch (err) {
         err.component = err.component || 'RoutePreloadMixin.js@beforeRouteEnter'
-        logger.log(err)
-        AddSnack(`Unable to enter route: ${to.name}`, {color: 'error'})
+        this.logError(err, `Unable to enter route: ${to.name}`)
       } finally {
         singleton.loading.active = false
       }
@@ -48,9 +47,10 @@ export default function RoutePreloadMixin (loadCallback: Function, fullscreen: b
         this.hydrate(routeData)
         singleton.loading.error = null
       } catch (err) {
-        err.component = err.component || 'RoutePreloadMixin.js@beforeRouteUpdate'
-        logger.log(err)
-        AddSnack(`Unable to update route: ${to.name}`, {color: 'error'})
+        if (this.isNotAuthError(err)) {
+          err.component = err.component || 'RoutePreloadMixin.js@beforeRouteUpdate'
+          this.logError(err, `Unable to update route: ${to.name}`)
+        }
       } finally {
         singleton.loading.active = false
         next()
@@ -62,9 +62,10 @@ export default function RoutePreloadMixin (loadCallback: Function, fullscreen: b
           await this.leaving()
         }
       } catch (err) {
-        err.component = err.component || 'RoutePreloadMixin.js@beforeRouteLeave'
-        logger.log(err)
-        AddSnack(`Unable to leave route: ${from.name}`, {color: 'error'})
+        if (this.isNotAuthError(err)) {
+          err.component = err.component || 'RoutePreloadMixin.js@beforeRouteLeave'
+          this.logError(err, `Unable to leave route: ${from.name}`)
+        }
       } finally {
         next()
       }

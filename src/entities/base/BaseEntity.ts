@@ -1,7 +1,7 @@
-import {parseDate} from '../../services/DateService'
+import { parseDate } from '../../services/DateService'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
-import {getColumnMeta} from '../decorators/WebOrmDecorators'
-import {camelToSnake, deepCopy} from '../../services/JSONUtil'
+import { getColumnMeta } from '../decorators/WebOrmDecorators'
+import { camelToSnake, deepCopy } from '../../services/JSONUtil'
 
 interface toSnakeJSONOpts {
   includeRelationships?: boolean

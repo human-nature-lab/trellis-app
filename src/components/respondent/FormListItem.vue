@@ -120,9 +120,9 @@
 
   import Vue from 'vue'
   import global from '../../static/singleton'
-  import SurveyService from "../../services/survey"
-  import InterviewService from "../../services/interview/InterviewService"
-  import {getCurrentPosition} from '../LocationFinder'
+  import SurveyService from '../../services/survey'
+  import InterviewService from '../../services/interview/InterviewService'
+  import { getCurrentPosition } from '../LocationFinder'
   import {defaultLoggingService as logger} from '../../services/logging/LoggingService'
   import singleton from '../../static/singleton'
 
@@ -186,9 +186,10 @@
           try {
             survey = await SurveyService.create(this.global.study.id, this.respondent.id, this.form.id)
           } catch (err) {
-            err.component = 'FormListItem.vue@tryCreatingSurvey'
-            logger.log(err)
-            this.alert('error', this.$t('create_survey_failed', [err]))
+            if (this.isNotAuthError(err)) {
+              err.component = 'FormListItem.vue@tryCreatingSurvey'
+              this.logError(err, this.$t('create_survey_failed', [err.message]))
+            }
           }
           if (survey) {
             this.tryStartingSurvey(survey)

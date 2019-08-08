@@ -1,8 +1,8 @@
-import {Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import ConditionTag from './ConditionTag'
-import {now} from '../../services/DateService'
+import { now } from '../../services/DateService'
 import Respondent from './Respondent'
 
 export interface RespondentConditionTagRecylerData {

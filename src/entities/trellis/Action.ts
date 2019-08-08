@@ -1,11 +1,11 @@
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
-import {AsDate, Serializable} from '../decorators/WebOrmDecorators'
+import { AsDate, Serializable } from '../decorators/WebOrmDecorators'
 import BaseEntity from '../base/BaseEntity'
-import {ActionPayload} from "../../components/interview/services/actions/DatumOperations";
-import {ValueTransformer} from "typeorm/decorator/options/ValueTransformer";
-import {Moment} from "moment";
-import MomentTransformer from "../base/MomentTransformer";
+import { ActionPayload } from '../../components/interview/services/actions/ActionPayload'
+import { ValueTransformer } from 'typeorm/decorator/options/ValueTransformer'
+import { Moment } from 'moment'
+import MomentTransformer from '../base/MomentTransformer'
 
 export class PayloadTransformer implements ValueTransformer {
   to (actionPayload: ActionPayload) {

@@ -1,5 +1,5 @@
-import {randomIntBits} from "../../classes/M";
-import {RandomPagination, RandomPaginationResult} from "../../types/Pagination";
+import { randomIntBits } from '../../classes/M'
+import { RandomPagination, RandomPaginationResult } from '../../types/Pagination'
 import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
@@ -7,11 +7,11 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database/DatabaseService'
-import {Brackets, Connection, EntityManager, IsNull} from 'typeorm'
-import RespondentPhoto from "../../entities/trellis/RespondentPhoto";
-import Photo from "../../entities/trellis/Photo";
-import {removeSoftDeleted} from "../database/SoftDeleteHelper";
-import Geo from "../../entities/trellis/Geo";
+import { Brackets, Connection, EntityManager, IsNull } from 'typeorm'
+import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
+import Photo from '../../entities/trellis/Photo'
+import { removeSoftDeleted } from '../database/SoftDeleteHelper'
+import Geo from '../../entities/trellis/Geo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export default class RespondentServiceCordova implements RespondentServiceInterface {
@@ -21,7 +21,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     let rPhoto = new RespondentPhoto()
     rPhoto.photoId = photo.id
     rPhoto.respondentId = respondentId
-    rPhoto.sortOrder = await repo.createQueryBuilder('rp').where('rp.respondentId = :respondentId', {respondentId}).getCount()
+    rPhoto.sortOrder = await repo.createQueryBuilder('rp').where('rp.respondentId = :respondentId', { respondentId }).getCount()
     await repo.save(rPhoto)
     let respondentPhoto = await repo.findOne({
       where: {
@@ -72,7 +72,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
         'photo'
       ]
     })
-    let photos: PhotoWithPivotTable[]  = []
+    let photos: PhotoWithPivotTable[] = []
     for (let i = 0; i < respondentPhotos.length; i++) {
       let respondentPhoto = respondentPhotos[i]
       photos.push(new PhotoWithPivotTable(respondentPhoto))

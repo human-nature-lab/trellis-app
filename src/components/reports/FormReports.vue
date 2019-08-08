@@ -45,10 +45,10 @@
 
 <script lang="ts">
   import FormService from '../../services/form/FormService'
-  import Form from "../../entities/trellis/Form"
+  import Form from '../../entities/trellis/Form'
   import TranslateMixin from '../../mixins/TranslateMixin'
   import global from '../../static/singleton'
-  import Report from "../../entities/web/Report"
+  import Report from '../../entities/web/Report'
   import Vue, {PropOptions} from 'vue'
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 
@@ -116,13 +116,20 @@
     },
     methods: {
       async loadForms (): Promise<void> {
-        this.formsAreLoading = true
-        this.forms = (await FormService.getStudyForms(this.studyId)).map(sf => sf.form)
-        this.forms.sort((a, b) => {
-          // @ts-ignore
-          return this.translate(a.nameTranslation, this.global.locale).localeCompare(this.translate(b.nameTranslation, this.global.locale))
-        })
-        this.formsAreLoading = false
+        try {
+          this.formsAreLoading = true
+          this.forms = (await FormService.getStudyForms(this.studyId)).map(sf => sf.form)
+          this.forms.sort((a, b) => {
+            // @ts-ignore
+            return this.translate(a.nameTranslation, this.global.locale).localeCompare(this.translate(b.nameTranslation, this.global.locale))
+          })
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        } finally {
+          this.formsAreLoading = false
+        }
       },
       reportIsLoading (form: FormWithReport): boolean {
         return this.reportsAreLoading || (!!form.report && form.report.status === 'queued')

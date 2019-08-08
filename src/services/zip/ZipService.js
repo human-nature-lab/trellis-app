@@ -1,4 +1,4 @@
-import {switchByModeEnv} from '../util'
+import { switchByModeEnv } from '../util'
 import ZipServiceMock from './ZipServiceMock'
 import ZipServiceCordova from './ZipServiceCordova'
 

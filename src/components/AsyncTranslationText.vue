@@ -49,16 +49,22 @@
         this.loadTranslation()
       },
       async loadTranslation () {
-        // Don't load if they already exist
-        if (!this.localTranslation || !this.localTranslation.translationText || !this.localTranslation.translationText.length) {
-          this.translated = this.$t('loading')
-          this.localTranslation.translationText = await TranslationTextService.getTranslatedTextByTranslationId(this.localTranslation.id)
+        try {
+          // Don't load if they already exist
+          if (!this.localTranslation || !this.localTranslation.translationText || !this.localTranslation.translationText.length) {
+            this.translated = this.$t('loading')
+            this.localTranslation.translationText = await TranslationTextService.getTranslatedTextByTranslationId(this.localTranslation.id)
+          }
+          // If you are in an interview, interpolate any fills
+          if (this.location) {
+            this.localTranslation.translationText = await InterpolationService.getInterpolatedTranslationText(this.localTranslation.translationText, this.location)
+          }
+          this.getTranslated()
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
-        // If you are in an interview, interpolate any fills
-        if (this.location) {
-          this.localTranslation.translationText = await InterpolationService.getInterpolatedTranslationText(this.localTranslation.translationText, this.location)
-        }
-        this.getTranslated()
       },
       getTranslated () {
         this.translated = TranslationService.getAny(this.localTranslation, global.locale)

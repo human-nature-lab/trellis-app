@@ -28,7 +28,7 @@
 
 <script lang="ts">
   import merge from 'lodash/merge'
-  import Vue, {Component} from "vue"
+  import Vue, {Component} from 'vue'
 
   interface SnackConfig {
     slot?: Component

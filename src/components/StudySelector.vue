@@ -20,10 +20,9 @@
 
 <script>
   import StudyService from '../services/study/StudyService'
-  import SingletonService from '../services/SingletonService'
   export default {
     name: 'study-selector',
-    data: function () {
+    data () {
       return {
         error: null,
         studies: [],
@@ -31,17 +30,17 @@
         isWorking: false
       }
     },
-    created: function () {
+    created () {
       this.load()
     },
     methods: {
-      change: function (studyId) {
+      change (studyId) {
         const study = this.getStudyById(studyId)
         this.study = study
         StudyService.setCurrentStudy(study)
         this.$emit('change', study)
       },
-      load: async function () {
+      async load () {
         try {
           this.isWorking = true
           // await SingletonService.hasLoaded()
@@ -51,12 +50,14 @@
             return b.name.localeCompare(a.name)
           })
         } catch (err) {
-          this.error = err
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Failed to load studies')
+          }
         } finally {
           this.isWorking = false
         }
       },
-      getStudyById: function (studyId) {
+      getStudyById (studyId) {
         for (let i = 0; i < this.studies.length; i++) {
           if (this.studies[i].id === studyId) {
             return this.studies[i]

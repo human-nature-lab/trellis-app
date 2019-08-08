@@ -80,9 +80,9 @@
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum'
-  import {pushRoute, pushRouteAndQueueCurrent} from '../../router'
+  import { pushRoute, pushRouteAndQueueCurrent } from '../../router'
   export default {
-    components: {PhotoAlbum},
+    components: { PhotoAlbum },
     name: 'add-respondent-form',
     props: {
       associatedRespondentId: String,
@@ -114,11 +114,23 @@
     },
     methods: {
       async addPhoto (photo) {
-        let returnPhoto = await RespondentService.addPhoto(this.respondent.id, photo)
-        this.respondent.photos.push(returnPhoto)
+        try {
+          let returnPhoto = await RespondentService.addPhoto(this.respondent.id, photo)
+          this.respondent.photos.push(returnPhoto)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async onUpdatePhotos (photos) {
-        await RespondentService.updatePhotos(photos)
+        try {
+          await RespondentService.updatePhotos(photos)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async onDeletePhoto (photo) {
         let confirmMessage = this.$t('remove_photo_confirm') + ''
@@ -127,7 +139,9 @@
           await RespondentService.removePhoto(photo)
           this.respondent.photos.splice(this.respondent.photos.indexOf(photo), 1)
         } catch (err) {
-          console.error(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       },
       async save () {
@@ -139,9 +153,10 @@
           this.respondent = respondent
           this.step++
         } catch (err) {
-          err.component = 'AddRespondentForm@save'
-          this.log(err)
-          this.alert('error', `Unable to create respondent: ${this.name}`, { timeout: 0 })
+          if (this.isNotAuthError(err)) {
+            err.component = 'AddRespondentForm@save'
+            this.logError(err)
+          }
           this.step = 0
           this.respondent = null
         } finally {

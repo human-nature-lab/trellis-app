@@ -2,7 +2,7 @@ import ValidateLocale from './guards/ValidateLocale'
 import chain from './guards/ChainableGuards'
 import ValidateStudy from './guards/ValidateStudy'
 import ValidatePermissions from './guards/ValidatePermissions'
-import {TrellisPermission} from '../static/permissions.base'
+import { TrellisPermission } from '../static/permissions.base'
 
 const Forms = () => import(/* webpackChunkName: "forms" */'../views/Forms')
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview')

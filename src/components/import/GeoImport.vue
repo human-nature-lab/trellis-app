@@ -40,8 +40,9 @@
           this.$emit('updateGeos', geos)
           this.alert('success', this.$t('import_success'))
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('import_failed'), { timeout: 0 })
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('import_failed'))
+          }
         } finally {
           this.isWorking = false
         }

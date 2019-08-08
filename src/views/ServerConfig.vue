@@ -56,8 +56,9 @@
         this.isLoading = true
         this.entries = await ConfigService.getAll()
       } catch (err) {
-        this.log(err)
-        this.alert('error', err.message)
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
       } finally {
         this.isLoading = false
       }
@@ -72,7 +73,3 @@
     }
   })
 </script>
-
-<style lang="sass" scoped>
-
-</style>

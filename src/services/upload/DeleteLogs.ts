@@ -1,6 +1,6 @@
-import Log from "../../entities/trellis-config/Log";
+import Log from '../../entities/trellis-config/Log'
 import DatabaseService from '../database/DatabaseService'
-import {Connection} from 'typeorm'
+import { Connection } from 'typeorm'
 
 export default async function DeleteLogs () {
   const conn: Connection = await DatabaseService.getConfigDatabase()

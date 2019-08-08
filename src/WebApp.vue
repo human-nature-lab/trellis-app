@@ -116,7 +116,7 @@
   import singleton from './static/singleton'
   // Do not remove!
   import SingletonService from './services/SingletonService'
-  import {defaultLoggingService} from './services/logging/LoggingService'
+  import { defaultLoggingService } from './services/logging/LoggingService'
   import GeoLocationService from './services/geolocation'
   import SnackbarQueue from './components/SnackbarQueue'
   import DocsSidebar from './components/documentation/DocsSidebar'

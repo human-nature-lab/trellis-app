@@ -1,5 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, JoinTable, ManyToMany} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import RespondentName from './RespondentName'
 import RespondentGeo from './RespondentGeo'
@@ -8,9 +8,9 @@ import Geo from './Geo'
 import ConditionTag from './ConditionTag'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import Photo from './Photo'
-import {LazyQuery} from '../decorators/QueryDecorator'
-import Survey from "./Survey";
-import Edge from "./Edge";
+import { LazyQuery } from '../decorators/QueryDecorator'
+import Survey from './Survey'
+import Edge from './Edge'
 
 
 @Entity()

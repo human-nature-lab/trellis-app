@@ -1,14 +1,14 @@
-import InterviewManager from "../classes/InterviewManager";
-import Form from "../../../entities/trellis/Form";
-import Section from "../../../entities/trellis/Section";
-import QuestionGroup from "../../../entities/trellis/QuestionGroup";
-import DataStore from "../classes/DataStore";
-import Datum from "../../../entities/trellis/Datum";
-import QuestionDatum from "../../../entities/trellis/QuestionDatum";
-import Question from "../../../entities/trellis/Question";
-import SkipService from "../../../services/SkipService";
-import Action from "../../../entities/trellis/Action";
-import {locToNumber} from "./LocationHelpers";
+import InterviewManager from '../classes/InterviewManager'
+import Form from '../../../entities/trellis/Form'
+import Section from '../../../entities/trellis/Section'
+import QuestionGroup from '../../../entities/trellis/QuestionGroup'
+import DataStore from '../classes/DataStore'
+import Datum from '../../../entities/trellis/Datum'
+import QuestionDatum from '../../../entities/trellis/QuestionDatum'
+import Question from '../../../entities/trellis/Question'
+import SkipService from '../../../services/SkipService'
+import Action from '../../../entities/trellis/Action'
+import { locToNumber } from './LocationHelpers'
 
 export interface InterviewLocation {
   section: number

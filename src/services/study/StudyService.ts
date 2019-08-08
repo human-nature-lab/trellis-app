@@ -1,4 +1,4 @@
-import {switchByModeEnv} from '../util'
+import { switchByModeEnv } from '../util'
 import StudyServiceWeb from './StudyServiceWeb'
 import StudyServiceCordova from './StudyServiceCordova'
 // import StudyServiceMock from './StudyServiceMock'

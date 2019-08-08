@@ -35,7 +35,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import GeoType from '../../entities/trellis/GeoType'
-  import PermissionMixin from "../../mixins/PermissionMixin"
+  import PermissionMixin from '../../mixins/PermissionMixin'
   import CRUDMenu from '../CRUDMenu'
   export default Vue.extend({
     name: 'GeoTypeRow',

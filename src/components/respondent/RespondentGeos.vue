@@ -69,7 +69,7 @@
   // @ts-ignore
   import MoveRespondentGeoForm from './MoveRespondentGeoForm'
   // @ts-ignore
-  import {checkForCensusForm} from '../CensusFormChecker'
+  import { checkForCensusForm } from '../CensusFormChecker'
 
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusTypes from '../../static/census.types'
@@ -140,8 +140,9 @@
             this.respondent.geos.splice(index, 1, rg)
           }
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to update Current location')
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to update current location')
+          }
         }
       },
       geoIsSelectable (geo: Geo): boolean {
@@ -171,13 +172,18 @@
         this.respondent.geos.push(rGeo)
         this.$emit('after-add', rGeo)
       },
-      remove (respondentGeoId: string): Promise<void> {
+      async remove (respondentGeoId: string): Promise<void> {
         if (!confirm(this.$t('confirm_delete_geo') + '')) return
-        return RespondentService.removeRespondentGeo(this.respondent.id, respondentGeoId).then(() => {
+        try {
+          await RespondentService.removeRespondentGeo(this.respondent.id, respondentGeoId)
           let index = this.respondent.geos.findIndex(g => g.id === respondentGeoId)
           let rm = this.respondent.geos.splice(index, 1)
           this.$emit('after-remove', rm[0])
-        })
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       }
     },
     computed: {

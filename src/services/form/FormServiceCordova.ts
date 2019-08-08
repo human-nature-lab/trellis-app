@@ -1,12 +1,12 @@
-import formTypes from "../../static/form.types";
+import formTypes from '../../static/form.types'
 import FormServiceInterface from './FormServiceInterface'
 import DatabaseService from '../database/DatabaseService'
 import StudyForm from '../../entities/trellis/StudyForm'
 import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'
-import {In, IsNull} from 'typeorm'
-import {removeSoftDeleted} from "../database/SoftDeleteHelper";
-import {isEqual} from 'lodash'
+import { In, IsNull } from 'typeorm'
+import { removeSoftDeleted } from '../database/SoftDeleteHelper'
+import { isEqual } from 'lodash'
 
 export default class FormServiceCordova implements FormServiceInterface {
 

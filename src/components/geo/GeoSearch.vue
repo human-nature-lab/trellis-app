@@ -196,16 +196,21 @@
         if (!geo || !geo.nameTranslation) return this.$t('no_translation')
         return TranslationService.getAny(geo.nameTranslation, this.global.locale)
       },
-      loadAncestors () {
-        if (this.results && this.results.length) {
-          GeoService.getGeoAncestors(this.results[0].id).then(geos => {
+      async loadAncestors () {
+        try {
+          if (this.results && this.results.length) {
+            const geos = await GeoService.getGeoAncestors(this.results[0].id)
             geos.forEach(geo => {
               this.geoCache_[geo.id] = geo
             })
             this.lastParentIds.push(null)
             this.lastParentIds.push(...geos.map(g => g.id))
             this.lastParentIds.pop()
-          })
+          }
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       },
       updateRoute: function () {
@@ -265,7 +270,7 @@
           this.selectedGeos.pop()
         }
       },
-      search () {
+      async search () {
         this.isSearching = true
         let filters = {}
         if (this.query) {
@@ -276,21 +281,21 @@
             filters[key] = this.filters[key]
           }
         }
-        return GeoService.search(this.global.study.id, filters).then(results => {
+        try {
+          const results = await GeoService.search(this.global.study.id, filters)
           this.results = results
           for (let geo of results) {
             this.geoCache_[geo.id] = geo
           }
           this.$emit('returned-geo-results', results, this.userFilters.parent)
-        }).catch(err => {
-          this.log({
-            message: `Unable to retrieve geos for the current filters`
-          })
-          this.log(err)
-        }).then(() => {
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err, `Unable to retrieve geos for the current filters`)
+          }
+        } finally {
           this.isSearching = false
           this.updateRoute()
-        })
+        }
       },
       isGeoSelected (geo) {
         return this.selectedIds.indexOf(geo.id) > -1

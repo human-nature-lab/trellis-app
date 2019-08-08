@@ -1,9 +1,9 @@
-import {AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta} from './interview/InterviewDeltaInterface'
+import { AddedRemovedDelta, ConditionTagDelta, DataDelta, ModifiedDelta } from './interview/InterviewDeltaInterface'
 import QuestionDatum from '../entities/trellis/QuestionDatum'
-import SectionConditionTag from "../entities/trellis/SectionConditionTag";
-import SurveyConditionTag from "../entities/trellis/SurveyConditionTag";
-import RespondentConditionTag from "../entities/trellis/RespondentConditionTag";
-import {ConditionTagInterface} from "./interview/InterviewDataInterface";
+import SectionConditionTag from '../entities/trellis/SectionConditionTag'
+import SurveyConditionTag from '../entities/trellis/SurveyConditionTag'
+import RespondentConditionTag from '../entities/trellis/RespondentConditionTag'
+import { ConditionTagInterface } from './interview/InterviewDataInterface'
 import * as Moment from 'moment'
 import union from 'lodash/union'
 export default class DiffService {

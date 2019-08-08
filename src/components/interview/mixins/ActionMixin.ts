@@ -1,6 +1,6 @@
 import actionBus from '../services/actions/ActionBus'
 import Action from '../../../entities/trellis/Action'
-import {ActionPayload} from "../services/actions/DatumOperations";
+import { ActionPayload } from '../services/actions/DatumOperations'
 import Vue from 'vue'
 import debounce from 'lodash/debounce'
 

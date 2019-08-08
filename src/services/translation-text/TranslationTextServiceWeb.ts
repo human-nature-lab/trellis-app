@@ -1,7 +1,7 @@
 import http from '../http/AxiosInstance'
-import {uriTemplate} from "../http/WebUtils";
+import { uriTemplate } from '../http/WebUtils'
 import TranslationTextServiceInterface from './TranslationTextServiceInterface'
-import TranslationText from "../../entities/trellis/TranslationText";
+import TranslationText from '../../entities/trellis/TranslationText'
 
 export default class TranslationTextServiceWeb implements TranslationTextServiceInterface {
 

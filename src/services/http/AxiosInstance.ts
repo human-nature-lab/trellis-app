@@ -53,9 +53,9 @@ async function responseError (err) {
     let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
     singleton.loading.active = false
     if (RouteWhitelist.indexOf(router.currentRoute.name) === -1) {
-      router.replace({name: 'Login', query: {to: nextRoute}})
+      router.replace({ name: 'Login', query: { to: nextRoute } })
     }
-    return Promise.reject(err.response)
+    return Promise.reject(err)
   }
   return Promise.reject(err)
 }

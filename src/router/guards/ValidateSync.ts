@@ -1,6 +1,6 @@
 import SyncService from '../../services/SyncService'
 import SingletonService from '../../services/SingletonService'
-import RouteWhitelist from "../RouteWhitelist";
+import RouteWhitelist from '../RouteWhitelist'
 
 export default async function (to, from, next) {
   await SingletonService.hasLoaded()

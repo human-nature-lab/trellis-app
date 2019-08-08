@@ -2,8 +2,8 @@ import Study from '../entities/trellis/Study'
 import Locale from '../entities/trellis/Locale'
 import User from '../entities/trellis/User'
 import storage from '../services/StorageService'
-import Action from "../entities/trellis/Action";
-import Form from "../entities/trellis/Form";
+import Action from '../entities/trellis/Action'
+import Form from '../entities/trellis/Form'
 declare const cordova: any
 
 export interface SecondaryDrawer {

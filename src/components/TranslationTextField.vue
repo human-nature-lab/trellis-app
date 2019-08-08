@@ -22,11 +22,11 @@
 </template>
 
 <script lang="ts">
-  import {Mutex} from "async-mutex"
-  import Locale from "../entities/trellis/Locale"
-  import TranslationText from "../entities/trellis/TranslationText"
-  import LocaleService from "../services/locale/LocaleService"
-  import SingletonService from "../services/SingletonService"
+  import { Mutex } from 'async-mutex'
+  import Locale from '../entities/trellis/Locale'
+  import TranslationText from '../entities/trellis/TranslationText'
+  import LocaleService from '../services/locale/LocaleService'
+  import SingletonService from '../services/SingletonService'
   import TranslationTextService from '../services/translation-text/TranslationTextService'
   import ClickToEdit from './ClickToEdit'
   import singleton, {Singleton} from '../static/singleton'
@@ -141,8 +141,9 @@
           }
           release()
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to load locales', {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load locales')
+          }
         }
       }
     }

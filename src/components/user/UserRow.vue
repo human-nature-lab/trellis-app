@@ -28,13 +28,13 @@
 </template>
 
 <script lang="ts">
-  import Vue from "vue"
-  import User from "../../entities/trellis/User"
+  import Vue from 'vue'
+  import User from '../../entities/trellis/User'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import StudyService from "../../services/study/StudyService"
-  import UserService from "../../services/user/UserService"
+  import StudyService from '../../services/study/StudyService'
+  import UserService from '../../services/user/UserService'
   import global from '../../static/singleton'
-  import IsAdminMixin from "../../mixins/IsAdminMixin"
+  import IsAdminMixin from '../../mixins/IsAdminMixin'
   import CRUDMenu from '../CRUDMenu'
 
   export default Vue.extend({
@@ -58,8 +58,15 @@
     },
     async created () {
       this.loading = true
-      this.allStudies = await StudyService.getAllStudies()
-      this.loading = false
+      try {
+        this.allStudies = await StudyService.getAllStudies()
+      } catch (err) {
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
+      } finally {
+        this.loading = false
+      }
     },
     data () {
       return {
@@ -84,13 +91,25 @@
         }
       },
       async addUserStudy (studyId: string) {
-        let userStudy = await UserService.addStudy(this.user, studyId)
-        this.user.studies.push(userStudy)
+        try {
+          let userStudy = await UserService.addStudy(this.user, studyId)
+          this.user.studies.push(userStudy)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async removeUserStudy (userStudyId: String ) {
-        await UserService.removeStudy(this.user, userStudyId)
-        const index = this.user.studies.findIndex(s => s.id === userStudyId)
-        this.user.studies.splice(index, 1)
+        try {
+          await UserService.removeStudy(this.user, userStudyId)
+          const index = this.user.studies.findIndex(s => s.id === userStudyId)
+          this.user.studies.splice(index, 1)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       }
     }
   })

@@ -72,8 +72,9 @@
           this.$emit('newRolePermission', newRolePermission)
           this.alert('success', this.$t('resource_updated', [rolePermission.permissionId]))
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_update', [rolePermission.permissionId]), { timeout: 0 })
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [rolePermission.permissionId]))
+          }
         } finally {
           rolePermission.isWorking = false
         }

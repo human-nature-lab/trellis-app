@@ -1,7 +1,7 @@
-import {Route} from "vue-router";
+import { Route } from 'vue-router'
 import DatabaseService from '../../services/database/DatabaseService'
-import {getNextRouteOrDefault} from '../'
-import RouteWhitelist from "../RouteWhitelist";
+import { getNextRouteOrDefault } from '../'
+import RouteWhitelist from '../RouteWhitelist'
 
 export default async function (to: Route, from: Route, next: (...any) => {}) {
   const configRouteName = 'ConfigureServer'

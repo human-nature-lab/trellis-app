@@ -15,18 +15,30 @@
       :headers="headers"
       :items="items">
       <tr slot="items" slot-scope="props">
-        <td v-for="h in headers" :style="{borderColor: props.item.color}">{{props.item[h.value]}}</td>
+        <td v-for="h in headers" :style="{borderColor: props.item.color}">{{ props.item[h.value] }}</td>
       </tr>
     </v-data-table>
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
   import GeoLocationService from '../services/geolocation'
-  import { interpolateHeatmap } from '../classes/M'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
+  import Vue from 'vue'
 
-  export default {
+  type HistoryItem = {
+    timestamp: number
+    latitude: number
+    longitude: number
+    altitude: number
+    accuracy: number
+    heading: number
+    speed: number
+    diff: number
+    color: string
+  }
+
+  export default Vue.extend({
     name: 'LocationHistory',
     mixins: [DocsLinkMixin('./admin/LocationHistory.md')],
     data () {
@@ -49,7 +61,7 @@
       }
     },
     computed: {
-      items () {
+      items (): HistoryItem[] {
         return this.geolocation.positionHistory.map(p => ({
           timestamp: p.timestamp,
           latitude: p.coords.latitude,
@@ -59,12 +71,12 @@
           heading: p.coords.heading,
           speed: p.coords.speed,
           diff: Date.now() - p.timestamp,
-          color: interpolateHeatmap(Date.now() - p.timestamp, [0, 5 * 60 * 1000], ['00ff00', 'ff0000'])
+          // color: interpolateHeatmap(Date.now() - p.timestamp, [0, 5 * 60 * 1000], ['00ff00', 'ff0000'])
         }))
       },
-      isWatching () {
+      isWatching (): boolean {
         return this.geolocation.watchId !== null
       }
     }
-  }
+  })
 </script>

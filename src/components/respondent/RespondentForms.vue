@@ -53,7 +53,7 @@
 <script lang="ts">
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import FormsView from './FormsView.vue'
-  import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
+  import RoutePreloadMixin from '../../mixins/RoutePreloadMixin'
   import SurveyService from '../../services/survey'
   import FormService from '../../services/form/FormService'
   import RespondentService from '../../services/respondent/RespondentService'
@@ -89,30 +89,26 @@
     conditionTags: RespondentConditionTag[]
   }
 
-  function load (to): Promise<object> {
+  async function load (to): Promise<object> {
     let respondentId = to.params.respondentId
     let studyId = to.params.studyId
-    let respondent, surveys, forms
-    return Promise.all([
+    const [respondent, surveys, forms] = await Promise.all([
       RespondentService.getRespondentById(respondentId),
       SurveyService.getRespondentSurveys(studyId, respondentId),
       FormService.getStudyForms(studyId)
-    ]).then(res => {
-      [respondent, surveys, forms] = res
-      return respondent.respondentConditionTags
-    }).then(conditionTags => {
-      return {
-        conditionTags,
-        respondent,
-        surveys,
-        forms
-      }
-    })
+    ])
+    const conditionTags = await respondent.respondentConditionTags
+    return {
+      conditionTags,
+      respondent,
+      surveys,
+      forms
+    }
   }
 
   export default Vue.extend({
     name: 'respondent-forms',
-    mixins: [RouteMixinFactory(load), DocsLinkMixin('./respondents/RespondentForms.md')],
+    mixins: [RoutePreloadMixin(load), DocsLinkMixin('./respondents/RespondentForms.md')],
     data () {
       return {
         global,

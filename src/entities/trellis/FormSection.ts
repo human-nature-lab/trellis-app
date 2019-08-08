@@ -1,5 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
-import {Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
+import { Serializable } from '../decorators/WebOrmDecorators'
 import Section from './Section'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
@@ -7,11 +7,11 @@ import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 export default class FormSection extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
-  @Column({select: false}) @Serializable
+  @Column({ select: false }) @Serializable
   formId: string
-  @Column({select: false}) @Serializable
+  @Column({ select: false }) @Serializable
   sectionId: string
-  @Column({type: 'integer'}) @Serializable
+  @Column({ type: 'integer' }) @Serializable
   sortOrder: number
   @Column() @Serializable
   isRepeatable: boolean

@@ -1,5 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm'
-import {enumerable, Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { enumerable, Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TranslationText from './TranslationText'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 

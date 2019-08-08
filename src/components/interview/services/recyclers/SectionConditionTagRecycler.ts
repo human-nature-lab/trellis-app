@@ -1,6 +1,6 @@
 import Recycler from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
-import {now} from '../../../../services/DateService'
+import { now } from '../../../../services/DateService'
 import SectionConditionTag from '../../../../entities/trellis/SectionConditionTag'
 import AssignConditionTag from '../../../../entities/trellis/AssignConditionTag'
 import InterviewManagerOld from '../../classes/InterviewManager'

@@ -1,6 +1,6 @@
-import {Route} from "vue-router";
-import UserService from "../../services/user/UserService";
-import {TrellisPermission} from "../../static/permissions.base";
+import { Route } from 'vue-router'
+import UserService from '../../services/user/UserService'
+import { TrellisPermission } from '../../static/permissions.base'
 import PermissionService from '../../services/permission'
 
 export default function (permissions: TrellisPermission | TrellisPermission[]) {

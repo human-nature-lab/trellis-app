@@ -1,5 +1,5 @@
 import debounce from 'lodash/debounce'
-import {roughSizeOf} from "./M";
+import { roughSizeOf } from './M'
 
 interface SizeMeta {
   touched: number,

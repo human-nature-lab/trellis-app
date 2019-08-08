@@ -3,8 +3,8 @@ import DatabaseService from '../database/DatabaseService'
 import Photo from '../../entities/trellis/Photo'
 import uuid from 'uuid/v4'
 import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'
-import {In, IsNull} from 'typeorm'
-import CancellablePromise from "../../classes/CancellablePromise";
+import { In, IsNull } from 'typeorm'
+import CancellablePromise from '../../classes/CancellablePromise'
 
 declare global {
   interface Window {ImageResizer: any}

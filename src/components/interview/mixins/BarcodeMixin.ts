@@ -1,5 +1,5 @@
 import barcode from '../../../services/barcode'
-import {LoggingLevel} from "../../../services/logging/LoggingTypes"
+import { LoggingLevel } from '../../../services/logging/LoggingTypes'
 import PT from '../../../static/parameter.types'
 export default {
   computed: {

@@ -1,8 +1,8 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToOne } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Choice from './Choice'
-import {mapFromSnakeJSON} from '../../services/JSONUtil'
+import { mapFromSnakeJSON } from '../../services/JSONUtil'
 import Question from './Question'
 
 @Entity()

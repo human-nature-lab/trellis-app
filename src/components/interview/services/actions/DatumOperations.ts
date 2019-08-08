@@ -1,30 +1,14 @@
-import {snakeToCamel} from '../../../../services/JSONUtil'
+import { snakeToCamel } from '../../../../services/JSONUtil'
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import Datum from '../../../../entities/trellis/Datum'
-import InterviewManager from "../../classes/InterviewManager";
-import {ActionHandler} from "./ActionManager";
-import Action from "../../../../entities/trellis/Action";
-import {defaultLoggingService} from "../../../../services/logging/LoggingService";
+import InterviewManager from '../../classes/InterviewManager'
+import { ActionHandler } from './ActionManager'
+import Action from '../../../../entities/trellis/Action'
+import { defaultLoggingService } from '../../../../services/logging/LoggingService'
+import { ActionPayload } from './ActionPayload'
 
 interface DatumFindFunc {
   (value: Datum, payload: ActionPayload): boolean
-}
-
-export interface ActionPayload {
-  val: string
-  name: string
-  dk_rf?: boolean
-  dk_rf_val?: string
-  choice_id?: string
-  sort_order?: number
-  roster_id?: string
-  geo_id?: string
-  edge_id?: string
-  photo_id?: string,
-  datum_id?: string,
-  random_sort_order?: number,
-  respondent_geo_id?: string,
-  respondent_name_id?: string
 }
 
 /**

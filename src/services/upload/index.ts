@@ -1,3 +1,3 @@
-import UploadServiceWeb from "./UploadServiceWeb";
+import UploadServiceWeb from './UploadServiceWeb'
 
 export default new UploadServiceWeb()

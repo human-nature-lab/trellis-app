@@ -35,7 +35,7 @@
 
 <script lang="ts">
   import Vue, { Component } from 'vue'
-  import { RawLocation } from "vue-router/types/router"
+  import { RawLocation } from 'vue-router/types/router'
   import DeviceAdmin from '../components/info/DeviceAdmin.vue'
   import DeviceInfo from '../components/info/DeviceInfo.vue'
   import GPSInfo from '../components/info/GPSInfo.vue'

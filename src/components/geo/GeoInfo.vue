@@ -81,10 +81,10 @@
 </template>
 
 <script lang="ts">
-  import Translation from "../../entities/trellis/Translation"
-  import PermissionMixin from "../../mixins/PermissionMixin"
-  import TranslationTextField from "../TranslationTextField"
-  import TrellisModal from "../TrellisModal"
+  import Translation from '../../entities/trellis/Translation'
+  import PermissionMixin from '../../mixins/PermissionMixin'
+  import TranslationTextField from '../TranslationTextField'
+  import TrellisModal from '../TrellisModal'
 
   // @ts-ignore
   import GeoBreadcrumbs from './GeoBreadcrumbs'
@@ -102,10 +102,10 @@
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import GeoService from '../../services/geo/GeoService'
   import router from '../../router'
-  import {Route} from 'vue-router'
+  import { Route } from 'vue-router'
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
-  import {SearchFilter} from '../../services/respondent/RespondentServiceInterface'
+  import { SearchFilter } from '../../services/respondent/RespondentServiceInterface'
   import DocsFiles from '../documentation/DocsFiles'
 
   export default Vue.extend({
@@ -155,20 +155,34 @@
         })
       },
       async addPhoto (photo: Photo) {
-        let photoWithPivotTable = await GeoService.addPhoto(this.geo.id, photo)
-        this.geoPhotos.push(photoWithPivotTable)
+        try {
+          let photoWithPivotTable = await GeoService.addPhoto(this.geo.id, photo)
+          this.geoPhotos.push(photoWithPivotTable)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
-      onUpdatePhotos: async function (photos) {
-        await GeoService.updatePhotos(photos)
+      async onUpdatePhotos (photos) {
+        try {
+          await GeoService.updatePhotos(photos)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
-      onDeletePhoto: async function (photo) {
+      async onDeletePhoto (photo) {
         let confirmMessage = this.$t('remove_photo_confirm') + ''
         if (!window.confirm(confirmMessage)) return
         try {
           await GeoService.removePhoto(photo)
           this.geoPhotos.splice(this.geoPhotos.indexOf(photo), 1)
         } catch (err) {
-          console.error(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       },
       onGeoTypeSelected: async function (geoType) {
