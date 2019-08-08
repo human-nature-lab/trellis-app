@@ -1,5 +1,5 @@
 import formTypes from '../../static/form.types'
-import { http, adminInst } from '../http/AxiosInstance'
+import http, { adminInst } from '../http/AxiosInstance'
 import FormServiceInterface from './FormServiceInterface'
 import StudyForm from '../../entities/trellis/StudyForm'
 import { saveAs } from 'file-saver'

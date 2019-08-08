@@ -49,3 +49,12 @@ Questions are required by default, but questions can be made optional using this
 #### geo_type
 The geo_type parameter has different behavior depending on the question type. It is valid only for geo and 
 respondent_geo question types. For the geo question type it can be
+
+#### allowed_time
+Setting this parameter to a value greater than `0` will result in a timer being shown to the user with start,
+stop and reset controls shown. The value represents the number of seconds that should be allowed for this question.
+
+#### show_timer_controls
+Setting this parameter to `0` will make it so that the timer controls do not appear in the question. This is
+primarily useful for self-administered surveys where it is undesirable for a respondent to be able to control
+the timer.
