@@ -24,15 +24,13 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
   }
 
   async getRespondentPhotos (respondentId: string): Promise<Array<PhotoWithPivotTable>> {
-    let photos: PhotoWithPivotTable[]  = []
-    let res = await http().get(uriTemplate('respondent/{}/photos', [respondentId]))
+    let photos: PhotoWithPivotTable[] = []
+    let res = await http().get(uriTemplate('respondent/{respondentId}/photos', [respondentId]))
     for (let i = 0; i < res.data.photos.length; i++) {
       let respondentPhoto = new RespondentPhoto().fromSnakeJSON(res.data.photos[i])
-      let photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
-      respondentPhoto.photo = photo
+      respondentPhoto.photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
       photos.push(new PhotoWithPivotTable(respondentPhoto))
     }
-
     return photos
   }
 

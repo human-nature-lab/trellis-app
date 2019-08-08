@@ -190,7 +190,13 @@ export function deepCopy (obj: any, copySelf: boolean = false): any {
     if (obj.copy && copySelf) {
       return obj.copy()
     } else if (obj.constructor) {
-      let d = new obj.constructor()
+      let d
+      // Try using the constructor. This will fail if the constructor requires arguments
+      try {
+        d = new obj.constructor()
+      } catch (err) {
+        d = {}
+      }
       for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
           d[key] = deepCopy(obj[key], true)

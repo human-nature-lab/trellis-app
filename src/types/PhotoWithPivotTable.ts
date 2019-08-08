@@ -15,7 +15,7 @@ export default class PhotoWithPivotTable {
   fileName: string
   pivot: PhotoPivotTable
 
-  constructor(joinTable: RespondentPhoto|GeoPhoto|DatumPhoto) {
+  constructor (joinTable: RespondentPhoto | GeoPhoto | DatumPhoto) {
     let entityId: string = ''
     if (joinTable instanceof RespondentPhoto) {
       entityId = joinTable.respondentId
@@ -25,14 +25,14 @@ export default class PhotoWithPivotTable {
       entityId = joinTable.datumId
     }
 
-    this.id = (joinTable.photo) ? joinTable.photo.id : null
-    this.fileName = (joinTable.photo) ? joinTable.photo.fileName : null
-    let pivot = new PhotoPivotTable()
-    pivot.id = joinTable.id
-    pivot.sortOrder = joinTable.sortOrder
-    pivot.notes = joinTable.notes
-    pivot.entityId = entityId
-    pivot.photoId = joinTable.photoId
-    this.pivot = pivot
+    this.id = joinTable.photo ? joinTable.photo.id : null
+    this.fileName = joinTable.photo ? joinTable.photo.fileName : null
+    this.pivot = {
+      id: joinTable.id,
+      sortOrder: joinTable.sortOrder,
+      notes: joinTable.notes,
+      entityId,
+      photoId: joinTable.photoId
+    } as PhotoPivotTable
   }
 }
