@@ -1,3 +1,4 @@
+const restrictedGlobals = ['window', 'self', 'top', 'document', 'XMLHttpRequest', 'fetch', 'WebAssembly']
 export default class ConditionAssignmentService {
   public conditionAssignmentMethods: Map<string, Function> = new Map()
 
@@ -8,7 +9,11 @@ export default class ConditionAssignmentService {
    */
   register (id: string, functionString: string): void {
     // TODO: Do this safely instead. Maybe consider using -> https://github.com/andywer/threads.js/tree/master
-    this.conditionAssignmentMethods.set(id, eval(`(function() {'use strict'; return ${functionString}})()`))
+    this.conditionAssignmentMethods.set(id, Function(`'use strict';
+      return (function (${restrictedGlobals.join(',')}) {
+        return ${functionString}
+      })()      
+    `)())
   }
 
   /**

@@ -391,7 +391,7 @@ export default class InterviewManager extends InterviewManagerBase {
   private playActionsAndMoveForward () {
     this._isReplaying = true
     let c = 0
-    let keepMoving = true
+    let keepMoving = this.actions.hasActions()
     while (keepMoving && c < 1000) {
       keepMoving = this.playPageActions() && this.currentLocationHasValidResponses() && this.stepForward()
       c++
