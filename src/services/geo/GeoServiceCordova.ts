@@ -39,7 +39,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       },
       relations: ['geoType', 'nameTranslation', 'nameTranslation.translationText']
     })
-
+    if (!geo) return null
     geo.photos = await this.getGeoPhotos(geoId)
     removeSoftDeleted(geo)
     return geo
