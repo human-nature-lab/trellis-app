@@ -25,11 +25,17 @@
           checking: false,
           source: null,
           snapshotFileSize: 0,
-          currentLog: undefined
+          currentLog: undefined,
+          promises: new Set()
         }
       },
       created () {
         this.checkDownloadSize()
+      },
+      beforeDestroy () {
+        for (const promise of this.promises) {
+          Promise.reject(promise)
+        }
       },
       props: {
         snapshotId: {
@@ -39,53 +45,57 @@
         loggingService: {
           type: LoggingService,
           required: false,
-          'default': function () { return defaultLoggingService }
+          default: () => defaultLoggingService
         }
       },
       methods: {
-        checkDownloadSize: function () {
-          const CancelToken = axios.CancelToken
-          this.source = CancelToken.source()
-          this.checking = true
-          let freeDiskSpace = 0
-          DeviceService.getFreeDiskSpace()
-            .then((result) => { freeDiskSpace = result })
-            .then(() => SyncService.getSnapshotFileSize(this.source, this.snapshotId))
-            .then((snapshotFileSize) => {
-              this.checking = false
-              this.snapshotFileSize = snapshotFileSize
-              if (snapshotFileSize > freeDiskSpace) {
-                this.loggingService.log({
-                  severity: 'warn',
-                  message: this.$t('snapshot_requires_space', [formatBytesFilter(snapshotFileSize), formatBytesFilter(freeDiskSpace)])
-                }).then((result) => { this.currentLog = result })
-              } else if ((snapshotFileSize * 5) > freeDiskSpace) {
-                this.loggingService.log({
-                  severity: 'warn',
-                  message: this.$t('extracted_snapshot_requires_space', [formatBytesFilter(snapshotFileSize * 5), formatBytesFilter(freeDiskSpace)])
-                }).then((result) => { this.currentLog = result })
-              } else {
-                this.onDone()
-              }
-            }).catch((err) => {
-              this.loggingService.log(err).then((result) => { this.currentLog = result })
-            })
+        async checkDownloadSize () {
+          try {
+            const CancelToken = axios.CancelToken
+            this.source = CancelToken.source()
+            this.checking = true
+            let p = DeviceService.getFreeDiskSpace()
+            this.promises.add(p)
+            let freeDiskSpace = await p
+            this.promises.delete(p)
+            if (!this.checking) return
+            p = await SyncService.getSnapshotFileSize(this.source, this.snapshotId)
+            this.promises.add(p)
+            this.snapshotFileSize = await p
+            this.promises.delete(p)
+            this.checking = false
+            if (this.snapshotFileSize > freeDiskSpace) {
+              this.currentLog = await this.loggingService.log({
+                severity: 'warn',
+                message: this.$t('snapshot_requires_space', [formatBytesFilter(this.snapshotFileSize), formatBytesFilter(freeDiskSpace)])
+              })
+            } else if ((this.snapshotFileSize * 5) > freeDiskSpace) {
+              this.currentLog = await this.loggingService.log({
+                severity: 'warn',
+                message: this.$t('extracted_snapshot_requires_space', [formatBytesFilter(this.snapshotFileSize * 5), formatBytesFilter(freeDiskSpace)])
+              })
+            } else {
+              this.onDone()
+            }
+          } catch (err) {
+            defaultLoggingService.log(err)
+          }
         },
-        stopChecking: function () {
+        stopChecking () {
           if (this.source) {
             this.source.cancel(this.$t('operation_cancelled'))
           }
           this.checking = false
         },
-        onDone: function () {
+        onDone () {
           this.success = true
           this.$emit('check-download-size-done', this.snapshotFileSize)
         },
-        retry: function () {
+        retry () {
           this.currentLog = undefined
           this.checkDownloadSize()
         },
-        ignore: function () {
+        ignore () {
           this.loggingService.log({
             severity: 'info',
             message: this.$t('warning_ignored')

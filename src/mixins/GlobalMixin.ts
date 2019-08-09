@@ -6,6 +6,7 @@ import Vue, { Component } from 'vue'
 import { defaultLoggingService } from '../services/logging/LoggingService'
 import Log from '../entities/trellis-config/Log'
 import { TrellisPermission } from '../static/permissions.base'
+import i18n from '../i18n'
 // @ts-ignore
 import { AddSnack } from '../components/SnackbarQueue'
 
@@ -39,7 +40,7 @@ export default Vue.mixin({
       // @ts-ignore
       const isAuthError = err && ((err.response && err.response.status === 401) || err.status === 401)
       if (isAuthError) {
-        this.alert('info', this.$t('not_logged_in'))
+        this.alert('info', i18n.t('not_logged_in'), { unique: true })
       }
       return !isAuthError
     }
