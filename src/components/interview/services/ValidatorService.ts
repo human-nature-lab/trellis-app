@@ -169,22 +169,23 @@ export function parametersToMap (parameters: QuestionParameter[], question: Ques
   return pMap
 }
 
-// @ts-ignore
-function validateIndependentParameters (questionDatum: QuestionDatum, pMap: {[key: ParameterType]: any}) {
+function validateIndependentParameters (questionDatum: QuestionDatum, pMap: {[key: string]: any}) {
   // Handle the trivial case
   if (pMap[PT.read_only]) {
     return true
   }
 
-  if (questionDatum.noOne) {
+  if (questionDatum && questionDatum.noOne) {
     return true
   }
 
   if (pMap[PT.is_required] && (pMap[PT.show_dk] || pMap[PT.show_rf])) {
-    if (questionDatum.dkRf !== null && questionDatum.dkRf !== undefined && questionDatum.dkRfVal && questionDatum.dkRfVal.length) {
+    if (questionDatum && questionDatum.dkRf !== null && questionDatum.dkRf !== undefined && questionDatum.dkRfVal && questionDatum.dkRfVal.length) {
       return true
     }
   }
+
+  return false
 }
 
 /**
