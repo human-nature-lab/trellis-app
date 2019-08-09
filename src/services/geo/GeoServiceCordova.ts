@@ -1,4 +1,5 @@
 import DatabaseService from '../database/DatabaseService'
+import { isUndefined } from '../util'
 import GeoServiceAbstract, { GeoSearchParams } from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import { In, IsNull } from 'typeorm'
@@ -185,7 +186,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     let count = 0
     let ancestorIds = {}
     let ancestors = []
-    while (currentGeoId !== null && !ancestors.hasOwnProperty(currentGeoId) && count < 25) {
+    while (!isUndefined(currentGeoId) && !ancestors.hasOwnProperty(currentGeoId) && count < 25) {
       // This caching seems necessary for relationship questions when the respondent has a large number of respondent geos. This method is called for each of those
       let geo
       if (geoCache.has(currentGeoId)) {
@@ -194,6 +195,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
         geo = await this.getGeoById(currentGeoId)
         geoCache.set(currentGeoId, geo)
       }
+      if (!geo) break
       ancestors.push(geo)
       ancestorIds[geoId] = true
       currentGeoId = geo.parentId
