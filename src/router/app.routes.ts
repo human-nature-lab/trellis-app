@@ -1,0 +1,39 @@
+import ServerConfigGuard from './guards/ServerConfigGuard'
+import DeviceKeyGuard from './guards/DeviceKeyGuard'
+import { guardQueue } from './guards/GuardQueue'
+
+const Sync = () => import(/* webpackChunkName: "sync" */'../views/Sync.vue')
+const Logs = () => import(/* webpackChunkName: "logs" */'../views/Logs.vue')
+const Storage = () => import(/* webpackChunkName: "storage" */'../views/Storage.vue')
+const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'../views/RegisterDevice.vue')
+const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'../views/ServerIPConfig.vue')
+
+export default [{
+  path: '/',
+  name: 'Home',
+  component: Sync,
+  beforeEnter: guardQueue([ServerConfigGuard, DeviceKeyGuard])
+}, {
+  path: '/sync',
+  name: 'Sync',
+  component: Sync,
+  beforeEnter: guardQueue([ServerConfigGuard, DeviceKeyGuard])
+}, {
+  path: '/logs',
+  name: 'Logs',
+  component: Logs
+}, {
+  path: '/storage',
+  name: 'Storage',
+  component: Storage
+}, {
+  path: '/register-device',
+  name: 'RegisterDevice',
+  component: RegisterDevice,
+  beforeEnter: guardQueue([ServerConfigGuard, DeviceKeyGuard])
+}, {
+  path: '/configure-server',
+  name: 'ConfigureServer',
+  component: ConfigureServer,
+  beforeEnter: guardQueue([ServerConfigGuard])
+}]
