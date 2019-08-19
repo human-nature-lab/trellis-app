@@ -1,6 +1,6 @@
 {
   "name": "trellis",
-  "version": "3.0.33",
+  "version": "3.1.0-a0",
   "description": "The form view component of the Trellis platform.",
   "author": "wyattis <wyatt.israel@yale.edu>, disperse <mark.mcknight@yale.edu>",
   "private": true,
@@ -9,7 +9,7 @@
     "dev-android": "webpack --config=build/webpack.dev.mobile.conf.js && cordova run android",
     "start": "node build/dev-server.mobile.js",
     "build": "node build/build.js",
-    "unit": "cross-env {\n    presets: [\n      ['babel-preset-env', {\n        targets: '> 0.25%, not dead'\n      }]\n    ],\n    plugins: ['@babel/plugin-syntax-dynamic-import']\n  }L_ENV=test karma start test/unit/karma.conf.js --single-run",
+    "unit": "cross-env L_ENV=test karma start test/unit/karma.conf.js --single-run",
     "unit-debug": "karma start test/unit/karma.conf.js --browsers=Chrome",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
@@ -17,7 +17,8 @@
     "cordova-build": "npm run build && cordova build",
     "browser": "npm run build && cordova run browser",
     "ios": "npm run build && cordova run ios",
-    "android": "npm run build && cordova run android --device",
+    "web": "cross-env APP_ENV=WEB npm run build",
+    "android": "cross-env APP_ENV=ANDROID npm run build",
     "android-vm": "npm run build && cordova run android"
   },
   "dependencies": {

@@ -75,9 +75,9 @@ var webpackConfig = merge(baseWebpackConfig, {
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       filename: process.env.NODE_ENV === 'testing'
-        ? 'index.html'
+        ? 'index.ts.html'
         : config.build.index,
-      template: 'index.html',
+      template: 'index.ts.html',
       inject: true,
       minify: {
         removeComments: true,
@@ -102,7 +102,8 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     new SentryPlugin({
       release: sentryRelease,
-      include: 'www/'
+      include: 'www/',
+      urlPrefix: process.env.APP_ENV === 'ANDROID' ? '/android_asset/www/' : null
     }),
     new HandlebarsPlugin({
       data: require('../config/config-xml.data.prod'),
