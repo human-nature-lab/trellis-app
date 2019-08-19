@@ -8,14 +8,15 @@ export default abstract class ConfigServiceAbstract {
    * Load all of the visible configuration values. Some are private and will only be shown if the user is logged in.
    */
   public async load (): Promise<void> {
-
-    const pairs: Config[] = await this.getAll()
-
-    for (const pair of pairs) {
-      const val = this.castValue(pair.type, pair.value)
-      setDot(config, pair.key, val)
+    try {
+      const pairs: Config[] = await this.getAll()
+      for (const pair of pairs) {
+        const val = this.castValue(pair.type, pair.value)
+        setDot(config, pair.key, val)
+      }
+    } catch (err) {
+      console.error(err)
     }
-
   }
 
   /**

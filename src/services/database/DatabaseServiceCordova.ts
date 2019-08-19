@@ -94,7 +94,7 @@ export default class DatabaseServiceCordova {
     try {
       const operations = ['update', 'insert']
       const tableNameResults = await queryRunner.query('select tbl_name from SQLite_master where type = "table"')
-      const tableNames: string[] = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] })
+      const tableNames: string[] = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] }).filter(n => n !== 'sqlite_sequence')
       console.log('tableNames', tableNames)
       await asyncForEach(tableNames, async tableName => {
         if (tableName !== 'updated_records') {
