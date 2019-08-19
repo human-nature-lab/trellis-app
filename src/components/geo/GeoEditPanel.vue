@@ -59,7 +59,7 @@
   import global from '../../static/singleton'
   import TranslationTextField from '../TranslationTextField.vue'
   import GeoTypeSelector from './GeoTypeSelector.vue'
-  import index from '../../router/index'
+  import index from '../../router'
 
   const STATUS = {
     NO_GEO: 0, // No geo, new or existing, selected

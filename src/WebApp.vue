@@ -64,7 +64,7 @@
                slot="activator"
                flat
                icon
-               :to="{name: 'locale', query: {to: $route.fullPath}}">
+               :to="{name: 'LocaleSelector', query: {to: $route.fullPath}}">
           {{global.locale ? global.locale.languageTag : ''}}
         </v-btn>
         <span>{{$t('change_locale')}}</span>

@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from 'axios'
 import config from 'config'
 import RouteWhitelist from '../../router/RouteWhitelist'
 import storage from '../StorageService'
-import router, { routerReady } from '../../router'
+import router, { replaceRouteAndQueueCurrent, routerReady } from '../../router'
 import singleton from '../../static/singleton'
 import DatabaseService from '../database/DatabaseService'
 import DeviceService from '../device/DeviceService'
@@ -53,7 +53,7 @@ async function responseError (err) {
     let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
     singleton.loading.active = false
     if (RouteWhitelist.indexOf(router.currentRoute.name) === -1) {
-      router.replace({ name: 'Login', query: { to: nextRoute } })
+      replaceRouteAndQueueCurrent({ name: 'Login' })
     }
     return Promise.reject(err)
   }
@@ -118,7 +118,7 @@ export async function resetSyncCredentials () {
 
 export const adminInst = axios.create({
   baseURL: config.apiRoot,
-  headers: {'X-Key': config.xKey}
+  headers: { 'X-Key': config.xKey }
 })
 
 adminInst.interceptors.request.use(requestInterceptor)

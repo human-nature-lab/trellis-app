@@ -266,3 +266,24 @@ export function safeParse (str: string, reviver?: (this: any, key: string, val: 
     return str
   }
 }
+
+type HashTable = {[key: string]: any}
+
+export function copyWhitelist<T extends HashTable> (obj: {[key: keyof T]: any}, whitelist?: (keyof T)[]): HashTable {
+  if (!obj) {
+    return obj
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(o => deepCopy(o))
+  } else if (typeof obj === 'object') {
+    let r: HashTable = {}
+    for (const key in obj) {
+      if (whitelist && whitelist.indexOf(key) > -1) {
+        r[key] = deepCopy(obj[key])
+      }
+    }
+    return r
+  } else {
+    return JSON.parse(JSON.stringify(obj))
+  }
+}

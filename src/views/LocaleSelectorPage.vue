@@ -17,16 +17,16 @@
 
 <script>
   import LocaleSelector from '../components/LocaleSelector'
-  import index from '../router/index'
+  import router from '../router'
   export default {
     name: 'locale-selector',
     methods: {
       done: function () {
         if (this.$route.query.to) {
           let path = this.$route.query.to.replace(/locale=[^&?]*/g, '')
-          index.push({path: path})
+          router.push({path: path})
         } else {
-          index.push({name: 'Home'})
+          router.push({name: 'Home'})
         }
       }
     },

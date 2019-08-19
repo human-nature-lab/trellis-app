@@ -1,5 +1,6 @@
 import Vue from 'vue'
-import Router from 'vue-router'
+import Router, { RedirectOption, Route } from 'vue-router'
+import { copyWhitelist } from '../services/JSONUtil'
 import { defaultLoggingService as logger } from '../services/logging/LoggingService'
 import singleton from '../static/singleton'
 import ValidateSync from './guards/ValidateSync'
@@ -13,7 +14,7 @@ import { LoggingLevel } from '../services/logging/LoggingTypes'
 import { AddSnack } from '../components/SnackbarQueue'
 import PhotoService from '../services/photo/PhotoService'
 
-const defaultRoute = {name: 'Home'}
+const defaultRoute = { name: 'Home' }
 
 let routes = sharedRoutes
 if (singleton.offline) {
@@ -45,7 +46,6 @@ router.beforeEach((to, from, next) => {
     // Moving to new page, loading
     singleton.loading.indeterminate = true
     singleton.loading.active = true
-    singleton.loading.fullscreen = true
   }
   console.log('before route', to.name, from.name)
   logger.log({
@@ -89,6 +89,7 @@ export function routerReady () {
   return new Promise(resolve => {
     function check () {
       console.log('checking if router ready')
+      // @ts-ignore
       if (router.history.ready) {
         clearInterval(intervalId)
         clearTimeout(timeoutId)
@@ -110,15 +111,14 @@ export function routerReady () {
  * @param {Object} query
  */
 export function pushRouteAndQueueCurrent (route, query) {
-  if (!route.query) {
-    route.query = {}
-  }
-  if (query) {
-    route.query.to = JSON.stringify({ path: router.currentRoute.fullPath, query: query })
-  } else {
-    route.query.to = router.currentRoute.fullPath
-  }
-  router.push(route)
+  let newRoute = makeQueuedRoute(query ? { path: router.currentRoute.fullPath, query: query } : router.currentRoute.fullPath, router.currentRoute)
+  newRoute = Object.assign(newRoute, route)
+  router.push(newRoute)
+}
+
+export function replaceRouteAndQueueCurrent (route) {
+  let newRoute = makeQueuedRoute(route, router.currentRoute)
+  router.replace(newRoute)
 }
 
 /**
@@ -126,15 +126,51 @@ export function pushRouteAndQueueCurrent (route, query) {
  * @param route
  * @param queued
  */
-export function pushRoute (route, queued) {
-  // TODO: Avoid duplicate queued routes
-  if (queued) {
-    if (!route.query) {
-      route.query = {}
-    }
-    route.query.to = JSON.stringify(queued)
+export function pushRoute (route: Route, queued: RedirectOption) {
+  // const newRoute = makeQueuedRoute(queued)
+  // router.push(newRoute)
+}
+
+export function queueRoute (route: QueuableRoute) {
+  const newRoute = makeQueuedRoute(router.currentRoute, route)
+  router.replace(newRoute)
+}
+
+export function replaceAndQueue (route: QueuableRoute) {
+  return queueRoute(route)
+}
+
+type QueuableRoute = {
+  name?: string
+  path?: string
+  query?: {
+    [key: string]: any
+    q?: string[]
   }
-  router.push(route)
+  params?: {[key: string]: any}
+}
+
+export function makeQueuedRoute (currentRoute: QueuableRoute, queuedRoute: QueuableRoute | string) {
+  if (typeof currentRoute === 'string') {
+    currentRoute = router.resolve(currentRoute)
+  }
+  currentRoute = copyWhitelist(currentRoute, ['name', 'path', 'query', 'params']) as QueuableRoute
+  let routeQueue: string[] = currentRoute && currentRoute.query && currentRoute.query.q
+  console.log('currentRoute', currentRoute, 'queue', routeQueue)
+  const routeStr = JSON.stringify(queuedRoute)
+  if (!routeQueue) {
+    routeQueue = []
+  }
+  if (routeQueue.indexOf(routeStr) === -1) {
+    routeQueue.push(routeStr)
+  } else {
+    console.log('Route already queued', routeStr)
+  }
+  if (!currentRoute.query) {
+    currentRoute.query = {}
+  }
+  currentRoute.query.q = routeQueue
+  return currentRoute
 }
 
 /**
@@ -159,15 +195,14 @@ export function replaceWithNext () {
 }
 
 export function getNextRoute () {
-  const current = router.currentRoute
-  if (current.query.to) {
-    let to
-    try {
-      to = JSON.parse(current.query.to)
-    } catch (err) {
-      to = current.query.to
+  const current = JSON.parse(JSON.stringify(router.currentRoute))
+  if (current && current.query && current.query.q) {
+    const nextRoute = current.query.q.shift()
+    if (!nextRoute.query) {
+      nextRoute.query = {}
     }
-    return to
+    nextRoute.query.q = current.query.q
+    return nextRoute
   }
   return null
 }

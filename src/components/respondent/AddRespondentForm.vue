@@ -80,7 +80,7 @@
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum'
-  import { pushRoute, pushRouteAndQueueCurrent } from '../../router'
+  import { queueRoute, pushRouteAndQueueCurrent } from '../../router'
   export default {
     components: { PhotoAlbum },
     name: 'add-respondent-form',
@@ -176,7 +176,7 @@
           }
           setTimeout(() => {
             if (this.redirectToRespondentInfo) {
-              pushRoute({
+              queueRoute({
                 name: 'StartCensusForm',
                 params: {
                   studyId: this.studyId,

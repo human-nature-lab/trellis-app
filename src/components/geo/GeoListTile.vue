@@ -33,7 +33,7 @@
 
 <script>
   import TranslationMixin from '../../mixins/TranslationMixin'
-  import index from '../../router/index'
+  import index from '../../router'
   import Photo from '../photo/Photo'
   import Geo from '../../entities/trellis/Geo'
   import VListTileAction from 'vuetify/src/components/VList/VListTileAction'

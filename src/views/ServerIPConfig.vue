@@ -41,6 +41,7 @@
   import AlertService from '../services/AlertService'
   import router, { replaceWithNextOr } from '../router'
   import global from '../static/singleton'
+  import DocsLinkMixin from '../mixins/DocsLinkMixin'
 
   export default {
     name: 'ServerIpConfig',
