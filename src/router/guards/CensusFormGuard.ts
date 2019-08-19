@@ -1,7 +1,9 @@
+import { Route } from 'vue-router'
 import CensusFormService from '../../services/census/index'
 import router from '../index'
+import { GuardConfig } from './GuardQueue'
 
-export default function ValidateCensusForm (to, from, next) {
+export function ValidateCensusForm (to, from, next) {
   if (to.params.censusTypeId) {
     CensusFormService.getCensusForm(to.params.studyId, to.params.censusTypeId).then(form => {
       next()
@@ -13,3 +15,10 @@ export default function ValidateCensusForm (to, from, next) {
     })
   }
 }
+
+export default {
+  async condition (to: Route) {
+    const form = await CensusFormService.getCensusForm(to.params.studyId, to.params.censusTypeId)
+    return !!form
+  }
+} as GuardConfig
