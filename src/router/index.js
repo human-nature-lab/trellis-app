@@ -2,9 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import { defaultLoggingService as logger } from '../services/logging/LoggingService'
 import singleton from '../static/singleton'
-import ValidateSync from './guards/ValidateSync'
-import ValidateLogin from './guards/ValidateLogin'
-import chain from './guards/ChainableGuards'
+import SyncGuard from './guards/SyncGuard'
+import LoginGuard from './guards/LoginGuard'
+import { guardQueue } from './guards/GuardQueue'
 
 import appRoutes from './app.routes'
 import webRoutes from './web.routes'
@@ -35,7 +35,7 @@ export const router = new Router({
 
 // If we're in offline mode, require that the application is synced
 if (singleton.offline) {
-  router.beforeEach(chain(ValidateSync, ValidateLogin))
+  router.beforeEach(guardQueue([SyncGuard, LoginGuard]))
 }
 
 router.beforeEach((to, from, next) => {
