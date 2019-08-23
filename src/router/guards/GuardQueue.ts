@@ -1,4 +1,4 @@
-import { RedirectOption, Route, RouteConfig } from 'vue-router'
+import { RedirectOption, Route } from 'vue-router'
 import { Queue } from '../../classes/Queue'
 
 export interface GuardConfig {

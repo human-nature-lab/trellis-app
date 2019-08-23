@@ -16,17 +16,13 @@
 </template>
 
 <script>
-  import router from '../router'
+  import { routeQueue } from '../router'
   import StudySelector from '../components/StudySelector'
   export default {
     name: 'study-selector-page',
     methods: {
-      done: function () {
-        if (this.$route.query.to) {
-          router.push({path: this.$route.query.to})
-        } else {
-          router.push({name: 'Home'})
-        }
+      done () {
+        routeQueue.next()
       }
     },
     head: {
