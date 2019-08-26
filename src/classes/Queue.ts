@@ -10,4 +10,8 @@ export class Queue<T> {
     this.items.push(item)
   }
 
+  peek (): T | null {
+    return this.items.length ? this.items[0] : null
+  }
+
 }

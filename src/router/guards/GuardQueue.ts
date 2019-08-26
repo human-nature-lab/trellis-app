@@ -16,7 +16,7 @@ export function guardQueue (configs: GuardConfig[]) {
       if (!isValid) {
         const nextRoute = guard.redirect(to, from)
         if (nextRoute) {
-          await routeQueue.unshift(nextRoute)
+          next(routeQueue.withQueue(nextRoute))
         }
         // routeQueue.unshift(nextRoute)
         // if (typeof nextRoute === 'string') {
