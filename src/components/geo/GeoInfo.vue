@@ -11,6 +11,11 @@
           </Permission>
         </v-toolbar-title>
         <v-spacer />
+        <v-btn
+          @click.stop="showGeoMap"
+          icon>
+          <v-icon>map</v-icon>
+        </v-btn>
         <v-btn @click="viewRespondents">
           {{ $t('respondents') }}
         </v-btn>
@@ -101,7 +106,7 @@
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import GeoService from '../../services/geo/GeoService'
-  import router from '../../router'
+  import router, { routeQueue } from '../../router'
   import { Route } from 'vue-router'
   import Geo from '../../entities/trellis/Geo'
   import Vue from 'vue'
@@ -144,7 +149,7 @@
         this.geoPhotosLoading = false
       },
       viewRespondents () {
-        router.push({
+        routeQueue.redirect({
           name: 'RespondentsSearch',
           query: {
             filters: JSON.stringify({
@@ -210,6 +215,14 @@
           this.log(err)
           this.alert('error', this.$t('failed_resource_delete', [this.geo.id]), {timeout: 0})
         }
+      },
+      showGeoMap () {
+        routeQueue.redirect({
+          name: 'GeoSearchWithMap',
+          params: {
+            geoId: this.geo.id
+          }
+        })
       }
     }
   })
