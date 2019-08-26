@@ -101,10 +101,6 @@
       formType: String,
       value: {
         type: Boolean
-      },
-      isBusy: {
-        type: Boolean,
-        default: false
       }
     },
     watch: {

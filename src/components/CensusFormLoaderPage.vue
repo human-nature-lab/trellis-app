@@ -7,7 +7,7 @@
   import CensusService from '../services/census/index'
   import SurveyService from '../services/survey'
   import InterviewService from '../services/interview/InterviewService'
-  import router from '../router'
+  import { routeQueue } from '../router'
   function setup (to) {
     let res = {
       studyId: to.params.studyId
@@ -20,7 +20,6 @@
       .then(survey => InterviewService.create(survey.id))
       .then(interview => {
         res.interview = interview
-        res.queryTo = to.query.to
         return res
       })
   }
@@ -30,14 +29,11 @@
     methods: {
       // We are misusing the hydrate method to redirect to the interview here
       hydrate (data) {
-        router.replace({
+        routeQueue.replaceAndMerge({
           name: 'Interview',
           params: {
             studyId: data.studyId,
             interviewId: data.interview.id
-          },
-          query: {
-            to: data.queryTo
           }
         })
       }

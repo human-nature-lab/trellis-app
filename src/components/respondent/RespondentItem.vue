@@ -95,7 +95,7 @@
           return noName
         } else if (this.respondent.names && this.respondent.names.length) {
           const rName = this.respondent.names.find(n => n.isDisplayName)
-          return rName.name
+          return rName ? rName.name : this.respondent.name
         } else if (this.respondent.name) {
           return this.respondent.name
         } else {

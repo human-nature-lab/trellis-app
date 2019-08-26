@@ -53,7 +53,7 @@
   import config from 'config'
   import menuBus from './MenuBus'
   import LoginService from '../../services/login'
-  import router from '../../router'
+  import { routeQueue } from '../../router'
   import SingletonService from '../../services/SingletonService'
   import storage from '../../services/StorageService'
   import global from '../../static/singleton'
@@ -105,7 +105,7 @@
       },
       async logout () {
         await LoginService.logout()
-        router.push({name: 'Login', query: {to: router.currentRoute.fullPath}})
+        routeQueue.redirect({ name: 'Login' })
       },
       toggleDarkTheme () {
         SingletonService.setDarkTheme(!SingletonService.get('darkTheme'))

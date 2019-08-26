@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from 'axios'
 import config from 'config'
 import RouteWhitelist from '../../router/RouteWhitelist'
 import storage from '../StorageService'
-import router, { replaceRouteAndQueueCurrent, routerReady } from '../../router'
+import router, { routeQueue, routerReady } from '../../router'
 import singleton from '../../static/singleton'
 import DatabaseService from '../database/DatabaseService'
 import DeviceService from '../device/DeviceService'
@@ -50,10 +50,10 @@ function responseInterceptor (response) {
 async function responseError (err) {
   if (err.response && err.response.status === 401) {
     await routerReady()
-    let nextRoute = router.history.pending ? router.history.pending.fullPath : router.currentRoute.fullPath
     singleton.loading.active = false
     if (RouteWhitelist.indexOf(router.currentRoute.name) === -1) {
-      replaceRouteAndQueueCurrent({ name: 'Login' })
+      routeQueue.unshift({ name: 'Login' })
+      // replaceRouteAndQueueCurrent({ name: 'Login' })
     }
     return Promise.reject(err)
   }

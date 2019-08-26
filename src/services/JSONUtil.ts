@@ -278,8 +278,12 @@ export function copyWhitelist<T extends HashTable> (obj: {[key: keyof T]: any}, 
   } else if (typeof obj === 'object') {
     let r: HashTable = {}
     for (const key in obj) {
-      if (whitelist && whitelist.indexOf(key) > -1) {
-        r[key] = deepCopy(obj[key])
+      if (obj[key] && whitelist && whitelist.indexOf(key) > -1) {
+        const o = deepCopy(obj[key])
+        // Filter empty objects
+        if (typeof o !== 'object' || Object.keys(o).length) {
+          r[key] = o
+        }
       }
     }
     return r

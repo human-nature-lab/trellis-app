@@ -39,7 +39,7 @@
   import { heartbeatInstance } from '../services/http/AxiosInstance'
   import DatabaseService from '../services/database/DatabaseService'
   import AlertService from '../services/AlertService'
-  import router, { replaceWithNextOr } from '../router'
+  import { routeQueue } from '../router'
   import global from '../static/singleton'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
 
@@ -62,9 +62,7 @@
           const http = await heartbeatInstance(combinedAddress)
           await http.get(`heartbeat`)
           await DatabaseService.setServerIPAddress(combinedAddress)
-          replaceWithNextOr(() => {
-            router.replace({name: 'Home'})
-          })
+          routeQueue.goToNext()
         } catch (err) {
           AlertService.addAlert(err)
         } finally {

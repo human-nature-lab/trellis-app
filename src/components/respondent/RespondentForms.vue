@@ -65,7 +65,7 @@
   import Translation from '../../entities/trellis/Translation'
   import SkipService from '../../services/SkipService'
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
-  import { pushRouteAndQueueCurrent } from '../../router'
+  import { routeQueue } from '../../router'
   import Interview from '../../entities/trellis/Interview'
 
   export class DisplayForm {
@@ -126,7 +126,7 @@
     },
     methods: {
       async startInterview (interview: Interview) {
-        pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
+        routeQueue.unshift({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
       },
       hydrate (data: RespondentFormsData) {
           // Join any surveys that have been created with the possible forms
@@ -148,7 +148,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

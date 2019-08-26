@@ -1,4 +1,4 @@
-import { pushRouteAndQueueCurrent } from '../../router'
+import { routeQueue } from '../../router'
 import Form from '../../entities/trellis/Form'
 export default abstract class CensusServiceAbstract {
   /**
@@ -8,7 +8,7 @@ export default abstract class CensusServiceAbstract {
    * @param {String} respondentId
    */
   redirectToCensusForm(studyId: string, censusTypeId: string, respondentId: string): void {
-    pushRouteAndQueueCurrent({
+    routeQueue.unshift({
       name: 'StartCensusForm',
       params: {
         studyId: studyId,

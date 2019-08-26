@@ -1,4 +1,5 @@
 import { Route } from 'vue-router'
+import SingletonService from '../../services/SingletonService'
 import StudyService from '../../services/study/StudyService'
 import StorageService from '../../services/StorageService'
 import { GuardConfig } from './GuardQueue'
@@ -42,12 +43,18 @@ export default {
     }
     try {
       let study = await StudyService.getStudy(studyId)
+      if (study) {
+        SingletonService.setCurrentStudy(study)
+      }
       return !!study
     } catch (err) {
       StorageService.delete('current-study')
     }
     try {
       let study = to.params.studyId ? await StudyService.getStudy(to.params.studyId) : await StudyService.getCurrentStudy()
+      if (study) {
+        SingletonService.setCurrentStudy(study)
+      }
       return !!study
     } catch (err) {
       return false

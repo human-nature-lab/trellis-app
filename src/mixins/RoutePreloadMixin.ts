@@ -1,8 +1,4 @@
 import singleton from '../static/singleton'
-import router from '../router'
-import {defaultLoggingService as logger} from '../services/logging/LoggingService'
-// @ts-ignore
-import { AddSnack } from '../components/SnackbarQueue'
 import Vue from 'vue'
 
 /**
@@ -16,7 +12,6 @@ import Vue from 'vue'
 export default function RoutePreloadMixin (loadCallback: Function, fullscreen: boolean = false) {
   let data
   return Vue.extend({
-    router,
     created (this: Vue) {
       this.hydrate(data)
       singleton.loading.error = null

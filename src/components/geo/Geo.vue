@@ -37,7 +37,7 @@
   import GeoService from '../../services/geo/GeoService'
   import DocsFiles from '../documentation/DocsFiles'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
-  import { queueRoute } from '../../router'
+  import { routeQueue } from '../../router'
 
   export default {
     name: 'geo',
@@ -63,7 +63,7 @@
       addLocationClose (addedLocation) {
         this.adding = false
         if (addedLocation instanceof Geo) {
-          queueRoute({
+          routeQueue.unshift({
             name: 'Geo',
             params: {
               geoId: addedLocation.id

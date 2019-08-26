@@ -98,7 +98,7 @@
   import GeoService from '../../services/geo/GeoService'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
-  import router from '../../router'
+  import { routeQueue } from '../../router'
   import global from '../../static/singleton'
 
   export default {
@@ -220,7 +220,7 @@
           q.query = this.query
         }
         q.filters = JSON.stringify(this.filters)
-        router.replace({
+        routeQueue.replace({
           name: this.$route.name,
           params: this.$route.params,
           query: q

@@ -138,7 +138,7 @@
   import actionBus from './services/actions/ActionBus'
 
   import { allParametersAreValidWithError } from './services/ValidatorService'
-  import router, { replaceWithNextOr } from '../../router'
+  import router, { routeQueue } from '../../router'
   import InterviewLoader from './services/InterviewLoader'
   import SurveyService from '../../services/survey'
   import cloneDeep from 'lodash/cloneDeep'
@@ -372,14 +372,14 @@
           this.error = err
         }
       },
-      redirectToComplete (interviewId) {
-        router.replace({name: 'SurveyComplete', params: {surveyId: this.interview.surveyId}})
-      },
       exit () {
         this.alreadyExited = true
-        replaceWithNextOr(() => {
-          this.redirectToComplete()
-        })
+        const nextRoute = routeQueue.next()
+        if (nextRoute) {
+          router.replace(nextRoute)
+        } else {
+          router.replace({ name: 'SurveyComplete', params: { surveyId: this.interview.surveyId } })
+        }
       },
       async saveData () {
         this.isSaving = true

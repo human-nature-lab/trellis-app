@@ -1,7 +1,6 @@
 import User from '../../entities/trellis/User'
 import DatabaseService from '../database/DatabaseService'
 import { UserServiceAbstract } from './UserServiceAbstract'
-import router from '../../router'
 import UserStudy from '../../entities/trellis/UserStudy'
 import Pagination from '../../types/Pagination'
 export class UserServiceCordova extends UserServiceAbstract {

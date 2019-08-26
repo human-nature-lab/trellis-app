@@ -145,7 +145,7 @@
   import PhotoAlbum from '../photo/PhotoAlbum'
   import TranslationTextField from '../TranslationTextField.vue'
   import GeoTypeSelector from './GeoTypeSelector.vue'
-  import { pushRouteAndQueueCurrent } from '../../router'
+  import { routeQueue } from '../../router'
   import { getCurrentPosition } from '../LocationFinder'
   import isNumber from 'lodash/isNumber'
   import global from '../../static/singleton'
@@ -290,7 +290,7 @@
         this.checkingForCensus = true
         const hasCensus = await CensusFormService.hasCensusForm(global.study.id, censusTypes.add_geo)
         if (hasCensus) {
-          pushRouteAndQueueCurrent({
+          routeQueue.unshift({
             name: 'StartCensusForm',
             params: {
               studyId: this.studyId,

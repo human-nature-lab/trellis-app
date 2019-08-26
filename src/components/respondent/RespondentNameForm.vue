@@ -56,7 +56,7 @@
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import singleton from '../../static/singleton'
-  import { pushRouteAndQueueCurrent } from '../../router'
+  import { routeQueue } from '../../router'
   import Respondent from '../../entities/trellis/Respondent'
   import RespondentName from '../../entities/trellis/RespondentName'
   import Vue from 'vue'
@@ -120,7 +120,7 @@
           }
           let hasCensus = await CensusFormService.hasCensusForm(this.global.study.id, censusTypes.rename_respondent)
           if (hasCensus) {
-            pushRouteAndQueueCurrent({
+            routeQueue.unshift({
               name: 'StartCensusForm',
               params: {
                 studyId: this.global.study.id,

@@ -13,10 +13,11 @@
       <v-card-title>
         <translation-text-field
           v-if="curStatus === STATUS.EDIT_NAME || curStatus === STATUS.NEW_EDIT_NAME"
+          :editing="true"
           :persist="(curStatus === STATUS.EDIT_NAME)"
           :translation="selectedGeo.nameTranslation"
-          v-on:editing-cancelled="onEditingCancelled"
-          v-on:editing-done="onEditingDone">
+          @cancelled="onEditingCancelled"
+          @save="onEditingDone">
         </translation-text-field>
         <div slot="header" v-if="curStatus === STATUS.NEW_POSITION">
           <h2>{{ $t('new_location') }}</h2>

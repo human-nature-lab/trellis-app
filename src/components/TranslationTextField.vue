@@ -4,8 +4,8 @@
       <ClickToEdit
         v-model="editingText"
         :editing="isEditing"
-        :editable="persist"
-        @update:editing="isEditing = $event"
+        :editable="editable"
+        @update:editing="updateState"
         :disabled="saving"
         @save="onSave" />
       <v-spacer />
@@ -55,6 +55,10 @@
         type: Boolean,
         default: true
       },
+      editable: {
+        type: Boolean,
+        default: true
+      },
       editing: {
         type: Boolean,
         default: false
@@ -100,8 +104,13 @@
       }
     },
     methods: {
+      updateState (editingState) {
+        this.isEditing = editingState
+        if (!this.isEditing) {
+          this.$emit('cancelled')
+        }
+      },
       async onSave (newText) {
-        if (!this.persist) return
 
         this.saving = true
         this.tt.translatedText = newText
@@ -113,18 +122,21 @@
           }
         }
 
-        // Save any changed translationText elements
-        for (let i = 0; i < this.memCopy.translationText.length; i++) {
-          const mTt = this.memCopy.translationText[i]
-          const tt = this.translation.translationText.find(t => t.localeId === mTt.localeId)
-          if (!tt) {
-            // Save a new translation text
-            this.memCopy.translationText[i] = await TranslationTextService.createTranslationText(this.translation.id, mTt)
-          } else if (tt.translatedText !== mTt.translatedText) {
-            // Update an existing translation text
-            this.memCopy.translationText[i] = await TranslationTextService.updateTranslatedTextById(mTt.id, mTt.translatedText)
+        if (this.persist) {
+          // Save any changed translationText elements
+          for (let i = 0; i < this.memCopy.translationText.length; i++) {
+            const mTt = this.memCopy.translationText[i]
+            const tt = this.translation.translationText.find(t => t.localeId === mTt.localeId)
+            if (!tt) {
+              // Save a new translation text
+              this.memCopy.translationText[i] = await TranslationTextService.createTranslationText(this.translation.id, mTt)
+            } else if (tt.translatedText !== mTt.translatedText) {
+              // Update an existing translation text
+              this.memCopy.translationText[i] = await TranslationTextService.updateTranslatedTextById(mTt.id, mTt.translatedText)
+            }
           }
         }
+
         this.$emit('save', this.memCopy)
         this.saving = false
         this.isEditing = false

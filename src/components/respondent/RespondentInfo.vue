@@ -61,7 +61,7 @@
 
 <script lang="ts">
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
-  import { replaceWithNextOr } from '../../router'
+  import { routeQueue } from '../../router'
 
   // @ts-ignore
   import Permission from '../Permission'
@@ -83,7 +83,6 @@
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
   import singleton from '../../static/singleton'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import router from '../../router'
 
   /**
    * The respondent info router loader
@@ -162,9 +161,7 @@
           this.isLoading = true
           await RespondentService.removeRespondent(this.respondent.id)
           this.alert('success', this.$t('resource_deleted', [this.name]))
-          replaceWithNextOr(() => {
-            router.go(-1)
-          })
+          routeQueue.goToNextOrPrevious()
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err, this.$t('failed_resource_delete', [this.name]))

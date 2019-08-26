@@ -51,7 +51,7 @@
   import Documentation from './Documentation'
   import Vue from 'vue'
   import bus, {DocsEventTypes} from './DocsEventBus'
-  import router from '../../router'
+  import { routeQueue } from '../../router'
   export default Vue.extend({
     components: {DocsTOC, Documentation},
     name: 'DocsSidebar',
@@ -81,7 +81,7 @@
         return 400
       },
       newTabLink (): object {
-        const route = router.resolve({
+        const route = routeQueue.resolve({
           name: 'Documentation',
           params: {
             filePath: this.currentFile.slice(2)

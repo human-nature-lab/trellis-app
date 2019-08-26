@@ -22,7 +22,7 @@
     name: 'study-selector-page',
     methods: {
       done () {
-        routeQueue.next()
+        routeQueue.goToNext()
       }
     },
     head: {

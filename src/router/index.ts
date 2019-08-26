@@ -1,3 +1,4 @@
+import { Mutex } from 'async-mutex'
 import Vue from 'vue'
 import Router from 'vue-router'
 import { defaultLoggingService as logger } from '../services/logging/LoggingService'
@@ -86,21 +87,31 @@ router.onError(err => {
 /**
  * Returns a Promise that can be awaited to determine if the router is ready. This is used primarily to ensure that
  */
+const readyMutex = new Mutex()
+let isReady = false
 export function routerReady () {
-  return new Promise(resolve => {
+  return new Promise(async resolve => {
+    const release = await readyMutex.acquire()
+    if (isReady) {
+      release()
+      return resolve(true)
+    }
     function check () {
       console.log('checking if router ready')
       // @ts-ignore
       if (router.history.ready) {
+        isReady = true
         clearInterval(intervalId)
         clearTimeout(timeoutId)
         resolve(true)
+        release()
       }
     }
     const intervalId = setInterval(check, 100)
     const timeoutId = setTimeout(() => {
       clearInterval(intervalId)
       resolve(false)
+      release()
     }, 20000)
     check()
   })

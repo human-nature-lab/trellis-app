@@ -80,7 +80,7 @@
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum'
-  import { queueRoute, pushRouteAndQueueCurrent } from '../../router'
+  import { routeQueue } from '../../router'
   export default {
     components: { PhotoAlbum },
     name: 'add-respondent-form',
@@ -176,16 +176,7 @@
           }
           setTimeout(() => {
             if (this.redirectToRespondentInfo) {
-              queueRoute({
-                name: 'StartCensusForm',
-                params: {
-                  studyId: this.studyId,
-                  censusTypeId: censusTypeId
-                },
-                query: {
-                  respondentId: this.respondent.id
-                }
-              }, {
+              routeQueue.unshift({
                 name: 'Respondent',
                 params: {
                   studyId: this.studyId,
@@ -193,8 +184,7 @@
                 },
                 replace: true
               })
-            } else {
-              pushRouteAndQueueCurrent({
+              routeQueue.unshift({
                 name: 'StartCensusForm',
                 params: {
                   studyId: this.studyId,
@@ -203,9 +193,23 @@
                 query: {
                   respondentId: this.respondent.id
                 }
-              }, {
-                associatedRespondentId: this.associatedRespondentId,
-                associatedRespondentName: this.name
+              })
+            } else {
+              routeQueue.replaceAndMerge({
+                query: {
+                  associatedRespondentId: this.associatedRespondentId,
+                  associatedRespondentName: this.name
+                }
+              })
+              routeQueue.unshift({
+                name: 'StartCensusForm',
+                params: {
+                  studyId: this.studyId,
+                  censusTypeId: censusTypeId
+                },
+                query: {
+                  respondentId: this.respondent.id
+                }
               })
             }
           }, censusDelay)
