@@ -16,8 +16,11 @@ export function guardQueue (configs: GuardConfig[]) {
       const isValid = await guard.condition(to, from)
       console.log('guard', guard.name, 'result for', to.name, isValid)
       if (!isValid) {
-        const nextRoute = guard.redirect(to, from)
-        const toRoute = nextRoute ? nextRoute : routeQueue.nextOrDefault
+        let nextRoute
+        if (guard.redirect) {
+          nextRoute = guard.redirect(to, from)
+        }
+        const toRoute = nextRoute || routeQueue.nextOrDefault()
         console.log('redirecting to', toRoute)
         return next(toRoute)
       }

@@ -1,15 +1,9 @@
-import User from '../../entities/trellis/User'
-import UserService from '../../services/user/UserService'
-import { routeQueue } from '../index'
+import { Route } from 'vue-router'
+import LoginGuard from './LoginGuard'
 
 export default {
   name: 'AlreadyLoggedInGuard',
-  async condition () {
-    const user = await UserService.getCurrentUser()
-    // redirect to next if already logged in
-    return !(user instanceof User)
-  },
-  redirect () {
-    return routeQueue.nextOrDefault()
+  async condition (to: Route) {
+    return !(await LoginGuard.condition(to))
   }
 }

@@ -1,3 +1,5 @@
+import AlreadyConfiguredServerGuard from './guards/AlreadyConfiguredServerGuard'
+import AlreadyHaveDeviceKeyGuard from './guards/AlreadyHaveDeviceKeyGuard'
 import ServerConfigGuard from './guards/ServerConfigGuard'
 import DeviceKeyGuard from './guards/DeviceKeyGuard'
 import { guardQueue } from './GuardQueue'
@@ -30,10 +32,10 @@ export default [{
   path: '/register-device',
   name: 'RegisterDevice',
   component: RegisterDevice,
-  beforeEnter: guardQueue([ServerConfigGuard, DeviceKeyGuard])
+  beforeEnter: guardQueue([ServerConfigGuard, AlreadyHaveDeviceKeyGuard])
 }, {
   path: '/configure-server',
   name: 'ConfigureServer',
   component: ConfigureServer,
-  beforeEnter: guardQueue([ServerConfigGuard])
+  beforeEnter: guardQueue([AlreadyConfiguredServerGuard])
 }]

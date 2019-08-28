@@ -1,5 +1,5 @@
 import DeviceService from '../../services/device/DeviceService'
-import { GuardConfig } from './GuardQueue'
+import { GuardConfig } from '../GuardQueue'
 
 export default {
   name: 'DeviceKeyGuard',

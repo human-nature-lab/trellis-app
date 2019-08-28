@@ -27,12 +27,14 @@ export class RouteQueue {
       this.queue = []
       this.saveQueue()
     }
-    this.init()
+    setTimeout(this.init.bind(this), 500)
   }
 
   private async init () {
     await routerReady()
-    this.currentRoute = this.router.currentRoute
+    if (!this.currentRoute) {
+      this.currentRoute = this.router.currentRoute
+    }
   }
 
   setDefault (route: QueuableRoute) {
