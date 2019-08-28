@@ -1,4 +1,4 @@
-import { guardQueue } from './guards/GuardQueue'
+import { guardQueue } from './GuardQueue'
 import LocaleGuard from './guards/LocaleGuard'
 import StudyGuard from './guards/StudyGuard'
 import PermissionGuard from './guards/PermissionGuard'

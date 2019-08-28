@@ -29,7 +29,7 @@
     methods: {
       // We are misusing the hydrate method to redirect to the interview here
       hydrate (data) {
-        routeQueue.replaceAndMerge({
+        routeQueue.replace({
           name: 'Interview',
           params: {
             studyId: data.studyId,

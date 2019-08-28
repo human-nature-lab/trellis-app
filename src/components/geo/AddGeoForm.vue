@@ -290,7 +290,7 @@
         this.checkingForCensus = true
         const hasCensus = await CensusFormService.hasCensusForm(global.study.id, censusTypes.add_geo)
         if (hasCensus) {
-          routeQueue.unshift({
+          routeQueue.push({
             name: 'StartCensusForm',
             params: {
               studyId: this.studyId,
@@ -308,7 +308,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

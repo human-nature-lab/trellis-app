@@ -22,6 +22,7 @@ export async function oldGuard (to, from, next) {
 }
 
 export default {
+  name: 'SyncGuard',
   async condition () {
     if (SingletonService.get('synced')) {
       return true

@@ -52,8 +52,7 @@ async function responseError (err) {
     await routerReady()
     singleton.loading.active = false
     if (RouteWhitelist.indexOf(router.currentRoute.name) === -1) {
-      routeQueue.unshift({ name: 'Login' })
-      // replaceRouteAndQueueCurrent({ name: 'Login' })
+      routeQueue.replaceAndReturnToCurrent({ name: 'Login' })
     }
     return Promise.reject(err)
   }

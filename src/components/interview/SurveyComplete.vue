@@ -17,7 +17,13 @@
     methods: {
       async toRespondentForms () {
         const survey = await SurveyService.getSurveyById(this.$route.params.surveyId)
-        routeQueue.replace({name: 'RespondentForms', params: {studyId: survey.studyId, respondentId: survey.respondentId}})
+        routeQueue.replace({
+          name: 'RespondentForms',
+          params: {
+            studyId: survey.studyId,
+            respondentId: survey.respondentId
+          }
+        })
       }
     }
   }

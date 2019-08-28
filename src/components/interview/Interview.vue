@@ -376,9 +376,9 @@
         this.alreadyExited = true
         const nextRoute = routeQueue.next()
         if (nextRoute) {
-          router.replace(nextRoute)
+          routeQueue.replace(nextRoute)
         } else {
-          router.replace({ name: 'SurveyComplete', params: { surveyId: this.interview.surveyId } })
+          routeQueue.replace({ name: 'SurveyComplete', params: { surveyId: this.interview.surveyId } })
         }
       },
       async saveData () {

@@ -26,7 +26,12 @@ export abstract class UserServiceAbstract {
    * Get the current user
    * @returns {Object}
    */
-  getCurrentUser(): User {
+  async getCurrentUser (): Promise<User> {
+    if (this.user) return this.user
+    const user = await this.loadCurrentUser()
+    if (user instanceof User) {
+      await this.setCurrentUser(user)
+    }
     return this.user
   }
 

@@ -8,7 +8,7 @@ export default abstract class CensusServiceAbstract {
    * @param {String} respondentId
    */
   redirectToCensusForm(studyId: string, censusTypeId: string, respondentId: string): void {
-    routeQueue.unshift({
+    routeQueue.push({
       name: 'StartCensusForm',
       params: {
         studyId: studyId,

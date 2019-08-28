@@ -63,7 +63,7 @@
       addLocationClose (addedLocation) {
         this.adding = false
         if (addedLocation instanceof Geo) {
-          routeQueue.unshift({
+          routeQueue.push({
             name: 'Geo',
             params: {
               geoId: addedLocation.id

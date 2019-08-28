@@ -1,11 +1,11 @@
 import { Mutex } from 'async-mutex'
 import Vue from 'vue'
-import Router from 'vue-router'
+import Router, { RouteConfig } from 'vue-router'
 import { defaultLoggingService as logger } from '../services/logging/LoggingService'
 import singleton from '../static/singleton'
 import SyncGuard from './guards/SyncGuard'
 import LoginGuard from './guards/LoginGuard'
-import { guardQueue } from './guards/GuardQueue'
+import { guardQueue } from './GuardQueue'
 
 import appRoutes from './app.routes'
 import { RouteQueue } from './RouteQueue'
@@ -43,6 +43,7 @@ if (singleton.offline) {
 
 router.beforeEach((to, from, next) => {
   // Don't let photo requests prevent navigation from happening by cancelling outstanding requests
+  console.log('route queue', routeQueue.toString())
   PhotoService.cancelAllOutstanding()
   if (to.name !== from.name) {
     // Moving to new page, loading
@@ -103,16 +104,17 @@ export function routerReady () {
         isReady = true
         clearInterval(intervalId)
         clearTimeout(timeoutId)
-        resolve(true)
         release()
+        resolve(true)
       }
     }
     const intervalId = setInterval(check, 100)
     const timeoutId = setTimeout(() => {
+      release()
+      isReady = true
       clearInterval(intervalId)
       resolve(false)
-      release()
-    }, 20000)
+    }, 5000)
     check()
   })
 }

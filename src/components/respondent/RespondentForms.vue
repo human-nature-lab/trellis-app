@@ -126,7 +126,7 @@
     },
     methods: {
       async startInterview (interview: Interview) {
-        routeQueue.unshift({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
+        routeQueue.push({ name: 'Interview', params: { studyId: this.global['study'].id, interviewId: interview.id } })
       },
       hydrate (data: RespondentFormsData) {
           // Join any surveys that have been created with the possible forms

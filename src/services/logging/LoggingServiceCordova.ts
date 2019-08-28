@@ -35,6 +35,7 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
 
     const saving = this.queue.slice()
     if (saving.length === 0) {
+      this.releaseMutex()
       return // No need to save when the queue is empty
     }
     console.info(`writing ${saving.length} logs to disk`)

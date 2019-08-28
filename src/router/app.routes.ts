@@ -1,6 +1,6 @@
 import ServerConfigGuard from './guards/ServerConfigGuard'
 import DeviceKeyGuard from './guards/DeviceKeyGuard'
-import { guardQueue } from './guards/GuardQueue'
+import { guardQueue } from './GuardQueue'
 
 const Sync = () => import(/* webpackChunkName: "sync" */'../views/Sync.vue')
 const Logs = () => import(/* webpackChunkName: "logs" */'../views/Logs.vue')

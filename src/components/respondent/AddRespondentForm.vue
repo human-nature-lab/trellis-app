@@ -81,6 +81,8 @@
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum'
   import { routeQueue } from '../../router'
+  import merge from 'lodash/merge'
+
   export default {
     components: { PhotoAlbum },
     name: 'add-respondent-form',
@@ -184,7 +186,7 @@
                 },
                 replace: true
               })
-              routeQueue.unshift({
+              routeQueue.replace({
                 name: 'StartCensusForm',
                 params: {
                   studyId: this.studyId,
@@ -195,13 +197,14 @@
                 }
               })
             } else {
-              routeQueue.replaceAndMerge({
+              const nextRoute = merge(routeQueue.currentRoute, {
                 query: {
                   associatedRespondentId: this.associatedRespondentId,
                   associatedRespondentName: this.name
                 }
               })
-              routeQueue.unshift({
+              routeQueue.unshift(nextRoute)
+              routeQueue.replace({
                 name: 'StartCensusForm',
                 params: {
                   studyId: this.studyId,

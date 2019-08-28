@@ -1,7 +1,7 @@
 import LocaleService from '../../services/locale/LocaleService'
 import SingletonService from '../../services/SingletonService'
 import StorageService from '../../services/StorageService'
-import { GuardConfig } from './GuardQueue'
+import { GuardConfig } from '../GuardQueue'
 
 export async function oldGuard (to, from, next) {
   // If the user has previously selected a locale, load the locale into memory
@@ -25,6 +25,7 @@ export async function oldGuard (to, from, next) {
 }
 
 export default {
+  name: 'LocaleGuard',
   async condition () {
     const localeId = StorageService.get('current-locale')
     if (localeId) {

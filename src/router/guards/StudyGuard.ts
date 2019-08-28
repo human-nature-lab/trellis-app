@@ -1,11 +1,8 @@
 import { Route } from 'vue-router'
-<<<<<<< HEAD
 import SingletonService from '../../services/SingletonService'
-=======
->>>>>>> master
 import StudyService from '../../services/study/StudyService'
 import StorageService from '../../services/StorageService'
-import { GuardConfig } from './GuardQueue'
+import { GuardConfig } from '../GuardQueue'
 
 // export default async function (to, from, next) {
 //   // If the user has previously selected a study, load the study into memory
@@ -39,6 +36,7 @@ import { GuardConfig } from './GuardQueue'
 // }
 
 export default {
+  name: 'StudyGuard',
   async condition (to: Route) {
     let studyId = StorageService.get('current-study')
     if (!studyId) {

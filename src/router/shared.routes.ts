@@ -1,4 +1,6 @@
-import { guardQueue } from './guards/GuardQueue'
+import { RouteConfig } from 'vue-router'
+import AlreadyLoggedInGuard from './guards/AlreadyLoggedInGuard'
+import { guardQueue } from './GuardQueue'
 import StudyGuard from './guards/StudyGuard'
 import LocaleGuard from './guards/LocaleGuard'
 import CensusFormGuard from './guards/CensusFormGuard'
@@ -70,7 +72,8 @@ export default [{
 }, {
   path: '/login',
   name: 'Login',
-  component: WebLogin
+  component: WebLogin,
+  beforeEnter: guardQueue([AlreadyLoggedInGuard])
 }, {
   path: '/study',
   name: 'StudySelector',
@@ -99,4 +102,4 @@ export default [{
   path: '/changelog',
   name: 'Changelog',
   component: Changelog
-}]
+}] as RouteConfig[]

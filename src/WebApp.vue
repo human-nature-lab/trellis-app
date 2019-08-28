@@ -185,10 +185,10 @@
     },
     methods: {
       toStudySelector () {
-        routeQueue.unshift({ name: 'StudySelector' })
+        routeQueue.pushAndReturnToCurrent({ name: 'StudySelector' })
       },
       toLocaleSelector () {
-        routeQueue.unshift({ name: 'LocaleSelector' })
+        routeQueue.pushAndReturnToCurrent({ name: 'LocaleSelector' })
       },
       startGPSWatch () {
         if (this.global.watchGPS) {

@@ -120,7 +120,7 @@
           }
           let hasCensus = await CensusFormService.hasCensusForm(this.global.study.id, censusTypes.rename_respondent)
           if (hasCensus) {
-            routeQueue.unshift({
+            routeQueue.push({
               name: 'StartCensusForm',
               params: {
                 studyId: this.global.study.id,

@@ -1,6 +1,8 @@
 export class Queue<T> {
 
-  constructor (private items: T[] = []) {}
+  constructor (private items: T[] = []) {
+    this.items = items.slice()
+  }
 
   next (): T | null {
     return this.items.shift()
