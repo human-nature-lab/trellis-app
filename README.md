@@ -64,8 +64,7 @@ You may also need to add the plugins again using "cordova plugin add {name}" aft
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 ## Documentation
-The documentation is hosted in the [Trellis wiki](https://github.com/human-nature-lab/trellis/wiki), but it is embedded into the app as a submodule. To grab the docs submodule **the first time** use `git submodule update --init --recursive`. For all subsequent pulls, use `git submodule update --recursive --remote`. From within the docs submodule, you can make changes and push/pull changes to the wiki.
-
+Trellis has an internal documentation viewer. Changes to the documentation will automatically reload when developing.
 Any files that are added should also be added to `_Sidebar.md` so that it can be navigated to directly.
 
 ### Creating internal links to the documentation
