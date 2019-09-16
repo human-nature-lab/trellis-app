@@ -6,8 +6,8 @@ import fs from 'fs'
 import mv from 'mv'
 import path from 'path'
 import pkg from './package.json'
-import {prompt} from 'promptly'
-import {sentryRelease} from './build/utils'
+import { prompt } from 'promptly'
+import { sentryRelease } from './build/utils'
 
 const argv = parseArgs(process.argv)
 

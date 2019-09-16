@@ -1,5 +1,6 @@
 import Emitter from '../../../classes/Emitter'
 import Question from '../../../entities/trellis/Question'
+import { now } from '../../../services/DateService'
 import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
 import DatumRecycler from '../services/recyclers/DatumRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
@@ -222,6 +223,7 @@ export default class DataStore extends Emitter {
     this.datumIdMap.set(datum.id, datum)
     this.actionIdMap.set(datum.actionId, datum)
     datum.sortOrder = questionDatum.data.length
+    datum.updatedAt = now()
     questionDatum.data.push(datum)
     this.emitChange()
     return datum

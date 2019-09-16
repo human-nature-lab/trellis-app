@@ -5,12 +5,9 @@ import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import actionManager from './ActionManager'
 import {
   addDatum,
-  addDatumLimit,
   addOrUpdateSingleDatum,
   removeDatum,
-  updateDatum,
-  ActionPayload,
-  removeAllDatum
+  updateDatum
 } from './DatumOperations'
 import Question from '../../../../entities/trellis/Question'
 import InterviewManagerOld, {default as InterviewManager} from '../../classes/InterviewManager'
