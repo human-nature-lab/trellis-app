@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
-    "dev-android": "webpack --config=build/webpack.dev.mobile.conf.js && cordova run android --device",
+    "dev-android": "webpack --config=build/webpack.dev.mobile.conf.js && cordova run android",
     "start": "node build/dev-server.mobile.js",
     "build": "node build/build.js",
     "unit": "cross-env L_ENV=test karma start test/unit/karma.conf.js --single-run",
