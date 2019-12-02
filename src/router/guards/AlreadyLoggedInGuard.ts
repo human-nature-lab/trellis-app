@@ -4,6 +4,6 @@ import LoginGuard from './LoginGuard'
 export default {
   name: 'AlreadyLoggedInGuard',
   async condition (to: Route) {
-    return !(await LoginGuard.condition(to))
+    return to.name === 'Login' || !(await LoginGuard.condition(to))
   }
 }

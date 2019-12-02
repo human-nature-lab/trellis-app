@@ -12,6 +12,7 @@
 
 1. To bundle the application into the format that cordova expects run `npm run build`
 1. To create a signed APK run `./build.js --release --apk`. Check `build.es6.js` for additional build options.
+  - For a sentry release the sentry-org, sentry-project and sentry-token tokens must be provided.
 1. Supply the required passwords when prompted
 1. The APK will be moved to `releases/Trellis-{VERSION}.apk`
 

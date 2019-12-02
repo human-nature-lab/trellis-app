@@ -5,6 +5,7 @@ import LoginService from '../../services/login'
 import config from 'config'
 import RouteWhitelist from '../RouteWhitelist'
 
+
 export default {
   name: 'LoginGuard',
   async condition (to: Route) {
@@ -16,6 +17,7 @@ export default {
     } else if (user instanceof User) {
       return true
     }
+    return false
   },
   redirect () {
     return { name: 'Login' }
