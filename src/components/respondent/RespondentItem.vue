@@ -103,7 +103,7 @@
         }
       },
       photo (): Photo {
-        return this.respondent && !this.respondent.photos && this.respondent.photos.length ? this.respondent.photos[0] : null
+        return this.respondent && this.respondent.photos && this.respondent.photos.length ? this.respondent.photos[0] : null
       }
     }
   })
