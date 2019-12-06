@@ -87,11 +87,12 @@ Do all of these things before building for any of the environments.
 
 ### Web
 1. Do all of the things in the base section.
-1. Run `./build.js --web --sentry-token=${SENTRY_TOKEN}` to bundle files into the www/ directory.
-1. Zip these files and upload to the Trellistest server.
-1. Remove the existing www/ directory in the trellis-web repository.
-1. Unzip the uploaded zip. This should place these files into the www/ directory to be served by nginx.
-1. Copy the `config.js` for that environment into the `www` directory.
+1. Run `node build.js --web --sentry-token=${SENTRY_TOKEN}` to bundle files into the www/ directory.
+1. Zip the output files in the **www** folder and name as `Trellis-${version}.zip`.
+1. Make a release in the [trellis](https://github.com/human-nature-lab/trellis) repository
+  - Make sure to upload the zip directory as an asset
+1. Add an entry to the **RELEASES.md** file in the [trellis](https://github.com/human-nature-lab/trellis) repository
+1. Run `php artisan trellis:download-app` on any servers that need updated
 
 ## Testing
 ### Unit
