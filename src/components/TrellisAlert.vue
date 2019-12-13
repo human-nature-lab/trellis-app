@@ -52,16 +52,14 @@
         type: Boolean
       }
     },
-    created () {
-    },
     methods: {
-      getMessage: function () {
+      getMessage () {
         if (this.currentLog instanceof Log) {
           return this.currentLog.message
         }
         return ''
       },
-      getFullMessage: function () {
+      getFullMessage () {
         if (this.currentLog instanceof Log) {
           if (typeof this.currentLog.fullMessage === 'string') {
             return this.currentLog.fullMessage.replace(/\\n/g, '\n')
@@ -70,21 +68,21 @@
         }
         return ''
       },
-      getSeverity: function () {
+      getSeverity () {
         if (this.currentLog instanceof Log) {
           return this.currentLog.severity
         }
         return ''
       },
-      toggleShow: function () {
+      toggleShow () {
         if (this.isMore) {
           this.showMore = !this.showMore
         }
       },
-      selectAll: function (event) {
+      selectAll (event) {
         this.$refs.textarea.select()
       },
-      getType: function () {
+      getType () {
         const curSeverity = this.getSeverity()
         if (curSeverity === 'error') {
           return 'error'

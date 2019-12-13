@@ -145,7 +145,7 @@
   import PhotoAlbum from '../photo/PhotoAlbum'
   import TranslationTextField from '../TranslationTextField.vue'
   import GeoTypeSelector from './GeoTypeSelector.vue'
-  import { pushRouteAndQueueCurrent } from '../../router'
+  import { routeQueue } from '../../router'
   import { getCurrentPosition } from '../LocationFinder'
   import isNumber from 'lodash/isNumber'
   import global from '../../static/singleton'
@@ -182,8 +182,9 @@
         const study = await StudyService.getCurrentStudy()
         this.geo = GeoService.createNewGeo(this.parentGeoId, study.locales)
       } catch (err) {
-        this.log(err)
-        this.alert('error', 'Could not get current study', {timeout: 0})
+        if (this.isNotAuthError(err)) {
+          this.logError(err, 'Could not get current study')
+        }
       }
     },
     computed: {
@@ -218,31 +219,49 @@
           this.geo.longitude = coords.longitude
           this.geo.altitude = coords.altitude
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Could not get current position', {timeout: 0})
+          this.logError(err, 'Could not get current position')
         }
       },
       async useParentPosition () {
-        const parentGeo = await GeoService.getGeoById(this.parentGeoId)
-        this.geo.latitude = parentGeo.latitude
-        this.geo.longitude = parentGeo.longitude
-        this.geo.altitude = parentGeo.altitude
+        try {
+          const parentGeo = await GeoService.getGeoById(this.parentGeoId)
+          this.geo.latitude = parentGeo.latitude
+          this.geo.longitude = parentGeo.longitude
+          this.geo.altitude = parentGeo.altitude
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async onPositioningDone () {
         try {
           this.geo = await GeoService.createGeo(this.geo)
         } catch (err) {
-          this.log(err)
-          this.alert('error', `Could not create new geo`, {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
         this.step++
       },
       async addPhoto (photo) {
-        let returnPhoto = await GeoService.addPhoto(this.geo.id, photo)
-        this.geo.photos.push(returnPhoto)
+        try {
+          let returnPhoto = await GeoService.addPhoto(this.geo.id, photo)
+          this.geo.photos.push(returnPhoto)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async onUpdatePhotos (photos) {
-        await GeoService.updatePhotos(photos)
+        try {
+          await GeoService.updatePhotos(photos)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async onDeletePhoto (photo) {
         let confirmMessage = this.$t('remove_photo_confirm') + ''
@@ -271,7 +290,7 @@
         this.checkingForCensus = true
         const hasCensus = await CensusFormService.hasCensusForm(global.study.id, censusTypes.add_geo)
         if (hasCensus) {
-          pushRouteAndQueueCurrent({
+          routeQueue.push({
             name: 'StartCensusForm',
             params: {
               studyId: this.studyId,
@@ -289,7 +308,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

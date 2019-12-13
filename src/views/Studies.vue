@@ -108,8 +108,10 @@
           this.isEditing = false
           this.editingStudy = null
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_update', [study.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', this.$t('failed_resource_update', [study.name]), {timeout: 0})
+          }
         } finally {
           this.isWorking = false
         }
@@ -122,8 +124,10 @@
           this.alert('success', this.$t('resource_created', [study.name]))
           this.isAdding = false
         } catch (err){
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_create', [study.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', this.$t('failed_resource_create', [study.name]), {timeout: 0})
+          }
         } finally {
           this.isWorking = false
         }
@@ -137,35 +141,36 @@
           this.studies.splice(index, 1)
           this.alert('success', this.$t('resource_deleted', [study.name]))
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_delete', [study.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', this.$t('failed_resource_delete', [study.name]), {timeout: 0})
+          }
         } finally {
           this.isWorking = false
         }
       },
-      async loadStudies (): void {
+      async loadStudies () {
         try {
           this.isLoading = true
           this.studies = await StudyService.getAllStudies()
         } catch (err) {
-          this.log(err)
-          this.alert('error', err.message, {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', err.message, {timeout: 0})
+          }
         } finally {
           this.isLoading = false
         }
       },
-      async loadLocales (): void {
+      async loadLocales () {
         try {
           this.locales = await LocaleService.getAllLocales()
         } catch (err) {
-          this.log(err)
-          this.alert('error', err.message, {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       }
     }
   })
 </script>
-
-<style scoped>
-
-</style>

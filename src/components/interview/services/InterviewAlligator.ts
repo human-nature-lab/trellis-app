@@ -1,14 +1,14 @@
-import InterviewManager from "../classes/InterviewManager";
-import Form from "../../../entities/trellis/Form";
-import Section from "../../../entities/trellis/Section";
-import QuestionGroup from "../../../entities/trellis/QuestionGroup";
-import DataStore from "../classes/DataStore";
-import Datum from "../../../entities/trellis/Datum";
-import QuestionDatum from "../../../entities/trellis/QuestionDatum";
-import Question from "../../../entities/trellis/Question";
-import SkipService from "../../../services/SkipService";
-import Action from "../../../entities/trellis/Action";
-import {locToNumber} from "./LocationHelpers";
+import InterviewManager from '../classes/InterviewManager'
+import Form from '../../../entities/trellis/Form'
+import Section from '../../../entities/trellis/Section'
+import QuestionGroup from '../../../entities/trellis/QuestionGroup'
+import DataStore from '../classes/DataStore'
+import Datum from '../../../entities/trellis/Datum'
+import QuestionDatum from '../../../entities/trellis/QuestionDatum'
+import Question from '../../../entities/trellis/Question'
+import SkipService from '../../../services/SkipService'
+import Action from '../../../entities/trellis/Action'
+import { locToNumber } from './LocationHelpers'
 
 export interface InterviewLocation {
   section: number
@@ -18,6 +18,11 @@ export interface InterviewLocation {
   pageId?: string
   sectionFollowUpRepetition: number
   sectionFollowUpDatumId?: string
+}
+
+export interface InterviewQuestionLocation extends InterviewLocation {
+  questionId: string
+  questionTypeId: string
 }
 
 enum SortMethod {
@@ -35,6 +40,7 @@ export default class InterviewAlligator {
   private pageIndex: Map<string, QuestionGroup> = new Map()
   private sectionToNumIndex: Map<string, number> = new Map()
   private pageToNumIndex: Map<string, number> = new Map()
+  private varNameToQuestionIndex: Map<string, Question> = new Map()
 
   private hasDataChanges: boolean = true
 
@@ -79,6 +85,9 @@ export default class InterviewAlligator {
         const page = section.questionGroups[p]
         this.pageIndex.set(page.id, page)
         this.pageToNumIndex.set(page.id, p)
+        for (const question of page.questions) {
+          this.varNameToQuestionIndex.set(question.varName, question)
+        }
       }
     }
   }
@@ -262,6 +271,32 @@ export default class InterviewAlligator {
     // this.indicateThatDataHasChanged()
   }
 
+  public getQuestionByVarName (varName: string): Question {
+    return this.varNameToQuestionIndex.get(varName)
+  }
+
+  public getLocByVarName (varName: string, sectionRepetition: number, sectionFollowUpRepetition: number): InterviewQuestionLocation | null {
+    for (const loc of this.pages) {
+      const questionGroup: QuestionGroup = this.pageIndex.get(loc.pageId)
+      if (loc.sectionRepetition === sectionRepetition && loc.sectionFollowUpRepetition === sectionFollowUpRepetition) {
+        for (const question of questionGroup.questions) {
+          if (question.varName === varName) {
+            return {
+              page: loc.page,
+              section: loc.section,
+              questionId: question.id,
+              questionTypeId: question.questionTypeId,
+              sectionRepetition: loc.sectionRepetition,
+              sectionFollowUpDatumId: loc.sectionFollowUpDatumId,
+              sectionFollowUpRepetition: loc.sectionFollowUpRepetition
+            }
+          }
+        }
+      }
+    }
+    return null
+  }
+
   public get loc (): InterviewLocation {
     return this.pages[this.index]
   }
@@ -302,7 +337,7 @@ export default class InterviewAlligator {
     return this.currentPage().id
   }
 
-  public currentQuestions (...args): Question[] {
+  public currentQuestions (): Question[] {
     return this.currentPage().questions
   }
 }

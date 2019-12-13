@@ -1,6 +1,6 @@
-import GeoType from "../../entities/trellis/GeoType";
-import {adminInst} from "../http/AxiosInstance";
-import {uriTemplate} from "../http/WebUtils";
+import GeoType from '../../entities/trellis/GeoType'
+import { adminInst } from '../http/AxiosInstance'
+import { uriTemplate } from '../http/WebUtils'
 
 export default class GeoTypeServiceWeb {
 

@@ -1,5 +1,5 @@
 import Interview from '../../entities/trellis/Interview'
-import {now} from '../DateService'
+import { now } from '../DateService'
 import DatabaseService from '../database/DatabaseService'
 import InterviewServiceAbstract from './InterviewServiceAbstract'
 import Action from '../../entities/trellis/Action'
@@ -10,11 +10,11 @@ import UserService from '../user/UserService'
 import SurveyConditionTag from '../../entities/trellis/SurveyConditionTag'
 import SectionConditionTag from '../../entities/trellis/SectionConditionTag'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
-import {IsNull, Repository, SelectQueryBuilder} from 'typeorm'
+import { IsNull, Repository, SelectQueryBuilder } from 'typeorm'
 import Survey from '../../entities/trellis/Survey'
 import Datum from '../../entities/trellis/Datum'
 import InterviewDataInterface from './InterviewDataInterface'
-import {randomIntBits} from "../../classes/M";
+import { randomIntBits } from '../../classes/M'
 
 export default class InterviewServiceCordova extends InterviewServiceAbstract {
 
@@ -43,7 +43,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
       interview.altitude = coordinates.altitude ? coordinates.altitude.toString(): null
     }
     interview = await repo.save(interview)
-    return await this.getInterview(interview.id)
+    return this.getInterview(interview.id)
   }
 
   public async complete (id: string): Promise<void> {
@@ -150,14 +150,14 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
   }
 
   private async getSurveyConditionTags (interviewId: string): Promise<SurveyConditionTag[]> {
-    return await (await DatabaseService.getRepository(SurveyConditionTag)).createQueryBuilder('survey_condition_tag')
+    return (await DatabaseService.getRepository(SurveyConditionTag)).createQueryBuilder('survey_condition_tag')
       .where(qb => `survey_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`)
       .andWhere('survey_condition_tag.deletedAt is null')
       .getMany()
   }
 
   private async getSectionConditionTags (interviewId: string): Promise<SectionConditionTag[]> {
-    return await (await DatabaseService.getRepository(SectionConditionTag)).createQueryBuilder('section_condition_tag')
+    return (await DatabaseService.getRepository(SectionConditionTag)).createQueryBuilder('section_condition_tag')
       .where(qb => {
         return `section_condition_tag.surveyId = ${this.surveyIdSubQuery(interviewId, qb)}`
       })
@@ -167,7 +167,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
   }
 
   private async getRespondentConditionTags (interviewId: string): Promise<RespondentConditionTag[]> {
-    return await (await DatabaseService.getRepository(RespondentConditionTag)).createQueryBuilder('respondent_condition_tag')
+    return (await DatabaseService.getRepository(RespondentConditionTag)).createQueryBuilder('respondent_condition_tag')
       .where(qb => {
         return `respondent_condition_tag.respondentId = ${this.respondentIdSubQuery(interviewId, qb)}`
       })

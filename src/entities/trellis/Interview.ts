@@ -1,5 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn} from 'typeorm'
-import {AsDate, Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn } from 'typeorm'
+import { AsDate, Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Survey from './Survey'
 import User from './User'

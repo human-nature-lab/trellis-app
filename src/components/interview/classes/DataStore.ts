@@ -1,21 +1,26 @@
 import Emitter from '../../../classes/Emitter'
+import Question from '../../../entities/trellis/Question'
+import { now } from '../../../services/DateService'
 import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
 import DatumRecycler from '../services/recyclers/DatumRecycler'
 import RespondentConditionTagRecycler from '../services/recyclers/RespondentConditionTagRecycler'
 import SectionConditionTagRecycler from '../services/recyclers/SectionConditionTagRecycler'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
-import ConditionTagStore from './/ConditionTagStore'
+import cts, { ConditionTagStore } from './ConditionTagStore'
 import Datum from '../../../entities/trellis/Datum'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 import SectionConditionTag from '../../../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../../../entities/trellis/SurveyConditionTag'
-import InterviewDataInterface, {ConditionTagInterface} from "../../../services/interview/InterviewDataInterface";
-import ConditionTag from "../../../entities/trellis/ConditionTag";
-import Action from "../../../entities/trellis/Action";
+import InterviewDataInterface, {
+  ConditionTagInterface,
+  ConditionTagScope
+} from '../../../services/interview/InterviewDataInterface'
+import ConditionTag from '../../../entities/trellis/ConditionTag'
+import Action from '../../../entities/trellis/Action'
 import cloneDeep from 'lodash/cloneDeep'
-import InterviewService from "../../../services/interview/InterviewService"
-import {Mutex, MutexInterface} from "async-mutex";
+import InterviewService from '../../../services/interview/InterviewService'
+import { Mutex, MutexInterface } from 'async-mutex'
 
 export interface FindFunction<T> {
   (o: T, i?: number, a?: T[]): boolean
@@ -25,20 +30,22 @@ export interface FilterFunction<T> {
   (o: T, i?: number, a?: T[]): boolean
 }
 
+const conditionTagScopes = [ConditionTagScope.RESPONDENT, ConditionTagScope.SURVEY, ConditionTagScope.SECTION]
+
 export default class DataStore extends Emitter {
   private baseRespondentConditionTags: any[] = []
   public data: QuestionDatum[] = []
   public conditionTags: ConditionTagInterface = {
-    respondent: [],
-    section: [],
-    survey: []
+    [ConditionTagScope.RESPONDENT]: [],
+    [ConditionTagScope.SECTION]: [],
+    [ConditionTagScope.SURVEY]: []
   }
   private datumIdMap: Map<string, Datum> = new Map()
   private questionDatumIdMap: Map<string, QuestionDatum> = new Map()
   private questionDatumQuestionIdIndex: Map<string, QuestionDatum[]> = new Map()
   private actionIdMap: Map<string, Datum> = new Map()
   private followUpDatumIdMap: Map<string, Datum> = new Map()
-
+  private conditionTagStore: ConditionTagStore = cts
   private previousState!: InterviewDataInterface
   private mutex = new Mutex()
   private releaseMutex!: MutexInterface.Releaser
@@ -140,7 +147,7 @@ export default class DataStore extends Emitter {
     } else if (tags && tags.respondent) {
       this.baseRespondentConditionTags = tags.respondent
     }
-    for (let type of ['respondent', 'survey', 'section']) {
+    for (let type of conditionTagScopes) {
       if (this.conditionTags[type] && tags[type]) {
         for (let tag of tags[type]) {
           this.addTag(type, tag)
@@ -216,6 +223,7 @@ export default class DataStore extends Emitter {
     this.datumIdMap.set(datum.id, datum)
     this.actionIdMap.set(datum.actionId, datum)
     datum.sortOrder = questionDatum.data.length
+    datum.updatedAt = now()
     questionDatum.data.push(datum)
     this.emitChange()
     return datum
@@ -279,13 +287,14 @@ export default class DataStore extends Emitter {
    * @param {RespondentConditionTag | SectionConditionTag | SurveyConditionTag} tag
    * @param {ConditionTag} conditionTag
    */
-  addTag (type: string, tag: RespondentConditionTag|SectionConditionTag|SurveyConditionTag, conditionTag?: ConditionTag): void {
+  addTag (type: ConditionTagScope, tag: RespondentConditionTag | SectionConditionTag | SurveyConditionTag, conditionTag?: ConditionTag): void {
+    // @ts-ignore
     this.conditionTags[type].push(tag)
     if (tag.conditionTag) {
-      ConditionTagStore.add(tag.conditionTag)
+      this.conditionTagStore.add(tag.conditionTag)
     }
     if (conditionTag) {
-      ConditionTagStore.add(conditionTag)
+      this.conditionTagStore.add(conditionTag)
     }
     this.emitChange()
   }
@@ -335,24 +344,24 @@ export default class DataStore extends Emitter {
   public getAllConditionTagsForLocation (sectionRepetition: number, sectionFollowUpDatumId: string): ConditionTag[] {
     const tags = []
     for (let rct of this.conditionTags.respondent) {
-      tags.push(ConditionTagStore.getTagById(rct.conditionTagId))
+      tags.push(this.conditionTagStore.getTagById(rct.conditionTagId))
     }
     for (let sct of this.conditionTags.survey) {
-      tags.push(ConditionTagStore.getTagById(sct.conditionId))
+      tags.push(this.conditionTagStore.getTagById(sct.conditionId))
     }
     for (let sct of this.conditionTags.section) {
       if (sct.repetition === sectionRepetition &&
         sct.followUpDatumId === sectionFollowUpDatumId) {
-        tags.push(ConditionTagStore.getTagById(sct.conditionId))
+        tags.push(this.conditionTagStore.getTagById(sct.conditionId))
       }
     }
     return tags
   }
 
   public getAllConditionTags (): ConditionTag[] {
-    let tags: ConditionTag[] = this.conditionTags.respondent.map(rct => ConditionTagStore.getTagById(rct.conditionTagId))
-    tags = tags.concat(this.conditionTags.survey.map(sct => ConditionTagStore.getTagById(sct.conditionId)))
-    tags = tags.concat(this.conditionTags.section.map(sct => ConditionTagStore.getTagById(sct.conditionId)))
+    let tags: ConditionTag[] = this.conditionTags.respondent.map(rct => this.conditionTagStore.getTagById(rct.conditionTagId))
+    tags = tags.concat(this.conditionTags.survey.map(sct => this.conditionTagStore.getTagById(sct.conditionId)))
+    tags = tags.concat(this.conditionTags.section.map(sct => this.conditionTagStore.getTagById(sct.conditionId)))
     return tags
   }
 
@@ -413,6 +422,31 @@ export default class DataStore extends Emitter {
    */
   getQuestionDatumById (id: string) {
     return this.questionDatumIdMap.get(id)
+  }
+
+  /**
+   * Search all of the condition tags to check if one currently exists
+   * @param name
+   * @param sectionRepetition
+   * @param followUpDatumId
+   */
+  hasConditionTag (name: string, sectionRepetition: number, followUpDatumId: string): boolean {
+    for (const tag of this.conditionTags[ConditionTagScope.RESPONDENT]) {
+      if (tag.conditionTag && tag.conditionTag.name === name) {
+        return true
+      }
+    }
+    for (const tag of this.conditionTags[ConditionTagScope.SURVEY]) {
+      if (tag.conditionTag && tag.conditionTag.name === name) {
+        return true
+      }
+    }
+    for (const tag of this.conditionTags[ConditionTagScope.SECTION]) {
+      if (tag.repetition === sectionRepetition && tag.followUpDatumId === followUpDatumId) {
+        return true
+      }
+    }
+    return false
   }
 
 }

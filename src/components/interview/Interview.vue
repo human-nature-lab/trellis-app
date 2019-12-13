@@ -17,6 +17,7 @@
           </span>
         </v-toolbar-title>
       </v-toolbar>
+      <ConditionAssignmentErrors v-if="conditionAssignmentErrors" :errors="conditionAssignmentErrors" />
       <v-flex>
         <v-progress-linear
           v-if="isSaving"
@@ -124,34 +125,40 @@
 </template>
 
 <script>
-  import RoutePreloadMixin from '../../mixins/RoutePreloadMixin'
   import Page from './Page'
   import ConditionTagList from './ConditionTagList'
   import AsyncTranslationText from '../AsyncTranslationText'
+  import ConditionAssignmentErrors from './ConditionAssignmentErrors'
   import menuBus from '../main-menu/MenuBus'
   import global from '../../static/singleton'
   import AT from '../../static/action.types'
 
-  import {sharedInterview, clearSharedInterview} from './classes/InterviewManager'
+  import { sharedInterview, clearSharedInterview } from './classes/InterviewManager'
   import InterviewService from '../../services/interview/InterviewService'
   import actionBus from './services/actions/ActionBus'
 
-  import {allParametersAreValidWithError} from './services/ValidatorService'
-  import router, {replaceWithNextOr} from '../../router'
+  import { allParametersAreValidWithError } from './services/ValidatorService'
+  import router, { routeQueue } from '../../router'
   import InterviewLoader from './services/InterviewLoader'
   import SurveyService from '../../services/survey'
   import cloneDeep from 'lodash/cloneDeep'
 
   function load (to) {
     return new Promise(async (resolve, reject) => {
-      global.loading.active = true
-      global.loading.indeterminate = true
-      global.loading.fullscreen = true
-      interviewData = await InterviewLoader.load(to)
-      resolve()
-      setTimeout(() => {
-        global.loading.active = false
-      })
+      try {
+        global.loading.active = true
+        global.loading.indeterminate = true
+        global.loading.fullscreen = true
+        interviewData = await InterviewLoader.load(to)
+        resolve()
+        setTimeout(() => {
+          global.loading.active = false
+        })
+      } catch (err) {
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
+      }
     })
   }
 
@@ -183,6 +190,7 @@
         disableInput: false,
         showSafeToExitMessage: false,
         type: 'interview',
+        conditionAssignmentErrors: null,
         interviewData: {},
         interviewActions: {},
         interviewConditionTags: {},
@@ -274,6 +282,7 @@
         this.interviewConditionTags = interviewState.data.conditionTags
         this.interviewActions = interviewState.actions.store
         this.interview = interview
+        this.conditionAssignmentErrors = interviewState.conditionAssignmentErrors
         this.form = form
         interviewState.on('atEnd', this.showEndDialog, this)
         interviewState.on('atBeginning', this.showBeginningDialog, this)
@@ -363,14 +372,14 @@
           this.error = err
         }
       },
-      redirectToComplete (interviewId) {
-        router.replace({name: 'SurveyComplete', params: {surveyId: this.interview.surveyId}})
-      },
       exit () {
         this.alreadyExited = true
-        replaceWithNextOr(() => {
-          this.redirectToComplete()
-        })
+        const nextRoute = routeQueue.next()
+        if (nextRoute) {
+          routeQueue.replace(nextRoute)
+        } else {
+          routeQueue.replace({ name: 'SurveyComplete', params: { surveyId: this.interview.surveyId } })
+        }
       },
       async saveData () {
         this.isSaving = true
@@ -379,11 +388,11 @@
       },
       async completeSurvey () {
         if (this.type === 'preview') return
-        return await SurveyService.complete(this.interview.surveyId)
+        return SurveyService.complete(this.interview.surveyId)
       },
       async completeInterview () {
         if (this.type === 'preview') return
-        return await InterviewService.complete(this.interview.id)
+        return InterviewService.complete(this.interview.id)
       },
       async saveAndExit () {
         await this.saveData()
@@ -415,7 +424,8 @@
     components: {
       Page,
       ConditionTagList,
-      AsyncTranslationText
+      AsyncTranslationText,
+      ConditionAssignmentErrors
     }
   }
 </script>

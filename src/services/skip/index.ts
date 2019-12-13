@@ -1,7 +1,7 @@
-import Skip from "../../entities/trellis/Skip";
-import {adminInst} from "../http/AxiosInstance";
-import {uriTemplate} from "../http/WebUtils";
-import FormSkip from "../../entities/trellis/FormSkip";
+import Skip from '../../entities/trellis/Skip'
+import { adminInst } from '../http/AxiosInstance'
+import { uriTemplate } from '../http/WebUtils'
+import FormSkip from '../../entities/trellis/FormSkip'
 
 class SkipService {
 

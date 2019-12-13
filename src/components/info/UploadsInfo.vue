@@ -22,7 +22,10 @@
     },
     created () {
       SyncService.getNewPhotosCount().then(c => this.pendingPhotos.val = c)
-      DatabaseService.getUpdatedRecordsCount().then(c => this.pendingRows.val = c)
+      DatabaseService.getUpdatedRecordsCount().then(c => this.pendingRows.val = c).catch(err => {
+        this.log(err)
+        this.pendingRows.val = 0
+      })
     },
     computed: {
       items (): object[] {

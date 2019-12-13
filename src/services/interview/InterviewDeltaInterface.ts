@@ -3,7 +3,7 @@ import Datum from '../../entities/trellis/Datum'
 import SurveyConditionTag from '../../entities/trellis/SurveyConditionTag'
 import SectionConditionTag from '../../entities/trellis/SectionConditionTag'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
-import {mapCamelToPlain} from '../JSONUtil'
+import { mapCamelToPlain } from '../JSONUtil'
 import SnakeSerializable from '../../entities/interfaces/SnakeSerializable'
 
 export class AddedRemovedDelta<T> implements SnakeSerializable {

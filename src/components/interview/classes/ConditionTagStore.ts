@@ -1,4 +1,4 @@
-import ConditionTag from "../../../entities/trellis/ConditionTag";
+import ConditionTag from '../../../entities/trellis/ConditionTag'
 
 export class ConditionTagStore {
   private idToNameMap: Map<string, string>

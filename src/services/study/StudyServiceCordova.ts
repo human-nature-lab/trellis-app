@@ -31,7 +31,7 @@ class StudyServiceCordova extends StudyServiceAbstract {
   }
 
   async getMyStudies (): Promise<Study[]> {
-    let user: User = UserService.getCurrentUser()
+    let user: User = await UserService.getCurrentUser()
     if (user.roleId === 'admin') {
       let repo = await DatabaseService.getRepository(Study)
       return repo.find({

@@ -28,7 +28,7 @@
 
 <script lang="ts">
   import merge from 'lodash/merge'
-  import Vue, {Component} from "vue"
+  import Vue, {Component} from 'vue'
 
   interface SnackConfig {
     slot?: Component
@@ -43,6 +43,7 @@
     left?: boolean
     right?: boolean
     absolute?: boolean
+    unique?: boolean
   }
 
   const defaultConfig: SnackConfig = {
@@ -85,12 +86,26 @@
     methods: {
       pushQueue (msgOrSlot: string|Component, config?: SnackConfig) {
         config = merge({}, defaultConfig, config)
+
+        function match (c: SnackConfig): boolean {
+          return c.color === config.color && (c.msg === config.msg || c.slot === config.slot)
+        }
+
         if (typeof msgOrSlot === 'string') {
           config.msg = msgOrSlot
         } else {
           config.slot = msgOrSlot
         }
-        this.queue.push(config)
+
+        if (config.unique) {
+          const queueIndex = this.queue.findIndex(c => match(c))
+          if (queueIndex === -1 && !match(this.snack)) {
+            this.queue.push(config)
+          }
+        } else {
+          this.queue.push(config)
+        }
+
         this.nextOrDone()
       },
       clearSnack () {

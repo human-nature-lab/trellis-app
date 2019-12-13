@@ -1,9 +1,9 @@
-import {ValueTransformer} from "typeorm/decorator/options/ValueTransformer";
-import moment, {isDate, isMoment, Moment} from "moment";
-import {FindOperator} from 'typeorm'
+import { ValueTransformer } from 'typeorm/decorator/options/ValueTransformer'
+import moment, { isDate, isMoment, Moment } from 'moment'
+import { FindOperator } from 'typeorm'
 
 export class MomentTransformer implements ValueTransformer {
-  to (date: Moment|any) {
+  to (date: Moment | any) {
     if (date == null) return date
     else if (isMoment(date)) {
       return date.toDate()

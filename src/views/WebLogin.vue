@@ -20,9 +20,8 @@
 
 <script>
   import LoginService from '../services/login'
-  import UserService from '../services/user/UserService'
   import LoginForm from '../components/LoginForm'
-  import router from '../router'
+  import { routeQueue } from '../router'
 
   export default {
     name: 'web-login',
@@ -43,11 +42,7 @@
           this.isWorking = true
           await LoginService.login(username, password)
           // await UserService.loadCurrentUser()
-          if (this.$route.query.to) {
-            router.push({path: this.$route.query.to})
-          } else {
-            router.push({name: 'Home'})
-          }
+          routeQueue.goToNext()
         } catch (err) {
           if (err.response && err.response.status && err.response.status === 403) {
             this.alert('error', 'Invalid username or password')

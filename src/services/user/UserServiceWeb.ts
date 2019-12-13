@@ -12,7 +12,7 @@ export class UserServiceWeb extends UserServiceAbstract {
   private mutex: Mutex = new Mutex()
 
   async loadCurrentUser (): Promise<User | null> {
-
+    if (this.user) return this.user
     const release = await this.mutex.acquire()
     let user: User = null
     try {

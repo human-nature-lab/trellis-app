@@ -1,4 +1,5 @@
 import DatabaseService from '../database/DatabaseService'
+import { isUndefined } from '../util'
 import GeoServiceAbstract, { GeoSearchParams } from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'
 import { In, IsNull } from 'typeorm'
@@ -39,7 +40,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
       },
       relations: ['geoType', 'nameTranslation', 'nameTranslation.translationText']
     })
-
+    if (!geo) return null
     geo.photos = await this.getGeoPhotos(geoId)
     removeSoftDeleted(geo)
     return geo
@@ -93,12 +94,12 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
         'photo'
       ]
     })
-    let photos: PhotoWithPivotTable[]  = []
+    let photos: PhotoWithPivotTable[] = []
     for (let i = 0; i < geoPhotos.length; i++) {
       let geoPhoto = geoPhotos[i]
       // Fixes an issue where the location info page will not load
       // if the respondent_photo table refers to a non-existent photo table row
-      if (geoPhoto.photoId !== null) {
+      if (geoPhoto.photoId !== null && geoPhoto.photo !== null) {
         photos.push(new PhotoWithPivotTable(geoPhoto))
       }
     }
@@ -185,7 +186,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
     let count = 0
     let ancestorIds = {}
     let ancestors = []
-    while (currentGeoId !== null && !ancestors.hasOwnProperty(currentGeoId) && count < 25) {
+    while (!isUndefined(currentGeoId) && !ancestors.hasOwnProperty(currentGeoId) && count < 25) {
       // This caching seems necessary for relationship questions when the respondent has a large number of respondent geos. This method is called for each of those
       let geo
       if (geoCache.has(currentGeoId)) {
@@ -194,6 +195,7 @@ export default class GeoServiceCordova extends GeoServiceAbstract {
         geo = await this.getGeoById(currentGeoId)
         geoCache.set(currentGeoId, geo)
       }
+      if (!geo) break
       ancestors.push(geo)
       ancestorIds[geoId] = true
       currentGeoId = geo.parentId

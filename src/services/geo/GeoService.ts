@@ -1,4 +1,4 @@
-import switchByModeEnv from '../../services/util'
+import switchByModeEnv from '../util'
 import GeoServiceWeb from './GeoServiceWeb'
 import GeoServiceCordova from './GeoServiceCordova'
 

@@ -1,4 +1,4 @@
-import {Vue} from "vue/types/vue";
+import { Vue } from 'vue/types/vue'
 
 export default {
   errorCaptured (err: Error, vm: Vue, info: string) {

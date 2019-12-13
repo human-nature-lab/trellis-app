@@ -1,12 +1,12 @@
-import EdgeServiceInterface, {SourceTarget} from "./EdgeServiceInterface";
-import Edge from "../../entities/trellis/Edge";
+import EdgeServiceInterface, {SourceTarget} from './EdgeServiceInterface'
+import Edge from '../../entities/trellis/Edge'
 import DatabaseService from '../database/DatabaseService'
-import {In} from 'typeorm'
+import { In } from 'typeorm'
 
 export default class EdgeServiceCordova implements EdgeServiceInterface {
   async getEdges (edgeIds: string[]): Promise<Edge[]> {
     let repo = await DatabaseService.getRepository(Edge)
-    return await repo.find({
+    return repo.find({
       where: {
         id: In(edgeIds)
       },
@@ -30,6 +30,6 @@ export default class EdgeServiceCordova implements EdgeServiceInterface {
       return edge
     })
     let res = await repo.save(edges)
-    return await this.getEdges(res.map(e => e.id))
+    return this.getEdges(res.map(e => e.id))
   }
 }

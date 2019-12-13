@@ -1,14 +1,14 @@
-import Pagination, {RandomPagination, RandomPaginationResult} from "../../types/Pagination";
+import Pagination, {RandomPagination, RandomPaginationResult} from '../../types/Pagination'
 import http, {adminInst} from '../http/AxiosInstance'
 import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
-import Photo from "../../entities/trellis/Photo";
+import Photo from '../../entities/trellis/Photo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
-import {uriTemplate} from "../http/WebUtils";
+import { uriTemplate } from '../http/WebUtils'
 export default class RespondentServiceWeb implements RespondentServiceInterface {
 
   async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
@@ -24,15 +24,13 @@ export default class RespondentServiceWeb implements RespondentServiceInterface 
   }
 
   async getRespondentPhotos (respondentId: string): Promise<Array<PhotoWithPivotTable>> {
-    let photos: PhotoWithPivotTable[]  = []
-    let res = await http().get(uriTemplate('respondent/{}/photos', [respondentId]))
+    let photos: PhotoWithPivotTable[] = []
+    let res = await http().get(uriTemplate('respondent/{respondentId}/photos', [respondentId]))
     for (let i = 0; i < res.data.photos.length; i++) {
       let respondentPhoto = new RespondentPhoto().fromSnakeJSON(res.data.photos[i])
-      let photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
-      respondentPhoto.photo = photo
+      respondentPhoto.photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
       photos.push(new PhotoWithPivotTable(respondentPhoto))
     }
-
     return photos
   }
 

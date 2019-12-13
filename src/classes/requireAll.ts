@@ -6,7 +6,7 @@ export default function requireAll (r) {
   return o
 }
 
-export function requireAllModules (r) {
+export function requireAllModules (r, ) {
   const modules = requireAll(r)
   return Object.keys(modules).map(k => modules[k].default)
 }

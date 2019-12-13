@@ -1,5 +1,5 @@
-import {OneToOne, ManyToMany, JoinTable, JoinColumn, Entity, Column, PrimaryGeneratedColumn, ManyToOne} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { ManyToMany, JoinTable, JoinColumn, Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Locale from './Locale'
 

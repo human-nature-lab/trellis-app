@@ -53,7 +53,7 @@
 <script lang="ts">
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import FormsView from './FormsView.vue'
-  import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
+  import RoutePreloadMixin from '../../mixins/RoutePreloadMixin'
   import SurveyService from '../../services/survey'
   import FormService from '../../services/form/FormService'
   import RespondentService from '../../services/respondent/RespondentService'
@@ -65,7 +65,7 @@
   import Translation from '../../entities/trellis/Translation'
   import SkipService from '../../services/SkipService'
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
-  import { pushRouteAndQueueCurrent } from '../../router'
+  import { routeQueue } from '../../router'
   import Interview from '../../entities/trellis/Interview'
 
   export class DisplayForm {
@@ -89,30 +89,26 @@
     conditionTags: RespondentConditionTag[]
   }
 
-  function load (to): Promise<object> {
+  async function load (to): Promise<object> {
     let respondentId = to.params.respondentId
     let studyId = to.params.studyId
-    let respondent, surveys, forms
-    return Promise.all([
+    const [respondent, surveys, forms] = await Promise.all([
       RespondentService.getRespondentById(respondentId),
       SurveyService.getRespondentSurveys(studyId, respondentId),
       FormService.getStudyForms(studyId)
-    ]).then(res => {
-      [respondent, surveys, forms] = res
-      return respondent.respondentConditionTags
-    }).then(conditionTags => {
-      return {
-        conditionTags,
-        respondent,
-        surveys,
-        forms
-      }
-    })
+    ])
+    const conditionTags = await respondent.respondentConditionTags
+    return {
+      conditionTags,
+      respondent,
+      surveys,
+      forms
+    }
   }
 
   export default Vue.extend({
     name: 'respondent-forms',
-    mixins: [RouteMixinFactory(load), DocsLinkMixin('./respondents/RespondentForms.md')],
+    mixins: [RoutePreloadMixin(load), DocsLinkMixin('./respondents/RespondentForms.md')],
     data () {
       return {
         global,
@@ -130,7 +126,7 @@
     },
     methods: {
       async startInterview (interview: Interview) {
-        pushRouteAndQueueCurrent({name: 'Interview', params: {studyId: this.global['study'].id, interviewId: interview.id}})
+        routeQueue.push({ name: 'Interview', params: { studyId: this.global['study'].id, interviewId: interview.id } })
       },
       hydrate (data: RespondentFormsData) {
           // Join any surveys that have been created with the possible forms
@@ -152,7 +148,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

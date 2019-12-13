@@ -1,12 +1,11 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, ManyToOne} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, ManyToOne } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Respondent from './Respondent'
 import Form from './Form'
 import Interview from './Interview'
-import {mapFromSnakeJSON} from '../../services/JSONUtil'
-import MomentTransformer from "../base/MomentTransformer";
-import {Moment} from "moment";
+import MomentTransformer from '../base/MomentTransformer'
+import { Moment } from 'moment'
 
 @Entity()
 export default class Survey extends TimestampedSoftDelete {

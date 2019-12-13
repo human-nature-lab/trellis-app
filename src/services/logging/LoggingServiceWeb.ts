@@ -1,5 +1,5 @@
 import LoggingServiceAbstract from './LoggingServiceAbstract'
-import Log from "../../entities/trellis-config/Log";
+import Log from '../../entities/trellis-config/Log'
 
 class LoggingServiceWeb extends LoggingServiceAbstract {
 

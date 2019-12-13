@@ -97,8 +97,9 @@
           this.isLoading = true
           this.geoTypes = await GeoTypeService.allStudyGeoTypes(this.global.study.id)
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to load', {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load geo types')
+          }
         } finally {
           this.isLoading = false
         }
@@ -114,8 +115,9 @@
           this.geoTypes.push(newGeoType)
           this.isAdding = false
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_create', [this.$t('geo_type')]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_create', [this.$t('geo_type')]))
+          }
         } finally {
           this.isBusy = false
         }
@@ -124,7 +126,6 @@
         try {
           this.isBusy = true
           const updatedGeoType: GeoType = await GeoTypeService.update(geoType)
-
           const index = this.geoTypes.findIndex(gt => gt.id === geoType.id)
           if (index > -1) {
             this.geoTypes.splice(index, 1, updatedGeoType)
@@ -132,8 +133,9 @@
           this.isEditing = false
           this.editingGeoType = null
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_update', [geoType.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [geoType.name]))
+          }
         } finally {
           this.isBusy = false
         }
@@ -148,8 +150,9 @@
             this.geoTypes.splice(index, 1)
           }
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_delete', [geoType.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_delete', [geoType.name]))
+          }
         } finally {
           this.isBusy = false
         }
@@ -157,7 +160,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

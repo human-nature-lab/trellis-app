@@ -5,7 +5,7 @@ import DatabaseService from '../../services/database/DatabaseService'
 export default class RosterServiceCordova implements RosterServiceInterface {
   async getRosterRows (rosterIds: string[]): Promise<Roster[]> {
     const repo = await DatabaseService.getRepository(Roster)
-    return await repo.findByIds(rosterIds)
+    return repo.findByIds(rosterIds)
   }
   async createRosterRows (rosterRows: string[]): Promise<Roster[]> {
     const conn = await DatabaseService.getDatabase()

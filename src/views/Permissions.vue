@@ -103,7 +103,7 @@
 
   export default Vue.extend({
     name: 'Permissions',
-    mixins: [ PermissionMixin, DebounceMixin, DocsLinkMixin('./admin/Permissions.md') ],
+    mixins: [PermissionMixin, DebounceMixin, DocsLinkMixin('./admin/Permissions.md')],
     components: { PermissionRow, TrellisModal, NewRoleForm },
     data () {
       return {
@@ -150,20 +150,29 @@
     methods: {
       async loadPermissions () {
         this.isLoading = true
-        const res = await PermissionService.all()
-        this.permissions = res.all
-        this.roles = res.roles
-        this.isLoading = false
+        try {
+          const res = await PermissionService.all()
+          this.permissions = res.all
+          this.roles = res.roles
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load permissions')
+          }
+        } finally {
+          this.isLoading = false
+        }
       },
       async addRole (role: Role) {
         try {
           const newRole = await RoleService.create(role)
           this.roles.push(newRole)
           this.alert('success', this.$t('resource_created', [role.name]))
-          this.showRoleDialog = false
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_create', [role.name]), { timeout: 0 })
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_create', [role.name]))
+          }
+        } finally {
+          this.showRoleDialog = false
         }
       },
       async removeRole (role: Role) {
@@ -174,8 +183,9 @@
           this.roles.splice(index, 1)
           this.alert('success', this.$t('resource_deleted', [role.name]))
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_delete', [role.name]), { timeout: 0 })
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_delete', [role.name]))
+          }
         }
       },
       newRolePermission (rolePermission: RolePermission) {
@@ -206,8 +216,9 @@
           this.copy.isActive = false
           this.alert('success', this.$t('resource_updated', [newRole.name]))
         } catch (err) {
-          this.log(err)
-          this.alert('error', this.$t('failed_resource_update', [this.copy.toRole.name]), {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [this.copy.toRole.name]))
+          }
         } finally {
           this.isLoading = false
         }

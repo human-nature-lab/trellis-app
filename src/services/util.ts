@@ -1,5 +1,5 @@
 import config from 'config'
-import {APP_ENV, APP_MODE} from '../static/constants'
+import { APP_ENV, APP_MODE } from '../static/constants'
 import storage from './StorageService'
 
 const isOffline = config.appEnv === APP_ENV.CORDOVA && (storage.get('offline') !== null ? storage.get('offline') : true)
@@ -24,4 +24,9 @@ export function switchByModeEnv (args) {
 export function makeBasicAuthHeader (username, password) {
   return 'Basic ' + btoa(`${username}:${password}`)
 }
+
+export function isUndefined (val: any): boolean {
+  return val === null || val === undefined
+}
+
 export default switchByModeEnv

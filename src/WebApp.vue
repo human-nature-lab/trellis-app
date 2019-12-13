@@ -52,7 +52,7 @@
         <v-tooltip right>
           <v-btn class="subheading" slot="activator"
                  flat
-                 :to="{name: 'StudySelector', query: {to: $route.fullPath}}">
+                 @click="toStudySelector">
             {{global.study.name}}
           </v-btn>
           <span>{{$t('change_study')}}</span>
@@ -64,7 +64,7 @@
                slot="activator"
                flat
                icon
-               :to="{name: 'locale', query: {to: $route.fullPath}}">
+               @click="toLocaleSelector">
           {{global.locale ? global.locale.languageTag : ''}}
         </v-btn>
         <span>{{$t('change_locale')}}</span>
@@ -112,11 +112,11 @@
   import TrellisAlert from './components/TrellisAlert.vue'
   import TrellisLoadingCircular from './components/TrellisLoadingCircle'
   import LocationFinder from './components/LocationFinder'
-  import router from './router'
+  import router, { routeQueue } from './router'
   import singleton from './static/singleton'
   // Do not remove!
   import SingletonService from './services/SingletonService'
-  import {defaultLoggingService} from './services/logging/LoggingService'
+  import { defaultLoggingService } from './services/logging/LoggingService'
   import GeoLocationService from './services/geolocation'
   import SnackbarQueue from './components/SnackbarQueue'
   import DocsSidebar from './components/documentation/DocsSidebar'
@@ -184,6 +184,12 @@
       }
     },
     methods: {
+      toStudySelector () {
+        routeQueue.pushAndReturnToCurrent({ name: 'StudySelector' })
+      },
+      toLocaleSelector () {
+        routeQueue.pushAndReturnToCurrent({ name: 'LocaleSelector' })
+      },
       startGPSWatch () {
         if (this.global.watchGPS) {
           GeoLocationService.watchPosition()

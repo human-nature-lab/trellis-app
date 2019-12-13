@@ -1,9 +1,9 @@
-import {Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, OneToMany, JoinTable} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, OneToMany, JoinTable } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Form from './Form'
 import QuestionGroup from './QuestionGroup'
-import SkipConditionTag from "./SkipConditionTag";
+import SkipConditionTag from './SkipConditionTag'
 
 @Entity()
 export default class Skip extends SparseTimestampedSoftDelete {

@@ -1,4 +1,4 @@
-import {switchByModeEnv} from '../util'
+import { switchByModeEnv } from '../util'
 import FileServiceMock from './FileServiceMock'
 import FileServiceCordova from './FileServiceCordova'
 

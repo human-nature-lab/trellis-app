@@ -1,10 +1,10 @@
 import AlertService from '../../services/AlertService'
 import LoggingServiceAbstract from './LoggingServiceAbstract'
-import Log from "../../entities/trellis-config/Log";
+import Log from '../../entities/trellis-config/Log'
 import throttle from 'lodash/throttle'
-import {LoggingLevel, LogRequest} from "./LoggingTypes";
-import {IsNull, Not} from 'typeorm'
-import {Mutex, MutexInterface} from "async-mutex";
+import { LoggingLevel, LogRequest } from './LoggingTypes'
+import { IsNull, Not } from 'typeorm'
+import { Mutex, MutexInterface } from 'async-mutex'
 
 class LoggingServiceCordova extends LoggingServiceAbstract {
 
@@ -35,6 +35,7 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
 
     const saving = this.queue.slice()
     if (saving.length === 0) {
+      this.releaseMutex()
       return // No need to save when the queue is empty
     }
     console.info(`writing ${saving.length} logs to disk`)

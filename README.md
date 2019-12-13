@@ -12,6 +12,7 @@
 
 1. To bundle the application into the format that cordova expects run `npm run build`
 1. To create a signed APK run `./build.js --release --apk`. Check `build.es6.js` for additional build options.
+  - For a sentry release the sentry-org, sentry-project and sentry-token tokens must be provided.
 1. Supply the required passwords when prompted
 1. The APK will be moved to `releases/Trellis-{VERSION}.apk`
 
@@ -64,8 +65,7 @@ You may also need to add the plugins again using "cordova plugin add {name}" aft
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 ## Documentation
-The documentation is hosted in the [Trellis wiki](https://github.com/human-nature-lab/trellis/wiki), but it is embedded into the app as a submodule. To grab the docs submodule **the first time** use `git submodule update --init --recursive`. For all subsequent pulls, use `git submodule update --recursive --remote`. From within the docs submodule, you can make changes and push/pull changes to the wiki.
-
+Trellis has an internal documentation viewer. Changes to the documentation will automatically reload when developing.
 Any files that are added should also be added to `_Sidebar.md` so that it can be navigated to directly.
 
 ### Creating internal links to the documentation
@@ -87,11 +87,12 @@ Do all of these things before building for any of the environments.
 
 ### Web
 1. Do all of the things in the base section.
-1. Run `./build.js --web --sentry-token=${SENTRY_TOKEN}` to bundle files into the www/ directory.
-1. Zip these files and upload to the Trellistest server.
-1. Remove the existing www/ directory in the trellis-web repository.
-1. Unzip the uploaded zip. This should place these files into the www/ directory to be served by nginx.
-1. Copy the `config.js` for that environment into the `www` directory.
+1. Run `node build.js --web --sentry-token=${SENTRY_TOKEN}` to bundle files into the www/ directory.
+1. Zip the output files in the **www** folder and name as `Trellis-${version}.zip`.
+1. Make a release in the [trellis](https://github.com/human-nature-lab/trellis) repository
+  - Make sure to upload the zip directory as an asset
+1. Add an entry to the **RELEASES.md** file in the [trellis](https://github.com/human-nature-lab/trellis) repository
+1. Run `php artisan trellis:download-app` on any servers that need updated
 
 ## Testing
 ### Unit

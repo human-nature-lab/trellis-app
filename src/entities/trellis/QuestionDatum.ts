@@ -1,12 +1,11 @@
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Datum from './Datum'
-import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm'
-import {AsDate, Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
+import { AsDate, Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
-import {now} from '../../services/DateService'
-import {PrimaryColumn} from "typeorm/browser";
+import { now } from '../../services/DateService'
 import MomentTransformer from '../base/MomentTransformer'
-import {Moment} from 'moment'
+import { Moment } from 'moment'
 
 export interface QuestionDatumRecyclerData {
   id: string

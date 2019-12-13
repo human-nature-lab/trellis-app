@@ -26,7 +26,7 @@
 </template>
 
 <script>
-  import requireAll from "../classes/requireAll"
+  import requireAll from '../classes/requireAll'
   import global from '../static/singleton'
   import Markdown from './Markdown'
 

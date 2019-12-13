@@ -2,14 +2,14 @@ import SurveyServiceInterface from './SurveyServiceInterface'
 import Survey from '../../entities/trellis/Survey'
 import DatabaseService from '../database/DatabaseService'
 import uuidv4 from 'uuid/v4'
-import {now} from '../DateService'
-import {IsNull} from 'typeorm'
+import { now } from '../DateService'
+import { IsNull } from 'typeorm'
 
 export default class SurveyServiceCordova implements SurveyServiceInterface {
 
   async getSurveyById (surveyId: string): Promise<Survey> {
     const repo = await DatabaseService.getRepository(Survey)
-    return await repo.findOne({
+    return repo.findOne({
       where: {
         id: surveyId,
         deletedAt: IsNull()
@@ -19,7 +19,7 @@ export default class SurveyServiceCordova implements SurveyServiceInterface {
 
   async getSurvey (studyId: string, respondentId: string, formId: string): Promise<Survey> {
     const repo = await DatabaseService.getRepository(Survey)
-    return await repo.findOne({
+    return repo.findOne({
       where: {
         studyId,
         respondentId,

@@ -90,11 +90,20 @@
     },
     computed: {
       name (): string {
-        let rName = this.respondent.names.find(n => n.isDisplayName)
-        return rName ? rName.name : this.respondent.name
+        const noName = 'Unnamed Respondent'
+        if (!this.respondent) {
+          return noName
+        } else if (this.respondent.names && this.respondent.names.length) {
+          const rName = this.respondent.names.find(n => n.isDisplayName)
+          return rName ? rName.name : this.respondent.name
+        } else if (this.respondent.name) {
+          return this.respondent.name
+        } else {
+          return noName
+        }
       },
       photo (): Photo {
-        return this.respondent.photos.length ? this.respondent.photos[0] : null
+        return this.respondent && this.respondent.photos && this.respondent.photos.length ? this.respondent.photos[0] : null
       }
     }
   })

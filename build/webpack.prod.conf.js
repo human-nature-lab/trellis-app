@@ -102,7 +102,8 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     new SentryPlugin({
       release: sentryRelease,
-      include: 'www/'
+      include: 'www/',
+      urlPrefix: process.env.APP_ENV === 'ANDROID' ? '/android_asset/www/' : null
     }),
     new HandlebarsPlugin({
       data: require('../config/config-xml.data.prod'),

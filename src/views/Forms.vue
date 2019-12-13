@@ -3,16 +3,41 @@
     <v-progress-linear
       v-if="isLoading"
       indeterminate></v-progress-linear>
-    <v-card v-for="formType in numericFormTypes">
+    <v-card v-for="formType in numericFormTypes" :key="formType">
       <v-toolbar flat>
         <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <permission :requires="TrellisPermission.ADD_FORM">
-          <v-btn
-            icon
-            @click="addForm(formType)">
-            <v-icon>add</v-icon>
-          </v-btn>
+          <v-menu
+            offset-x
+            lazy>
+            <v-btn icon slot="activator">
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+            <v-list>
+              <v-list-tile @click="addForm(formType)">
+                <v-list-tile-action>
+                  <v-icon>add</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  Add Form
+                </v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile @click="showFormImport = true">
+                <v-list-tile-action>
+                  <v-icon>import_export</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  Import Form
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+<!--          <v-btn-->
+<!--            icon-->
+<!--            @click="addForm(formType)">-->
+<!--            <-->
+<!--          </v-btn>-->
         </permission>
       </v-toolbar>
       <v-data-table
@@ -41,16 +66,16 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from "../components/Permission"
-  import StudyForm from "../entities/trellis/StudyForm"
+  import Permission from '../components/Permission.vue'
+  import StudyForm from '../entities/trellis/StudyForm'
   import FormService from '../services/form/FormService'
-  import TranslationService from "../services/TranslationService"
-  import formTypes from "../static/form.types"
-  import global, {Singleton} from '../static/singleton'
-  import Form from "../entities/trellis/Form"
-  import FormListTile from "../components/forms/FormListTile"
-  import TrellisModal from '../components/TrellisModal'
-  import FormSkips from '../components/forms/FormSkips'
+  import TranslationService from '../services/TranslationService'
+  import formTypes from '../static/form.types'
+  import global, { Singleton } from '../static/singleton'
+  import Form from '../entities/trellis/Form'
+  import FormListTile from '../components/forms/FormListTile.vue'
+  import TrellisModal from '../components/TrellisModal.vue'
+  import FormSkips from '../components/forms/FormSkips.vue'
   import DocsFiles from '../components/documentation/DocsFiles'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
 
@@ -58,10 +83,8 @@
     name: 'Forms',
     mixins: [DocsLinkMixin(DocsFiles.getting_started.create_form)],
     components: {FormListTile, TrellisModal, FormSkips, Permission},
-    async created () {
-      this.isLoading = true
-      this.studyForms = await FormService.getAllStudyForms(global.study.id)
-      this.isLoading = false
+    created () {
+      this.loadForms()
     },
     data () {
       return {
@@ -69,7 +92,8 @@
         global: global as Singleton,
         studyForms: null,
         isAddingNewForm: false,
-        isLoading: false
+        isLoading: false,
+        showImportForm: false
       }
     },
     computed: {
@@ -121,7 +145,9 @@
           this.studyForms.push(studyForm)
           this.alert('success', this.$t('resource_created', [this.formName(studyForm.form)]))
         } catch (err) {
-          this.alert('error', this.$t('failed_resource_create', [this.$t('form')]))
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_create', [this.$t('form')]))
+          }
         }
       },
       async updateForm (form: Form) {
@@ -131,8 +157,9 @@
           Object.assign(sf.form, newForm)
           this.alert('success', this.$t('resource_updated', [this.formName(form)]))
         } catch (err) {
-          this.alert('error', this.$t('failed_resource_update', [this.formName(form)]))
-          this.log(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [this.formName(form)]))
+          }
         }
       },
       async updateStudyForm (studyForm: StudyForm) {
@@ -142,8 +169,21 @@
           Object.assign(sf.form, newStudyForm)
           this.alert('success', this.$t('resource_updated', [this.formName(studyForm.form)]))
         } catch (err) {
-          this.alert('error', this.$t('failed_resource_update', [this.formName(studyForm.form)]))
-          this.log(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [this.formName(studyForm.form)]))
+          }
+        }
+      },
+      async loadForms () {
+        this.isLoading = true
+        try {
+          this.studyForms = await FormService.getAllStudyForms(global.study.id)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load forms')
+          }
+        } finally {
+          this.isLoading = false
         }
       },
       formTypeName (formType: formTypes) {
@@ -165,7 +205,9 @@
             this.studyForms.splice(index, 1)
             this.alert('success', this.$t('resource_deleted', [this.formName(studyForm.form)]))
           } catch (err) {
-            this.alert('error', this.$t('failed_resource_delete', [this.formName(studyForm.form)]))
+            if (this.isNotAuthError(err)) {
+              this.logError(err, this.$t('failed_resource_delete', [this.formName(studyForm.form)]))
+            }
           }
         }
       }

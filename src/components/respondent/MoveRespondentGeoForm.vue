@@ -154,7 +154,9 @@
           }
           this.$emit('done', this.respondentGeo, rGeo)
         } catch (err) {
-          console.error(err)
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
           this.$emit('input', false)
         } finally {
           this.newGeo = null

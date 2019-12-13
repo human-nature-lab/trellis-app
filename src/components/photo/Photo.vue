@@ -167,10 +167,12 @@
             const src = await p
             this.setSrc(src)
           } catch (err) {
-            if (err && err.message !== 'Cancelled image load') {
-              this.log(err)
-              this.setError(err)
-              throw err
+            if (this.isNotAuthError(err)) {
+              if (err && err.message !== 'Cancelled image load') {
+                this.log(err)
+                this.setError(err)
+                throw err
+              }
             }
           }
         }

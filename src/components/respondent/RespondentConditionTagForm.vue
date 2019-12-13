@@ -8,9 +8,6 @@
         :title="$t('add_condition_tag')"
         @close="$emit('input', false)"></modal-title>
       <v-card-text>
-        <v-alert v-if="error">
-          {{error}}
-        </v-alert>
         <v-layout row>
           <v-select
             autofocus
@@ -42,8 +39,7 @@
       conditionTagName: '',
       conditions: [],
       isLoading: false,
-      isSaving: false,
-      error: null
+      isSaving: false
     }),
     created () {
       this.load()
@@ -64,7 +60,9 @@
         try {
           this.conditions = await ConditionTagService.getRespondentConditionTagNames()
         } catch (err) {
-          this.error = err
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         } finally {
           this.isLoading = false
         }
@@ -79,7 +77,9 @@
           this.$emit('close', respondentConditionTag)
           this.conditionTagName = ''
         } catch (err) {
-          this.error = err
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         } finally {
           this.isSaving = false
         }

@@ -97,6 +97,7 @@
         formTypes,
         showMenu: false,
         isOpen: false,
+        isBusy: false,
         memForm: this.form.copy(),
         saveThrottled: debounce(async () => {
           this.$emit('save', this.memForm)
@@ -117,7 +118,7 @@
       }
     },
     computed: {
-      censusTypes: function() {
+      censusTypes () {
         let returnTypes = []
         for (let censusType in censusTypes) {
           returnTypes.push({
@@ -135,8 +136,15 @@
       printForm () {},
       async exportForm () {
         this.isBusy = true
-        await FormService.exportForm(this.form.id)
-        this.isBusy = false
+        try {
+          await FormService.exportForm(this.form.id)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to export form')
+          }
+        } finally {
+          this.isBusy = false
+        }
       },
       save () {
         this.$emit('save', this.memForm)

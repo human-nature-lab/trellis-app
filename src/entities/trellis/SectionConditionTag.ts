@@ -1,9 +1,9 @@
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
-import {Column, Entity, JoinColumn, OneToOne, PrimaryColumn} from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import ConditionTag from './ConditionTag'
-import {now} from '../../services/DateService'
+import { now } from '../../services/DateService'
 
 export interface SectionConditionTagRecylerData {
   id: string

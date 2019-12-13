@@ -1,7 +1,11 @@
 import './globals'
 import {expect} from 'chai'
+import Form from '../../src/entities/trellis/Form'
 
 import ConditionAssignmentService from '../../src/services/ConditionAssignmentService'
+import { FormBuilder } from '../FormBuilder'
+import { SectionTemplate } from '../FormBuilderTypes'
+import { InterviewController } from '../InterviewController'
 
 function time (func, n = 5000) {
   let i = n
@@ -64,6 +68,43 @@ export default function () {
       let evalTime = time(testEval)
       // console.log(cassTime, evalTime)
       expect(cassTime).to.be.lessThan(evalTime, 'Wow... This managed to be slower somehow O.o')
+    })
+
+    describe('api', () => {
+      const form = require('../forms/condition-assignment-api-form-builder.json')
+      // const builder = FormBuilder.fromTemplate(require('../forms/condition-assignment-api').default)
+      // debugger
+      const builder = new FormBuilder(new Form().fromSnakeJSON(form))
+      console.log(JSON.stringify(builder.form, null, 2))
+      console.log(JSON.stringify(builder.form.toSnakeJSON({ includeRelationships: true }), null, 2))
+      it('should handle looking up data anywhere in the form', async () => {
+        const controller = new InterviewController(builder.form)
+        await controller.load()
+        controller.validateLocation({ page: 0 })
+        await controller.selectNChoice()
+        await controller.next({ page: 1 })
+        const firstConditionTags = ['ran_first', 'api_for_first_is_same']
+        controller.matchConditionTags(firstConditionTags)
+        controller.hasNoConditionAssignmentErrors()
+        await controller.selectNChoice()
+        await controller.next({ page: 2 })
+        const secondConditionTags = firstConditionTags.concat(['second_saw_first_question_datum', 'second_saw_first_condition_tag'])
+        controller.matchConditionTags(secondConditionTags)
+        await controller.selectNChoice()
+        await controller.selectNChoice(1)
+        await controller.selectNChoice(2)
+        await controller.next({ section: 1, page: 0 })
+        await controller.selectNChoice()
+        await controller.next({ section: 1, page: 1 })
+        controller.matchConditionTags(secondConditionTags.concat(['first_repetition']))
+        await controller.selectNChoice(0)
+        await controller.next({ section: 1, page: 0, sectionFollowUpRepetition: 1 })
+        await controller.selectNChoice()
+        await controller.next({ section: 1, page: 1, sectionFollowUpRepetition: 1 })
+        controller.matchConditionTags(secondConditionTags.concat(['second_repetition', 'had_previous']))
+        await controller.next({ section: 1, page: 0, sectionFollowUpRepetition: 2 })
+      })
+      it('should get data for current section in follow up sections')
     })
   })
 

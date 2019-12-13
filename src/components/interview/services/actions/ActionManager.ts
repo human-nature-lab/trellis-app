@@ -1,8 +1,8 @@
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import Action from '../../../../entities/trellis/Action'
-import InterviewManager from "../../classes/InterviewManager";
-import {ActionPayload} from "./DatumOperations";
-import Question from "../../../../entities/trellis/Question";
+import InterviewManager from '../../classes/InterviewManager'
+import { ActionPayload } from './DatumOperations'
+import Question from '../../../../entities/trellis/Question'
 
 export interface ActionHandler {
   (interview: InterviewManager,

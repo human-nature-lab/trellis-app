@@ -36,7 +36,7 @@
   import Device from '../entities/trellis/Device'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import DeviceService from '../services/device/DeviceService'
-  import { replaceWithNext } from '../router'
+  import { routeQueue } from '../router'
 
   export default Vue.extend({
     name: 'RegisterDevice',
@@ -61,13 +61,12 @@
           device.name = this.deviceName
           const storedDevice = await DeviceService.createDevice(device, this.username, this.password)
           await DeviceService.setDeviceKey(storedDevice)
-          replaceWithNext()
+          routeQueue.goToNext()
         } catch (err) {
           if (err && err.response && err.response.status === 401) {
             this.alert('error', 'Cannot register device with this username and password')
           } else {
-            this.log(err)
-            this.alert('error', err.message, {timeout: 0})
+            this.logError(err)
           }
         } finally {
           this.isWorking = false
@@ -81,7 +80,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

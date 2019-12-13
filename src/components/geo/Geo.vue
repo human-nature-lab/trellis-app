@@ -37,7 +37,7 @@
   import GeoService from '../../services/geo/GeoService'
   import DocsFiles from '../documentation/DocsFiles'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
-  import { pushRoute } from '../../router/index'
+  import { routeQueue } from '../../router'
 
   export default {
     name: 'geo',
@@ -63,7 +63,7 @@
       addLocationClose (addedLocation) {
         this.adding = false
         if (addedLocation instanceof Geo) {
-          pushRoute({
+          routeQueue.push({
             name: 'Geo',
             params: {
               geoId: addedLocation.id
@@ -79,12 +79,15 @@
         this.setCanUserAddChild()
       },
       async setCanUserAddChild () {
-        let parentGeo = await GeoService.getGeoById(this.parentGeoId)
-        this.canUserAddChild = (parentGeo && parentGeo.hasOwnProperty('geoType')) ? parentGeo.geoType.canUserAddChild : false
+        try {
+          let parentGeo = await GeoService.getGeoById(this.parentGeoId)
+          this.canUserAddChild = (parentGeo && parentGeo.hasOwnProperty('geoType')) ? parentGeo.geoType.canUserAddChild : false
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       }
     }
   }
 </script>
-
-<style lang="sass">
-</style>

@@ -1,6 +1,7 @@
-import {AssignerFunction, RelationshipOpts} from '../entities/decorators/WebOrmDecorators'
-import {copyDate} from './DateService'
+import { AssignerFunction, RelationshipOpts } from '../entities/decorators/WebOrmDecorators'
+import { copyDate } from './DateService'
 import moment from 'moment'
+import { isUndefined } from './util'
 
 /**
  * Convert a camel case string into snake case
@@ -179,7 +180,7 @@ export function mapCamelToPlain (source: any, skipSnakeJSON = false, keyMap?: st
  * @returns {any}
  */
 export function deepCopy (obj: any, copySelf: boolean = false): any {
-  if (obj === null || obj === undefined) {
+  if (isUndefined(obj)) {
     return obj
   } else if (Array.isArray(obj)) {
     return obj.map(o => deepCopy(o, true))
@@ -189,7 +190,13 @@ export function deepCopy (obj: any, copySelf: boolean = false): any {
     if (obj.copy && copySelf) {
       return obj.copy()
     } else if (obj.constructor) {
-      let d = new obj.constructor()
+      let d
+      // Try using the constructor. This will fail if the constructor requires arguments
+      try {
+        d = new obj.constructor()
+      } catch (err) {
+        d = {}
+      }
       for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
           d[key] = deepCopy(obj[key], true)
@@ -257,5 +264,30 @@ export function safeParse (str: string, reviver?: (this: any, key: string, val: 
     return JSON.parse(str, reviver)
   } catch (err) {
     return str
+  }
+}
+
+type HashTable = {[key: string]: any}
+
+export function copyWhitelist<T extends HashTable> (obj: {[key: keyof T]: any}, whitelist?: (keyof T)[]): HashTable {
+  if (!obj) {
+    return obj
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(o => deepCopy(o))
+  } else if (typeof obj === 'object') {
+    let r: HashTable = {}
+    for (const key in obj) {
+      if (obj[key] && whitelist && whitelist.indexOf(key) > -1) {
+        const o = deepCopy(obj[key])
+        // Filter empty objects
+        if (typeof o !== 'object' || Object.keys(o).length) {
+          r[key] = o
+        }
+      }
+    }
+    return r
+  } else {
+    return JSON.parse(JSON.stringify(obj))
   }
 }

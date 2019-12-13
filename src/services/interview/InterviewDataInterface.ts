@@ -3,10 +3,16 @@ import RespondentConditionTag from '../../entities/trellis/RespondentConditionTa
 import SurveyConditionTag from '../../entities/trellis/SurveyConditionTag'
 import SectionConditionTag from '../../entities/trellis/SectionConditionTag'
 
+export enum ConditionTagScope {
+  RESPONDENT = 'respondent',
+  SURVEY = 'survey',
+  SECTION = 'section'
+}
+
 export interface ConditionTagInterface {
-  respondent: RespondentConditionTag[]
-  section: SectionConditionTag[]
-  survey: SurveyConditionTag[]
+  [ConditionTagScope.RESPONDENT]: RespondentConditionTag[]
+  [ConditionTagScope.SECTION]: SectionConditionTag[]
+  [ConditionTagScope.SURVEY]: SurveyConditionTag[]
 }
 
 export default interface InterviewDataInterface {

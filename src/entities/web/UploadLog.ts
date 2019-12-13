@@ -1,6 +1,6 @@
-import BaseEntity from "../base/BaseEntity";
-import {AsDate, Serializable} from "../decorators/WebOrmDecorators";
-import {Moment} from "moment";
+import BaseEntity from '../base/BaseEntity'
+import { AsDate, Serializable } from '../decorators/WebOrmDecorators'
+import { Moment } from 'moment'
 
 export default class UploadLog extends BaseEntity {
   @Serializable

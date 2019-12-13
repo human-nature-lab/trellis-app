@@ -1,4 +1,4 @@
-import {roughSizeOf} from "../../classes/M";
+import { roughSizeOf } from '../../classes/M'
 import http, {Token} from '../http/AxiosInstance'
 import axios from 'axios'
 import LRU from 'lru-cache'
@@ -9,7 +9,7 @@ const cache = new LRU({
   }
 })
 import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'
-import Photo from "../../entities/trellis/Photo";
+import Photo from '../../entities/trellis/Photo'
 
 export default class PhotoServiceWeb extends PhotoServiceAbstract {
 l

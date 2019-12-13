@@ -63,7 +63,7 @@
 </template>
 
 <script>
-  import {TrellisPermission} from '../../static/permissions.base'
+  import { TrellisPermission } from '../../static/permissions.base'
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
   import Permission from '../Permission'
   import PermissionMixin from '../../mixins/PermissionMixin'

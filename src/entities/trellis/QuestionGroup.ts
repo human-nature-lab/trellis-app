@@ -1,5 +1,5 @@
-import {Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm'
-import {Relationship, Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Question from './Question'
 import SectionQuestionGroup from './SectionQuestionGroup'

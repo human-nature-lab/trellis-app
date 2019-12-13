@@ -51,8 +51,8 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import GeoType from "../../entities/trellis/GeoType"
-  import TrellisLoadingCircle from "../TrellisLoadingCircle.vue"
+  import GeoType from '../../entities/trellis/GeoType'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
   export default Vue.extend({
     name: 'GeoTypeForm',
     components: { TrellisLoadingCircle },

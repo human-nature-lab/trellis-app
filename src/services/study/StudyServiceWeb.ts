@@ -1,4 +1,4 @@
-import {uriTemplate} from "../http/WebUtils";
+import { uriTemplate } from '../http/WebUtils'
 import StudyServiceAbstract from './StudyServiceAbstract'
 import Study from '../../entities/trellis/Study'
 import http, {adminInst} from '../http/AxiosInstance'
@@ -24,7 +24,7 @@ export default class StudyServiceWeb extends StudyServiceAbstract {
 
   async getAllStudies (): Promise<Study[]> {
     if (this.allStudiesPromise) {
-      return await this.allStudiesPromise
+      return this.allStudiesPromise
     }
 
     this.allStudiesPromise = adminInst.get('study').then(res => {
@@ -32,7 +32,7 @@ export default class StudyServiceWeb extends StudyServiceAbstract {
       return res.data.studies.map(s => new Study().fromSnakeJSON(s))
     })
 
-    return await this.allStudiesPromise
+    return this.allStudiesPromise
   }
 
   async createStudy (study: Study): Promise<Study> {

@@ -1,7 +1,7 @@
-import {Entity, Column, PrimaryColumn, ManyToMany} from 'typeorm'
-import {Serializable} from '../decorators/WebOrmDecorators'
+import { Entity, Column, PrimaryColumn, ManyToMany } from 'typeorm'
+import { Serializable } from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
-import Skip from "./Skip";
+import Skip from './Skip'
 
 @Entity()
 export default class ConditionTag extends SparseTimestampedSoftDelete {

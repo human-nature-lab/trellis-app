@@ -1,6 +1,6 @@
 <template>
   <v-layout column class="full-width-col">
-    <v-card v-for="skip in sortedSkips">
+    <v-card v-for="skip in sortedSkips" :key="skip.id">
       <SkipRow
         :conditionTags="conditionTags"
         :subject="subject"
@@ -30,12 +30,12 @@
 <script lang="ts">
   import Vue from 'vue'
   import Skip from '../../entities/trellis/Skip'
-  import SkipRow from './SkipRow'
-  import ConditionTag from "../../entities/trellis/ConditionTag"
+  import SkipRow from './SkipRow.vue'
+  import ConditionTag from '../../entities/trellis/ConditionTag'
   import SkipService from '../../services/skip'
   export default Vue.extend({
     name: 'SkipEditor',
-    components: {SkipRow},
+    components: { SkipRow },
     props: {
       skips: Array as () => Skip[],
       conditionTags: Array as () => ConditionTag[],
@@ -69,17 +69,36 @@
         this.showNewSkip = true
       },
       async storeNewSkip (newSkip: Skip) {
-        this.lockNewSkip = true
-        await this.newSkip(newSkip)
-        this.lockNewSkip = false
-        this.showNewSkip = false
+        try {
+          this.lockNewSkip = true
+          await this.newSkip(newSkip)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        } finally {
+          this.lockNewSkip = false
+          this.showNewSkip = false
+        }
       },
       async updateSkip (skip: Skip) {
-        skip = await SkipService.updateSkip(skip)
-        this.$emit('update', skip)
+        try {
+          skip = await SkipService.updateSkip(skip)
+          this.$emit('update', skip)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async removeSkip (skip: Skip) {
-        await this.deleteSkip(skip)
+        try {
+          await this.deleteSkip(skip)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
+        }
       },
       async removeNewSkip () {
         this.showNewSkip = false

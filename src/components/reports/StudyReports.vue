@@ -45,8 +45,8 @@ import { StudyReportType } from '../../services/report/ReportService'
 
 <script lang="ts">
   import Vue, {PropOptions} from 'vue'
-  import Report from "../../entities/web/Report"
-  import {StudyReportType} from "../../services/report/ReportService"
+  import Report from '../../entities/web/Report'
+  import { StudyReportType } from '../../services/report/ReportService'
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 
   interface StudyReportTypeObj {
@@ -120,7 +120,3 @@ import { StudyReportType } from '../../services/report/ReportService'
     }
   })
 </script>
-
-<style scoped>
-
-</style>

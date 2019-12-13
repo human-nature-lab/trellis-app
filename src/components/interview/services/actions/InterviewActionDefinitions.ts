@@ -5,18 +5,15 @@ import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import actionManager from './ActionManager'
 import {
   addDatum,
-  addDatumLimit,
   addOrUpdateSingleDatum,
   removeDatum,
-  updateDatum,
-  ActionPayload,
-  removeAllDatum
+  updateDatum
 } from './DatumOperations'
 import Question from '../../../../entities/trellis/Question'
 import InterviewManagerOld, {default as InterviewManager} from '../../classes/InterviewManager'
-import Datum from "../../../../entities/trellis/Datum";
-import Choice from "../../../../entities/trellis/Choice";
-import Action from "../../../../entities/trellis/Action";
+import Datum from '../../../../entities/trellis/Datum'
+import Choice from '../../../../entities/trellis/Choice'
+import Action from '../../../../entities/trellis/Action'
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form

@@ -38,12 +38,9 @@
           this.alert('success', this.$t('import_success'))
           this.$emit('import-respondents', respondents)
         } catch (err) {
-          this.log(err)
-          let message = this.$t('import_failed')
-          if (err && err.response && err.response.data && err.response.data.msg) {
-            message = err.response.data.msg
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('import_failed'))
           }
-          this.alert('error', message, {timeout: 0})
         } finally {
           this.isWorking = false
         }

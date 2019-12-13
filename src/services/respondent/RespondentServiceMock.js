@@ -1,5 +1,5 @@
 import uuid from 'uuid/v4'
-import {now} from '../DateService'
+import { now } from '../DateService'
 import MockService from '../mock/MockService'
 const fakeRespondents = [{
   id: uuid(),

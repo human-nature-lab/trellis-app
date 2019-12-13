@@ -10,14 +10,20 @@
 </template>
 
 <script>
-  import router from '../../router'
+  import routeQueue from '../../router'
   import SurveyService from '../../services/survey/'
   export default {
     name: 'SurveyComplete',
     methods: {
       async toRespondentForms () {
         const survey = await SurveyService.getSurveyById(this.$route.params.surveyId)
-        router.replace({name: 'RespondentForms', params: {studyId: survey.studyId, respondentId: survey.respondentId}})
+        routeQueue.replace({
+          name: 'RespondentForms',
+          params: {
+            studyId: survey.studyId,
+            respondentId: survey.respondentId
+          }
+        })
       }
     }
   }

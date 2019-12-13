@@ -3,10 +3,10 @@ import uuid from 'uuid/v4'
 import DatabaseService from './database/DatabaseService'
 import DeviceService from './device/DeviceService'
 import { syncInstance } from './http/AxiosInstance'
-import {AxiosRequestConfig, AxiosResponse, CancelTokenSource} from "axios";
-import {Connection, IsNull} from 'typeorm'
+import { AxiosRequestConfig, AxiosResponse, CancelTokenSource } from 'axios'
+import { Connection, IsNull } from 'typeorm'
 import LoginService from '../services/login'
-import SingletonService from "./SingletonService";
+import SingletonService from './SingletonService'
 
 /**
  * Max number of rows to write to upload file at a time.
@@ -180,7 +180,7 @@ class SyncService {
   }
 
   async getUpdatedRows (connection:Connection, tableName:string, rowIds:string[]): Promise<object[]> {
-    return await connection.query(`select *, "${tableName}" as table_name from ${tableName} where id in (${rowIds});`)
+    return connection.query(`select *, "${tableName}" as table_name from ${tableName} where id in (${rowIds});`)
   }
 
   async getUpdatedPhotos (connection:Connection, rowIds:string[]): Promise<object[]> {
@@ -190,7 +190,7 @@ class SyncService {
 
   async markUpdatedRowsAsUploaded () {
     const connection = await DatabaseService.getDatabase()
-    return await connection.query(`update updated_records set uploaded_at = date('now') where uploaded_at is null;`)
+    return connection.query(`update updated_records set uploaded_at = date('now') where uploaded_at is null;`)
   }
 
   async createUploadFile (fileEntry, trackProgress, isCancelled) {

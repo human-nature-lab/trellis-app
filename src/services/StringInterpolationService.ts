@@ -6,7 +6,7 @@ export default class StringInterpolationService {
    * @param {String} msg - The message to extract the keys from
    * @returns {Array} - 0 or more interpolation keys
    */
-  static getInterpolationKeys (msg) {
+  static getInterpolationKeys (msg: string) {
     let match
     let keys = []
     while ((match = matchAllBrackets.exec(msg)) !== null) {
@@ -25,7 +25,7 @@ export default class StringInterpolationService {
    * @param msg
    * @param {object} vals - Key pairs of question names and their values
    */
-  static interpolate (msg, vals) {
+  static interpolate (msg: string, vals: {[key: string]: any}) {
     let match
     let interpolatedMsg = msg
     while ((match = matchAllBrackets.exec(msg)) !== null) {

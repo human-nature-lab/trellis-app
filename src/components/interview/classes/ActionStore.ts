@@ -1,14 +1,14 @@
 import Emitter from '../../../classes/Emitter'
-import {now, parseDate} from '../../../services/DateService'
+import { now, parseDate } from '../../../services/DateService'
 import Action from '../../../entities/trellis/Action'
 import Form from '../../../entities/trellis/Form'
-import {InterviewLocation} from '../services/InterviewAlligator'
+import { InterviewLocation } from '../services/InterviewAlligator'
 import AT from '../../../static/action.types'
-import {locToNumber} from "../services/LocationHelpers";
-import {ActionPayload} from "../services/actions/DatumOperations";
-import {randomIntBits} from "../../../classes/M";
-import InterviewService from "../../../services/interview/InterviewService";
-import {Mutex, MutexInterface}from "async-mutex";
+import { locToNumber } from '../services/LocationHelpers'
+import { ActionPayload } from '../services/actions/DatumOperations'
+import { randomIntBits } from '../../../classes/M'
+import InterviewService from '../../../services/interview/InterviewService'
+import { Mutex, MutexInterface }from 'async-mutex'
 
 /**
  * Creates an ordered store that keeps the actions sorted following the order of the form. Actions are accessible via
@@ -17,7 +17,7 @@ import {Mutex, MutexInterface}from "async-mutex";
  */
 export default class ActionStore extends Emitter {
   public store: any[]
-  public lastRealAction: Action|null = null
+  public lastRealAction: Action | null = null
   public questionBins: Map<string, Action[]> = new Map()
   private lastRealActionLocNum: number = -1
   private questionIndex: Map<string, Action[]> = new Map()
@@ -68,6 +68,10 @@ export default class ActionStore extends Emitter {
       this.releaseMutex()
     }
 
+  }
+
+  public hasActions (): boolean {
+    return this.store.length > 0
   }
 
   /**

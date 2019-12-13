@@ -1,8 +1,8 @@
 import DatabaseService from '../database/DatabaseService'
 import CensusServiceAbstract from './CensusServiceAbstract'
 import StudyForm from '../../entities/trellis/StudyForm'
-import Form from "../../entities/trellis/Form";
-import FormService from "../form/FormService";
+import Form from '../../entities/trellis/Form'
+import FormService from '../form/FormService'
 
 export default class CensusServiceCordova extends CensusServiceAbstract {
 

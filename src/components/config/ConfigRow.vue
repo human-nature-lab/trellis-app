@@ -46,8 +46,9 @@
           this.isEditing = false
           this.alert('success', `Successfully updated ${this.entry.key}`)
         } catch (err) {
-          this.log(err)
-          this.alert('error', err.message, {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       },
       async reset () {
@@ -58,8 +59,9 @@
           this.isEditing = false
           this.alert('success', `Successfully reset ${entry.key}`)
         } catch (err) {
-          this.log(err)
-          this.alert('error', err.message, {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err)
+          }
         }
       }
     }

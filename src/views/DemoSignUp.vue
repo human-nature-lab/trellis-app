@@ -64,7 +64,6 @@
   import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import ValidationMixin from '../mixins/ValidationMixin'
   import { adminInst } from '../services/http/AxiosInstance'
-  import router from '../router'
 
   export default Vue.extend({
     name: 'DemoSignUp',

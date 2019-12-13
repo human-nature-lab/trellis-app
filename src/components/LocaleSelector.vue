@@ -25,7 +25,7 @@
   import SingletonService from '../services/SingletonService'
   export default Vue.extend({
     name: 'locale-selector',
-    data: function () {
+    data () {
       return {
         error: null,
         locales: [],
@@ -33,11 +33,11 @@
         isLoading: false
       }
     },
-    created: function () {
+    created () {
       this.load()
     },
     methods: {
-      change: function (localeId) {
+      change (localeId) {
         const locale = this.getLocaleById(localeId)
         this.locale = locale
         LocaleService.setCurrentLocale(locale)
@@ -52,12 +52,14 @@
           this.locale = await LocaleService.getCurrentLocale()
           this.error = null
         } catch (err) {
-          this.error = err
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Failed to load locales')
+          }
         } finally {
           this.isLoading = false
         }
       },
-      getLocaleById: function (localeId) {
+      getLocaleById (localeId) {
         for (let i = 0; i < this.locales.length; i++) {
           let locale = this.locales[i]
           if (locale.id === localeId) {

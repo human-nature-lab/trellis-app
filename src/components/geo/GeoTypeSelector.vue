@@ -29,14 +29,17 @@
 
   export default {
     name: 'geo-type-selector',
-    created: function () {
-      GeoService.getGeoTypesByStudy(global.study.id, this.showUserAddable)
-        .then((geoTypes) => {
-          this.geoTypes = geoTypes
-          if (this.geoType) {
-            this.curGeoType = this.geoTypes.find((gt) => gt.id === this.geoType.id)
-          }
-        })
+    async created () {
+      try {
+        this.geoTypes = await GeoService.getGeoTypesByStudy(global.study.id, this.showUserAddable)
+        if (this.geoType) {
+          this.curGeoType = this.geoTypes.find((gt) => gt.id === this.geoType.id)
+        }
+      } catch (err) {
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
+      }
     },
     props: {
       disableButton: {

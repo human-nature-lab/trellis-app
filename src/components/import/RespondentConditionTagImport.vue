@@ -37,12 +37,9 @@
           await ConditionTagService.importRespondentConditionTags(files[0]['file'], this.global.study.id)
           this.alert('success', 'Imported respondent condition tags successfully')
         } catch (err) {
-          this.log(err)
-          let msg = err.msg
-          if (!msg) {
-            msg = this.$t('import_failed')
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('import_failed'))
           }
-          this.alert('error', msg, {timeout: 0})
         } finally {
           this.isWorking = false
         }

@@ -24,7 +24,7 @@
   // @ts-ignore
   import Vue from 'vue'
 
-  import RespondentFill from "../../entities/trellis/RespondentFill"
+  import RespondentFill from '../../entities/trellis/RespondentFill'
   import RespondentService from '../../services/respondent/RespondentService'
 
   export default Vue.extend({
@@ -55,7 +55,9 @@
         let respondentFills = await RespondentService.getRespondentFillsById(this.respondent.id)
         this.respondentFills = respondentFills
       } catch (err) {
-        this.log(err)
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
       }
     },
     props: {

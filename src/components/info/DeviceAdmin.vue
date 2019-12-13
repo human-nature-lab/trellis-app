@@ -23,7 +23,7 @@
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 
   export default Vue.extend({
-    name: "DeviceAdmin",
+    name: 'DeviceAdmin',
     components: { TrellisLoadingCircle },
     data () {
       return {

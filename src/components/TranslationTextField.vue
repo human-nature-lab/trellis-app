@@ -4,8 +4,8 @@
       <ClickToEdit
         v-model="editingText"
         :editing="isEditing"
-        :editable="persist"
-        @update:editing="isEditing = $event"
+        :editable="editable"
+        @update:editing="updateState"
         :disabled="saving"
         @save="onSave" />
       <v-spacer />
@@ -22,11 +22,11 @@
 </template>
 
 <script lang="ts">
-  import {Mutex} from "async-mutex"
-  import Locale from "../entities/trellis/Locale"
-  import TranslationText from "../entities/trellis/TranslationText"
-  import LocaleService from "../services/locale/LocaleService"
-  import SingletonService from "../services/SingletonService"
+  import { Mutex } from 'async-mutex'
+  import Locale from '../entities/trellis/Locale'
+  import TranslationText from '../entities/trellis/TranslationText'
+  import LocaleService from '../services/locale/LocaleService'
+  import SingletonService from '../services/SingletonService'
   import TranslationTextService from '../services/translation-text/TranslationTextService'
   import ClickToEdit from './ClickToEdit'
   import singleton, {Singleton} from '../static/singleton'
@@ -52,6 +52,10 @@
         required: true
       },
       persist: {
+        type: Boolean,
+        default: true
+      },
+      editable: {
         type: Boolean,
         default: true
       },
@@ -100,8 +104,13 @@
       }
     },
     methods: {
+      updateState (editingState) {
+        this.isEditing = editingState
+        if (!this.isEditing) {
+          this.$emit('cancelled')
+        }
+      },
       async onSave (newText) {
-        if (!this.persist) return
 
         this.saving = true
         this.tt.translatedText = newText
@@ -113,18 +122,21 @@
           }
         }
 
-        // Save any changed translationText elements
-        for (let i = 0; i < this.memCopy.translationText.length; i++) {
-          const mTt = this.memCopy.translationText[i]
-          const tt = this.translation.translationText.find(t => t.localeId === mTt.localeId)
-          if (!tt) {
-            // Save a new translation text
-            this.memCopy.translationText[i] = await TranslationTextService.createTranslationText(this.translation.id, mTt)
-          } else if (tt.translatedText !== mTt.translatedText) {
-            // Update an existing translation text
-            this.memCopy.translationText[i] = await TranslationTextService.updateTranslatedTextById(mTt.id, mTt.translatedText)
+        if (this.persist) {
+          // Save any changed translationText elements
+          for (let i = 0; i < this.memCopy.translationText.length; i++) {
+            const mTt = this.memCopy.translationText[i]
+            const tt = this.translation.translationText.find(t => t.localeId === mTt.localeId)
+            if (!tt) {
+              // Save a new translation text
+              this.memCopy.translationText[i] = await TranslationTextService.createTranslationText(this.translation.id, mTt)
+            } else if (tt.translatedText !== mTt.translatedText) {
+              // Update an existing translation text
+              this.memCopy.translationText[i] = await TranslationTextService.updateTranslatedTextById(mTt.id, mTt.translatedText)
+            }
           }
         }
+
         this.$emit('save', this.memCopy)
         this.saving = false
         this.isEditing = false
@@ -141,8 +153,9 @@
           }
           release()
         } catch (err) {
-          this.log(err)
-          this.alert('error', 'Unable to load locales', {timeout: 0})
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Unable to load locales')
+          }
         }
       }
     }

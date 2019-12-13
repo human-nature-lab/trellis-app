@@ -1,7 +1,7 @@
 // @ts-ignore
 import translations from './translations.csv'
 import VueI18n from 'vue-i18n'
-import Vue from "vue";
+import Vue from 'vue'
 Vue.use(VueI18n)
 
 let locales = translations.shift().filter(t => t !== 'key' && t !== 'comment')

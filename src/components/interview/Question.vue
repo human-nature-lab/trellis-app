@@ -11,6 +11,7 @@
     <v-alert v-show="validationError" transition="slide-y-transition">
       {{validationError}}
     </v-alert>
+    <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
     <v-card-text class="question-content">
       <v-flex class="question-text title">
         <AsyncTranslationText
@@ -42,6 +43,7 @@
   import AsyncTranslationText from '../AsyncTranslationText'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import questionTypes from '../../static/question.types'
+  import ParameterType from '../../static/parameter.types'
 
   import DateQuestion from './questions/DateQuestion'
   import DecimalQuestion from './questions/DecimalQuestion'
@@ -55,6 +57,7 @@
   import RosterQuestion from './questions/RosterQuestion'
   import TextQuestion from './questions/TextQuestion'
   import TimeQuestion from './questions/TimeQuestion'
+  import QuestionTimer from './QuestionTimer'
 
   const typeMap = {
     [questionTypes.year]: DateQuestion,
@@ -129,10 +132,24 @@
           return null
         }
         return this.question.validationError
+      },
+      timerDuration () {
+        if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return 0
+        const qp = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.allowed_time)
+        return qp ? +qp.val : 0
+      },
+      showTimer () {
+        return this.timerDuration !== 0
+      },
+      showTimerControls () {
+        if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return true
+        const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.show_timer_controls)
+        return questionParameter ? !!questionParameter.val : true
       }
     },
     components: {
       AsyncTranslationText,
+      QuestionTimer,
       DateQuestion,
       DecimalQuestion,
       DontKnowRefused,

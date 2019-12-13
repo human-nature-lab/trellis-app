@@ -4,5 +4,5 @@ export default interface FromJSON {
    * web interface
    * @param {object} json
    */
-  fromSnakeJSON(json: object): this
+  fromSnakeJSON (json: object): this
 }

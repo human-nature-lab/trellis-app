@@ -1,9 +1,12 @@
+import Axios, { AxiosError, AxiosInstance, AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse } from 'axios'
 import config from 'config'
+import { TranslateResult } from 'vue-i18n'
 import { APP_ENV } from '../static/constants'
 import Vue, { Component } from 'vue'
 import { defaultLoggingService } from '../services/logging/LoggingService'
 import Log from '../entities/trellis-config/Log'
 import { TrellisPermission } from '../static/permissions.base'
+import i18n from '../i18n'
 // @ts-ignore
 import { AddSnack } from '../components/SnackbarQueue'
 
@@ -27,6 +30,19 @@ export default Vue.mixin({
       config = config ? config : {}
       config.color = color
       AddSnack(msg, config)
+    },
+    logError (err, message?: string | TranslateResult) {
+      message = message || err.message
+      this.log(err)
+      this.alert('error', message, { timeout: 0 })
+    },
+    isNotAuthError (err: AxiosError | AxiosResponse): boolean {
+      // @ts-ignore
+      const isAuthError = err && ((err.response && err.response.status === 401) || err.status === 401)
+      if (isAuthError) {
+        this.alert('info', i18n.t('not_logged_in'), { unique: true })
+      }
+      return !isAuthError
     }
   },
   computed: {
@@ -47,6 +63,8 @@ declare module 'vue/types/vue' {
     log (log: any): Promise<Log>
     addSnack (msg, config?): void
     alert (color: string, msg, config?): void
+    logError (err: Error, msg?: string | TranslateResult): void
+    isNotAuthError (err: AxiosError): boolean
     isWeb: boolean
     isCordova: boolean
     isDebug: boolean

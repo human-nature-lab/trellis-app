@@ -2,8 +2,8 @@ import Interview from '../../entities/trellis/Interview'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import InterviewDataInterface from './InterviewDataInterface'
-import DiffService from "../DiffService";
-import * as moment from "moment"
+import DiffService from '../DiffService'
+import * as moment from 'moment'
 
 export default abstract class InterviewServiceAbstract {
 

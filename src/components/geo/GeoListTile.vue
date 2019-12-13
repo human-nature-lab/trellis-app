@@ -33,7 +33,7 @@
 
 <script>
   import TranslationMixin from '../../mixins/TranslationMixin'
-  import index from '../../router/index'
+  import { routeQueue } from '../../router'
   import Photo from '../photo/Photo'
   import Geo from '../../entities/trellis/Geo'
   import VListTileAction from 'vuetify/src/components/VList/VListTileAction'
@@ -67,7 +67,7 @@
     },
     methods: {
       showGeoMap () {
-        index.push({
+        routeQueue.redirect({
           name: 'GeoSearchWithMap',
           params: {
             geoId: this.geo.id
@@ -75,7 +75,7 @@
         })
       },
       showGeoInfo () {
-        index.push({
+        routeQueue.redirect({
           name: 'Geo',
           params: {
             geoId: this.geo.id

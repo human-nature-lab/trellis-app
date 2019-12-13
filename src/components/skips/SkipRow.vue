@@ -66,13 +66,13 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Skip from "../../entities/trellis/Skip"
-  import ConditionTag from "../../entities/trellis/ConditionTag"
+  import Skip from '../../entities/trellis/Skip'
+  import ConditionTag from '../../entities/trellis/ConditionTag'
   import TrellisLoadingCircle from '../TrellisLoadingCircle'
-  import TrellisModal from "../TrellisModal"
+  import TrellisModal from '../TrellisModal'
   import debounce from 'lodash/debounce'
   import SkipConditionTag from '../../entities/trellis/SkipConditionTag'
-  import CompareService from "../../services/CompareService"
+  import CompareService from '../../services/CompareService'
 
   export default Vue.extend({
     name: 'SkipRow',

@@ -1,8 +1,7 @@
 import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
-import config from 'config'
 import merge from 'lodash/merge'
-import CancellablePromise from "../../classes/CancellablePromise";
+import CancellablePromise from '../../classes/CancellablePromise'
 declare var md5chksum, FileTransfer, cordova
 /* global md5chksum, FileTransfer */
 
@@ -49,7 +48,7 @@ class FileServiceCordova {
     })
   }
 
-  writeFile (directory, file, fileName, fileSize, storageType = 'PERSISTENT', create = true, exclusive = false) {
+  writeFile (directory: string, file: File, fileName: string, fileSize: number, storageType = 'PERSISTENT', create = true, exclusive = false) {
     let requestFileSystemOptions = {
       'storageType': (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
       'requestedBytes': fileSize
@@ -153,12 +152,12 @@ class FileServiceCordova {
 
   async getFullResPhotosDir (): Promise<DirectoryEntry> {
     const fs = await this.requestFileSystem()
-    return await this.getDirectoryEntry(fs, FULL_RES_DIR)
+    return this.getDirectoryEntry(fs, FULL_RES_DIR)
   }
 
   async getPhotosDir (): Promise<DirectoryEntry> {
     const fs = await this.requestFileSystem()
-    return await this.getDirectoryEntry(fs, PHOTOS_DIR)
+    return this.getDirectoryEntry(fs, PHOTOS_DIR)
   }
 
   listPhotos () {
@@ -326,7 +325,6 @@ class FileServiceCordova {
     return new Promise(async (resolve, reject) => {
       try {
         let file: FileEntry = await this.getFile(filePath)
-        debugger
         file.getMetadata(meta => {
           resolve(meta.size)
         }, err => {

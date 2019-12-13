@@ -6,8 +6,8 @@ import fs from 'fs'
 import mv from 'mv'
 import path from 'path'
 import pkg from './package.json'
-import {prompt} from 'promptly'
-import {sentryRelease} from './build/utils'
+import { prompt } from 'promptly'
+import { sentryRelease } from './build/utils'
 
 const argv = parseArgs(process.argv)
 
@@ -97,7 +97,7 @@ async function buildWeb () {
   // Build files
   console.log('bundling files for web')
   const env = getEnv()
-  await exec('npm', ['run', 'build'], {
+  await exec('npm', ['run', 'web'], {
     env
   })
   console.log('zipping files')
@@ -106,8 +106,12 @@ async function buildWeb () {
 }
 
 async function buildRelease (keystorePassword, keyPassword) {
-  console.log('building release APK')
+  console.log('building webpack')
   const env = getEnv()
+  await exec('npm', ['run', 'android'], {
+    env
+  })
+  console.log('building release APK')
   try {
     await exec('cordova', [
       'build', 'android', '--release', '--', '--storePassword', keystorePassword, '--password', keyPassword, '--keystore', opts.keystorePath, '--alias', opts.keyAlias
@@ -136,6 +140,7 @@ async function createSentryRelease () {
 }
 
 async function swapFiles (fileOne, fileTwo) {
+  if (fileOne === fileTwo || !fileOne || !fileTwo) return
   console.log('swapping', fileOne, 'and', fileTwo)
   const tmpName = fileOne + '.tmp'
   fs.renameSync(fileOne, tmpName)
@@ -148,7 +153,7 @@ async function cleanUpConfig () {
 }
 
 async function earlyExit () {
-  // await cleanUpConfig()
+  await cleanUpConfig()
   process.exit()
 }
 
@@ -172,11 +177,10 @@ process.on('SIGINT', function () {
 })
 
 async function main () {
-  // await swapFiles(buildConfigPath, opts.configPath)
+  await swapFiles(buildConfigPath, opts.configPath)
   if (opts.apk) {
     if (opts.release) {
       const [keystorePassword, keyPassword] = await getPasswords()
-      await buildWeb()
       await buildRelease(keystorePassword, keyPassword)
       await moveApk()
     } else if (!opts.skipBuild) {
