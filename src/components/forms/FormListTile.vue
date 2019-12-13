@@ -24,11 +24,11 @@
               </v-list-tile-content>
             </v-list-tile>
           </Permission>
-            <v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
+            <!--v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
               <v-list-tile-content>
                 Print
               </v-list-tile-content>
-            </v-list-tile>
+            </v-list-tile-->
             <v-list-tile @click="exportForm">
               <v-list-tile-content>
                 Export
