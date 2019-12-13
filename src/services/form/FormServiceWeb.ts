@@ -58,6 +58,19 @@ export class FormServiceWeb implements FormServiceInterface {
     saveAs(blob, `form-${formId}.json`)
   }
 
+  async importForm (studyId: string, formName: string, formType: number, file: File): Promise<Form> {
+    const formData = new FormData()
+    formData.append('formJsonFile', file)
+    formData.append('formName', formName)
+    formData.append('formType', formType)
+    const res = await adminInst.post(uriTemplate('study/{studyId}/form/import', [studyId]), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    return new Form().fromSnakeJSON(res.data.importedForm)
+  }
+
   async deleteForm (studyId: string, formId: string) {
     await adminInst.delete(uriTemplate('study/{study}/form/{form}', [studyId, formId]))
   }

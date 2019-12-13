@@ -1,67 +1,72 @@
 <template>
-  <v-flex xs12>
-    <v-progress-linear
-      v-if="isLoading"
-      indeterminate></v-progress-linear>
-    <v-card v-for="formType in numericFormTypes" :key="formType">
-      <v-toolbar flat>
-        <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <permission :requires="TrellisPermission.ADD_FORM">
-          <v-menu
-            offset-x
-            lazy>
-            <v-btn icon slot="activator">
-              <v-icon>more_vert</v-icon>
-            </v-btn>
-            <v-list>
-              <v-list-tile @click="addForm(formType)">
-                <v-list-tile-action>
-                  <v-icon>add</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  Add Form
-                </v-list-tile-content>
-              </v-list-tile>
-              <v-list-tile @click="showFormImport = true">
-                <v-list-tile-action>
-                  <v-icon>import_export</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  Import Form
-                </v-list-tile-content>
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-<!--          <v-btn-->
-<!--            icon-->
-<!--            @click="addForm(formType)">-->
-<!--            <-->
-<!--          </v-btn>-->
-        </permission>
-      </v-toolbar>
-      <v-data-table
-        :headers="headers(formType)"
-        hide-actions
-        :items="studyFormsByType(formType)">
-        <template slot="items" slot-scope="props">
-          <form-list-tile
-            :form="props.item.form"
-            :study-form="props.item"
-            :form-type="formType"
-            v-model="props.item.showHidden"
-            @save="updateForm"
-            @updateStudyForm="updateStudyForm"
-            @delete="deleteForm(props.item)"></form-list-tile>
-           <tr v-if="props.item.showHidden">
-            <td colspan="4">
-              <form-skips :form="props.item.form"></form-skips>
-            </td>
-          </tr>
-        </template>
-      </v-data-table>
-    </v-card>
-  </v-flex>
+  <v-container>
+    <v-flex xs12>
+      <v-progress-linear
+        v-if="isLoading"
+        indeterminate></v-progress-linear>
+      <v-card v-for="formType in numericFormTypes" :key="formType">
+        <v-toolbar flat>
+          <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <permission :requires="TrellisPermission.ADD_FORM">
+            <v-menu
+              offset-x
+              lazy>
+              <v-btn icon slot="activator">
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+              <v-list>
+                <v-list-tile @click="addForm(formType)">
+                  <v-list-tile-action>
+                    <v-icon>add</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-content>
+                    Add Form
+                  </v-list-tile-content>
+                </v-list-tile>
+                <v-list-tile @click="showImportForm = true; importFormType = Number(formType)">
+                  <v-list-tile-action>
+                    <v-icon>import_export</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-content>
+                    Import Form
+                  </v-list-tile-content>
+                </v-list-tile>
+              </v-list>
+            </v-menu>
+            <!--          <v-btn-->
+            <!--            icon-->
+            <!--            @click="addForm(formType)">-->
+            <!--            <-->
+            <!--          </v-btn>-->
+          </permission>
+        </v-toolbar>
+        <v-data-table
+          :headers="headers(formType)"
+          hide-actions
+          :items="studyFormsByType(formType)">
+          <template slot="items" slot-scope="props">
+            <form-list-tile
+              :form="props.item.form"
+              :study-form="props.item"
+              :form-type="formType"
+              v-model="props.item.showHidden"
+              @save="updateForm"
+              @updateStudyForm="updateStudyForm"
+              @delete="deleteForm(props.item)"></form-list-tile>
+            <tr v-if="props.item.showHidden">
+              <td colspan="4">
+                <form-skips :form="props.item.form"></form-skips>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </v-card>
+    </v-flex>
+    <v-dialog v-model="showImportForm" @formImported="onFormImported(importedForm)" max-width="50em">
+      <form-import :form-type="importFormType"></form-import>
+    </v-dialog>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -71,35 +76,41 @@
   import FormService from '../services/form/FormService'
   import TranslationService from '../services/TranslationService'
   import formTypes from '../static/form.types'
-  import global, { Singleton } from '../static/singleton'
+  import global, {Singleton} from '../static/singleton'
   import Form from '../entities/trellis/Form'
   import FormListTile from '../components/forms/FormListTile.vue'
   import TrellisModal from '../components/TrellisModal.vue'
   import FormSkips from '../components/forms/FormSkips.vue'
   import DocsFiles from '../components/documentation/DocsFiles'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
+  import FormImport from '../components/import/FormImport'
 
   export default Vue.extend({
     name: 'Forms',
     mixins: [DocsLinkMixin(DocsFiles.getting_started.create_form)],
-    components: {FormListTile, TrellisModal, FormSkips, Permission},
-    created () {
+    components: {FormListTile, TrellisModal, FormSkips, Permission, FormImport},
+    created() {
       this.loadForms()
     },
-    data () {
+    data() {
       return {
         formTypes,
         global: global as Singleton,
         studyForms: null,
         isAddingNewForm: false,
         isLoading: false,
-        showImportForm: false
+        showImportForm: false,
+        importFormType: formTypes.CENSUS
       }
     },
     computed: {
-      numericFormTypes: function() {
-        return Object.keys(formTypes).filter(formType => {
-          return !isNaN(Number(formType))
+      numericFormTypes: function () {
+        let formTypeKeys = Object.keys(formTypes).filter(formType => {
+          return (!isNaN(Number(formType)));
+        })
+        return formTypeKeys.filter(formType => {
+          // Filter out DEFAULT_CENSUS formType until it is implemented
+          return formType != formTypes.DEFAULT_CENSUS
         })
       }
     },
@@ -136,10 +147,10 @@
           return studyForm.formTypeId == formType
         })
       },
-      formName (form: Form) {
+      formName(form: Form) {
         return TranslationService.getAny(form.nameTranslation, this.global.locale)
       },
-      async addForm (type: formTypes) {
+      async addForm(type: formTypes) {
         try {
           const studyForm = await FormService.createForm(this.global.study.id, type)
           this.studyForms.push(studyForm)
@@ -150,7 +161,11 @@
           }
         }
       },
-      async updateForm (form: Form) {
+      formImported(importedForm: Form) {
+        console.log('formImported', importedForm)
+        this.studyForms.push(importedForm)
+      },
+      async updateForm(form: Form) {
         try {
           const newForm = await FormService.updateForm(form)
           const sf = this.studyForms.find((sf: StudyForm) => sf.form.id === form.id)
@@ -162,7 +177,7 @@
           }
         }
       },
-      async updateStudyForm (studyForm: StudyForm) {
+      async updateStudyForm(studyForm: StudyForm) {
         try {
           const newStudyForm = await FormService.updateStudyForm(studyForm.studyId, studyForm)
           const sf = this.studyForms.find((sf: StudyForm) => sf.id === newStudyForm.id)
@@ -174,7 +189,7 @@
           }
         }
       },
-      async loadForms () {
+      async loadForms() {
         this.isLoading = true
         try {
           this.studyForms = await FormService.getAllStudyForms(global.study.id)
@@ -186,7 +201,7 @@
           this.isLoading = false
         }
       },
-      formTypeName (formType: formTypes) {
+      formTypeName(formType: formTypes) {
         formType = +formType  // convert to int
         switch (formType) {
           case formTypes.CENSUS:
@@ -197,7 +212,7 @@
             return this.$t('forms')
         }
       },
-      async deleteForm (studyForm: StudyForm) {
+      async deleteForm(studyForm: StudyForm) {
         if (confirm(this.$t('confirm_resource_delete', [this.formName(studyForm.form)]))) {
           try {
             await FormService.deleteForm(this.global.study.id, studyForm.form.id)
