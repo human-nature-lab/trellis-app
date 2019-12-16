@@ -161,6 +161,7 @@
     "typescript": "^3.0.1",
     "typescript-eslint-parser": "^18.0.0",
     "uglify-es": "^3.0.25",
+    "uglifyjs-webpack-plugin": "^2.2.0",
     "url-loader": "^1.0.1",
     "vue-i18n": "^8.10.0",
     "vue-loader": "^15.3.0",
