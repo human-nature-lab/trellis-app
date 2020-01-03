@@ -3,7 +3,6 @@
     <td class="small">
       <v-menu
         offset-x
-        max-width="60px"
         lazy
         v-model="showMenu">
         <v-list-tile-action slot="activator">
@@ -19,20 +18,29 @@
         </v-list-tile-action>
         <v-list>
           <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id}}">
-              <v-icon>edit</v-icon>
+            <v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'builder'}}">
+              <v-list-tile-content>
+                Edit
+              </v-list-tile-content>
             </v-list-tile>
           </Permission>
-          <v-list-tile @click="printForm">
-            <v-icon>print</v-icon>
-          </v-list-tile>
-          <v-list-tile
-            @click="exportForm">
-            <v-icon>save_alt</v-icon>
-          </v-list-tile>
-          <v-list-tile @click="$emit('delete')">
-            <v-icon color="error">delete</v-icon>
-          </v-list-tile>
+            <!--v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
+              <v-list-tile-content>
+                Print
+              </v-list-tile-content>
+            </v-list-tile-->
+            <v-list-tile @click="exportForm">
+              <v-list-tile-content>
+                Export
+              </v-list-tile-content>
+            </v-list-tile>
+          <Permission :requires="TrellisPermission.REMOVE_FORM">
+            <v-list-tile @click="$emit('delete')">
+              <v-list-tile-content>
+                <span color="error">Delete</span>
+              </v-list-tile-content>
+            </v-list-tile>
+          </Permission>
         </v-list>
       </v-menu>
     </td>
@@ -85,6 +93,7 @@
     },
     data () {
       return {
+        isBusy: false,
         formTypes,
         showMenu: false,
         isOpen: false,

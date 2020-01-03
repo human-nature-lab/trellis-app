@@ -1,5 +1,5 @@
 import formTypes from '../../static/form.types'
-import http, { adminInst } from '../http/AxiosInstance'
+import { adminInst } from '../http/AxiosInstance'
 import FormServiceInterface from './FormServiceInterface'
 import StudyForm from '../../entities/trellis/StudyForm'
 import { saveAs } from 'file-saver'
@@ -8,7 +8,7 @@ import { uriTemplate } from '../http/WebUtils'
 export class FormServiceWeb implements FormServiceInterface {
 
   getStudyForms (studyId: string): Promise<StudyForm[]> {
-    return http().get(uriTemplate('study/{study}/forms/published', [studyId])).then(res => {
+    return adminInst.get(uriTemplate('study/{study}/forms/published', [studyId])).then(res => {
       if (res.data.forms) {
         return res.data.forms.map(form => new StudyForm().fromSnakeJSON(form))
       } else {
@@ -24,7 +24,7 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   getForm (formId: string, bareBones: boolean = false): Promise<Form> {
-    return http().get(uriTemplate('form/{form}', [formId]))
+    return adminInst.get(uriTemplate('form/{form}', [formId]))
       .then(res => {
         if (res.data.form) {
           return new Form().fromSnakeJSON(res.data.form)
@@ -53,9 +53,22 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   async exportForm (formId: string) {
-    const res = await http().get(uriTemplate('form/{form}', [formId]))
+    const res = await adminInst.get(uriTemplate('form/{form}', [formId]))
     const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'text/json' })
     saveAs(blob, `form-${formId}.json`)
+  }
+
+  async importForm (studyId: string, formName: string, formType: number, file: File): Promise<Form> {
+    const formData = new FormData()
+    formData.append('formJsonFile', file)
+    formData.append('formName', formName)
+    formData.append('formType', formType)
+    const res = await adminInst.post(uriTemplate('study/{studyId}/form/import', [studyId]), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    return new Form().fromSnakeJSON(res.data.importedForm)
   }
 
   async deleteForm (studyId: string, formId: string) {
