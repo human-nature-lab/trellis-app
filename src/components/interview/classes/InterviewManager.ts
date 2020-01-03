@@ -24,7 +24,7 @@ import Section from '../../../entities/trellis/Section'
 export default class InterviewManager extends InterviewManagerBase {
 
   private _isReplaying: boolean
-  private hasAddedActions: boolean = false
+  private hasAddedActions: boolean = true
   private lastActionHasChanged: boolean = false
   private lastAction: Action = null
   private isNavigating: boolean = false
@@ -257,7 +257,7 @@ export default class InterviewManager extends InterviewManagerBase {
       this.resetHighWaterMark()
       this.replayToCurrent()
       this.stepForward(false)
-    } else if (this.isAtHighWaterMark && this.lastAction) {
+    } else if (this.isAtHighWaterMark && this.hasAddedActions) {
       // We are at the end of the survey and we made changes. Play all valid actions ahead of this point in the survey and then move back to the correct page.
       if (this.stepForward()) {
         // Only play actions and move forward if we haven't already reached the end of the survey
