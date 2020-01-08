@@ -24,16 +24,21 @@
               </v-list-tile-content>
             </v-list-tile>
           </Permission>
+          <v-list-tile :to="{name: 'InterviewPreview', params: {formId: form.id}}">
+            <v-list-tile-content>
+              Preview
+            </v-list-tile-content>
+          </v-list-tile>
             <!--v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
               <v-list-tile-content>
                 Print
               </v-list-tile-content>
             </v-list-tile-->
-            <v-list-tile @click="exportForm">
-              <v-list-tile-content>
-                Export
-              </v-list-tile-content>
-            </v-list-tile>
+          <v-list-tile @click="exportForm">
+            <v-list-tile-content>
+              Export
+            </v-list-tile-content>
+          </v-list-tile>
           <Permission :requires="TrellisPermission.REMOVE_FORM">
             <v-list-tile @click="$emit('delete')">
               <v-list-tile-content>
@@ -97,7 +102,6 @@
         formTypes,
         showMenu: false,
         isOpen: false,
-        isBusy: false,
         memForm: this.form.copy(),
         saveThrottled: debounce(async () => {
           this.$emit('save', this.memForm)
