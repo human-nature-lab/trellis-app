@@ -58,7 +58,7 @@ export default [{
   path: '/geo/:geoId',
   name: 'Geo',
   component: GeoInfo,
-  beforeEnter: guardQueue([LocaleGuard])
+  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
 }, {
   path: '/study/:studyId/respondent/:respondentId',
   name: 'Respondent',

@@ -1,5 +1,6 @@
 <template>
   <AsyncTranslationText
+    passive
     :translation="translation"
     :location="location">
   </AsyncTranslationText>

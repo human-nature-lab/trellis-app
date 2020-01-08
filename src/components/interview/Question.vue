@@ -15,6 +15,7 @@
     <v-card-text class="question-content">
       <v-flex class="question-text title">
         <AsyncTranslationText
+          passive
           :translation="question.questionTranslation"
           :location="location">
         </AsyncTranslationText>

@@ -25,8 +25,8 @@
                   v-if="geo !== null && step === 1"
                   :persist="false"
                   :translation="geo.nameTranslation"
-                  v-on:editing-cancelled="closeDialog(null)"
-                  v-on:editing-done="onEditingDone">
+                  @cancelled="closeDialog(null)"
+                  @save="onNameSave">
                 </translation-text-field>
               </v-card-text>
               <v-card-actions>
@@ -205,7 +205,8 @@
       nextStep () {
         this.step++
       },
-      async onEditingDone () {
+      async onNameSave (newTranslation) {
+        this.geo.nameTranslation = newTranslation
         this.addLocationCompleted = true
       },
       onGeoTypeSelected (geoType) {

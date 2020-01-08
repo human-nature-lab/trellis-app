@@ -4,13 +4,13 @@
       <v-toolbar card prominent>
         <v-toolbar-title>
           <AsyncTranslationText :translation="geo.nameTranslation"/>
-          <Permission :requires="TrellisPermission.EDIT_GEO">
-            <v-btn icon small @click="showEditName = true">
-              <v-icon>edit</v-icon>
-            </v-btn>
-          </Permission>
         </v-toolbar-title>
         <v-spacer />
+        <Permission :requires="TrellisPermission.EDIT_GEO">
+          <v-btn icon small @click="showEditName = true">
+            <v-icon>edit</v-icon>
+          </v-btn>
+        </Permission>
         <v-btn
           @click.stop="showGeoMap"
           icon>
@@ -143,6 +143,9 @@
     },
     methods: {
       hydrate: async function (geo: Geo) {
+        if (!geo) {
+          return this.logError(new Error(`Unable to load location`))
+        }
         this.geo = geo
         this.translation = geo.nameTranslation
         this.geoPhotos = await GeoService.getGeoPhotos(geo.id)
@@ -197,7 +200,7 @@
         try {
           GeoService.updateGeo(this.geo)
         } catch (err) {
-          console.error(err)
+          this.logError(err)
         } finally {
           this.showGeoTypeDialog = false
         }

@@ -59,13 +59,18 @@
   import AT from '../../../static/action.types'
   import PT from '../../../static/parameter.types'
   import global from '../../../static/singleton'
-  import AsyncTranslationText from '../../AsyncTranslationText.vue'
   import ModalTitle from '../../ModalTitle'
   import GeoTypeParameterMixin from '../mixins/GeoTypeParameterMixin'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   export default {
     name: 'geo-question',
     mixins: [ActionMixin, GeoTypeParameterMixin, QuestionDisabledMixin],
+    components: {
+      GeoSearch,
+      GeoListTile,
+      ModalTitle,
+      GeoBreadcrumbs
+    },
     props: {
       question: {
         type: Object,
@@ -170,13 +175,6 @@
         this.loadGeos(toLoad)
         return rows
       }
-    },
-    components: {
-      AsyncTranslationText,
-      GeoSearch,
-      GeoListTile,
-      ModalTitle,
-      GeoBreadcrumbs
     }
   }
 </script>

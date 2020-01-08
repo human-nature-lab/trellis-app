@@ -22,6 +22,10 @@
       },
       location: {
         type: Object
+      },
+      passive: {
+        type: Boolean,
+        default: false
       }
     },
     data () {
@@ -32,7 +36,11 @@
     },
     watch: {
       translation (newT, oldT) {
-        if (newT && oldT && newT.id === oldT.id) return
+        // Only update if the translation id changes. Passive prop should be used if the
+        // translation reference gets updated frequently but nothing changes to prevent screen flashing
+        if (this.passive && newT && oldT && newT.id === oldT.id) {
+          return
+        }
         this.reset()
       },
       location (newL, oldL) {
