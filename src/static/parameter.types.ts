@@ -1,5 +1,13 @@
 enum ParameterType  {
   min = 1,
+  max = 2,
+  other = 3,
+  none = 4,
+  read_only = 5,
+  show_dk = 6,
+  show_rf = 7,
+  is_required = 8,
+  geo_type = 9,
   min_relationships = 10,
   max_relationships = 11,
   min_geos = 12,
@@ -12,16 +20,12 @@ enum ParameterType  {
   and_respondent_condition_tag = 19,
   or_respondent_condition_tag = 20,
   hide_no_one = 21,
-  max = 2,
-  other = 3,
-  none = 4,
-  read_only = 5,
-  show_dk = 6,
-  show_rf = 7,
-  is_required = 8,
-  geo_type = 9,
   allowed_time = 22,
-  show_timer_controls = 23
+  show_timer_controls = 23,
+  min_date = 24,
+  max_date = 25,
+  min_time = 26,
+  max_time = 27
 }
 
 export default ParameterType

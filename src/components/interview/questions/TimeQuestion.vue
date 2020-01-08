@@ -2,12 +2,15 @@
   <v-time-picker
     :landscape="$vuetify.breakpoint.smAndUp"
     v-model="time"
+    :min="min"
+    :max="max"
     :disable="isQuestionDisabled"/>
 </template>
 
 <script>
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
+  import PT from '../../../static/parameter.types'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   export default {
     name: 'time-question',
@@ -28,6 +31,18 @@
             val
           })
         }
+      },
+      min () {
+        const v = this.question.questionParameters.find(qp => {
+          return qp.parameterId == PT.min_time && qp.val
+        })
+        return v ? v.val : null
+      },
+      max () {
+        const v = this.question.questionParameters.find(qp => {
+          return qp.parameterId == PT.max_time && qp.val
+        })
+        return v ? v.val : null
       }
     }
   }
