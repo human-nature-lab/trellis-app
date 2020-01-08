@@ -123,7 +123,6 @@
   import SurveyService from '../../services/survey'
   import InterviewService from '../../services/interview/InterviewService'
   import { getCurrentPosition } from '../LocationFinder'
-  import {defaultLoggingService as logger} from '../../services/logging/LoggingService'
   import singleton from '../../static/singleton'
 
   export default Vue.extend({
@@ -209,10 +208,9 @@
             try {
               coords = await getCurrentPosition()
             } catch (err2) {
-              err2.component('FormListItem.vue@tryStartingSurvey')
-              logger.log(err2)
-              console.error(err)
-              console.error(err2)
+              err2.component = 'FormListItem.vue@tryStartingSurvey'
+              this.logError(err)
+              this.logError(err2)
               alert(this.$t('gps_error', [err2]))
             }
           }
@@ -220,7 +218,8 @@
             interview = await InterviewService.create(survey.id, coords)
             this.$emit('newInterview', interview)
           } catch (err) {
-            console.error(err)
+            err.component = 'FormListItem.vue@tryStartingSurvey'
+            this.logError(err)
             alert(this.$t('create_interview_failed', [err]))
           }
         }
