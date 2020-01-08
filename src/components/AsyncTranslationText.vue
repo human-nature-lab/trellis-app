@@ -31,7 +31,8 @@
       }
     },
     watch: {
-      translation () {
+      translation (newT, oldT) {
+        if (newT && oldT && newT.id === oldT.id) return
         this.reset()
       },
       location (newL, oldL) {
