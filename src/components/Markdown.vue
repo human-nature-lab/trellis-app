@@ -93,19 +93,21 @@
         this.$nextTick(this.attachLinkListeners)
         const renderer = new marked.Renderer()
         renderer.link = (href, title, text) => {
-          if (this.useAbsolutePath) {
+          const isExternal = href.includes('http')
+          console.log('href', href, isExternal)
+          if (this.useAbsolutePath && !isExternal) {
             href = path.normalize(path.join(this.currentDirLoc as string, href))
           }
           const params: {[key: string]: string} = {}
           params[this.paramName as string] = href
-          if (this.transformLinks) {
+          if (this.transformLinks && !isExternal) {
             const res: {href: string} = router.resolve({
               name: this.routeName,
               params
             })
             href = res.href
           }
-          return `<a href="${href}"` + (title ? `title="${title}"` : '') + `>
+          return `<a href="${href}"` + (title ? `title="${title}"` : '') + (isExternal ? '' : ' class="internal" ') + `>
                     ${text}
                   </a>`
         }
@@ -118,7 +120,7 @@
     methods: {
       attachLinkListeners (): void {
         if (this.$refs.mdContainer instanceof Element) {
-          this.$refs.mdContainer.querySelectorAll('a').forEach(a => {
+          this.$refs.mdContainer.querySelectorAll('a.internal').forEach(a => {
             a.addEventListener('click', (e) => {
               // @ts-ignore
               if (this.preventLinkPropagation) {
@@ -164,4 +166,10 @@
       width: 100%
       overflow: auto
       margin-bottom: 20px
+    h3, h4, h5, h6
+      margin-top: 1.4em
+    h1
+      margin-top: 1.7em
+    h2
+      margin-top: 1.6em
 </style>
