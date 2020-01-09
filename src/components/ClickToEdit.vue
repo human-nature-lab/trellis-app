@@ -65,7 +65,8 @@
       }
     },
     watch: {
-      value () {
+      value (newVal) {
+        if (this.memText === newVal) return
         this.resetEditorState()
       },
       editing (val) {

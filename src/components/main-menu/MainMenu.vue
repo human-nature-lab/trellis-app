@@ -135,6 +135,12 @@
       },
       changePassword () {
         this.showPasswordModal = true
+      },
+      openStudySelector () {
+        routeQueue.pushAndReturnToCurrent({ name: 'StudySelector' })
+      },
+      openLocaleSelector () {
+        routeQueue.pushAndReturnToCurrent({ name: 'LocaleSelector' })
       }
     },
     computed: {
@@ -203,13 +209,13 @@
         }, {
           title: 'settings',
           items: [{
-            to: {name: 'StudySelector', query: {to: this.$route.fullPath}},
+            click: this.openStudySelector,
             icon: 'assignment',
             title: 'change_study'
           }, {
+            click: this.openLocaleSelector,
             title: 'change_locale',
-            icon: 'language',
-            to: {name: 'locale', query: {to: this.$route.fullPath}}
+            icon: 'language'
           }, {
             click: this.toggleDarkTheme,
             icon: 'wb_sunny',

@@ -21,7 +21,10 @@ export function guardQueue (configs: GuardConfig[]) {
           nextRoute = guard.redirect(to, from)
         }
         const toRoute = nextRoute || routeQueue.nextOrDefault()
-        console.log('redirecting to', toRoute)
+        routeQueue.swapFirst({
+          path: to.fullPath
+        })
+        console.log('redirecting to', toRoute, routeQueue)
         return next(toRoute)
       }
       guard = queue.next()

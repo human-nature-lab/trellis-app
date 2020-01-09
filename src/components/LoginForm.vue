@@ -15,6 +15,7 @@
       @keyup.enter="login"
       v-model="username" />
     <v-text-field
+      ref="passField"
       :label="$t('password')"
       autocapitalize="off"
       autocorrect="off"
@@ -23,7 +24,7 @@
       @keyup.enter="login"
       @change="$emit('password', password)"
       :append-icon="isPassHidden ? 'visibility' : 'visibility_off'"
-      :append-icon-cb="() => (isPassHidden = !isPassHidden)"
+      :append-icon-cb="togglePassHidden"
       :type="isPassHidden ? 'password' : 'text'"
       v-model="password"/>
     <v-btn
@@ -89,6 +90,15 @@
             this.username = ''
             this.password = ''
           }
+        }
+      },
+      togglePassHidden () {
+        this.isPassHidden = !this.isPassHidden
+        if (this.$refs.passField) {
+          this.$nextTick(() => {
+            // @ts-ignore
+            this.$refs.passField.focus()
+          })
         }
       }
     }

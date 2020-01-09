@@ -69,6 +69,11 @@ export class RouteQueue {
     }
   }
 
+  swapFirst (route: QueuableRoute) {
+    this.queue.splice(0, 1, route)
+    this.saveQueue()
+  }
+
   unshift (route: QueuableRoute) {
     if (!this.isAlreadyQueued(route)) {
       this.queue.unshift(route)

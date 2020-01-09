@@ -94,7 +94,6 @@
         const renderer = new marked.Renderer()
         renderer.link = (href, title, text) => {
           const isExternal = href.includes('http')
-          console.log('href', href, isExternal)
           if (this.useAbsolutePath && !isExternal) {
             href = path.normalize(path.join(this.currentDirLoc as string, href))
           }
