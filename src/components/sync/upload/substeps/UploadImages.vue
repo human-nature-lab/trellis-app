@@ -18,6 +18,7 @@
     import DatabaseService from '../../../../services/database/DatabaseService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import { makeBasicAuthHeader } from '../../../../services/util'
 
     export default {
       name: 'upload-images',
@@ -43,6 +44,14 @@
           type: LoggingService,
           required: false,
           'default': function () { return defaultLoggingService }
+        },
+        username: {
+          type: String,
+          required: true
+        },
+        password: {
+          type: String,
+          required: true
         }
       },
       methods: {
@@ -57,7 +66,7 @@
             const deviceId = await DeviceService.getUUID()
             const apiRoot = await DatabaseService.getServerIPAddress()
             const uri = apiRoot + `/sync/device/${deviceId}/upload/image`
-            FileService.upload(uri, photoFile)
+            FileService.upload(uri, photoFile, this.onUploadProgress, makeBasicAuthHeader(this.username, this.password))
               .then(() => {
                 this.numImagesUploaded++
                 this.progress = (this.numImagesUploaded / this.imagesToUpload.length) * 100
@@ -72,6 +81,9 @@
                 }
               })
           }
+        },
+        onUploadProgress (progressEvent) {
+          //console.log(progressEvent)
         },
         onDone: function () {
           this.success = true

@@ -100,6 +100,8 @@
                 v-if="uploadStep > 2 && uploadSubStep > 2"
                 :logging-service="loggingService"
                 :images-to-upload="fileList"
+                :username="username"
+                :password="password"
                 @upload-images-done="uploadImagesDone">
               </upload-images>
             </sync-step>

@@ -75,7 +75,7 @@
         }
       },
       onUploadProgress (progressEvent) {
-        console.log(progressEvent)
+        //console.log(progressEvent)
         let curProgress = (progressEvent.loaded / progressEvent.total) * 100
         // Only update at 5% increments, without this the progress bar does not update
         if ((curProgress - this.progress) > 5) {
