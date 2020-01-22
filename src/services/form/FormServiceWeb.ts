@@ -1,5 +1,5 @@
 import formTypes from '../../static/form.types'
-import { adminInst } from '../http/AxiosInstance'
+import { http, adminInst } from '../http/AxiosInstance'
 import FormServiceInterface from './FormServiceInterface'
 import StudyForm from '../../entities/trellis/StudyForm'
 import { saveAs } from 'file-saver'
@@ -8,7 +8,7 @@ import { uriTemplate } from '../http/WebUtils'
 export class FormServiceWeb implements FormServiceInterface {
 
   getStudyForms (studyId: string): Promise<StudyForm[]> {
-    return adminInst.get(uriTemplate('study/{study}/forms/published', [studyId])).then(res => {
+    return http().get(uriTemplate('study/{study}/forms/published', [studyId])).then(res => {
       if (res.data.forms) {
         return res.data.forms.map(form => new StudyForm().fromSnakeJSON(form))
       } else {
@@ -24,7 +24,7 @@ export class FormServiceWeb implements FormServiceInterface {
   }
 
   getForm (formId: string, bareBones: boolean = false): Promise<Form> {
-    return adminInst.get(uriTemplate('form/{form}', [formId]))
+    return http().get(uriTemplate('form/{form}', [formId]))
       .then(res => {
         if (res.data.form) {
           return new Form().fromSnakeJSON(res.data.form)
