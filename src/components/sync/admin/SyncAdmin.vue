@@ -241,7 +241,7 @@
       processUploads: async function () {
         this.uploadsProcessing = true
         try {
-          await withAuth(SyncAdminService.processUploads())
+          SyncAdminService.processUploads()
           this.getUploads()
         } catch (err) {
           if (this.isNotAuthError(err)) {
