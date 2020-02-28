@@ -1,11 +1,12 @@
-# Trellis Interview
+# Trellis APP
 
-> The trellis SPA for conducting interviews
+> The Trellis SPA for conducting administered interviews.
 
 ## Releasing
 
 ### Mobile
-- Before building a mobile release the keystore will need to be downloaded from [Google Drive](https://drive.google.com/drive/folders/1iI-UfnBcPngQg-Qf2EiKLsP51TuBOvZT?usp=sharing) ("trellis-web.jks")
+- Before building a mobile release for the first time the keystore will need to be created. This keystore must be reused with each subsequent signed release. More information about APK signing and keystores can be found [here](https://developer.android.com/studio/publish/app-signing).
+  - `keytool -genkey -v -keystore trellis-keystore.jks -alias alias_name -keyalg RSA -keysize 2048 -validity 10000`
 - Cordova will need to be installed globally for this step. `npm i -g cordova@8.1.2`
 
 #### Android
