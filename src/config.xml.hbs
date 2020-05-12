@@ -20,6 +20,11 @@
   <content src="{{CONTENT_SOURCE}}" />
   <platform name="android">
     <allow-intent href="market:*" />
+    {{!-- {{#if DEV}}
+      <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+          <application android:usesCleartextTraffic="true" />
+      </edit-config>
+    {{/if}} --}}
     <icon src="static/img/icons/android-icon-36x36.png" density="ldpi" />
     <icon src="static/img/icons/android-icon-48x48.png" density="mdpi" />
     <icon src="static/img/icons/android-icon-72x72.png" density="hdpi" />

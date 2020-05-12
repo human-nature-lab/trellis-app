@@ -10,6 +10,9 @@ import Question from '../entities/trellis/Question'
 import TranslationService from './TranslationService'
 import singleton from '../static/singleton'
 import QuestionDatum from '../entities/trellis/QuestionDatum'
+import GeoService from './geo/GeoService'
+import Geo from '../entities/trellis/Geo'
+import RespondentService from './respondent/RespondentService'
 
 export default class InterpolationService {
   /**
@@ -45,6 +48,13 @@ export default class InterpolationService {
           break
         case QT.roster:
           promises.push(RosterService.getRosterRows([datum.rosterId]).then(rows => rows[0].val))
+          break
+        case QT.geo:
+          promises.push(GeoService.getGeoById(datum.geoId).then((geo: Geo) => {
+            console.log('geo', geo)
+            const r = TranslationService.getAny(geo.nameTranslation, singleton.locale)
+            return r
+          }))
           break
         case QT.multiple_select:
         case QT.multiple_choice:

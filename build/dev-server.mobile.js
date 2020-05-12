@@ -16,6 +16,7 @@ const exec = require('child_process').exec;
 
 // default port where dev server listens for incoming traffic
 var port = process.env.PORT || config.dev.port
+var host = process.env.HOST || config.dev.host || '0.0.0.0'
 // automatically open browser, if not set will be false
 var autoOpenBrowser = !!config.dev.autoOpenBrowser
 // Define HTTP proxies to your custom API backend
@@ -95,7 +96,7 @@ app.use(hotMiddleware)
 var staticPath = path.posix.join(config.dev.assetsPublicPath, config.dev.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
 
-var uri = 'http://localhost:' + port
+var uri = `http://${host}:${port}`
 
 var _resolve
 var readyPromise = new Promise(resolve => {
@@ -130,7 +131,7 @@ devMiddleware.waitUntilValid(() => {
   }
 })
 
-var server = app.listen(port)
+var server = app.listen(port, host)
 
 module.exports = {
   ready: readyPromise,
