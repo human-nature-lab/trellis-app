@@ -54,7 +54,7 @@
     "moment": "^2.22.2",
     "ngraph.forcelayout": "^0.5.0",
     "ngraph.graph": "0.0.14",
-    "node-sass": "4.13.0",
+    "node-sass": "4.13.1",
     "performant-array-to-tree": "git+https://github.com/wyattis/performant-array-to-tree.git",
     "phonegap-plugin-barcodescanner": "^8.0.1",
     "reflect-metadata": "^0.1.12",
