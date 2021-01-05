@@ -226,6 +226,7 @@
   }
 </script>
 
-<style scoped>
-
+<style lang="sass">
+  .dialog__content 
+    z-index: 1700 !important;
 </style>
