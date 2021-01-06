@@ -22,6 +22,10 @@
           </v-layout>
         </v-flex>
       </v-layout>
+      <br />
+      <v-layout row>
+            <ResetRecords/>
+      </v-layout>
     </v-container>
   </v-flex>
 </template>
@@ -31,6 +35,7 @@
   import DocsLinkBadge from '../documentation/DocsLinkBadge.vue'
   import GeoImport from '../import/GeoImport.vue'
   import GeoPhotoImport from '../import/GeoPhotoImport.vue'
+  import ResetRecords from '../import/ResetRecords.vue'
   import RespondentConditionTagImport from '../import/RespondentConditionTagImport.vue'
   import RespondentImport from '../import/RespondentImport.vue'
   import RespondentPhotoImport from '../import/RespondentPhotoImport.vue'
@@ -39,6 +44,7 @@
   export default Vue.extend({
     name: 'DataImport',
     components: {
+      ResetRecords,
       GeoImport,
       GeoPhotoImport,
       RespondentImport,
