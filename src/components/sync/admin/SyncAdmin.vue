@@ -37,6 +37,11 @@
               @click="generateSnapshot">
               {{ $t('generate_snapshot') }}
             </v-btn>
+          <v-btn
+            flat              
+            @click="checkSnapshot">
+              {{ $t('Check Snapshot') }}  
+          </v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -126,6 +131,11 @@
               @click="processUploads">
               {{ $t('process_uploads') }}
             </v-btn>
+            <v-btn
+              flat
+              @click="checkUpload">
+              {{ $t('Check Upload') }}         
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -144,6 +154,10 @@
     components: { UploadLogs },
     data () {
       return {
+        SnapshotSuccessCounter: 0,
+        SnapshotFailedCounter: 0,
+        UploadSuccessCounter: 0,
+        UploadFailedCounter: 0,
         uploadPagination: {
           sortBy: 'created_at',
           descending: true
@@ -155,6 +169,7 @@
         generatingSnapshot: false,
         search: '',
         snapshotsLoading: false,
+        snapshotFailed: false,
         snapshots: [],
         snapshotColumns: [
           {
@@ -168,6 +183,7 @@
         ],
         uploadsProcessing: false,
         uploadsLoading: false,
+        uploadsFailed: false,
         uploads: [],
         uploadColumns: [{
           text: '',
@@ -208,6 +224,24 @@
       }
     },
     methods: {
+      countSnapshot: function () {
+        if (localStorage.SnapshotFailedCounter) {
+          this.SnapshotFailedCounter = parseInt(localStorage.SnapshotFailedCounter)
+        }
+        if (localStorage.SnapshotSuccessCounter) {
+          this.SnapshotSuccessCounter = parseInt(localStorage.SnapshotSuccessCounter)
+        }
+        return (this.snapshotFailed == true) ? localStorage.SnapshotFailedCounter = this.SnapshotFailedCounter + 1 : localStorage.SnapshotSuccessCounter = this.SnapshotSuccessCounter + 1
+      },
+      countUploads: function () {
+        if (localStorage.UploadFailedCounter) {
+          this.UploadFailedCounter = parseInt(localStorage.UploadFailedCounter)
+        }
+        if (localStorage.UploadSuccessCounter) {
+          this.UploadSuccessCounter = parseInt(localStorage.UploadSuccessCounter)
+        }
+        return (this.uploadsFailed == true) ? localStorage.UploadFailedCounter = this.UploadFailedCounter + 1 : localStorage.UploadSuccessCounter = this.UploadSuccessCounter + 1
+      },
       getUploads: async function () {
         this.uploadsLoading = true
         try {
@@ -240,32 +274,48 @@
       },
       processUploads: async function () {
         this.uploadsProcessing = true
+        this.uploadsFailed = false
         try {
           await SyncAdminService.processUploads()
           this.getUploads()
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.log(err)
+            this.uploadsFailed = true
             this.alert('error', 'Unable to process uploads')
           }
         } finally {
+          this.countUploads()
           this.uploadsProcessing = false
         }
       },
       generateSnapshot: async function () {
         this.generatingSnapshot = true
+        this.snapshotFailed = false
         try {
           await SyncAdminService.generateSnapshot()
           this.getSnapshots()
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.log(err)
+            this.snapshotFailed = true
             this.alert('error', 'Unable to generate a snapshot')
           }
         } finally {
+          this.countSnapshot()
           this.generatingSnapshot = false
         }
-      }
+      },
+      checkSnapshot: function () {
+        let SnapshotSuccessCounter = (localStorage.SnapshotSuccessCounter) ? localStorage.SnapshotSuccessCounter : 0
+        let SnapshotFailedCounter = (localStorage.SnapshotFailedCounter) ? localStorage.SnapshotFailedCounter : 0
+        this.alert('success', this.$t('Pending number: ') + SnapshotSuccessCounter + this.$t(' and Failure number: ') + SnapshotFailedCounter )
+      },
+      checkUpload: function () {
+        let UploadSuccessCounter = (localStorage.UploadSuccessCounter) ? localStorage.UploadSuccessCounter : 0
+        let UploadFailedCounter = (localStorage.UploadFailedCounter) ? localStorage.UploadFailedCounter : 0
+        this.alert('success', this.$t('Success number: ') + UploadSuccessCounter + this.$t(' and Failure number: ') + UploadFailedCounter )
+     }
     }
   }
 </script>
