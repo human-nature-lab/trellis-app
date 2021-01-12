@@ -71,6 +71,7 @@
     },
     methods: {
       async backupDatabase () {
+        this.backup.error = null
         this.backup.isOpen = true
         this.backup.isWorking = true
         this.backup.progress = 0
@@ -85,6 +86,7 @@
             }
           })
         } catch (err) {
+          console.error(err)
           this.log(err)
           this.backup.error = err.exception
         } finally {
