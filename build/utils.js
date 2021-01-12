@@ -27,7 +27,7 @@ exports.cssLoaders = function (options) {
 
   // generate loader string to be used with extract text plugin
   function generateLoaders (loader, loaderOptions) {
-    var loaders = ['thread-loader', cssLoader]
+    var loaders = [cssLoader]
     if (loader) {
       loaders.push({
         loader: loader + '-loader',
@@ -53,9 +53,8 @@ exports.cssLoaders = function (options) {
   return {
     css: generateLoaders(),
     postcss: generateLoaders(),
-    less: generateLoaders('less'),
-    sass: generateLoaders('sass', { indentedSyntax: true }),
-    scss: generateLoaders('sass'),
+    sass: generateLoaders('sass', { implementation: require('sass'), indentedSyntax: true }),
+    scss: generateLoaders('sass', { implementation: require('sass') }),
     stylus: generateLoaders('stylus'),
     styl: generateLoaders('stylus')
   }
