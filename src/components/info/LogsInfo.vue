@@ -1,6 +1,7 @@
 <template>
   <InfoBlock
     :title="$t('logs')"
+    :to="{ name: 'Logs' }"
     :items="items"/>
 </template>
 
