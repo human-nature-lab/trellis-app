@@ -1,5 +1,17 @@
 <template>
-  <tr>
+  <tr class="form-list-row">
+    <td class="small" v-if="Number(formType) !== formTypes.CENSUS" >
+      <v-icon class="drag-handle">drag_handle</v-icon>
+    </td>
+    <td v-if="Number(formType) !== formTypes.CENSUS">
+      <v-text-field
+        :value="studyForm.sortOrder"
+        hide-details
+        single-line
+        readonly
+        type="number"
+        @change="changeSortOrder"></v-text-field>
+    </td>
     <td class="small">
       <v-menu
         offset-x
@@ -42,7 +54,7 @@
           <Permission :requires="TrellisPermission.REMOVE_FORM">
             <v-list-tile @click="$emit('delete')">
               <v-list-tile-content>
-                <span color="error">Delete</span>
+                <span class="error--text">Delete</span>
               </v-list-tile-content>
             </v-list-tile>
           </Permission>
@@ -52,7 +64,7 @@
     <td>
       <TranslationTextField :translation="memForm.nameTranslation" @click.stop.prevent></TranslationTextField>
     </td>
-    <td v-if="formType == formTypes.CENSUS" style="min-width: 20em;">
+    <td v-if="Number(formType) === formTypes.CENSUS" style="min-width: 20em;">
       <v-select
         :items="censusTypes"
         v-model="studyForm.censusTypeId"
@@ -153,6 +165,11 @@
       save () {
         this.$emit('save', this.memForm)
       },
+      changeSortOrder (sortOrder) {
+        let sf = this.studyForm.copy()
+        sf.sortOrder = sortOrder
+        this.$emit('updateStudyForm', sf)
+      },
       changeCensusType (censusTypeId) {
         let sf = this.studyForm.copy()
         sf.censusTypeId = censusTypeId
@@ -165,4 +182,6 @@
 <style lang="sass">
   .small
     width: 20px
+  .drag-handle
+    cursor: grab
 </style>

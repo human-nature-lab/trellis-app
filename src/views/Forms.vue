@@ -4,7 +4,7 @@
       <v-progress-linear
         v-if="isLoading"
         indeterminate></v-progress-linear>
-      <v-card v-for="formType in numericFormTypes" :key="formType">
+      <v-card v-for="formType in numericFormTypes" :key="'v-card-' + formType">
         <v-toolbar flat>
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer></v-spacer>
@@ -34,17 +34,14 @@
                 </v-list-tile>
               </v-list>
             </v-menu>
-            <!--          <v-btn-->
-            <!--            icon-->
-            <!--            @click="addForm(formType)">-->
-            <!--            <-->
-            <!--          </v-btn>-->
           </permission>
         </v-toolbar>
         <v-data-table
+          :id="'form-table-' + formType"
           :headers="headers(formType)"
           hide-actions
-          :items="studyFormsByType(formType)">
+          item-key="form.id"
+          :items="studyFormsByType[formType]">
           <template slot="items" slot-scope="props">
             <form-list-tile
               :form="props.item.form"
@@ -54,11 +51,11 @@
               @save="updateForm"
               @updateStudyForm="updateStudyForm"
               @delete="deleteForm(props.item)"></form-list-tile>
-            <tr v-if="props.item.showHidden">
+            <!--tr v-if="props.item.showHidden">
               <td colspan="4">
                 <form-skips :form="props.item.form"></form-skips>
               </td>
-            </tr>
+            </tr-->
           </template>
         </v-data-table>
       </v-card>
@@ -84,6 +81,8 @@
   import DocsFiles from '../components/documentation/DocsFiles'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import FormImport from '../components/import/FormImport'
+  import groupBy from 'lodash/groupBy'
+  import Sortable from 'sortablejs'
 
   export default Vue.extend({
     name: 'Forms',
@@ -92,11 +91,15 @@
     created() {
       this.loadForms()
     },
+    mounted() {
+      this.initSortable()
+    },
     data() {
       return {
         formTypes,
         global: global as Singleton,
         studyForms: null,
+        studyFormsByType: {},
         isAddingNewForm: false,
         isLoading: false,
         showImportForm: false,
@@ -116,12 +119,22 @@
     },
     methods: {
       headers(formType) {
-        let hdr = [{
+        let hdr = []
+
+        if (formType != formTypes.CENSUS) {
+          hdr = hdr.concat([{
+            text: ''
+          }, {
+            text: 'Order'
+          }])
+        }
+
+        hdr = hdr.concat([{
           text: 'Actions'
         }, {
-          text: 'Form',
+          text: 'Name',
           class: 'max-width'
-        }]
+        }])
 
         if (formType == formTypes.CENSUS) {
           hdr.push({
@@ -142,11 +155,38 @@
           return h
         });
       },
-      studyFormsByType(formType) {
-        return (this.studyForms || []).filter(studyForm => {
-          return studyForm.formTypeId == formType
+      initSortable() {
+        Object.keys(formTypes).forEach((formType) => {
+          let table = document.querySelector('#form-table-' + formType + ' tbody')
+          if (table instanceof HTMLElement && Number(formType) !== formTypes.CENSUS) {
+            console.log('table', table)
+            Sortable.create(table, {
+              group: 'form-type-' + formType,
+              handle: '.drag-handle',
+              onEnd({newIndex, oldIndex }) {
+                console.log('endDrag', formType, newIndex, oldIndex)
+              }
+            })
+          }
         })
       },
+      /*
+      studyFormsByType(formType) {
+        const studyFormsByType = (this.studyForms || []).filter(studyForm => {
+          return studyForm.formTypeId == formType
+        }).sort((a, b) => {
+          return a.sortOrder - b.sortOrder
+        })
+        return studyFormsByType
+      },
+      getStudyFormsByType() {
+        const returnObject = {}
+        for (let formType of this.numericFormTypes) {
+          returnObject[formType] = this.studyFormsByType(formType)
+        }
+        return returnObject
+      },
+       */
       formName(form: Form) {
         return TranslationService.getAny(form.nameTranslation, this.global.locale)
       },
@@ -162,7 +202,6 @@
         }
       },
       formImported(importedForm: Form) {
-        console.log('formImported', importedForm)
         this.studyForms.push(importedForm)
       },
       async updateForm(form: Form) {
@@ -193,6 +232,8 @@
         this.isLoading = true
         try {
           this.studyForms = await FormService.getAllStudyForms(global.study.id)
+          this.studyFormsByType = groupBy(this.studyForms, 'formTypeId')
+          console.log('this.studyFormsByType', this.studyFormsByType)
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err, 'Unable to load forms')
@@ -233,6 +274,6 @@
 <style lang="sass" scoped>
   .small
     column-width: 20px
-  /*.max-width*/
-    /*column-width: 90%*/
+  .form-list-move
+    transition: transform 0.5s
 </style>
