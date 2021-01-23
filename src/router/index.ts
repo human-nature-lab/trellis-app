@@ -23,8 +23,6 @@ if (singleton.offline) {
   routes = routes.concat(webRoutes)
 }
 
-console.log('Routes', routes)
-
 Vue.use(Router)
 
 export const router = new Router({
@@ -38,19 +36,20 @@ export const routeQueue = new RouteQueue(router, { name: 'Home' })
 
 // If we're in offline mode, require that the application is synced
 if (singleton.offline) {
-  router.beforeEach(guardQueue([SyncGuard, LoginGuard]))
+  router.beforeEach(guardQueue([SyncGuard]))
 }
+
+// Always require we're logged in
+router.beforeEach(guardQueue([LoginGuard]))
 
 router.beforeEach((to, from, next) => {
   // Don't let photo requests prevent navigation from happening by cancelling outstanding requests
-  console.log('route queue', routeQueue.toString())
   PhotoService.cancelAllOutstanding()
   if (to.name !== from.name) {
     // Moving to new page, loading
     singleton.loading.indeterminate = true
     singleton.loading.active = true
   }
-  console.log('before route', to.name, from.name)
   logger.log({
     component: 'router/index.js@beforeEach',
     message: `before navigating to: ${to.fullPath}`,
@@ -98,7 +97,6 @@ export function routerReady () {
       return resolve(true)
     }
     function check () {
-      console.log('checking if router ready')
       // @ts-ignore
       if (router.history.ready) {
         isReady = true
