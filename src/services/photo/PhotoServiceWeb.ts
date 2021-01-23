@@ -31,7 +31,6 @@ l
       count++
     }
     this.existingCancelTokens.clear()
-    console.log(`cancelled ${count} outstanding photo requests`)
   }
 
   getPhotoSrc (photoId: string): [Promise<string>, CancelFunction] {

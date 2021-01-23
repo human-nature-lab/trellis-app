@@ -15,8 +15,6 @@ import QuestionGroup from './QuestionGroup'
 import Form from './Form'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
-console.log(QuestionGroup)
-
 @Entity()
 export default class Section extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable

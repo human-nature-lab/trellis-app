@@ -33,7 +33,6 @@ export default abstract class PermissionServiceAbstract {
       for (const p of updatedPermissions) {
         this.userPermissions[TrellisPermission[p]] = true
       }
-      console.log('permissions for', user, this.userPermissions)
     }
 
     this.hasLoadedOnce = true
