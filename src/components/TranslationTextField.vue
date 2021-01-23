@@ -1,6 +1,6 @@
 <template>
   <v-container @click.stop>
-    <v-layout row wrap>
+    <v-layout row wrap class="translation-text-container">
       <ClickToEdit
         v-model="editingText"
         :editing="isEditing"
@@ -8,7 +8,6 @@
         @update:editing="updateState"
         :disabled="saving"
         @save="onSave" />
-      <v-spacer />
       <v-select
         dense
         class="small-select"
@@ -167,8 +166,11 @@
   .small-select
     display: inline-block
     max-width: $width
-    padding-top: 0
+    padding-top: 8px
+    margin-left: 1em
     min-width: $width
     .input-group__details
       display: none
+  .translation-text-container
+    border: 1px solid rgba(0,0,0,0.12)
 </style>
