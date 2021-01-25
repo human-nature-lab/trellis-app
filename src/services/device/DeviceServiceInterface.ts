@@ -39,7 +39,7 @@ export default interface DeviceServiceInterface {
    * Create a new device
    * @param device
    */
-  createDevice (device: Device, username: string, password: string): PromiseLike<Device>
+  createDevice (device: Device): PromiseLike<Device>
 
   /**
    * Get the unique key used to authenticate this device.

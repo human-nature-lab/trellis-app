@@ -107,10 +107,9 @@ export default class DeviceServiceCordova implements DeviceServiceInterface {
     throw new Error('Not implemented')
   }
 
-  async createDevice (device: Device, username: string, password: string): Promise<Device> {
+  async createDevice (device: Device): Promise<Device> {
     let r = null
     try {
-      await setSyncCredentials(username, password)
       const http = await syncInstance()
       const res = await http.post('device', {
         device: device.toSnakeJSON()

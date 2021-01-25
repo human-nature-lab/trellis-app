@@ -59,20 +59,10 @@ app.get('/cordova.js', function (req, res) {
       console.log(err)
       res.status(500).send({ error: err })
     })
-    // fs.readFile('platforms/android/platform_www/cordova.js', function (err, data) {
-    //   if (err) {
-    //     res.send(err)
-    //     console.error(err)
-    //   } else {
-    //     res.send(data)
-    //   }
-    // })
   }
 })
 
 app.get('/cordova_plugins.js', function (req, res) {
-  // var data = fs.readFileSync('platforms/android/platform_www/cordova_plugins.js')
-  // res.send(data)
   res.sendFile(path.join(__dirname, '../platforms/android/platform_www/cordova_plugins.js'), function (err) {
     if (!err) return
     console.log(err)

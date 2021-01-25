@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import config from 'config'
 import RouteWhitelist from '../../router/RouteWhitelist'
 import storage from '../StorageService'
@@ -7,6 +7,7 @@ import singleton from '../../static/singleton'
 import DatabaseService from '../database/DatabaseService'
 import DeviceService from '../device/DeviceService'
 import { makeBasicAuthHeader } from '../util'
+import { requestCredentials } from '../../components/login/LoginModal'
 
 export interface Token {
   hash: string
@@ -97,22 +98,41 @@ export async function syncInstance (): Promise<AxiosInstance> {
       config.headers['X-Key'] = await DeviceService.getDeviceKey()
       return config
     })
+    syncInst.interceptors.response.use(null, async function (err) {
+      console.error(err)
+      if (err.response && err.response.status === 401) {
+        const config = err.config as AxiosRequestConfig
+        const creds = await requestCredentials()
+        config.headers['Authorization'] = makeBasicAuthHeader(creds.username, creds.password)
+        setSyncCredentials(creds.username, creds.password)
+        return syncInst(config)
+      } else {
+        throw err
+      }
+    })
   }
   return syncInst
 }
 
 let syncAuthInterceptor
+let syncAuthHeader: string | null
 export async function setSyncCredentials (username: string, password: string) {
   const sync = await syncInstance()
+  syncAuthHeader = makeBasicAuthHeader(username, password)
   syncAuthInterceptor = sync.interceptors.request.use(function (config) {
-    config.headers['Authorization'] = makeBasicAuthHeader(username, password)
+    if (syncAuthHeader) {
+      config.headers['Authorization'] = syncAuthHeader
+    }
     return config
   })
 }
 
 export async function resetSyncCredentials () {
-  const sync = await syncInstance()
-  sync.interceptors.request.eject(syncAuthInterceptor)
+  syncAuthHeader = null
+}
+
+export async function getSyncAuthentication () {
+  return syncAuthHeader
 }
 
 export const adminInst = axios.create({

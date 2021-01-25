@@ -25,19 +25,10 @@
       </v-container>
       <v-container>
         <v-card>
-          <StudyReports
-            v-model="selectedStudyTypes"
-            :reportsAreLoading="isLoading"
-            :reports="reports" />
-        </v-card>
-      </v-container>
-      <v-container>
-        <v-card>
-          <FormReports
-            v-model="selectedForms"
-            :reportsAreLoading="isLoading"
-            :reports="reports"
-            :studyId="global.study.id" />
+          <v-data-table
+            v-model="selectedReports"
+            :items="reports"
+            :loading="isLoading" />
         </v-card>
       </v-container>
       <v-container>
@@ -83,14 +74,11 @@
       return {
         global,
         isLoading: false,
-        isDispatching: false,
         isDownloading: false,
         downloadProgress: 0,
         selectedStudyTypes: [],
-        selectedForms: [],
-        reports: [],
-        pollingRate: 10 * 1000,
-        isPolling: false
+        selectedReports: [],
+        reports: []
       }
     },
     created () {
@@ -100,7 +88,7 @@
       async loadLatestReports (): Promise<void> {
         this.isLoading = true
         try {
-          this.reports = (await ReportService.getLatestReports(this.global.study.id))
+          this.reports = await ReportService.getAvailableReports()
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.log(err)
@@ -127,26 +115,8 @@
           this.isDispatching = false
         }
       },
-      mergeReports (reports: Report[], comparator?: (r: Report, r2: Report) => boolean) {
-        if (!comparator) {
-          comparator = (r, r2) => r.id === r2.id
-        }
-        for (let i = 0; i < reports.length; i++) {
-          const report = reports[i]
-          const oldReportIndex = this.reports.findIndex(r => comparator(r, report))
-          if (oldReportIndex > -1) {
-            this.reports.splice(oldReportIndex, 1, report)
-          } else {
-            this.reports.push(report)
-          }
-        }
-      },
-      mergeReportsByType (reports: Report[]) {
-        return this.mergeReports(reports, (r: Report, r2: Report) => r.type + r.formId === r2.type + r2.formId)
-      },
       clearSelected () {
-        this.selectedStudyTypes = []
-        this.selectedForms = []
+        this.selectedReports = []
       },
       startPolling (): void {
         // TODO: Poll for the status of queued reports

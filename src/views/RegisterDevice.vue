@@ -9,29 +9,25 @@
     </v-layout>
     <v-layout justify-space-around>
       <v-flex xs8>
-        <LoginForm
-          v-model="isLoginValid"
-          :showLoginButton="false"
-          @username="username = $event"
-          @password="password = $event" />
         <v-text-field
           v-model="deviceName"
           :rules="deviceNameRules"
           :label="$t('device_name')" />
         <v-btn
-          :disabled="!isValid || isWorking"
+          :disabled="isWorking"
           @click="register">
           <TrellisLoadingCircle v-if="isWorking" size="30px" />
           <span v-else>{{$t('register_device')}}</span>
         </v-btn>
       </v-flex>
     </v-layout>
+    <LoginModal />
   </v-flex>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
-  import LoginForm from '../components/LoginForm.vue'
+  import LoginModal from '../components/login/LoginModal.vue'
   import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import Device from '../entities/trellis/Device'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
@@ -41,13 +37,10 @@
   export default Vue.extend({
     name: 'RegisterDevice',
     mixins: [DocsLinkMixin('./devices/RegisterDevice.md')],
-    components: { LoginForm, TrellisLoadingCircle },
+    components: { LoginModal, TrellisLoadingCircle },
     data () {
       return {
         isWorking: false,
-        isLoginValid: false,
-        username: '',
-        password: '',
         deviceName: device && device.model,
         deviceNameRules: [v => !!v && !!v.length || this.$t('required_field')]
       }
@@ -59,7 +52,7 @@
           const device = new Device()
           device.deviceId = await DeviceService.getUUID()
           device.name = this.deviceName
-          const storedDevice = await DeviceService.createDevice(device, this.username, this.password)
+          const storedDevice = await DeviceService.createDevice(device)
           await DeviceService.setDeviceKey(storedDevice)
           routeQueue.goToNext()
         } catch (err) {
@@ -71,11 +64,6 @@
         } finally {
           this.isWorking = false
         }
-      }
-    },
-    computed: {
-      isValid (): boolean {
-        return this.isLoginValid && !!this.deviceName.length
       }
     }
   })

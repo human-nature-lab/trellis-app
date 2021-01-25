@@ -18,7 +18,7 @@
     import DatabaseService from '../../../../services/database/DatabaseService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
-    import { makeBasicAuthHeader } from '../../../../services/util'
+    import { getSyncAuthentication } from '../../../../services/http/AxiosInstance'
 
     export default {
       name: 'upload-images',
@@ -45,14 +45,6 @@
           required: false,
           'default': function () { return defaultLoggingService }
         },
-        username: {
-          type: String,
-          required: true
-        },
-        password: {
-          type: String,
-          required: true
-        }
       },
       methods: {
         doWork: async function () {
@@ -66,12 +58,14 @@
             const deviceId = await DeviceService.getUUID()
             const apiRoot = await DatabaseService.getServerIPAddress()
             const uri = apiRoot + `/sync/device/${deviceId}/upload/image`
-            FileService.upload(uri, photoFile, this.onUploadProgress, makeBasicAuthHeader(this.username, this.password))
+            const syncAuth = await getSyncAuthentication()
+            FileService.upload(uri, photoFile, this.onUploadProgress, syncAuth)
               .then(() => {
                 this.numImagesUploaded++
                 this.progress = (this.numImagesUploaded / this.imagesToUpload.length) * 100
               })
               .catch((err) => {
+                console.error(err)
                 this.loggingService.log(err).then((result) => { this.currentLog = result })
                 this.working = false
               })
