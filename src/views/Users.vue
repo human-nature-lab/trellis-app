@@ -22,12 +22,12 @@
         :rows-per-page-items="[25, 50, 100]"
         :rows-per-page-text="$t('rows_per_page')"
         :pagination.sync="pagination">
-        <UserRow
-          slot="items"
-          slot-scope="props"
-          :user="props.item"
-          @edit="editUser(props.item)"
-          @remove="removeUser(props.item)" />
+        <template v-slot:item="{ item }">
+          <UserRow
+            :user="item"
+            @edit="editUser(item)"
+            @remove="removeUser(item)" />
+        </template>
       </v-data-table>
     </v-container>
     <TrellisModal

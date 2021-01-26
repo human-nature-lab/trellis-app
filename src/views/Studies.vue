@@ -19,14 +19,14 @@
         :headers="headers"
         hide-default-footer
         :items="studies">
-        <StudyRow
-          slot="items"
-          slot-scope="{item: study} = props"
-          @edit="startEditing(study)"
-          @remove="removeStudy(study)"
-          :key="study.id"
-          :study="study"
-          :locales="locales" />
+        <template v-slot:item="{ item: study }">
+          <StudyRow
+            @edit="startEditing(study)"
+            @remove="removeStudy(study)"
+            :key="study.id"
+            :study="study"
+            :locales="locales" />
+        </template>
       </v-data-table>
     </v-container>
     <TrellisModal v-model="isEditing" title="Editing Study">

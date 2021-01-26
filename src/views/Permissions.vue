@@ -21,11 +21,11 @@
       <v-data-table
         hide-default-footer
         :items="filteredPermissions">
-        <template slot="headers" slot-scope="props">
+        <template v-slot:header>
           <tr>
             <th>{{$t('permission')}}</th>
             <th>{{$t('type')}}</th>
-            <th v-for="role in roles">
+            <th v-for="role in roles" :key="role.id">
               {{role.name}}
               <v-menu
                 lazy
@@ -58,12 +58,12 @@
             </th>
           </tr>
         </template>
-        <PermissionRow
-          slot="items"
-          slot-scope="{item: permission}"
-          @newRolePermission="newRolePermission"
-          :permission="permission"
-          :roles="roles" />
+        <template v-slot:item="{item: permission}">
+          <PermissionRow
+            @newRolePermission="newRolePermission"
+            :permission="permission"
+            :roles="roles" />
+        </template>
       </v-data-table>
     </v-card>
     <TrellisModal

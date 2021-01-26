@@ -15,10 +15,10 @@
       hide-default-footer
       :loading="isLoading"
       :items="entries">
-      <template v-slot:item="{ item: entry }">
+      <template v-slot:item="{ item }">
         <ConfigRow
           @update="updateEntry"
-          :entry="entry" />
+          :entry="item" />
       </template>
     </v-data-table>
   </v-flex>

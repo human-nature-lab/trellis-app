@@ -6,11 +6,11 @@
         :headers="headers"
         :pagination.sync="pagination"
         :items="meta">
-        <template v-slot:item="props">
+        <template v-slot:item="{ item  }">
           <tr class="dense">
-            <td>{{props.item.name}}</td>
-            <td>{{props.item.inserted}}</td>
-            <td>{{props.item.updated}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.inserted}}</td>
+            <td>{{item.updated}}</td>
           </tr>
         </template>
       </v-data-table>

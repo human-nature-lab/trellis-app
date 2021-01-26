@@ -17,7 +17,7 @@
       :rows-per-page-items="[25, 50, 100, {text: 'All', value: -1}]"
       :pagination.sync="pagination"
       :headers="headers">
-      <template slot="items" slot-scope="{item: device}">
+      <template v-slot:item="{ item: device }">
         <td>
           <CRUDMenu
             :editable="hasPermission(TrellisPermission.EDIT_DEVICE)"

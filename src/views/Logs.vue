@@ -34,22 +34,22 @@
       :total-items="total"
       :pagination.sync="pagination"
       @update:pagination="updatePage">
-      <template v-slot:item="props" >
-        <tr @click="showFull(props.item)">
+      <template v-slot:item="{ item }" >
+        <tr @click="showFull(item)">
           <td>
-            {{props.item.createdAt.local().fromNow()}}
+            {{item.createdAt.local().fromNow()}}
           </td>
-          <td :class="`text--${props.item.severity} ${props.item.severity}`">
-            {{props.item.severity}}
-          </td>
-          <td>
-            {{props.item.message}}
+          <td :class="`text--${item.severity} ${item.severity}`">
+            {{item.severity}}
           </td>
           <td>
-            {{props.item.component}}
+            {{item.message}}
           </td>
           <td>
-            <v-icon v-if="props.item.uploadedAt" color="green">check</v-icon>
+            {{item.component}}
+          </td>
+          <td>
+            <v-icon v-if="item.uploadedAt" color="green">check</v-icon>
           </td>
         </tr>
       </template>
