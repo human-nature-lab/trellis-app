@@ -11,10 +11,15 @@
           <permission :requires="TrellisPermission.ADD_FORM">
             <v-menu
               offset-x
-              lazy>
-              <v-btn icon slot="activator">
-                <v-icon>more_vert</v-icon>
-              </v-btn>
+              >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  icon>
+                  <v-icon>more_vert</v-icon>
+                </v-btn>
+              </template>
               <v-list>
                 <v-list-item @click="addForm(formType)">
                   <v-list-item-action>

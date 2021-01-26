@@ -22,15 +22,17 @@
             </photo>
           </v-card-media>
           <v-card-actions class="photo-actions">
-            <v-btn v-if="allowSorting "flat icon color="amber" @click="setFavorite(photo)">
+            <v-btn v-if="allowSorting " flat icon color="amber" @click="setFavorite(photo)">
               <v-icon v-if="photo.pivot.sortOrder === 0" medium>star</v-icon>
               <v-icon v-else medium>star_border</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
             <v-menu bottom left>
-              <v-btn slot="activator" icon>
-                <v-icon medium>more_vert</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn v-on="on" v-bind="attrs" icon>
+                  <v-icon medium>more_vert</v-icon>
+                </v-btn>
+              </template>
               <v-list>
                 <v-list-item v-if="allowNotes">
                   <v-btn icon @click.native="editPhoto(photo)">

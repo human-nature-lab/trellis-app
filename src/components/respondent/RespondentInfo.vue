@@ -1,7 +1,7 @@
 <template>
   <v-flex xs12>
     <v-card tile>
-      <v-toolbar card prominent>
+      <v-toolbar flat>
         <v-toolbar-title>
           {{name}}
           <v-chip

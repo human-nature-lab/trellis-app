@@ -4,9 +4,14 @@
       <v-toolbar-title>{{$t('logs')}}</v-toolbar-title>
       <v-spacer />
       <v-menu offset-y v-if="isCordova">
-        <v-btn icon slot="activator">
-          <v-icon>more_vert</v-icon>
-        </v-btn>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            v-on="on"
+            v-bind="attrs"
+            icon> 
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+        </template>
         <v-list>
           <v-list-item @click="uploadLogs">
             <v-list-item-action>

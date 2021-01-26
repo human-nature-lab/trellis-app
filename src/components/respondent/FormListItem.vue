@@ -10,9 +10,12 @@
           <v-tooltip
             right
             v-if="form.isComplete">
-            <v-icon
-              slot="activator"
-              color="green darken-2">check_circle</v-icon>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                v-on="on"
+                v-bind="attrs"
+                color="green darken-2">check_circle</v-icon>
+            </template>
             <span>
               {{ $t('completed') }}
             </span>
@@ -20,9 +23,12 @@
           <v-tooltip
             right
             v-else-if="form.isStarted">
-            <v-icon
-              slot="activator"
-              color="orange darken-2">query_builder</v-icon>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                v-on="on"
+                v-bind="attrs"
+                color="orange darken-2">query_builder</v-icon>
+            </template>
             <span>
               {{ $t('in_progress') }}
             </span>
@@ -30,9 +36,13 @@
           <v-tooltip
             right
             v-else>
-            <v-icon slot="activator">
-              play_circle_outline
-            </v-icon>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                v-on="on"
+                v-bind="attrs">
+                play_circle_outline
+              </v-icon>
+            </template>
             <span>
               {{ $t('not_started') }}
             </span>

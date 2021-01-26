@@ -6,13 +6,16 @@
       </v-toolbar-title>
       <v-spacer />
       <Permission :requires="TrellisPermission.ADD_RESPONDENT_NAME">
-        <v-tooltip lazy left>
-          <v-btn
-            slot="activator"
-            icon
-            @click="isAdding = true">
-            <v-icon>add</v-icon>
-          </v-btn>
+        <v-tooltip left>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              icon
+              @click="isAdding = true">
+              <v-icon>add</v-icon>
+            </v-btn>
+          </template>
           <span>{{$t('add_respondent_name')}}</span>
         </v-tooltip>
       </Permission>

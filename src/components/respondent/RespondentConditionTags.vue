@@ -7,13 +7,16 @@
       <v-spacer />
       <Permission :requires="TrellisPermission.ADD_RESPONDENT_CONDITION_TAG">
         <v-tooltip left>
-          <v-btn
-            slot="activator"
-            icon
-            class="mb-2"
-            @click="showForm = true">
-            <v-icon>add</v-icon>
-          </v-btn>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              icon
+              class="mb-2"
+              @click="showForm = true">
+              <v-icon>add</v-icon>
+            </v-btn>
+          </template>
           <span>{{$t('add_condition_tag')}}</span>
         </v-tooltip>
       </Permission>

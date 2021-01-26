@@ -45,12 +45,15 @@
               </v-chip>
             </v-select>
             <v-tooltip bottom>
-              <v-btn
-                slot="activator"
-                icon
-                @click="clearFilters">
-                <v-icon>clear</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  icon
+                  @click="clearFilters">
+                  <v-icon>clear</v-icon>
+                </v-btn>
+              </template>
               <span>
                 {{ $t('clear') }}
               </span>
@@ -115,7 +118,6 @@
       <v-spacer></v-spacer>
       <v-btn
         v-if="canAddRespondent"
-        slot="activator"
         color="primary"
         @click="showAssociatedRespondentDialog = true"
         :disabled="isLoading">

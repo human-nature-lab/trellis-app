@@ -9,11 +9,14 @@
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-menu offset-y>
-            <v-btn
-              slot="activator"
-              icon>
-              <v-icon>more_vert</v-icon>
-            </v-btn>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                icon>
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+            </template>
             <v-list>
               <v-list-item @click="showHidden=!showHidden">
                 <v-list-item-action>

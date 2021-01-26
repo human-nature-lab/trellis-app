@@ -4,9 +4,11 @@
     offset-x
     max-width="60px"
     lazy>
-    <v-btn icon slot="activator">
-      <v-icon>more_vert</v-icon>
-    </v-btn>
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn icon v-on="on" v-bind="attrs">
+        <v-icon>more_vert</v-icon>
+      </v-btn>
+    </template>
     <v-list>
       <v-list-item
         @click="$emit('edit')"

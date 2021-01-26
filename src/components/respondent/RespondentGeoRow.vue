@@ -41,21 +41,27 @@
       <v-tooltip
         bottom
         v-if="!respondentGeo.isCurrent">
-        <v-btn
-          slot="activator"
-          icon
-          @click="$emit('remove', respondentGeo.id)">
-          <v-icon>delete</v-icon>
-        </v-btn>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            v-on="on"
+            v-bind="attrs"
+            icon
+            @click="$emit('remove', respondentGeo.id)">
+            <v-icon>delete</v-icon>
+          </v-btn>
+        </template>
         <span>{{ $t('remove_location') }}</span>
       </v-tooltip>
       <v-tooltip bottom>
-        <v-btn
-          icon
-          slot="activator"
-          @click="$emit('move', respondentGeo)">
-          <v-icon>edit</v-icon>
-        </v-btn>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            v-on="on"
+            v-bind="attrs"
+            icon
+            @click="$emit('move', respondentGeo)">
+            <v-icon>edit</v-icon>
+          </v-btn>
+        </template>
         <span>{{ $t('move_respondent_location') }}</span>
       </v-tooltip>
     </td>

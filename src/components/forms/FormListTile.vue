@@ -5,17 +5,19 @@
         offset-x
         lazy
         v-model="showMenu">
-        <v-list-item-action slot="activator">
-          <v-btn
-            :disabled="isBusy"
-            @click.stop.prevent="showMenu = !showMenu"
-            icon>
-            <TrellisLoadingCircle
-              v-if="isBusy"
-              size="100%"></TrellisLoadingCircle>
-            <v-icon v-else>more_vert</v-icon>
-          </v-btn>
-        </v-list-item-action>
+        <template v-slot:activator="{ on, attrs }">
+          <v-list-item-action v-on="on" v-bind="attrs">
+            <v-btn
+              :disabled="isBusy"
+              @click.stop.prevent="showMenu = !showMenu"
+              icon>
+              <TrellisLoadingCircle
+                v-if="isBusy"
+                size="100%"></TrellisLoadingCircle>
+              <v-icon v-else>more_vert</v-icon>
+            </v-btn>
+          </v-list-item-action>
+        </template>
         <v-list>
           <Permission :requires="TrellisPermission.EDIT_FORM">
             <v-list-item :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'builder'}}">

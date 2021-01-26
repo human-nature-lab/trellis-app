@@ -11,9 +11,15 @@
           :label="$t('search')"
           @change="debounceModel('query.debounce', 500)" />
         <v-tooltip left>
-          <v-btn slot="activator" icon @click="showRoleDialog = true">
-            <v-icon>add</v-icon>
-          </v-btn>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              icon
+              @click="showRoleDialog = true">
+              <v-icon>add</v-icon>
+            </v-btn>
+          </template>
           <span>Create a new role</span>
         </v-tooltip>
       </v-toolbar>
@@ -30,11 +36,14 @@
               <v-menu
                 lazy
                 :disabled="isLoading">
-                <v-btn
-                  slot="activator"
-                  icon>
-                  <v-icon>more_vert</v-icon>
-                </v-btn>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-on="on"
+                    v-bind="attrs"
+                    icon>
+                    <v-icon>more_vert</v-icon>
+                  </v-btn>
+                </template>
                 <v-list>
                   <v-list-item
                     v-if="role.canDelete"

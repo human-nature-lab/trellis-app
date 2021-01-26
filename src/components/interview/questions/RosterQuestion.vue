@@ -8,14 +8,17 @@
           :key="row.id">
           <v-list-item-avatar>
             <v-tooltip top>
-              <v-btn
-                slot="activator"
-                icon
-                v-if="editingIndex === rowIndex"
-                :disabled="isSavingEdit || isQuestionDisabled"
-                @click="stopEditingAndRevert(row, rowIndex)">
-                <v-icon color="red">clear</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  icon
+                  v-if="editingIndex === rowIndex"
+                  :disabled="isSavingEdit || isQuestionDisabled"
+                  @click="stopEditingAndRevert(row, rowIndex)">
+                  <v-icon color="red">clear</v-icon>
+                </v-btn>
+              </template>
               <span>
                 {{ $t('revert_changes') }}
               </span>
@@ -42,15 +45,23 @@
               left
               lazy
               :nudge-left="30">
-              <v-btn icon slot="activator">
-                <v-icon>more_vert</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn icon v-on="on" v-bind="attrs">
+                  <v-icon>more_vert</v-icon>
+                </v-btn>
+              </template>
               <v-list>
                 <v-list-item>
                   <v-tooltip left>
-                    <v-btn icon @click="startEditingRow(row, rowIndex)" slot="activator">
-                      <v-icon>edit</v-icon>
-                    </v-btn>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        v-on="on"
+                        v-bind="attrs"
+                        icon
+                        @click="startEditingRow(row, rowIndex)">
+                        <v-icon>edit</v-icon>
+                      </v-btn>
+                    </template>
                     <span>
                       {{ $t('select_to_edit') }}
                     </span>
@@ -58,26 +69,32 @@
                 </v-list-item>
                 <v-list-item>
                   <v-tooltip left>
-                    <v-btn
-                      icon
-                      @click="removeRosterRow(row)"
-                      slot="activator">
-                      <v-icon color="red">delete</v-icon>
-                    </v-btn>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        v-on="on"
+                        v-bind="attrs"
+                        icon
+                        @click="removeRosterRow(row)">
+                        <v-icon color="red">delete</v-icon>
+                      </v-btn>
+                    </template>
                     <span>{{ $t('delete') }}</span>
                   </v-tooltip>
                 </v-list-item>
               </v-list>
             </v-menu>
             <v-tooltip top>
-              <v-btn
-                v-if="editingIndex === rowIndex"
-                icon
-                :disabled="isQuestionDisabled"
-                slot="activator"
-                @click.stop="stopEditingAndSave(row, rowIndex)">
-                  <v-icon color="green">check</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  v-if="editingIndex === rowIndex"
+                  icon
+                  :disabled="isQuestionDisabled"
+                  @click.stop="stopEditingAndSave(row, rowIndex)">
+                    <v-icon color="green">check</v-icon>
+                </v-btn>
+              </template>
               <span>
                 {{ $t('save') }}
               </span>
