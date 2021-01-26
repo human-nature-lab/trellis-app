@@ -3,7 +3,6 @@
     <td class="small">
       <v-menu
         offset-x
-        lazy
         v-model="showMenu">
         <template v-slot:activator="{ on, attrs }">
           <v-list-item-action v-on="on" v-bind="attrs">

@@ -34,7 +34,6 @@
             <th v-for="role in roles" :key="role.id">
               {{role.name}}
               <v-menu
-                lazy
                 :disabled="isLoading">
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn

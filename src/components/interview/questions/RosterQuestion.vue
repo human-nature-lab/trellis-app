@@ -43,7 +43,6 @@
               v-if="!isSavingEdit && !row.isLoading && rowIndex !== editingIndex"
               :disabled="editingIndex > 0 || isQuestionDisabled"
               left
-              lazy
               :nudge-left="30">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon v-on="on" v-bind="attrs">

@@ -2,8 +2,7 @@
   <v-menu
     v-if="editable || removable"
     offset-x
-    max-width="60px"
-    lazy>
+    max-width="60px">
     <template v-slot:activator="{ on, attrs }">
       <v-btn icon v-on="on" v-bind="attrs">
         <v-icon>more_vert</v-icon>
