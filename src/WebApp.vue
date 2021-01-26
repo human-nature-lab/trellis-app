@@ -50,11 +50,19 @@
           </template>
           <span>{{$t('change_locale')}}</span>
         </v-tooltip>
-        <v-toolbar-side-icon
+        <v-tooltip
           v-if="global.secondaryDrawer.isEnabled"
-          @click.stop="global.secondaryDrawer.onClick">
-          <v-icon>{{global.secondaryDrawer.icon || 'search'}}</v-icon>
-        </v-toolbar-side-icon>
+          left>
+          <template v-slot:activator="{on, attrs}">
+            <v-icon
+              v-on="on"
+              v-bind="attrs"
+              @click.stop="global.secondaryDrawer.onClick">
+              {{global.secondaryDrawer.icon || 'search'}}
+            </v-icon>
+          </template>
+          <span>{{$t('view_current_documentation')}}</span>
+        </v-tooltip>
       </v-app-bar>
       <v-dialog
         max-width="300"

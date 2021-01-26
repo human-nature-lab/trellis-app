@@ -18,16 +18,18 @@
       :pagination.sync="pagination"
       :headers="headers">
       <template v-slot:item="{ item: device }">
-        <td>
-          <CRUDMenu
-            :editable="hasPermission(TrellisPermission.EDIT_DEVICE)"
-            :removable="hasPermission(TrellisPermission.REMOVE_DEVICE)"
-            @edit="startEdit(device)"
-            @remove="deleteDevice(device)" />
-        </td>
-        <td>{{device.name}}</td>
-        <td>{{device.deviceId}}</td>
-        <td>{{device.addedByUser && device.addedByUser.name}}</td>
+        <tr>
+          <td>
+            <CRUDMenu
+              :editable="hasPermission(TrellisPermission.EDIT_DEVICE)"
+              :removable="hasPermission(TrellisPermission.REMOVE_DEVICE)"
+              @edit="startEdit(device)"
+              @remove="deleteDevice(device)" />
+          </td>
+          <td>{{device.name}}</td>
+          <td>{{device.deviceId}}</td>
+          <td>{{device.addedByUser && device.addedByUser.name}}</td>
+        </tr>
       </template>
     </v-data-table>
     <TrellisModal v-model="isAdding" :title="$t('new_device')">

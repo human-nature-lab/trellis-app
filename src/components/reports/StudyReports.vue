@@ -15,27 +15,29 @@ import { StudyReportType } from '../../services/report/ReportService'
       select-all
       hide-default-footer>
       <template v-slot:item="props">
-        <td :active="props.selected">
-          <v-checkbox
-            @click="props.selected = !props.selected"
-            :input-value="props.selected"
-            primary
-            hide-details />
-        </td>
-        <td>
-          {{props.item.title}}
-        </td>
-        <td>
-          <span v-if="reportIsLoading(props.item)">
-            <TrellisLoadingCircle size="20px" />
-          </span>
-          <span v-else-if="props.item.report">
-            {{props.item.report.createdAt}}
-          </span>
-          <span v-else>
-            No reports
-          </span>
-        </td>
+        <tr>
+          <td :active="props.selected">
+            <v-checkbox
+              @click="props.selected = !props.selected"
+              :input-value="props.selected"
+              primary
+              hide-details />
+          </td>
+          <td>
+            {{props.item.title}}
+          </td>
+          <td>
+            <span v-if="reportIsLoading(props.item)">
+              <TrellisLoadingCircle size="20px" />
+            </span>
+            <span v-else-if="props.item.report">
+              {{props.item.report.createdAt}}
+            </span>
+            <span v-else>
+              No reports
+            </span>
+          </td>
+        </tr>
       </template>
     </v-data-table>
   </v-flex>

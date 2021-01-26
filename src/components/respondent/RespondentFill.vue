@@ -13,8 +13,10 @@
       :items="respondentFills"
       hide-default-footer>
       <template v-slot:item="{ item }">
-        <td>{{ item.name }}</td> <!-- respondent Name -->
-        <td class="text-xs-right">{{ item.val }}</td> <!-- respondent Value-->
+        <tr>
+          <td>{{ item.name }}</td> <!-- respondent Name -->
+          <td class="text-xs-right">{{ item.val }}</td> <!-- respondent Value-->
+        </tr>
       </template>
     </v-data-table>
   </v-flex>

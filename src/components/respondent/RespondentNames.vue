@@ -26,27 +26,29 @@
       :items="respondent.names"
       hide-default-footer>
       <template v-slot:item="props">
-        <td>{{props.item.name}}</td>
-        <td>
-          <v-icon v-if="props.item.isDisplayName">check</v-icon>
-        </td>
-        <td>
-          <Permission :requires="TrellisPermission.EDIT_RESPONDENT_NAME">
-            <v-btn
-              icon
-              @click="currentName = props.item; isEditing = true">
-              <v-icon>edit</v-icon>
-            </v-btn>
-          </Permission>
-          <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_NAME">
-            <v-btn
-              icon
-              @click="removeName(props.item.id)">
-              <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
-              <v-icon v-else>delete</v-icon>
-            </v-btn>
-          </Permission>
-        </td>
+        <tr>
+          <td>{{props.item.name}}</td>
+          <td>
+            <v-icon v-if="props.item.isDisplayName">check</v-icon>
+          </td>
+          <td>
+            <Permission :requires="TrellisPermission.EDIT_RESPONDENT_NAME">
+              <v-btn
+                icon
+                @click="currentName = props.item; isEditing = true">
+                <v-icon>edit</v-icon>
+              </v-btn>
+            </Permission>
+            <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_NAME">
+              <v-btn
+                icon
+                @click="removeName(props.item.id)">
+                <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
+                <v-icon v-else>delete</v-icon>
+              </v-btn>
+            </Permission>
+          </td>
+        </tr>
       </template>
     </v-data-table>
     <RespondentNameForm

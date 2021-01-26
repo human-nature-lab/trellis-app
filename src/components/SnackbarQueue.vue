@@ -15,8 +15,9 @@
       <v-spacer />
       <v-btn
         v-if="showClose"
-        @click="next"
-        flat>{{$t('close')}}</v-btn>
+        @click="next">
+        {{$t('close')}}
+      </v-btn>
       <v-btn
         v-if="showCloseAll"
         @click="closeAll">

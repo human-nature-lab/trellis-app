@@ -16,8 +16,10 @@
               :items="snapshots">
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
               <template v-slot:item="{ item }">
-                <td>{{ item.created_at }}</td>
-                <td>{{ item.file_name }}</td>
+                <tr>
+                  <td>{{ item.created_at }}</td>
+                  <td>{{ item.file_name }}</td>
+                </tr>
               </template>
               <template v-slot:no-data>
                 <v-alert :value="!snapshotsLoading" type="info">
@@ -31,7 +33,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn
-              flat
+              text
               :loading="generatingSnapshot"
               :disabled="generatingSnapshot"
               @click="generateSnapshot">
@@ -120,7 +122,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn
-              flat
+              text
               :loading="uploadsProcessing"
               :disabled="uploadsProcessing"
               @click="processUploads">

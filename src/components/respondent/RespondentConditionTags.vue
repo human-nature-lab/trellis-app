@@ -27,20 +27,22 @@
       :headers="conditionTagHeaders"
       :items="conditionTags">
       <template v-slot:item="{ item }">
-        <td>{{ item.conditionTag.name }}</td>
-        <td class="text-xs-right">{{ item.createdAt.format('l') }}</td>
-        <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG">
-          <td>
-            <v-btn
-              icon
-              @click="deleteRespondentConditionTag(item.id)">
-              <v-progress-circular
-                v-if="isDeleting(item.id)"
-                indeterminate />
-              <v-icon v-else>delete</v-icon>
-            </v-btn>
-          </td>
-        </Permission>
+        <tr>
+          <td>{{ item.conditionTag.name }}</td>
+          <td class="text-xs-right">{{ item.createdAt.format('l') }}</td>
+          <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG">
+            <td>
+              <v-btn
+                icon
+                @click="deleteRespondentConditionTag(item.id)">
+                <v-progress-circular
+                  v-if="isDeleting(item.id)"
+                  indeterminate />
+                <v-icon v-else>delete</v-icon>
+              </v-btn>
+            </td>
+          </Permission>
+        </tr>
       </template>
     </v-data-table>
     <RespondentConditionTagForm
