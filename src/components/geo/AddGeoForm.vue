@@ -8,7 +8,7 @@
         <v-spacer></v-spacer>
         <v-btn
           icon
-          flat
+          text
           style="top: 0"
           @click="closeDialog(null)">
           <v-icon>clear</v-icon>

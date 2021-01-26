@@ -24,7 +24,7 @@
       @click="ignore">{{$t('ignore')}}</v-btn>
     <v-btn
       v-if="cancel !== undefined && working"
-      flat
+      text 
       @click="cancel">{{$t('stop')}}</v-btn>
   </div>
 </template>

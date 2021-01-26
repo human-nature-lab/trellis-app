@@ -7,7 +7,7 @@
       <slot></slot><span v-if="isCountingDown">&nbsp;{{ continueIn }}</span>
     </v-btn>
     <v-btn
-      flat
+      text 
       v-show="buttonStatus !== STATUS.DONE"
       @click="onCancel">
       {{ $t('cancel') }}

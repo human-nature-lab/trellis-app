@@ -3,7 +3,7 @@
     <v-card>
       <v-btn
         icon
-        flat
+        text
         absolute
         top
         right
@@ -41,9 +41,9 @@
           v-on:geo-type-selected="geoTypeSelected">
         </geo-type-selector>
         <span v-if="curStatus === STATUS.SELECTED">
-          <v-btn small flat @click="moveGeo">{{ $t('move') }} <v-icon right>my_location</v-icon></v-btn>
-          <v-btn small flat @click="renameGeo">{{ $t('rename') }} <v-icon right>edit</v-icon></v-btn>
-          <v-btn small flat @click="removeGeo">{{ $t('delete') }} <v-icon right>delete</v-icon></v-btn>
+          <v-btn small text @click="moveGeo">{{ $t('move') }} <v-icon right>my_location</v-icon></v-btn>
+          <v-btn small text @click="renameGeo">{{ $t('rename') }} <v-icon right>edit</v-icon></v-btn>
+          <v-btn small text @click="removeGeo">{{ $t('delete') }} <v-icon right>delete</v-icon></v-btn>
         </span>
         <v-switch v-if="curStatus === STATUS.MOVING" :label="$t('move_child_elements')" v-model="moveChildren"></v-switch>
         <v-btn v-if="curStatus === STATUS.MOVING" flat @click="cancelMoveGeo">{{ $t('cancel') }}</v-btn>

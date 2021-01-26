@@ -64,8 +64,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat @click.native="editPhoto(null)">{{ $t('cancel') }}</v-btn>
-          <v-btn flat @click.native="updatePhotos(editingPhoto)">{{ $t('save') }}</v-btn>
+          <v-btn text @click.native="editPhoto(null)">{{ $t('cancel') }}</v-btn>
+          <v-btn text @click.native="updatePhotos(editingPhoto)">{{ $t('save') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
