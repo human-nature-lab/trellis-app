@@ -19,7 +19,7 @@
       </v-toolbar>
       <v-progress-linear :active="isLoading" indeterminate :height="3" />
       <v-data-table
-        hide-actions
+        hide-default-footer
         :items="filteredPermissions">
         <template slot="headers" slot-scope="props">
           <tr>

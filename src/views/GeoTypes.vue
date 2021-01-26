@@ -15,7 +15,7 @@
       <v-data-table
         :loading="isLoading || isBusy"
         :headers="headers"
-        hide-actions
+        hide-default-footer
         :items="geoTypes">
         <GeoTypeRow
           :geoType="geoType"

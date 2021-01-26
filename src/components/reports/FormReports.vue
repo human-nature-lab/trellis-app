@@ -13,7 +13,7 @@
       @input="$emit('input', $event)"
       item-key="id"
       select-all
-      hide-actions>
+      hide-default-footer>
       <template
         slot="items"
         slot-scope="props">

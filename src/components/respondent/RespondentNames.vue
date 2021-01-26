@@ -21,7 +21,7 @@
       class="mb-3"
       :headers="nameHeaders"
       :items="respondent.names"
-      hide-actions>
+      hide-default-footer>
       <template slot="items" slot-scope="props">
         <td>{{props.item.name}}</td>
         <td>

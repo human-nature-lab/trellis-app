@@ -11,7 +11,7 @@
       class="mb-3"
       :headers="fillHeaders"
       :items="respondentFills"
-      hide-actions>
+      hide-default-footer>
       <template slot="items" slot-scope="props">
         <td>{{ props.item.name }}</td> <!-- respondent Name -->
         <td class="text-xs-right">{{ props.item.val }}</td> <!-- respondent Value-->

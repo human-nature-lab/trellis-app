@@ -11,7 +11,8 @@
     </v-toolbar>
     <v-data-table
       :headers="headers"
-      hide-actions
+      :items-per-page="entries.length"
+      hide-default-footer
       :loading="isLoading"
       :items="entries">
       <ConfigRow

@@ -20,7 +20,7 @@
     </v-toolbar>
     <v-data-table
       class="mb-3"
-      hide-actions
+      hide-default-footer
       :headers="conditionTagHeaders"
       :items="conditionTags">
       <template slot="items" slot-scope="props">

@@ -19,7 +19,7 @@
       class="mb-3"
       :headers="locationHeaders"
       :items="locations"
-      hide-actions>
+      hide-default-footer>
       <template slot="items" slot-scope="props">
         <respondent-geo-row
           @remove="remove"
@@ -35,7 +35,7 @@
           disable-initial-sort
           :headers="locationHeaders"
           :items="props.item.history"
-          hide-actions>
+          hide-default-footer>
           <template slot="items" slot-scope="historyProps">
             <RespondentGeoRow :respondentGeo="historyProps.item"></RespondentGeoRow>
           </template>

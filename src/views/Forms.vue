@@ -43,7 +43,7 @@
         </v-toolbar>
         <v-data-table
           :headers="headers(formType)"
-          hide-actions
+          hide-default-footer
           :items="studyFormsByType(formType)">
           <template slot="items" slot-scope="props">
             <form-list-tile

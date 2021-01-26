@@ -17,7 +17,7 @@
       <v-data-table
         :loading="isLoading"
         :headers="headers"
-        hide-actions
+        hide-default-footer
         :items="studies">
         <StudyRow
           slot="items"

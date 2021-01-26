@@ -12,14 +12,14 @@
       :left="snack.left"
       :absolute="snack.absolute">
       <span v-if="!!snack.msg">{{snack.msg}}</span>
+      <v-spacer />
       <v-btn
         v-if="showClose"
         @click="next"
         flat>{{$t('close')}}</v-btn>
       <v-btn
         v-if="showCloseAll"
-        @click="closeAll"
-        flat>
+        @click="closeAll">
         {{$t('close_all')}} ({{queue.length}})
       </v-btn>
     </v-snackbar>

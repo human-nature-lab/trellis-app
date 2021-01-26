@@ -10,8 +10,8 @@
       :flat="!internal.editing"
       :append-icon="appendIcon"
       :prepend-icon="internal.editing ? 'clear' : ''"
-      :prepend-icon-cb="resetEditorState"
-      :append-icon-cb="internal.editing ? save : startEditing"
+      @click:prepend="resetEditorState"
+      @click:append="internal.editing ? save : startEditing"
       v-model="memText"
       @keyup.enter="save"
       class="min-text-field" />

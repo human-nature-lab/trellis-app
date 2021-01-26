@@ -13,7 +13,7 @@ import { StudyReportType } from '../../services/report/ReportService'
       :items="reportTypes"
       item-key="value"
       select-all
-      hide-actions>
+      hide-default-footer>
       <template
         slot="items"
         slot-scope="props">
