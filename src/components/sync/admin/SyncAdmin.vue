@@ -15,11 +15,11 @@
               :headers="snapshotColumns"
               :items="snapshots">
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
-              <template slot="items" slot-scope="props">
-                <td>{{ props.item.created_at }}</td>
-                <td>{{ props.item.file_name }}</td>
+              <template v-slot:item="{ item }">
+                <td>{{ item.created_at }}</td>
+                <td>{{ item.file_name }}</td>
               </template>
-              <template slot="no-data">
+              <template v-slot:no-data>
                 <v-alert :value="!snapshotsLoading" type="info">
                   {{ $t('no_results') }}
                 </v-alert>
@@ -62,7 +62,7 @@
               :headers="uploadColumns"
               :items="uploadsFiltered">
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
-              <template slot="items" slot-scope="props">
+              <template v-slot:item="props">
                 <tr>
                   <td>
                     <v-btn

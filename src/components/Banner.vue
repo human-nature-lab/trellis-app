@@ -29,15 +29,9 @@
     props: {
       serverMode: String
     },
-    data () {
-      return {
-        demoBannerColor: 'orange',
-        testBannerColor: 'amber'
-      }
-    },
     computed: {
       backgroundColor () {
-        return this.serverMode === 'test' ? this.testBannerColor : this.demoBannerColor
+        return this.serverMode === 'test' ? 'yellow' : 'orange'
       }
     }
   })

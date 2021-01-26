@@ -6,7 +6,7 @@
         :headers="headers"
         :pagination.sync="pagination"
         :items="meta">
-        <template slot="items" slot-scope="props">
+        <template v-slot:item="props">
           <tr class="dense">
             <td>{{props.item.name}}</td>
             <td>{{props.item.inserted}}</td>

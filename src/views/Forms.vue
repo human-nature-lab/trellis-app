@@ -45,7 +45,7 @@
           :headers="headers(formType)"
           hide-default-footer
           :items="studyFormsByType(formType)">
-          <template slot="items" slot-scope="props">
+          <template v-slot:item="props">
             <form-list-tile
               :form="props.item.form"
               :study-form="props.item"

@@ -5,6 +5,8 @@
       <ClickToEdit
         v-model="entry.value"
         :editing="isEditing"
+        :loading="isWorking"
+        :disabled="isWorking"
         @save="updateEntry" />
     </td>
     <td>
@@ -34,12 +36,14 @@
     },
     data () {
       return {
+        isWorking: false,
         isEditing: false
       }
     },
     methods: {
       async updateEntry (newValue: string) {
         try {
+          this.isWorking = true
           this.entry.value = newValue
           await ConfigService.set(this.entry.key, this.entry.value)
           this.$emit('update', this.entry)
@@ -49,11 +53,14 @@
           if (this.isNotAuthError(err)) {
             this.logError(err)
           }
+        } finally {
+          this.isWorking = false
         }
       },
       async reset () {
         if (!confirm(`Really reset ${this.entry.key}? This action cannot be undone.`)) return
         try {
+          this.isWorking = true
           const entry = await ConfigService.reset(this.entry.key)
           this.$emit('update', entry)
           this.isEditing = false
@@ -62,6 +69,8 @@
           if (this.isNotAuthError(err)) {
             this.logError(err)
           }
+        } finally {
+          this.isWorking = false
         }
       }
     }

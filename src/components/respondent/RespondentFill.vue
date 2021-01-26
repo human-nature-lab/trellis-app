@@ -12,9 +12,9 @@
       :headers="fillHeaders"
       :items="respondentFills"
       hide-default-footer>
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.name }}</td> <!-- respondent Name -->
-        <td class="text-xs-right">{{ props.item.val }}</td> <!-- respondent Value-->
+      <template v-slot:item="{ item }">
+        <td>{{ item.name }}</td> <!-- respondent Name -->
+        <td class="text-xs-right">{{ item.val }}</td> <!-- respondent Value-->
       </template>
     </v-data-table>
   </v-flex>

@@ -34,7 +34,7 @@
       :total-items="total"
       :pagination.sync="pagination"
       @update:pagination="updatePage">
-      <template slot="items" slot-scope="props" >
+      <template v-slot:item="props" >
         <tr @click="showFull(props.item)">
           <td>
             {{props.item.createdAt.local().fromNow()}}

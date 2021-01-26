@@ -22,7 +22,7 @@
       :headers="nameHeaders"
       :items="respondent.names"
       hide-default-footer>
-      <template slot="items" slot-scope="props">
+      <template v-slot:item="props">
         <td>{{props.item.name}}</td>
         <td>
           <v-icon v-if="props.item.isDisplayName">check</v-icon>

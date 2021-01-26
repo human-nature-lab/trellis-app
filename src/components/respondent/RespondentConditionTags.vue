@@ -23,16 +23,16 @@
       hide-default-footer
       :headers="conditionTagHeaders"
       :items="conditionTags">
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.conditionTag.name }}</td>
-        <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
+      <template v-slot:item="{ item }">
+        <td>{{ item.conditionTag.name }}</td>
+        <td class="text-xs-right">{{ item.createdAt.format('l') }}</td>
         <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG">
           <td>
             <v-btn
               icon
-              @click="deleteRespondentConditionTag(props.item.id)">
+              @click="deleteRespondentConditionTag(item.id)">
               <v-progress-circular
-                v-if="isDeleting(props.item.id)"
+                v-if="isDeleting(item.id)"
                 indeterminate />
               <v-icon v-else>delete</v-icon>
             </v-btn>

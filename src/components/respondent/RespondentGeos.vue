@@ -4,12 +4,15 @@
       <v-toolbar-title>{{ $t('locations') }}</v-toolbar-title>
       <v-spacer />
       <v-tooltip left>
-        <v-btn
-          slot="activator"
-          icon
-          @click="isAddingGeo = true">
-          <v-icon>add</v-icon>
-        </v-btn>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-on="on"
+            v-bind="attrs"
+            @click="isAddingGeo = true">
+            <v-icon>add</v-icon>
+          </v-btn>
+        </template>
         <span>{{ $t('add_locations') }}</span>
       </v-tooltip>
     </v-toolbar>
@@ -20,7 +23,7 @@
       :headers="locationHeaders"
       :items="locations"
       hide-default-footer>
-      <template slot="items" slot-scope="props">
+      <template v-slot:item="props">
         <respondent-geo-row
           @remove="remove"
           @move="startMove"
@@ -30,13 +33,13 @@
           v-model="props.expanded"
           :respondent-geo="props.item"></respondent-geo-row>
       </template>
-      <template slot="expand" slot-scope="props">
+      <template v-slot:expanded-item="props">
         <v-data-table
           disable-initial-sort
           :headers="locationHeaders"
           :items="props.item.history"
           hide-default-footer>
-          <template slot="items" slot-scope="historyProps">
+          <template v-slot:item="historyProps">
             <RespondentGeoRow :respondentGeo="historyProps.item"></RespondentGeoRow>
           </template>
         </v-data-table>

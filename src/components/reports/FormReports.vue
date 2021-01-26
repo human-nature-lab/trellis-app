@@ -14,9 +14,7 @@
       item-key="id"
       select-all
       hide-default-footer>
-      <template
-        slot="items"
-        slot-scope="props">
+      <template v-slot:item="props">
         <td :active="props.selected">
           <v-checkbox
             @click="props.selected = !props.selected"

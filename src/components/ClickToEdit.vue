@@ -7,11 +7,12 @@
       :dense="dense"
       :solo="solo"
       :label="label"
+      :loading="loading"
       :flat="!internal.editing"
       :append-icon="appendIcon"
       :prepend-icon="internal.editing ? 'clear' : ''"
       @click:prepend="resetEditorState"
-      @click:append="internal.editing ? save : startEditing"
+      @click:append="onClickAppend"
       v-model="memText"
       @keyup.enter="save"
       class="min-text-field" />
@@ -31,6 +32,7 @@
         type: Boolean,
         default: false
       },
+      loading: Boolean,
       autofocus: {
         type: Boolean,
         default: true
@@ -88,6 +90,13 @@
       }
     },
     methods: {
+      onClickAppend () {
+        if (this.internal.editing) {
+          this.save()
+        } else {
+          this.startEditing()
+        }
+      },
       resetEditorState() {
         this.memText = this.value
         this.internal.editing = false
@@ -99,6 +108,7 @@
         } else {
           this.resetEditorState()
         }
+        this.internal.editing = false
       },
       startEditing() {
         this.internal.editing = true
