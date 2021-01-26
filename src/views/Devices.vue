@@ -13,9 +13,8 @@
     </v-toolbar>
     <v-data-table
       :loading="isBusy"
+      :footer-props="footerProps"
       :items="devices"
-      :rows-per-page-items="[25, 50, 100, {text: 'All', value: -1}]"
-      :pagination.sync="pagination"
       :headers="headers">
       <template v-slot:item="{ item: device }">
         <tr>
@@ -32,6 +31,7 @@
         </tr>
       </template>
     </v-data-table>
+    
     <TrellisModal v-model="isAdding" :title="$t('new_device')">
       <DeviceForm @save="createDevice" :isBusy="isBusy"/>
     </TrellisModal>
@@ -43,14 +43,14 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from '../components/Permission'
+  import Permission from '../components/Permission.vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import PermissionMixin from '../mixins/PermissionMixin'
   import DeviceService from '../services/device/DeviceService'
-  import TrellisModal from '../components/TrellisModal'
-  import DeviceForm from '../components/devices/DeviceForm'
+  import TrellisModal from '../components/TrellisModal.vue'
+  import DeviceForm from '../components/devices/DeviceForm.vue'
   import Pagination from '../types/Pagination'
-  import CRUDMenu from '../components/CRUDMenu'
+  import CRUDMenu from '../components/CRUDMenu.vue'
   import Device from '../entities/trellis/Device'
   export default Vue.extend({
     name: 'Devices',
@@ -62,6 +62,14 @@
         isAdding: false,
         isEditing: false,
         editingDevice: null,
+        footerProps: {
+          itemsPerPageAllText: this.$t('all'),
+          itemsPerPageOptions: [2, 50, 100, -1],
+          itemsPerPageText: this.$t('rows_per_page'),
+          pagination: {
+            itemsPerPage: 2
+          }
+        },
         headers: [{
           text: this.$t('actions'),
           sortable: false
@@ -75,9 +83,6 @@
           text: this.$t('added_by_user'),
           value: 'addedByUser.name'
         }],
-        pagination: {
-          rowsPerPage: 25
-        } as Pagination<Device>,
         devices: []
       }
     },
@@ -106,7 +111,7 @@
       async loadDevices () {
         this.isBusy = true
         try {
-          const page = await DeviceService.getDevices(this.pagination)
+          const page = await DeviceService.getDevices(this.footerProps.pagination)
           this.pagination.total = page.total
           this.pagination.start = page.start
           this.pagination.count = page.count

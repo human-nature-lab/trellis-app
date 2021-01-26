@@ -1,15 +1,12 @@
 <template>
-  <v-layout
-    column
-    fill-height>
+  <v-col class="fill-height">
     <v-toolbar>
       <v-btn icon v-if="parentGeo !== null" @click.stop="upOneLevelDone">
         <v-icon>arrow_back</v-icon>
       </v-btn>
       <v-toolbar-title>{{ parentGeoName }}</v-toolbar-title>
     </v-toolbar>
-    <v-flex
-      fill-height
+    <v-container
       ref="mapContainer"
       id="leafletMap"
       style="position: relative;">
@@ -37,8 +34,8 @@
           <v-icon style="height:auto;">add</v-icon>
         </v-btn>
       </Permission>
-    </v-flex>
-    <div>
+    </v-container>
+    <v-col class="flow-grow-0">
       <Permission :requires="TrellisPermission.EDIT_GEO">
         <GeoEditPanel
           v-on:select-geo-done="selectGeoDone"
@@ -51,8 +48,9 @@
           :selected-geo="selectedGeo"
           :leaflet-map="trellisMap" />
       </Permission>
-    </div>
-  </v-layout>
+    </v-col>
+
+  </v-col>
 </template>
 
 <script>
@@ -468,7 +466,8 @@
     z-index: 3000 !important
     margin-bottom: 50px
   #leafletMap
-    height: 400px /* Temporary height, replaced by actual container height via javascript */
+    height: 100%
+    // height: 400px /* Temporary height, replaced by actual container height via javascript */
     width: 100%
   .trellis-popup
     margin: 2px 2px

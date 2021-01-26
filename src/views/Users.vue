@@ -18,10 +18,8 @@
         :headers="headers"
         :items="users"
         :loading="isLoading"
-        :total-items="total"
-        :rows-per-page-items="[25, 50, 100]"
-        :rows-per-page-text="$t('rows_per_page')"
-        :pagination.sync="pagination">
+        :footer-props="footerProps"
+        :server-items-length="total">
         <template v-slot:item="{ item }">
           <UserRow
             :user="item"
@@ -64,11 +62,13 @@
         showEditUser: false,
         userToEdit: null,
         isLoading: false,
-        pagination: {
-          descending: false,
-          page: 1,
-          rowsPerPage: 25,
-          sortBy: 'name'
+        footerProps: {
+          itemsPerPageAllText: this.$t('all'),
+          itemsPerPageOptions: [2, 50, 100, -1],
+          itemsPerPageText: this.$t('rows_per_page'),
+          pagination: {
+            itemsPerPage: 2
+          }
         }
       }
     },
@@ -98,7 +98,7 @@
     watch: {
       pagination: {
         handler (newVal, oldVal) {
-          if (!DiffService.objectsAreEqualByProps(newVal, oldVal, ['descending', 'page', 'rowsPerPage', 'sortBy'])) {
+          if (!DiffService.objectsAreEqualByProps(newVal, oldVal, ['descending', 'page', 'itemsPerPage', 'sortBy'])) {
             this.loadUsers()
           }
         },
@@ -113,7 +113,8 @@
       async loadUsers () {
         try {
           this.isLoading = true
-          const page = await UserService.getPage(this.pagination.page - 1, this.pagination.rowsPerPage, this.pagination.sortBy, this.pagination.descending)
+          const pagination = this.footerProps.pagination
+          const page = await UserService.getPage(pagination.page - 1, pagination.itemsPerPage, pagination.sortBy, pagination.descending)
           this.total = page.total
           this.users = page.data
           console.log('users', this.users)

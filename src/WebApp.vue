@@ -91,7 +91,7 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container fill-height>
+        <v-container fluid fill-height>
           <router-view class="route-container fade-in" />
         </v-container>
       </v-main>
