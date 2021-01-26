@@ -8,9 +8,7 @@
       <Photo
         class="respondent-photo"
         @click="onClick"
-        :photo="photo"
-        width="150"
-        height="150" />
+        :photo="photo" />
       <v-card-actions class="respondent-name">
         <v-layout row wrap>
           <v-flex @click="onClick">

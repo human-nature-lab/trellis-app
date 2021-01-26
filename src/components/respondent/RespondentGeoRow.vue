@@ -36,7 +36,7 @@
       <v-icon v-else-if="respondentGeo.isCurrent">check</v-icon>
     </td>
     <td
-      class="actions"
+      class="actions flex flex-nowrap"
       v-show="showControls">
       <v-tooltip
         bottom

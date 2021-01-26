@@ -18,24 +18,24 @@
     </v-toolbar>
     <v-alert v-show="error" color="error">{{error}}</v-alert>
     <v-data-table
-      disable-initial-sort
+      sort-by="translated"
       class="mb-3"
       :headers="locationHeaders"
       :items="locations"
       hide-default-footer>
       <template v-slot:item="props">
-        <respondent-geo-row
+        <RespondentGeoRow
           @remove="remove"
           @move="startMove"
           @overrideCurrent="toggleIsCurrent(props.item)"
           :show-history="!!props.item.history && !!props.item.history.length"
           :show-controls="true"
           v-model="props.expanded"
-          :respondent-geo="props.item"></respondent-geo-row>
+          :respondent-geo="props.item" />
       </template>
       <template v-slot:expanded-item="props">
         <v-data-table
-          disable-initial-sort
+          sort-by="translated"
           :headers="locationHeaders"
           :items="props.item.history"
           hide-default-footer>

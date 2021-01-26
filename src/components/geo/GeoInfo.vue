@@ -1,7 +1,7 @@
 <template>
   <v-flex xs12>
     <v-card>
-      <v-toolbar card prominent>
+      <v-toolbar flat>
         <v-toolbar-title>
           <AsyncTranslationText :translation="geo.nameTranslation"/>
         </v-toolbar-title>

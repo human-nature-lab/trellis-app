@@ -9,7 +9,7 @@
     <v-container
       fluid
       fill-height
-      class="full-photo grey lighten-4"
+      class="full-photo grey lighten-4 center"
       @click="$emit('input', false)">
       <photo :photo="photo" :isContained="true"></photo>
     </v-container>
