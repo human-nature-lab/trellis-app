@@ -1,6 +1,5 @@
 <template>
   <v-dialog
-    lazy
     :value="value"
     @input="$emit('input', $event)">
     <v-card>

@@ -34,7 +34,6 @@
       {{ $t('no_one') }}
     </v-btn>
     <v-dialog
-      lazy
       v-model="respondentSearchDialog">
       <ModalTitle
         :title="$t('respondent_search')"

@@ -1,6 +1,6 @@
 <template>
     <v-flex>
-      <v-dialog lazy v-model="backup.isOpen" :persistent="backup.isWorking">
+      <v-dialog v-model="backup.isOpen" :persistent="backup.isWorking">
         <ModalTitle title="Backup" @close="closeBackup()" />
         <v-card>
           <v-card-text>

@@ -32,7 +32,6 @@
       <!--we need the geo-search-dialog class for geo search to work correctly in the dialog-->
       <v-dialog
         content-class="geo-search-dialog"
-        lazy
         v-model="geoSearchDialog">
         <modal-title
           :title="$t('location_search')"
