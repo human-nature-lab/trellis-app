@@ -83,8 +83,7 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container
-          :class="{'px-0': $vuetify.breakpoint.xsOnly, 'ma-0 pa-0 app-container': serverMode=='production', 'app-container-demo': serverMode=='demo' || serverMode=='test' }">
+        <v-container fill-height>
           <router-view class="route-container fade-in" />
         </v-container>
       </v-main>
