@@ -30,9 +30,9 @@
     <v-btn
       v-if="showLoginButton"
       @click="login"
+      :loading="isWorking"
       :disabled="isWorking || !isValid">
-      <TrellisLoadingCircle v-if="isWorking" size="25px" />
-      <span v-else>{{ $t('login') }}</span>
+      {{ $t('login') }}
     </v-btn>
   </v-form>
 </template>

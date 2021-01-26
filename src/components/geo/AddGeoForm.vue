@@ -67,18 +67,18 @@
               <v-card-title class="subheading">{{ $t('current_position') }}</v-card-title>
               <v-card-text>
                 <v-list dense>
-                  <v-list-tile>
-                    <v-list-tile-content>{{ $t('latitude') }}</v-list-tile-content>
-                    <v-list-tile-content class="align-end">{{ latitude }}</v-list-tile-content>
-                  </v-list-tile>
-                  <v-list-tile>
-                    <v-list-tile-content>{{ $t('longitude') }}</v-list-tile-content>
-                    <v-list-tile-content class="align-end">{{ longitude }}</v-list-tile-content>
-                  </v-list-tile>
-                  <v-list-tile>
-                    <v-list-tile-content>{{ $t('altitude') }}</v-list-tile-content>
-                    <v-list-tile-content class="align-end">{{ altitude }}</v-list-tile-content>
-                  </v-list-tile>
+                  <v-list-item>
+                    <v-list-item-content>{{ $t('latitude') }}</v-list-item-content>
+                    <v-list-item-content class="align-end">{{ latitude }}</v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>{{ $t('longitude') }}</v-list-item-content>
+                    <v-list-item-content class="align-end">{{ longitude }}</v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>{{ $t('altitude') }}</v-list-item-content>
+                    <v-list-item-content class="align-end">{{ altitude }}</v-list-item-content>
+                  </v-list-item>
                 </v-list>
                 <v-btn @click="getPosition">{{$t('use_current_position')}}</v-btn>
                 <v-btn v-if="this.parentGeoId !== null" @click="useParentPosition">{{$t('use_parent_position')}}</v-btn>

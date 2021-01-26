@@ -101,8 +101,6 @@
       content-class="condition-tag-dialog"
       transition="dialog-bottom-transition"
       scrollable
-      full-width
-      lazy
       v-model="dialog.conditionTag">
       <v-card tile>
         <v-toolbar

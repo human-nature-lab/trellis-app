@@ -15,12 +15,12 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
-              <v-list-tile @click="showHidden=!showHidden">
-                <v-list-tile-action>
+              <v-list-item @click="showHidden=!showHidden">
+                <v-list-item-action>
                   <v-icon v-if="showHidden">check</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-title>{{$t('show_all')}}</v-list-tile-title>
-              </v-list-tile>
+                </v-list-item-action>
+                <v-list-item-title>{{$t('show_all')}}</v-list-item-title>
+              </v-list-item>
             </v-list>
           </v-menu>
         </v-toolbar>

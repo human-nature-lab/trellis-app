@@ -1,36 +1,82 @@
-var path = require('path')
-var utils = require('./utils')
-var config = require('../config')
-var vueLoaderConfig = require('./vue-loader.conf')
-var FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
-var webpack = require('webpack')
-var SpeedMeasurePlugin = require('speed-measure-webpack-plugin')
-var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-var CopyWebpackPlugin = require('copy-webpack-plugin')
-
-const smp = new SpeedMeasurePlugin()
+const path = require('path')
+const utils = require('./utils')
+const config = require('../config')
+const webpack = require('webpack')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
 }
 
-module.exports = smp.wrap({
+function resolveCache (dir) {
+  return resolve(path.join('node_modules/.cache', dir))
+}
+
+function fileLoader (dirName) {
+  return {
+    loader: 'file-loader',
+    options: {
+      name: utils.assetsPath(`${dirName}/[name].[hash:8].[ext]`)
+    }
+  }
+}
+
+function urlLoader (dirName) {
+  return {
+    loader: 'url-loader',
+    options: {
+      limit: 4096,
+      fallback: fileLoader(dirName)
+    }
+  }
+}
+
+const isProd = process.env === 'production'
+const sourceMap = true 
+
+const cssLoaders = [{
+  loader: 'css-loader',
+  options: {
+    sourceMap
+  }
+}, {
+  loader: 'postcss-loader',
+  options: {
+    sourceMap
+  }
+}]
+
+cssLoaders.unshift(isProd ? MiniCssExtractPlugin.loader : {
+  loader: 'vue-style-loader',
+  options: {
+    sourceMap
+  }
+})
+
+module.exports = {
   target: 'web',
   entry: {
-    app: ['@babel/polyfill', './src/main.ts']
+    app: ['./src/main.ts']
   },
   externals: {
     config: 'config'
   },
+  devtool: sourceMap ? 'eval' : false,
   output: {
     path: config.build.assetsRoot,
-    filename: '[name].js',
-    publicPath: process.env.NODE_ENV === 'production'
+    filename: 'js/[name].js',
+    publicPath: isProd
       ? config.build.assetsPublicPath
       : config.dev.assetsPublicPath,
-    chunkFilename: '[id].[hash:8].js'
+    chunkFilename: 'js/[id].[hash:8].js'
   },
+  mode: isProd ? 'production' : 'development',
   optimization: {
     // usedExports: true,
     // concatenateModules: true,
@@ -52,21 +98,39 @@ module.exports = smp.wrap({
     },
   },
   resolve: {
-    extensions: ['.js', '.vue', '.json', '.ts', '.tsx', '.csv'],
+    extensions: [
+      '.tsx',
+      '.ts',
+      '.mjs',
+      '.js',
+      '.jsx',
+      '.vue',
+      '.json',
+      '.csv',
+      '.wasm'
+    ],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
-      '@': resolve('src')
+      '@': resolve('src'),
+      // Stupid leaflet CSS import workaround. Might be fixed in newer versions of leaflet, but I'm not opening that can of worms.
+      './images/layers.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers.png'),
+      './images/layers-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers-2x.png'),
+      './images/marker-icon.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon.png'),
+      './images/marker-icon-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon-2x.png'),
+      './images/marker-shadow.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-shadow.png')
     }
   },
   node: {
     fs: 'empty'
   },
+  devServer: {
+    hot: true,
+    compress: true,
+    port: process.env.PORT || config.dev.port,
+    host: process.env.HOST || config.dev.host || '0.0.0.0'
+  },
   module: {
     rules: [
-      {
-        test: /\.txt\.js$/,
-        loader: 'raw-loader'
-      },
       {
         test: /\.md$/,
         loader: 'raw-loader'
@@ -80,98 +144,100 @@ module.exports = smp.wrap({
         }
       },
       {
-        test: /\.(js|vue)$/,
-        use: [{
-          loader: 'thread-loader',
-          options: {
-            workers: 2
-          }
-        }, {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
-        }],
-        enforce: 'pre',
-        include: [resolve('src'), resolve('test')]
+        test: /\.(png|jpe?g|gif)(\?.*)?$/,
+        use: [urlLoader('images')]
       },
       {
-        test: /\.tsx?$/,
-        use: [{
-          loader: 'thread-loader',
-          options: {
-            workers: 2
-          }
-        }, {
-          loader: 'ts-loader',
-          options: {
-            appendTsSuffixTo: [/\.vue$/],
-            happyPackMode: true
-          }
-        }],
-        exclude: /node_modules/
+        test: /\.(svg)(\?.*)?$/,
+        use: [fileLoader('svg')]
+      },
+      {
+        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+        use: [urlLoader('media')]
+      },
+      {
+        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
+        use: [urlLoader('fonts')]
       },
       {
         test: /\.vue$/,
         use: [{
-          loader: 'thread-loader',
+          loader: 'cache-loader',
           options: {
-            workers: 2
+            cacheDirectory: resolveCache('vue-loader'),
           }
         }, {
           loader: 'vue-loader',
-          options: vueLoaderConfig,
-        }],
-        exclude: /node_modules/
+          options: {
+            compilerOptions: {
+              whitespace: 'condense'
+            }
+          },
+        }]
       },
       {
-        test: /\.js$/,
+        test: /\.m?jsx?$/,
         use: [{
-          loader: 'thread-loader',
+          loader: 'cache-loader',
           options: {
-            workers: 2
+            cacheDirectory: resolveCache('babel-loader')
           }
         }, {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/env']
-          }
+          loader: 'babel-loader'
         }],
-        include: [resolve('src'), resolve('test')],
         exclude: /node_modules/
       },
-/*      {
-        test: /\.json$/,
-        loader: 'json-loader',
-        exclude: /node_modules/
-      },*/
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'file-loader',
-        options: {
-          name: utils.assetsPath('img/[name].[hash:7].[ext]')
-        }
+        test: /\.tsx?$/,
+        use: [{
+          loader: 'cache-loader',
+          options: {
+            cacheDirectory: resolveCache('ts-loader')
+          }
+        }, {
+          loader: 'babel-loader'
+        }, {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true,
+            appendTsSuffixTo: [
+              '\\.vue$'
+            ],
+            happyPackMode: false
+          }
+        }]
       },
       {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'file-loader',
-        options: {
-          name: utils.assetsPath('media/[name].[hash:7].[ext]')
-        }
+        test: /\.css$/,
+        use: cssLoaders
       },
       {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
-        }
+        test: /\.sass$/,
+        use: cssLoaders.concat({
+          loader: 'sass-loader',
+          options: {
+            sourceMap,
+            sassOptions: {
+              indentedSyntax: true
+            }
+          }
+        })
+      },
+      {
+        test: /\.scss$/,
+        use: cssLoaders.concat({
+          loader: 'sass-loader',
+          options: {
+            sourceMap
+          }
+        })
       }
     ]
   },
   plugins: [
-    new FilterWarningsPlugin({
-      exclude: [/Critical dependency/, /mongodb/, /mssql/, /mysql/, /mysql2/, /oracledb/, /pg/, /pg-native/, /pg-query-stream/, /redis/, /react-native-sqlite-storage/, /sqlite3/]
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env),
+      VERSION: JSON.stringify(require('../package').version)
     }),
     new VueLoaderPlugin(),
     new webpack.NormalModuleReplacementPlugin(/typeorm$/, function (result) {
@@ -183,16 +249,36 @@ module.exports = smp.wrap({
     }),
     // copy custom static assets
     new CopyWebpackPlugin([{
-      from: path.resolve(__dirname, '../static'),
+      from: resolve('static'),
       to: config.build.assetsSubDirectory,
+      toType: 'dir',
       ignore: ['.*']
     }]),
+    new VuetifyLoaderPlugin(),
+    new HtmlWebpackPlugin({
+      filename: config.build.index,
+      template: 'index.html',
+      inject: true,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeAttributeQuotes: true
+      },
+      chunksSortMode: 'none'
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFileName: '[id].css'
+    }),
+    // new ForkTsCheckerWebpackPlugin({
+    //   typescript: {
+    //     extensions: {
+    //       vue: {
+    //         enabled: true,
+    //         compiler: 'vue-template-compiler'
+    //       }
+    //     }
+    //   }
+    // })
   ]
-})
-
-// var threadLoader = require('thread-loader')
-// threadLoader.warmup({}, [
-//   'babel-loader',
-//   'sass-loader',
-//   'eslint-loader'
-// ])
+}

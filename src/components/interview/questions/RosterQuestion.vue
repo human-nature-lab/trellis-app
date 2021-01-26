@@ -2,11 +2,11 @@
   <v-flex xs12 class="roster-question">
     <v-card class="roster">
       <v-list>
-        <v-list-tile
+        <v-list-item
           :data-id="row.id"
           v-for="(row, rowIndex) in roster"
           :key="row.id">
-          <v-list-tile-avatar>
+          <v-list-item-avatar>
             <v-tooltip top>
               <v-btn
                 slot="activator"
@@ -20,8 +20,8 @@
                 {{ $t('revert_changes') }}
               </span>
             </v-tooltip>
-          </v-list-tile-avatar>
-          <v-list-tile-content>
+          </v-list-item-avatar>
+          <v-list-item-content>
             <v-text-field
               :disabled="isQuestionDisabled"
               :placeholder="oldText"
@@ -34,8 +34,8 @@
               @keyup.esc.stop="stopEditingAndRevert(row, rowIndex)" />
             <span class="roster-val"
               v-if="rowIndex !== editingIndex">{{row.val}}</span>
-          </v-list-tile-content>
-          <v-list-tile-action>
+          </v-list-item-content>
+          <v-list-item-action>
             <v-menu
               v-if="!isSavingEdit && !row.isLoading && rowIndex !== editingIndex"
               :disabled="editingIndex > 0 || isQuestionDisabled"
@@ -46,7 +46,7 @@
                 <v-icon>more_vert</v-icon>
               </v-btn>
               <v-list>
-                <v-list-tile>
+                <v-list-item>
                   <v-tooltip left>
                     <v-btn icon @click="startEditingRow(row, rowIndex)" slot="activator">
                       <v-icon>edit</v-icon>
@@ -55,8 +55,8 @@
                       {{ $t('select_to_edit') }}
                     </span>
                   </v-tooltip>
-                </v-list-tile>
-                <v-list-tile>
+                </v-list-item>
+                <v-list-item>
                   <v-tooltip left>
                     <v-btn
                       icon
@@ -66,7 +66,7 @@
                     </v-btn>
                     <span>{{ $t('delete') }}</span>
                   </v-tooltip>
-                </v-list-tile>
+                </v-list-item>
               </v-list>
             </v-menu>
             <v-tooltip top>
@@ -86,18 +86,18 @@
               v-if="isSavingEdit || row.isLoading"
               indeterminate
               color="primary" />
-          </v-list-tile-action>
-        </v-list-tile>
-        <v-list-tile v-if="isAddingNew">
-          <v-list-tile-avatar>
+          </v-list-item-action>
+        </v-list-item>
+        <v-list-item v-if="isAddingNew">
+          <v-list-item-avatar>
             <v-btn
               :disabled="isSavingNew"
               icon
               @click="stopAddingWithoutSaving">
               <v-icon color="red">delete</v-icon>
             </v-btn>
-          </v-list-tile-avatar>
-          <v-list-tile-content>
+          </v-list-item-avatar>
+          <v-list-item-content>
             <v-text-field
               :disabled="isQuestionDisabled"
               v-model="newText"
@@ -106,8 +106,8 @@
               @keyup.enter="stopAddingAndSave"
               :append-icon="barcodeIcon"
               :append-icon-cb="scanBarcode"/>
-          </v-list-tile-content>
-          <v-list-tile-action>
+          </v-list-item-content>
+          <v-list-item-action>
             <v-btn
               v-if="!isSavingNew"
               icon
@@ -118,8 +118,8 @@
               v-if="isSavingNew"
               indeterminate
               color="primary" />
-          </v-list-tile-action>
-        </v-list-tile>
+          </v-list-item-action>
+        </v-list-item>
       </v-list>
       <v-fab-transition>
         <v-btn

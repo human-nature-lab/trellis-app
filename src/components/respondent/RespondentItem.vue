@@ -5,13 +5,12 @@
       :raised="selected === true"
       tile
       :class="{selected: selected === true, respondent: true, 'ma-1': true}">
-      <v-card-media class="respondent-photo"
-                    @click="onClick">
-        <Photo
-          :photo="photo"
-          width="150"
-          height="150" />
-      </v-card-media>
+      <Photo
+        class="respondent-photo"
+        @click="onClick"
+        :photo="photo"
+        width="150"
+        height="150" />
       <v-card-actions class="respondent-name">
         <v-layout row wrap>
           <v-flex @click="onClick">

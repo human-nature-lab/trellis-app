@@ -10,8 +10,8 @@
               <v-icon>more_vert</v-icon>
             </v-btn>
             <v-list>
-              <v-list-tile>
-                <v-list-tile-content>
+              <v-list-item>
+                <v-list-item-content>
                   <file-upload
                     input-id="convert-template"
                     extensions="json"
@@ -19,24 +19,24 @@
                     @input="convertForm">
                     Convert form to TypeScript
                   </file-upload>
-                </v-list-tile-content>
-              </v-list-tile>
-              <v-list-tile @click="addAlert">
-                <v-list-tile-action>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item @click="addAlert">
+                <v-list-item-action>
                   <v-icon>add_alert</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
+                </v-list-item-action>
+                <v-list-item-content>
                   Add Alert
-                </v-list-tile-content>
-              </v-list-tile>
-              <v-list-tile @click="throwError">
-                <v-list-tile-action>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item @click="throwError">
+                <v-list-item-action>
                   <v-icon>error</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
+                </v-list-item-action>
+                <v-list-item-content>
                   Throw error
-                </v-list-tile-content>
-              </v-list-tile>
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
           </v-menu>
         </v-toolbar>

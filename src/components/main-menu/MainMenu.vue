@@ -18,26 +18,26 @@
             {{ $t(section.title) }}
           </v-subheader>
           <v-divider v-if="section.title"></v-divider>
-          <v-list-tile
+          <v-list-item
             v-for="item in section.items"
             :key="item.title"
             v-if="item.showIf !== false"
             @click="(e) => item.click && item.click(e)"
             v-bind="{to: item.to ? item.to : null}">
-            <v-list-tile-action>
+            <v-list-item-action>
               <v-icon :color="item.iconColor">{{item.icon}}</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>
                 {{ $t(item.title) }}
-              </v-list-tile-title>
-            </v-list-tile-content>
-            <v-list-tile-action v-if="item.switchValue != null">
+              </v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-action v-if="item.switchValue != null">
               <v-switch
                 :color="item.switchColor"
                 v-model="item.switchValue" />
-            </v-list-tile-action>
-          </v-list-tile>
+            </v-list-item-action>
+          </v-list-item>
         </v-list>
       </template>
     </v-list>

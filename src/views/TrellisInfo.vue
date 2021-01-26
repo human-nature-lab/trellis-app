@@ -66,8 +66,3 @@
     mixins: [DocsLinkMixin('./admin/Information.md')]
   })
 </script>
-
-<style lang="sass" scoped>
-  /*.card*/
-    /*width:*/
-</style>

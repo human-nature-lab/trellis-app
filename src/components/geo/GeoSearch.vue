@@ -75,16 +75,16 @@
             :geo="geo">
           </geo-list-tile>
           <v-divider></v-divider>
-          <v-list-tile v-if="results.length === defaultSearchResultsLimit">
-            <v-list-tile-content>
-              <v-list-tile-title>
+          <v-list-item v-if="results.length === defaultSearchResultsLimit">
+            <v-list-item-content>
+              <v-list-item-title>
                 {{ $t('displaying_first_results',[defaultSearchResultsLimit]) }}
-              </v-list-tile-title>
-              <v-list-tile-sub-title>
+              </v-list-item-title>
+              <v-list-item-sub-title>
                 {{ $t('use_search_field_results') }}
-              </v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
+              </v-list-item-sub-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </div>
     </v-layout>

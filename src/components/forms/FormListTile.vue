@@ -5,7 +5,7 @@
         offset-x
         lazy
         v-model="showMenu">
-        <v-list-tile-action slot="activator">
+        <v-list-item-action slot="activator">
           <v-btn
             :disabled="isBusy"
             @click.stop.prevent="showMenu = !showMenu"
@@ -15,36 +15,36 @@
               size="100%"></TrellisLoadingCircle>
             <v-icon v-else>more_vert</v-icon>
           </v-btn>
-        </v-list-tile-action>
+        </v-list-item-action>
         <v-list>
           <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'builder'}}">
-              <v-list-tile-content>
+            <v-list-item :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'builder'}}">
+              <v-list-item-content>
                 Edit
-              </v-list-tile-content>
-            </v-list-tile>
+              </v-list-item-content>
+            </v-list-item>
           </Permission>
-          <v-list-tile :to="{name: 'InterviewPreview', params: {formId: form.id}}">
-            <v-list-tile-content>
+          <v-list-item :to="{name: 'InterviewPreview', params: {formId: form.id}}">
+            <v-list-item-content>
               Preview
-            </v-list-tile-content>
-          </v-list-tile>
-            <!--v-list-tile :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
-              <v-list-tile-content>
+            </v-list-item-content>
+          </v-list-item>
+            <!--v-list-item :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
+              <v-list-item-content>
                 Print
-              </v-list-tile-content>
-            </v-list-tile-->
-          <v-list-tile @click="exportForm">
-            <v-list-tile-content>
+              </v-list-item-content>
+            </v-list-item-->
+          <v-list-item @click="exportForm">
+            <v-list-item-content>
               Export
-            </v-list-tile-content>
-          </v-list-tile>
+            </v-list-item-content>
+          </v-list-item>
           <Permission :requires="TrellisPermission.REMOVE_FORM">
-            <v-list-tile @click="$emit('delete')">
-              <v-list-tile-content>
+            <v-list-item @click="$emit('delete')">
+              <v-list-item-content>
                 <span color="error">Delete</span>
-              </v-list-tile-content>
-            </v-list-tile>
+              </v-list-item-content>
+            </v-list-item>
           </Permission>
         </v-list>
       </v-menu>

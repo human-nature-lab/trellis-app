@@ -34,14 +34,14 @@
             <v-icon>more_vert</v-icon>
           </v-btn>
           <v-list>
-            <v-list-tile @click="backupDatabase">
-              <v-list-tile-action>
+            <v-list-item @click="backupDatabase">
+              <v-list-item-action>
                 <v-icon>cloud_upload</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
+              </v-list-item-action>
+              <v-list-item-content>
                 {{$t('backup_database')}}
-              </v-list-tile-content>
-            </v-list-tile>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-menu>
       </v-toolbar>

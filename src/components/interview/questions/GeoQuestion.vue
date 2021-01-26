@@ -2,8 +2,8 @@
     <v-flex>
       <v-card>
         <v-list>
-          <v-list-tile v-for="geo in geos" :key="geo.id">
-            <v-list-tile-content>
+          <v-list-item v-for="geo in geos" :key="geo.id">
+            <v-list-item-content>
               <span v-if="geo.nameTranslation">
                 <geo-breadcrumbs
                   :canNavigate="false"
@@ -14,8 +14,8 @@
               <span v-else>
                 {{ $t('loading') }}
               </span>
-            </v-list-tile-content>
-          </v-list-tile>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
         <v-btn
           absolute

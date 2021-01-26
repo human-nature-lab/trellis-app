@@ -36,23 +36,23 @@
                   <v-icon>more_vert</v-icon>
                 </v-btn>
                 <v-list>
-                  <v-list-tile
+                  <v-list-item
                     v-if="role.canDelete"
                     :disabled="!hasPermission(TrellisPermission.EDIT_PERMISSIONS)"
                     @click="removeRole(role)">
-                    <v-list-tile-action>
+                    <v-list-item-action>
                       <v-icon color="error">delete</v-icon>
-                    </v-list-tile-action>
+                    </v-list-item-action>
                     {{$t('delete') | TitleCase}}
-                  </v-list-tile>
-                  <v-list-tile
+                  </v-list-item>
+                  <v-list-item
                     @click="startCopy(role)"
                     :disabled="!hasPermission(TrellisPermission.EDIT_PERMISSIONS)">
-                    <v-list-tile-action>
+                    <v-list-item-action>
                       <v-icon>chevron_right</v-icon>
-                    </v-list-tile-action>
+                    </v-list-item-action>
                     {{$t('copy') | TitleCase}}
-                  </v-list-tile>
+                  </v-list-item>
                 </v-list>
               </v-menu>
             </th>

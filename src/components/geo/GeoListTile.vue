@@ -1,34 +1,34 @@
 <template>
-    <v-list-tile @click="$emit('click')">
-      <v-list-tile-avatar :tile="true">
+    <v-list-item @click="$emit('click')">
+      <v-list-item-avatar :tile="true">
         <Photo :photo="primaryPhoto" :is-building="true" height="50" width="50"></Photo>
-      </v-list-tile-avatar>
-      <v-list-tile-action v-if="isSelectable">
+      </v-list-item-avatar>
+      <v-list-item-action v-if="isSelectable">
         <v-btn
           icon
           @click.stop="$emit('geo-select')">
           <v-icon color="primary" v-if="selected">check_box</v-icon>
           <v-icon v-else>check_box_outline_blank</v-icon>
         </v-btn>
-      </v-list-tile-action>
-      <v-list-tile-content>
+      </v-list-item-action>
+      <v-list-item-content>
         {{this.translated}}
-      </v-list-tile-content>
-      <v-list-tile-action>
+      </v-list-item-content>
+      <v-list-item-action>
         <v-btn
           @click.stop="showGeoMap"
           icon>
           <v-icon>map</v-icon>
         </v-btn>
-      </v-list-tile-action>
-      <v-list-tile-action>
+      </v-list-item-action>
+      <v-list-item-action>
         <v-btn
           @click.stop="showGeoInfo"
           icon>
           <v-icon>info</v-icon>
         </v-btn>
-      </v-list-tile-action>
-    </v-list-tile>
+      </v-list-item-action>
+    </v-list-item>
 </template>
 
 <script>
@@ -36,7 +36,6 @@
   import { routeQueue } from '../../router'
   import Photo from '../photo/Photo'
   import Geo from '../../entities/trellis/Geo'
-  import VListTileAction from 'vuetify/src/components/VList/VListTileAction'
   export default {
     name: 'geo-list-tile',
     props: {
@@ -85,7 +84,6 @@
     },
     mixins: [TranslationMixin],
     components: {
-      VListTileAction,
       Photo
     }
   }

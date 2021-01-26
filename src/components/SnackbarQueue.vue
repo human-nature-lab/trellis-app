@@ -65,7 +65,7 @@
     showClose: false,
     showCloseAll: false,
     timeoutId: null,
-    timeout: 0
+    timeout: -1
   }
 
   export function AddSnack (msgOrSlot: string|Component, config?: SnackConfig) {

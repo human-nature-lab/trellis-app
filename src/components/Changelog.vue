@@ -11,14 +11,14 @@
       <v-container>
         <h3>Changelog</h3>
         <v-list>
-          <v-list-tile
+          <v-list-item
             v-for="file in files"
             :key="file"
             @click="selectFile(file)">
-            <v-list-tile-content>
+            <v-list-item-content>
               {{file.slice(2, -3)}}
-            </v-list-tile-content>
-          </v-list-tile>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-container>
     </v-navigation-drawer>

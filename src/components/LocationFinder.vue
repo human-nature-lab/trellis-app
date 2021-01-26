@@ -1,8 +1,7 @@
 <template>
     <v-dialog
-      lazy
       v-model="isOpen"
-      full-width
+      fullscreen
       persistent>
       <v-card>
         <v-toolbar>

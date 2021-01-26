@@ -5,16 +5,16 @@
       <!--<v-icon v-else>add</v-icon>-->
     <!--</v-btn>-->
     <!--<v-list>-->
-      <!--<v-list-tile @click="photoFromCamera">-->
-        <!--<v-list-tile-action>-->
+      <!--<v-list-item @click="photoFromCamera">-->
+        <!--<v-list-item-action>-->
           <!--<v-icon>photo_camera</v-icon>-->
-        <!--</v-list-tile-action>-->
-      <!--</v-list-tile>-->
-      <!--<v-list-tile @click="photoFromFile">-->
-        <!--<v-list-tile-action>-->
+        <!--</v-list-item-action>-->
+      <!--</v-list-item>-->
+      <!--<v-list-item @click="photoFromFile">-->
+        <!--<v-list-item-action>-->
           <!--<v-icon>cloud_upload</v-icon>-->
-        <!--</v-list-tile-action>-->
-      <!--</v-list-tile>-->
+        <!--</v-list-item-action>-->
+      <!--</v-list-item>-->
     <!--</v-list>-->
   <!--</v-menu>-->
   <span>

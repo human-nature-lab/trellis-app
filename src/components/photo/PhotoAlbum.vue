@@ -32,16 +32,16 @@
                 <v-icon medium>more_vert</v-icon>
               </v-btn>
               <v-list>
-                <v-list-tile v-if="allowNotes">
+                <v-list-item v-if="allowNotes">
                   <v-btn icon @click.native="editPhoto(photo)">
                     <v-icon medium>edit</v-icon>
                   </v-btn>
-                </v-list-tile>
-                <v-list-tile>
+                </v-list-item>
+                <v-list-item>
                   <v-btn icon @click.native="deletePhoto(photo)">
                     <v-icon medium>delete</v-icon>
                   </v-btn>
-                </v-list-tile>
+                </v-list-item>
               </v-list>
             </v-menu>
           </v-card-actions>

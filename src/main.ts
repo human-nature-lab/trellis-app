@@ -1,24 +1,21 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 // import './timeoutTracker'
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
+
 import Vue from 'vue'
-import Vuetify from 'vuetify'
-import 'vuetify/dist/vuetify.css'
 import VueCordova from 'vue-cordova'
 import VueHead from 'vue-head'
 import i18n from './i18n/index'
 import './mixins/GlobalMixin'
 import 'typeface-roboto/index.css'
 import 'material-design-icons-iconfont'
-// @ts-ignore
-import Debug from './components/Debug'
-// @ts-ignore
-import WebApp from './WebApp'
+import Debug from './components/Debug.vue'
+import WebApp from './WebApp.vue'
 import router from './router'
 
 import config from 'config'
 import ConfigService from './services/config'
-import theme from './static/theme'
+import vuetify from './plugins/vuetify'
 import { APP_ENV } from './static/constants'
 import './logging'
 import './filters/toFixed.filter'
@@ -28,7 +25,6 @@ async function init () {
   // Wait for the configuration to load before doing anything else
   await ConfigService.load()
 
-  Vue.use(Vuetify, theme)
   Vue.config.productionTip = false
   Vue.use(VueHead)
   if (config.appEnv === APP_ENV.CORDOVA) {
@@ -40,6 +36,7 @@ async function init () {
     el: '#app',
     router,
     i18n,
+    vuetify,
     template: '<WebApp />',
     components: {
       WebApp

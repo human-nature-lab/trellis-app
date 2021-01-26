@@ -8,16 +8,16 @@
       <v-icon>more_vert</v-icon>
     </v-btn>
     <v-list>
-      <v-list-tile
+      <v-list-item
         @click="$emit('edit')"
         v-if="editable">
         <v-icon>edit</v-icon>
-      </v-list-tile>
-      <v-list-tile
+      </v-list-item>
+      <v-list-item
         @click="$emit('remove')"
         v-if="removable">
         <v-icon color="error">delete</v-icon>
-      </v-list-tile>
+      </v-list-item>
     </v-list>
   </v-menu>
 </template>

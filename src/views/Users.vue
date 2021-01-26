@@ -41,13 +41,13 @@
 </template>
 
 <script lang="ts">
-  import Permission from '../components/Permission'
-  import User from '../entities/Trellis/User'
-  import UserEdit from '../components/user/UserEdit'
-  import UserRow from '../components/user/UserRow'
+  import Permission from '../components/Permission.vue'
+  import User from '../entities/trellis/User'
+  import UserEdit from '../components/user/UserEdit.vue'
+  import UserRow from '../components/user/UserRow.vue'
   import DiffService from '../services/DiffService'
   import UserService from '../services/user/UserService'
-  import TrellisModal from '../components/TrellisModal'
+  import TrellisModal from '../components/TrellisModal.vue'
   import Vue from 'vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import IsAdminMixin from '../mixins/IsAdminMixin'

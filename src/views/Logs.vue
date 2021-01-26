@@ -8,22 +8,22 @@
           <v-icon>more_vert</v-icon>
         </v-btn>
         <v-list>
-          <v-list-tile @click="uploadLogs">
-            <v-list-tile-action>
+          <v-list-item @click="uploadLogs">
+            <v-list-item-action>
               <v-icon>cloud_upload</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
+            </v-list-item-action>
+            <v-list-item-content>
               Upload logs
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile @click="deleteLogs">
-            <v-list-tile-action>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item @click="deleteLogs">
+            <v-list-item-action>
               <v-icon>delete</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
+            </v-list-item-action>
+            <v-list-item-content>
               Delete logs
-            </v-list-tile-content>
-          </v-list-tile>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-menu>
     </v-toolbar>

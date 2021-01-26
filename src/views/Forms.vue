@@ -16,22 +16,22 @@
                 <v-icon>more_vert</v-icon>
               </v-btn>
               <v-list>
-                <v-list-tile @click="addForm(formType)">
-                  <v-list-tile-action>
+                <v-list-item @click="addForm(formType)">
+                  <v-list-item-action>
                     <v-icon>add</v-icon>
-                  </v-list-tile-action>
-                  <v-list-tile-content>
+                  </v-list-item-action>
+                  <v-list-item-content>
                     Add Form
-                  </v-list-tile-content>
-                </v-list-tile>
-                <v-list-tile @click="showImportForm = true; importFormType = Number(formType)">
-                  <v-list-tile-action>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item @click="showImportForm = true; importFormType = Number(formType)">
+                  <v-list-item-action>
                     <v-icon>import_export</v-icon>
-                  </v-list-tile-action>
-                  <v-list-tile-content>
+                  </v-list-item-action>
+                  <v-list-item-content>
                     Import Form
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-content>
+                </v-list-item>
               </v-list>
             </v-menu>
             <!--          <v-btn-->
@@ -234,5 +234,5 @@
   .small
     column-width: 20px
   /*.max-width*/
-    /*column-width: 90%*/
+  /*column-width: 90%*/
 </style>
