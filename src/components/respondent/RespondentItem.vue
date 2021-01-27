@@ -26,7 +26,7 @@
         v-if="labels && labels.length">
         <v-chip
           label
-          outline
+          outlined
           v-for="label in labels"
           :key="label">
           {{label}}

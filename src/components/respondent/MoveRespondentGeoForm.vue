@@ -15,7 +15,7 @@
             <v-flex xs8>
               <v-chip
                 color="primary"
-                outline
+                outlined
                 label>
                 <GeoBreadcrumbs
                   v-if="respondentGeo.geoId !== null && respondentGeo.geo"

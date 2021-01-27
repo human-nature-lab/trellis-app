@@ -33,16 +33,16 @@
               @input="onQueryChange"
               :loading="conditionTagsLoading"
               autocomplete>
-              <v-chip
-                slot="selection"
-                slot-scope="props"
-                outline
-                color="primary">
-                <v-avatar>
-                  <v-icon>label</v-icon>
-                </v-avatar>
-                {{props.item}}
-              </v-chip>
+              <template #selection="props">
+                <v-chip
+                  outlined
+                  color="primary">
+                  <v-avatar>
+                    <v-icon>label</v-icon>
+                  </v-avatar>
+                  {{props.item}}
+                </v-chip>
+              </template>
             </v-select>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
@@ -84,8 +84,8 @@
         v-for="(geo, index) in filters.geos"
         :key="geo.id"
         color="primary"
-        outline
-        @input="removeGeoFilter(index)"
+        outlined
+        @click:close="removeGeoFilter(index)"
         :close="canRemoveGeos">
         <v-avatar>
           <v-icon>home</v-icon>
@@ -101,8 +101,8 @@
         <v-chip
           v-for="(r) in selected"
           :key="r.id"
-          @input="onSelectRespondent(r)"
-          :close="true">
+          @click:close="onSelectRespondent(r)"
+          close>
           {{ getRespondentName(r) }}
         </v-chip>
       </v-flex>

@@ -8,7 +8,7 @@
             v-if="respondent.associatedRespondentId"
             label
             color="error"
-            outline>({{$t('other_respondent')}})</v-chip>
+            outlined>({{$t('other_respondent')}})</v-chip>
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">

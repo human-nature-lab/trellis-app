@@ -1,9 +1,10 @@
 <template>
   <v-container fluid>
-    <v-layout row class="cart">
-      <v-flex>
-        <v-layout row wrap class="items">
+    <v-row class="cart">
+      <v-col sm="10">
+        <v-row wrap class="pa-4 items">
           <div
+            class="mr-1"
             v-for="item in items"
             :key="item.id">
             <slot v-bind:item="item">
@@ -12,15 +13,18 @@
               </div>
             </slot>
           </div>
-        </v-layout>
-      </v-flex>
+        </v-row>
+      </v-col>
+      <v-col sm="2">
+        <v-btn
+          @click="$emit('done')"
+          class="primary--text">
+          {{ $t('done') }}
+        </v-btn>
+      </v-col>
       <v-spacer />
-      <v-btn
-        @click="$emit('done')"
-        class="primary--text">
-        {{ $t('done') }}
-      </v-btn>
-    </v-layout>
+
+    </v-row>
   </v-container>
 </template>
 

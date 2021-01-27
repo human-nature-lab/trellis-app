@@ -1,9 +1,9 @@
 <template>
   <v-card class="geo-search h100" :class="{'cart-spacing': selectedGeos.length}">
-    <v-layout column class="h100">
+    <v-col class="h100">
       <div class="search-header">
         <v-container fluid class="pb-0">
-          <v-layout row>
+          <v-row>
             <v-text-field
               xs11
               v-model="query"
@@ -11,15 +11,15 @@
               :loading="isSearching"
               @input="queryChange">
             </v-text-field>
-          </v-layout>
-          <v-layout class="geo-breadcrumbs">
+          </v-row>
+          <v-col class="geo-breadcrumbs">
             <span
               v-for="geo in ancestors"
               v-if="geo"
               class="geo-name">
               {{ translate(geo) }}
             </span>
-          </v-layout>
+          </v-col>
           <v-alert v-show="error" color="error">
             {{ error }}
           </v-alert>
@@ -29,12 +29,13 @@
             @done="onDone"
             @remove="removeGeo"
             :items="selectedGeos">
-            <template slot-scope="props">
+            <template #default="props">
               <v-chip
-                outline
+                outlined
                 close
+                close-icon="close"
                 color="primary"
-                @input="removeGeo(props.item)">
+                @click:close="removeGeo(props.item)">
                 <v-avatar>
                   <v-icon>home</v-icon>
                 </v-avatar>
@@ -47,7 +48,7 @@
             v-ripple
             v-if="lastParentIds.length > 1"
             @click="moveUpOneLevel">
-            <v-layout row>
+            <v-row>
               <v-flex xs1>
                 <v-icon>arrow_upward</v-icon>
               </v-flex>
@@ -55,7 +56,7 @@
               <v-flex xs1 class="text-lg-right">
                 <v-icon>arrow_upward</v-icon>
               </v-flex>
-            </v-layout>
+            </v-row>
           </v-container>
         </v-container>
       </div>
@@ -87,7 +88,7 @@
           </v-list-item>
         </v-list>
       </div>
-    </v-layout>
+    </v-col>
   </v-card>
 </template>
 
