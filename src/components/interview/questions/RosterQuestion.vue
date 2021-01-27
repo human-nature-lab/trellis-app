@@ -16,7 +16,7 @@
                   v-if="editingIndex === rowIndex"
                   :disabled="isSavingEdit || isQuestionDisabled"
                   @click="stopEditingAndRevert(row, rowIndex)">
-                  mdi-clear</v-icon>
+                  <v-icon color="red">mdi-clear</v-icon>
                 </v-btn>
               </template>
               <span>

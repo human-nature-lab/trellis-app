@@ -9,7 +9,7 @@
         right
         mt-5
         style="top: 0"
-        @click="closePanel">mdi-clear</v-icon></v-btn>
+        @click="closePanel"><v-icon>mdi-clear</v-icon></v-btn>
       <v-card-title>
         <translation-text-field
           v-if="curStatus === STATUS.EDIT_NAME || curStatus === STATUS.NEW_EDIT_NAME"

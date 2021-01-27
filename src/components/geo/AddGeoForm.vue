@@ -11,7 +11,7 @@
           text
           style="top: 0"
           @click="closeDialog(null)">
-          mdi-clear</v-icon>
+          <v-icon>mdi-clear</v-icon>
         </v-btn>
       </v-card-title>
       <v-card-text>

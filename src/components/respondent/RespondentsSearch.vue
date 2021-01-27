@@ -51,7 +51,7 @@
                   v-bind="attrs"
                   icon
                   @click="clearFilters">
-                  mdi-clear</v-icon>
+                  <v-icon>mdi-clear</v-icon>
                 </v-btn>
               </template>
               <span>

@@ -57,7 +57,7 @@
               {{$t('census_form_found')}}
             </v-flex>
             <v-flex v-else>
-              mdi-clear</v-icon>
+              <v-icon color="error">mdi-clear</v-icon>
               {{$t('census_form_not_found')}}
             </v-flex>
           </v-card-text>
