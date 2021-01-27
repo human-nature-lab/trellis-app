@@ -1,5 +1,5 @@
 <template>
-  <v-flex :class="{disabled: disabled}">
+  <v-flex :class="{ disabled: disabled }">
     <v-text-field
       ref="textField"
       :disabled="disabled"
@@ -15,120 +15,121 @@
       @click:append="onClickAppend"
       v-model="memText"
       @keyup.enter="save"
-      class="min-text-field" />
+      class="min-text-field"
+    />
   </v-flex>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
+  import Vue from "vue";
   export default Vue.extend({
-    name: 'ClickToEdit',
+    name: "ClickToEdit",
     props: {
       value: {
         type: String,
-        default: 'Empty'
+        default: "Empty",
       },
       disabled: {
         type: Boolean,
-        default: false
+        default: false,
       },
       loading: Boolean,
       autofocus: {
         type: Boolean,
-        default: true
+        default: true,
       },
       editable: {
         type: Boolean,
-        default: true
+        default: true,
       },
       editing: {
         type: Boolean,
-        default: false
+        default: false,
       },
       label: {
         type: String,
-        default: ''
+        default: "",
       },
       dense: {
         type: Boolean,
-        default: true
+        default: true,
       },
       solo: {
         type: Boolean,
-        default: true
-      }
+        default: true,
+      },
     },
     data() {
       return {
         memText: this.value,
         internal: {
-          editing: this.editing
-        }
-      }
+          editing: this.editing,
+        },
+      };
     },
     watch: {
-      value (newVal) {
-        if (this.memText === newVal) return
-        this.resetEditorState()
+      value(newVal) {
+        if (this.memText === newVal) return;
+        this.resetEditorState();
       },
-      editing (val) {
-        this.internal.editing = val
-      }
+      editing(val) {
+        this.internal.editing = val;
+      },
     },
     computed: {
-      hasEdits (): boolean {
-        return this.memText !== this.value
+      hasEdits(): boolean {
+        return this.memText !== this.value;
       },
-      appendIcon (): string {
+      appendIcon(): string {
         if (!this.editable) {
-          return null
+          return null;
         } else if (this.internal.editing) {
-          return 'save'
+          return "mdi-content-save";
         } else {
-          return 'edit'
+          return "mdi-pencil";
         }
-      }
+      },
     },
     methods: {
-      onClickAppend () {
+      onClickAppend() {
         if (this.internal.editing) {
-          this.save()
+          this.save();
         } else {
-          this.startEditing()
+          this.startEditing();
         }
       },
       resetEditorState() {
-        this.memText = this.value
-        this.internal.editing = false
-        this.$emit('update:editing', this.internal.editing)
+        this.memText = this.value;
+        this.internal.editing = false;
+        this.$emit("update:editing", this.internal.editing);
       },
       save() {
         if (this.hasEdits) {
-          this.$emit('save', this.memText)
+          this.$emit("save", this.memText);
         } else {
-          this.resetEditorState()
+          this.resetEditorState();
         }
-        this.internal.editing = false
+        this.internal.editing = false;
       },
       startEditing() {
-        this.internal.editing = true
-        this.$emit('update:editing', this.internal.editing)
+        this.internal.editing = true;
+        this.$emit("update:editing", this.internal.editing);
         // Focus on the input box
         if (this.autofocus && this.$refs.textField && this.$refs.textField.$el) {
-          const input = this.$refs.textField.$el.querySelector('input')
+          const input = this.$refs.textField.$el.querySelector("input");
           if (input) {
-            input.focus()
+            input.focus();
           }
         }
-      }
-    }
-  })
+      },
+    },
+  });
 </script>
 
 <style lang="sass">
-  .min-text-field
-    display: inline-block
-    padding-top: 0
-    .input-group__details
-      display: none
+.min-text-field
+  display: inline-block
+  padding-top: 0
+  .input-group__details
+    display: none
 </style>

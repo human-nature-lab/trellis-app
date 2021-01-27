@@ -67,12 +67,11 @@
           <v-expansion-panel inset>
             <v-expansion-panel-content>
               <div slot="header">{{ $t('notes') }}</div>
-              <v-text-field
+              <v-textarea
                 v-model="notes"
                 auto-grow
                 full-width
-                :placeholder="$t('notes')"
-                textarea/>
+                :placeholder="$t('notes')" />
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-layout>

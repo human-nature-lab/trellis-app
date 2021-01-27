@@ -8,13 +8,11 @@
         @close="$emit('input', false)"></modal-title>
       <v-card-text>
         <v-layout row>
-          <v-select
+          <v-combobox
             autofocus
-            autocomplete
-            combobox
             v-model="conditionTagName"
             :loading="isLoading"
-            :items="conditions"></v-select>
+            :items="conditions" />
           <v-btn
             @click="save">
             <v-progress-circular v-if="isSaving" indeterminate></v-progress-circular>
