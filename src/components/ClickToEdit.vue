@@ -16,8 +16,7 @@
       @click:append="onClickAppend"
       v-model="memText"
       @keyup.enter="save"
-      class="min-text-field"
-    />
+      class="min-text-field" />
   </v-flex>
 </template>
 

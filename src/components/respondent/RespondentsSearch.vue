@@ -5,14 +5,12 @@
         :placeholder="$t('search')"
         v-model="query"
         :loading="isLoading"
-        @input="onQueryChange"
-      ></v-text-field>
+        @input="onQueryChange" />
       <v-btn
         v-if="canSelect"
         @click="onDone"
         class="text--primary"
-        :disabled="isLoading"
-      >
+        :disabled="isLoading">
         {{ $t("done") }}
       </v-btn>
       <v-btn icon @click="filtersIsOpen = !filtersIsOpen">
@@ -40,14 +38,12 @@
             <v-flex>
               <v-checkbox
                 v-model="filters.includeChildren"
-                :label="$t('include_child_locations')"
-              />
+                :label="$t('include_child_locations')" />
             </v-flex>
             <v-flex>
               <v-checkbox
                 v-model="showPastResidents"
-                :label="$t('show_past_residents')"
-              />
+                :label="$t('show_past_residents')"  />
             </v-flex>
           </v-layout>
         </v-flex>
@@ -80,8 +76,7 @@
           v-for="r in selected"
           :key="r.id"
           @click:close="onSelectRespondent(r)"
-          close
-        >
+          close>
           {{ getRespondentName(r) }}
         </v-chip>
       </v-flex>
@@ -92,20 +87,14 @@
         :length="pagination.maxPages + 2"
         :value="pagination.page + 1"
         total-visible="7"
-        :disabled="
-          isLoading ||
-          (pagination.page === 0 &&
-            respondentResults.length !== pagination.size)
-        "
-        @input="updateCurrentPage"
-      />
+        :disabled="isLoading"
+        @input="updateCurrentPage" />
       <v-spacer></v-spacer>
       <v-btn
         v-if="canAddRespondent"
         color="primary"
         @click="showAssociatedRespondentDialog = true"
-        :disabled="isLoading"
-      >
+        :disabled="isLoading">
         <span v-if="respondentId">
           {{ $t("add_other_respondent") }}
         </span>
@@ -125,8 +114,7 @@
           @delete="removeRespondent(respondent)"
           :selected="isSelected(respondent)"
           :respondent="respondent"
-          :labels="getRespondentLabels(respondent)"
-        />
+          :labels="getRespondentLabels(respondent)" />
       </v-layout>
       <v-layout v-if="!respondentResults.length" ma-4>
         <v-container> {{ $t("no_results") }}: {{ query }} </v-container>
@@ -134,15 +122,13 @@
     </v-container>
     <TrellisModal
       :title="respondentId ? $t('add_other_respondent') : $t('add_respondent')"
-      v-model="showAssociatedRespondentDialog"
-    >
+      v-model="showAssociatedRespondentDialog">
       <AddRespondentForm
         @close="addRespondentClose"
         :studyId="studyId"
         :redirectToRespondentInfo="false"
         :onRespondentAdded="onRespondentAdded"
-        :associatedRespondentId="respondentId"
-      />
+        :associatedRespondentId="respondentId" />
     </TrellisModal>
   </v-container>
 </template>

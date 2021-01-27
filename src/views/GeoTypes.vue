@@ -17,12 +17,12 @@
         :headers="headers"
         hide-default-footer
         :items="geoTypes">
-        <GeoTypeRow
-          :geoType="geoType"
-          @edit="startEditing(geoType)"
-          @remove="removeGeoType(geoType)"
-          slot="items"
-          slot-scope="{item: geoType}" />
+        <template #item="{ item: geoType }">
+          <GeoTypeRow
+            :geoType="geoType"
+            @edit="startEditing(geoType)"
+            @remove="removeGeoType(geoType)" />
+        </template>
       </v-data-table>
     </v-container>
     <TrellisModal

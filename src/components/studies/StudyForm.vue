@@ -16,12 +16,16 @@
               <v-slider
                 :disabled="isWorking"
                 :step="1"
+                max="100"
+                min="20"
                 :label="$t('photo_quality')"
                 v-model="memStudy.photoQuality" />
             </v-flex>
             <v-flex xs3>
               <v-text-field
                 v-model="memStudy.photoQuality"
+                max="100"
+                min="20"
                 type="number"
                 step="5" />
             </v-flex>
