@@ -9,7 +9,7 @@
         right
         mt-5
         style="top: 0"
-        @click="closePanel"><v-icon>clear</v-icon></v-btn>
+        @click="closePanel">mdi-clear</v-icon></v-btn>
       <v-card-title>
         <translation-text-field
           v-if="curStatus === STATUS.EDIT_NAME || curStatus === STATUS.NEW_EDIT_NAME"
@@ -41,9 +41,9 @@
           v-on:geo-type-selected="geoTypeSelected">
         </geo-type-selector>
         <span v-if="curStatus === STATUS.SELECTED">
-          <v-btn small text @click="moveGeo">{{ $t('move') }} <v-icon right>my_location</v-icon></v-btn>
-          <v-btn small text @click="renameGeo">{{ $t('rename') }} <v-icon right>edit</v-icon></v-btn>
-          <v-btn small text @click="removeGeo">{{ $t('delete') }} <v-icon right>delete</v-icon></v-btn>
+          <v-btn small text @click="moveGeo">{{ $t('move') }} <v-icon right>mdi-crosshairs-gps</v-icon></v-btn>
+          <v-btn small text @click="renameGeo">{{ $t('rename') }} <v-icon right>mdi-edit</v-icon></v-btn>
+          <v-btn small text @click="removeGeo">{{ $t('delete') }} <v-icon right>mdi-delete</v-icon></v-btn>
         </span>
         <v-switch v-if="curStatus === STATUS.MOVING" :label="$t('move_child_elements')" v-model="moveChildren"></v-switch>
         <v-btn v-if="curStatus === STATUS.MOVING" flat @click="cancelMoveGeo">{{ $t('cancel') }}</v-btn>

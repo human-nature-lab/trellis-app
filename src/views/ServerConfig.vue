@@ -6,7 +6,7 @@
       </v-toolbar-title>
       <v-spacer />
       <v-btn icon @click="showAddDialog = true">
-        <v-icon>add</v-icon>
+        <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-toolbar>
     <v-data-table

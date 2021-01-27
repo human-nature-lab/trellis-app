@@ -18,7 +18,7 @@
           <v-btn
             @click="showFullscreen = true"
             icon>
-            <v-icon :large="$vuetify.breakpoint.smAndDown">fullscreen</v-icon>
+            <v-icon :large="$vuetify.breakpoint.smAndDown">mdi-fullscreen</v-icon>
           </v-btn>
         </v-layout>
       </v-card-actions>

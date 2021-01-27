@@ -39,7 +39,7 @@
                 :disabled="disabled"
                 justify-left>
                 <TrellisLoadingCircle v-show="prevActive" size="30px" margin="0 8px" />
-                <v-icon left v-show="!prevActive">chevron_left</v-icon>
+                <v-icon left v-show="!prevActive">mdi-chevron-left</v-icon>
                 {{isAtBeginning ? $t('exit') : $t('previous')}}
               </v-btn>
             </v-col>
@@ -49,7 +49,7 @@
                 justify-right>
                 {{isAtEnd ? $t('finish') : $t('next')}}
                 <TrellisLoadingCircle v-show="nextActive" size="30px" margin="0 8px" />
-                <v-icon right v-show="!nextActive">chevron_right</v-icon>
+                <v-icon right v-show="!nextActive">mdi-chevron-right</v-icon>
               </v-btn>
             </v-col>
           </v-row>

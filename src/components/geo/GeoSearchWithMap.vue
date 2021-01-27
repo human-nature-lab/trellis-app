@@ -2,7 +2,7 @@
   <v-col class="fill-height">
     <v-toolbar>
       <v-btn icon v-if="parentGeo !== null" @click.stop="upOneLevelDone">
-        <v-icon>arrow_back</v-icon>
+        <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
       <v-toolbar-title>{{ parentGeoName }}</v-toolbar-title>
     </v-toolbar>
@@ -19,7 +19,7 @@
         absolute
         bottom
         left>
-        <v-icon style="height:auto;">print</v-icon>
+        <v-icon style="height:auto;">mdi-printer</v-icon>
       </v-btn>
       <Permission :requires="TrellisPermission.ADD_GEO">
         <v-btn
@@ -31,7 +31,7 @@
           absolute
           bottom
           right>
-          <v-icon style="height:auto;">add</v-icon>
+          <v-icon style="height:auto;">mdi-plus</v-icon>
         </v-btn>
       </Permission>
     </v-container>

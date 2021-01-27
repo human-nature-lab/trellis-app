@@ -4,7 +4,7 @@
       <template v-slot:activator="{ on, attrs }">
         <v-btn v-on="on" v-bind="attrs" @click="photoFromCamera" icon>
           <v-progress-circular v-if="isAddingPhoto" indeterminate />
-          <v-icon v-else>add</v-icon>
+          <v-icon v-else>mdi-plus</v-icon>
         </v-btn>
       </template>
       <span>{{$t('add_photos')}}</span>

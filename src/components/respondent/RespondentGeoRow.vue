@@ -5,8 +5,8 @@
         icon
         v-if="showHistory"
         @click="$emit('input', !value)">
-        <v-icon v-if="value">keyboard_arrow_down</v-icon>
-        <v-icon v-else>chevron_right</v-icon>
+        <v-icon v-if="value">mdi-arrow-down</v-icon>
+        <v-icon v-else>mdi-chevron-right</v-icon>
       </v-btn>
     </td>
     <td>
@@ -31,9 +31,9 @@
         color="primary"
         @click="$emit('overrideCurrent')"
         v-if="canChangeIsCurrent" >
-        <v-icon v-if="respondentGeo.isCurrent">check</v-icon>
+        <v-icon v-if="respondentGeo.isCurrent">mdi-check</v-icon>
       </v-btn>
-      <v-icon v-else-if="respondentGeo.isCurrent">check</v-icon>
+      <v-icon v-else-if="respondentGeo.isCurrent">mdi-check</v-icon>
     </td>
     <td
       class="actions flex flex-nowrap"
@@ -47,7 +47,7 @@
             v-bind="attrs"
             icon
             @click="$emit('remove', respondentGeo.id)">
-            <v-icon>delete</v-icon>
+            <v-icon>mdi-delete</v-icon>
           </v-btn>
         </template>
         <span>{{ $t('remove_location') }}</span>
@@ -59,7 +59,7 @@
             v-bind="attrs"
             icon
             @click="$emit('move', respondentGeo)">
-            <v-icon>edit</v-icon>
+            <v-icon>mdi-pencil</v-icon>
           </v-btn>
         </template>
         <span>{{ $t('move_respondent_location') }}</span>

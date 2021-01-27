@@ -58,7 +58,7 @@
               v-on="on"
               v-bind="attrs"
               @click.stop="global.secondaryDrawer.onClick">
-              {{global.secondaryDrawer.icon || 'search'}}
+              {{global.secondaryDrawer.icon || 'mdi-magnify'}}
             </v-icon>
           </template>
           <span>{{$t('view_current_documentation')}}</span>

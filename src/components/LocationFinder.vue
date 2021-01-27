@@ -50,7 +50,7 @@
               <v-flex v-else-if="state === 'found-location'">
                 <v-layout justify-space-around>
                   <v-flex>
-                    <v-icon color="success">check</v-icon> {{$t('position_success')}}
+                    <v-icon color="success">mdi-check</v-icon> {{$t('position_success')}}
                   </v-flex>
                 </v-layout>
                 <v-layout justify-space-around>

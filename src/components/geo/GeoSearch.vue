@@ -33,11 +33,11 @@
               <v-chip
                 outlined
                 close
-                close-icon="close"
+                close-icon="mdi-close"
                 color="primary"
                 @click:close="removeGeo(props.item)">
                 <v-avatar>
-                  <v-icon>home</v-icon>
+                  <v-icon>mdi-home</v-icon>
                 </v-avatar>
                 {{translate(props.item)}}
               </v-chip>
@@ -50,11 +50,11 @@
             @click="moveUpOneLevel">
             <v-row>
               <v-flex xs1>
-                <v-icon>arrow_upward</v-icon>
+                <v-icon>mdi-arrow-up</v-icon>
               </v-flex>
               <v-spacer></v-spacer>
               <v-flex xs1 class="text-lg-right">
-                <v-icon>arrow_upward</v-icon>
+                <v-icon>mdi-arrow-up</v-icon>
               </v-flex>
             </v-row>
           </v-container>

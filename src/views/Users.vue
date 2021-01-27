@@ -10,7 +10,7 @@
           <v-btn
             icon
             @click="userToEdit = null; showEditUser = true">
-            <v-icon>add</v-icon>
+            <v-icon>mdi-plus</v-icon>
           </v-btn>
         </Permission>
       </v-toolbar>

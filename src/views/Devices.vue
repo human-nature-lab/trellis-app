@@ -7,7 +7,7 @@
         <v-btn
           icon
           @click="showAddDevice">
-          <v-icon>add</v-icon>
+          <v-icon>mdi-plus</v-icon>
         </v-btn>
       </Permission>
     </v-toolbar>

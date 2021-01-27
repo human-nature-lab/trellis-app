@@ -9,13 +9,13 @@
             v-on="on"
             v-bind="attrs"
             icon> 
-            <v-icon>more_vert</v-icon>
+            <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
         </template>
         <v-list>
           <v-list-item @click="uploadLogs">
             <v-list-item-action>
-              <v-icon>cloud_upload</v-icon>
+              <v-icon>mdi-cloud-upload</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               Upload logs
@@ -23,7 +23,7 @@
           </v-list-item>
           <v-list-item @click="deleteLogs">
             <v-list-item-action>
-              <v-icon>delete</v-icon>
+              <v-icon>mdi-delete</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               Delete logs
@@ -54,7 +54,7 @@
             {{item.component}}
           </td>
           <td>
-            <v-icon v-if="item.uploadedAt" color="green">check</v-icon>
+            <v-icon v-if="item.uploadedAt" color="green">mdi-check</v-icon>
           </td>
         </tr>
       </template>

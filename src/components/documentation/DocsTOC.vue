@@ -6,7 +6,7 @@
         </v-toolbar-title>
         <v-spacer />
         <v-btn icon @click="close">
-          <v-icon>arrow_forward</v-icon>
+          <v-icon>mdi-arrow-right</v-icon>
         </v-btn>
       </v-toolbar>
       <v-container>

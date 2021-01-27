@@ -3,7 +3,9 @@
     <v-list dense>
       <v-toolbar flat>
         <v-btn icon @click="global.menuDrawer.open = false">
-          <v-icon>arrow_back</v-icon>
+          <v-icon >
+            mdi-arrow-left
+          </v-icon>
         </v-btn>
         <v-flex class="text-xs-right" v-if="isLoggedIn">
           {{ $t('logged_in_as', [global.user.username]) }}
@@ -157,21 +159,21 @@
         return [{
           items: [{
             title: 'respondents',
-            icon: 'group',
+            icon: 'mdi-account-group',
             to: {name: 'RespondentsSearch'}
           }, {
             title: 'locations',
-            icon: 'place',
+            icon: 'mdi-map-marker',
             to: {name: 'GeoSearch'}
           }, {
             showIf: !this.global.offline,
             to: {name: 'SyncAdmin'},
-            icon: 'sync',
+            icon: 'mdi-sync',
             title: 'sync'
           }, {
             showIf: this.global.offline,
             to: {name: 'Sync'},
-            icon: 'sync',
+            icon: 'mdi-sync',
             title: 'sync'
           }]
         }, {
@@ -179,46 +181,46 @@
           showIf: this.isWeb,
           items: [{
             to: {name: 'Users'},
-            icon: 'recent_actors',
+            icon: 'mdi-account-box-multiple',
             title: 'users',
             showIf: this.hasPermission(TrellisPermission.VIEW_USERS)
           }, {
             to: {name: 'Forms'},
-            icon: 'library_books',
+            icon: 'mdi-form-select',
             title: 'forms'
           }, {
             to: {name: 'Reports'},
-            icon: 'save',
+            icon: 'mdi-content-save',
             title: 'reports',
             showIf: this.hasPermission(TrellisPermission.VIEW_REPORTS)
           }, {
             to: {name: 'Devices'},
-            icon: 'devices',
+            icon: 'mdi-cellphone-link',
             title: 'devices',
             showIf: this.hasPermission(TrellisPermission.VIEW_DEVICES)
           }, {
             to: {name: 'Studies'},
-            icon: 'import_contacts',
+            icon: 'mdi-book-open-blank-variant',
             title: 'studies',
             showIf: this.hasPermission(TrellisPermission.VIEW_STUDIES)
           }, {
             to: {name: 'GeoTypes'},
-            icon: 'edit_location',
+            icon: 'mdi-map-plus',
             title: 'geo_types'
           }]
         }, {
           title: 'settings',
           items: [{
             click: this.openStudySelector,
-            icon: 'assignment',
+            icon: 'mdi-clipboard-text',
             title: 'change_study'
           }, {
             click: this.openLocaleSelector,
             title: 'change_locale',
-            icon: 'language'
+            icon: 'mdi-web'
           }, {
             click: this.toggleDarkTheme,
-            icon: 'wb_sunny',
+            icon: 'mdi-theme-light-dark',
             title: 'toggle_dark',
             switchColor: 'green',
             iconColor: null,
@@ -226,7 +228,7 @@
           }, {
             click: this.toggleBatterySaver,
             title: 'battery_saver',
-            icon: 'battery_alert',
+            icon: 'mdi-battery-alert',
             switchColor: 'green',
             switchValue: this.global.cpuOptimized,
             showIf: this.isCordovaBuild
@@ -235,7 +237,7 @@
             title: 'track_location',
             iconColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green': 'yellow') : null,
             switchColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green': 'yellow') : null,
-            icon: this.global.watchGPS ? (this.global.gpsFixed ? 'gps_fixed' : 'gps_not_fixed') : 'gps_off',
+            icon: this.global.watchGPS ? (this.global.gpsFixed ? 'mdi-crosshairs-gps' : 'mdi-crosshairs') : 'mdi-crosshairs-question',
             switchValue: this.global.watchGPS,
             showIf: this.isCordovaBuild
           }]
@@ -243,45 +245,45 @@
           title: 'general',
           items: [{
             to: {name: 'Documentation'},
-            icon: 'help',
+            icon: 'mdi-help-circle',
             title: 'documentation'
           }, {
             to: {name: 'Info'},
-            icon: 'info',
+            icon: 'mdi-information',
             title: 'information'
           }, {
             showIf: this.isInterview,
             click: () => this.emit('showConditionTags'),
-            icon: 'local_offer',
+            icon: 'mdi-tag',
             title: 'condition_tags'
           }, {
             showIf: this.isLoggedIn,
             click: this.logout,
-            icon: 'exit_to_app',
+            icon: 'mdi-exit-to-app',
             title: 'logout'
           }, {
             showIf: this.isLoggedIn,
             click: this.changePassword,
-            icon: 'settings_backup_restore',
+            icon: 'mdi-backup-restore',
             title: 'change_password'
           }, {
             to: {name: 'ServerConfig'},
-            icon: 'build',
+            icon: 'mdi-wrench',
             title: 'server_config',
             showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_CONFIG)
           }, {
             to: {name: 'Permissions'},
-            icon: 'lock',
+            icon: 'mdi-lock',
             title: 'permissions',
             showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_PERMISSIONS)
           }, {
             click: this.refresh,
-            icon: 'refresh',
+            icon: 'mdi-refresh',
             title: 'refresh'
           }, {
             showIf: this.isDebug,
             to: { name: 'ServiceTesting' },
-            icon: 'done_all',
+            icon: 'mdi-check-all',
             title: 'Service Testing'
           }]
         }]

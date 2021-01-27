@@ -13,7 +13,7 @@
               <TrellisLoadingCircle
                 v-if="isBusy"
                 size="100%"></TrellisLoadingCircle>
-              <v-icon v-else>more_vert</v-icon>
+              <v-icon v-else>mdi-dots-vertical</v-icon>
             </v-btn>
           </v-list-item-action>
         </template>
@@ -66,8 +66,8 @@
     </td>
     <td>
       <v-btn icon @click="$emit('input', !value)">
-        <v-icon v-if="value">keyboard_arrow_up</v-icon>
-        <v-icon v-else>keyboard_arrow_down</v-icon>
+        <v-icon v-if="value">mdi-arrow-up</v-icon>
+        <v-icon v-else>mdi-arrow-down</v-icon>
       </v-btn>
     </td>
   </tr>

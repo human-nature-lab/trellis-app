@@ -9,21 +9,19 @@
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer></v-spacer>
           <permission :requires="TrellisPermission.ADD_FORM">
-            <v-menu
-              offset-x
-              >
+            <v-menu offset-x>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   v-on="on"
                   v-bind="attrs"
                   icon>
-                  <v-icon>more_vert</v-icon>
+                  <v-icon>mdi-dots-vertical</v-icon>
                 </v-btn>
               </template>
               <v-list>
                 <v-list-item @click="addForm(formType)">
                   <v-list-item-action>
-                    <v-icon>add</v-icon>
+                    <v-icon>mdi-plus</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
                     Add Form
@@ -31,7 +29,7 @@
                 </v-list-item>
                 <v-list-item @click="showImportForm = true; importFormType = Number(formType)">
                   <v-list-item-action>
-                    <v-icon>import_export</v-icon>
+                    <v-icon>mdi-swap-vertical</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
                     Import Form

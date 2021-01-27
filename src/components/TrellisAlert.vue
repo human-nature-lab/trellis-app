@@ -10,7 +10,7 @@
         <slot></slot>
       </v-flex>
       <v-flex xs1>
-        <v-icon v-if="isMore">{{ (showMore) ? 'expand_less' : 'expand_more' }}</v-icon>
+        <v-icon v-if="isMore">{{ (showMore) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
       </v-flex>
     </v-row>
     <v-row wrap v-if="showMore">

@@ -36,7 +36,7 @@
             :disabled="disabled"
             v-show="!isLoading"
             :items="existingConditionTagNames"
-            append-icon="add"
+            append-icon="mdi-add"
             @click:append="showCreateConditionTag"
             :value="selectedConditionTags"
             @input="updateConditionTags"/>
@@ -49,7 +49,7 @@
       :disabled="isDirty || disabled"
       @click="remove()">
       <TrellisLoadingCircle v-if="isDirty" size="100%" />
-      <v-icon v-else>delete</v-icon>
+      <v-icon v-else>mdi-delete</v-icon>
     </v-btn>
     <TrellisModal
       title="New condition tag"
@@ -57,7 +57,7 @@
       <v-text-field
         label="Condition tag"
         v-model="conditionTagName"
-        append-icon="add"
+        append-icon="mdi-add"
         @click:append="addConditionTag"
         />
     </TrellisModal>

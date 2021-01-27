@@ -13,7 +13,7 @@
               v-bind="attrs"
               icon
               @click="isAdding = true">
-              <v-icon>add</v-icon>
+              <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
           <span>{{$t('add_respondent_name')}}</span>
@@ -29,14 +29,14 @@
         <tr>
           <td>{{props.item.name}}</td>
           <td>
-            <v-icon v-if="props.item.isDisplayName">check</v-icon>
+            <v-icon v-if="props.item.isDisplayName">mdi-check</v-icon>
           </td>
           <td>
             <Permission :requires="TrellisPermission.EDIT_RESPONDENT_NAME">
               <v-btn
                 icon
                 @click="currentName = props.item; isEditing = true">
-                <v-icon>edit</v-icon>
+                <v-icon>mdi-pencil</v-icon>
               </v-btn>
             </Permission>
             <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_NAME">
@@ -44,7 +44,7 @@
                 icon
                 @click="removeName(props.item.id)">
                 <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
-                <v-icon v-else>delete</v-icon>
+                <v-icon v-else>mdi-delete</v-icon>
               </v-btn>
             </Permission>
           </td>

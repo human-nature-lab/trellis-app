@@ -12,7 +12,7 @@
               <v-icon
                 v-on="on"
                 v-bind="attrs"
-                color="green darken-2">check_circle</v-icon>
+                color="green darken-2">mdi-check-circle</v-icon>
             </template>
             <span>
               {{ $t('completed') }}
@@ -25,7 +25,7 @@
               <v-icon
                 v-on="on"
                 v-bind="attrs"
-                color="orange darken-2">query_builder</v-icon>
+                color="orange darken-2">mdi-clock-outline</v-icon>
             </template>
             <span>
               {{ $t('in_progress') }}
@@ -38,7 +38,7 @@
               <v-icon
                 v-on="on"
                 v-bind="attrs">
-                play_circle_outline
+                mdi-play-circle-outline
               </v-icon>
             </template>
             <span>
@@ -59,8 +59,8 @@
             :disabled="!form.surveys.length"
             icon
             @click="isOpen = !isOpen">
-            <v-icon v-if="!isOpen">keyboard_arrow_down</v-icon>
-            <v-icon v-else>keyboard_arrow_up</v-icon>
+            <v-icon v-if="!isOpen">mdi-arrow-down</v-icon>
+            <v-icon v-else>mdi-arrow-up</v-icon>
           </v-btn>
         </v-flex>
       </v-row>

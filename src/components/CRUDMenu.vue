@@ -5,19 +5,19 @@
     max-width="60px">
     <template v-slot:activator="{ on, attrs }">
       <v-btn icon v-on="on" v-bind="attrs">
-        <v-icon>more_vert</v-icon>
+        <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </template>
     <v-list>
       <v-list-item
         @click="$emit('edit')"
         v-if="editable">
-        <v-icon>edit</v-icon>
+        <v-icon>mdi-pencil</v-icon>
       </v-list-item>
       <v-list-item
         @click="$emit('remove')"
         v-if="removable">
-        <v-icon color="error">delete</v-icon>
+        <v-icon color="error">mdi-delete</v-icon>
       </v-list-item>
     </v-list>
   </v-menu>

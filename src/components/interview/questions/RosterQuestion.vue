@@ -16,7 +16,7 @@
                   v-if="editingIndex === rowIndex"
                   :disabled="isSavingEdit || isQuestionDisabled"
                   @click="stopEditingAndRevert(row, rowIndex)">
-                  <v-icon color="red">clear</v-icon>
+                  mdi-clear</v-icon>
                 </v-btn>
               </template>
               <span>
@@ -46,7 +46,7 @@
               :nudge-left="30">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon v-on="on" v-bind="attrs">
-                  <v-icon>more_vert</v-icon>
+                  <v-icon>mdi-dots-vertical</v-icon>
                 </v-btn>
               </template>
               <v-list>
@@ -58,7 +58,7 @@
                         v-bind="attrs"
                         icon
                         @click="startEditingRow(row, rowIndex)">
-                        <v-icon>edit</v-icon>
+                        <v-icon>mdi-pencil</v-icon>
                       </v-btn>
                     </template>
                     <span>
@@ -74,7 +74,7 @@
                         v-bind="attrs"
                         icon
                         @click="removeRosterRow(row)">
-                        <v-icon color="red">delete</v-icon>
+                        <v-icon color="red">mdi-delete</v-icon>
                       </v-btn>
                     </template>
                     <span>{{ $t('delete') }}</span>
@@ -91,7 +91,7 @@
                   icon
                   :disabled="isQuestionDisabled"
                   @click.stop="stopEditingAndSave(row, rowIndex)">
-                    <v-icon color="green">check</v-icon>
+                    <v-icon color="green">mdi-check</v-icon>
                 </v-btn>
               </template>
               <span>
@@ -110,7 +110,7 @@
               :disabled="isSavingNew"
               icon
               @click="stopAddingWithoutSaving">
-              <v-icon color="red">delete</v-icon>
+              <v-icon color="red">mdi-delete</v-icon>
             </v-btn>
           </v-list-item-avatar>
           <v-list-item-content>
@@ -128,7 +128,7 @@
               v-if="!isSavingNew"
               icon
               @click.stop="stopAddingAndSave">
-              <v-icon color="green">check</v-icon>
+              <v-icon color="green">mdi-check</v-icon>
             </v-btn>
             <v-progress-circular
               v-if="isSavingNew"
@@ -147,7 +147,7 @@
           absolute
           bottom
           right>
-          <v-icon style="height:auto;">add</v-icon>
+          <v-icon style="height:auto;">mdi-plus</v-icon>
         </v-btn>
       </v-fab-transition>
     </v-card>

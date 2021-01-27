@@ -10,7 +10,7 @@
           <v-btn
             @click="isAdding=true"
             icon>
-            <v-icon>add</v-icon>
+            <v-icon>mdi-plus</v-icon>
           </v-btn>
         </Permission>
       </v-toolbar>

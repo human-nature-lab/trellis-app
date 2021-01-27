@@ -14,7 +14,7 @@
               icon
               class="mb-2"
               @click="showForm = true">
-              <v-icon>add</v-icon>
+              <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
           <span>{{$t('add_condition_tag')}}</span>
@@ -38,7 +38,7 @@
                 <v-progress-circular
                   v-if="isDeleting(item.id)"
                   indeterminate />
-                <v-icon v-else>delete</v-icon>
+                <v-icon v-else>mdi-delete</v-icon>
               </v-btn>
             </td>
           </Permission>

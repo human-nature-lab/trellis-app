@@ -14,8 +14,8 @@
         {{ $t('done') }}
       </v-btn>
       <v-btn icon @click="filtersIsOpen = !filtersIsOpen">
-        <v-icon v-if="filtersIsOpen">keyboard_arrow_up</v-icon>
-        <v-icon v-else>keyboard_arrow_down</v-icon>
+        <v-icon v-if="filtersIsOpen">mdi-arrow-up</v-icon>
+        <v-icon v-else>mdi-arrow-down</v-icon>
       </v-btn>
     </v-layout>
     <v-scale-transition>
@@ -38,7 +38,7 @@
                   outlined
                   color="primary">
                   <v-avatar>
-                    <v-icon>label</v-icon>
+                    <v-icon>mdi-label</v-icon>
                   </v-avatar>
                   {{props.item}}
                 </v-chip>
@@ -51,7 +51,7 @@
                   v-bind="attrs"
                   icon
                   @click="clearFilters">
-                  <v-icon>clear</v-icon>
+                  mdi-clear</v-icon>
                 </v-btn>
               </template>
               <span>
@@ -88,7 +88,7 @@
         @click:close="removeGeoFilter(index)"
         :close="canRemoveGeos">
         <v-avatar>
-          <v-icon>home</v-icon>
+          <v-icon>mdi-home</v-icon>
         </v-avatar>
         <GeoBreadcrumbs
           :geoId="geo"

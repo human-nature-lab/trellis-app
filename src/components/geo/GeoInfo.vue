@@ -8,13 +8,13 @@
         <v-spacer />
         <Permission :requires="TrellisPermission.EDIT_GEO">
           <v-btn icon small @click="showEditName = true">
-            <v-icon>edit</v-icon>
+            <v-icon>mdi-pencil</v-icon>
           </v-btn>
         </Permission>
         <v-btn
           @click.stop="showGeoMap"
           icon>
-          <v-icon>map</v-icon>
+          <v-icon>mdi-map</v-icon>
         </v-btn>
         <v-btn @click="viewRespondents">
           {{ $t('respondents') }}
@@ -37,7 +37,7 @@
                   icon
                   small
                   @click="showGeoTypeDialog = true">
-                  <v-icon>edit</v-icon>
+                  <v-icon>mdi-pencil</v-icon>
                 </v-btn>
               </Permission>
             </span>

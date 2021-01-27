@@ -7,8 +7,8 @@
         <v-btn
           icon
           @click.stop="$emit('geo-select')">
-          <v-icon color="primary" v-if="selected">check_box</v-icon>
-          <v-icon v-else>check_box_outline_blank</v-icon>
+          <v-icon color="primary" v-if="selected">mdi-checkbox-marked</v-icon>
+          <v-icon v-else>mdi-checkbox-blank-outline</v-icon>
         </v-btn>
       </v-list-item-action>
       <v-list-item-content>
@@ -18,14 +18,14 @@
         <v-btn
           @click.stop="showGeoMap"
           icon>
-          <v-icon>map</v-icon>
+          <v-icon>mdi-map</v-icon>
         </v-btn>
       </v-list-item-action>
       <v-list-item-action>
         <v-btn
           @click.stop="showGeoInfo"
           icon>
-          <v-icon>info</v-icon>
+          <v-icon>mdi-information</v-icon>
         </v-btn>
       </v-list-item-action>
     </v-list-item>

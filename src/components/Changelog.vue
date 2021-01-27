@@ -36,7 +36,7 @@
     name: 'Changelog',
     beforeRouteEnter (to, from, next) {
       global.secondaryDrawer.isEnabled = true
-      global.secondaryDrawer.icon = 'change_history'
+      global.secondaryDrawer.icon = 'mdi-delta'
       next()
     },
     beforeRouteLeave (to, from, next) {

@@ -21,7 +21,7 @@
     <v-flex>
       <v-btn
         @click="addSkip">
-        <v-icon>add</v-icon> {{$t('add_skip')}}
+        <v-icon>mdi-plus</v-icon> {{$t('add_skip')}}
       </v-btn>
     </v-flex>
   </v-layout>

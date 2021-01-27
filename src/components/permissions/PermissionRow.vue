@@ -4,7 +4,7 @@
       <v-badge right color="white">
         <v-tooltip slot="badge" right>
           <template v-slot:activator="{ on, attrs }">
-            <v-icon v-on="on" v-bind="attrs">info_outline</v-icon>
+            <v-icon v-on="on" v-bind="attrs">mdi-information-outline</v-icon>
           </template>
           {{permission.description}}
         </v-tooltip>

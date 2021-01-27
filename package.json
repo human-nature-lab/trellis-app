@@ -23,6 +23,7 @@
     "android-vm": "npm run build && cordova run android"
   },
   "dependencies": {
+    "@mdi/font": "^5.9.55",
     "@sentry/browser": "^4.5.3",
     "@types/node": "^10.5.2",
     "@types/webpack-env": "^1.13.6",
@@ -51,7 +52,6 @@
     "lodash": "^4.17.15",
     "lru-cache": "^6.0.0",
     "marked": "^0.7.0",
-    "material-design-icons-iconfont": "^3.0.3",
     "mocha": "^3.5.3",
     "moment": "^2.22.2",
     "ngraph.forcelayout": "^0.5.0",

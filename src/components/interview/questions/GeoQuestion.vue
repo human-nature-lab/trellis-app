@@ -26,7 +26,7 @@
           :disabled="isQuestionDisabled"
           @click="openGeoSearch()">
           <v-icon
-            style="height:auto;">{{geoIds.length ? 'edit': 'add'}}</v-icon>
+            style="height:auto;">{{geoIds.length ? 'mdi-pencil': 'mdi-plus'}}</v-icon>
         </v-btn>
       </v-card>
       <!--we need the geo-search-dialog class for geo search to work correctly in the dialog-->

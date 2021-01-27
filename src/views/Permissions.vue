@@ -17,7 +17,7 @@
               v-bind="attrs"
               icon
               @click="showRoleDialog = true">
-              <v-icon>add</v-icon>
+              <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
           <span>Create a new role</span>
@@ -40,7 +40,7 @@
                     v-on="on"
                     v-bind="attrs"
                     icon>
-                    <v-icon>more_vert</v-icon>
+                    <v-icon>mdi-dots-vertical</v-icon>
                   </v-btn>
                 </template>
                 <v-list>
@@ -49,7 +49,7 @@
                     :disabled="!hasPermission(TrellisPermission.EDIT_PERMISSIONS)"
                     @click="removeRole(role)">
                     <v-list-item-action>
-                      <v-icon color="error">delete</v-icon>
+                      <v-icon color="error">mdi-delete</v-icon>
                     </v-list-item-action>
                     {{$t('delete') | TitleCase}}
                   </v-list-item>
@@ -57,7 +57,7 @@
                     @click="startCopy(role)"
                     :disabled="!hasPermission(TrellisPermission.EDIT_PERMISSIONS)">
                     <v-list-item-action>
-                      <v-icon>chevron_right</v-icon>
+                      <v-icon>mdi-chevron-right</v-icon>
                     </v-list-item-action>
                     {{$t('copy') | TitleCase}}
                   </v-list-item>

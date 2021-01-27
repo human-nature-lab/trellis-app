@@ -53,11 +53,11 @@
               {{$t('checking_census_form')}}
             </v-flex>
             <v-flex v-else-if="hasCensusForm" >
-              <v-icon color="success">check</v-icon>
+              <v-icon color="success">mdi-check</v-icon>
               {{$t('census_form_found')}}
             </v-flex>
             <v-flex v-else>
-              <v-icon color="error">clear</v-icon>
+              mdi-clear</v-icon>
               {{$t('census_form_not_found')}}
             </v-flex>
           </v-card-text>

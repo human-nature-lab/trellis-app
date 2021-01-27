@@ -21,25 +21,25 @@
           </photo>
           <v-card-actions class="photo-actions">
             <v-btn v-if="allowSorting" icon color="amber" @click="setFavorite(photo)">
-              <v-icon v-if="photo.pivot.sortOrder === 0" medium>star</v-icon>
-              <v-icon v-else medium>star_border</v-icon>
+              <v-icon v-if="photo.pivot.sortOrder === 0" medium>mdi-star</v-icon>
+              <v-icon v-else medium>mdi-star-outline</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
             <v-menu bottom left>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn v-on="on" v-bind="attrs" icon>
-                  <v-icon medium>more_vert</v-icon>
+                  <v-icon medium>mdi-dots-vertical</v-icon>
                 </v-btn>
               </template>
               <v-list>
                 <v-list-item v-if="allowNotes">
                   <v-btn icon @click.native="editPhoto(photo)">
-                    <v-icon medium>edit</v-icon>
+                    <v-icon medium>mdi-edit</v-icon>
                   </v-btn>
                 </v-list-item>
                 <v-list-item>
                   <v-btn icon @click.native="deletePhoto(photo)">
-                    <v-icon medium>delete</v-icon>
+                    <v-icon medium>mdi-delete</v-icon>
                   </v-btn>
                 </v-list-item>
               </v-list>

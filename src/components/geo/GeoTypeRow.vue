@@ -12,21 +12,21 @@
       <v-icon
         v-if="geoType.canUserAdd"
         color="primary">
-        check
+        mdi-check
       </v-icon>
     </td>
     <td class="center">
       <v-icon
         v-if="geoType.canUserAddChild"
         color="primary">
-        check
+        mdi-check
       </v-icon>
     </td>
     <td class="center">
       <v-icon
         v-if="geoType.canContainRespondent"
         color="primary">
-        check
+        mdi-check
       </v-icon>
     </td>
   </tr>

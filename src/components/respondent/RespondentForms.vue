@@ -14,13 +14,13 @@
                 v-on="on"
                 v-bind="attrs"
                 icon>
-                <v-icon>more_vert</v-icon>
+                <v-icon>mdi-dots-vertical</v-icon>
               </v-btn>
             </template>
             <v-list>
               <v-list-item @click="showHidden=!showHidden">
                 <v-list-item-action>
-                  <v-icon v-if="showHidden">check</v-icon>
+                  <v-icon v-if="showHidden">mdi-check</v-icon>
                 </v-list-item-action>
                 <v-list-item-title>{{$t('show_all')}}</v-list-item-title>
               </v-list-item>

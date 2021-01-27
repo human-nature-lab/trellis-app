@@ -23,7 +23,7 @@
       :rules="rules.password"
       @keyup.enter="login"
       @change="$emit('password', password)"
-      :append-icon="isPassHidden ? 'visibility' : 'visibility_off'"
+      :append-icon="isPassHidden ? 'mdi-eye' : 'mdi-eye-off'"
       @click:append="togglePassHidden"
       :type="isPassHidden ? 'password' : 'text'"
       v-model="password"/>

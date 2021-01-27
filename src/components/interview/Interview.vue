@@ -108,7 +108,7 @@
           dark
           color="primary">
           <v-btn icon dark @click.native="dialog.conditionTag = false">
-            <v-icon>close</v-icon>
+            <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>
             {{ $t('conditions') }}

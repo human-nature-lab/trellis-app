@@ -13,14 +13,14 @@
               </v-layout>
               <v-flex v-else-if="backup.error">
                 <div>
-                  <v-icon color="error">close</v-icon> {{$t('backup_failed')}}
+                  <v-icon color="error">mdi-close</v-icon> {{$t('backup_failed')}}
                 </div>
                 <v-alert color="error" v-show="backup.error">
                   {{backup.error}}
                 </v-alert>
               </v-flex>
               <v-flex v-else>
-                <v-icon color="success">check</v-icon> {{$t('backup_success')}}
+                <v-icon color="success">mdi-check</v-icon> {{$t('backup_success')}}
               </v-flex>
             </v-container>
           </v-card-text>
@@ -35,13 +35,13 @@
               v-on="on"
               v-bind="attrs"
               icon>
-              <v-icon>more_vert</v-icon>
+              <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
           <v-list>
             <v-list-item @click="backupDatabase">
               <v-list-item-action>
-                <v-icon>cloud_upload</v-icon>
+                <v-icon>mdi-cloud-upload</v-icon>
               </v-list-item-action>
               <v-list-item-content>
                 {{$t('backup_database')}}

@@ -51,7 +51,7 @@
             <v-spacer></v-spacer>
             <v-text-field
               v-model="search"
-              append-icon="search"
+              append-icon="mdi-magnify"
               :label="$t('search')"
               single-line
               hide-details>
@@ -71,8 +71,8 @@
                       :disabled="props.item.status !== 'SUCCESS' && props.item.status !== 'FAILED'"
                       icon
                       @click="props.item.isOpen = !props.item.isOpen">
-                      <v-icon v-if="props.item.isOpen">keyboard_arrow_down</v-icon>
-                      <v-icon v-else>keyboard_arrow_right</v-icon>
+                      <v-icon v-if="props.item.isOpen">mdi-arrow-down</v-icon>
+                      <v-icon v-else>mdi-arrow-right</v-icon>
                     </v-btn>
                   </td>
                   <td>{{ props.item.created_at }}</td>

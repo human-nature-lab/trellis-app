@@ -47,7 +47,7 @@
                 <v-btn
                   color="error"
                   @click="deleteRespondent">
-                  <v-icon>delete</v-icon>
+                  <v-icon>mdi-delete</v-icon>
                   {{$t('delete')}}
                 </v-btn>
               </Permission>

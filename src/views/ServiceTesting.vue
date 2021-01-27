@@ -11,7 +11,7 @@
                 v-on="on"
                 v-bind="attrs"
                 icon>
-                <v-icon>more_vert</v-icon>
+                <v-icon>mdi-dots-vertical</v-icon>
               </v-btn>
             </template>
             <v-list>
@@ -28,7 +28,7 @@
               </v-list-item>
               <v-list-item @click="addAlert">
                 <v-list-item-action>
-                  <v-icon>add_alert</v-icon>
+                  <v-icon>mdi-plus_alert</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                   Add Alert
@@ -36,7 +36,7 @@
               </v-list-item>
               <v-list-item @click="throwError">
                 <v-list-item-action>
-                  <v-icon>error</v-icon>
+                  <v-icon>mdi-alert-circle</v-icon>
                 </v-list-item-action>
                 <v-list-item-content>
                   Throw error
@@ -66,8 +66,8 @@
             :key="test.title">
             <v-layout row>
               <v-flex xs>
-                <v-icon v-if="test.state === SUCCESSFUL" color="success">check_circle</v-icon>
-                <v-icon v-else-if="test.state === FAILED" color="error">error</v-icon>
+                <v-icon v-if="test.state === SUCCESSFUL" color="success">mdi-check_circle</v-icon>
+                <v-icon v-else-if="test.state === FAILED" color="error">mdi-alert-circle</v-icon>
               </v-flex>
               <v-layout column>
                 <v-flex>{{test.title}} - {{test.duration}}</v-flex>

@@ -11,7 +11,7 @@
           text
           style="top: 0"
           @click="closeDialog(null)">
-          <v-icon>clear</v-icon>
+          mdi-clear</v-icon>
         </v-btn>
       </v-card-title>
       <v-card-text>
@@ -117,7 +117,7 @@
             <v-card>
               <v-card-text>
                 <v-progress-circular indeterminate v-if="checkingForCensus"></v-progress-circular>
-                <v-icon v-else color="success">check</v-icon>
+                <v-icon v-else color="success">mdi-check</v-icon>
                 {{$t('checking_census_form')}}
               </v-card-text>
               <v-card-actions>

@@ -10,7 +10,7 @@
       :loading="loading"
       :flat="!internal.editing"
       :append-icon="appendIcon"
-      :prepend-icon="internal.editing ? 'clear' : ''"
+      :prepend-icon="internal.editing ? 'mdi-clear' : ''"
       @click:prepend="resetEditorState"
       @click:append="onClickAppend"
       v-model="memText"

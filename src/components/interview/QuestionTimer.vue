@@ -9,14 +9,14 @@
       color="primary"
       :disabled="timer.hasExpired"
       @click="toggleState">
-      <v-icon v-if="timer.isRunning">pause</v-icon>
-      <v-icon v-else>play_arrow</v-icon>
+      <v-icon v-if="timer.isRunning">mdi-pause</v-icon>
+      <v-icon v-else>mdi-play</v-icon>
     </v-btn>
     <v-btn
       v-if="showControls"
       color="primary"
       @click="reset">
-      <v-icon>refresh</v-icon>
+      <v-icon>mdi-refresh</v-icon>
     </v-btn>
   </v-layout>
 </template>
