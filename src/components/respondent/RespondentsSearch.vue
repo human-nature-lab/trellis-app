@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="respondent-search">
-    <v-layout row>
+    <v-row no-gutter>
       <v-text-field
         :placeholder="$t('search')"
         v-model="query"
@@ -17,11 +17,11 @@
         <v-icon v-if="filtersIsOpen">mdi-chevron-up</v-icon>
         <v-icon v-else>mdi-chevron-down</v-icon>
       </v-btn>
-    </v-layout>
+    </v-row>
     <v-scale-transition>
-      <v-layout column v-if="filtersIsOpen">
-        <v-flex>
-          <v-layout>
+      <v-col v-if="filtersIsOpen">
+        <v-col>
+          <v-row>
             <ConditionTagAutocomplete v-model="filters.conditionTags" />
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
@@ -33,27 +33,27 @@
                 {{ $t("clear") }}
               </span>
             </v-tooltip>
-          </v-layout>
-          <v-layout row wrap v-if="showGeoFilterOptions">
-            <v-flex>
+          </v-row>
+          <v-row v-if="showGeoFilterOptions">
+            <v-col>
               <v-checkbox
                 v-model="filters.includeChildren"
                 :label="$t('include_child_locations')" />
-            </v-flex>
-            <v-flex>
+            </v-col>
+            <v-col>
               <v-checkbox
                 v-model="showPastResidents"
                 :label="$t('show_past_residents')"  />
-            </v-flex>
-          </v-layout>
-        </v-flex>
-      </v-layout>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-col>
     </v-scale-transition>
     <v-divider v-if="filters.geos && filters.geos.length" />
-    <v-layout row wrap v-if="filters.geos && filters.geos.length">
-      <v-flex class="subheading">
+    <v-row no-gutter v-if="filters.geos && filters.geos.length">
+      <v-col class="subheading">
         <v-container>{{ $t("filters") }}</v-container>
-      </v-flex>
+      </v-col>
       <v-spacer />
       <v-chip
         v-for="(geo, index) in filters.geos"
@@ -68,10 +68,10 @@
         </v-avatar>
         <GeoBreadcrumbs :geoId="geo" :maxDepth="2" />
       </v-chip>
-    </v-layout>
+    </v-row>
     <v-divider v-if="selected.length > 0" />
-    <v-layout v-if="selected.length > 0">
-      <v-flex>
+    <v-col v-if="selected.length > 0">
+      <v-col>
         <v-chip
           v-for="r in selected"
           :key="r.id"
@@ -79,32 +79,36 @@
           close>
           {{ getRespondentName(r) }}
         </v-chip>
-      </v-flex>
-    </v-layout>
-    <v-layout row wrap>
-      <v-pagination
-        class="pagination"
-        :length="pagination.maxPages + 2"
-        :value="pagination.page + 1"
-        total-visible="7"
-        :disabled="isLoading"
-        @input="updateCurrentPage" />
-      <v-spacer></v-spacer>
-      <v-btn
-        v-if="canAddRespondent"
-        color="primary"
-        @click="showAssociatedRespondentDialog = true"
-        :disabled="isLoading">
-        <span v-if="respondentId">
-          {{ $t("add_other_respondent") }}
-        </span>
-        <span v-else>
-          {{ $t("add_respondent") }}
-        </span>
-      </v-btn>
-    </v-layout>
+      </v-col>
+    </v-col>
+    <v-row >
+      <v-col>
+        <v-pagination
+          class="ma-n4"
+          :length="pagination.maxPages + 2"
+          :value="pagination.page + 1"
+          total-visible="7"
+          :disabled="isLoading"
+          @input="updateCurrentPage" />
+      </v-col>
+      <v-spacer />
+      <v-col>
+        <v-btn
+          v-if="canAddRespondent"
+          color="primary"
+          @click="showAssociatedRespondentDialog = true"
+          :disabled="isLoading">
+          <span v-if="respondentId">
+            {{ $t("add_other_respondent") }}
+          </span>
+          <span v-else>
+            {{ $t("add_respondent") }}
+          </span>
+        </v-btn>
+      </v-col>
+    </v-row>
     <v-container class="respondents" fluid grid-list-sm>
-      <v-layout row wrap>
+      <v-row>
         <RespondentItem
           v-for="respondent in respondentResults"
           :key="respondent.id"
@@ -115,10 +119,10 @@
           :selected="isSelected(respondent)"
           :respondent="respondent"
           :labels="getRespondentLabels(respondent)" />
-      </v-layout>
-      <v-layout v-if="!respondentResults.length" ma-4>
+      </v-row>
+      <v-col v-if="!respondentResults.length" ma-4>
         <v-container> {{ $t("no_results") }}: {{ query }} </v-container>
-      </v-layout>
+      </v-col>
     </v-container>
     <TrellisModal
       :title="respondentId ? $t('add_other_respondent') : $t('add_respondent')"
@@ -441,8 +445,3 @@
     }
   }
 </script>
-
-<style lang="sass">
-.pagination
-  margin: auto
-</style>
