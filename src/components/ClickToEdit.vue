@@ -8,6 +8,7 @@
       :solo="solo"
       :label="label"
       :loading="loading"
+      hide-details
       :flat="!internal.editing"
       :append-icon="appendIcon"
       :prepend-icon="internal.editing ? 'mdi-clear' : ''"
