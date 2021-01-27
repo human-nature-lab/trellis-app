@@ -1,68 +1,64 @@
 <template>
-  <v-container fill-height>
-    <v-layout>
-      <v-flex>
-        <v-container>
-          <v-layout row class="sync-content">
-            <v-flex class="xs12">
-              <sync-status
-                v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
-                :local-latest-snapshot="localLatestSnapshot"
-                :updated-records-count="updatedRecordsCount">
-              </sync-status>
-              <upload
-                v-if="uploading || uploadingPhotos"
-                :username="username"
-                :password="password"
-                :init-upload-step="uploadStep"
-                @upload-done="uploadDone"
-                @upload-cancelled="uploadCancelled">
-              </upload>
-              <download
-                v-if="downloading || downloadingPhotos"
-                :password="password"
-                :username="username"
-                :init-download-step="downloadStep"
-                @download-done="downloadDone"
-                @download-cancelled="downloadCancelled">
-              </download>
-            </v-flex>
-          </v-layout>
-          <v-layout
-            v-if="!needsServerConfig"
-            row
-            class="mt-2 sync-footer"
-            justify-space-between>
-            <v-flex class="xs6 text-xs-left">
-              <v-btn :disabled="!enableUpload"
-                     :loading="uploading"
-                     @click="onUpload">
-                <v-icon>cloud_upload</v-icon>
-              </v-btn>
-              <v-btn @click="onUploadPhotos"
-                     :loading="uploadingPhotos"
-                     :disabled="!enablePhotoDownload">
-                <v-icon>collections</v-icon>
-                <v-icon>arrow_upward</v-icon>
-              </v-btn>
-            </v-flex>
-            <v-flex class="xs6 text-xs-right">
-              <v-btn @click="onDownload"
-                     :loading="downloading"
-                     :disabled="!enableDownload">
-                <v-icon>cloud_download</v-icon>
-              </v-btn>
-              <v-btn @click="onDownloadPhotos"
-                     :loading="downloadingPhotos"
-                     :disabled="!enablePhotoDownload">
-                <v-icon>collections</v-icon>
-                <v-icon>arrow_downward</v-icon>
-              </v-btn>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-flex>
-    </v-layout>
+  <v-container fill-height justify-start>
+    <v-col>
+      <v-container>
+        <v-row>
+          <v-flex class="xs12">
+            <sync-status
+              v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
+              :local-latest-snapshot="localLatestSnapshot"
+              :updated-records-count="updatedRecordsCount">
+            </sync-status>
+            <upload
+              v-if="uploading || uploadingPhotos"
+              :username="username"
+              :password="password"
+              :init-upload-step="uploadStep"
+              @upload-done="uploadDone"
+              @upload-cancelled="uploadCancelled">
+            </upload>
+            <download
+              v-if="downloading || downloadingPhotos"
+              :password="password"
+              :username="username"
+              :init-download-step="downloadStep"
+              @download-done="downloadDone"
+              @download-cancelled="downloadCancelled">
+            </download>
+          </v-flex>
+        </v-row>
+        <v-row
+          v-if="!needsServerConfig"
+          class="sync-footer">
+          <v-flex class="xs6 text-xs-left">
+            <v-btn :disabled="!enableUpload"
+                    :loading="uploading"
+                    @click="onUpload">
+              <v-icon>cloud_upload</v-icon>
+            </v-btn>
+            <v-btn @click="onUploadPhotos"
+                    :loading="uploadingPhotos"
+                    :disabled="!enablePhotoDownload">
+              <v-icon>collections</v-icon>
+              <v-icon>arrow_upward</v-icon>
+            </v-btn>
+          </v-flex>
+          <v-flex class="xs6 text-xs-right">
+            <v-btn @click="onDownload"
+                    :loading="downloading"
+                    :disabled="!enableDownload">
+              <v-icon>cloud_download</v-icon>
+            </v-btn>
+            <v-btn @click="onDownloadPhotos"
+                    :loading="downloadingPhotos"
+                    :disabled="!enablePhotoDownload">
+              <v-icon>collections</v-icon>
+              <v-icon>arrow_downward</v-icon>
+            </v-btn>
+          </v-flex>
+        </v-row>
+      </v-container>
+    </v-col>
     <LoginModal />
   </v-container>
 </template>

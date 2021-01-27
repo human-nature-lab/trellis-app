@@ -151,14 +151,12 @@
     <TrellisModal
       :title="respondentId ? $t('add_other_respondent') : $t('add_respondent')"
       v-model="showAssociatedRespondentDialog">
-      <v-card>
-        <AddRespondentForm
-          @close="addRespondentClose"
-          :studyId="studyId"
-          :redirectToRespondentInfo="false"
-          :onRespondentAdded="onRespondentAdded"
-          :associatedRespondentId="respondentId" />
-      </v-card>
+      <AddRespondentForm
+        @close="addRespondentClose"
+        :studyId="studyId"
+        :redirectToRespondentInfo="false"
+        :onRespondentAdded="onRespondentAdded"
+        :associatedRespondentId="respondentId" />
     </TrellisModal>
   </v-container>
 </template>

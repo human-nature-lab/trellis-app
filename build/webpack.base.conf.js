@@ -38,7 +38,7 @@ function urlLoader (dirName) {
 }
 
 const isProd = process.env === 'production'
-const sourceMap = true 
+const sourceMap = true
 
 const cssLoaders = [isProd ? MiniCssExtractPlugin.loader : {
   loader: 'vue-style-loader',
@@ -59,6 +59,7 @@ const cssLoaders = [isProd ? MiniCssExtractPlugin.loader : {
 
 module.exports = {
   target: 'web',
+  mode: isProd ? 'production' : 'development',
   entry: {
     app: ['./src/main.ts']
   },

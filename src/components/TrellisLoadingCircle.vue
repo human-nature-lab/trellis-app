@@ -42,8 +42,7 @@
     },
     computed: {
       borderColor () {
-        // @ts-ignore
-        return this.$vuetify.theme[this.color]
+        return this.$vuetify.theme.currentTheme[this.color]
       },
       containerStyles (): object {
         return {
