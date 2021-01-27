@@ -8,7 +8,7 @@
     </v-toolbar>
     <v-data-table
       v-if="respondentFills !== undefined"
-      class="mb-3"
+      class="mb-4"
       :headers="fillHeaders"
       :items="respondentFills"
       hide-default-footer>

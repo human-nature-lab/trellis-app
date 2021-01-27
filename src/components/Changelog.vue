@@ -1,5 +1,5 @@
 <template>
-  <v-flex class="ma-3">
+  <v-flex class="ma-4">
     <v-layout>
       <v-container>
         <v-layout>

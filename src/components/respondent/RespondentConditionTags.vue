@@ -22,7 +22,7 @@
       </Permission>
     </v-toolbar>
     <v-data-table
-      class="mb-3"
+      class="mb-4"
       hide-default-footer
       :headers="conditionTagHeaders"
       :items="conditionTags">

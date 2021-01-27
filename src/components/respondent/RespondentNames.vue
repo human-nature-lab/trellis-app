@@ -21,7 +21,7 @@
       </Permission>
     </v-toolbar>
     <v-data-table
-      class="mb-3"
+      class="mb-4"
       :headers="nameHeaders"
       :items="respondent.names"
       hide-default-footer>

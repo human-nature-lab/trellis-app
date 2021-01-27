@@ -21,7 +21,7 @@
         </v-btn>
       </v-toolbar>
       <v-container>
-        <v-layout wrap class="mb-3">
+        <v-layout wrap class="mb-4">
           <v-flex>
             <span class="subheading button-min-height">
               {{ $t('location') }}: <GeoBreadcrumbs v-if="geo.id" :geoId="geo.id"></GeoBreadcrumbs>

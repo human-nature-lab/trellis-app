@@ -19,7 +19,7 @@
     <v-alert v-show="error" color="error">{{error}}</v-alert>
     <v-data-table
       sort-by="translated"
-      class="mb-3"
+      class="mb-4"
       :headers="locationHeaders"
       :items="locations"
       hide-default-footer>

@@ -65,7 +65,7 @@
         </v-flex>
       </v-row>
       <v-row
-        class="ml-5"
+        class="ml-12"
         v-if="isOpen">
         <v-flex>
           <table class="table">

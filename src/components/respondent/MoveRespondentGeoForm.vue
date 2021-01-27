@@ -52,7 +52,7 @@
               </v-btn>
             </v-flex>
           </v-layout>
-          <v-layout row wrap mt-3>
+          <v-layout row wrap mt-4>
             <v-flex xs6>
               <v-checkbox
                 v-model="isCurrent"

@@ -7,7 +7,7 @@
         absolute
         top
         right
-        mt-5
+        mt-12
         style="top: 0"
         @click="closePanel"><v-icon>mdi-clear</v-icon></v-btn>
       <v-card-title>

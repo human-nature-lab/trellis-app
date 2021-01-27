@@ -142,7 +142,7 @@
           :respondent="respondent"
           :labels="getRespondentLabels(respondent)"/>
       </v-layout>
-      <v-layout v-if="!respondentResults.length" ma-3>
+      <v-layout v-if="!respondentResults.length" ma-4>
         <v-container>
           {{ $t('no_results') }}: {{query}}
         </v-container>

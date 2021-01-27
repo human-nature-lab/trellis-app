@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row class="cart">
       <v-col sm="10">
-        <v-row wrap class="pa-4 items">
+        <v-row wrap class="pa-6 items">
           <div
             class="mr-1"
             v-for="item in items"
