@@ -8,7 +8,7 @@
     :placeholder="$t('text_placeholder')"
     :disabled="isQuestionDisabled"
     :append-icon="barcodeIcon"
-    :append-icon-cb="doScan"
+    @click:append="doScan"
     />
 </template>
 

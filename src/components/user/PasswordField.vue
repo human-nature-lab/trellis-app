@@ -3,7 +3,7 @@
     <v-text-field
       v-model="newPassword"
       :append-icon="showPassword ? 'visibility' : 'visibility_off'"
-      :append-icon-cb="() => (showPassword = !showPassword)"
+      @click:append="() => (showPassword = !showPassword)"
       validate-on-blur
       :rules="newPassRules"
       :type="showPassword ? 'text' : 'password'"

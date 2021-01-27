@@ -37,7 +37,7 @@
             v-show="!isLoading"
             :items="existingConditionTagNames"
             append-icon="add"
-            :append-icon-cb="showCreateConditionTag"
+            @click:append="showCreateConditionTag"
             :value="selectedConditionTags"
             @input="updateConditionTags"/>
         </v-flex>
@@ -58,7 +58,7 @@
         label="Condition tag"
         v-model="conditionTagName"
         append-icon="add"
-        :append-icon-cb="addConditionTag"
+        @click:append="addConditionTag"
         />
     </TrellisModal>
   </v-layout>

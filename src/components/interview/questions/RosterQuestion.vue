@@ -32,7 +32,7 @@
               v-if="rowIndex === editingIndex"
               autofocus
               :append-icon="barcodeIcon"
-              :append-icon-cb="scanBarcode"
+              @click:append="scanBarcode"
               @keyup.enter="stopEditingAndSave(row, rowIndex)"
               @keyup.esc.stop="stopEditingAndRevert(row, rowIndex)" />
             <span class="roster-val"
@@ -121,7 +121,7 @@
               @keyup.esc="stopAddingWithoutSaving"
               @keyup.enter="stopAddingAndSave"
               :append-icon="barcodeIcon"
-              :append-icon-cb="scanBarcode"/>
+              @click:append="scanBarcode"/>
           </v-list-item-content>
           <v-list-item-action>
             <v-btn

@@ -4,7 +4,7 @@
       v-if="!hasPermission(TrellisPermission.EDIT_PASSWORDS)"
       v-model="oldPassword"
       :append-icon="showOldPass ? 'visibility' : 'visibility_off'"
-      :append-icon-cb="() => (showOldPass = !showOldPass)"
+      @click:append="() => (showOldPass = !showOldPass)"
       :type="showOldPass ? 'text' : 'password'"
       :rules="oldPassRules"
       validate-on-blur
