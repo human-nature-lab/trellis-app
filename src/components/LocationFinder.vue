@@ -1,7 +1,6 @@
 <template>
     <v-dialog
       v-model="isOpen"
-      fullscreen
       persistent>
       <v-card>
         <v-toolbar>

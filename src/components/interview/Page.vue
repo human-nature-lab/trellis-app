@@ -32,26 +32,28 @@
           :location="location"
           :key="question.id"/>
       </v-flex>
-      <v-flex
-        class="page-footer">
-          <v-layout row
-                    justify-space-between>
-            <v-btn @click="onPrevious"
-                   :disabled="disabled"
-                   justify-left>
-              <TrellisLoadingCircle v-show="prevActive" size="30px" margin="0 8px" />
-              <v-icon left v-show="!prevActive">chevron_left</v-icon>
-              {{isAtBeginning ? $t('exit') : $t('previous')}}
-            </v-btn>
-            <v-btn @click="onNext"
-                   :disabled="!isNavigationEnabled || disabled"
-                   justify-right>
-              {{isAtEnd ? $t('finish') : $t('next')}}
-              <TrellisLoadingCircle v-show="nextActive" size="30px" margin="0 8px" />
-              <v-icon right v-show="!nextActive">chevron_right</v-icon>
-            </v-btn>
-          </v-layout>
-      </v-flex>
+      <v-col class="page-footer">
+          <v-row no-gutter>
+            <v-col>
+              <v-btn @click="onPrevious"
+                :disabled="disabled"
+                justify-left>
+                <TrellisLoadingCircle v-show="prevActive" size="30px" margin="0 8px" />
+                <v-icon left v-show="!prevActive">chevron_left</v-icon>
+                {{isAtBeginning ? $t('exit') : $t('previous')}}
+              </v-btn>
+            </v-col>
+            <v-col>
+              <v-btn @click="onNext"
+                :disabled="!isNavigationEnabled || disabled"
+                justify-right>
+                {{isAtEnd ? $t('finish') : $t('next')}}
+                <TrellisLoadingCircle v-show="nextActive" size="30px" margin="0 8px" />
+                <v-icon right v-show="!nextActive">chevron_right</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+      </v-col>
     </v-layout>
   </v-container>
 </template>
@@ -171,8 +173,8 @@
     padding: 0
     margin: 0
     width: 100%
-    .btn
+    .v-btn
       margin: 0
-      width: 50%
-      height: $btn-height
+      width: 100%
+      height: $btn-height !important
 </style>

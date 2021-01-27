@@ -14,7 +14,6 @@ function mobileOnly (cb) {
 }
 
 module.exports = webpackMerge(config, {
-  mode: 'production',
   devServer: {
     before (app, server, compiler) {
       app.get('/cordova.js', mobileOnly((req, res) => {

@@ -1,11 +1,9 @@
 <template>
-  <v-card class="ma-1">
-    <v-layout
-      column
+  <v-container class="ma-1">
+    <v-col
       :id="'form-' + form.id"
       :class="{'open': isOpen}">
-      <v-layout
-        row>
+      <v-row>
         <v-flex class="centered icon-container clickable" @click.once="tryCreatingSurvey">
           <v-tooltip
             right
@@ -65,9 +63,8 @@
             <v-icon v-else>keyboard_arrow_up</v-icon>
           </v-btn>
         </v-flex>
-      </v-layout>
-      <v-layout
-        column
+      </v-row>
+      <v-row
         class="ml-5"
         v-if="isOpen">
         <v-flex>
@@ -119,9 +116,9 @@
             </tbody>
           </table>
         </v-flex>
-      </v-layout>
-    </v-layout>
-  </v-card>
+      </v-row>
+    </v-col>
+  </v-container>
 </template>
 
 <script>
