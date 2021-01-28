@@ -8,6 +8,7 @@ import DeviceService from './device/DeviceService'
 import DatabaseService from './database/DatabaseService'
 import config from 'config'
 import { APP_ENV } from '../static/constants'
+import theme from '../static/theme'
 
 enum StorageKey {
   theme = 'dark-theme',
@@ -31,6 +32,7 @@ class SingletonService extends Emitter {
   async loadFromLocalStorage () {
     if (storage.get(StorageKey.theme)) {
       singleton.darkTheme = storage.get(StorageKey.theme)
+      theme.dark = singleton.darkTheme
     }
     /* Moved to ValidateStudy Guard
     if (storage.get(StorageKey.study)) {
@@ -73,7 +75,7 @@ class SingletonService extends Emitter {
     this.dispatch('locale', locale)
   }
 
-  setDarkTheme (useDarkTheme) {
+  setDarkTheme (useDarkTheme: boolean) {
     singleton.darkTheme = useDarkTheme
     storage.set(StorageKey.theme, useDarkTheme)
     this.dispatch('dark-theme', useDarkTheme)

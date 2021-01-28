@@ -110,7 +110,9 @@
         routeQueue.redirect({ name: 'Login' })
       },
       toggleDarkTheme () {
-        SingletonService.setDarkTheme(!SingletonService.get('darkTheme'))
+        const isDark = SingletonService.get('darkTheme')
+        this.$vuetify.theme.dark = !isDark
+        SingletonService.setDarkTheme(!isDark)
       },
       toggleBatterySaver () {
         this.global.cpuOptimized = !this.global.cpuOptimized
