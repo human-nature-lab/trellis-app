@@ -81,18 +81,16 @@
         </v-chip>
       </v-col>
     </v-col>
-    <v-row >
-      <v-col>
+    <v-row class="justify-space-between">
+      <v-col cols="auto">
         <v-pagination
-          class="ma-n4"
           :length="pagination.maxPages + 2"
           :value="pagination.page + 1"
           total-visible="7"
-          :disabled="isLoading"
+          :disabled="isLoading || (pagination.page === 0 && respondentResults.length !== pagination.size)"
           @input="updateCurrentPage" />
       </v-col>
-      <v-spacer />
-      <v-col>
+      <v-col cols="auto">
         <v-btn
           v-if="canAddRespondent"
           color="primary"

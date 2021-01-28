@@ -10,7 +10,8 @@
           </v-card-title>
           <v-card-text>
             <v-data-table
-              :pagination.sync="snapshotPagination"
+              sort-by="created_at"
+              sort-desc
               :loading="snapshotsLoading"
               :headers="snapshotColumns"
               :items="snapshots">
@@ -59,7 +60,8 @@
           </v-card-title>
           <v-card-text>
             <v-data-table
-              :pagination.sync="uploadPagination"
+              sort-by="created_at"
+              sort-desc
               :loading="uploadsLoading"
               :headers="uploadColumns"
               :items="uploadsFiltered">
@@ -146,14 +148,6 @@
     components: { UploadLogs },
     data () {
       return {
-        uploadPagination: {
-          sortBy: 'created_at',
-          descending: true
-        },
-        snapshotPagination: {
-          sortBy: 'created_at',
-          descending: true
-        },
         generatingSnapshot: false,
         search: '',
         snapshotsLoading: false,
