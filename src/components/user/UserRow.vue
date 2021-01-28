@@ -11,7 +11,7 @@
     <td>{{user.username}}</td>
     <td>{{user.role && user.role.name}}</td>
     <td>
-      <v-select
+      <v-autocomplete
         :loading="loading"
         :items="allStudies"
         item-text="name"
@@ -20,7 +20,6 @@
         v-model="selectedStudies"
         @change="saveUserStudies"
         dense
-        autocomplete
         multiple
         chips />
     </td>

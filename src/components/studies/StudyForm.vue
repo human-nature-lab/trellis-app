@@ -32,8 +32,7 @@
           </v-layout>
         </v-flex>
         <v-flex>
-          <v-select
-            autocomplete
+          <v-autocomplete
             required
             :rules="defaultLocaleRules"
             :disabled="isWorking"

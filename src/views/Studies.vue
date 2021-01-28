@@ -47,10 +47,10 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from '../components/Permission'
-  import StudyForm from '../components/studies/StudyForm'
-  import StudyRow from '../components/studies/StudyRow'
-  import TrellisModal from '../components/TrellisModal'
+  import Permission from '../components/Permission.vue'
+  import StudyForm from '../components/studies/StudyForm.vue'
+  import StudyRow from '../components/studies/StudyRow.vue'
+  import TrellisModal from '../components/TrellisModal.vue'
   import Study from '../entities/trellis/Study'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import LocaleService from '../services/locale/LocaleService'

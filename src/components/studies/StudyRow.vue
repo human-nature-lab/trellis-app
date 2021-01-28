@@ -10,12 +10,11 @@
     <td>{{study.name}}</td>
     <td>{{study.photoQuality}}%</td>
     <td>
-      <v-select
+      <v-autocomplete
         dense
         chips
         deletable-chips
         multiple
-        autocomplete
         :readonly="!hasPermission(TrellisPermission.EDIT_STUDY)"
         :loading="!locales.length || isWorking"
         v-model="study.locales"
