@@ -10,6 +10,9 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 const { VueLoaderPlugin } = require('vue-loader')
+var SentryPlugin = require('@sentry/webpack-plugin')
+var sentryRelease = require('./utils').sentryRelease()
+const fs = require('fs')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -38,8 +41,10 @@ function urlLoader (dirName) {
   }
 }
 
-const isProd = process.env === 'production'
+const isProd = process.env.NODE_ENV === 'production'
 const sourceMap = true
+const useSentry = isProd && fs.existsSync('.sentryclirc')
+console.log('building', isProd ? 'prod' : 'dev', useSentry ? 'with sentry' : 'without sentry')
 
 const cssLoaders = [isProd ? MiniCssExtractPlugin.loader : {
   loader: 'vue-style-loader',
@@ -58,6 +63,63 @@ const cssLoaders = [isProd ? MiniCssExtractPlugin.loader : {
   }
 }]
 
+const plugins = [
+  new CleanWebpackPlugin(),
+  new webpack.DefinePlugin({
+    'process.env': JSON.stringify(process.env),
+    VERSION: JSON.stringify(require('../package').version)
+  }),
+  new VueLoaderPlugin(),
+  new webpack.NormalModuleReplacementPlugin(/typeorm$/, function (result) {
+    result.request = result.request.replace(/typeorm/, "typeorm/browser");
+  }),
+  new BundleAnalyzerPlugin({
+    analyzerMode: 'static',
+    openAnalyzer: false
+  }),
+  // copy custom static assets
+  new CopyWebpackPlugin([{
+    from: resolve('static'),
+    to: config.build.assetsSubDirectory,
+    toType: 'dir',
+    ignore: ['.*']
+  }]),
+  new VuetifyLoaderPlugin(),
+  new HtmlWebpackPlugin({
+    filename: config.build.index,
+    template: 'index.html',
+    inject: true,
+    minify: {
+      removeComments: true,
+      collapseWhitespace: true,
+      removeAttributeQuotes: true
+    },
+    chunksSortMode: 'none'
+  }),
+  new MiniCssExtractPlugin({
+    filename: '[name].[contenthash].css'
+  }),
+  // new ForkTsCheckerWebpackPlugin({
+  //   typescript: {
+  //     extensions: {
+  //       vue: {
+  //         enabled: true,
+  //         compiler: 'vue-template-compiler'
+  //       }
+  //     }
+  //   }
+  // })
+]
+
+if (useSentry) {
+  plugins.push(new SentryPlugin({
+    release: sentryRelease,
+    include: 'www/',
+    urlPrefix: process.env.APP_ENV === 'ANDROID' ? '/android_asset/www/' : null
+  }))
+}
+
+const devtool = sourceMap && (isProd ? 'hidden-source-map' : 'eval')
 module.exports = {
   target: 'web',
   mode: isProd ? 'production' : 'development',
@@ -67,7 +129,7 @@ module.exports = {
   externals: {
     config: 'config'
   },
-  devtool: sourceMap ? 'eval' : false,
+  devtool,
   output: {
     path: config.build.assetsRoot,
     filename: 'js/[name].js',
@@ -80,10 +142,16 @@ module.exports = {
   optimization: {
     // usedExports: true,
     // concatenateModules: true,
-    // minimize: true,
+    minimize: isProd,
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true
+        },
         cordova: {
           test: /\/services\/.*Cordova/,
           name: 'cordova-services',
@@ -234,52 +302,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new CleanWebpackPlugin(),
-    new webpack.DefinePlugin({
-      'process.env': JSON.stringify(process.env),
-      VERSION: JSON.stringify(require('../package').version)
-    }),
-    new VueLoaderPlugin(),
-    new webpack.NormalModuleReplacementPlugin(/typeorm$/, function (result) {
-      result.request = result.request.replace(/typeorm/, "typeorm/browser");
-    }),
-    new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      openAnalyzer: false
-    }),
-    // copy custom static assets
-    new CopyWebpackPlugin([{
-      from: resolve('static'),
-      to: config.build.assetsSubDirectory,
-      toType: 'dir',
-      ignore: ['.*']
-    }]),
-    new VuetifyLoaderPlugin(),
-    new HtmlWebpackPlugin({
-      filename: config.build.index,
-      template: 'index.html',
-      inject: true,
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeAttributeQuotes: true
-      },
-      chunksSortMode: 'none'
-    }),
-    new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFileName: '[id].css'
-    }),
-    // new ForkTsCheckerWebpackPlugin({
-    //   typescript: {
-    //     extensions: {
-    //       vue: {
-    //         enabled: true,
-    //         compiler: 'vue-template-compiler'
-    //       }
-    //     }
-    //   }
-    // })
-  ]
+  plugins
 }

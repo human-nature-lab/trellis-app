@@ -33,11 +33,13 @@ www/js/vendor.*.js
 config.js
 config.*.js
 !config.default.js
-config.dev.js
-config.xml.js
+config/config-xml.dev.js
+config/config-xml.prod.js
 
 src/entities/**/*.js
 src/entities/**/*.map
 
 releases
 *.jks
+
+.sentryclirc
