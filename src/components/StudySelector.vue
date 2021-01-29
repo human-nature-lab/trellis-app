@@ -10,7 +10,6 @@
       There are no studies set up, go to <router-link to="Studies">Studies</router-link> to create your first study.
     </v-alert>
     <v-select
-      v-if="studies.length > 0"
       :label="$t('study')"
       :loading="isWorking"
       v-model="study"

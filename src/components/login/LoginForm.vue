@@ -23,16 +23,16 @@
       :rules="rules.password"
       @keyup.enter="login"
       @change="$emit('password', password)"
-      :append-icon="isPassHidden ? 'visibility' : 'visibility_off'"
-      :append-icon-cb="togglePassHidden"
+      :append-icon="isPassHidden ? 'mdi-eye' : 'mdi-eye-off'"
+      @click:append="togglePassHidden"
       :type="isPassHidden ? 'password' : 'text'"
       v-model="password"/>
     <v-btn
       v-if="showLoginButton"
       @click="login"
+      :loading="isWorking"
       :disabled="isWorking || !isValid">
-      <TrellisLoadingCircle v-if="isWorking" size="25px" />
-      <span v-else>{{ $t('login') }}</span>
+      {{ $t('login') }}
     </v-btn>
   </v-form>
 </template>

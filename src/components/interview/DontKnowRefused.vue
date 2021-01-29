@@ -1,6 +1,6 @@
 <template>
-  <v-flex>
-    <v-layout row>
+  <v-col no-gutter>
+    <v-row no-gutter>
       <v-btn
         v-if="showDk"
         :class="{primary: dk}"
@@ -15,8 +15,8 @@
         @click="rf =! rf">
         {{ $t('refuse_to_answer') }}
       </v-btn>
-    </v-layout>
-    <v-layout v-if="shouldShowReason">
+    </v-row>
+    <v-col v-if="shouldShowReason">
       <v-text-field
         name="Reason"
         :disabled="disabled"
@@ -25,8 +25,8 @@
         v-model="reason"
         required
         :autofocus="!reason || !reason.length" />
-    </v-layout>
-  </v-flex>
+    </v-col>
+  </v-col>
 </template>
 
 <script>

@@ -1,107 +1,108 @@
 <template>
-  <v-app light dense class="web" :dark="global.darkTheme" :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
-    <v-dialog
-      max-width="300"
-      v-model="global.loading.fullscreen && global.loading.active"
-      persistent>
-      <v-card>
-        <v-card-title primary-title>
-          <h3>{{ $t('loading') }}</h3>
-        </v-card-title>
-        <v-card-text>
-          <v-layout row justify-center>
-            <TrellisLoadingCircular />
-          </v-layout>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-    <v-navigation-drawer
-      v-model="global.menuDrawer.open"
-      app>
-      <MainMenu />
-    </v-navigation-drawer>
-    <v-toolbar
-      fixed app
-      :value="serverMode === 'demo' || serverMode === 'test'"
-      :color="serverMode === 'demo' ? demoBannerColor : testBannerColor">
-      <v-toolbar-title>
-       <span v-if="serverMode === 'demo'">
-         {{ $t('demo_alert') }}
-       </span>
-       <span v-else-if="serverMode === 'test'">
-        {{ $t('test_alert') }}
-       </span>
-      </v-toolbar-title>
-      <v-btn
-        v-if="serverMode === 'demo' && isWeb && !isLoggedIn"
-        :to="{name: 'DemoSignUp'}">{{$t('sign_up')}}</v-btn>
-    </v-toolbar>
-    <v-toolbar
-      fixed app
-      :class="{'main-menu': serverMode=='production', 'main-menu-demo': serverMode=='demo' || serverMode=='test'}">
-      <!-- MainMenu /-->
-      <v-toolbar-side-icon
-        @click.stop="global.menuDrawer.open = !global.menuDrawer.open"
-        v-if="!global.menuDrawer.open"/>
-      <v-toolbar-title class="logo">
-        <router-link :to="{name: 'Home'}" class="deep-orange--text">
-          <img src="../static/img/trellis-logo.png" alt="trellis">
-        </router-link>
-      </v-toolbar-title>
-      <v-toolbar-title v-if="global.study" class="study">
-        <v-tooltip right>
-          <v-btn class="subheading" slot="activator"
-                 flat
-                 @click="toStudySelector">
-            {{global.study.name}}
-          </v-btn>
-          <span>{{$t('change_study')}}</span>
+  <div class="main-wrapper">
+    <Banner :serverMode="serverMode" />
+    <v-app
+      class="web"
+      :dark="global.darkTheme"
+      :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
+      <v-navigation-drawer
+        v-model="global.menuDrawer.open"
+        app>
+        <MainMenu />
+      </v-navigation-drawer>
+      <v-app-bar
+        app
+        absolute
+        elevate-on-scroll
+        scroll-target="#trellis-main">
+        <v-app-bar-nav-icon
+          @click="global.menuDrawer.open = !global.menuDrawer.open" />
+        <v-toolbar-title class="logo">
+          <router-link :to="{name: 'Home'}" class="deep-orange--text">
+            <img src="../static/img/trellis-logo.png" alt="trellis" />
+          </router-link>
+        </v-toolbar-title>
+        <v-toolbar-title v-if="global.study" class="study">
+          <v-tooltip right>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn 
+                class="subheading"
+                v-on="on"
+                v-bind="attrs"
+                @click="toStudySelector">
+                {{global.study.name}}
+              </v-btn>
+            </template>
+            <span>{{$t('change_study')}}</span>
+          </v-tooltip>
+        </v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-tooltip left>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn 
+              class="subheading"
+              icon
+              v-bind="attrs"
+              v-on="on"
+              @click="toLocaleSelector">
+              {{global.locale ? global.locale.languageTag : ''}}
+            </v-btn>
+          </template>
+          <span>{{$t('change_locale')}}</span>
         </v-tooltip>
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-tooltip left>
-        <v-btn class="subheading"
-               slot="activator"
-               flat
-               icon
-               @click="toLocaleSelector">
-          {{global.locale ? global.locale.languageTag : ''}}
-        </v-btn>
-        <span>{{$t('change_locale')}}</span>
-      </v-tooltip>
-      <v-toolbar-side-icon
-        v-if="global.secondaryDrawer.isEnabled"
-        @click.stop="global.secondaryDrawer.onClick">
-        <v-icon>{{global.secondaryDrawer.icon || 'search'}}</v-icon>
-      </v-toolbar-side-icon>
-    </v-toolbar>
-    <v-content>
-      <v-dialog :value="alerts && alerts.length > 0" persistent>
+        <v-tooltip
+          v-if="global.secondaryDrawer.isEnabled"
+          left>
+          <template v-slot:activator="{on, attrs}">
+            <v-icon
+              v-on="on"
+              v-bind="attrs"
+              @click.stop="global.secondaryDrawer.onClick">
+              {{global.secondaryDrawer.icon || 'mdi-magnify'}}
+            </v-icon>
+          </template>
+          <span>{{$t('view_current_documentation')}}</span>
+        </v-tooltip>
+      </v-app-bar>
+      <v-dialog
+        max-width="300"
+        :value="global.loading.fullscreen && global.loading.active"
+        persistent>
         <v-card>
+          <v-card-title primary-title>
+            <h3>{{ $t('loading') }}</h3>
+          </v-card-title>
           <v-card-text>
-            <trellis-alert :current-log="alerts[alerts.length - 1]"></trellis-alert>
+            <v-layout row justify-center>
+              <TrellisLoadingCircular />
+            </v-layout>
           </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="dismissAlert()">Dismiss</v-btn>
-          </v-card-actions>
         </v-card>
       </v-dialog>
-      <v-container
-        justify-start
-        fluid
-        fill-height
-        :class="{'px-0': $vuetify.breakpoint.xsOnly, 'ma-0 pa-0 app-container': serverMode=='production', 'app-container-demo': serverMode=='demo' || serverMode=='test' }">
-        <router-view class="route-container fade-in" />
-      </v-container>
-    </v-content>
+      <v-main id="trellis-main" class="scroll-container">
+        <v-dialog :value="alerts && alerts.length > 0" persistent>
+          <v-card>
+            <v-card-text>
+              <trellis-alert :current-log="alerts[alerts.length - 1]"></trellis-alert>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="dismissAlert()">Dismiss</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-container fluid fill-height>
+          <router-view class="route-container fade-in" />
+        </v-container>
+      </v-main>
 
-    <LocationFinder />
-    <CensusFormChecker />
-    <SnackbarQueue />
-    <DocsSidebar />
+      <LocationFinder />
+      <CensusFormChecker />
+      <SnackbarQueue />
+      <DocsSidebar />
 
-  </v-app>
+    </v-app>
+  </div>
 </template>
 
 <script>
@@ -123,6 +124,7 @@
   import UserService from './services/user/UserService'
   import config from 'config'
   import IsLoggedInMixin from './mixins/IsLoggedInMixin'
+  import Banner from './components/Banner'
 
   export default {
     name: 'WebApp',
@@ -134,9 +136,7 @@
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
         alerts: AlertService.alerts,
         cpuOptimized: true,
-        serverMode: config.serverMode,
-        demoBannerColor: 'orange darken-4',
-        testBannerColor: 'amber'
+        serverMode: config.serverMode
       }
     },
     async created () {
@@ -176,7 +176,8 @@
       CensusFormChecker,
       SnackbarQueue,
       DocsSidebar,
-      TrellisLoadingCircular
+      TrellisLoadingCircular,
+      Banner
     },
     computed: {
       withinCordova () {
@@ -225,57 +226,72 @@
 </script>
 
 <style lang="sass">
-  .container
-    &.fill-height
-      align-items: start
-  html
-    overflow-y: auto
-  body
+  // .container
+  //   &.fill-height
+  //     align-items: start
+  html, body
+    overflow: auto !important
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
-  .route-loading
-    position: absolute
-    margin: 0
-    margin-top: 2px
-  .navigation-drawer
-    z-index: 1600
-    padding: 0
-  .dialog
-    z-index: 1600
-  .overlay
-    z-index: 1500
-  .app-container
-    /*margin-top: 50px*/
-    /*margin-bottom: 50px*/
-  .app-container-demo
-    padding-top: 56px
-  .main-menu
-    margin-top: 0 !important
-  .main-menu-demo
-    margin-top: 56px !important
-  .demo-banner
-    z-index: 1600
-    position: fixed
-    width: 100%
-    height: 55px
-    margin-top: 0
-    font-weight: bold
-    font-size: 20px
-  @media only screen and (max-width: 900px)
-    .demo-banner
-      font-size: 15px
-  @media only screen and (max-width: 700px)
-    .demo-banner
-      font-size: 11px
-  .list--dense
-    padding-top: 0
+  // .route-loading
+  //   position: absolute
+  //   margin: 0
+  //   margin-top: 2px
+  // .navigation-drawer
+  //   z-index: 1600
+  //   padding: 0
+  // .dialog
+  //   z-index: 1600
+  // .overlay
+  //   z-index: 1500
+  // .app-container
+  //   /*margin-top: 50px*/
+  //   /*margin-bottom: 50px*/
+  // .app-container-demo
+  //   padding-top: 56px
+  // .main-menu
+  //   margin-top: 0 !important
+  // .main-menu-demo
+  //   margin-top: 56px !important
+  // .demo-banner
+  //   z-index: 1600
+  //   position: fixed
+  //   width: 100%
+  //   height: 55px
+  //   margin-top: 0
+  //   font-weight: bold
+  //   font-size: 20px
+  // @media only screen and (max-width: 900px)
+  //   .demo-banner
+  //     font-size: 15px
+  // @media only screen and (max-width: 700px)
+  //   .demo-banner
+  //     font-size: 11px
+  // .list--dense
+  //   padding-top: 0
   .logo
     height: 55%
     img
       max-width: 100%
       max-height: 100%
-  .study
-    margin-left: 0
+  
+  .main-wrapper
+    display: flex
+    flex-direction: column
+    height: 100vh
+    overflow: hidden
+
+  .banner
+    flex-grow: 0
+  .v-application
+    flex-grow: 1
+    height: 100%
+  .scroll-container
+    overflow: auto
+    flex: 1 1 auto !important
+    margin-bottom: 64px
+  // .study
+  //   margin-left: 0
   .fade-in
     animation: fade-in .3s ease-in-out 0s 1
   @keyframes fade-in

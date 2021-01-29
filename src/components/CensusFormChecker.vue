@@ -1,6 +1,5 @@
 <template>
     <v-dialog
-      lazy
       v-model="isOpen">
       <v-card>
         <v-container fluid>

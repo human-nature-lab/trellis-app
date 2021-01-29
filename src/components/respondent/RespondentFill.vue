@@ -8,13 +8,15 @@
     </v-toolbar>
     <v-data-table
       v-if="respondentFills !== undefined"
-      class="mb-3"
+      class="mb-4"
       :headers="fillHeaders"
       :items="respondentFills"
-      hide-actions>
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.name }}</td> <!-- respondent Name -->
-        <td class="text-xs-right">{{ props.item.val }}</td> <!-- respondent Value-->
+      hide-default-footer>
+      <template v-slot:item="{ item }">
+        <tr>
+          <td>{{ item.name }}</td> <!-- respondent Name -->
+          <td class="text-xs-right">{{ item.val }}</td> <!-- respondent Value-->
+        </tr>
       </template>
     </v-data-table>
   </v-flex>

@@ -5,7 +5,7 @@
         small
         :color="global.darkTheme ? 'white' : 'primary'"
         @click="openDocs"
-        slot="badge">help_outline</v-icon>
+        slot="badge">mdi-help-circle-outline</v-icon>
       <slot />
     </v-badge>
   </span>

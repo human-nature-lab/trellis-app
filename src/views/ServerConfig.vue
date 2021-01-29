@@ -6,19 +6,20 @@
       </v-toolbar-title>
       <v-spacer />
       <v-btn icon @click="showAddDialog = true">
-        <v-icon>add</v-icon>
+        <v-icon>mdi-plus</v-icon>
       </v-btn>
     </v-toolbar>
     <v-data-table
       :headers="headers"
-      hide-actions
+      :items-per-page="entries.length"
+      hide-default-footer
       :loading="isLoading"
       :items="entries">
-      <ConfigRow
-        slot="items"
-        slot-scope="{item: entry}"
-        @update="updateEntry"
-        :entry="entry" />
+      <template v-slot:item="{ item }">
+        <ConfigRow
+          @update="updateEntry"
+          :entry="item" />
+      </template>
     </v-data-table>
   </v-flex>
 </template>

@@ -1,6 +1,6 @@
 <template>
     <v-flex>
-      <v-dialog lazy v-model="backup.isOpen" :persistent="backup.isWorking">
+      <v-dialog v-model="backup.isOpen" :persistent="backup.isWorking">
         <ModalTitle title="Backup" @close="closeBackup()" />
         <v-card>
           <v-card-text>
@@ -13,14 +13,14 @@
               </v-layout>
               <v-flex v-else-if="backup.error">
                 <div>
-                  <v-icon color="error">close</v-icon> {{$t('backup_failed')}}
+                  <v-icon color="error">mdi-close</v-icon> {{$t('backup_failed')}}
                 </div>
                 <v-alert color="error" v-show="backup.error">
                   {{backup.error}}
                 </v-alert>
               </v-flex>
               <v-flex v-else>
-                <v-icon color="success">check</v-icon> {{$t('backup_success')}}
+                <v-icon color="success">mdi-check</v-icon> {{$t('backup_success')}}
               </v-flex>
             </v-container>
           </v-card-text>
@@ -30,18 +30,23 @@
         <v-toolbar-title>{{ $t('storage') }}</v-toolbar-title>
         <v-spacer />
         <v-menu offset-y v-if="isCordova">
-          <v-btn icon slot="activator">
-            <v-icon>more_vert</v-icon>
-          </v-btn>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              icon>
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
           <v-list>
-            <v-list-tile @click="backupDatabase">
-              <v-list-tile-action>
-                <v-icon>cloud_upload</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
+            <v-list-item @click="backupDatabase">
+              <v-list-item-action>
+                <v-icon>mdi-cloud-upload</v-icon>
+              </v-list-item-action>
+              <v-list-item-content>
                 {{$t('backup_database')}}
-              </v-list-tile-content>
-            </v-list-tile>
+              </v-list-item-content>
+            </v-list-item>
           </v-list>
         </v-menu>
       </v-toolbar>

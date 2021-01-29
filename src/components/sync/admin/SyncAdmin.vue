@@ -10,16 +10,19 @@
           </v-card-title>
           <v-card-text>
             <v-data-table
-              :pagination.sync="snapshotPagination"
+              sort-by="created_at"
+              sort-desc
               :loading="snapshotsLoading"
               :headers="snapshotColumns"
               :items="snapshots">
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
-              <template slot="items" slot-scope="props">
-                <td>{{ props.item.created_at }}</td>
-                <td>{{ props.item.file_name }}</td>
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td>{{ item.created_at }}</td>
+                  <td>{{ item.file_name }}</td>
+                </tr>
               </template>
-              <template slot="no-data">
+              <template v-slot:no-data>
                 <v-alert :value="!snapshotsLoading" type="info">
                   {{ $t('no_results') }}
                 </v-alert>
@@ -31,7 +34,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn
-              flat
+              text
               :loading="generatingSnapshot"
               :disabled="generatingSnapshot"
               @click="generateSnapshot">
@@ -49,7 +52,7 @@
             <v-spacer></v-spacer>
             <v-text-field
               v-model="search"
-              append-icon="search"
+              append-icon="mdi-magnify"
               :label="$t('search')"
               single-line
               hide-details>
@@ -57,20 +60,21 @@
           </v-card-title>
           <v-card-text>
             <v-data-table
-              :pagination.sync="uploadPagination"
+              sort-by="created_at"
+              sort-desc
               :loading="uploadsLoading"
               :headers="uploadColumns"
               :items="uploadsFiltered">
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
-              <template slot="items" slot-scope="props">
+              <template v-slot:item="props">
                 <tr>
                   <td>
                     <v-btn
                       :disabled="props.item.status !== 'SUCCESS' && props.item.status !== 'FAILED'"
                       icon
                       @click="props.item.isOpen = !props.item.isOpen">
-                      <v-icon v-if="props.item.isOpen">keyboard_arrow_down</v-icon>
-                      <v-icon v-else>keyboard_arrow_right</v-icon>
+                      <v-icon v-if="props.item.isOpen">mdi-arrow-down</v-icon>
+                      <v-icon v-else>mdi-arrow-right</v-icon>
                     </v-btn>
                   </td>
                   <td>{{ props.item.created_at }}</td>
@@ -120,7 +124,7 @@
           </v-card-text>
           <v-card-actions>
             <v-btn
-              flat
+              text
               :loading="uploadsProcessing"
               :disabled="uploadsProcessing"
               @click="processUploads">
@@ -144,14 +148,6 @@
     components: { UploadLogs },
     data () {
       return {
-        uploadPagination: {
-          sortBy: 'created_at',
-          descending: true
-        },
-        snapshotPagination: {
-          sortBy: 'created_at',
-          descending: true
-        },
         generatingSnapshot: false,
         search: '',
         snapshotsLoading: false,

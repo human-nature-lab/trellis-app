@@ -8,10 +8,10 @@
         <v-spacer></v-spacer>
         <v-btn
           icon
-          flat
+          text
           style="top: 0"
           @click="closeDialog(null)">
-          <v-icon>clear</v-icon>
+          <v-icon>mdi-clear</v-icon>
         </v-btn>
       </v-card-title>
       <v-card-text>
@@ -67,18 +67,18 @@
               <v-card-title class="subheading">{{ $t('current_position') }}</v-card-title>
               <v-card-text>
                 <v-list dense>
-                  <v-list-tile>
-                    <v-list-tile-content>{{ $t('latitude') }}</v-list-tile-content>
-                    <v-list-tile-content class="align-end">{{ latitude }}</v-list-tile-content>
-                  </v-list-tile>
-                  <v-list-tile>
-                    <v-list-tile-content>{{ $t('longitude') }}</v-list-tile-content>
-                    <v-list-tile-content class="align-end">{{ longitude }}</v-list-tile-content>
-                  </v-list-tile>
-                  <v-list-tile>
-                    <v-list-tile-content>{{ $t('altitude') }}</v-list-tile-content>
-                    <v-list-tile-content class="align-end">{{ altitude }}</v-list-tile-content>
-                  </v-list-tile>
+                  <v-list-item>
+                    <v-list-item-content>{{ $t('latitude') }}</v-list-item-content>
+                    <v-list-item-content class="align-end">{{ latitude }}</v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>{{ $t('longitude') }}</v-list-item-content>
+                    <v-list-item-content class="align-end">{{ longitude }}</v-list-item-content>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-content>{{ $t('altitude') }}</v-list-item-content>
+                    <v-list-item-content class="align-end">{{ altitude }}</v-list-item-content>
+                  </v-list-item>
                 </v-list>
                 <v-btn @click="getPosition">{{$t('use_current_position')}}</v-btn>
                 <v-btn v-if="this.parentGeoId !== null" @click="useParentPosition">{{$t('use_parent_position')}}</v-btn>
@@ -117,7 +117,7 @@
             <v-card>
               <v-card-text>
                 <v-progress-circular indeterminate v-if="checkingForCensus"></v-progress-circular>
-                <v-icon v-else color="success">check</v-icon>
+                <v-icon v-else color="success">mdi-check</v-icon>
                 {{$t('checking_census_form')}}
               </v-card-text>
               <v-card-actions>

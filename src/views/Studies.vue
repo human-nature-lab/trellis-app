@@ -10,23 +10,23 @@
           <v-btn
             @click="isAdding=true"
             icon>
-            <v-icon>add</v-icon>
+            <v-icon>mdi-plus</v-icon>
           </v-btn>
         </Permission>
       </v-toolbar>
       <v-data-table
         :loading="isLoading"
         :headers="headers"
-        hide-actions
+        hide-default-footer
         :items="studies">
-        <StudyRow
-          slot="items"
-          slot-scope="{item: study} = props"
-          @edit="startEditing(study)"
-          @remove="removeStudy(study)"
-          :key="study.id"
-          :study="study"
-          :locales="locales" />
+        <template v-slot:item="{ item: study }">
+          <StudyRow
+            @edit="startEditing(study)"
+            @remove="removeStudy(study)"
+            :key="study.id"
+            :study="study"
+            :locales="locales" />
+        </template>
       </v-data-table>
     </v-container>
     <TrellisModal v-model="isEditing" title="Editing Study">
@@ -47,10 +47,10 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Permission from '../components/Permission'
-  import StudyForm from '../components/studies/StudyForm'
-  import StudyRow from '../components/studies/StudyRow'
-  import TrellisModal from '../components/TrellisModal'
+  import Permission from '../components/Permission.vue'
+  import StudyForm from '../components/studies/StudyForm.vue'
+  import StudyRow from '../components/studies/StudyRow.vue'
+  import TrellisModal from '../components/TrellisModal.vue'
   import Study from '../entities/trellis/Study'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import LocaleService from '../services/locale/LocaleService'

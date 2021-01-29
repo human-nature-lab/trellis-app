@@ -9,29 +9,32 @@
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer></v-spacer>
           <permission :requires="TrellisPermission.ADD_FORM">
-            <v-menu
-              offset-x
-              lazy>
-              <v-btn icon slot="activator">
-                <v-icon>more_vert</v-icon>
-              </v-btn>
+            <v-menu offset-x>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  icon>
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
+              </template>
               <v-list>
-                <v-list-tile @click="addForm(formType)">
-                  <v-list-tile-action>
-                    <v-icon>add</v-icon>
-                  </v-list-tile-action>
-                  <v-list-tile-content>
+                <v-list-item @click="addForm(formType)">
+                  <v-list-item-action>
+                    <v-icon>mdi-plus</v-icon>
+                  </v-list-item-action>
+                  <v-list-item-content>
                     Add Form
-                  </v-list-tile-content>
-                </v-list-tile>
-                <v-list-tile @click="showImportForm = true; importFormType = Number(formType)">
-                  <v-list-tile-action>
-                    <v-icon>import_export</v-icon>
-                  </v-list-tile-action>
-                  <v-list-tile-content>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item @click="showImportForm = true; importFormType = Number(formType)">
+                  <v-list-item-action>
+                    <v-icon>mdi-swap-vertical</v-icon>
+                  </v-list-item-action>
+                  <v-list-item-content>
                     Import Form
-                  </v-list-tile-content>
-                </v-list-tile>
+                  </v-list-item-content>
+                </v-list-item>
               </v-list>
             </v-menu>
             <!--          <v-btn-->
@@ -43,9 +46,9 @@
         </v-toolbar>
         <v-data-table
           :headers="headers(formType)"
-          hide-actions
+          hide-default-footer
           :items="studyFormsByType(formType)">
-          <template slot="items" slot-scope="props">
+          <template v-slot:item="props">
             <form-list-tile
               :form="props.item.form"
               :study-form="props.item"
@@ -234,5 +237,5 @@
   .small
     column-width: 20px
   /*.max-width*/
-    /*column-width: 90%*/
+  /*column-width: 90%*/
 </style>

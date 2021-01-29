@@ -2,8 +2,8 @@
   <v-flex>
     <v-text-field
       v-model="newPassword"
-      :append-icon="showPassword ? 'visibility' : 'visibility_off'"
-      :append-icon-cb="() => (showPassword = !showPassword)"
+      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+      @click:append="() => (showPassword = !showPassword)"
       validate-on-blur
       :rules="newPassRules"
       :type="showPassword ? 'text' : 'password'"

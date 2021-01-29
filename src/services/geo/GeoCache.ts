@@ -4,4 +4,4 @@ const cacheOptions = {
   max: 50
 }
 
-export default LRU(cacheOptions)
+export default new LRU(cacheOptions)

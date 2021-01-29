@@ -1,14 +1,11 @@
 <template>
   <v-card class="question" :question-id="question.id">
-    <v-card-title class="primary question-title white--text">
-      <v-layout row>
-        <v-spacer></v-spacer>
-        <v-flex sm6 class="text-xs-right">
-          {{question.varName}} : {{question.questionType.name}}
-        </v-flex>
-      </v-layout>
+    <v-card-title class="primary question-title white--text flex justify-end">
+      <v-flex sm6 class="text-right">
+        {{question.varName}} : {{question.questionType.name}}
+      </v-flex>
     </v-card-title>
-    <v-alert v-show="validationError" transition="slide-y-transition">
+    <v-alert color="error" v-show="validationError" transition="slide-y-transition">
       {{validationError}}
     </v-alert>
     <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
@@ -57,6 +54,7 @@
   import RespondentGeoQuestion from './questions/RespondentGeoQuestion'
   import RosterQuestion from './questions/RosterQuestion'
   import TextQuestion from './questions/TextQuestion'
+  import TextAreaQuestion from './questions/TextAreaQuestion'
   import TimeQuestion from './questions/TimeQuestion'
   import QuestionTimer from './QuestionTimer'
 
@@ -75,7 +73,7 @@
     [questionTypes.respondent_geo]: RespondentGeoQuestion,
     [questionTypes.roster]: RosterQuestion,
     [questionTypes.text]: TextQuestion,
-    [questionTypes.text_area]: TextQuestion,
+    [questionTypes.text_area]: TextAreaQuestion,
     [questionTypes.time]: TimeQuestion,
     [questionTypes.image]: ImageQuestion
   }

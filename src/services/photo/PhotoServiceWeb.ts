@@ -1,5 +1,5 @@
 import { roughSizeOf } from '../../classes/M'
-import http, {Token} from '../http/AxiosInstance'
+import http from '../http/AxiosInstance'
 import axios from 'axios'
 import LRU from 'lru-cache'
 const cache = new LRU({
@@ -12,7 +12,7 @@ import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'
 import Photo from '../../entities/trellis/Photo'
 
 export default class PhotoServiceWeb extends PhotoServiceAbstract {
-l
+
   private existingCancelTokens = new Set()
 
   async getPhotosByIds (photoIds: string[]): Promise<Photo[]> {

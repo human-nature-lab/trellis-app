@@ -9,18 +9,21 @@
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-menu offset-y>
-            <v-btn
-              slot="activator"
-              icon>
-              <v-icon>more_vert</v-icon>
-            </v-btn>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                icon>
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
             <v-list>
-              <v-list-tile @click="showHidden=!showHidden">
-                <v-list-tile-action>
-                  <v-icon v-if="showHidden">check</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-title>{{$t('show_all')}}</v-list-tile-title>
-              </v-list-tile>
+              <v-list-item @click="showHidden=!showHidden">
+                <v-list-item-action>
+                  <v-icon v-if="showHidden">mdi-check</v-icon>
+                </v-list-item-action>
+                <v-list-item-title>{{$t('show_all')}}</v-list-item-title>
+              </v-list-item>
             </v-list>
           </v-menu>
         </v-toolbar>

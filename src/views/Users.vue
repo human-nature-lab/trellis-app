@@ -10,7 +10,7 @@
           <v-btn
             icon
             @click="userToEdit = null; showEditUser = true">
-            <v-icon>add</v-icon>
+            <v-icon>mdi-plus</v-icon>
           </v-btn>
         </Permission>
       </v-toolbar>
@@ -18,16 +18,14 @@
         :headers="headers"
         :items="users"
         :loading="isLoading"
-        :total-items="total"
-        :rows-per-page-items="[25, 50, 100]"
-        :rows-per-page-text="$t('rows_per_page')"
-        :pagination.sync="pagination">
-        <UserRow
-          slot="items"
-          slot-scope="props"
-          :user="props.item"
-          @edit="editUser(props.item)"
-          @remove="removeUser(props.item)" />
+        :footer-props="footerProps"
+        :server-items-length="total">
+        <template v-slot:item="{ item }">
+          <UserRow
+            :user="item"
+            @edit="editUser(item)"
+            @remove="removeUser(item)" />
+        </template>
       </v-data-table>
     </v-container>
     <TrellisModal
@@ -41,13 +39,13 @@
 </template>
 
 <script lang="ts">
-  import Permission from '../components/Permission'
-  import User from '../entities/Trellis/User'
-  import UserEdit from '../components/user/UserEdit'
-  import UserRow from '../components/user/UserRow'
+  import Permission from '../components/Permission.vue'
+  import User from '../entities/trellis/User'
+  import UserEdit from '../components/user/UserEdit.vue'
+  import UserRow from '../components/user/UserRow.vue'
   import DiffService from '../services/DiffService'
   import UserService from '../services/user/UserService'
-  import TrellisModal from '../components/TrellisModal'
+  import TrellisModal from '../components/TrellisModal.vue'
   import Vue from 'vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import IsAdminMixin from '../mixins/IsAdminMixin'
@@ -64,11 +62,13 @@
         showEditUser: false,
         userToEdit: null,
         isLoading: false,
-        pagination: {
-          descending: false,
-          page: 1,
-          rowsPerPage: 25,
-          sortBy: 'name'
+        footerProps: {
+          itemsPerPageAllText: this.$t('all'),
+          itemsPerPageOptions: [2, 50, 100, -1],
+          itemsPerPageText: this.$t('rows_per_page'),
+          pagination: {
+            itemsPerPage: 2
+          }
         }
       }
     },
@@ -98,7 +98,7 @@
     watch: {
       pagination: {
         handler (newVal, oldVal) {
-          if (!DiffService.objectsAreEqualByProps(newVal, oldVal, ['descending', 'page', 'rowsPerPage', 'sortBy'])) {
+          if (!DiffService.objectsAreEqualByProps(newVal, oldVal, ['descending', 'page', 'itemsPerPage', 'sortBy'])) {
             this.loadUsers()
           }
         },
@@ -113,7 +113,8 @@
       async loadUsers () {
         try {
           this.isLoading = true
-          const page = await UserService.getPage(this.pagination.page - 1, this.pagination.rowsPerPage, this.pagination.sortBy, this.pagination.descending)
+          const pagination = this.footerProps.pagination
+          const page = await UserService.getPage(pagination.page - 1, pagination.itemsPerPage, pagination.sortBy, pagination.descending)
           this.total = page.total
           this.users = page.data
           console.log('users', this.users)

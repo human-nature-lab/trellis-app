@@ -9,7 +9,7 @@
       v-model="isOpen">
       <v-toolbar flat>
         <v-btn icon @click="openTOC">
-          <v-icon>toc</v-icon>
+          <v-icon>mdi-table-of-contents</v-icon>
         </v-btn>
         <v-toolbar-title>
           {{$t('documentation')}}
@@ -18,12 +18,12 @@
             :href="newTabLink"
             target="_blank"
             class="btn btn--flat btn--icon">
-            <v-icon>launch</v-icon>
+            <v-icon>mdi-launch</v-icon>
           </a>
         </v-toolbar-title>
         <v-spacer />
         <v-btn icon @click="isOpen = false">
-          <v-icon>arrow_forward</v-icon>
+          <v-icon>mdi-arrow-right</v-icon>
         </v-btn>
       </v-toolbar>
       <Documentation

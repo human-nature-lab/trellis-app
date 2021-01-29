@@ -8,21 +8,21 @@
           <v-btn
             icon
             @click="isAdding = true">
-            <v-icon>add</v-icon>
+            <v-icon>mdi-plus</v-icon>
           </v-btn>
         </Permission>
       </v-toolbar>
       <v-data-table
         :loading="isLoading || isBusy"
         :headers="headers"
-        hide-actions
+        hide-default-footer
         :items="geoTypes">
-        <GeoTypeRow
-          :geoType="geoType"
-          @edit="startEditing(geoType)"
-          @remove="removeGeoType(geoType)"
-          slot="items"
-          slot-scope="{item: geoType}" />
+        <template #item="{ item: geoType }">
+          <GeoTypeRow
+            :geoType="geoType"
+            @edit="startEditing(geoType)"
+            @remove="removeGeoType(geoType)" />
+        </template>
       </v-data-table>
     </v-container>
     <TrellisModal

@@ -20,7 +20,7 @@ export default function DocsLinkMixin (docLink: any) {
     previousState = JSON.parse(JSON.stringify(global.secondaryDrawer))
     previousState.onClick = global.secondaryDrawer.onClick
     global.secondaryDrawer.isEnabled = true
-    global.secondaryDrawer.icon = 'help_outline'
+    global.secondaryDrawer.icon = 'mdi-help-circle-outline'
     global.secondaryDrawer.onClick = () => {
       bus.$emit(DocsEventTypes.open, docLink)
     }

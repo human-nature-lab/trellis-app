@@ -42,8 +42,7 @@
     },
     computed: {
       borderColor () {
-        // @ts-ignore
-        return this.$vuetify.theme[this.color]
+        return this.$vuetify.theme.currentTheme[this.color]
       },
       containerStyles (): object {
         return {
@@ -78,10 +77,9 @@
       border: 4px solid rgba(0,0,0,0)
       animation: rotate 1s linear infinite
 
-  .cpu-optimized
-    .loading-container
-      .loading-circle
-        border-rad
+  // .cpu-optimized
+  //   .loading-container
+  //     .loading-circle
 
   @keyframes rotate
     0%

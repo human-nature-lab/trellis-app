@@ -52,14 +52,14 @@
         </v-card-text>
         <v-card-actions>
           <v-btn
-            flat
+            text 
             color="error"
             @click="dialog.beginning = false">
             {{ $t('cancel') }}
           </v-btn>
           <v-spacer />
           <v-btn
-            flat
+            text
             color="success"
             @click="saveAndExit">
             {{ $t('confirm') }}
@@ -82,14 +82,14 @@
         </v-card-text>
         <v-card-actions>
           <v-btn
-            flat
+            text
             color="error"
             @click="dialog.end = false">
             {{ $t('cancel') }}
           </v-btn>
           <v-spacer />
           <v-btn
-            flat
+            text
             color="success"
             @click="lockAndExit()">
             {{ $t('confirm') }}
@@ -101,8 +101,6 @@
       content-class="condition-tag-dialog"
       transition="dialog-bottom-transition"
       scrollable
-      full-width
-      lazy
       v-model="dialog.conditionTag">
       <v-card tile>
         <v-toolbar
@@ -110,7 +108,7 @@
           dark
           color="primary">
           <v-btn icon dark @click.native="dialog.conditionTag = false">
-            <v-icon>close</v-icon>
+            <v-icon>mdi-close</v-icon>
           </v-btn>
           <v-toolbar-title>
             {{ $t('conditions') }}

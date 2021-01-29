@@ -2,22 +2,23 @@
   <v-menu
     v-if="editable || removable"
     offset-x
-    max-width="60px"
-    lazy>
-    <v-btn icon slot="activator">
-      <v-icon>more_vert</v-icon>
-    </v-btn>
+    max-width="60px">
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn icon v-on="on" v-bind="attrs">
+        <v-icon>mdi-dots-vertical</v-icon>
+      </v-btn>
+    </template>
     <v-list>
-      <v-list-tile
+      <v-list-item
         @click="$emit('edit')"
         v-if="editable">
-        <v-icon>edit</v-icon>
-      </v-list-tile>
-      <v-list-tile
+        <v-icon>mdi-pencil</v-icon>
+      </v-list-item>
+      <v-list-item
         @click="$emit('remove')"
         v-if="removable">
-        <v-icon color="error">delete</v-icon>
-      </v-list-tile>
+        <v-icon color="error">mdi-delete</v-icon>
+      </v-list-item>
     </v-list>
   </v-menu>
 </template>

@@ -14,9 +14,16 @@
       :pagination.sync="pagination"
       :headers="headers"
       :items="items">
-      <tr slot="items" slot-scope="props">
-        <td v-for="h in headers" :style="{borderColor: props.item.color}">{{ props.item[h.value] }}</td>
-      </tr>
+      <template v-slot:item="{ item }">
+        <tr>
+          <td 
+            v-for="h in headers"
+            :key="h.value"
+            :style="{borderColor: item.color}">
+            {{ item[h.value] }}
+          </td>
+        </tr>
+      </template>
     </v-data-table>
   </v-container>
 </template>

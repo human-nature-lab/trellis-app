@@ -2,26 +2,29 @@
   <v-flex xs12 class="roster-question">
     <v-card class="roster">
       <v-list>
-        <v-list-tile
+        <v-list-item
           :data-id="row.id"
           v-for="(row, rowIndex) in roster"
           :key="row.id">
-          <v-list-tile-avatar>
+          <v-list-item-avatar>
             <v-tooltip top>
-              <v-btn
-                slot="activator"
-                icon
-                v-if="editingIndex === rowIndex"
-                :disabled="isSavingEdit || isQuestionDisabled"
-                @click="stopEditingAndRevert(row, rowIndex)">
-                <v-icon color="red">clear</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  icon
+                  v-if="editingIndex === rowIndex"
+                  :disabled="isSavingEdit || isQuestionDisabled"
+                  @click="stopEditingAndRevert(row, rowIndex)">
+                  <v-icon color="red">mdi-clear</v-icon>
+                </v-btn>
+              </template>
               <span>
                 {{ $t('revert_changes') }}
               </span>
             </v-tooltip>
-          </v-list-tile-avatar>
-          <v-list-tile-content>
+          </v-list-item-avatar>
+          <v-list-item-content>
             <v-text-field
               :disabled="isQuestionDisabled"
               :placeholder="oldText"
@@ -29,55 +32,68 @@
               v-if="rowIndex === editingIndex"
               autofocus
               :append-icon="barcodeIcon"
-              :append-icon-cb="scanBarcode"
+              @click:append="scanBarcode"
               @keyup.enter="stopEditingAndSave(row, rowIndex)"
               @keyup.esc.stop="stopEditingAndRevert(row, rowIndex)" />
             <span class="roster-val"
               v-if="rowIndex !== editingIndex">{{row.val}}</span>
-          </v-list-tile-content>
-          <v-list-tile-action>
+          </v-list-item-content>
+          <v-list-item-action>
             <v-menu
               v-if="!isSavingEdit && !row.isLoading && rowIndex !== editingIndex"
               :disabled="editingIndex > 0 || isQuestionDisabled"
               left
-              lazy
               :nudge-left="30">
-              <v-btn icon slot="activator">
-                <v-icon>more_vert</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn icon v-on="on" v-bind="attrs">
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
+              </template>
               <v-list>
-                <v-list-tile>
+                <v-list-item>
                   <v-tooltip left>
-                    <v-btn icon @click="startEditingRow(row, rowIndex)" slot="activator">
-                      <v-icon>edit</v-icon>
-                    </v-btn>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        v-on="on"
+                        v-bind="attrs"
+                        icon
+                        @click="startEditingRow(row, rowIndex)">
+                        <v-icon>mdi-pencil</v-icon>
+                      </v-btn>
+                    </template>
                     <span>
                       {{ $t('select_to_edit') }}
                     </span>
                   </v-tooltip>
-                </v-list-tile>
-                <v-list-tile>
+                </v-list-item>
+                <v-list-item>
                   <v-tooltip left>
-                    <v-btn
-                      icon
-                      @click="removeRosterRow(row)"
-                      slot="activator">
-                      <v-icon color="red">delete</v-icon>
-                    </v-btn>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        v-on="on"
+                        v-bind="attrs"
+                        icon
+                        @click="removeRosterRow(row)">
+                        <v-icon color="red">mdi-delete</v-icon>
+                      </v-btn>
+                    </template>
                     <span>{{ $t('delete') }}</span>
                   </v-tooltip>
-                </v-list-tile>
+                </v-list-item>
               </v-list>
             </v-menu>
             <v-tooltip top>
-              <v-btn
-                v-if="editingIndex === rowIndex"
-                icon
-                :disabled="isQuestionDisabled"
-                slot="activator"
-                @click.stop="stopEditingAndSave(row, rowIndex)">
-                  <v-icon color="green">check</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-on="on"
+                  v-bind="attrs"
+                  v-if="editingIndex === rowIndex"
+                  icon
+                  :disabled="isQuestionDisabled"
+                  @click.stop="stopEditingAndSave(row, rowIndex)">
+                    <v-icon color="green">mdi-check</v-icon>
+                </v-btn>
+              </template>
               <span>
                 {{ $t('save') }}
               </span>
@@ -86,18 +102,18 @@
               v-if="isSavingEdit || row.isLoading"
               indeterminate
               color="primary" />
-          </v-list-tile-action>
-        </v-list-tile>
-        <v-list-tile v-if="isAddingNew">
-          <v-list-tile-avatar>
+          </v-list-item-action>
+        </v-list-item>
+        <v-list-item v-if="isAddingNew">
+          <v-list-item-avatar>
             <v-btn
               :disabled="isSavingNew"
               icon
               @click="stopAddingWithoutSaving">
-              <v-icon color="red">delete</v-icon>
+              <v-icon color="red">mdi-delete</v-icon>
             </v-btn>
-          </v-list-tile-avatar>
-          <v-list-tile-content>
+          </v-list-item-avatar>
+          <v-list-item-content>
             <v-text-field
               :disabled="isQuestionDisabled"
               v-model="newText"
@@ -105,21 +121,21 @@
               @keyup.esc="stopAddingWithoutSaving"
               @keyup.enter="stopAddingAndSave"
               :append-icon="barcodeIcon"
-              :append-icon-cb="scanBarcode"/>
-          </v-list-tile-content>
-          <v-list-tile-action>
+              @click:append="scanBarcode"/>
+          </v-list-item-content>
+          <v-list-item-action>
             <v-btn
               v-if="!isSavingNew"
               icon
               @click.stop="stopAddingAndSave">
-              <v-icon color="green">check</v-icon>
+              <v-icon color="green">mdi-check</v-icon>
             </v-btn>
             <v-progress-circular
               v-if="isSavingNew"
               indeterminate
               color="primary" />
-          </v-list-tile-action>
-        </v-list-tile>
+          </v-list-item-action>
+        </v-list-item>
       </v-list>
       <v-fab-transition>
         <v-btn
@@ -131,7 +147,7 @@
           absolute
           bottom
           right>
-          <v-icon style="height:auto;">add</v-icon>
+          <v-icon style="height:auto;">mdi-plus</v-icon>
         </v-btn>
       </v-fab-transition>
     </v-card>

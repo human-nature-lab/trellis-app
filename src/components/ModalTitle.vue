@@ -13,7 +13,7 @@
       icon
       class="white--text"
       @click="$emit('close')">
-      <v-icon>close</v-icon>
+      <v-icon>mdi-close</v-icon>
     </v-btn>
   </v-toolbar>
 </template>
