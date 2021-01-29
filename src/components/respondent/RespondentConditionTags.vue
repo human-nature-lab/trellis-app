@@ -7,37 +7,42 @@
       <v-spacer />
       <Permission :requires="TrellisPermission.ADD_RESPONDENT_CONDITION_TAG">
         <v-tooltip left>
-          <v-btn
-            slot="activator"
-            icon
-            class="mb-2"
-            @click="showForm = true">
-            <v-icon>add</v-icon>
-          </v-btn>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              icon
+              class="mb-2"
+              @click="showForm = true">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
           <span>{{$t('add_condition_tag')}}</span>
         </v-tooltip>
       </Permission>
     </v-toolbar>
     <v-data-table
-      class="mb-3"
-      hide-actions
+      class="mb-4"
+      hide-default-footer
       :headers="conditionTagHeaders"
       :items="conditionTags">
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.conditionTag.name }}</td>
-        <td class="text-xs-right">{{ props.item.createdAt.format('l') }}</td>
-        <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG">
-          <td>
-            <v-btn
-              icon
-              @click="deleteRespondentConditionTag(props.item.id)">
-              <v-progress-circular
-                v-if="isDeleting(props.item.id)"
-                indeterminate />
-              <v-icon v-else>delete</v-icon>
-            </v-btn>
-          </td>
-        </Permission>
+      <template v-slot:item="{ item }">
+        <tr>
+          <td>{{ item.conditionTag.name }}</td>
+          <td class="text-xs-right">{{ item.createdAt.format('l') }}</td>
+          <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG">
+            <td>
+              <v-btn
+                icon
+                @click="deleteRespondentConditionTag(item.id)">
+                <v-progress-circular
+                  v-if="isDeleting(item.id)"
+                  indeterminate />
+                <v-icon v-else>mdi-delete</v-icon>
+              </v-btn>
+            </td>
+          </Permission>
+        </tr>
       </template>
     </v-data-table>
     <RespondentConditionTagForm

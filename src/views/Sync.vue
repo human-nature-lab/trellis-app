@@ -1,74 +1,65 @@
 <template>
-  <v-container fill-height>
-    <v-layout>
-      <v-flex>
-        <v-container>
-          <v-layout row class="sync-content">
-            <v-flex class="xs12">
-              <sync-status
-                v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
-                @login="isLoggingIn = true"
-                :local-latest-snapshot="localLatestSnapshot"
-                :updated-records-count="updatedRecordsCount">
-              </sync-status>
-              <upload
-                v-if="uploading || uploadingPhotos"
-                :username="username"
-                :password="password"
-                :init-upload-step="uploadStep"
-                @upload-done="uploadDone"
-                @upload-cancelled="uploadCancelled">
-              </upload>
-              <download
-                v-if="downloading || downloadingPhotos"
-                :password="password"
-                :username="username"
-                :init-download-step="downloadStep"
-                @download-done="downloadDone"
-                @download-cancelled="downloadCancelled">
-              </download>
-            </v-flex>
-          </v-layout>
-          <v-layout
-            v-if="!needsServerConfig"
-            row
-            class="mt-2 sync-footer"
-            justify-space-between>
-            <v-flex class="xs6 text-xs-left">
-              <v-btn :disabled="!enableUpload"
-                     :loading="uploading"
-                     @click="onUpload">
-                <v-icon>cloud_upload</v-icon>
-              </v-btn>
-              <v-btn @click="onUploadPhotos"
-                     :loading="uploadingPhotos"
-                     :disabled="!enablePhotoDownload">
-                <v-icon>collections</v-icon>
-                <v-icon>arrow_upward</v-icon>
-              </v-btn>
-            </v-flex>
-            <v-flex class="xs6 text-xs-right">
-              <v-btn @click="onDownload"
-                     :loading="downloading"
-                     :disabled="!enableDownload">
-                <v-icon>cloud_download</v-icon>
-              </v-btn>
-              <v-btn @click="onDownloadPhotos"
-                     :loading="downloadingPhotos"
-                     :disabled="!enablePhotoDownload">
-                <v-icon>collections</v-icon>
-                <v-icon>arrow_downward</v-icon>
-              </v-btn>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-flex>
-    </v-layout>
-    <TrellisModal
-      v-model="isLoggingIn"
-      :title="$t('login')">
-      <LoginForm @login="setSyncCredentials"/>
-    </TrellisModal>
+  <v-container fill-height justify-start>
+    <v-col>
+      <v-container>
+        <v-row>
+          <v-flex class="xs12">
+            <sync-status
+              v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
+              :local-latest-snapshot="localLatestSnapshot"
+              :updated-records-count="updatedRecordsCount">
+            </sync-status>
+            <upload
+              v-if="uploading || uploadingPhotos"
+              :username="username"
+              :password="password"
+              :init-upload-step="uploadStep"
+              @upload-done="uploadDone"
+              @upload-cancelled="uploadCancelled">
+            </upload>
+            <download
+              v-if="downloading || downloadingPhotos"
+              :password="password"
+              :username="username"
+              :init-download-step="downloadStep"
+              @download-done="downloadDone"
+              @download-cancelled="downloadCancelled">
+            </download>
+          </v-flex>
+        </v-row>
+        <v-row
+          v-if="!needsServerConfig"
+          class="sync-footer">
+          <v-flex class="xs6 text-xs-left">
+            <v-btn :disabled="!enableUpload"
+                    :loading="uploading"
+                    @click="onUpload">
+              <v-icon>mdi-cloud-upload</v-icon>
+            </v-btn>
+            <v-btn @click="onUploadPhotos"
+                    :loading="uploadingPhotos"
+                    :disabled="!enablePhotoDownload">
+              <v-icon>mdi-collections</v-icon>
+              <v-icon>mdi-arrow-up</v-icon>
+            </v-btn>
+          </v-flex>
+          <v-flex class="xs6 text-xs-right">
+            <v-btn @click="onDownload"
+                    :loading="downloading"
+                    :disabled="!enableDownload">
+              <v-icon>mdi-cloud-download</v-icon>
+            </v-btn>
+            <v-btn @click="onDownloadPhotos"
+                    :loading="downloadingPhotos"
+                    :disabled="!enablePhotoDownload">
+              <v-icon>mdi-collections</v-icon>
+              <v-icon>mdi-arrow-down</v-icon>
+            </v-btn>
+          </v-flex>
+        </v-row>
+      </v-container>
+    </v-col>
+    <LoginModal />
   </v-container>
 </template>
 
@@ -82,7 +73,7 @@
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import DocsFiles from '../components/documentation/DocsFiles'
   import TrellisModal from '../components/TrellisModal'
-  import LoginForm from '../components/LoginForm'
+  import LoginModal from '../components/login/LoginModal'
   import { resetSyncCredentials, setSyncCredentials } from '../services/http/AxiosInstance'
 
   export default {
@@ -93,7 +84,7 @@
       Upload,
       SyncStatus,
       TrellisModal,
-      LoginForm
+      LoginModal,
     },
     mixins: [DocsLinkMixin(DocsFiles.sync.introduction)],
     data () {
@@ -109,10 +100,6 @@
         serverLatestSnapshot: null,
         localLatestSnapshot: null,
         updatedRecordsCount: null,
-        hasSetSyncCredentials: false,
-        isLoggingIn: false,
-        username: null,
-        password: null
       }
     },
     created () {
@@ -121,7 +108,6 @@
     props: {},
     methods: {
       async initComponent () {
-        await this.resetSyncCredentials()
         this.loading = true
         try {
           this.serverIPAddress = await DatabaseService.getServerIPAddress()
@@ -135,48 +121,19 @@
       async onServerIPConfigDone () {
         this.serverIPAddress = await DatabaseService.getServerIPAddress()
       },
-      async setSyncCredentials (username, password) {
-        this.username = username
-        this.password = password
-        setSyncCredentials(username, password)
-        this.hasSetSyncCredentials = true
-        this.isLoggingIn = false
-      },
-      async resetSyncCredentials () {
-        await resetSyncCredentials()
-        this.username = null
-        this.password = null
-        this.hasSetSyncCredentials = false
-      },
       onDownload () {
-        if (!this.hasSetSyncCredentials) {
-          this.isLoggingIn = true
-          return
-        }
         this.downloadStep = 1
         this.downloading = true
       },
       onUpload () {
-        if (!this.hasSetSyncCredentials) {
-          this.isLoggingIn = true
-          return
-        }
         this.uploadStep = 1
         this.uploading = true
       },
       onUploadPhotos () {
-        if (!this.hasSetSyncCredentials) {
-          this.isLoggingIn = true
-          return
-        }
         this.uploadStep = 3
         this.uploadingPhotos = true
       },
       onDownloadPhotos () {
-        if (!this.hasSetSyncCredentials) {
-          this.isLoggingIn = true
-          return
-        }
         this.downloadStep = 4
         this.downloadingPhotos = true
       },

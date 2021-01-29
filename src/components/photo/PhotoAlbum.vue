@@ -13,35 +13,35 @@
         class="photo-flex"
         :key="photo.id">
         <v-card class="photo-vcard">
-          <v-card-media>
-            <photo
-              @click="showFull(photo)"
-              :isCentered="true"
-              width="100%"
-              :photo="photo">
-            </photo>
-          </v-card-media>
+          <photo
+            @click="showFull(photo)"
+            :isCentered="true"
+            width="100%"
+            :photo="photo">
+          </photo>
           <v-card-actions class="photo-actions">
-            <v-btn v-if="allowSorting "flat icon color="amber" @click="setFavorite(photo)">
-              <v-icon v-if="photo.pivot.sortOrder === 0" medium>star</v-icon>
-              <v-icon v-else medium>star_border</v-icon>
+            <v-btn v-if="allowSorting" icon color="amber" @click="setFavorite(photo)">
+              <v-icon v-if="photo.pivot.sortOrder === 0" medium>mdi-star</v-icon>
+              <v-icon v-else medium>mdi-star-outline</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
             <v-menu bottom left>
-              <v-btn slot="activator" icon>
-                <v-icon medium>more_vert</v-icon>
-              </v-btn>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn v-on="on" v-bind="attrs" icon>
+                  <v-icon medium>mdi-dots-vertical</v-icon>
+                </v-btn>
+              </template>
               <v-list>
-                <v-list-tile v-if="allowNotes">
+                <v-list-item v-if="allowNotes">
                   <v-btn icon @click.native="editPhoto(photo)">
-                    <v-icon medium>edit</v-icon>
+                    <v-icon medium>mdi-edit</v-icon>
                   </v-btn>
-                </v-list-tile>
-                <v-list-tile>
+                </v-list-item>
+                <v-list-item>
                   <v-btn icon @click.native="deletePhoto(photo)">
-                    <v-icon medium>delete</v-icon>
+                    <v-icon medium>mdi-delete</v-icon>
                   </v-btn>
-                </v-list-tile>
+                </v-list-item>
               </v-list>
             </v-menu>
           </v-card-actions>
@@ -62,8 +62,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn flat @click.native="editPhoto(null)">{{ $t('cancel') }}</v-btn>
-          <v-btn flat @click.native="updatePhotos(editingPhoto)">{{ $t('save') }}</v-btn>
+          <v-btn text @click.native="editPhoto(null)">{{ $t('cancel') }}</v-btn>
+          <v-btn text @click.native="updatePhotos(editingPhoto)">{{ $t('save') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

@@ -106,7 +106,7 @@ export function routerReady () {
         resolve(true)
       }
     }
-    const intervalId = setInterval(check, 100)
+    const intervalId = setInterval(check, 300)
     const timeoutId = setTimeout(() => {
       release()
       isReady = true

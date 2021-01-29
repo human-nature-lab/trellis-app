@@ -436,7 +436,7 @@ respondent_name_instructions,Respondent's full name (with nickname),Nombre compl
 cannot_undo,This action cannot be undone.,Esta accion no puede ser anulada,
 role,Role,Rol,
 studies,Studies,Estudios,
-actions,Actions,Acciones,Things like edit and delete
+actions,Actions,Acciones,Things like edit and delete 
 invalid_password_length,Password must be at least {0} characters,La contraseña debe tener al menos {0} caracteres,
 passwords_dont_match,Passwords do not match,Las contraseñas no son iguales,
 password_updated,Password was updated successfully,La contraseña fue actualizada exitosamente,
@@ -517,3 +517,4 @@ form_has_condition_errors,Form has errors in condition assignment,El formulario 
 condition_assignment_errors,Condition assignment errors,Errores de asignacion de condicion ,
 not_logged_in,Your session has expired.,Su sesion ha terminado,
 import_form,Import form,Importar formulario,
+view_current_documentation,View documentation for this page,,

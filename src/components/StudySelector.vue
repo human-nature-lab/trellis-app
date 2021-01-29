@@ -1,11 +1,14 @@
 <template>
   <v-flex>
-    <v-alert color="error" v-if="error">
-      {{error}}
-    </v-alert>
     <debug name="Studies">
       <pre>{{studies}}</pre>
     </debug>
+    <v-alert color="error" v-show="error">
+      {{error}}
+    </v-alert>
+    <v-alert color="info" v-show="showCreateStudy">
+      There are no studies set up, go to <router-link to="Studies">Studies</router-link> to create your first study.
+    </v-alert>
     <v-select
       :label="$t('study')"
       :loading="isWorking"
@@ -27,7 +30,8 @@
         error: null,
         studies: [],
         study: null,
-        isWorking: false
+        isWorking: false,
+        showCreateStudy: false
       }
     },
     created () {
@@ -43,7 +47,6 @@
       async load () {
         try {
           this.isWorking = true
-          // await SingletonService.hasLoaded()
           this.study = await StudyService.getCurrentStudy()
           this.studies = await StudyService.getMyStudies()
           this.studies.sort(function (a, b) {
@@ -55,6 +58,7 @@
           }
         } finally {
           this.isWorking = false
+          if (this.studies.length === 0) this.showCreateStudy = true
         }
       },
       getStudyById (studyId) {

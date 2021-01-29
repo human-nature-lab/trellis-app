@@ -1,13 +1,14 @@
 <template>
-  <v-text-field
+  <v-textarea
     v-model="text"
-    auto-grow
     full-width
+    autogrow
+    dense
+    :rows="textarea ? 4 : 1"
     :placeholder="$t('text_placeholder')"
-    textarea
     :disabled="isQuestionDisabled"
     :append-icon="barcodeIcon"
-    :append-icon-cb="doScan"
+    @click:append="doScan"
     />
 </template>
 
@@ -24,6 +25,10 @@
       question: {
         type: Object,
         required: true
+      },
+      textarea: {
+        type: Boolean,
+        default: false
       }
     },
     mixins: [QuestionDisabledMixin, VuetifyValidationRules, ActionMixin, BarcodeMixin],

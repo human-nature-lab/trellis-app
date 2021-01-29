@@ -6,12 +6,17 @@
           <v-toolbar-title>Service Testing</v-toolbar-title>
           <v-spacer />
           <v-menu offset-y>
-            <v-btn icon slot="activator">
-              <v-icon>more_vert</v-icon>
-            </v-btn>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                icon>
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
             <v-list>
-              <v-list-tile>
-                <v-list-tile-content>
+              <v-list-item>
+                <v-list-item-content>
                   <file-upload
                     input-id="convert-template"
                     extensions="json"
@@ -19,24 +24,24 @@
                     @input="convertForm">
                     Convert form to TypeScript
                   </file-upload>
-                </v-list-tile-content>
-              </v-list-tile>
-              <v-list-tile @click="addAlert">
-                <v-list-tile-action>
-                  <v-icon>add_alert</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item @click="addAlert">
+                <v-list-item-action>
+                  <v-icon>mdi-plus_alert</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
                   Add Alert
-                </v-list-tile-content>
-              </v-list-tile>
-              <v-list-tile @click="throwError">
-                <v-list-tile-action>
-                  <v-icon>error</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item @click="throwError">
+                <v-list-item-action>
+                  <v-icon>mdi-alert-circle</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
                   Throw error
-                </v-list-tile-content>
-              </v-list-tile>
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
           </v-menu>
         </v-toolbar>
@@ -61,8 +66,8 @@
             :key="test.title">
             <v-layout row>
               <v-flex xs>
-                <v-icon v-if="test.state === SUCCESSFUL" color="success">check_circle</v-icon>
-                <v-icon v-else-if="test.state === FAILED" color="error">error</v-icon>
+                <v-icon v-if="test.state === SUCCESSFUL" color="success">mdi-check_circle</v-icon>
+                <v-icon v-else-if="test.state === FAILED" color="error">mdi-alert-circle</v-icon>
               </v-flex>
               <v-layout column>
                 <v-flex>{{test.title}} - {{test.duration}}</v-flex>

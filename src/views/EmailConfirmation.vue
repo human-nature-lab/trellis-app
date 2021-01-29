@@ -5,7 +5,7 @@
         Confirming
       </v-stepper-step>
       <v-stepper-content step="1">
-        <v-layout class="ma-5">
+        <v-layout class="ma-12">
           <v-flex>
             Confirming email and provisioning resources
           </v-flex>
@@ -16,7 +16,7 @@
         Confirmed
       </v-stepper-step>
       <v-stepper-content step="2">
-        <v-layout class="ma-5">
+        <v-layout class="ma-12">
           <v-flex v-if="confirmationSucceeded">
             Thank you for confirming your email! Please <router-link :to="{name: 'Login'}">login</router-link> to continue.
           </v-flex>

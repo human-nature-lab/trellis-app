@@ -1,6 +1,5 @@
 <template>
   <v-dialog
-    lazy
     :value="value"
     @input="close">
     <v-card>
@@ -29,7 +28,7 @@
           </v-layout>
       </v-card-text>
     </v-card>
-    <v-dialog lazy v-model="showGeoSearch">
+    <v-dialog v-model="showGeoSearch">
       <ModalTitle :title="$t('location_search')" @close="showGeoSearch=false" />
       <GeoSearch
         :showCart="true"

@@ -1,5 +1,5 @@
 <template>
-  <div class="checkbox-group">
+  <v-row class="checkbox-group">
     <v-checkbox
       v-if="question.type.name==='multiple_select'"
       :disabled="disabled"
@@ -25,7 +25,7 @@
       :value="choice.otherText"
       :autofocus="!choice.otherText || !choice.otherText.length"
       @input="onOtherChange"/>
-  </div>
+  </v-row>
 </template>
 
 <script>

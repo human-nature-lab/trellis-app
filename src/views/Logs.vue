@@ -4,26 +4,31 @@
       <v-toolbar-title>{{$t('logs')}}</v-toolbar-title>
       <v-spacer />
       <v-menu offset-y v-if="isCordova">
-        <v-btn icon slot="activator">
-          <v-icon>more_vert</v-icon>
-        </v-btn>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            v-on="on"
+            v-bind="attrs"
+            icon> 
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
         <v-list>
-          <v-list-tile @click="uploadLogs">
-            <v-list-tile-action>
-              <v-icon>cloud_upload</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
+          <v-list-item @click="uploadLogs">
+            <v-list-item-action>
+              <v-icon>mdi-cloud-upload</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
               Upload logs
-            </v-list-tile-content>
-          </v-list-tile>
-          <v-list-tile @click="deleteLogs">
-            <v-list-tile-action>
-              <v-icon>delete</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item @click="deleteLogs">
+            <v-list-item-action>
+              <v-icon>mdi-delete</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
               Delete logs
-            </v-list-tile-content>
-          </v-list-tile>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-menu>
     </v-toolbar>
@@ -34,22 +39,22 @@
       :total-items="total"
       :pagination.sync="pagination"
       @update:pagination="updatePage">
-      <template slot="items" slot-scope="props" >
-        <tr @click="showFull(props.item)">
+      <template v-slot:item="{ item }" >
+        <tr @click="showFull(item)">
           <td>
-            {{props.item.createdAt.local().fromNow()}}
+            {{item.createdAt.local().fromNow()}}
           </td>
-          <td :class="`text--${props.item.severity} ${props.item.severity}`">
-            {{props.item.severity}}
-          </td>
-          <td>
-            {{props.item.message}}
+          <td :class="`text--${item.severity} ${item.severity}`">
+            {{item.severity}}
           </td>
           <td>
-            {{props.item.component}}
+            {{item.message}}
           </td>
           <td>
-            <v-icon v-if="props.item.uploadedAt" color="green">check</v-icon>
+            {{item.component}}
+          </td>
+          <td>
+            <v-icon v-if="item.uploadedAt" color="green">mdi-check</v-icon>
           </td>
         </tr>
       </template>

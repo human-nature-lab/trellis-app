@@ -5,13 +5,10 @@
       :raised="selected === true"
       tile
       :class="{selected: selected === true, respondent: true, 'ma-1': true}">
-      <v-card-media class="respondent-photo"
-                    @click="onClick">
-        <Photo
-          :photo="photo"
-          width="150"
-          height="150" />
-      </v-card-media>
+      <Photo
+        class="respondent-photo"
+        @click="onClick"
+        :photo="photo" />
       <v-card-actions class="respondent-name">
         <v-layout row wrap>
           <v-flex @click="onClick">
@@ -21,7 +18,7 @@
           <v-btn
             @click="showFullscreen = true"
             icon>
-            <v-icon :large="$vuetify.breakpoint.smAndDown">fullscreen</v-icon>
+            <v-icon :large="$vuetify.breakpoint.smAndDown">mdi-fullscreen</v-icon>
           </v-btn>
         </v-layout>
       </v-card-actions>
@@ -29,7 +26,7 @@
         v-if="labels && labels.length">
         <v-chip
           label
-          outline
+          outlined
           v-for="label in labels"
           :key="label">
           {{label}}

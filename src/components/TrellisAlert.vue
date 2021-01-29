@@ -3,17 +3,17 @@
     :value="show"
     :type="getType()"
     @click="toggleShow"
-    outline>
-    <v-layout row wrap>
+    outlined>
+    <v-row wrap>
       <v-flex :xs11="isMore">
         {{ getMessage() }}
         <slot></slot>
       </v-flex>
       <v-flex xs1>
-        <v-icon v-if="isMore">{{ (showMore) ? 'expand_less' : 'expand_more' }}</v-icon>
+        <v-icon v-if="isMore">{{ (showMore) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
       </v-flex>
-    </v-layout>
-    <v-layout row wrap v-if="showMore">
+    </v-row>
+    <v-row wrap v-if="showMore">
       <v-flex xs12>
         <div class="textarea-wrapper">
           <textarea
@@ -24,7 +24,7 @@
             @click.stop="selectAll"></textarea>
         </div>
       </v-flex>
-    </v-layout>
+    </v-row>
   </v-alert>
 </template>
 

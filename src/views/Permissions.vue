@@ -11,59 +11,67 @@
           :label="$t('search')"
           @change="debounceModel('query.debounce', 500)" />
         <v-tooltip left>
-          <v-btn slot="activator" icon @click="showRoleDialog = true">
-            <v-icon>add</v-icon>
-          </v-btn>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              icon
+              @click="showRoleDialog = true">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
           <span>Create a new role</span>
         </v-tooltip>
       </v-toolbar>
       <v-progress-linear :active="isLoading" indeterminate :height="3" />
       <v-data-table
-        hide-actions
+        hide-default-footer
         :items="filteredPermissions">
-        <template slot="headers" slot-scope="props">
+        <template v-slot:header>
           <tr>
             <th>{{$t('permission')}}</th>
             <th>{{$t('type')}}</th>
-            <th v-for="role in roles">
+            <th v-for="role in roles" :key="role.id">
               {{role.name}}
               <v-menu
-                lazy
                 :disabled="isLoading">
-                <v-btn
-                  slot="activator"
-                  icon>
-                  <v-icon>more_vert</v-icon>
-                </v-btn>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-on="on"
+                    v-bind="attrs"
+                    icon>
+                    <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
                 <v-list>
-                  <v-list-tile
+                  <v-list-item
                     v-if="role.canDelete"
                     :disabled="!hasPermission(TrellisPermission.EDIT_PERMISSIONS)"
                     @click="removeRole(role)">
-                    <v-list-tile-action>
-                      <v-icon color="error">delete</v-icon>
-                    </v-list-tile-action>
+                    <v-list-item-action>
+                      <v-icon color="error">mdi-delete</v-icon>
+                    </v-list-item-action>
                     {{$t('delete') | TitleCase}}
-                  </v-list-tile>
-                  <v-list-tile
+                  </v-list-item>
+                  <v-list-item
                     @click="startCopy(role)"
                     :disabled="!hasPermission(TrellisPermission.EDIT_PERMISSIONS)">
-                    <v-list-tile-action>
-                      <v-icon>chevron_right</v-icon>
-                    </v-list-tile-action>
+                    <v-list-item-action>
+                      <v-icon>mdi-chevron-right</v-icon>
+                    </v-list-item-action>
                     {{$t('copy') | TitleCase}}
-                  </v-list-tile>
+                  </v-list-item>
                 </v-list>
               </v-menu>
             </th>
           </tr>
         </template>
-        <PermissionRow
-          slot="items"
-          slot-scope="{item: permission}"
-          @newRolePermission="newRolePermission"
-          :permission="permission"
-          :roles="roles" />
+        <template v-slot:item="{item: permission}">
+          <PermissionRow
+            @newRolePermission="newRolePermission"
+            :permission="permission"
+            :roles="roles" />
+        </template>
       </v-data-table>
     </v-card>
     <TrellisModal

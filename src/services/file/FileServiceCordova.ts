@@ -209,6 +209,13 @@ class FileServiceCordova {
             promise.cancelDownload = fileTransfer.abort.bind(fileTransfer)
             fileTransfer.onprogress = onDownloadProgress
             const fileURL = fileEntry.toURL()
+            const headers = {
+              'X-Key': deviceKey
+            }
+            if (authHeader) {
+              headers['Authorization'] = authHeader
+            }
+            console.log('file transfer headers', headers)
             fileTransfer.download(uri, fileURL,
               (success) => {
                 resolve(fileEntry)
@@ -224,10 +231,7 @@ class FileServiceCordova {
                   reject(err)
                 }
               },
-              false, { headers: {
-                'X-Key': deviceKey,
-                'Authorization': authHeader
-              } })
+              false, { headers })
           } catch (err) {
             reject(err)
           }

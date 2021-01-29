@@ -58,8 +58,6 @@
                 :logging-service="loggingService"
                 :md5hash="compressedUploadFileHash"
                 :file-entry="compressedUploadFile"
-                :username="username"
-                :password="password"
                 @upload-snapshot-done="uploadSnapshotDone">
               </upload-snapshot>
               <verify-upload
@@ -100,8 +98,6 @@
                 v-if="uploadStep > 2 && uploadSubStep > 2"
                 :logging-service="loggingService"
                 :images-to-upload="fileList"
-                :username="username"
-                :password="password"
                 @upload-images-done="uploadImagesDone">
               </upload-images>
             </sync-step>
@@ -178,14 +174,6 @@
         type: Number,
         required: true
       },
-      username: {
-        type: String,
-        required: true
-      },
-      password: {
-        type: String,
-        required: true
-      }
     },
     methods: {
       showLog () {

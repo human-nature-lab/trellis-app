@@ -1,14 +1,14 @@
 <template>
   <v-flex xs12>
     <v-card tile>
-      <v-toolbar card prominent>
+      <v-toolbar flat>
         <v-toolbar-title>
           {{name}}
           <v-chip
             v-if="respondent.associatedRespondentId"
             label
             color="error"
-            outline>({{$t('other_respondent')}})</v-chip>
+            outlined>({{$t('other_respondent')}})</v-chip>
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}">
@@ -47,7 +47,7 @@
                 <v-btn
                   color="error"
                   @click="deleteRespondent">
-                  <v-icon>delete</v-icon>
+                  <v-icon>mdi-delete</v-icon>
                   {{$t('delete')}}
                 </v-btn>
               </Permission>

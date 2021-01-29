@@ -11,7 +11,7 @@
         </v-select>
         <v-btn
           :disabled="curGeoType === null || disableButton"
-          flat
+          text
           right
           @click="selectGeoType">
           {{ $t('select') }}

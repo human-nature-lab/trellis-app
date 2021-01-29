@@ -23,7 +23,7 @@
     name: 'DocsRoute',
     beforeRouteEnter (to: Route, from: Route, next) {
       global.secondaryDrawer.isEnabled = true
-      global.secondaryDrawer.icon = 'toc'
+      global.secondaryDrawer.icon = 'mdi-table-of-contents'
       next()
     },
     beforeRouteUpdate (to: Route, from: Route, next) {

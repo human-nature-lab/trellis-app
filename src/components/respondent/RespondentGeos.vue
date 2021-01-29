@@ -4,39 +4,42 @@
       <v-toolbar-title>{{ $t('locations') }}</v-toolbar-title>
       <v-spacer />
       <v-tooltip left>
-        <v-btn
-          slot="activator"
-          icon
-          @click="isAddingGeo = true">
-          <v-icon>add</v-icon>
-        </v-btn>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-on="on"
+            v-bind="attrs"
+            @click="isAddingGeo = true">
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </template>
         <span>{{ $t('add_locations') }}</span>
       </v-tooltip>
     </v-toolbar>
     <v-alert v-show="error" color="error">{{error}}</v-alert>
     <v-data-table
-      disable-initial-sort
-      class="mb-3"
+      sort-by="translated"
+      class="mb-4"
       :headers="locationHeaders"
       :items="locations"
-      hide-actions>
-      <template slot="items" slot-scope="props">
-        <respondent-geo-row
+      hide-default-footer>
+      <template v-slot:item="props">
+        <RespondentGeoRow
           @remove="remove"
           @move="startMove"
           @overrideCurrent="toggleIsCurrent(props.item)"
           :show-history="!!props.item.history && !!props.item.history.length"
           :show-controls="true"
           v-model="props.expanded"
-          :respondent-geo="props.item"></respondent-geo-row>
+          :respondent-geo="props.item" />
       </template>
-      <template slot="expand" slot-scope="props">
+      <template v-slot:expanded-item="props">
         <v-data-table
-          disable-initial-sort
+          sort-by="translated"
           :headers="locationHeaders"
           :items="props.item.history"
-          hide-actions>
-          <template slot="items" slot-scope="historyProps">
+          hide-default-footer>
+          <template v-slot:item="historyProps">
             <RespondentGeoRow :respondentGeo="historyProps.item"></RespondentGeoRow>
           </template>
         </v-data-table>

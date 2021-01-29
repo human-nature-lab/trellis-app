@@ -1,6 +1,5 @@
 <template>
   <v-dialog
-    lazy
     :value="value"
     @input="$emit('input', $event)">
     <v-card>
@@ -16,7 +15,7 @@
             <v-flex xs8>
               <v-chip
                 color="primary"
-                outline
+                outlined
                 label>
                 <GeoBreadcrumbs
                   v-if="respondentGeo.geoId !== null && respondentGeo.geo"
@@ -53,7 +52,7 @@
               </v-btn>
             </v-flex>
           </v-layout>
-          <v-layout row wrap mt-3>
+          <v-layout row wrap mt-4>
             <v-flex xs6>
               <v-checkbox
                 v-model="isCurrent"
@@ -68,12 +67,11 @@
           <v-expansion-panel inset>
             <v-expansion-panel-content>
               <div slot="header">{{ $t('notes') }}</div>
-              <v-text-field
+              <v-textarea
                 v-model="notes"
                 auto-grow
                 full-width
-                :placeholder="$t('notes')"
-                textarea/>
+                :placeholder="$t('notes')" />
             </v-expansion-panel-content>
           </v-expansion-panel>
           <v-layout>

@@ -18,7 +18,7 @@
         fixed
         bottom
         right>
-        <v-icon style="height:auto;">add</v-icon>
+        <v-icon style="height:auto;">mdi-plus</v-icon>
       </v-btn>
     </v-fab-transition>
     <add-geo-form

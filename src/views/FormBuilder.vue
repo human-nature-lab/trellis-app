@@ -2,6 +2,7 @@
   <v-flex xs12>
     <TrellisLoadingCircle v-if="isLoading"/>
     <iframe
+      ref="iframe"
       v-show="!isLoading"
       :src="iframeSrc"
       frameborder="0" />
@@ -23,7 +24,8 @@
         global,
         formId: this.$route.params.formId,
         formBuilderUrl: config.formBuilderUrl,
-        isLoading: true
+        isLoading: true,
+        intervalId: null
       }
     },
     beforeRouteUpdate (to: Route, from: Route, next) {
@@ -34,6 +36,18 @@
       setTimeout(() => {
         this.isLoading = false
       }, 1000)
+    },
+    mounted () {
+      this.intervalId = setInterval(this.resizeIframe, 500)
+    },
+    beforeDestroy () {
+      clearInterval(this.intervalId)
+    },
+    methods: {
+      resizeIframe () {
+        const height = this.$refs.iframe.contentWindow.document.body.scrollHeight + 'px'
+        this.$refs.iframe.height = height
+      }
     },
     computed: {
       iframeSrc (): string {
@@ -49,9 +63,7 @@
 </script>
 
 <style lang="sass" scoped>
-  div
-    height: 100%
   iframe
-    height: 99%
+    min-height: 99%
     width: 100%
 </style>

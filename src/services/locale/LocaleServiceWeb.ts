@@ -26,7 +26,7 @@ class LocaleServiceWeb extends LocaleServiceAbstract {
   }
 
   async removeStudyLocale (studyId: string, locale: Locale): Promise<void> {
-    const res = await adminInst.delete(uriTemplate('/study/{study}/locale/{locale}', [studyId, locale.id]))
+    const res = await adminInst.delete(uriTemplate('/study/{study}/locales/{locale}', [studyId, locale.id]))
     if (res.status > 205) {
       throw new Error('Unable to remove study locale')
     }

@@ -1,18 +1,19 @@
 <template>
-  <v-card class="ma-1">
-    <v-layout
-      column
+  <v-container class="ma-1">
+    <v-col
       :id="'form-' + form.id"
       :class="{'open': isOpen}">
-      <v-layout
-        row>
+      <v-row>
         <v-flex class="centered icon-container clickable" @click.once="tryCreatingSurvey">
           <v-tooltip
             right
             v-if="form.isComplete">
-            <v-icon
-              slot="activator"
-              color="green darken-2">check_circle</v-icon>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                v-on="on"
+                v-bind="attrs"
+                color="green darken-2">mdi-check-circle</v-icon>
+            </template>
             <span>
               {{ $t('completed') }}
             </span>
@@ -20,9 +21,12 @@
           <v-tooltip
             right
             v-else-if="form.isStarted">
-            <v-icon
-              slot="activator"
-              color="orange darken-2">query_builder</v-icon>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                v-on="on"
+                v-bind="attrs"
+                color="orange darken-2">mdi-clock-outline</v-icon>
+            </template>
             <span>
               {{ $t('in_progress') }}
             </span>
@@ -30,9 +34,13 @@
           <v-tooltip
             right
             v-else>
-            <v-icon slot="activator">
-              play_circle_outline
-            </v-icon>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                v-on="on"
+                v-bind="attrs">
+                mdi-play-circle-outline
+              </v-icon>
+            </template>
             <span>
               {{ $t('not_started') }}
             </span>
@@ -51,14 +59,13 @@
             :disabled="!form.surveys.length"
             icon
             @click="isOpen = !isOpen">
-            <v-icon v-if="!isOpen">keyboard_arrow_down</v-icon>
-            <v-icon v-else>keyboard_arrow_up</v-icon>
+            <v-icon v-if="!isOpen">mdi-arrow-down</v-icon>
+            <v-icon v-else>mdi-arrow-up</v-icon>
           </v-btn>
         </v-flex>
-      </v-layout>
-      <v-layout
-        column
-        class="ml-5"
+      </v-row>
+      <v-row
+        class="ml-12"
         v-if="isOpen">
         <v-flex>
           <table class="table">
@@ -109,9 +116,9 @@
             </tbody>
           </table>
         </v-flex>
-      </v-layout>
-    </v-layout>
-  </v-card>
+      </v-row>
+    </v-col>
+  </v-container>
 </template>
 
 <script>

@@ -1,9 +1,9 @@
 <template>
   <v-card class="geo-search h100" :class="{'cart-spacing': selectedGeos.length}">
-    <v-layout column class="h100">
+    <v-col class="h100">
       <div class="search-header">
         <v-container fluid class="pb-0">
-          <v-layout row>
+          <v-row>
             <v-text-field
               xs11
               v-model="query"
@@ -11,15 +11,15 @@
               :loading="isSearching"
               @input="queryChange">
             </v-text-field>
-          </v-layout>
-          <v-layout class="geo-breadcrumbs">
+          </v-row>
+          <v-col class="geo-breadcrumbs">
             <span
               v-for="geo in ancestors"
               v-if="geo"
               class="geo-name">
               {{ translate(geo) }}
             </span>
-          </v-layout>
+          </v-col>
           <v-alert v-show="error" color="error">
             {{ error }}
           </v-alert>
@@ -29,14 +29,15 @@
             @done="onDone"
             @remove="removeGeo"
             :items="selectedGeos">
-            <template slot-scope="props">
+            <template #default="props">
               <v-chip
-                outline
+                outlined
                 close
+                close-icon="mdi-close"
                 color="primary"
-                @input="removeGeo(props.item)">
+                @click:close="removeGeo(props.item)">
                 <v-avatar>
-                  <v-icon>home</v-icon>
+                  <v-icon>mdi-home</v-icon>
                 </v-avatar>
                 {{translate(props.item)}}
               </v-chip>
@@ -47,15 +48,15 @@
             v-ripple
             v-if="lastParentIds.length > 1"
             @click="moveUpOneLevel">
-            <v-layout row>
+            <v-row>
               <v-flex xs1>
-                <v-icon>arrow_upward</v-icon>
+                <v-icon>mdi-arrow-up</v-icon>
               </v-flex>
               <v-spacer></v-spacer>
               <v-flex xs1 class="text-lg-right">
-                <v-icon>arrow_upward</v-icon>
+                <v-icon>mdi-arrow-up</v-icon>
               </v-flex>
-            </v-layout>
+            </v-row>
           </v-container>
         </v-container>
       </div>
@@ -75,19 +76,19 @@
             :geo="geo">
           </geo-list-tile>
           <v-divider></v-divider>
-          <v-list-tile v-if="results.length === defaultSearchResultsLimit">
-            <v-list-tile-content>
-              <v-list-tile-title>
+          <v-list-item v-if="results.length === defaultSearchResultsLimit">
+            <v-list-item-content>
+              <v-list-item-title>
                 {{ $t('displaying_first_results',[defaultSearchResultsLimit]) }}
-              </v-list-tile-title>
-              <v-list-tile-sub-title>
+              </v-list-item-title>
+              <v-list-item-sub-title>
                 {{ $t('use_search_field_results') }}
-              </v-list-tile-sub-title>
-            </v-list-tile-content>
-          </v-list-tile>
+              </v-list-item-sub-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </div>
-    </v-layout>
+    </v-col>
   </v-card>
 </template>
 

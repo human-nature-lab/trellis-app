@@ -20,7 +20,7 @@
 
 <script>
   import LoginService from '../services/login'
-  import LoginForm from '../components/LoginForm'
+  import LoginForm from '../components/login/LoginForm'
   import { routeQueue } from '../router'
 
   export default {

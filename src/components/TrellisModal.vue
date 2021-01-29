@@ -1,11 +1,10 @@
 <template>
     <v-dialog
-      lazy
       :value="value"
       @input="$emit('input', $event)">
       <ModalTitle
         :title="title"
-        @close="$emit('input', false)" />
+        @close="onClose" />
       <v-card>
         <v-container>
           <slot />
@@ -22,6 +21,12 @@
     props: {
       value: Boolean,
       title: String
+    },
+    methods: {
+      onClose () {
+        this.$emit('close')
+        this.$emit('input', false)
+      }
     }
   }
 </script>

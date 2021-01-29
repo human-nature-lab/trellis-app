@@ -6,44 +6,49 @@
       </v-toolbar-title>
       <v-spacer />
       <Permission :requires="TrellisPermission.ADD_RESPONDENT_NAME">
-        <v-tooltip lazy left>
-          <v-btn
-            slot="activator"
-            icon
-            @click="isAdding = true">
-            <v-icon>add</v-icon>
-          </v-btn>
+        <v-tooltip left>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              icon
+              @click="isAdding = true">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
           <span>{{$t('add_respondent_name')}}</span>
         </v-tooltip>
       </Permission>
     </v-toolbar>
     <v-data-table
-      class="mb-3"
+      class="mb-4"
       :headers="nameHeaders"
       :items="respondent.names"
-      hide-actions>
-      <template slot="items" slot-scope="props">
-        <td>{{props.item.name}}</td>
-        <td>
-          <v-icon v-if="props.item.isDisplayName">check</v-icon>
-        </td>
-        <td>
-          <Permission :requires="TrellisPermission.EDIT_RESPONDENT_NAME">
-            <v-btn
-              icon
-              @click="currentName = props.item; isEditing = true">
-              <v-icon>edit</v-icon>
-            </v-btn>
-          </Permission>
-          <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_NAME">
-            <v-btn
-              icon
-              @click="removeName(props.item.id)">
-              <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
-              <v-icon v-else>delete</v-icon>
-            </v-btn>
-          </Permission>
-        </td>
+      hide-default-footer>
+      <template v-slot:item="props">
+        <tr>
+          <td>{{props.item.name}}</td>
+          <td>
+            <v-icon v-if="props.item.isDisplayName">mdi-check</v-icon>
+          </td>
+          <td>
+            <Permission :requires="TrellisPermission.EDIT_RESPONDENT_NAME">
+              <v-btn
+                icon
+                @click="currentName = props.item; isEditing = true">
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </Permission>
+            <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_NAME">
+              <v-btn
+                icon
+                @click="removeName(props.item.id)">
+                <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
+                <v-icon v-else>mdi-delete</v-icon>
+              </v-btn>
+            </Permission>
+          </td>
+        </tr>
       </template>
     </v-data-table>
     <RespondentNameForm

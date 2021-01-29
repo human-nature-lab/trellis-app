@@ -5,7 +5,7 @@
     </div>
     <v-chip
       :close="!edge.isLoading && !isQuestionDisabled"
-      @input="remove(edge.id)"
+      @click:close="remove(edge.id)"
       :id="edge.id"
       :key="edge.id"
       v-for="edge in edges">
@@ -34,7 +34,6 @@
       {{ $t('no_one') }}
     </v-btn>
     <v-dialog
-      lazy
       v-model="respondentSearchDialog">
       <ModalTitle
         :title="$t('respondent_search')"

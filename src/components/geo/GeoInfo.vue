@@ -1,27 +1,27 @@
 <template>
   <v-flex xs12>
     <v-card>
-      <v-toolbar card prominent>
+      <v-toolbar flat>
         <v-toolbar-title>
           <AsyncTranslationText :translation="geo.nameTranslation"/>
         </v-toolbar-title>
         <v-spacer />
         <Permission :requires="TrellisPermission.EDIT_GEO">
           <v-btn icon small @click="showEditName = true">
-            <v-icon>edit</v-icon>
+            <v-icon>mdi-pencil</v-icon>
           </v-btn>
         </Permission>
         <v-btn
           @click.stop="showGeoMap"
           icon>
-          <v-icon>map</v-icon>
+          <v-icon>mdi-map</v-icon>
         </v-btn>
         <v-btn @click="viewRespondents">
           {{ $t('respondents') }}
         </v-btn>
       </v-toolbar>
       <v-container>
-        <v-layout wrap class="mb-3">
+        <v-layout wrap class="mb-4">
           <v-flex>
             <span class="subheading button-min-height">
               {{ $t('location') }}: <GeoBreadcrumbs v-if="geo.id" :geoId="geo.id"></GeoBreadcrumbs>
@@ -37,7 +37,7 @@
                   icon
                   small
                   @click="showGeoTypeDialog = true">
-                  <v-icon>edit</v-icon>
+                  <v-icon>mdi-pencil</v-icon>
                 </v-btn>
               </Permission>
             </span>
