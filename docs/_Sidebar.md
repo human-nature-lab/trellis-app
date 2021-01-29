@@ -35,6 +35,7 @@
 #### Reports
 - [Introduction](reports/Introduction.md)
 - [Importing](reports/Importing.md)
+- [Custom reports](reports/CustomReports.md)
 - [Survey reports](reports/SurveyReports.md)
 - [Respondent reports](reports/RespondentReport.md)
 - [Location reports](reports/LocationReport.md)
