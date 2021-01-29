@@ -18,7 +18,7 @@
   import FileService from '../../../../services/file/FileService'
   import DatabaseService from '../../../../services/database/DatabaseService'
   import DeviceService from '../../../../services/device/DeviceService'
-  import { makeBasicAuthHeader } from '../../../../services/util'
+import { getSyncAuthentication } from '../../../../services/http/AxiosInstance'
 
   export default {
     name: 'upload-snapshot',
@@ -47,14 +47,6 @@
         type: String,
         required: true
       },
-      username: {
-        type: String,
-        required: true
-      },
-      password: {
-        type: String,
-        required: true
-      }
     },
     methods: {
       async doWork () {
@@ -63,9 +55,10 @@
         console.log('md5hash', this.md5hash)
         const deviceId = await DeviceService.getUUID()
         const apiRoot = await DatabaseService.getServerIPAddress()
+        const syncAuth = await getSyncAuthentication()
         const uri = apiRoot + `/sync/device/${deviceId}/upload`
         try {
-          await FileService.upload(uri, this.fileEntry, this.onUploadProgress, makeBasicAuthHeader(this.username, this.password))
+          await FileService.upload(uri, this.fileEntry, this.onUploadProgress, syncAuth)
           this.working = false
           this.success = true
           this.$emit('upload-snapshot-done')

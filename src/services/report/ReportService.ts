@@ -12,6 +12,11 @@ export enum StudyReportType {
 }
 
 class ReportService {
+  
+  async getAvailableReports (): Promise<any[]> {
+    const res = await adminInst.get(`reports/available`)
+    return res.data
+  }
 
   /**
    * Get all of the latest reports from a study

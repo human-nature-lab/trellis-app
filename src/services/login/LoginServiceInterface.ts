@@ -1,4 +1,12 @@
 export default interface LoginServiceInterface {
+  
+  
+  /**
+   * Request login credentials to the application
+   * @returns {Promise<{ password: string, username: string}>}
+   * @memberof LoginServiceInterface
+   */
+  requestLogin (): Promise<{ password: string, username: string}>
 
   /**
    * Login to the web app

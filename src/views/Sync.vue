@@ -7,7 +7,6 @@
             <v-flex class="xs12">
               <sync-status
                 v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
-                @login="isLoggingIn = true"
                 :local-latest-snapshot="localLatestSnapshot"
                 :updated-records-count="updatedRecordsCount">
               </sync-status>
@@ -64,11 +63,7 @@
         </v-container>
       </v-flex>
     </v-layout>
-    <TrellisModal
-      v-model="isLoggingIn"
-      :title="$t('login')">
-      <LoginForm @login="setSyncCredentials"/>
-    </TrellisModal>
+    <LoginModal />
   </v-container>
 </template>
 
@@ -82,7 +77,7 @@
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import DocsFiles from '../components/documentation/DocsFiles'
   import TrellisModal from '../components/TrellisModal'
-  import LoginForm from '../components/LoginForm'
+  import LoginModal from '../components/login/LoginModal'
   import { resetSyncCredentials, setSyncCredentials } from '../services/http/AxiosInstance'
 
   export default {
@@ -93,7 +88,7 @@
       Upload,
       SyncStatus,
       TrellisModal,
-      LoginForm
+      LoginModal,
     },
     mixins: [DocsLinkMixin(DocsFiles.sync.introduction)],
     data () {
@@ -109,10 +104,6 @@
         serverLatestSnapshot: null,
         localLatestSnapshot: null,
         updatedRecordsCount: null,
-        hasSetSyncCredentials: false,
-        isLoggingIn: false,
-        username: null,
-        password: null
       }
     },
     created () {
@@ -121,7 +112,6 @@
     props: {},
     methods: {
       async initComponent () {
-        await this.resetSyncCredentials()
         this.loading = true
         try {
           this.serverIPAddress = await DatabaseService.getServerIPAddress()
@@ -135,48 +125,19 @@
       async onServerIPConfigDone () {
         this.serverIPAddress = await DatabaseService.getServerIPAddress()
       },
-      async setSyncCredentials (username, password) {
-        this.username = username
-        this.password = password
-        setSyncCredentials(username, password)
-        this.hasSetSyncCredentials = true
-        this.isLoggingIn = false
-      },
-      async resetSyncCredentials () {
-        await resetSyncCredentials()
-        this.username = null
-        this.password = null
-        this.hasSetSyncCredentials = false
-      },
       onDownload () {
-        if (!this.hasSetSyncCredentials) {
-          this.isLoggingIn = true
-          return
-        }
         this.downloadStep = 1
         this.downloading = true
       },
       onUpload () {
-        if (!this.hasSetSyncCredentials) {
-          this.isLoggingIn = true
-          return
-        }
         this.uploadStep = 1
         this.uploading = true
       },
       onUploadPhotos () {
-        if (!this.hasSetSyncCredentials) {
-          this.isLoggingIn = true
-          return
-        }
         this.uploadStep = 3
         this.uploadingPhotos = true
       },
       onDownloadPhotos () {
-        if (!this.hasSetSyncCredentials) {
-          this.isLoggingIn = true
-          return
-        }
         this.downloadStep = 4
         this.downloadingPhotos = true
       },

@@ -7,8 +7,6 @@
             <v-flex class="headline">
               {{ $t('sync_status') }}
             </v-flex>
-            <v-spacer />
-            <v-btn @click="$emit('login')">{{$t('login')}}</v-btn>
           </v-layout>
         </v-card-title>
         <v-card-text>
