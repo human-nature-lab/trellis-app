@@ -193,7 +193,6 @@ module.exports = {
   },
   devServer: {
     hot: true,
-    compress: true,
     port: process.env.PORT || config.dev.port,
     host: process.env.HOST || config.dev.host || '0.0.0.0'
   },
