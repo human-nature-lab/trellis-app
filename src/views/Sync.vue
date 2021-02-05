@@ -30,7 +30,7 @@
         <v-row
           v-if="!needsServerConfig"
           class="sync-footer">
-          <v-flex class="xs6 text-xs-left">
+          <v-col cols="auto">
             <v-btn :disabled="!enableUpload"
                     :loading="uploading"
                     @click="onUpload">
@@ -42,8 +42,9 @@
               <v-icon>mdi-collections</v-icon>
               <v-icon>mdi-arrow-up</v-icon>
             </v-btn>
-          </v-flex>
-          <v-flex class="xs6 text-xs-right">
+          </v-col>
+          <v-spacer />
+          <v-col cols="auto">
             <v-btn @click="onDownload"
                     :loading="downloading"
                     :disabled="!enableDownload">
@@ -55,7 +56,7 @@
               <v-icon>mdi-collections</v-icon>
               <v-icon>mdi-arrow-down</v-icon>
             </v-btn>
-          </v-flex>
+          </v-col>
         </v-row>
       </v-container>
     </v-col>
