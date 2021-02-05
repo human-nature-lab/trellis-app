@@ -2,9 +2,9 @@
   <v-card :ripple="!!to" tile :to="to">
     <v-card-text>
       <v-container>
-        <v-layout class="display-1 mb-2">{{title}}</v-layout>
-        <v-layout v-if="component" :is="component"></v-layout>
-        <v-layout v-else row v-for="pair in items" :key="pair.key">
+        <v-row class="display-1 mb-2">{{title}}</v-row>
+        <v-row v-if="component" :is="component"></v-row>
+        <v-row v-else row v-for="pair in items" :key="pair.key">
           <v-flex class="subheading">{{pair.key}}</v-flex>
           <v-spacer />
           <v-flex v-if="pair.component" class="text-sm-right body-2">
@@ -18,7 +18,7 @@
               indeterminate
               :size="16"></v-progress-circular>
           </v-flex>
-        </v-layout>
+        </v-row>
       </v-container>
     </v-card-text>
   </v-card>

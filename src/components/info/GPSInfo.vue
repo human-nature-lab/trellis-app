@@ -10,6 +10,7 @@
   import InfoBlock from './InfoBlock.vue'
   import GeoLocationService from '../../services/geolocation'
   import * as moment from 'moment'
+  import { VChip } from 'vuetify/lib'
 
   export default Vue.extend({
     name: "GPSInfo",
@@ -19,7 +20,8 @@
         status: {
           key: this.$t('status'),
           component: {
-            template: '<v-chip label outline :class="classes">{{status}}</v-chip>',
+            template: '<v-chip label outlined :class="classes">{{status}}</v-chip>',
+            components: { VChip },
             // @ts-ignore
             data: () => this.statusData
           }
@@ -31,7 +33,8 @@
         lastUpdate: {
           key: this.$t('last_updated'),
           component: {
-            template: '<v-chip label outline :class="classes">{{label}}</v-chip>',
+            template: '<v-chip label outlined :class="classes">{{label}}</v-chip>',
+            components: { VChip },
             // @ts-ignore
             data: () => this.updateData
           }
