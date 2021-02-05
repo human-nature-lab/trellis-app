@@ -49,7 +49,7 @@ A simplified Docker configuration for development is in progress. Contact us if 
 #### Initial setup
 This step is similar to the configuration required to create a release.
 1. Add `config.js` file in `static/`. Look at `static/config.default.js` for template. The `apiRoot` should point to your development API server.
-1. Add `config-xml.dev.js` file in `config/`. The template is `config/config-xml.default.js`. Point the `CONTENT_SOURCE` to your Webpack development server and add `DEV: true`.
+1. Add `config-xml.dev.js` file in `config/`. The template is `config/config-xml.dev.default.js`. Point the `CONTENT_SOURCE` to your Webpack development server.
 
 #### Android
 1. Start the Webpack development server with `npm start`
