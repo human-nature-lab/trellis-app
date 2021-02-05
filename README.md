@@ -7,7 +7,7 @@
 
 ### Configuration
 1. `npm install`
-1. [Install Cordova][2]
+1. [Install Cordova][2] (`npm i -g cordova@8.1.2`)
 1. Add `config.js` file in `static/`. Look at `static/config.default.js` for template.
 1. Create a `config-xml.prod.js` file in `config/`. The template is `config/config-xml.default.js`.
 1. **Optional**: Configure Sentry by adding a `.sentryclirc`file and logging in with `sentry-cli login`. See [Sentry docs][1] for more info.
