@@ -28,7 +28,7 @@ jobs:
         # uses: oxr463/setup-cordova@cfd9f1c03c813dddb8a934257f159147bb15bcd4
         uses: oxr463/setup-cordova@0.0.2
         with:
-          exec: cordova -v
+          exec: cordova platform add android
 
       # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
       - uses: c-hive/gha-npm-cache@v1

@@ -46,7 +46,12 @@ const sourceMap = true
 const useSentry = isProd && fs.existsSync('.sentryclirc')
 console.log('building', isProd ? 'prod' : 'dev', useSentry ? 'with sentry' : 'without sentry')
 
-const cssLoaders = [isProd ? MiniCssExtractPlugin.loader : {
+const cssLoaders = [isProd ? {
+  loader: MiniCssExtractPlugin.loader,
+  options: {
+    esModule: false
+  }
+} : {
   loader: 'vue-style-loader',
   options: {
     sourceMap
@@ -123,6 +128,9 @@ const devtool = sourceMap && (isProd ? 'hidden-source-map' : 'eval')
 module.exports = {
   target: 'web',
   mode: isProd ? 'production' : 'development',
+  stats: {
+    children: !isProd
+  },
   entry: {
     app: ['./src/main.ts']
   },
