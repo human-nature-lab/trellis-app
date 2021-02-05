@@ -9,6 +9,7 @@
     "build:android": "cross-env NODE_ENV=production APP_ENV=ANDROID npm run mobile && cordova run android",
     "release:android": "cross-env NODE_ENV=production APP_ENV=ANDROID npm run mobile && cordova run android --release",
     "build:dev:web": "npm run web",
+    "cordova": "cordova",
     "build:web": "cross-env NODE_ENV=\"production\" npm run web",
     "web": "webpack --config=build/webpack.web.conf.js",
     "mobile": "webpack --config=build/webpack.mobile.conf.js",
