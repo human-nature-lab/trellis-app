@@ -28,7 +28,7 @@ jobs:
         # uses: oxr463/setup-cordova@cfd9f1c03c813dddb8a934257f159147bb15bcd4
         uses: oxr463/setup-cordova@0.0.2
         with:
-          exec: cordova platform add android
+          exec: cordova -v
 
       # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
       - uses: c-hive/gha-npm-cache@v1
@@ -37,19 +37,21 @@ jobs:
 
       - name: Copy config file
         run: cp static/config.default.js static/config.js
-
-      - name: Build debug APK
-        id: debug_apk
-        run: |
-          npm run build:android
-          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
-          
           
       - name: Build web bundle
         id: web_bundle
         run: |
           npm run build:web
           zip -r trellis-web.zip www/
+
+      - name: Add android platform
+        run: cordova platform add android
+      
+      - name: Build debug APK
+        id: debug_apk
+        run: |
+          npm run build:android
+          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
       - name: Create Release
         id: create_release
