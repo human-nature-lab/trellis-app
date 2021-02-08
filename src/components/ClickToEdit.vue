@@ -1,23 +1,22 @@
 <template>
-  <v-flex :class="{ disabled: disabled }">
-    <v-text-field
-      ref="textField"
-      :disabled="disabled"
-      :readonly="!internal.editing"
-      :dense="dense"
-      :solo="solo"
-      :label="label"
-      :loading="loading"
-      hide-details
-      :flat="!internal.editing"
-      :append-icon="appendIcon"
-      :prepend-icon="internal.editing ? 'mdi-clear' : ''"
-      @click:prepend="resetEditorState"
-      @click:append="onClickAppend"
-      v-model="memText"
-      @keyup.enter="save"
-      class="min-text-field" />
-  </v-flex>
+  <v-text-field
+    :full-width="true"
+    ref="textField"
+    :disabled="disabled"
+    :readonly="!internal.editing"
+    :dense="dense"
+    :solo="solo"
+    :label="label"
+    :loading="loading"
+    hide-details
+    :flat="true"
+    :append-icon="appendIcon"
+    :prepend-inner-icon="internal.editing ? 'mdi-close' : ''"
+    @click:prepend-inner="resetEditorState"
+    @click:append="onClickAppend"
+    v-model="memText"
+    @keyup.enter="save"
+    class="min-text-field" />
 </template>
 
 <script lang="ts">
@@ -114,13 +113,11 @@
       startEditing() {
         this.internal.editing = true;
         this.$emit("update:editing", this.internal.editing);
-        // Focus on the input box
-        if (this.autofocus && this.$refs.textField && this.$refs.textField.$el) {
-          const input = this.$refs.textField.$el.querySelector("input");
-          if (input) {
-            input.focus();
-          }
-        }
+        // Focus on the input box, we have to wait for the next tick so
+        // the text field can be no longer readonly in order to focus it.
+        this.$nextTick(() => {
+          this.$refs["textField"].$refs.input.focus();
+        })
       },
     },
   });
@@ -128,7 +125,6 @@
 
 <style lang="sass">
 .min-text-field
-  display: inline-block
   padding-top: 0
   .input-group__details
     display: none
