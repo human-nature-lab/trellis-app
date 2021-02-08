@@ -1,7 +1,7 @@
 <template>
   <tr class="form-list-row">
     <td class="small" v-if="Number(formType) !== formTypes.CENSUS" >
-      <v-icon class="drag-handle">drag_handle</v-icon>
+      <v-icon>mdi-drag-horizontal-variant</v-icon>
     </td>
     <td v-if="Number(formType) !== formTypes.CENSUS">
       <v-text-field
@@ -74,7 +74,6 @@
         :items="censusTypes"
         v-model="studyForm.censusTypeId"
         @change="changeCensusType"
-        box
         hide-details
         label="Census type"
       ></v-select>
