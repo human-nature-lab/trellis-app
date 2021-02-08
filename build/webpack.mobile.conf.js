@@ -12,6 +12,7 @@ function mobileOnly (req, res, next) {
 }
 
 const isProd = process.env.NODE_ENV === 'production'
+console.log('isProd', isProd, process.env.NODE_ENV, process.env.APP_ENV)
 module.exports = webpackMerge(config, {
   devServer: {
     before (app, server, compiler) {
