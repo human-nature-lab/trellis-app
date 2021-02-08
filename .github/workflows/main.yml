@@ -10,6 +10,10 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      debug:
+        description: Should start a Ngrok session if the action fails
+        default: 'false'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -82,12 +86,12 @@ jobs:
           asset_content_type: application/zip
       
       - name: SSH Debug
-        if: ${{ failure() && secrets.NGROK_TOKEN && secrets.NGROK_USER_PASS }}
+        if: ${{ failure() && github.events.inputs.debug == 'true' }}
         run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
         env:
           NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
           USER_PASS: ${{ secrets.NGROK_USER_PASS }}
 
       - name: Keep alive if failure
-        if: ${{ failure() && secrets.NGROK_TOKEN && secrets.NGROK_USER_PASS }}
+        if: ${{ failure() && github.events.inputs.debug == 'true' }}
         run: sleep 1h # Prevent to killing instance after failure
