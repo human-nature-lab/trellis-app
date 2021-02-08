@@ -30,11 +30,11 @@ jobs:
       - name: Copy config file
         run: cp static/config.default.js static/config.js
       
-      # - name: Build web bundle
-      #   id: web_bundle
-      #   run: |
-      #     npm run build:web
-      #     zip -r trellis-web.zip www/
+      - name: Build web bundle
+        id: web_bundle
+        run: |
+          npm run build:web
+          zip -r trellis-web.zip www/
 
       - name: Use coturiv/setup-ionic
         uses: coturiv/setup-ionic@v1
@@ -43,7 +43,6 @@ jobs:
       
       - name: Build debug APK
         run: |
-          mkdir -p www/
           cordova platform add android
           npm run build:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
@@ -70,13 +69,13 @@ jobs:
           asset_name: trellis-debug.apk
           asset_content_type: application/octet-stream
       
-      # - name: Upload web bundle
-      #   id: upload-web-bundle
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-      #     asset_path: ./trellis-web.zip
-      #     asset_name: trellis-web.zip
-      #     asset_content_type: application/zip
+      - name: Upload web bundle
+        id: upload-web-bundle
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./trellis-web.zip
+          asset_name: trellis-web.zip
+          asset_content_type: application/zip
