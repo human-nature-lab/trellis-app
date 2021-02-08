@@ -42,9 +42,9 @@ jobs:
         uses: oxr463/setup-cordova@0.0.2
         with:
           exec: |
-            mkdir -p www/ \
+            mkdir -p www/ && \
             npm run cordova -- platform add android && \
-            npm run build:android \
+            npm run build:android && \
             mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
       - name: Create Release
