@@ -36,15 +36,16 @@ jobs:
           npm run build:web
           zip -r trellis-web.zip www/
 
-      - name: Build debug APK
-        # You may pin to the exact commit or the version.
-        # uses: oxr463/setup-cordova@cfd9f1c03c813dddb8a934257f159147bb15bcd4
-        uses: oxr463/setup-cordova@0.0.2
-        with:
-          exec: |
-            npm run cordova -- platform add android && \
-            npm run build:android \
-            mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
+      # - name: Build debug APK
+      #   # You may pin to the exact commit or the version.
+      #   # uses: oxr463/setup-cordova@cfd9f1c03c813dddb8a934257f159147bb15bcd4
+      #   uses: oxr463/setup-cordova@0.0.2
+      #   with:
+      #     exec: |
+      #       mkdir -p www \
+      #       npm run cordova -- platform add android && \
+      #       npm run build:android \
+      #       mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
       - name: Create Release
         id: create_release
@@ -57,16 +58,16 @@ jobs:
           draft: true
           prerelease: false
         
-      - name: Upload debug APK
-        id: upload-debug-apk
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./trellis-debug.apk
-          asset_name: trellis-debug-${{github.ref}}.apk
-          asset_content_type: application/octet-stream
+      # - name: Upload debug APK
+      #   id: upload-debug-apk
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+      #     asset_path: ./trellis-debug.apk
+      #     asset_name: trellis-debug-${{github.ref}}.apk
+      #     asset_content_type: application/octet-stream
       
       - name: Upload web bundle
         id: upload-web-bundle
@@ -78,5 +79,3 @@ jobs:
           asset_path: ./trellis-web.zip
           asset_name: trellis-web-${{github.ref}}.zip
           asset_content_type: application/zip
-      
-
