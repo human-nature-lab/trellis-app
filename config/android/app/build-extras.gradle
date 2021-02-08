@@ -7,6 +7,12 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.2.0'
+    classpath 'com.android.tools.build:gradle:4.1.1'
   }
 }
+
+// android {
+//   defaultConfig {
+//       ndkVersion = "21.3.6528147"   
+//   }
+// }
