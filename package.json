@@ -12,7 +12,8 @@
     "build:web": "cross-env NODE_ENV=\"production\" npm run web",
     "web": "webpack --config=build/webpack.web.conf.js",
     "mobile": "webpack --config=build/webpack.mobile.conf.js",
-    "start": "webpack-dev-server --config=build/webpack.mobile.conf.js"
+    "start": "webpack-dev-server --config=build/webpack.mobile.conf.js",
+    "start:web": "webpack-dev-server --config=build/webpack.web.conf.js"
   },
   "dependencies": {
     "@mdi/font": "^5.9.55",
