@@ -18,11 +18,12 @@
         :readonly="!hasPermission(TrellisPermission.EDIT_STUDY)"
         :loading="!locales.length || isWorking"
         v-model="study.locales"
-        @change="updateLocales"
         item-text="languageName"
         item-value="id"
         return-object
         single-line
+        @input="searchInput=null"
+        :search-input.sync="searchInput"
         :items="locales" />
     </td>
     <td>{{study.defaultLocale.languageName}}</td>
@@ -53,38 +54,37 @@
     },
     data () {
       return {
-        isWorking: false
+        isWorking: false,
+        searchInput: null
       }
     },
-    methods: {
-      updateLocales (newLocales) {
-        if (newLocales.length > this.study.locales.length) {
+    watch: {
+      'study.locales' : function (newVal, oldVal) {
+        if (newVal.length > oldVal.length) {
           // Add
-          this.addStudyLocale(newLocales[newLocales.length - 1])
+          this.addStudyLocale(newVal[newVal.length - 1])
         } else {
           // Remove
-          for (const locale of this.study.locales) {
-            const i = newLocales.findIndex(l => l.id === locale.id)
+          for (const locale of oldVal) {
+            const i = newVal.findIndex(l => l.id === locale.id)
             if (i === -1) {
               return this.removeStudyLocale(locale)
             }
           }
-          this.alert('error', 'Unable to remove locale', {timeout: 0})
         }
-      },
-      compareLocales (one, two): boolean {
-        return one.id === two.id
-      },
+      }
+    },
+    methods: {
       async addStudyLocale (locale: Locale) {
         try {
           this.isWorking = true
           const studyLocale: StudyLocale = await LocaleService.addStudyLocale(this.study.id, locale)
-          this.alert('success', this.$t('resource_updated', [this.study.name]))
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err, 'Unable to add study locale')
           }
         } finally {
+          this.alert('success', this.$t('resource_updated', [this.study.name]))
           this.isWorking = false
         }
       },
@@ -97,6 +97,7 @@
             this.logError(err, 'Unable to remove study locale')
           }
         } finally {
+          this.alert('success', this.$t('resource_updated', [this.study.name]))
           this.isWorking = false
         }
       }
