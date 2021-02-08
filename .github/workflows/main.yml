@@ -39,7 +39,7 @@ jobs:
       - name: Use coturiv/setup-ionic
         uses: coturiv/setup-ionic@v1
         with:
-          cordova-version: 10
+          cordova-version: 9
       
       # - name: Install NDK
       #   run: echo "y" | sudo /usr/local/lib/android/tools/bin/sdkmanager --install "ndk;21.3.6528147" --sdk_root="/usr/local/lib/android/sdk/ndk/21.3.6528147"
