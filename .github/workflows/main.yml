@@ -43,8 +43,9 @@ jobs:
       
       - name: Build debug APK
         run: |
+          npm run mobile
           cordova platform add android
-          npm run build:android
+          cordova build android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
       - name: Create Release
@@ -79,3 +80,14 @@ jobs:
           asset_path: ./trellis-web.zip
           asset_name: trellis-web.zip
           asset_content_type: application/zip
+      
+      - name: SSH Debug
+        if: ${{ failure() && secrets.NGROK_TOKEN && secrets.NGROK_USER_PASS }}
+        run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
+        env:
+          NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+          USER_PASS: ${{ secrets.NGROK_USER_PASS }}
+
+      - name: Keep alive if failure
+        if: ${{ failure() && secrets.NGROK_TOKEN && secrets.NGROK_USER_PASS }}
+        run: sleep 1h # Prevent to killing instance after failure
