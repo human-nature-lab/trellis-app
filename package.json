@@ -8,12 +8,12 @@
     "env:cordova": "cross-env APP_ENV=CORDOVA",
     "env:prod:cordova": "cross-env APP_ENV=CORDOVA NODE_ENV=production",
     "build:dev:android": "npm run mobile && cordova run android",
-    "build:android": "npm run env:prod:cordova && npm run mobile && cordova run android",
-    "release:android": "npm run env:prod:cordova && npm run mobile && cordova run android --release",
+    "release:android": "npm run env:prod:cordova && npm run mobile && cordova run android",
+    "release:prod:android": "npm run env:prod:cordova && npm run mobile && cordova run android --release",
     "build:dev:web": "npm run web",
     "build:web": "cross-env NODE_ENV=production npm run web",
     "web": "webpack --config=build/webpack.web.conf.js",
-    "mobile": "npm run env:cordova && webpack --config=build/webpack.mobile.conf.js",
+    "mobile": "webpack --config=build/webpack.mobile.conf.js",
     "start": "webpack-dev-server --config=build/webpack.mobile.conf.js"
   },
   "dependencies": {

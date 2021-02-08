@@ -43,6 +43,7 @@ jobs:
       
       - name: Build debug APK
         run: |
+          npm run env:prod:cordova
           npm run mobile
           cordova platform add android
           cordova build android
