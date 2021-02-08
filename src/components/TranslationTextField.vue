@@ -1,26 +1,24 @@
 <template>
-  <v-container @click.stop>
-    <v-layout row wrap class="translation-text-container">
-      <ClickToEdit
-        v-model="editingText"
-        :editing="isEditing"
-        :editable="editable"
-        @update:editing="updateState"
-        :disabled="saving"
-        @save="onSave"
-      />
-      <v-select
-        dense
-        hide-details
-        class="small-select"
-        :items="locales"
-        item-text="languageTag"
-        item-value="id"
-        v-model="selectedLocale"
-        :disabled="saving || isEditing"
-      />
-    </v-layout>
-  </v-container>
+  <v-toolbar dense flat outlined @click.stop>
+    <ClickToEdit
+      v-model="editingText"
+      :editing="isEditing"
+      :editable="editable"
+      @update:editing="updateState"
+      :disabled="saving"
+      @save="onSave"
+    />
+    <v-select
+      dense
+      hide-details
+      class="small-select"
+      :items="locales"
+      item-text="languageTag"
+      item-value="id"
+      v-model="selectedLocale"
+      :disabled="saving || isEditing"
+    />
+  </v-toolbar>
 </template>
 
 <script lang="ts">
@@ -187,6 +185,4 @@ $width: 60px
   min-width: $width
 .input-group__details
   display: none
-.translation-text-container
-  border: 1px solid rgba(0,0,0,0.12)
 </style>
