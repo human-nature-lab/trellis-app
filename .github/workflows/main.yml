@@ -35,14 +35,17 @@ jobs:
         run: |
           npm run build:web
           zip -r trellis-web.zip www/
+      
+      # - name: Cache platforms and plugins
+      #   path: |
+      #     platforms
+      #     plugins
+      #   key: ${{ runner.os }}-cordova-9-android-9
 
       - name: Use coturiv/setup-ionic
         uses: coturiv/setup-ionic@v1
         with:
           cordova-version: 9
-      
-      # - name: Install NDK
-      #   run: echo "y" | sudo /usr/local/lib/android/tools/bin/sdkmanager --install "ndk;21.3.6528147" --sdk_root="/usr/local/lib/android/sdk/ndk/21.3.6528147"
       
       - name: Build debug APK
         run: |
