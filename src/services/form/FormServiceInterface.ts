@@ -61,4 +61,10 @@ export default interface FormServiceInterface {
    */
   deleteForm (studyId: string, formId: string): PromiseLike<any>
 
+  /**
+   * Takes an array of study forms and updates their sort order
+   * @param studyId
+   * @param studyForms
+   */
+  reorderForms (studyId: string, studyForms: StudyForm[]): PromiseLike<StudyForm[]>
 }
