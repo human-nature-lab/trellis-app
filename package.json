@@ -1,6 +1,10 @@
 {
   "name": "trellis",
   "version": "3.1.6",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/human-nature-lab/trellis-app"
+  },
   "description": "The form view component of the Trellis platform.",
   "author": "wyattis <wyatt.israel@yale.edu>, disperse <mark.mcknight@yale.edu>",
   "private": true,
