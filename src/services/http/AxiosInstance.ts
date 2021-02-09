@@ -130,7 +130,7 @@ export async function resetSyncCredentials () {
 }
 
 export async function getSyncAuthentication () {
-  return syncAuthHeader
+  return syncAuthHeader.get()
 }
 
 export const adminInst = axios.create({
