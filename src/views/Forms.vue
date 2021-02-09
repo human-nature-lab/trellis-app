@@ -4,7 +4,7 @@
       <v-progress-linear
         v-if="isLoading"
         indeterminate></v-progress-linear>
-      <v-card v-for="formType in numericFormTypes" :key="formType">
+      <v-card class="mt-4" v-for="formType in numericFormTypes" :key="formType">
         <v-toolbar flat>
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer></v-spacer>
@@ -40,19 +40,29 @@
           </permission>
         </v-toolbar>
         <v-data-table
+          :sort-by.sync="sortBy"
           :headers="headers(formType)"
           hide-default-footer
           :items="studyFormsByType[formType]">
           :item-key="form.id"
-          <template v-slot:item="props">
-            <form-list-tile
-              :form="props.item.form"
-              :study-form="props.item"
-              :form-type="formType"
-              v-model="props.item.showHidden"
-              @save="updateForm"
-              @updateStudyForm="updateStudyForm"
-              @delete="deleteForm(props.item)"></form-list-tile>
+          <template v-slot:body="props">
+            <draggable
+              handle=".drag-handle"
+              :list="props.items"
+              @end="reorderForms"
+              tag="tbody">
+              <form-list-tile
+                v-for="item in props.items"
+                :key="item.id"
+                :form="item.form"
+                :study-form="item"
+                :form-type="formType"
+                v-model="item.showHidden"
+                @save="updateForm"
+                @updateStudyForm="updateStudyForm"
+                @delete="deleteForm(props.item)">
+              </form-list-tile>
+            </draggable>
             <!--tr v-if="props.item.showHidden">
               <td colspan="4">
                 <form-skips :form="props.item.form"></form-skips>
@@ -84,31 +94,31 @@
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import FormImport from '../components/import/FormImport'
   import groupBy from 'lodash/groupBy'
-  import Sortable from 'sortablejs'
+  import draggable from 'vuedraggable'
 
   export default Vue.extend({
     name: 'Forms',
     mixins: [DocsLinkMixin(DocsFiles.getting_started.create_form)],
-    components: {FormListTile, TrellisModal, FormSkips, Permission, FormImport},
+    components: {FormListTile, TrellisModal, FormSkips, Permission, FormImport, draggable},
     created() {
       this.loadForms()
-    },
-    mounted() {
-      this.initSortable()
     },
     data() {
       return {
         formTypes,
         global: global as Singleton,
         studyForms: null,
-        studyFormsByType: {},
         isAddingNewForm: false,
         isLoading: false,
         showImportForm: false,
-        importFormType: formTypes.CENSUS
+        importFormType: formTypes.CENSUS,
+        sortBy: 'sortOrder'
       }
     },
     computed: {
+      studyFormsByType() {
+        return groupBy(this.studyForms, 'formTypeId')
+      },
       numericFormTypes: function () {
         let formTypeKeys = Object.keys(formTypes).filter(formType => {
           return (!isNaN(Number(formType)));
@@ -157,21 +167,6 @@
           return h
         });
       },
-      initSortable() {
-        Object.keys(formTypes).forEach((formType) => {
-          let table = document.querySelector('#form-table-' + formType + ' tbody')
-          if (table instanceof HTMLElement && Number(formType) !== formTypes.CENSUS) {
-            console.log('table', table)
-            Sortable.create(table, {
-              group: 'form-type-' + formType,
-              handle: '.drag-handle',
-              onEnd({newIndex, oldIndex }) {
-                console.log('endDrag', formType, newIndex, oldIndex)
-              }
-            })
-          }
-        })
-      },
       /*
       studyFormsByType(formType) {
         const studyFormsByType = (this.studyForms || []).filter(studyForm => {
@@ -201,6 +196,26 @@
           if (this.isNotAuthError(err)) {
             this.logError(err, this.$t('failed_resource_create', [this.$t('form')]))
           }
+        }
+      },
+      async reorderForms(evt) {
+        let tempStudyForms = this.studyFormsByType[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
+        let shifted = tempStudyForms[evt.oldIndex]
+        tempStudyForms.splice(evt.oldIndex, 1)
+        tempStudyForms.splice(evt.newIndex, 0, shifted)
+        for (let i = 0; i < tempStudyForms.length; i++) {
+          tempStudyForms[i].sortOrder = i + 1
+        }
+        try {
+          const forms = await FormService.reorderForms(this.global.study.id, tempStudyForms)
+          this.studyForms = forms
+          this.sortBy = 'sortOrder'
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [this.$t('forms')]))
+          }
+        } finally {
+          this.alert('success', this.$t('resource_updated', [this.$t('forms')]))
         }
       },
       formImported(importedForm: Form) {
@@ -234,8 +249,6 @@
         this.isLoading = true
         try {
           this.studyForms = await FormService.getAllStudyForms(global.study.id)
-          this.studyFormsByType = groupBy(this.studyForms, 'formTypeId')
-          console.log('this.studyFormsByType', this.studyFormsByType)
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err, 'Unable to load forms')
@@ -276,6 +289,4 @@
 <style lang="sass" scoped>
   .small
     column-width: 20px
-  .form-list-move
-    transition: transform 0.5s
 </style>
