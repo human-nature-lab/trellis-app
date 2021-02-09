@@ -30,11 +30,11 @@ jobs:
       - name: Copy config file
         run: cp static/config.default.js static/config.js
       
-      # - name: Build web bundle
-      #   id: web_bundle
-      #   run: |
-      #     npm run build:web
-      #     zip -r trellis-web.zip www/
+      - name: Build web bundle
+        id: web_bundle
+        run: |
+          npm run build:web
+          zip -r trellis-web.zip www/
 
       - name: Use coturiv/setup-ionic
         uses: coturiv/setup-ionic@v1
