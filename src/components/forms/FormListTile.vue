@@ -1,6 +1,6 @@
 <template>
   <tr class="form-list-row">
-    <td class="small" v-if="Number(formType) !== formTypes.CENSUS" >
+    <td class="small drag-handle" v-if="Number(formType) !== formTypes.CENSUS" >
       <v-icon>mdi-drag-horizontal-variant</v-icon>
     </td>
     <td v-if="Number(formType) !== formTypes.CENSUS">
