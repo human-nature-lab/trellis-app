@@ -6,11 +6,11 @@ const repo = package.repository.url
 const argStr = process.argv.join(' ')
 const filename = path.basename(__filename)
 let tagVersion = argStr.split(filename)[1].trim().split(' ')[0]
-tagVersion = tagVersion.replace('refs/heads/actions', '')
+tagVersion = tagVersion.replace('refs/heads/', '').replace('refs/tags/', '')
 const packageVersion = package.version
 console.log('tagVersion', tagVersion, 'packageVersion', packageVersion)
 
-let titleVersion = tagVersion.length ? tagVersion : packageVersion + '-alpha'
+let titleVersion = tagVersion.length ? tagVersion : packageVersion
 let releaseVersion = titleVersion.split('-')[0].replace('v', '')
 const outputLocation = `changelog/${releaseVersion}.md`
 
