@@ -18,7 +18,6 @@ const outputLocation = `changelog/${releaseVersion}.md`
 if (!fs.existsSync(outputLocation)) {
   const n = new Date()
   fs.writeFileSync(outputLocation, `
-# Trellis [${releaseVersion}]
 
 *${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}*
 
@@ -33,7 +32,6 @@ None so far
 ## Bugs
 No known bugs fixed at this time
 
-[${releaseVersion}]: ${repo}/releases/tag/v${releaseVersion}
   `.trim())
 }
 
