@@ -1,16 +1,8 @@
 <template>
   <tr class="form-list-row">
-    <td class="small drag-handle" v-if="Number(formType) !== formTypes.CENSUS" >
-      <v-icon>mdi-drag-horizontal-variant</v-icon>
-    </td>
-    <td v-if="Number(formType) !== formTypes.CENSUS">
-      <v-text-field
-        :value="studyForm.sortOrder"
-        hide-details
-        single-line
-        readonly
-        type="number"
-        @change="changeSortOrder"></v-text-field>
+    <td class="medium drag-handle" v-if="Number(formType) !== formTypes.CENSUS" >
+      <span class="text-button">{{ studyForm.sortOrder }}</span>
+      <span class="ml-2"><v-icon>mdi-drag-horizontal-variant</v-icon></span>
     </td>
     <td class="small">
       <v-menu offset-x v-model="showMenu">
@@ -188,6 +180,8 @@
 <style lang="sass">
 .small
   width: 20px
+.medium
+  width: 80px
 .drag-handle
   cursor: grab
 </style>

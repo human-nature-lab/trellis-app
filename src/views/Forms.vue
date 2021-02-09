@@ -135,8 +135,6 @@
 
         if (formType != formTypes.CENSUS) {
           hdr = hdr.concat([{
-            text: ''
-          }, {
             text: 'Order'
           }])
         }
