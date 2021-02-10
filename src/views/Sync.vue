@@ -11,16 +11,12 @@
             </sync-status>
             <upload
               v-if="uploading || uploadingPhotos"
-              :username="username"
-              :password="password"
               :init-upload-step="uploadStep"
               @upload-done="uploadDone"
               @upload-cancelled="uploadCancelled">
             </upload>
             <download
               v-if="downloading || downloadingPhotos"
-              :password="password"
-              :username="username"
               :init-download-step="downloadStep"
               @download-done="downloadDone"
               @download-cancelled="downloadCancelled">
@@ -60,7 +56,6 @@
         </v-row>
       </v-container>
     </v-col>
-    <LoginModal />
   </v-container>
 </template>
 
@@ -74,8 +69,6 @@
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import DocsFiles from '../components/documentation/DocsFiles'
   import TrellisModal from '../components/TrellisModal'
-  import LoginModal from '../components/login/LoginModal'
-  import { resetSyncCredentials, setSyncCredentials } from '../services/http/AxiosInstance'
 
   export default {
     name: 'sync',
@@ -85,7 +78,6 @@
       Upload,
       SyncStatus,
       TrellisModal,
-      LoginModal,
     },
     mixins: [DocsLinkMixin(DocsFiles.sync.introduction)],
     data () {

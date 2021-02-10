@@ -6,7 +6,7 @@
 ## Releasing
 
 ### Cloud based
-Automatic releases are triggered when a new tag matching `v*` is created. This process takes about 5 minutes and is the simplest way to release everything.
+Automatic releases are triggered when a new tag matching `v*` is created. This process takes about 5 minutes and is the simplest way to release everything. Find the new release under the releases section in Github.
 - `npm version prerelease` OR `npm version minor` OR `npm version major`
 - `git push`
 - `git push --tags`

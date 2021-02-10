@@ -44,9 +44,11 @@
       }
     },
     created () {
+      console.log('LoginModal.created')
       component = this
     },
     destroyed () {
+      console.log('LoginModal.destroyed')
       component = null
     },
     methods: {
