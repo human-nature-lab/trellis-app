@@ -74,9 +74,8 @@
       <v-checkbox v-model="memForm.isPublished" @change="save"></v-checkbox>
     </td>
     <td>
-      <v-btn icon @click="$emit('input', !value)">
-        <v-icon v-if="value">mdi-chevron-up</v-icon>
-        <v-icon v-else>mdi-chevron-down</v-icon>
+      <v-btn icon @click="$emit('toggleFormSkips', studyForm.form)">
+        <v-icon :class="{ 'primary--text': (studyForm.form.skips.length > 0) }">{{ icons.mdiArrowDecision }}</v-icon>
       </v-btn>
     </td>
   </tr>
@@ -97,6 +96,7 @@
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";
   import StudyForm from "../../entities/trellis/StudyForm";
+  import { mdiArrowDecision } from '@mdi/js';
 
   export default Vue.extend({
     name: "form-list-tile",
@@ -108,6 +108,9 @@
     },
     data() {
       return {
+        icons: {
+          mdiArrowDecision
+        },
         isBusy: false,
         formTypes,
         showMenu: false,

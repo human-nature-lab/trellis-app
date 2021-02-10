@@ -1,64 +1,62 @@
 <template>
-  <v-row wrap class="align-center">
-    <v-col cols="11">
-      <v-row wrap class="align-center">
-        <v-col cols="12" md="2">
-          <v-select
-            dense
-            solo
-            single-line
-            hide-details
-            :disabled="disabled"
-            v-model="memSkip.showHide"
-            :items="skipTypes"
-          />
-        </v-col>
-        <v-col cols="12" md="2"> this {{ subject }} if {{ scope }} has </v-col>
-        <v-col cols="12" md="3">
-          <v-select
-            dense
-            solo
-            single-line
-            hide-details
-            :disabled="disabled"
-            v-model="memSkip.anyAll"
-            :items="logicTypes"
-          />
-        </v-col>
-        <v-col cols="12" md="2"> of these conditions: </v-col>
-        <v-col cols="12" md="3">
-          <TrellisLoadingCircle v-if="isLoading" />
-          <v-autocomplete
-            dense
-            deletable-chips
-            chips
-            solo
-            single-line
-            hide-details
-            multiple
-            :disabled="disabled"
-            v-show="!isLoading"
-            :items="existingConditionTagNames"
-            append-icon="mdi-plus"
-            @click:append="showCreateConditionTag"
-            :value="selectedConditionTags"
-            @input="updateConditionTags"
-          />
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col cols="1" class="align-center justify-center h-full">
-      <v-row>
-        <v-btn
-          icon
-          :disabled="isDirty || disabled"
-          @click="remove()"
-          :loading="isDirty"
-        >
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
-      </v-row>
-    </v-col>
+  <div>
+    <v-card dense outlined class="mb-4">
+      <v-container fluid>
+        <v-row dense>
+          <v-col cols="12" lg="1">
+            <v-select
+              dense
+              :disabled="disabled"
+              v-model="memSkip.showHide"
+              :items="skipTypes"
+              style="max-width: 8em"
+              :hint="'the ' + subject"
+              persistent-hint
+            />
+          </v-col>
+          <v-col cols="12" lg="1">
+            <v-select
+              dense
+              :disabled="disabled"
+              v-model="memSkip.anyAll"
+              :items="logicTypes"
+              style="max-width: 8em"
+              :hint="'if ' + scope + ' has'"
+              persistent-hint
+            />
+          </v-col>
+          <v-col cols="12" lg="9">
+            <v-autocomplete
+              dense
+              deletable-chips
+              chips
+              small-chips
+              multiple
+              :loading="isLoading"
+              :disabled="disabled || isLoading"
+              v-show="!isLoading"
+              :items="existingConditionTagNames"
+              append-icon="mdi-plus"
+              @click:append="showCreateConditionTag"
+              :value="selectedConditionTags"
+              @input="updateConditionTags"
+              hint="conditions"
+              persistent-hint
+            />
+          </v-col>
+          <v-col cols="12" lg="1">
+            <v-btn
+              class="align-end"
+              icon
+              :disabled="isDirty || disabled"
+              @click="remove()"
+              :loading="isDirty">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-card>
     <TrellisModal title="New condition tag" v-model="showConditionTag">
       <v-text-field
         label="Condition tag"
@@ -67,7 +65,7 @@
         @click:append="addConditionTag"
       />
     </TrellisModal>
-  </v-row>
+  </div>
 </template>
 
 <script lang="ts">
@@ -142,7 +140,6 @@
       },
       memSkip: {
         handler(newSkip): void {
-          console.log("modified memory copy of skip", newSkip);
           if (
             !CompareService.entitiesAreEqual(newSkip, this.skip) &&
             newSkip.conditionTags.length
@@ -162,7 +159,7 @@
         return this.memSkip.conditionTags.map((sct) => sct.conditionTagName);
       },
       isLoading(): boolean {
-        return Array.isArray(this.conditionTags) && !this.conditionTags.length;
+        return this.conditionTags === null
       },
       existingConditionTagNames(): string[] {
         return this.conditionTags

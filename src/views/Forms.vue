@@ -58,22 +58,21 @@
                 :study-form="item"
                 :form-type="formType"
                 v-model="item.showHidden"
+                @toggleFormSkips="toggleFormSkips"
                 @save="updateForm"
                 @updateStudyForm="updateStudyForm"
                 @delete="deleteForm(props.item)">
               </form-list-tile>
             </draggable>
-            <!--tr v-if="props.item.showHidden">
-              <td colspan="4">
-                <form-skips :form="props.item.form"></form-skips>
-              </td>
-            </tr-->
           </template>
         </v-data-table>
       </v-card>
     </v-flex>
     <v-dialog v-model="showImportForm" @formImported="onFormImported(importedForm)" max-width="50em">
       <form-import :form-type="importFormType"></form-import>
+    </v-dialog>
+    <v-dialog v-model="showFormSkips">
+      <form-skips :form="formSkipsForm"></form-skips>
     </v-dialog>
   </v-container>
 </template>
@@ -112,7 +111,9 @@
         isLoading: false,
         showImportForm: false,
         importFormType: formTypes.CENSUS,
-        sortBy: 'sortOrder'
+        sortBy: 'sortOrder',
+        showFormSkips: false,
+        formSkipsForm: null
       }
     },
     computed: {
@@ -153,9 +154,11 @@
         }
 
         hdr = hdr.concat([{
-          text: 'Published'
+          text: 'Published',
+          align: 'center'
         }, {
-          text: ''
+          text: 'Skip',
+          align: 'center'
         }])
 
         return hdr.map((h, i) => {
@@ -165,23 +168,10 @@
           return h
         });
       },
-      /*
-      studyFormsByType(formType) {
-        const studyFormsByType = (this.studyForms || []).filter(studyForm => {
-          return studyForm.formTypeId == formType
-        }).sort((a, b) => {
-          return a.sortOrder - b.sortOrder
-        })
-        return studyFormsByType
+      toggleFormSkips(form) {
+        this.formSkipsForm = form
+        this.showFormSkips = !this.showFormSkips
       },
-      getStudyFormsByType() {
-        const returnObject = {}
-        for (let formType of this.numericFormTypes) {
-          returnObject[formType] = this.studyFormsByType(formType)
-        }
-        return returnObject
-      },
-       */
       formName(form: Form) {
         return TranslationService.getAny(form.nameTranslation, this.global.locale)
       },

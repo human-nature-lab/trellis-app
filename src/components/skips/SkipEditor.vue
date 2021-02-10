@@ -37,7 +37,7 @@
     components: { SkipRow },
     props: {
       skips: Array as () => Skip[],
-      conditionTags: Array as () => ConditionTag[],
+      conditionTags: Array as () => ConditionTag[] | null,
       subject: {
         type: String,
         required: true,
