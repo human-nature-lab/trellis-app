@@ -23,8 +23,7 @@
   export default Vue.extend({
     props: {
       title: {
-        type: String,
-        required: true
+        type: String
       }
     },
     name: 'ModalTitle'
