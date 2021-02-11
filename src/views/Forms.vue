@@ -72,7 +72,7 @@
       <form-import :form-type="importFormType"></form-import>
     </v-dialog>
     <v-dialog v-model="showFormSkips">
-      <form-skips :form="formSkipsForm"></form-skips>
+      <form-skips :form="formSkipsForm" @dismissFormSkips="showFormSkips=false"></form-skips>
     </v-dialog>
   </v-container>
 </template>
