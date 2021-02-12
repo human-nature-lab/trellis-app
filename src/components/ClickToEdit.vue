@@ -1,5 +1,6 @@
 <template>
   <v-text-field
+    autofocus
     :full-width="true"
     ref="textField"
     :disabled="disabled"
