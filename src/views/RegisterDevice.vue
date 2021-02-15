@@ -21,13 +21,11 @@
         </v-btn>
       </v-flex>
     </v-layout>
-    <LoginModal />
   </v-flex>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
-  import LoginModal from '../components/login/LoginModal.vue'
   import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import Device from '../entities/trellis/Device'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
@@ -37,7 +35,7 @@
   export default Vue.extend({
     name: 'RegisterDevice',
     mixins: [DocsLinkMixin('./devices/RegisterDevice.md')],
-    components: { LoginModal, TrellisLoadingCircle },
+    components: { TrellisLoadingCircle },
     data () {
       return {
         isWorking: false,

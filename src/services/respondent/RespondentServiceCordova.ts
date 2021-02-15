@@ -231,11 +231,8 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
-
+    
     const respondents = await q.getMany()
-
-    // const respondents = []
-    console.log('respondents', respondents)
     removeSoftDeleted(respondents)
     return {
       page: pagination.page,

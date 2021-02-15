@@ -35,17 +35,40 @@ jobs:
         run: |
           npm run build:web
           zip -r trellis-web.zip www/
+      
+      # - name: Cache platforms and plugins
+      #   path: |
+      #     platforms
+      #     plugins
+      #   key: ${{ runner.os }}-cordova-9-android-9
 
       - name: Use coturiv/setup-ionic
         uses: coturiv/setup-ionic@v1
         with:
-          cordova-version: 8
+          cordova-version: 9
       
       - name: Build debug APK
         run: |
+          npx cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile
           cordova platform add android
-          npm run build:android
+          cordova build android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
+      
+      # - name: SSH Debug
+      #   if: ${{ failure() }}
+      #   run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
+      #   env:
+      #     NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+      #     USER_PASS: ${{ secrets.NGROK_USER_PASS }}
+
+      # - name: Keep alive if failure
+      #   if: ${{ failure() }}
+      #   run: sleep 1h # Prevent to killing instance after failure
+      
+      - name: Release content
+        run: node ./make-release-content.js ${{ github.ref }}
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       
       - name: Create Release
         id: create_release
@@ -54,9 +77,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
           tag_name: ${{ github.ref }}
-          release_name: Trellis release ${{ github.ref }}
-          draft: true
-          prerelease: false
+          release_name: ${{ env.RELEASE_TITLE }}
+          body_path: ${{ env.RELEASE_FILE }}
+          draft: ${{ env.IS_PRERELEASE == 'false' }}
+          prerelease: ${{ env.IS_PRERELEASE }}
         
       - name: Upload debug APK
         id: upload-debug-apk

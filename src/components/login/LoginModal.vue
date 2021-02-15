@@ -46,7 +46,7 @@
     created () {
       component = this
     },
-    beforeDestroy () {
+    destroyed () {
       component = null
     },
     methods: {

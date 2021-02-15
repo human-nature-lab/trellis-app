@@ -1,12 +1,12 @@
 <template>
-  <v-flex xs12>
+  <v-col class="full-height">
     <TrellisLoadingCircle v-if="isLoading"/>
     <iframe
       ref="iframe"
       v-show="!isLoading"
       :src="iframeSrc"
       frameborder="0" />
-  </v-flex>
+  </v-col>
 </template>
 
 <script lang="ts">
@@ -66,4 +66,6 @@
   iframe
     min-height: 99%
     width: 100%
+  .full-height
+    height: 100%
 </style>

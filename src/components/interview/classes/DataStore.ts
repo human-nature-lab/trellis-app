@@ -72,15 +72,12 @@ export default class DataStore extends Emitter {
    * Persist any changes to the data here
    */
   public async save (interviewId: string) {
-    console.log('waiting to acquire data mutex')
     this.releaseMutex = await this.mutex.acquire()
-    console.log('acquired data mutex')
     try {
       const newState = this.getState()
       await InterviewService.saveDiff(interviewId, newState, this.previousState)
       this.previousState = newState
     } finally {
-      console.log('releasing data mutex')
       this.releaseMutex()
     }
   }

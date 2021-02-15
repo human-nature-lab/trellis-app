@@ -100,6 +100,7 @@
       <CensusFormChecker />
       <SnackbarQueue />
       <DocsSidebar />
+      <LoginModal />
 
     </v-app>
   </div>
@@ -108,6 +109,7 @@
 <script>
   import MainMenu from './components/main-menu/MainMenu'
   import CensusFormChecker from './components/CensusFormChecker'
+  import LoginModal from './components/login/LoginModal.vue'
   import VDivider from 'vuetify/src/components/VDivider/VDivider'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
@@ -177,7 +179,8 @@
       SnackbarQueue,
       DocsSidebar,
       TrellisLoadingCircular,
-      Banner
+      Banner,
+      LoginModal
     },
     computed: {
       withinCordova () {

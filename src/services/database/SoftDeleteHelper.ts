@@ -9,12 +9,8 @@ export function removeSoftDeleted (obj: any, softDeleteKey: string = 'deletedAt'
   if (obj === null) return
   if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
-      // if (obj[i] && obj[i].constructor && obj[i].constructor.name === 'Question') {
-      //   if (obj[i].questionParameters.length === 2) {
-      //     debugger
-      //   }
-      // }
-      if (obj[i][softDeleteKey] != null) {
+      const deletedVal = obj[i][softDeleteKey]
+      if (deletedVal !== null && deletedVal !== undefined) {
         obj.splice(i, 1)
         i--
       } else {

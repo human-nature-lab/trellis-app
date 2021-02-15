@@ -1,0 +1,18 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    maven {
+      url "https://maven.google.com"
+    }
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:4.1.1'
+  }
+}
+
+// android {
+//   defaultConfig {
+//       ndkVersion = "21.3.6528147"   
+//   }
+// }

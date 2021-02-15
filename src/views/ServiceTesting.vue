@@ -45,36 +45,37 @@
             </v-list>
           </v-menu>
         </v-toolbar>
-        <v-expansion-panel v-model="testSelectorOpen">
-          <v-expansion-panel-content>
-            <div slot="header">Test suites</div>
-            <v-checkbox
-              v-model="modulesToRun"
-              v-for="name in testModules"
-              :key="name"
-              :value="name"
-              :label="name" />
-          </v-expansion-panel-content>
-        </v-expansion-panel>
+        <v-expansion-panels>
+          <v-expansion-panel v-model="testSelectorOpen">
+            <v-expansion-panel-header>Test suites</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-checkbox
+                v-model="modulesToRun"
+                v-for="name in testModules"
+                :key="name"
+                :value="name"
+                :label="name" />
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+
         <v-toolbar flat>
           <v-toolbar-title>Results</v-toolbar-title>
         </v-toolbar>
         <v-card>
-          <v-flex
+          <v-row
+            class="result"
             v-for="test in tests"
-            v-model="test.open"
             :key="test.title">
-            <v-layout row>
-              <v-flex xs>
-                <v-icon v-if="test.state === SUCCESSFUL" color="success">mdi-check_circle</v-icon>
-                <v-icon v-else-if="test.state === FAILED" color="error">mdi-alert-circle</v-icon>
-              </v-flex>
-              <v-layout column>
-                <v-flex>{{test.title}} - {{test.duration}}</v-flex>
-                <v-flex>{{ test.err }}</v-flex>
-              </v-layout>
-            </v-layout>
-          </v-flex>
+            <v-col cols="1" class="px-6 py-8">
+              <v-icon v-if="test.state === SUCCESSFUL" color="success">mdi-check-circle</v-icon>
+              <v-icon v-else-if="test.state === FAILED" color="error">mdi-alert-circle</v-icon>
+            </v-col>
+            <v-col cols="11">
+              <v-col>{{test.title}} - {{test.duration}}ms</v-col>
+              <v-col>{{test.err}}</v-col>
+            </v-col>
+          </v-row>
         </v-card>
         <v-card-actions>
           <v-btn
@@ -104,7 +105,7 @@
   import FileUpload from 'vue-upload-component'
   import Form from '../entities/trellis/Form'
   import { saveAs } from 'file-saver'
-
+  
   let runner
   export default {
     name: 'service-testing',
@@ -207,7 +208,6 @@
       convertForm () {
         if (!this.forms.length) return
         const file = this.forms[0].file
-        console.log(file)
         const reader = new FileReader()
         let content
         reader.onload = function (evt) {
@@ -229,3 +229,8 @@
     },
   }
 </script>
+
+<style lang="sass" scoped>
+  .test-result
+    margin-top: 0 !important
+</style>
