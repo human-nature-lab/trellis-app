@@ -233,11 +233,7 @@ export default class RespondentServiceCordova implements RespondentServiceInterf
     q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
     
     const respondents = await q.getMany()
-
-    // const respondents = []
-    console.log('respondents', JSON.parse(JSON.stringify(respondents)))
     removeSoftDeleted(respondents)
-    console.log('respondents', JSON.parse(JSON.stringify(respondents)))
     return {
       page: pagination.page,
       size: pagination.size,

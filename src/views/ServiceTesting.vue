@@ -106,8 +106,6 @@
   import Form from '../entities/trellis/Form'
   import { saveAs } from 'file-saver'
   
-  console.log('test', testModules)
-
   let runner
   export default {
     name: 'service-testing',
@@ -210,7 +208,6 @@
       convertForm () {
         if (!this.forms.length) return
         const file = this.forms[0].file
-        console.log(file)
         const reader = new FileReader()
         let content
         reader.onload = function (evt) {
