@@ -1,11 +1,10 @@
 <template>
-    <v-dialog
-      v-model="isOpen"
-      persistent>
+    <TrellisModal
+      :title="$t('location')"
+      small
+      :value="isOpen"
+      :persistent="true">
       <v-card>
-        <v-toolbar>
-          <v-toolbar-title>Location</v-toolbar-title>
-        </v-toolbar>
         <v-card-text>
           <v-container fluid text-xs-center>
             <v-layout>
@@ -34,12 +33,12 @@
                     {{$t('position_fail_hint')}}
                   </v-flex>
                 </v-layout>
-                <v-layout>
+                <v-layout class="mt-2">
                   <v-spacer></v-spacer>
                   <v-btn v-if="lastKnownCoordinates" @click="useLastPosition">
                     {{$t('use_last_position')}}
                   </v-btn>
-                  <v-btn @click="skip">
+                  <v-btn @click="skip" class="mr-2">
                     {{$t('skip')}}
                   </v-btn>
                   <v-btn @click="retry">
@@ -93,12 +92,13 @@
           </v-container>
         </v-card-text>
       </v-card>
-    </v-dialog>
+    </TrellisModal>
 </template>
 
 <script>
   import * as moment from 'moment'
   import GeoLocationService from '../services/geolocation/index'
+  import TrellisModal from './TrellisModal'
 
   const PositionError = {
     PERMISSION_DENIED: 1,
@@ -137,6 +137,7 @@
 
   export default {
     name: 'LocationFinder',
+    components: {TrellisModal},
     data () {
       return data
     },
