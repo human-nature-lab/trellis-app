@@ -80,7 +80,7 @@
       },
       async setCanUserAddChild () {
         try {
-          let parentGeo = await GeoService.getGeoById(this.parentGeoId)
+          let parentGeo = (this.parentGeoId) ? await GeoService.getGeoById(this.parentGeoId) : null
           this.canUserAddChild = (parentGeo && parentGeo.hasOwnProperty('geoType')) ? parentGeo.geoType.canUserAddChild : false
         } catch (err) {
           if (this.isNotAuthError(err)) {
