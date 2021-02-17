@@ -1,7 +1,7 @@
 import { Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
-export default class ReportFile extends TimestampedSoftDelete {
+export class ReportFile extends TimestampedSoftDelete {
   @Serializable
   id: string
   @Serializable
@@ -10,4 +10,8 @@ export default class ReportFile extends TimestampedSoftDelete {
   reportId: string
   @Serializable
   fileName: string
+  @Serializable
+  dataType: string
+  @Serializable
+  size: number
 }

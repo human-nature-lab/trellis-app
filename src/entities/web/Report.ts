@@ -1,12 +1,12 @@
 import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import ReportFile from './ReportFile'
+import { ReportFile } from './ReportFile'
 
-export default class Report extends TimestampedSoftDelete {
+export class Report extends TimestampedSoftDelete {
   @Serializable
   id: string
   @Serializable
-  type: string
+  name: string
   @Serializable
   formId?: string
   @Serializable

@@ -1,29 +1,25 @@
 <template>
-  <v-flex>
-    <v-toolbar flat>
+  <v-col>
+    <v-toolbar>
       <v-toolbar-title >
         <DocsLinkBadge to="reports/Importing.md">{{$t('data_import')}}</DocsLinkBadge>
       </v-toolbar-title>
     </v-toolbar>
-    <v-container>
-      <v-layout>
-        <v-flex>
-          <v-layout column>
-            <GeoImport />
-            <GeoPhotoImport />
-            <RespondentGeoImport />
-          </v-layout>
-        </v-flex>
-        <v-flex>
-          <v-layout column align-content-end align-end>
-            <RespondentImport />
-            <RespondentPhotoImport />
-            <RespondentConditionTagImport />
-          </v-layout>
-        </v-flex>
-      </v-layout>
-    </v-container>
-  </v-flex>
+    <v-card>
+      <v-row>
+        <v-col>
+          <GeoImport />
+          <GeoPhotoImport />
+          <RespondentGeoImport />
+        </v-col>
+        <v-col>
+          <RespondentImport />
+          <RespondentPhotoImport />
+          <RespondentConditionTagImport />
+        </v-col>
+      </v-row>
+    </v-card>
+  </v-col>
 </template>
 
 <script lang="ts">
