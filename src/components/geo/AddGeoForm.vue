@@ -1,29 +1,22 @@
 <template>
-  <v-dialog
-    v-model="adding"
-    :persistent="true">
+  <TrellisModal
+    :title="$t('add_location')"
+    :value="adding"
+    :persistent="true"
+    @opened="onOpen"
+    @close="done">
     <v-card>
-      <v-card-title>
-        <h2>{{ $t('add_location') }}</h2>
-        <v-spacer></v-spacer>
-        <v-btn
-          icon
-          text
-          style="top: 0"
-          @click="closeDialog(null)">
-          <v-icon>mdi-clear</v-icon>
-        </v-btn>
-      </v-card-title>
       <v-card-text>
-        <v-stepper v-model="step" vertical>
 
-          <v-stepper-step step="1" :complete="step > 1">{{$t('add_location')}}</v-stepper-step>
+        <v-stepper v-model="step" vertical>
+          <v-stepper-step step="1" :complete="step > 1">{{$t('location_name')}}</v-stepper-step>
           <v-stepper-content step="1">
             <v-card>
               <v-card-text>
                 <translation-text-field
-                  v-if="geo !== null && step === 1"
+                  v-if="step === 1 && this.geo.nameTranslation !== null"
                   :persist="false"
+                  :editing="true"
                   :translation="geo.nameTranslation"
                   @cancelled="closeDialog(null)"
                   @save="onNameSave">
@@ -44,11 +37,10 @@
           <v-stepper-content step="2">
             <v-card>
               <v-card-text>
-                <geo-type-selector
-                  :disable-button="locationTypeSelected"
-                  :show-user-addable="true"
-                  v-on:geo-type-selected="onGeoTypeSelected">
-                </geo-type-selector>
+                <geo-type-select
+                  :showUserAddable="true"
+                  @geoTypeSelected="onGeoTypeSelected">
+                </geo-type-select>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -66,21 +58,22 @@
             <v-card>
               <v-card-title class="subheading">{{ $t('current_position') }}</v-card-title>
               <v-card-text>
-                <v-list dense>
-                  <v-list-item>
-                    <v-list-item-content>{{ $t('latitude') }}</v-list-item-content>
-                    <v-list-item-content class="align-end">{{ latitude }}</v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>{{ $t('longitude') }}</v-list-item-content>
-                    <v-list-item-content class="align-end">{{ longitude }}</v-list-item-content>
-                  </v-list-item>
-                  <v-list-item>
-                    <v-list-item-content>{{ $t('altitude') }}</v-list-item-content>
-                    <v-list-item-content class="align-end">{{ altitude }}</v-list-item-content>
-                  </v-list-item>
-                </v-list>
-                <v-btn @click="getPosition">{{$t('use_current_position')}}</v-btn>
+                <v-text-field
+                  v-model="geo.latitude"
+                  type="number"
+                  :label="$t('latitude')"
+                />
+                <v-text-field
+                  v-model="geo.longitude"
+                  type="number"
+                  :label="$t('longitude')"
+                />
+                <v-text-field
+                  v-model="geo.altitude"
+                  type="number"
+                  :label="$t('altitude')"
+                />
+                <v-btn @click="getPosition" class="mr-2">{{$t('use_current_position')}}</v-btn>
                 <v-btn v-if="this.parentGeoId !== null" @click="useParentPosition">{{$t('use_parent_position')}}</v-btn>
               </v-card-text>
               <v-card-actions>
@@ -96,7 +89,7 @@
 
           <v-stepper-step step="4" :complete="step > 4">{{$t('add_photos')}}</v-stepper-step>
           <v-stepper-content step="4">
-            <v-card v-if="geo">
+            <v-card>
               <v-card-text>
                 <photo-album
                   :title="$t('add_photos')"
@@ -134,7 +127,7 @@
         </v-stepper>
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </TrellisModal>
 </template>
 
 <script>
@@ -144,22 +137,23 @@
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum'
   import TranslationTextField from '../TranslationTextField.vue'
-  import GeoTypeSelector from './GeoTypeSelector.vue'
+  import GeoTypeSelect from './GeoTypeSelect.vue'
   import { routeQueue } from '../../router'
   import { getCurrentPosition } from '../LocationFinder'
-  import isNumber from 'lodash/isNumber'
   import global from '../../static/singleton'
+  import TrellisModal from '../TrellisModal'
 
   export default {
     components: {
       PhotoAlbum,
       TranslationTextField,
-      GeoTypeSelector
+      GeoTypeSelect,
+      TrellisModal
     },
     name: 'add-geo-form',
     props: {
       parentGeoId: {
-        type: String
+        type: String | null
       },
       adding: {
         type: Boolean,
@@ -172,36 +166,39 @@
         addLocationCompleted: false,
         locationTypeSelected: false,
         isSaving: false,
-        geo: null,
+        geo: {
+          id: null,
+          latitude: null,
+          longitude: null,
+          altitude: null,
+          nameTranslation: null,
+          geoType: null,
+          photos: []
+        },
         checkingForCensus: false,
-        isDone: false
-      }
-    },
-    async created () {
-      try {
-        const study = await StudyService.getCurrentStudy()
-        this.geo = GeoService.createNewGeo(this.parentGeoId, study.locales)
-      } catch (err) {
-        if (this.isNotAuthError(err)) {
-          this.logError(err, 'Could not get current study')
-        }
+        isDone: false,
+        loading: false
       }
     },
     computed: {
-      latitude () {
-        return (this.geo && this.geo.hasOwnProperty('latitude') && isNumber(this.geo.latitude)) ? this.geo.latitude : this.$t('none')
-      },
-      longitude () {
-        return (this.geo && this.geo.hasOwnProperty('longitude') && isNumber(this.geo.longitude)) ? this.geo.longitude : this.$t('none')
-      },
-      altitude () {
-        return (this.geo && this.geo.hasOwnProperty('altitude') && isNumber(this.geo.altitude)) ? this.geo.altitude : this.$t('none')
-      },
       positionSet () {
-        return (isNumber(this.latitude) && isNumber(this.longitude))
+        return (!!this.geo.latitude && !!this.geo.longitude)
       }
     },
     methods: {
+      async onOpen () {
+        try {
+          this.loading = true
+          const study = await StudyService.getCurrentStudy()
+          this.geo = GeoService.createNewGeo(this.parentGeoId, study.locales)
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err, 'Could not get current study')
+          }
+        } finally {
+          this.loading = false
+        }
+      },
       nextStep () {
         this.step++
       },
@@ -294,7 +291,7 @@
           routeQueue.push({
             name: 'StartCensusForm',
             params: {
-              studyId: this.studyId,
+              studyId: global.study.id,
               censusTypeId: censusTypes.add_geo
             },
             query: {
