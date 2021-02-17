@@ -4,13 +4,23 @@
       <div class="search-header">
         <v-container fluid class="pb-0">
           <v-row>
-            <v-text-field
-              xs11
-              v-model="query"
-              :placeholder="$t('search')"
-              :loading="isSearching"
-              @input="queryChange">
-            </v-text-field>
+            <v-col cols="10">
+              <v-text-field
+                xs11
+                v-model="query"
+                :placeholder="$t('search')"
+                :loading="isSearching"
+                @input="queryChange">
+              </v-text-field>
+            </v-col>
+            <v-col cols="2">
+              <v-btn
+                color="primary"
+                @click="showAddLocationDialog = true"
+                :disabled="isSearching">
+                {{ $t("add_geo") }}
+              </v-btn>
+            </v-col>
           </v-row>
           <v-col class="geo-breadcrumbs">
             <span
@@ -44,20 +54,6 @@
             </template>
           </Cart>
           <v-divider v-if="showCart"></v-divider>
-          <v-container
-            v-ripple
-            v-if="lastParentIds.length > 1"
-            @click="moveUpOneLevel">
-            <v-row>
-              <v-flex xs1>
-                <v-icon>mdi-arrow-up</v-icon>
-              </v-flex>
-              <v-spacer></v-spacer>
-              <v-flex xs1 class="text-lg-right">
-                <v-icon>mdi-arrow-up</v-icon>
-              </v-flex>
-            </v-row>
-          </v-container>
         </v-container>
       </div>
       <div class="geo-list">
@@ -65,8 +61,19 @@
           <span v-if="isSearching">{{ $t('searching') }}</span>
           <span v-else>{{ $t('no_locations_found') }}</span>
         </v-container>
-        <v-list v-show="results.length">
+        <v-list>
+          <v-list-item @click="moveUpOneLevel" v-if="lastParentIds.length > 1">
+            <v-container>
+              <v-row>
+                <v-col cols="1"><v-icon>mdi-arrow-up</v-icon></v-col>
+                <v-col cols="10" class="text-center">{{ $t('up_one_level') }}</v-col>
+                <v-col cols="1"><v-icon>mdi-arrow-up</v-icon></v-col>
+              </v-row>
+            </v-container>
+          </v-list-item>
+          <v-divider/>
           <geo-list-tile
+            v-if="results.length"
             v-for="geo in orderedResults"
             :isSelectable="geoIsSelectable(geo)"
             :selected="isGeoSelected(geo)"
@@ -89,6 +96,11 @@
         </v-list>
       </div>
     </v-col>
+    <AddGeoForm
+      @close="closeAddLocationDialog"
+      :adding="showAddLocationDialog"
+      :parent-geo-id="parentGeoId"
+    />
   </v-card>
 </template>
 
@@ -101,12 +113,15 @@
   import singleton from '../../static/singleton'
   import { routeQueue } from '../../router'
   import global from '../../static/singleton'
+  import AddGeoForm from './AddGeoForm'
+  import Geo from '../../entities/trellis/Geo'
 
   export default {
     name: 'geo-search',
     components: {
-      GeoListTile,
-      Cart
+      AddGeoForm,
+      Cart,
+      GeoListTile
     },
     props: {
       selectedGeos: {
@@ -155,7 +170,8 @@
         error: null,
         isSearching: false,
         lastParentIds: [],
-        queryChange: debounce(this.search, 300)
+        queryChange: debounce(this.search, 300),
+        showAddLocationDialog: false
       }
     },
     created () {
@@ -166,6 +182,12 @@
       this.search().then(this.loadAncestors)
     },
     computed: {
+      parentGeoId () {
+        if (this.lastParentIds && this.lastParentIds.length && this.lastParentIds[this.lastParentIds.length - 1]) {
+          return this.lastParentIds[this.lastParentIds.length - 1]
+        }
+        return null
+      },
       filters () {
         return Object.assign({}, this.baseFilters, this.userFilters)
       },
@@ -190,6 +212,13 @@
       }
     },
     methods: {
+      closeAddLocationDialog (geo) {
+        this.showAddLocationDialog = false
+        if (geo instanceof Geo) {
+          // Created new Geo, update search
+          this.search()
+        }
+      },
       geoIsSelectable (geo) {
         return typeof this.isSelectable === 'boolean' ? this.isSelectable : this.isSelectable(geo)
       },
