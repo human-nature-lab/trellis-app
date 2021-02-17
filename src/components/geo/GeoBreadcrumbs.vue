@@ -3,7 +3,12 @@
     <span v-if="isLoading">
       Loading...
     </span>
-    <span v-else-if="canNavigate">
+    <span
+      class="geo-name"
+      v-if="!isLoading">
+      Top \
+    </span>
+    <span v-if="!isLoading && canNavigate">
       <router-link
         class="geo-name"
         :to="{name: 'Geo', params: {geoId: geo.id}}"
@@ -12,7 +17,7 @@
         <AsyncTranslationText :translation="geo.nameTranslation" />
       </router-link>
     </span>
-    <span v-else>
+    <span v-if="!isLoading && !canNavigate">
       <span
         class="geo-name"
         v-for="geo in ancestors"

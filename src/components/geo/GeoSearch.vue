@@ -23,6 +23,7 @@
             </v-col>
           </v-row>
           <v-col class="geo-breadcrumbs">
+            <span>Top</span>
             <span
               v-for="geo in ancestors"
               v-if="geo"
