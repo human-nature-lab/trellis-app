@@ -1,48 +1,42 @@
 <template>
   <v-flex xs12>
     <v-card>
-      <v-toolbar flat>
-        <v-toolbar-title>
-          <AsyncTranslationText :translation="geo.nameTranslation"/>
-        </v-toolbar-title>
-        <v-spacer />
-        <Permission :requires="TrellisPermission.EDIT_GEO">
-          <v-btn icon small @click="showEditName = true">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-        </Permission>
-        <v-btn
-          @click.stop="showGeoMap"
-          icon>
-          <v-icon>mdi-map</v-icon>
-        </v-btn>
-        <v-btn @click="viewRespondents">
-          {{ $t('respondents') }}
-        </v-btn>
-      </v-toolbar>
       <v-container>
-        <v-layout wrap class="mb-4">
-          <v-flex>
-            <span class="subheading button-min-height">
-              {{ $t('location') }}: <GeoBreadcrumbs v-if="geo.id" :geoId="geo.id"></GeoBreadcrumbs>
-            </span>
-          </v-flex>
-          <v-spacer />
-          <v-flex class="text-xs-right">
-            <span class="subheading button-min-height">
-              {{ $t('type') }}:
-              {{ geo.geoType.name }}
-              <Permission :requires="TrellisPermission.EDIT_GEO">
-                <v-btn
-                  icon
-                  small
-                  @click="showGeoTypeDialog = true">
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-              </Permission>
-            </span>
-          </v-flex>
-        </v-layout>
+        <v-row>
+          <v-col cols="12" lg="8">
+            <TranslationTextField
+              v-if="hasPermission(TrellisPermission.EDIT_GEO)"
+              :translation="geo.nameTranslation"
+              label="Location name" />
+            <AsyncTranslationText
+              v-else
+              :translation="geo.nameTranslation" />
+          </v-col>
+          <v-col cols="12" lg="2">
+            <v-btn
+              @click.stop="showGeoMap">
+              Show on map
+              <v-icon class="ml-2">mdi-map</v-icon>
+            </v-btn>
+          </v-col>
+          <v-col cols="12" lg="2">
+            <v-btn class="ml-2" @click="viewRespondents">
+              {{ $t('respondents') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" lg="8">
+            {{ $t('hierarchy') }}: <GeoBreadcrumbs v-if="geo.id" :geoId="geo.id"></GeoBreadcrumbs>
+          </v-col>
+          <v-col cols="12" lg="4">
+            <GeoTypeSelect
+              @geoTypeSelected="onGeoTypeSelected"
+              :click-to-edit="hasPermission(TrellisPermission.EDIT_GEO)"
+              :readonly="!hasPermission(TrellisPermission.EDIT_GEO)"
+              :geo-type="geo.geoType" />
+          </v-col>
+        </v-row>
         <v-layout column>
           <PhotoAlbum
             :loading="geoPhotosLoading"
@@ -68,20 +62,6 @@
         </v-layout>
       </v-container>
     </v-card>
-    <TrellisModal
-      v-model="showGeoTypeDialog"
-      :title="$t('edit_geo_type')">
-      <GeoTypeSelector
-        v-on:geo-type-selected="onGeoTypeSelected"
-        :geoType="geo.geoType" />
-    </TrellisModal>
-    <TrellisModal
-      v-model="showEditName"
-      :title="$t('edit_geo_name')">
-      <TranslationTextField
-        :translation="geo.nameTranslation"
-        @save="updateTranslation" />
-    </TrellisModal>
   </v-flex>
 </template>
 
@@ -96,7 +76,7 @@
   // @ts-ignore
   import PhotoAlbum from '../photo/PhotoAlbum'
   // @ts-ignore
-  import GeoTypeSelector from './GeoTypeSelector'
+  import GeoTypeSelect from './GeoTypeSelect'
   // @ts-ignore
   import AsyncTranslationText from '../AsyncTranslationText'
   // @ts-ignore
@@ -125,7 +105,7 @@
       GeoBreadcrumbs,
       PhotoAlbum,
       AsyncTranslationText,
-      GeoTypeSelector,
+      GeoTypeSelect,
       Permission,
       TranslationTextField,
       TrellisModal
@@ -137,8 +117,7 @@
         error: null,
         geoPhotos: [],
         geoPhotosLoading: true,
-        showGeoTypeDialog: false,
-        showEditName: false
+        editingGeoType: false
       }
     },
     methods: {
@@ -199,10 +178,9 @@
         this.geo.geoType = geoType
         try {
           GeoService.updateGeo(this.geo)
+          this.alert('success', this.$t('resource_updated', [this.$t('geo_type')]))
         } catch (err) {
           this.logError(err)
-        } finally {
-          this.showGeoTypeDialog = false
         }
       },
       updateTranslation (newT: Translation) {
