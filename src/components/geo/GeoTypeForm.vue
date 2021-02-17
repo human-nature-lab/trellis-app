@@ -36,6 +36,7 @@
                 {{$t('clear')}}
               </v-btn>
               <v-btn
+                class="ml-2"
                 @click="save"
                 :disabled="isBusy || !isValid">
                 <TrellisLoadingCircle v-if="isBusy" size="30px" />

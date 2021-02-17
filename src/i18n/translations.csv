@@ -436,7 +436,7 @@ respondent_name_instructions,Respondent's full name (with nickname),Nombre compl
 cannot_undo,This action cannot be undone.,Esta accion no puede ser anulada,
 role,Role,Rol,
 studies,Studies,Estudios,
-actions,Actions,Acciones,Things like edit and delete 
+actions,Actions,Acciones,Things like edit and delete
 invalid_password_length,Password must be at least {0} characters,La contraseña debe tener al menos {0} caracteres,
 passwords_dont_match,Passwords do not match,Las contraseñas no son iguales,
 password_updated,Password was updated successfully,La contraseña fue actualizada exitosamente,
@@ -474,8 +474,8 @@ devices,Devices,Dispositivos,
 geo_types,Location types,Tipos de ubicacion,
 resource_creating,Creating new {0},Creando nuevo/a,"New Study, New Locale, New Device, New GeoType"
 geo_type,Location type,Tipo de ubicacion,
-can_user_create,Respondents can create,Participantes pueden crear,
-can_user_add_child,Respondents can add children,Participantes pueden agregar hijos,
+can_user_create,Surveyor can create,Encuestador pueden crear,
+can_user_add_child,Surveyor can add children,Encuestador pueden agregar hijos,
 can_contain_respondent,Can contain respondents,Puede contener participantes,
 demo_alert,This server is for demonstration purposes only! Not for human subjects research.,Este servidor es solo para propositos de demostracion! No es para investigaciones con sujetos humanos,
 test_alert,This server is for testing only! Not for data collection.,Este servidor es solamente para realizar pruebas! No es para recoleccion de datos. ,
@@ -517,4 +517,8 @@ form_has_condition_errors,Form has errors in condition assignment,El formulario 
 condition_assignment_errors,Condition assignment errors,Errores de asignacion de condicion ,
 not_logged_in,Your session has expired.,Su sesion ha terminado,
 import_form,Import form,Importar formulario,
-view_current_documentation,View documentation for this page,,
+view_current_documentation,View documentation for this page,[translation_needed],
+geo_forms,Location Forms,[translation_needed],Label in forms view for location forms
+location_name,Location name,[translation_needed],Label for first step of add location dialog
+up_one_level,Up one level,[translation_needed],Label to go to parent location in location search
+hierarchy,Hierarchy,[translation_needed],Label for the location hierarchy e.g Copan Ruinas / Copan / HH127
