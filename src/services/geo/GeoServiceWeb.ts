@@ -49,10 +49,11 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
     return res.data.geos.map(g => new Geo().fromSnakeJSON(g))
   }
 
-  createGeo (geo: Geo): Promise<any> {
-    return http().put('/geo', {
+  async createGeo (geo: Geo): Promise<any> {
+    const res = await http().put('/geo', {
       geo: geo
     })
+    return new Geo().fromSnakeJSON(res.data.geo)
   }
 
   updateGeo (geo: Geo): Promise<any> {
