@@ -16,7 +16,6 @@ export default function DocsLinkMixin (docLink: any) {
   }
 
   function attachDocLink () {
-    console.log('updating documentation link', docLink)
     previousState = JSON.parse(JSON.stringify(global.secondaryDrawer))
     previousState.onClick = global.secondaryDrawer.onClick
     global.secondaryDrawer.isEnabled = true

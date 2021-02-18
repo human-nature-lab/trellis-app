@@ -1,11 +1,27 @@
 <template>
-  <SkipEditor
-    :newSkip="addFormSkip"
-    :deleteSkip="deleteFormSkip"
-    @update="skipUpdated"
-    :conditionTags="respondentConditionTags"
-    subject="form"
-    :skips="form.skips" />
+  <v-layout>
+    <v-flex xs12>
+      <v-card>
+        <ModalTitle
+          @close="$emit('dismissFormSkips')">
+          <AsyncTranslationText :translation="form.nameTranslation"></AsyncTranslationText> <span>{{ $t("skips") | TitleCase }}</span>
+        </ModalTitle>
+        <v-card-text>
+          <SkipEditor
+            :newSkip="addFormSkip"
+            :deleteSkip="deleteFormSkip"
+            @update="skipUpdated"
+            :conditionTags="respondentConditionTags"
+            subject="form"
+            :skips="form.skips" />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn class="mb-2 mr-2" @click="$emit('dismissFormSkips')">Done</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script lang="ts">
@@ -13,14 +29,17 @@
   import Form from '../../entities/trellis/Form'
   import Skip from '../../entities/trellis/Skip'
   import SkipEditor from '../skips/SkipEditor'
-  import ConditionTag from '../../entities/trellis/ConditionTag'
   import ConditionTagService from '../../services/condition-tag'
   import SkipService from '../../services/skip'
   import FormSkip from '../../entities/trellis/FormSkip'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
+  import ModalTitle from '../ModalTitle.vue'
+  import TitleCase from '../../filters/TitleCase'
 
   export default Vue.extend({
     name: 'form-skips',
-    components: {SkipEditor},
+    components: {AsyncTranslationText, SkipEditor, ModalTitle},
+    filters: {TitleCase},
     props: {
       form: Object as () => Form
     },
@@ -35,7 +54,7 @@
     },
     data () {
       return {
-        respondentConditionTags: [] as ConditionTag[]
+        respondentConditionTags: null
       }
     },
     methods: {

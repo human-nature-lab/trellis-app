@@ -89,4 +89,7 @@ export default class FormServiceCordova implements FormServiceInterface {
     throw Error('Not implemented')
   }
 
+  reorderForms (studyId: string, studyForms: StudyForm[]): Promise<StudyForm[]> {
+    throw new Error('Not implemented')
+  }
 }

@@ -1,6 +1,7 @@
 <template>
   <v-col no-gutter>
     <SkipRow
+      v-if="conditionTags !== null"
       v-for="skip in sortedSkips"
       :key="skip.id"
       :conditionTags="conditionTags"
@@ -10,7 +11,7 @@
       :skip="skip"
     />
     <SkipRow
-      v-if="showNewSkip"
+      v-if="showNewSkip && conditionTags !== null"
       :conditionTags="conditionTags"
       :disabled="lockNewSkip"
       @save="storeNewSkip"
@@ -18,7 +19,7 @@
       :subject="subject"
       :skip="tempSkip"
     />
-    <v-row no-gutter>
+    <v-row no-gutter class="mt-4">
       <v-btn @click="addSkip">
         {{ $t("add_skip") }} <v-icon right>mdi-plus</v-icon>
       </v-btn>
@@ -37,7 +38,7 @@
     components: { SkipRow },
     props: {
       skips: Array as () => Skip[],
-      conditionTags: Array as () => ConditionTag[],
+      conditionTags: Array as () => ConditionTag[] | null,
       subject: {
         type: String,
         required: true,

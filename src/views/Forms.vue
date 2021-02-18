@@ -4,7 +4,7 @@
       <v-progress-linear
         v-if="isLoading"
         indeterminate></v-progress-linear>
-      <v-card v-for="formType in numericFormTypes" :key="formType">
+      <v-card class="mt-4" v-for="formType in numericFormTypes" :key="formType">
         <v-toolbar flat>
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer></v-spacer>
@@ -37,37 +37,42 @@
                 </v-list-item>
               </v-list>
             </v-menu>
-            <!--          <v-btn-->
-            <!--            icon-->
-            <!--            @click="addForm(formType)">-->
-            <!--            <-->
-            <!--          </v-btn>-->
           </permission>
         </v-toolbar>
         <v-data-table
+          :sort-by.sync="sortBy"
           :headers="headers(formType)"
           hide-default-footer
-          :items="studyFormsByType(formType)">
-          <template v-slot:item="props">
-            <form-list-tile
-              :form="props.item.form"
-              :study-form="props.item"
-              :form-type="formType"
-              v-model="props.item.showHidden"
-              @save="updateForm"
-              @updateStudyForm="updateStudyForm"
-              @delete="deleteForm(props.item)"></form-list-tile>
-            <tr v-if="props.item.showHidden">
-              <td colspan="4">
-                <form-skips :form="props.item.form"></form-skips>
-              </td>
-            </tr>
+          :items="studyFormsByType[formType]">
+          :item-key="form.id"
+          <template v-slot:body="props">
+            <draggable
+              handle=".drag-handle"
+              :list="props.items"
+              @end="reorderForms"
+              tag="tbody">
+              <form-list-tile
+                v-for="item in props.items"
+                :key="item.id"
+                :form="item.form"
+                :study-form="item"
+                :form-type="formType"
+                v-model="item.showHidden"
+                @toggleFormSkips="toggleFormSkips"
+                @save="updateForm"
+                @updateStudyForm="updateStudyForm"
+                @delete="deleteForm(props.item)">
+              </form-list-tile>
+            </draggable>
           </template>
         </v-data-table>
       </v-card>
     </v-flex>
     <v-dialog v-model="showImportForm" @formImported="onFormImported(importedForm)" max-width="50em">
       <form-import :form-type="importFormType"></form-import>
+    </v-dialog>
+    <v-dialog v-model="showFormSkips">
+      <form-skips :form="formSkipsForm" @dismissFormSkips="showFormSkips=false"></form-skips>
     </v-dialog>
   </v-container>
 </template>
@@ -87,11 +92,13 @@
   import DocsFiles from '../components/documentation/DocsFiles'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import FormImport from '../components/import/FormImport'
+  import groupBy from 'lodash/groupBy'
+  import draggable from 'vuedraggable'
 
   export default Vue.extend({
     name: 'Forms',
     mixins: [DocsLinkMixin(DocsFiles.getting_started.create_form)],
-    components: {FormListTile, TrellisModal, FormSkips, Permission, FormImport},
+    components: {FormListTile, TrellisModal, FormSkips, Permission, FormImport, draggable},
     created() {
       this.loadForms()
     },
@@ -103,10 +110,16 @@
         isAddingNewForm: false,
         isLoading: false,
         showImportForm: false,
-        importFormType: formTypes.CENSUS
+        importFormType: formTypes.CENSUS,
+        sortBy: 'sortOrder',
+        showFormSkips: false,
+        formSkipsForm: null
       }
     },
     computed: {
+      studyFormsByType() {
+        return groupBy(this.studyForms, 'formTypeId')
+      },
       numericFormTypes: function () {
         let formTypeKeys = Object.keys(formTypes).filter(formType => {
           return (!isNaN(Number(formType)));
@@ -119,12 +132,20 @@
     },
     methods: {
       headers(formType) {
-        let hdr = [{
+        let hdr = []
+
+        if (formType != formTypes.CENSUS) {
+          hdr = hdr.concat([{
+            text: 'Order'
+          }])
+        }
+
+        hdr = hdr.concat([{
           text: 'Actions'
         }, {
-          text: 'Form',
+          text: 'Name',
           class: 'max-width'
-        }]
+        }])
 
         if (formType == formTypes.CENSUS) {
           hdr.push({
@@ -133,9 +154,11 @@
         }
 
         hdr = hdr.concat([{
-          text: 'Published'
+          text: 'Published',
+          align: 'center'
         }, {
-          text: ''
+          text: 'Skip',
+          align: 'center'
         }])
 
         return hdr.map((h, i) => {
@@ -145,10 +168,9 @@
           return h
         });
       },
-      studyFormsByType(formType) {
-        return (this.studyForms || []).filter(studyForm => {
-          return studyForm.formTypeId == formType
-        })
+      toggleFormSkips(form) {
+        this.formSkipsForm = form
+        this.showFormSkips = !this.showFormSkips
       },
       formName(form: Form) {
         return TranslationService.getAny(form.nameTranslation, this.global.locale)
@@ -164,8 +186,27 @@
           }
         }
       },
+      async reorderForms(evt) {
+        let tempStudyForms = this.studyFormsByType[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
+        let shifted = tempStudyForms[evt.oldIndex]
+        tempStudyForms.splice(evt.oldIndex, 1)
+        tempStudyForms.splice(evt.newIndex, 0, shifted)
+        for (let i = 0; i < tempStudyForms.length; i++) {
+          tempStudyForms[i].sortOrder = i + 1
+        }
+        try {
+          const forms = await FormService.reorderForms(this.global.study.id, tempStudyForms)
+          this.studyForms = forms
+          this.sortBy = 'sortOrder'
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.logError(err, this.$t('failed_resource_update', [this.$t('forms')]))
+          }
+        } finally {
+          this.alert('success', this.$t('resource_updated', [this.$t('forms')]))
+        }
+      },
       formImported(importedForm: Form) {
-        console.log('formImported', importedForm)
         this.studyForms.push(importedForm)
       },
       async updateForm(form: Form) {
@@ -236,6 +277,4 @@
 <style lang="sass" scoped>
   .small
     column-width: 20px
-  /*.max-width*/
-  /*column-width: 90%*/
 </style>

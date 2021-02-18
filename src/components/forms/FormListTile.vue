@@ -1,5 +1,9 @@
 <template>
-  <tr>
+  <tr class="form-list-row">
+    <td class="medium drag-handle" v-if="Number(formType) !== formTypes.CENSUS" >
+      <span class="text-button">{{ studyForm.sortOrder }}</span>
+      <span class="ml-2"><v-icon>mdi-drag-horizontal-variant</v-icon></span>
+    </td>
     <td class="small">
       <v-menu offset-x v-model="showMenu">
         <template v-slot:activator="{ on, attrs }">
@@ -44,7 +48,7 @@
           <Permission :requires="TrellisPermission.REMOVE_FORM">
             <v-list-item @click="$emit('delete')">
               <v-list-item-content>
-                <span color="error">Delete</span>
+                <span color="error--text">Delete</span>
               </v-list-item-content>
             </v-list-item>
           </Permission>
@@ -57,12 +61,11 @@
         @click.stop.prevent
       ></TranslationTextField>
     </td>
-    <td v-if="formType === formTypes.CENSUS" style="min-width: 20em">
+    <td v-if="Number(formType) === formTypes.CENSUS" style="min-width: 20em">
       <v-select
         :items="censusTypes"
         v-model="studyForm.censusTypeId"
         @change="changeCensusType"
-        box
         hide-details
         label="Census type"
       ></v-select>
@@ -71,9 +74,8 @@
       <v-checkbox v-model="memForm.isPublished" @change="save"></v-checkbox>
     </td>
     <td>
-      <v-btn icon @click="$emit('input', !value)">
-        <v-icon v-if="value">mdi-chevron-up</v-icon>
-        <v-icon v-else>mdi-chevron-down</v-icon>
+      <v-btn icon @click="$emit('toggleFormSkips', studyForm.form)">
+        <v-icon :class="{ 'primary--text': (studyForm.form.skips.length > 0) }">{{ icons.mdiArrowDecision }}</v-icon>
       </v-btn>
     </td>
   </tr>
@@ -94,6 +96,7 @@
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";
   import StudyForm from "../../entities/trellis/StudyForm";
+  import { mdiArrowDecision } from '@mdi/js';
 
   export default Vue.extend({
     name: "form-list-tile",
@@ -105,6 +108,9 @@
     },
     data() {
       return {
+        icons: {
+          mdiArrowDecision
+        },
         isBusy: false,
         formTypes,
         showMenu: false,
@@ -160,6 +166,11 @@
       save() {
         this.$emit("save", this.memForm);
       },
+      changeSortOrder (sortOrder) {
+        let sf = this.studyForm.copy();
+        sf.sortOrder = sortOrder;
+        this.$emit("updateStudyForm", sf);
+      },
       changeCensusType(censusTypeId) {
         let sf = this.studyForm.copy();
         sf.censusTypeId = censusTypeId;
@@ -172,4 +183,8 @@
 <style lang="sass">
 .small
   width: 20px
+.medium
+  width: 80px
+.drag-handle
+  cursor: grab
 </style>

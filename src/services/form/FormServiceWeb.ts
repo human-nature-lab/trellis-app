@@ -75,6 +75,11 @@ export class FormServiceWeb implements FormServiceInterface {
     await adminInst.delete(uriTemplate('study/{study}/form/{form}', [studyId, formId]))
   }
 
+  async reorderForms (studyId: string, studyForms: StudyForm[]): Promise<StudyForm[]> {
+    const res = await adminInst.patch(uriTemplate('study/{study}/forms/reorder', [studyId]), { study_forms: studyForms })
+    return res.data.forms.map(f => new StudyForm().fromSnakeJSON(f))
+  }
+
 }
 
 export default FormServiceWeb
