@@ -68,8 +68,6 @@
                   :logging-service="loggingService"
                   :snapshotId="serverSnapshotId"
                   :snapshotFileSize="snapshotFileSize"
-                  :username="username"
-                  :password="password"
                   @download-snapshot-done="downloadSnapshotDone">
                 </download-snapshot>
                 <verify-download
@@ -245,14 +243,6 @@
     props: {
       initDownloadStep: {
         type: Number,
-        required: true
-      },
-      username: {
-        type: String,
-        required: true
-      },
-      password: {
-        type: String,
         required: true
       }
     },

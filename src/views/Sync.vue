@@ -11,16 +11,12 @@
             </sync-status>
             <upload
               v-if="uploading || uploadingPhotos"
-              :username="username"
-              :password="password"
               :init-upload-step="uploadStep"
               @upload-done="uploadDone"
               @upload-cancelled="uploadCancelled">
             </upload>
             <download
               v-if="downloading || downloadingPhotos"
-              :password="password"
-              :username="username"
               :init-download-step="downloadStep"
               @download-done="downloadDone"
               @download-cancelled="downloadCancelled">
@@ -30,7 +26,7 @@
         <v-row
           v-if="!needsServerConfig"
           class="sync-footer">
-          <v-flex class="xs6 text-xs-left">
+          <v-col cols="auto">
             <v-btn :disabled="!enableUpload"
                     :loading="uploading"
                     @click="onUpload">
@@ -42,8 +38,9 @@
               <v-icon>mdi-collections</v-icon>
               <v-icon>mdi-arrow-up</v-icon>
             </v-btn>
-          </v-flex>
-          <v-flex class="xs6 text-xs-right">
+          </v-col>
+          <v-spacer />
+          <v-col cols="auto">
             <v-btn @click="onDownload"
                     :loading="downloading"
                     :disabled="!enableDownload">
@@ -55,11 +52,10 @@
               <v-icon>mdi-collections</v-icon>
               <v-icon>mdi-arrow-down</v-icon>
             </v-btn>
-          </v-flex>
+          </v-col>
         </v-row>
       </v-container>
     </v-col>
-    <LoginModal />
   </v-container>
 </template>
 
@@ -73,8 +69,6 @@
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import DocsFiles from '../components/documentation/DocsFiles'
   import TrellisModal from '../components/TrellisModal'
-  import LoginModal from '../components/login/LoginModal'
-  import { resetSyncCredentials, setSyncCredentials } from '../services/http/AxiosInstance'
 
   export default {
     name: 'sync',
@@ -84,7 +78,6 @@
       Upload,
       SyncStatus,
       TrellisModal,
-      LoginModal,
     },
     mixins: [DocsLinkMixin(DocsFiles.sync.introduction)],
     data () {

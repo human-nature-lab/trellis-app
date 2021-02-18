@@ -25,7 +25,7 @@ cordova plugin add cordova-plugin-file-md5
 cordova plugin add cordova-plugin-zip
 cordova plugin add cordova-plugin-splashscreen
 cordova plugin add cordova-plugin-whitelist
-cordova plugin add cordova-sqlite-storage@2.6.0
+cordova plugin add cordova-sqlite-storage
 cordova plugin add cordova-plugin-file-transfer
 cordova plugin add cordova-plugin-geolocation
 cordova plugin add cordova-plugin-zeep

@@ -8,6 +8,7 @@ import DatabaseService from '../database/DatabaseService'
 import DeviceService from '../device/DeviceService'
 import { makeBasicAuthHeader } from '../util'
 import { requestCredentials } from '../../components/login/LoginModal'
+import { ExpiringValue } from '../../classes/ExpiringValue'
 
 export interface Token {
   hash: string
@@ -87,6 +88,8 @@ export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance
   })
 }
 
+const minuteMs = 60 * 1000
+const syncAuthHeader = new ExpiringValue(30 * minuteMs)
 export async function syncInstance (): Promise<AxiosInstance> {
   if (syncInst === undefined) {
     const apiRoot = await DatabaseService.getServerIPAddress()
@@ -96,6 +99,10 @@ export async function syncInstance (): Promise<AxiosInstance> {
     })
     syncInst.interceptors.request.use(async function (config) {
       config.headers['X-Key'] = await DeviceService.getDeviceKey()
+      const authHeader = syncAuthHeader.get()
+      if (authHeader) {
+        config.headers['Authorization'] = authHeader
+      }
       return config
     })
     syncInst.interceptors.response.use(null, async function (err) {
@@ -113,26 +120,17 @@ export async function syncInstance (): Promise<AxiosInstance> {
   }
   return syncInst
 }
-
-let syncAuthInterceptor
-let syncAuthHeader: string | null
 export async function setSyncCredentials (username: string, password: string) {
   const sync = await syncInstance()
-  syncAuthHeader = makeBasicAuthHeader(username, password)
-  syncAuthInterceptor = sync.interceptors.request.use(function (config) {
-    if (syncAuthHeader) {
-      config.headers['Authorization'] = syncAuthHeader
-    }
-    return config
-  })
+  syncAuthHeader.set(makeBasicAuthHeader(username, password))
 }
 
 export async function resetSyncCredentials () {
-  syncAuthHeader = null
+  syncAuthHeader.clear()
 }
 
 export async function getSyncAuthentication () {
-  return syncAuthHeader
+  return syncAuthHeader.get()
 }
 
 export const adminInst = axios.create({

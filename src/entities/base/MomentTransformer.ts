@@ -17,7 +17,9 @@ export class MomentTransformer implements ValueTransformer {
     }
   }
   from (date: Date) {
-    // console.log('date from db', date)
+    if (date === null || date === undefined) {
+      return null
+    }
     return moment(date)
   }
 }

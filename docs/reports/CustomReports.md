@@ -55,7 +55,7 @@ class SimplestReport extends Base {
 ### Properties
 | Property | Default | Description |
 | -------- | ------- | ----------- |
-| `$configSchema` | `[ 'studyId' => 'string|exists:study,id' ]` | The schema to use to validate the configuration which is passed to this report. See [Laravel validators][4] for options.|
+| `$configSchema` | `[ 'studyId' => 'string\|exists:study,id' ]` | The schema to use to validate the configuration which is passed to this report. See [Laravel validators][4] for options.|
 
 [1]: https://github.com/human-nature-lab/trellis-api/tree/master/app/Reports/examples
 [2]: https://laravel.com/docs/5.8/queries

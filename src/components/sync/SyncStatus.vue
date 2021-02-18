@@ -48,7 +48,7 @@
     },
     computed: {
       wasSnapshotDownloaded: function () {
-        return (this.localLatestSnapshot)
+        return !!this.localLatestSnapshot
       },
       snapshotDownloadedAt: function () {
         if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('snapshotCreatedAt')) {

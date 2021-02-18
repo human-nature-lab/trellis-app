@@ -17,7 +17,6 @@
     import DatabaseService from '../../../../services/database/DatabaseService'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
-    import { makeBasicAuthHeader } from '../../../../services/util'
     import { getSyncAuthentication } from '../../../../services/http/AxiosInstance'
     export default {
       name: 'download-snapshot',

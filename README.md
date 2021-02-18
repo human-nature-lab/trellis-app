@@ -5,9 +5,15 @@
 ---
 ## Releasing
 
-### Configuration
+### Cloud based
+Automatic releases are triggered when a new tag matching `v*` is created. This process takes about 5 minutes and is the simplest way to release everything. Find the new release under the releases section in Github.
+- `npm version prerelease` OR `npm version minor` OR `npm version major`
+- `git push`
+- `git push --tags`
+
+### Manual configuration
 1. `npm install`
-1. [Install Cordova][2]
+1. [Install Cordova][2] (`npm i -g cordova@8.1.2`)
 1. Add `config.js` file in `static/`. Look at `static/config.default.js` for template.
 1. Create a `config-xml.prod.js` file in `config/`. The template is `config/config-xml.default.js`.
 1. **Optional**: Configure Sentry by adding a `.sentryclirc`file and logging in with `sentry-cli login`. See [Sentry docs][1] for more info.
@@ -49,7 +55,7 @@ A simplified Docker configuration for development is in progress. Contact us if 
 #### Initial setup
 This step is similar to the configuration required to create a release.
 1. Add `config.js` file in `static/`. Look at `static/config.default.js` for template. The `apiRoot` should point to your development API server.
-1. Add `config-xml.dev.js` file in `config/`. The template is `config/config-xml.default.js`. Point the `CONTENT_SOURCE` to your Webpack development server and add `DEV: true`.
+1. Add `config-xml.dev.js` file in `config/`. The template is `config/config-xml.dev.default.js`. Point the `CONTENT_SOURCE` to your Webpack development server.
 
 #### Android
 1. Start the Webpack development server with `npm start`
