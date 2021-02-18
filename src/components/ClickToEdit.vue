@@ -1,6 +1,8 @@
 <template>
   <v-text-field
-    :full-width="true"
+    full-width
+    flat
+    hide-details
     ref="textField"
     :disabled="disabled"
     :readonly="!internal.editing"
@@ -8,8 +10,6 @@
     :solo="solo"
     :label="label"
     :loading="loading"
-    hide-details
-    :flat="true"
     :append-icon="appendIcon"
     :prepend-inner-icon="internal.editing ? 'mdi-close' : ''"
     @click:prepend-inner="resetEditorState"
