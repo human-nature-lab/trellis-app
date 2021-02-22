@@ -522,3 +522,4 @@ geo_forms,Location Forms,[translation_needed],Label in forms view for location f
 location_name,Location name,[translation_needed],Label for first step of add location dialog
 up_one_level,Up one level,[translation_needed],Label to go to parent location in location search
 hierarchy,Hierarchy,[translation_needed],Label for the location hierarchy e.g Copan Ruinas / Copan / HH127
+no_forms,No forms,[translation_needed],Displayed in forms table when no forms of that type found

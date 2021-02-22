@@ -17,6 +17,8 @@ export default class StudyForm extends TimestampedSoftDelete {
   formTypeId: number
   @Column({ nullable: true }) @Serializable
   censusTypeId: string
+  @Column({ nullable: true }) @Serializable
+  geoTypeId: string
 
   @Relationship(type => Form)
   @OneToOne(type => Form, { eager: true })

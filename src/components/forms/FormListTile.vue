@@ -1,6 +1,6 @@
 <template>
   <tr class="form-list-row">
-    <td class="medium drag-handle" v-if="Number(formType) !== formTypes.CENSUS" >
+    <td class="medium drag-handle" v-if="Number(formType) == formTypes.RESPONDENT" >
       <span class="text-button">{{ studyForm.sortOrder }}</span>
       <span class="ml-2"><v-icon>mdi-drag-horizontal-variant</v-icon></span>
     </td>
@@ -58,24 +58,28 @@
     <td>
       <TranslationTextField
         :translation="memForm.nameTranslation"
-        @click.stop.prevent
-      ></TranslationTextField>
+        @click.stop.prevent />
     </td>
-    <td v-if="Number(formType) === formTypes.CENSUS" style="min-width: 20em">
+    <td v-if="Number(formType) == formTypes.LOCATION" style="min-width: 20em">
+      <geo-type-select
+        :outlined="false"
+        show-user-addable
+        @geoTypeSelected="changeGeoType" />
+    </td>
+    <td v-if="Number(formType) == formTypes.CENSUS" style="min-width: 20em">
       <v-select
         :items="censusTypes"
         v-model="studyForm.censusTypeId"
         @change="changeCensusType"
         hide-details
-        label="Census type"
-      ></v-select>
+        label="Census type" />
     </td>
     <td>
       <v-checkbox v-model="memForm.isPublished" @change="save"></v-checkbox>
     </td>
     <td>
       <v-btn icon @click="$emit('toggleFormSkips', studyForm.form)">
-        <v-icon :class="{ 'primary--text': (studyForm.form.skips.length > 0) }">{{ icons.mdiArrowDecision }}</v-icon>
+        <v-icon :class="{ 'primary--text': (studyForm.form.skips.length > 0) }">mdi-arrow-decision</v-icon>
       </v-btn>
     </td>
   </tr>
@@ -96,7 +100,7 @@
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";
   import StudyForm from "../../entities/trellis/StudyForm";
-  import { mdiArrowDecision } from '@mdi/js';
+  import GeoTypeSelect from "../geo/GeoTypeSelect";
 
   export default Vue.extend({
     name: "form-list-tile",
@@ -105,12 +109,10 @@
       TranslationTextField,
       TrellisLoadingCircle,
       Permission,
+      GeoTypeSelect
     },
     data() {
       return {
-        icons: {
-          mdiArrowDecision
-        },
         isBusy: false,
         formTypes,
         showMenu: false,
@@ -174,6 +176,11 @@
       changeCensusType(censusTypeId) {
         let sf = this.studyForm.copy();
         sf.censusTypeId = censusTypeId;
+        this.$emit("updateStudyForm", sf);
+      },
+      changeGeoType(geoType) {
+        let sf = this.studyForm.copy();
+        sf.geoTypeId = geoType.id
         this.$emit("updateStudyForm", sf);
       },
     },

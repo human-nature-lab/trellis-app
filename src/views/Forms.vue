@@ -44,9 +44,23 @@
           :headers="headers(formType)"
           hide-default-footer
           :items="studyFormsByType[formType]">
-          :item-key="form.id"
           <template v-slot:body="props">
+            <tbody v-if="isLoading">
+            <tr>
+              <td align="center" class="green lighten-5" :colspan="headers(formType).length">
+                <span>{{ $t('loading') }}</span>
+              </td>
+            </tr>
+            </tbody>
+            <tbody v-else-if="props.items.length === 0">
+              <tr>
+                <td align="center" class="grey lighten-5" :colspan="headers(formType).length">
+                  <span>{{ $t('no_forms') }}</span>
+                </td>
+              </tr>
+            </tbody>
             <draggable
+              v-else
               handle=".drag-handle"
               :list="props.items"
               @end="reorderForms"
@@ -124,42 +138,25 @@
         let formTypeKeys = Object.keys(formTypes).filter(formType => {
           return (!isNaN(Number(formType)));
         })
-        return formTypeKeys.filter(formType => {
-          // Filter out DEFAULT_CENSUS formType until it is implemented
-          return formType != formTypes.DEFAULT_CENSUS
-        })
+        return formTypeKeys
       }
     },
     methods: {
       headers(formType) {
         let hdr = []
-
-        if (formType != formTypes.CENSUS) {
-          hdr = hdr.concat([{
-            text: 'Order'
-          }])
+        if (formType == formTypes.RESPONDENT) {
+          hdr.push({ text: 'Order' })
         }
-
-        hdr = hdr.concat([{
-          text: 'Actions'
-        }, {
-          text: 'Name',
-          class: 'max-width'
-        }])
-
+        hdr.push({ text: 'Actions' })
+        hdr.push({ text: 'Name', class: 'max-width' })
         if (formType == formTypes.CENSUS) {
-          hdr.push({
-            text: 'Census type'
-          })
+          hdr.push({ text: 'Census type' })
         }
-
-        hdr = hdr.concat([{
-          text: 'Published',
-          align: 'center'
-        }, {
-          text: 'Skip',
-          align: 'center'
-        }])
+        if (formType == formTypes.LOCATION) {
+          hdr.push({ text: 'Location type' })
+        }
+        hdr.push({ text: 'Published', align: 'center' })
+        hdr.push({ text: 'Skip', align: 'center' })
 
         return hdr.map((h, i) => {
           h.sortable = false
@@ -179,7 +176,7 @@
         try {
           const studyForm = await FormService.createForm(this.global.study.id, type)
           this.studyForms.push(studyForm)
-          this.alert('success', this.$t('resource_created', [this.formName(studyForm.form)]))
+          this.alert('success', this.$t('resource_created', [this.$t('form')]))
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err, this.$t('failed_resource_create', [this.$t('form')]))
@@ -187,7 +184,7 @@
         }
       },
       async reorderForms(evt) {
-        let tempStudyForms = this.studyFormsByType[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
+        let tempStudyForms = this.studyFormsByType[formTypes.RESPONDENT].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
         let shifted = tempStudyForms[evt.oldIndex]
         tempStudyForms.splice(evt.oldIndex, 1)
         tempStudyForms.splice(evt.newIndex, 0, shifted)
@@ -250,10 +247,12 @@
         switch (formType) {
           case formTypes.CENSUS:
             return this.$t('census_forms')
-          case formTypes.DEFAULT_CENSUS:
-            return this.$t('default_census_forms')
-          default:
+          case formTypes.RESPONDENT:
             return this.$t('forms')
+          case formTypes.LOCATION:
+            return this.$t('geo_forms')
+          default:
+            return ''
         }
       },
       async deleteForm(studyForm: StudyForm) {

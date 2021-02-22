@@ -1,12 +1,12 @@
 <template>
   <v-select
-    outlined
     dense
     hide-details
+    :outlined="outlined"
     :disabled="disabled"
     :readonly="readonly || (clickToEdit && !editing)"
-    :append-icon="(clickToEdit && !editing) ? 'mdi-pencil' : ''"
-    @click:append="editing = true"
+    :append-icon="(clickToEdit && !editing) ? 'mdi-pencil' : 'mdi-menu-down'"
+    @click:append="clickAppend"
     return-object
     :items="geoTypes"
     v-model="curGeoType"
@@ -17,6 +17,7 @@
 </template>
 
 <script>
+  /* TODO: When @click:append exists, clicking the menu-down icon does nothing. Can we remove this attribute selectively? */
   import GeoType from '../../entities/trellis/GeoType'
   import GeoService from '../../services/geo/GeoService'
   import global from '../../static/singleton'
@@ -36,6 +37,11 @@
       }
     },
     props: {
+      outlined: {
+        type: Boolean,
+        required: false,
+        'default': true
+      },
       disabled: {
         type: Boolean,
         required: false,
@@ -69,6 +75,11 @@
       }
     },
     methods: {
+      clickAppend: function () {
+        if (this.clickToEdit) {
+          this.editing = true
+        }
+      },
       selectGeoType: function () {
         if (this.editing && this.clickToEdit) {
           this.editing = false

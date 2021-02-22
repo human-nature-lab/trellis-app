@@ -1,7 +1,7 @@
 enum formTypes {
-  DATA_COLLECTION_FORM = 0,
+  RESPONDENT = 0,
   CENSUS = 1,
-  DEFAULT_CENSUS = 2
+  LOCATION = 2
 }
 
 export default formTypes
