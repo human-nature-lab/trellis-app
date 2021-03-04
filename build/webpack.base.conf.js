@@ -150,7 +150,7 @@ module.exports = {
   optimization: {
     // usedExports: true,
     // concatenateModules: true,
-    minimize: isProd,
+    minimize: false,
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
