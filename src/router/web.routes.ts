@@ -18,12 +18,13 @@ const ServerConfig = () => import(/* webpackChunkName: "server-config" */'../vie
 const DemoSignUp = () => import(/* webpackChunkName: "signup" */'../views/DemoSignUp.vue')
 const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'../views/EmailConfirmation.vue')
 const Permissions = () => import(/* webpackChunkName: "permissions" */'../views/Permissions.vue')
+const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'../views/StudyDashboard.vue')
 
 export default [{
   path: '/',
   name: 'Home',
-  component: RespondentsSearch,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  component: StudyDashboard,
+  beforeEnter: guardQueue([StudyGuard])
 }, {
   path: '/sync-admin',
   name: 'SyncAdmin',
