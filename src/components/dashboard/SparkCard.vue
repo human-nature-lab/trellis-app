@@ -1,9 +1,44 @@
 <template>
   <v-card>
-    <v-subheader>{{title}}</v-subheader>
-    <v-progress-circular v-if="isLoading" indeterminate />
+    <v-subheader>
+      <slot name="title" />
+      <v-spacer />
+      <v-btn 
+        v-if="values.length"
+        :disabled="loading"
+        icon
+        @click="asTable = !asTable">
+        <v-icon v-if="asTable" small>mdi-chart-line</v-icon>
+        <v-icon v-else small>mdi-table</v-icon>
+      </v-btn>
+    </v-subheader>
+    <v-skeleton-loader
+      v-if="loading"
+      type="image" />
     <v-col v-else-if="!values.length">
       No data for these dates
+    </v-col>
+    <v-col v-else-if="asTable">
+      <v-simple-table>
+        <template #default>
+          <thead>
+            <tr>
+              <th>
+                Date
+              </th>
+              <th>
+                Value
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(date, i) in labels" :key="date">
+              <td>{{date}}</td>
+              <td>{{value[i]}}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
     </v-col>
     <v-sparkline
       v-else
@@ -19,11 +54,10 @@
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
+  import Vue, { PropOptions } from 'vue'
   import { homogenizeDates } from '../../classes/HomogenizeDates'
-  import { adminInst } from '../../services/http/AxiosInstance'
-
-  type SparkData = {
+  
+  export type SparkData = {
     labels: string[],
     data: number[]
   }
@@ -32,14 +66,18 @@
     name: 'SparkCard',
     props: {
       title: String,
-      dataKey: String,
-      study: String,
       min: String,
       max: String,
       numLabels: {
         type: Number,
         default: 5
       },
+      loading: {
+        type: Boolean,
+        default: false
+      },
+      value: Array as PropOptions<number[]>,
+      labels: Array as PropOptions<string[]>,
       type: {
         type: String,
         default: 'trend'
@@ -51,55 +89,15 @@
     },
     data () {
       return {
-        isLoading: false,
-        error: null,
-        data: { labels: [], data: [] } as SparkData
-      }
-    },
-    created () {
-      this.load()
-    },
-    watch: {
-      min () {
-        this.$nextTick(this.load)
-      },
-      max () {
-        this.$nextTick(this.load)
-      }
-    },
-    methods: {
-      async load () {
-        this.isLoading = true
-        try {
-          const res = await adminInst.get(`study/${this.study}/dashboard/${this.dataKey}`, {
-            params: {
-              min: this.min,
-              max: this.max
-            }
-          })
-          this.data = res.data
-        } finally {
-          this.isLoading = false
-        }
-      },
-      async runLoad() {
-        this.isLoading = true
-        try {
-          this.data = await this.load()
-        } catch (err) {
-          this.error = err
-        } finally {
-          this.isLoading = false
-        }
+        asTable: false
       }
     },
     computed: {
       filledData (): SparkData {
-        return this.isLoading ? this.data : homogenizeDates(this.data, this.min, this.max) 
+        return this.loading ? { data: [], labels: [] } : homogenizeDates({ data: this.value, labels: this.labels }, this.min, this.max) 
       },
-      filteredLabels (): string[] {
-        const data = this.filledData
-        return data.labels.map((l, i) => data.data[i] ? l : undefined)
+      dates (): string[] {
+        return this.filledData.labels
       },
       values (): number[] {
         return this.filledData.data

@@ -9,7 +9,6 @@ export function homogenizeDates (data: Data, min?: string, max?: string, format 
   const dateCursor = moment(min || data.labels[0], format)
   const endDate = moment(max || data.labels[data.labels.length - 1], format)
   const numDates = endDate.diff(dateCursor, 'days') + 1 
-  console.log('numDates', numDates)
   const out: Data = {
     labels: new Array(numDates).fill(''),
     data: new Array(numDates).fill(0)

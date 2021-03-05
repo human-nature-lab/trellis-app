@@ -24,7 +24,7 @@ export default [{
   path: '/',
   name: 'Home',
   component: StudyDashboard,
-  beforeEnter: guardQueue([StudyGuard])
+  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
 }, {
   path: '/sync-admin',
   name: 'SyncAdmin',
