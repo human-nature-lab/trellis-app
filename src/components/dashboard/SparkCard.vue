@@ -1,7 +1,10 @@
 <template>
   <v-card>
     <v-subheader>{{title}}</v-subheader>
-    <v-progress-circular v-if="isLoading" indeterminate ref=""/>
+    <v-progress-circular v-if="isLoading" indeterminate />
+    <v-col v-else-if="!values.length">
+      No data for these dates
+    </v-col>
     <v-sparkline
       v-else
       auto-draw
@@ -12,6 +15,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import { homogenizeDates } from '../../classes/HomogenizeDates'
+  import { adminInst } from '../../services/http/AxiosInstance'
 
   type SparkData = {
     labels: string[],
@@ -21,8 +25,11 @@
   export default Vue.extend({
     name: 'SparkCard',
     props: {
-      load: Function,
       title: String,
+      dataKey: String,
+      study: String,
+      min: String,
+      max: String,
       type: {
         type: String,
         default: 'trend'
@@ -40,9 +47,31 @@
       }
     },
     created () {
-      this.runLoad()
+      this.load()
+    },
+    watch: {
+      min () {
+        this.$nextTick(this.load)
+      },
+      max () {
+        this.$nextTick(this.load)
+      }
     },
     methods: {
+      async load () {
+        this.isLoading = true
+        try {
+          const res = await adminInst.get(`study/${this.study}/dashboard/${this.dataKey}`, {
+            params: {
+              min: this.min,
+              max: this.max
+            }
+          })
+          this.data = res.data
+        } finally {
+          this.isLoading = false
+        }
+      },
       async runLoad() {
         this.isLoading = true
         try {
@@ -56,7 +85,7 @@
     },
     computed: {
       filledData (): SparkData {
-        return this.isLoading ? this.data : homogenizeDates(this.data) 
+        return this.isLoading ? this.data : homogenizeDates(this.data, this.min, this.max) 
       },
       values (): number[] {
         return this.filledData.data

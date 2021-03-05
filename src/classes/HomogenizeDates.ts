@@ -2,13 +2,13 @@ import moment from "moment"
 
 type Data = { labels: string[], data: number[] }
 
-export function homogenizeDates (data: Data, format = 'YYYY-MM-DD'): Data {
+export function homogenizeDates (data: Data, min?: string, max?: string, format = 'YYYY-MM-DD'): Data {
 
   if (!data.labels.length) return data
 
-  const currentDate = moment(data.labels[0], format)
-  const endDate = moment(data.labels[data.labels.length - 1], format)
-  const numDates = endDate.diff(currentDate, 'days') + 1 
+  const dateCursor = moment(min || data.labels[0], format)
+  const endDate = moment(max || data.labels[data.labels.length - 1], format)
+  const numDates = endDate.diff(dateCursor, 'days') + 1 
   console.log('numDates', numDates)
   const out: Data = {
     labels: new Array(numDates).fill(''),
@@ -17,13 +17,13 @@ export function homogenizeDates (data: Data, format = 'YYYY-MM-DD'): Data {
 
   let cursor = 0
   for (let i = 0; i < numDates; i++) {
-    const currentDateString = currentDate.format(format)
-    out.labels[i] = currentDateString
-    if (data.labels[cursor] === currentDateString) {
+    const dateCursorString = dateCursor.format(format)
+    out.labels[i] = dateCursorString
+    if (data.labels[cursor] === dateCursorString) {
       out.data[i] = data.data[cursor]
       cursor++
     }
-    currentDate.add(1, 'day')
+    dateCursor.add(1, 'day')
   }
 
   return out

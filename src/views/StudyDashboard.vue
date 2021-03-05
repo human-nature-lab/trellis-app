@@ -6,6 +6,19 @@
           <v-card-title>
             {{global.study.name}}
             <v-spacer />
+            Date range:
+            <v-dialog width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn text v-on="on" v-bind="attrs">{{min}}</v-btn>
+              </template>
+              <v-date-picker v-model="min" />
+            </v-dialog>
+            <v-dialog width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn text v-on="on" v-bind="attrs">{{max}}</v-btn>
+              </template>
+              <v-date-picker v-model="max" />
+            </v-dialog>
             <v-btn
               icon
               :loading="isLoading"
@@ -13,7 +26,7 @@
                 <v-icon>mdi-refresh</v-icon>
               </v-btn>
           </v-card-title>
-          <v-container>
+          <v-container fluid>
             <v-row>
               <v-col>Users: {{counts.users}}</v-col>
               <v-col>Surveys: {{counts.geos}}</v-col>
@@ -31,28 +44,39 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <SparkCard
           title="Users"
-          :load="() => loadDateSet('users')" />
+          :min="min"
+          :max="max"
+          :study="global.study.id"
+          data-key="users" />
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <SparkCard
           title="Respondents"
-          type="bar"
-          :load="() => loadDateSet('respondents')" />
+          :min="min"
+          :max="max"
+          :study="global.study.id"
+          data-key="respondents" />
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
+      <v-col cols="12" md="6">
         <SparkCard
           title="Surveys"
-          :load="() => loadDateSet('surveys')" />
+          :min="min"
+          :max="max"
+          :study="global.study.id"
+          data-key="surveys" />
       </v-col>
-      <v-col>
+      <v-col cols="12" md="6">
         <SparkCard
           title="Geos"
-          :load="() => loadDateSet('geos')" />
+          :min="min"
+          :max="max"
+          :study="global.study.id"
+          data-key="geos" />
       </v-col>
     </v-row>
   </v-col>
@@ -63,14 +87,17 @@
   import global from '../static/singleton'
   import { adminInst } from '../services/http/AxiosInstance'
   import SparkCard from '../components/dashboard/SparkCard.vue'
+  import moment from 'moment'
 
   export default Vue.extend({
     name: 'StudyDashboard',
     components: { SparkCard },
     data () {
-      return {
+      const today = moment()
+      return {  
         global,
-        min: '2018-01-01',
+        min: today.clone().subtract(1, 'year').format('YYYY-MM-DD'),
+        max: today.format('YYYY-MM-DD'),
         isLoading: false,
         counts: {
           users: 0,
@@ -94,14 +121,6 @@
         } finally {
           this.isLoading = false
         }
-      },
-      async loadDateSet (key: string) {
-        const res = await adminInst.get(`study/${this.global.study.id}/dashboard/${key}`, {
-          params: {
-            min: this.min,
-          }
-        })
-        return res.data
       }
     }
   })
