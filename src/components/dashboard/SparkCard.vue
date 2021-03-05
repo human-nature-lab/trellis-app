@@ -8,7 +8,13 @@
     <v-sparkline
       v-else
       auto-draw
-      :value="values" />
+      :labels="filledData.labels"
+      smooth
+      :value="values">
+      <template #label="item">
+        {{labelMask[item.index] ? item.value : ''}}
+      </template>
+    </v-sparkline>
   </v-card>
 </template>
 
@@ -30,6 +36,10 @@
       study: String,
       min: String,
       max: String,
+      numLabels: {
+        type: Number,
+        default: 5
+      },
       type: {
         type: String,
         default: 'trend'
@@ -87,8 +97,24 @@
       filledData (): SparkData {
         return this.isLoading ? this.data : homogenizeDates(this.data, this.min, this.max) 
       },
+      filteredLabels (): string[] {
+        const data = this.filledData
+        return data.labels.map((l, i) => data.data[i] ? l : undefined)
+      },
       values (): number[] {
         return this.filledData.data
+      },
+      labelMask(): boolean[] {
+        const data = this.filledData
+        const mask = new Array(data.data.length).fill(false)
+        const diff = Math.ceil(mask.length / this.numLabels)
+        const offset = Math.floor(diff / 2)
+        for (let i = 0; i < mask.length; i++) {
+          if (i % diff === offset) {
+            mask[i] = true
+          }
+        }
+        return mask
       }
     }
   })
