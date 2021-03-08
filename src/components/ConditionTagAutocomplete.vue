@@ -8,7 +8,6 @@
     dense
     chips
     tags
-    :return-object="returnObject"
     :hide-no-data="!hasLoaded"
     :search-input.sync="query"
     :loading="isLoading"
@@ -35,10 +34,6 @@
       value: {
         type: Array,
         required: true,
-      },
-      returnObject: {
-        type: Boolean,
-        required: false
       }
     },
     data() {
