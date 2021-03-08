@@ -1,20 +1,23 @@
 <template>
   <v-card>
-    <v-container v-if="isLoading">
-      <v-skeleton-loader type="text,text,text" />
-    </v-container>
-    <v-container v-else fluid>
+    <v-container fluid class="pa-2">
       <v-row>
-        <v-col>Users: {{counts.users}}</v-col>
-        <v-col>Surveys: {{counts.geos}}</v-col>
-      </v-row>
-      <v-row>
-        <v-col>Respondents: {{counts.respondents}}</v-col>
-        <v-col>Geos: {{counts.geos}}</v-col>
-      </v-row>
-      <v-row>
-        <v-col>Forms: {{counts.forms}}</v-col>
-        <v-col>Photos: {{counts.photos}}</v-col>
+        <v-col
+          cols="4"
+          lg="2"
+          v-for="(count, title) in sections"
+          :key="title"
+          class="py-4">
+          <v-skeleton-loader  v-if="isLoading" type="text,text" />
+          <div v-else>
+            <h4 class="text-center">
+              {{title}}
+            </h4>
+            <div class="text-center">
+              {{count}}
+            </div>
+          </div>
+        </v-col>
       </v-row>
     </v-container>
   </v-card>
@@ -22,7 +25,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-import { adminInst } from '../../services/http/AxiosInstance'
+  import { adminInst } from '../../services/http/AxiosInstance'
 
   export default Vue.extend({
     name: 'StudyCounts',
@@ -53,6 +56,18 @@ import { adminInst } from '../../services/http/AxiosInstance'
           this.counts = res.data
         } finally {
           this.isLoading = false
+        }
+      }
+    },
+    computed: {
+      sections () {
+        return {
+          Surveys: this.counts.surveys,
+          Respondents: this.counts.respondents,
+          Locations: this.counts.geos,
+          Photos: this.counts.photos,
+          Users: this.counts.users,
+          Forms: this.counts.forms,
         }
       }
     }

@@ -16,35 +16,21 @@
       v-if="loading"
       type="image" />
     <v-col v-else-if="!values.length">
-      No data for these dates
+      {{$t('no_matching_data')}}
     </v-col>
     <v-col v-else-if="asTable">
-      <v-simple-table>
-        <template #default>
-          <thead>
-            <tr>
-              <th>
-                Date
-              </th>
-              <th>
-                Value
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(date, i) in labels" :key="date">
-              <td>{{date}}</td>
-              <td>{{value[i]}}</td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
+      <v-data-table
+        dense
+        :items="series"
+        :headers="[{ text: 'Date', value: 'date'}, { text: 'Count', value: 'value' }]"
+        />
     </v-col>
     <v-sparkline
       v-else
       auto-draw
       :labels="filledData.labels"
-      smooth
+      line-width="0"
+      fill
       :value="values">
       <template #label="item">
         {{labelMask[item.index] ? item.value : ''}}
@@ -112,6 +98,12 @@
           }
         }
         return mask
+      },
+      series (): { value: number, date: string}[] {
+        return this.labels.map((date, i) => ({
+          date,
+          value: this.value[i]
+        }))
       }
     }
   })

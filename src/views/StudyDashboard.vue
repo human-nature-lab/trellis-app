@@ -1,13 +1,11 @@
 <template>
   <v-col>
     <v-row>
-      <v-col cols="12" md="4">
-        <h3>
-          {{global.study.name}}
-        </h3>
-      </v-col>
       <v-col cols="12" md="8">
         <v-row>
+          <div class="text-h4">
+            {{global.study.name}}
+          </div>
           <v-spacer />
           <v-dialog v-model="showMin" width="300">
             <template #activator="{ on, attrs }">
@@ -15,7 +13,10 @@
                 Start: {{min}}
               </v-btn>
             </template>
-            <v-date-picker v-model="min" @change="showMin = false" />
+            <v-date-picker
+              :max="max"
+              v-model="min" 
+              @change="showMin = false" />
           </v-dialog>
           <v-dialog v-model="showMax" width="300">
             <template #activator="{ on, attrs }">
@@ -23,12 +24,15 @@
                 End: {{max}}
               </v-btn>
             </template>
-            <v-date-picker v-model="max" @change="showMax = false" />
+            <v-date-picker
+              :min="min"
+              v-model="max"
+              @change="showMax = false" />
           </v-dialog>
         </v-row>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row class="my-8">
       <v-col>
         <StudyCounts :study="global.study.id" />
       </v-col>
@@ -62,14 +66,14 @@
       </v-col>
       <v-col cols="12" md="6">
         <SparkLoader
-          title="Geos"
+          title="Locations"
           :min="min"
           :max="max"
           :study="global.study.id"
           data-key="geos" />
       </v-col>
     </v-row>
-    <v-row>
+    <v-row class="mt-16">
       <DashboardForms 
         :min="min"
         :max="max"

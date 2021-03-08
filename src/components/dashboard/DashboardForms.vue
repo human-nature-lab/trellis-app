@@ -1,7 +1,7 @@
 <template>
   <v-col v-intersect="onIntersect">
     <v-card-title>
-      Forms
+      {{$t('forms')}}
       <v-spacer />
       <TrellisModal v-model="showUser" :title="$t('add_user')">
         <template #activator="{ on, attrs }">
