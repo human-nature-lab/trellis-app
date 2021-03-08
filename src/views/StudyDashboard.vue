@@ -11,7 +11,7 @@
           <v-spacer />
           <v-dialog v-model="showMin" width="300">
             <template #activator="{ on, attrs }">
-              <v-btn text v-on="on" v-bind="attrs">
+              <v-btn v-on="on" v-bind="attrs">
                 Start: {{min}}
               </v-btn>
             </template>
@@ -19,7 +19,7 @@
           </v-dialog>
           <v-dialog v-model="showMax" width="300">
             <template #activator="{ on, attrs }">
-              <v-btn text v-on="on" v-bind="attrs">
+              <v-btn v-on="on" v-bind="attrs">
                 End: {{max}}
               </v-btn>
             </template>

@@ -1,6 +1,7 @@
 import { uriTemplate } from '../http/WebUtils'
 import StudyServiceAbstract from './StudyServiceAbstract'
 import Study from '../../entities/trellis/Study'
+import User from '../../entities/trellis/User'
 import http, {adminInst} from '../http/AxiosInstance'
 
 export default class StudyServiceWeb extends StudyServiceAbstract {
@@ -8,13 +9,18 @@ export default class StudyServiceWeb extends StudyServiceAbstract {
   private allStudiesPromise!: Promise<Study[]>
 
   async getStudy (studyId: string): Promise<Study> {
-    let res = await http().get(`study/${studyId}`)
+    const res = await http().get(`study/${studyId}`)
     return new Study().fromSnakeJSON(res.data.study)
   }
 
   async getUserStudies (userId: string): Promise<Study[]> {
     // TODO: implement this correctly for web
     return this.getMyStudies()
+  }
+  
+  async getStudyUsers (studyId: string): Promise<User[]> {
+    const res = await adminInst.get(`study/${studyId}/users`)
+    return res.data.map(u => new User().fromSnakeJSON(u))
   }
 
   async getMyStudies (): Promise<Study[]> {

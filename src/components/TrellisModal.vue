@@ -2,11 +2,16 @@
     <v-dialog
       :value="value"
       @input="$emit('input', $event)">
-      <ModalTitle
-        :title="title"
-        @close="onClose" />
+      <slot name="title">
+        <ModalTitle
+          :title="title"
+          @close="onClose" />
+      </slot>
+      <template #activator="data">
+        <slot name="activator" v-bind="data" />
+      </template>
       <v-card>
-        <v-container>
+        <v-container fluid>
           <slot />
         </v-container>
       </v-card>
@@ -14,7 +19,7 @@
 </template>
 
 <script lang="ts">
-  import ModalTitle from './ModalTitle'
+  import ModalTitle from './ModalTitle.vue'
   export default {
     name: 'TrellisModal',
     components: { ModalTitle },

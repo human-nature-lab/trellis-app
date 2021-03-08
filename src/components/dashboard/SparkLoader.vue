@@ -1,7 +1,6 @@
 <template>
  <SparkCard
   v-intersect="onIntersect"
-  :title="title"
   :value="data.data"
   :min="min"
   :max="max"

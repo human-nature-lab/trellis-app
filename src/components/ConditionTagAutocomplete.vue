@@ -1,18 +1,19 @@
 <template>
   <v-autocomplete
+    v-on="$listeners"
     :items="conditionTags"
     :value="value"
-    @input="$emit('input', $event)"
     :label="$t('condition_tags')"
-    single-line
     multiple
     dense
     chips
     tags
+    :return-object="returnObject"
     :hide-no-data="!hasLoaded"
     :search-input.sync="query"
     :loading="isLoading"
-  >
+    @input="$emit('input', $event)"
+    v-bind="$attrs">
     <template #selection="props">
       <v-chip outlined color="primary">
         <v-avatar>
@@ -35,6 +36,10 @@
         type: Array,
         required: true,
       },
+      returnObject: {
+        type: Boolean,
+        required: false
+      }
     },
     data() {
       return {

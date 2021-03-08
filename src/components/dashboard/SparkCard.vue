@@ -65,7 +65,6 @@
   export default Vue.extend({
     name: 'SparkCard',
     props: {
-      title: String,
       min: String,
       max: String,
       numLabels: {
