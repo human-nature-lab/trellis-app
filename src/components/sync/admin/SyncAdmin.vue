@@ -201,7 +201,44 @@
           })
         }
         return returnArray
+      },
+       snapshotSuccessCount: function () {
+        return this.snapshots.filter(s => s.status === 'SUCCESS').length
+      },
+      snapshotFailedCount: function () {
+        return this.snapshots.filter(s => s.status === 'FAILED').length
+      },
+      snapshotPendingCount: function () {
+        return this.snapshots.filter(s => s.status === 'PENDING').length
+      },
+      uploadsSuccessCount: function () {
+        return this.uploads.filter(s => s.status === 'SUCCESS').length
+      },
+      uploadsFailedCount: function () {
+        return this.uploads.filter(s => s.status === 'FAILED').length
+      },
+      uploadsPendingCount: function () {
+        return this.uploads.filter(s => s.status === 'PENDING').length
       }
+    },
+    methods: {
+      getUploads: async function () {
+        this.uploadsLoading = true
+        try {
+          const uploads = await SyncAdminService.listUploads()
+          this.uploads = uploads.map(u => {
+            u.isOpen = false
+            return u
+          })
+        } catch (err) {
+          if (this.isNotAuthError(err)) {
+            this.log(err)
+            this.alert('error', 'Unable to fetch uploads')
+          }
+        } finally {
+          this.uploadsLoading = false
+        }
+      },
     },
     methods: {
       getUploads: async function () {
