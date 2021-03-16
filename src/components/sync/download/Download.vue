@@ -8,7 +8,7 @@
             <v-divider></v-divider>
             <v-stepper-step step="2">{{ $t('downloading') }}</v-stepper-step>
             <v-divider></v-divider>
-            <v-stepper-step step="3">{{ $t('inserting') }}</v-stepper-step>
+            <v-stepper-step step="3">{{ $t('replacing') }}</v-stepper-step>
             <v-divider></v-divider>
             <v-stepper-step step="4">{{ $t('images') }}</v-stepper-step>
           </v-stepper-header>
@@ -87,35 +87,30 @@
             </v-stepper-content>
             <v-stepper-content step="3">
               <sync-step
-                :title="$t('inserting')"
+                :title="$t('replacing')"
                 v-if="downloadStep === 3"
                 :continue-status="continueStatusArray[2]"
                 @continue-clicked="onContinue"
                 @cancel-clicked="onCancel">
-                <remove-database
+                <close-database
                   v-if="downloadStep > 2"
+                  :loggingService="loggingService"
+                  @done="onClosed" />
+                <remove-database
+                  v-if="downloadStep > 2 && downloadSubStep > 1"
                   :logging-service="loggingService"
                   @remove-database-done="removeDatabaseDone">
                 </remove-database>
-                <insert-rows
-                  v-if="downloadStep > 2 && downloadSubStep > 1"
-                  :logging-service="loggingService"
-                  :query-runner="queryRunner"
-                  @insert-rows-done="insertRowsDone"
-                  :extracted-snapshot="extractedSnapshot">
-                </insert-rows>
-                <configure-database
+                <move-database
                   v-if="downloadStep > 2 && downloadSubStep > 2"
+                  :logging-service="loggingService"
+                  @done="movedDatabase" />
+                <configure-database
+                  v-if="downloadStep > 2 && downloadSubStep > 3"
                   :logging-service="loggingService"
                   :query-runner="queryRunner"
                   @configure-database-done="configureDatabaseDone">
                 </configure-database>
-                <check-foreign-keys
-                  v-if="downloadStep > 2 && downloadSubStep > 3"
-                  :logging-service="loggingService"
-                  :query-runner="queryRunner"
-                  @check-foreign-keys-done="checkForeignKeysDone">
-                </check-foreign-keys>
                 <register-download
                   v-if="downloadStep > 2 && downloadSubStep > 4"
                   :logging-service="loggingService"
@@ -184,6 +179,8 @@
   import RegisterDownload from './substeps/RegisterDownload.vue'
   import GenerateImageList from './substeps/GenerateImageList.vue'
   import CalculateImageSize from './substeps/CalculateImageSize.vue'
+  import MoveDatabase from './substeps/MoveDatabase.vue'
+  import CloseDatabase from './substeps/CloseDatabase.vue'
   import DownloadImages from './substeps/DownloadImages.vue'
   import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
   import SyncService from '../../../services/SyncService'
@@ -220,25 +217,19 @@
         queryRunner: undefined
       }
     },
-    created () {
-      DeviceService.getUUID()
-        .then((deviceId) => {
-          this.deviceId = deviceId
-          return SyncService.createSync('download', deviceId)
+    async created () {
+      try {
+        this.deviceId = await DeviceService.getUUID()
+        this.sync = await SyncService.createSync('download', this.deviceId)
+        this.loggingService = new LoggingService({
+          syncId: this.sync.id,
+          deviceId: this.deviceId,
+          component: 'Download'
         })
-        .then((sync) => {
-          this.sync = sync
-          this.loggingService = new LoggingService({
-            'syncId': (sync.id),
-            'deviceId': (this.deviceId),
-            'component': 'Download'
-          })
-        })
-        .then(() => { this.downloadSubStep = 1 })
-        .catch((err) => {
-          defaultLoggingService.log(err)
-            .then((log) => { this.currentLog = log })
-        })
+        this.downloadSubStep = 1
+      } catch (err) {
+        defaultLoggingService.log(err).then(log => { this.currentLog = log })
+      }
     },
     props: {
       initDownloadStep: {
@@ -247,10 +238,10 @@
       }
     },
     methods: {
-      showLog: function () {
+      showLog () {
         return (this.currentLog !== undefined && this.currentLog instanceof Log)
       },
-      onContinue: function () {
+      onContinue () {
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
@@ -261,7 +252,7 @@
           this.$emit('download-done')
         }
       },
-      onCancel: function () {
+      onCancel () {
         if (this.continueStatus === BUTTON_STATUS.AUTO_CONTINUE) {
           this.continueStatus = BUTTON_STATUS.ENABLED
         } else {
@@ -293,11 +284,11 @@
         })
         this.downloadSubStep = 4
       },
-      compareDownloadDone: function (result) {
+      compareDownloadDone (result) {
         this.compareDownloadResult = result
         this.downloadSubStep = 5
       },
-      compareUploadDone: function (result) {
+      compareUploadDone (result) {
         this.compareUploadResult = result
         if ((this.compareDownloadResult === COMPARE_DOWNLOAD_RESULTS.NO_DOWNLOAD ||
              this.compareDownloadResult === COMPARE_DOWNLOAD_RESULTS.DOWNLOAD_OLDER) &&
@@ -307,64 +298,70 @@
           this.continueStatus = BUTTON_STATUS.ENABLED
         }
       },
-      emptySnapshotsDirectoryDone: function () {
+      emptySnapshotsDirectoryDone () {
         this.downloadSubStep = 2
       },
-      checkDownloadSizeDone: function (snapshotFileSize) {
+      checkDownloadSizeDone (snapshotFileSize) {
         this.snapshotFileSize = snapshotFileSize
         this.downloadSubStep = 3
       },
-      downloadSnapshotDone: function (fileEntry) {
+      downloadSnapshotDone (fileEntry) {
         this.downloadedSnapshotFileEntry = fileEntry
         this.downloadSubStep = 4
       },
-      verifyDownloadDone: function () {
+      verifyDownloadDone () {
         this.downloadSubStep = 5
       },
-      extractSnapshotDone: function (extractedSnapshot) {
+      extractSnapshotDone (extractedSnapshot) {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
         this.extractedSnapshot = extractedSnapshot
       },
-      removeDatabaseDone: function (queryRunner) {
+      removeDatabaseDone (queryRunner) {
         this.queryRunner = queryRunner
-        this.downloadSubStep = 2
+        this.downloadSubStep++
       },
-      insertRowsDone: function (queryRunner) {
+      insertRowsDone (queryRunner) {
         this.queryRunner = queryRunner
         this.downloadSubStep = 3
       },
-      configureDatabaseDone: function (queryRunner) {
+      configureDatabaseDone (queryRunner) {
         this.queryRunner = queryRunner
-        this.downloadSubStep = 4
+        this.downloadSubStep++
       },
-      checkForeignKeysDone: function () {
+      checkForeignKeysDone () {
         this.downloadSubStep = 5
       },
-      registerDownloadDone: function () {
+      registerDownloadDone () {
         this.continueStatus = BUTTON_STATUS.AUTO_CONTINUE
       },
-      generateImageListDone: function (imageList) {
+      generateImageListDone (imageList) {
         this.imagesToDownload = imageList
         this.downloadSubStep = 4
       },
-      calculateImageSizeDone: function (photosFound) {
+      calculateImageSizeDone (photosFound) {
         this.numImagesFound = photosFound
         this.downloadSubStep = 5
       },
-      downloadImagesDone: function (imagesDownloaded) {
+      movedDatabase () {
+        this.downloadSubStep++
+      },
+      onClosed () {
+        this.downloadSubStep++
+      },
+      downloadImagesDone (imagesDownloaded) {
         this.continueStatus = BUTTON_STATUS.DONE
       }
     },
     computed: {
       continueStatus: {
-        get: function () {
+        get () {
           return this.continueStatusArray[this.downloadStep - 1]
         },
-        set: function (status) {
+        set (status) {
           this.continueStatusArray.splice(this.downloadStep - 1, 1, status)
         }
       },
-      serverSnapshotId: function () {
+      serverSnapshotId () {
         if (this.serverSnapshot === null || (!this.serverSnapshot.hasOwnProperty('id'))) return ''
         return this.serverSnapshot['id']
       }
@@ -389,7 +386,9 @@
       RegisterDownload,
       GenerateImageList,
       CalculateImageSize,
-      DownloadImages
+      DownloadImages,
+      MoveDatabase,
+      CloseDatabase
     }
   }
 </script>

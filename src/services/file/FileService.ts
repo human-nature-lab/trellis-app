@@ -7,4 +7,8 @@ export const FileService = switchByModeEnv({
   CORDOVA: FileServiceCordova
 })
 
-export default new FileService()
+
+const fs  = new FileService()
+// @ts-ignore
+window.fs = fs
+export default fs

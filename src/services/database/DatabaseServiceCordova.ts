@@ -9,6 +9,7 @@ import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 import config from 'config'
 import { monekypatch } from './monekypatch'
 import { requireAllModules } from '../../classes/requireAll'
+import { delay } from '../../classes/delay'
 monekypatch()
 
 const trellisConfigConnection = {
@@ -58,6 +59,22 @@ export default class DatabaseServiceCordova {
   async getDatabase () {
     await this.databaseCreated
     return getConnection('trellis')
+  }
+
+  async closeDatabase (timeout = 2000): Promise<boolean> {
+    const conn = await this.getDatabase()
+    let hasTimedOut = false
+    setTimeout(() => {
+      hasTimedOut = true
+    }, timeout)
+    while (!hasTimedOut) {
+      if (conn.isConnected) {
+        await conn.close()
+        return true
+      }
+      await delay(100)
+    }
+    return false
   }
 
   async getRepository (entity: typeof Entity) {
