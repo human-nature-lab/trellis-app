@@ -4,7 +4,7 @@
     :currentLog="currentLog"
     :retry="close"
     :success="isDone">
-    {{$t('closing_database')}}
+    {{$t('closing_db')}}
   </SyncSubStep>
 </template>
 

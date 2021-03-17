@@ -160,22 +160,21 @@
   </div>
 </template>
 
-<script>
-  import SyncStep from '../SyncStep'
-  import CheckConnection from '../common/substeps/CheckConnection'
-  import AuthenticateDevice from '../common/substeps/AuthenticateDevice'
-  import CheckLatestSnapshot from './substeps/CheckLatestSnapshot'
-  import CompareDownload from './substeps/CompareDownload'
-  import CompareUpload from './substeps/CompareUpload'
-  import EmptySnapshotsDirectory from './substeps/EmptySnapshotsDirectory'
-  import CheckDownloadSize from './substeps/CheckDownloadSize'
+<script lang="ts">
+  import Vue from 'vue'
+  import SyncStep from '../SyncStep.vue'
+  import CheckConnection from '../common/substeps/CheckConnection.vue'
+  import AuthenticateDevice from '../common/substeps/AuthenticateDevice.vue'
+  import CheckLatestSnapshot from './substeps/CheckLatestSnapshot.vue'
+  import CompareDownload from './substeps/CompareDownload.vue'
+  import CompareUpload from './substeps/CompareUpload.vue'
+  import EmptySnapshotsDirectory from './substeps/EmptySnapshotsDirectory.vue'
+  import CheckDownloadSize from './substeps/CheckDownloadSize.vue'
   import DownloadSnapshot from './substeps/DownloadSnapshot.vue'
   import VerifyDownload from './substeps/VerifyDownload.vue'
   import ExtractSnapshot from './substeps/ExtractSnapshot.vue'
   import RemoveDatabase from './substeps/RemoveDatabase.vue'
-  import InsertRows from './substeps/InsertRows.vue'
   import ConfigureDatabase from './substeps/ConfigureDatabase.vue'
-  import CheckForeignKeys from './substeps/CheckForeignKeys.vue'
   import RegisterDownload from './substeps/RegisterDownload.vue'
   import GenerateImageList from './substeps/GenerateImageList.vue'
   import CalculateImageSize from './substeps/CalculateImageSize.vue'
@@ -190,7 +189,7 @@
   import Sync from '../../../entities/trellis-config/Sync'
   import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
   import TrellisAlert from '../../TrellisAlert.vue'
-  export default {
+  export default Vue.extend({
     name: 'download',
     data () {
       return {
@@ -380,9 +379,7 @@
       ExtractSnapshot,
       VerifyDownload,
       RemoveDatabase,
-      InsertRows,
       ConfigureDatabase,
-      CheckForeignKeys,
       RegisterDownload,
       GenerateImageList,
       CalculateImageSize,
@@ -390,7 +387,7 @@
       MoveDatabase,
       CloseDatabase
     }
-  }
+  })
 </script>
 
 <style lang="sass" scoped>
