@@ -58,6 +58,13 @@
               hide-details>
             </v-text-field>
           </v-card-title>
+          <div>
+           <ul class="inlineList">
+             <li> Successful: {{ uploadsSuccessCount }} </li>
+             <li> Failed: {{ uploadsFailedCount }} </li>
+             <li> Pending: {{ uploadsPendingCount }} </li>
+           </ul>
+          </div>
           <v-card-text>
             <v-data-table
               sort-by="created_at"
@@ -201,7 +208,16 @@
           })
         }
         return returnArray
-      }
+      },
+     uploadsSuccessCount: function () {
+       return this.uploads.filter(s => s.status === 'SUCCESS').length
+     },
+     uploadsFailedCount: function () {
+       return this.snapshots.filter(s => s.status === 'FAILED').length
+     },
+     uploadsPendingCount: function () {
+       return this.uploads.filter(s => s.status === 'PENDING').length
+     }
     },
     methods: {
       getUploads: async function () {
@@ -273,5 +289,13 @@
     width: 100%
     border: 1px solid #dd2c00
     overflow: scroll
+  .inlineList 
+    display: flex
+    flex-direction: row
+    list-style: none
+    padding: 0
+    white-space: nowrap
+    margin: 20px
+    /* Below sets up your display method: flex-start|flex-end|space-between|space-around */
+    justify-content: space-between
 </style>
-
