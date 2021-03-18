@@ -27,13 +27,22 @@
       @click:append="togglePassHidden"
       :type="isPassHidden ? 'password' : 'text'"
       v-model="password"/>
-    <v-btn
-      v-if="showLoginButton"
-      @click="login"
-      :loading="isWorking"
-      :disabled="isWorking || !isValid">
-      {{ $t('login') }}
-    </v-btn>
+    <ul class = "inlineList">
+      <li>
+        <v-btn
+          v-if="showLoginButton"
+          @click="login"
+          :loading="isWorking"
+          :disabled="isWorking || !isValid">
+          {{ $t('login') }}
+        </v-btn>
+      </li>
+      <li>
+        <v-btn @click="reset">
+          {{$t('reset')}}
+        </v-btn>
+      </li>
+    </ul>
   </v-form>
 </template>
 
@@ -83,6 +92,10 @@
       }
     },
     methods: {
+      reset () {
+          this.username = ''
+          this.password = ''
+      },
       login () {
         if (this.isValid && this.$refs.form.validate()) {
           this.$emit('login', this.username, this.password)
@@ -104,3 +117,13 @@
     }
   })
 </script>
+<style lang="sass" scoped>
+  .inlineList 
+    display: flex
+    flex-direction: row
+    list-style: none
+    padding: 0
+    white-space: nowrap
+    margin: 0
+    justify-content: space-between
+</style>
