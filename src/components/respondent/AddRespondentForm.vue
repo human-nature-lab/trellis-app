@@ -18,6 +18,10 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
+            <v-btn
+              @click="resetName()">
+              {{$t('clear')}}
+            </v-btn>
             <v-btn @click="save">
               <v-progress-circular v-if="isSaving"/>
               <span v-else>{{$t('continue')}}</span>
@@ -115,6 +119,9 @@
       }
     },
     methods: {
+       resetName () {
+          this.name = ''
+      },
       async addPhoto (photo) {
         try {
           let returnPhoto = await RespondentService.addPhoto(this.respondent.id, photo)
