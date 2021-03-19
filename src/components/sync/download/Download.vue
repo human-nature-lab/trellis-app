@@ -227,7 +227,7 @@
         })
         this.downloadSubStep = 1
       } catch (err) {
-        defaultLoggingService.log(err).then(log => { this.currentLog = log })
+        this.currentLog = await defaultLoggingService.log(err)
       }
     },
     props: {

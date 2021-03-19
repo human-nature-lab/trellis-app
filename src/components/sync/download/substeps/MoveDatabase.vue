@@ -45,11 +45,10 @@
           // @ts-ignore
           const snapshotUrl = cordova.file.applicationStorageDirectory + 'files/files/snapshots/snapshot.db'
           console.log(dbUrl, snapshotUrl)
-          await FileService.moveFull(snapshotUrl, dbUrl)
+          await FileService.moveUrl(snapshotUrl, dbUrl)
           this.isDone = true
           this.$emit('done')
         } catch (err) {
-          console.error(err)
           this.currentLog = await this.loggingService.log(err)
         } finally {
           this.isMoving = false

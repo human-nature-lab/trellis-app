@@ -111,7 +111,7 @@ class FileServiceCordova {
     return parts.length ? parts[parts.length - 1] : ''
   }
   
-  async moveFull (fromURI: string, toURI: string): Promise<FileEntry> {
+  async moveUrl (fromURI: string, toURI: string): Promise<FileEntry> {
     const fileEntry = await this.localUrl(fromURI) as FileEntry
     const dirUri = this.dirname(toURI)
     const newName = this.basename(toURI)
