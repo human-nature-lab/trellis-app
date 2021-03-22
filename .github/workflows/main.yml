@@ -27,8 +27,10 @@ jobs:
       - uses: c-hive/gha-npm-cache@v1
       - run: npm install
 
-      - name: Copy config file
-        run: cp static/config.default.js static/config.js
+      - name: Copy config files
+        run: |
+          cp static/config.default.js static/config.js
+          cp config/config-xml.dev.default.js config/config-xml.dev.js
       
       - name: Build web bundle
         id: web_bundle
