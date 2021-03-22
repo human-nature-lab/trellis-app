@@ -51,6 +51,13 @@ jobs:
         with:
           cordova-version: 9
       
+      - name: Build dev APK
+        run: |
+          npm run mobile
+          cordova platform add android
+          cordova build android
+          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-dev.apk
+      
       - name: Build debug APK
         run: |
           npx cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile
@@ -85,6 +92,17 @@ jobs:
           body_path: ${{ env.RELEASE_FILE }}
           draft: ${{ env.IS_PRERELEASE == 'false' }}
           prerelease: ${{ env.IS_PRERELEASE }}
+      
+      - name: Upload dev APK
+        id: upload-dev-apk
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./trellis-dev.apk
+          asset_name: trellis-dev.apk
+          asset_content_type: application/octet-stream
         
       - name: Upload debug APK
         id: upload-debug-apk
