@@ -63,7 +63,6 @@ jobs:
       - name: Build debug APK
         run: |
           npx cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile
-          cordova platform add android
           cordova build android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
