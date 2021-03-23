@@ -11,12 +11,10 @@
             <v-btn
               :disabled="isBusy"
               @click.stop.prevent="showMenu = !showMenu"
-              icon
-            >
+              icon>
               <TrellisLoadingCircle
                 v-if="isBusy"
-                size="100%"
-              ></TrellisLoadingCircle>
+                size="100%" />
               <v-icon v-else>mdi-dots-vertical</v-icon>
             </v-btn>
           </v-list-item-action>
@@ -27,14 +25,12 @@
               :to="{
                 name: 'FormBuilder',
                 params: { formId: form.id, mode: 'builder' },
-              }"
-            >
+              }">
               <v-list-item-content> Edit </v-list-item-content>
             </v-list-item>
           </Permission>
           <v-list-item
-            :to="{ name: 'InterviewPreview', params: { formId: form.id } }"
-          >
+            :to="{ name: 'InterviewPreview', params: { formId: form.id } }">
             <v-list-item-content> Preview </v-list-item-content>
           </v-list-item>
           <!--v-list-item :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
@@ -62,8 +58,8 @@
     </td>
     <td v-if="Number(formType) == formTypes.LOCATION" style="min-width: 20em">
       <geo-type-select
+        :geo-type-id="studyForm.geoTypeId"
         :outlined="false"
-        show-user-addable
         @geoTypeSelected="changeGeoType" />
     </td>
     <td v-if="Number(formType) == formTypes.CENSUS" style="min-width: 20em">

@@ -5,8 +5,8 @@
     :outlined="outlined"
     :disabled="disabled"
     :readonly="readonly || (clickToEdit && !editing)"
-    :append-icon="(clickToEdit && !editing) ? 'mdi-pencil' : 'mdi-menu-down'"
-    @click:append="clickAppend"
+    :append-outer-icon="(clickToEdit && !editing) ? 'mdi-pencil' : undefined"
+    @click:append-outer="clickAppend"
     return-object
     :items="geoTypes"
     v-model="curGeoType"
@@ -27,8 +27,9 @@
     async created () {
       try {
         this.geoTypes = await GeoService.getGeoTypesByStudy(global.study.id, this.showUserAddable)
-        if (this.geoType) {
-          this.curGeoType = this.geoTypes.find((gt) => gt.id === this.geoType.id)
+        if (this.geoType || this.geoTypeId) {
+          const gtid = (this.geoType) ? this.geoType.id : this.geoTypeId
+          this.curGeoType = this.geoTypes.find((gt) => gt.id === gtid)
         }
       } catch (err) {
         if (this.isNotAuthError(err)) {
@@ -59,6 +60,10 @@
       },
       geoType: {
         type: GeoType,
+        required: false
+      },
+      geoTypeId: {
+        type: String,
         required: false
       },
       showUserAddable: {
