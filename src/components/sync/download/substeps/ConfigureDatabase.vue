@@ -33,19 +33,17 @@
           type: LoggingService,
           required: false,
           'default': function () { return defaultLoggingService }
-        },
-        queryRunner: {
-          type: Object,
-          required: true
         }
       },
       methods: {
         startWork: async function () {
           this.working = true
           this.status.message = this.$t('configuring_db')
+          await DatabaseService.createDatabase()
+          const queryRunner = (await DatabaseService.getDatabase()).createQueryRunner()
           try {
-            await DatabaseService.createUpdatedRecordsTable(this.queryRunner, this.status)
-            await DatabaseService.addTriggers(this.queryRunner, this.status)
+            await DatabaseService.createUpdatedRecordsTable(queryRunner, this.status)
+            await DatabaseService.addTriggers(queryRunner, this.status)
             this.onDone()
           } catch (err) {
             this.working = false
@@ -55,7 +53,7 @@
         onDone: function () {
           this.working = false
           this.success = true
-          this.$emit('configure-database-done', this.queryRunner)
+          this.$emit('configure-database-done')
         },
         retry: function () {
           this.clearErrors()

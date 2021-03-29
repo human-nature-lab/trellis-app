@@ -34,7 +34,7 @@
               <v-list>
                 <v-list-item v-if="allowNotes">
                   <v-btn icon @click.native="editPhoto(photo)">
-                    <v-icon medium>mdi-edit</v-icon>
+                    <v-icon medium>mdi-pencil</v-icon>
                   </v-btn>
                 </v-list-item>
                 <v-list-item>

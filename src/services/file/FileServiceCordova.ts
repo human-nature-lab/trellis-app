@@ -81,21 +81,50 @@ class FileServiceCordova {
    * @param {string} newName
    * @returns {Promise<any>}
    */
-  move (filePath: string, dir: string, newName?: string): Promise<FileEntry> {
+  async move (filePath: string, dir: string, newName?: string): Promise<FileEntry> {
+    console.log('move', filePath, dir, newName)
+    const fileEntry = await this.localUrl(filePath) as FileEntry
+    const dirEntry = await this.localUrl(dir) as DirectoryEntry
+    console.log('move', fileEntry, dirEntry, newName)
+    return this.moveTo(fileEntry, dirEntry, newName)
+  }
+
+  moveTo (file: FileEntry, toDir: DirectoryEntry, name: string): Promise<FileEntry> {
     return new Promise((resolve, reject) => {
-      window.resolveLocalFileSystemURL(filePath, fileEntry => {
-        window.resolveLocalFileSystemURL(dir, (dirEntry: DirectoryEntry) => {
-          fileEntry.moveTo(dirEntry, newName, (newEntry: FileEntry) => {
-            resolve(newEntry)
-          }, err => {
-            reject('Unable to move file ' + JSON.stringify(err))
-          })
-        }, err => {
-          reject('Directory not found ' + JSON.stringify(err))
-        })
+      file.moveTo(toDir, name, (newEntry: FileEntry) => {
+        resolve(newEntry)
       }, err => {
-        reject('File not found ' + JSON.stringify(err))
+        reject('Unable to move file ' + JSON.stringify(err))
       })
+    })
+  }
+
+  dirname (path: string): string {
+    const parts = path.split('/')
+    if (!parts.length) return path
+    let last = parts[parts.length - 1]
+    return last.length ? parts.slice(0, -1).join('/') : parts.join('/')
+  }
+
+  basename (path: string): string {
+    let parts = path.split('/')
+    return parts.length ? parts[parts.length - 1] : ''
+  }
+  
+  async moveUrl (fromURI: string, toURI: string): Promise<FileEntry> {
+    const fileEntry = await this.localUrl(fromURI) as FileEntry
+    const dirUri = this.dirname(toURI)
+    const newName = this.basename(toURI)
+    console.log(fromURI, toURI, dirUri, newName)
+    const dirEntry = await this.localUrl(dirUri) as DirectoryEntry
+    return this.moveTo(fileEntry, dirEntry, newName)
+  }
+  
+  localUrl (filePath: string): Promise<FileEntry|DirectoryEntry> {
+    return new Promise((resolve, reject) => {
+      window.resolveLocalFileSystemURL(filePath, (entry: FileEntry | DirectoryEntry) => {
+        resolve(entry)
+      }, reject)
     })
   }
 
@@ -128,8 +157,22 @@ class FileServiceCordova {
       }, reject)
     })
   }
+  
+  async existsUrl (file: string): Promise<boolean> {
+    try {
+      await this.localUrl(file)
+      return true
+    } catch (err) {
+      return err.code === 1
+    }
+  }
+  
+  async deleteUrl (file: string) {
+    const entry = await this.localUrl(file) as FileEntry
+    return this.deleteFile(entry)
+  }
 
-  deleteFile (fileEntry) {
+  deleteFile (fileEntry: FileEntry): Promise<void> {
     return new Promise((resolve, reject) => {
       fileEntry.remove(resolve, reject)
     })
@@ -215,7 +258,6 @@ class FileServiceCordova {
             if (authHeader) {
               headers['Authorization'] = authHeader
             }
-            console.log('file transfer headers', headers)
             fileTransfer.download(uri, fileURL,
               (success) => {
                 resolve(fileEntry)
