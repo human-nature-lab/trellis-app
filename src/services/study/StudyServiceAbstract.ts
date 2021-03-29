@@ -1,3 +1,4 @@
+import User from '../../entities/trellis/User'
 import Study from '../../entities/trellis/Study'
 import SingletonService from '../SingletonService'
 
@@ -38,6 +39,11 @@ export default abstract class StudyServiceAbstract {
    * @returns {PromiseLike<Study[]>}
    */
   abstract getUserStudies (userId: string): PromiseLike<Study[]>
+  
+  /**
+   * Get all users assigned to a study
+   */
+  abstract getStudyUsers (studyId: string): PromiseLike<User[]>
 
   /**
    * Get all studies

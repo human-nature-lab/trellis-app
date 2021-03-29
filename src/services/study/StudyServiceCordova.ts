@@ -25,8 +25,19 @@ class StudyServiceCordova extends StudyServiceAbstract {
       .where(qb => 'study.id in ' + qb.subQuery()
         .select('user_study.studyId')
         .from(UserStudy, 'user_study')
-        .where('user_study.userId = :userId', {userId})
+        .where('user_study.userId = :userId', { userId })
         .getQuery()
+      ).getMany()
+  }
+  
+  async getStudyUsers (studyId: string): Promise<User[]> {
+    const repo = await DatabaseService.getRepository(User)
+    return repo.createQueryBuilder('user').
+      where(qb => 'user.id in ' + qb.subQuery().
+        select('user_study.userId').
+        from(UserStudy, 'user_study').
+        where('user_study.studyId = :studyId', { studyId }).
+        getQuery()
       ).getMany()
   }
 

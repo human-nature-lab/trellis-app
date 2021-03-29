@@ -182,6 +182,10 @@
           title: 'admin',
           showIf: this.isWeb,
           items: [{
+            to: { name: 'StudyDashboard' },
+            icon: 'mdi-chart-line',
+            title: 'study'
+          }, {
             to: {name: 'Users'},
             icon: 'mdi-account-box-multiple',
             title: 'users',
