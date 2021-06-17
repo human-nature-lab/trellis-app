@@ -198,12 +198,12 @@
           const forms = await FormService.reorderForms(this.global.study.id, tempStudyForms)
           this.studyForms = forms
           this.sortBy = 'sortOrder'
+          this.alert('success', this.$t('resource_updated', [this.$t('forms')]))
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err, this.$t('failed_resource_update', [this.$t('forms')]))
           }
-        } finally {
-          this.alert('success', this.$t('resource_updated', [this.$t('forms')]))
+          // TODO: Should probably return to the original order here
         }
       },
       formImported(importedForm: Form) {

@@ -18,6 +18,8 @@
         :headers="headers"
         :items="users"
         :loading="isLoading"
+        :options="pagination"
+        @update:options="loadUsers($event)"
         :footer-props="footerProps"
         :server-items-length="total">
         <template v-slot:item="{ item }">
@@ -43,7 +45,6 @@
   import User from '../entities/trellis/User'
   import UserEdit from '../components/user/UserEdit.vue'
   import UserRow from '../components/user/UserRow.vue'
-  import DiffService from '../services/DiffService'
   import UserService from '../services/user/UserService'
   import TrellisModal from '../components/TrellisModal.vue'
   import Vue from 'vue'
@@ -62,18 +63,21 @@
         showEditUser: false,
         userToEdit: null,
         isLoading: false,
+        pagination: {
+          page: 1,
+          itemsPerPage: 20,
+          sortBy: ['name'],
+          sortDesc: false
+        },
         footerProps: {
           itemsPerPageAllText: this.$t('all'),
-          itemsPerPageOptions: [2, 50, 100, -1],
+          itemsPerPageOptions: [20, 50, 100, -1],
           itemsPerPageText: this.$t('rows_per_page'),
-          pagination: {
-            itemsPerPage: 2
-          }
         }
       }
     },
     created () {
-      this.loadUsers()
+      this.loadUsers(this.pagination)
     },
     computed: {
       headers (): object[] {
@@ -95,26 +99,17 @@
         }]
       }
     },
-    watch: {
-      pagination: {
-        handler (newVal, oldVal) {
-          if (!DiffService.objectsAreEqualByProps(newVal, oldVal, ['descending', 'page', 'itemsPerPage', 'sortBy'])) {
-            this.loadUsers()
-          }
-        },
-        deep: true
-      }
-    },
     methods: {
       async editUser (user: User) {
         this.showEditUser = true
         this.userToEdit = user
       },
-      async loadUsers () {
+      async loadUsers (pagination) {
+        console.log('loadUsers', pagination)
         try {
           this.isLoading = true
-          const pagination = this.footerProps.pagination
-          const page = await UserService.getPage(pagination.page - 1, pagination.itemsPerPage, pagination.sortBy, pagination.descending)
+          this.pagination = pagination
+          const page = await UserService.getPage(pagination.page - 1, pagination.itemsPerPage, pagination.sortBy[0], pagination.sortDesc)
           this.total = page.total
           this.users = page.data
           console.log('users', this.users)

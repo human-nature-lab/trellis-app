@@ -14,6 +14,7 @@
     <v-data-table
       :loading="isBusy"
       :footer-props="footerProps"
+      :options="pagination"
       :items="devices"
       :headers="headers">
       <template v-slot:item="{ item: device }">
@@ -62,13 +63,15 @@
         isAdding: false,
         isEditing: false,
         editingDevice: null,
+        serverItemsLength: null,
         footerProps: {
           itemsPerPageAllText: this.$t('all'),
-          itemsPerPageOptions: [2, 50, 100, -1],
+          itemsPerPageOptions: [20, 50, 100, -1],
           itemsPerPageText: this.$t('rows_per_page'),
-          pagination: {
-            itemsPerPage: 2
-          }
+        },
+        pagination: {
+          itemsPerPage: 20,
+          page: 0
         },
         headers: [{
           text: this.$t('actions'),
@@ -112,9 +115,7 @@
         this.isBusy = true
         try {
           const page = await DeviceService.getDevices(this.footerProps.pagination)
-          this.pagination.total = page.total
-          this.pagination.start = page.start
-          this.pagination.count = page.count
+          this.serverItemsLength = page.total
           this.devices = page.data
         } catch (err) {
           if (this.isNotAuthError(err)) {

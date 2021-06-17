@@ -23,6 +23,7 @@ const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'..
 export default [{
   path: '/',
   name: 'Home',
+  default: true,
   component: StudyDashboard,
   beforeEnter: guardQueue([StudyGuard, LocaleGuard])
 }, {

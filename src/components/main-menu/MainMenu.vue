@@ -25,6 +25,7 @@
             :key="item.title"
             v-if="item.showIf !== false"
             @click="(e) => item.click && item.click(e)"
+            exact
             v-bind="{to: item.to ? item.to : null}">
             <v-list-item-action>
               <v-icon :color="item.iconColor">{{item.icon}}</v-icon>
@@ -182,7 +183,7 @@
           title: 'admin',
           showIf: this.isWeb,
           items: [{
-            to: { name: 'StudyDashboard' },
+            to: { name: 'Home' },
             icon: 'mdi-chart-line',
             title: 'study'
           }, {
