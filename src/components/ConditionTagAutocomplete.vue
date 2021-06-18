@@ -15,9 +15,7 @@
     v-bind="$attrs">
     <template #selection="props">
       <v-chip outlined color="primary">
-        <v-avatar>
-          <v-icon>mdi-label</v-icon>
-        </v-avatar>
+        <v-icon small class="mr-2">mdi-tag</v-icon>
         {{ props.item }}
       </v-chip>
     </template>
@@ -66,6 +64,7 @@
         this.isLoading = true;
         try {
           const tags = await ConditionTagService.respondent();
+          tags.sort((a, b) => a.name.localeCompare(b.name))
           this.conditionTags = tags.map((c) => c.name);
           this.hasLoaded = true;
         } catch (err) {

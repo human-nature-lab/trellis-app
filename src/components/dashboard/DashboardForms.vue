@@ -1,7 +1,9 @@
 <template>
   <v-col v-intersect="onIntersect">
     <v-card-title class="py-0 px-1">
-      {{$t('forms')}}
+      <div>
+        <div>{{$t('forms')}}</div>
+      </div>
       <v-spacer />
       <v-btn @click="downloadForms" class="mx-1">
         Download
@@ -42,11 +44,24 @@
         @change="load()" />
     </v-card-title>
     <v-row no-gutters>
-      <v-chip v-for="user in users" :key="user.id" @click:close="removeUser(user)" close>
-        <v-icon small class="mr-2">mdi-account</v-icon> {{user.name}}
+      <div v-if="!isLoading" class="pl-1 mr-4 subtitle-1">{{total}} surveys</div>
+      <v-chip
+        v-for="user in users"
+        :key="user.id"
+        @click:close="removeUser(user)"
+        close
+        class="mr-2">
+        <v-icon small class="mr-2">mdi-account</v-icon>
+        {{user.name}}
       </v-chip>
-      <v-chip v-for="tag in conditionTags" :key="tag" @click:close="removeTag(tag)" close>
-        <v-icon small class="mr-2">mdi-tag</v-icon> {{tag}}
+      <v-chip
+        v-for="tag in conditionTags"
+        :key="tag"
+        @click:close="removeTag(tag)"
+        close
+        class="mr-2">
+        <v-icon small class="mr-2">mdi-tag</v-icon>
+        {{tag}}
       </v-chip>
     </v-row>
     <v-row v-if="isLoading">
@@ -125,6 +140,18 @@
         this.load()
       }
     },
+    computed: {
+      total (): number {
+        let sum = 0
+        for (const id in this.forms) {
+          sum += this.forms[id].data.data.reduce((t, v) => t + v, 0)
+        }
+        return sum
+      },
+      hasFilters (): boolean {
+        return this.conditionTags.length || this.users.length
+      }
+    },
     methods: {
       onIntersect (entries: { isIntersecting: boolean }[]) {
         if (this.hasLoaded) return
@@ -200,7 +227,7 @@
         }
         rows.sort((a, b) => a[0].localeCompare(b[0]))
         const csv = PapaParse.unparse(headers.concat(rows))
-        let downloadName = `${this.min}-${this.max}_form_count`
+        let downloadName = `${this.min}-${this.max}_forms`
         if (this.conditionTags.length) {
           downloadName += `_cond_${this.conditionTags.join('-')}`
         }

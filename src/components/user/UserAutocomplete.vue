@@ -37,7 +37,9 @@
         if (this.hasLoaded || this.isLoading) return
         this.isLoading = true
         try {
-          this.users = await StudyService.getStudyUsers(this.study)
+          const users = await StudyService.getStudyUsers(this.study)
+          users.sort((a, b) => a.name.localeCompare(b.name))
+          this.users = users
           this.hasLoaded = true
         } catch(err) {
           this.error = err
