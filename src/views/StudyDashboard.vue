@@ -1,40 +1,56 @@
 <template>
   <v-col>
-    <v-row>
-      <v-col cols="12" md="8">
-        <v-row>
-          <div class="text-h4">
-            {{global.study.name}}
-          </div>
-          <v-spacer />
-          <v-dialog v-model="showMin" width="300">
-            <template #activator="{ on, attrs }">
-              <v-btn v-on="on" v-bind="attrs">
-                Start: {{min}}
-              </v-btn>
-            </template>
-            <v-date-picker
-              :max="max"
-              v-model="min" 
-              @change="showMin = false" />
-          </v-dialog>
-          <v-dialog v-model="showMax" width="300">
-            <template #activator="{ on, attrs }">
-              <v-btn v-on="on" v-bind="attrs">
-                End: {{max}}
-              </v-btn>
-            </template>
-            <v-date-picker
-              :min="min"
-              v-model="max"
-              @change="showMax = false" />
-          </v-dialog>
-        </v-row>
-      </v-col>
-    </v-row>
-    <v-row class="my-8">
+    <v-row class="mb-12">
       <v-col>
         <StudyCounts :study="global.study.id" />
+      </v-col>
+    </v-row>
+    <v-row class="px-1">
+      <div class="pa-2">
+        Dates:
+      </div>
+      <v-dialog v-model="showMin" width="300">
+        <template #activator="{ on, attrs }">
+          <v-btn v-on="on" v-bind="attrs" class="mx-2">
+            {{min}}
+          </v-btn>
+        </template>
+        <v-date-picker
+          :max="max"
+          v-model="min" 
+          @change="showMin = false" />
+      </v-dialog>
+      <v-icon>
+        mdi-arrow-right
+      </v-icon>
+      <v-dialog v-model="showMax" width="300">
+        <template #activator="{ on, attrs }">
+          <v-btn v-on="on" v-bind="attrs" class="mx-2">
+            {{max}}
+          </v-btn>
+        </template>
+        <v-date-picker
+          :min="min"
+          v-model="max"
+          @change="showMax = false" />
+      </v-dialog>
+    </v-row>
+    <v-row>
+      <v-col cols="12" md="6">
+        <SparkLoader
+          title="Respondents"
+          :min="min"
+          :max="max"
+          :study="global.study.id"
+          data-key="respondents" />
+      </v-col>
+      <v-col cols="12" md="6">
+        <SparkLoader
+          title="Surveys"
+          :min="min"
+          :max="max"
+          :study="global.study.id"
+          data-key="surveys" />
       </v-col>
     </v-row>
     <v-row>
@@ -45,24 +61,6 @@
           :max="max"
           :study="global.study.id"
           data-key="users" />
-      </v-col>
-      <v-col cols="12" md="6">
-        <SparkLoader
-          title="Respondents"
-          :min="min"
-          :max="max"
-          :study="global.study.id"
-          data-key="respondents" />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="6">
-        <SparkLoader
-          title="Surveys"
-          :min="min"
-          :max="max"
-          :study="global.study.id"
-          data-key="surveys" />
       </v-col>
       <v-col cols="12" md="6">
         <SparkLoader

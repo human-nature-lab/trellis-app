@@ -44,6 +44,7 @@
     "moment": "^2.22.2",
     "ngraph.forcelayout": "^0.5.0",
     "ngraph.graph": "0.0.14",
+    "papaparse": "^5.3.1",
     "reflect-metadata": "^0.1.12",
     "regenerator-runtime": "^0.13.7",
     "typeface-roboto": "0.0.54",
