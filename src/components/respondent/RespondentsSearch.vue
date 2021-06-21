@@ -248,7 +248,8 @@
         default: () => []
       },
       respondentId: {
-        type: String
+        type: String,
+        required: false
       },
       canAddRespondent: {
         type: Boolean,
@@ -258,7 +259,10 @@
         type: Boolean,
         default: true
       },
-      onRespondentAdded: Function
+      onRespondentAdded: {
+        type: Function,
+        required: false
+      }
     },
     head: {
       title: {

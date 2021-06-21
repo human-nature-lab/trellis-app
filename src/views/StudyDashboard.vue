@@ -18,7 +18,7 @@
         <v-date-picker
           :max="max"
           v-model="min" 
-          @change="showMin = false" />
+          @change="dateChange" />
       </v-dialog>
       <v-icon>
         mdi-arrow-right
@@ -32,7 +32,7 @@
         <v-date-picker
           :min="min"
           v-model="max"
-          @change="showMax = false" />
+          @change="dateChange" />
       </v-dialog>
     </v-row>
     <v-row>
@@ -88,9 +88,11 @@
   import StudyCounts from '../components/dashboard/StudyCounts.vue'
   import DashboardForms from '../components/dashboard/DashboardForms.vue'
   import moment from 'moment'
+  import { QueryPersistMixin } from '../mixins/QueryPersistMixin'
 
   export default Vue.extend({
     name: 'StudyDashboard',
+    mixins: [QueryPersistMixin],
     components: { SparkLoader, DashboardForms, StudyCounts },
     data () {
       const today = moment()
@@ -99,7 +101,19 @@
         showMin: false,
         showMax: false,
         min: today.clone().subtract(1, 'year').format('YYYY-MM-DD'),
-        max: today.format('YYYY-MM-DD')
+        max: today.format('YYYY-MM-DD'),
+        persistKeys: ['min', 'max']
+      }
+    },
+    created () {
+      this.readQueryState(...this.persistKeys)
+    },
+    methods: {
+      dateChange () {
+        console.log('dateChange')
+        this.showMin = false
+        this.showMax = false
+        this.updateQueryState(...this.persistKeys)
       }
     }
   })

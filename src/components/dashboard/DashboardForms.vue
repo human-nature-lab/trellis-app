@@ -9,39 +9,73 @@
         Download
         <v-icon small class="ml-2">mdi-download</v-icon>
       </v-btn>
-      <TrellisModal v-model="showUser" :title="$t('add_user')">
-        <template #activator="{ on, attrs }">
-          <v-btn v-on="on" v-bind="attrs" class="mx-1">
-            {{$t('add_user')}}
-            <v-icon small class="ml-2">mdi-plus</v-icon>
+      <v-menu offset-y left>
+        <template #activator="{ on, attrs}">
+          <v-btn v-on="on" v-bind="attrs">
+            <v-icon>mdi-filter</v-icon>
           </v-btn>
         </template>
-        <v-container>
-          <UserAutocomplete
-            v-model="users"
-            :study="study"
-            return-object
-            @change="load"
-            multiple />
-        </v-container>
-      </TrellisModal>
-      <TrellisModal v-model="showTag" :title="$t('add_condition_tag')">
-        <template #activator="{ on, attrs }">
-          <v-btn v-on="on" v-bind="attrs" class="mx-1">
-            {{$t('add_tag')}}
-            <v-icon small class="ml-2">mdi-plus</v-icon>
-          </v-btn>
-        </template>
-        <v-container>
-          <ConditionTagAutocomplete
-            v-model="conditionTags"
-            @change="load" />
-        </v-container>
-      </TrellisModal>
-      <v-switch 
-        v-model="onlyPublished"
-        :label="$t('published')"
-        @change="load()" />
+        <v-list>
+          <TrellisModal v-model="showUser" :title="$t('add_user')">
+            <template #activator="{ on, attrs }">
+              <v-list-item v-on="on" v-bind="attrs">
+                <v-list-item-avatar>
+                  <v-icon>mdi-account</v-icon>
+                </v-list-item-avatar>
+                {{$t('add_user')}}
+              </v-list-item>
+            </template>
+            <v-container>
+              <UserAutocomplete
+                v-model="users"
+                :study="study"
+                return-object
+                @change="load"
+                multiple />
+            </v-container>
+          </TrellisModal>
+          <TrellisModal v-model="showTag" :title="$t('add_condition_tag')">
+            <template #activator="{ on, attrs }">
+              <v-list-item v-on="on" v-bind="attrs">
+                <v-list-item-avatar>
+                  <v-icon>mdi-tag</v-icon>
+                </v-list-item-avatar>
+                {{$t('add_tag')}}
+              </v-list-item>
+            </template>
+            <v-container>
+              <ConditionTagAutocomplete
+                v-model="conditionTags"
+                @change="load" />
+            </v-container>
+          </TrellisModal>
+          <TrellisModal v-model="showRespondents" :title="$t('add_respondent')">
+            <template #activator="{ on, attrs }">
+              <v-list-item v-on="on" v-bind="attrs">
+                <v-list-item-avatar>
+                  <v-icon>mdi-account-group</v-icon>
+                </v-list-item-avatar>
+                {{$t('add_respondent')}}
+              </v-list-item>
+            </template>
+            <RespondentsSearch
+              @selected="updateRespondents"
+              :selectedRespondents="respondents" 
+              :canSelect="true"
+              :formsButtonVisible="false"
+              :infoButtonVisible="false"
+              :shouldUpdateRoute="false" 
+              :canAddRespondent="false"
+              :canRemoveGeos="false" />
+          </TrellisModal>
+          <v-list-item>
+            <v-switch
+              v-model="onlyPublished"
+              :label="$t('published')"
+              @change="load()" />
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-card-title>
     <v-row no-gutters>
       <div v-if="!isLoading" class="pl-1 mr-4 subtitle-1">{{total}} surveys</div>
@@ -63,6 +97,14 @@
         <v-icon small class="mr-2">mdi-tag</v-icon>
         {{tag}}
       </v-chip>
+      <RespondentChip
+        v-for="respondent in respondents"
+        :key="respondent"
+        @click:close="removeRespondent(respondent)"
+        close
+        :value="respondent"
+        class="mr-2"
+        />
     </v-row>
     <v-row v-if="isLoading">
       <v-col cols="12" md="6" v-for="i in 4" :key="i">
@@ -101,15 +143,27 @@
   import TrellisModal from '../TrellisModal.vue'
   import ConditionTagAutocomplete from '../ConditionTagAutocomplete.vue'
   import UserAutocomplete from '../user/UserAutocomplete.vue'
+  import RespondentsSearch from '../respondent/RespondentsSearch.vue'
+  import RespondentChip from '../respondent/RespondentChip.vue'
   import StudyForm from '../../entities/trellis/StudyForm'
   import TranslationService from '../../services/TranslationService'
   import PapaParse from 'papaparse'
   import { saveAs } from 'file-saver'
+  import { QueryPersistMixin } from '../../mixins/QueryPersistMixin'
 
 
   export default Vue.extend({
     name: 'DashboardForms',
-    components: { SparkCard, TranslatedText, TrellisModal, ConditionTagAutocomplete, UserAutocomplete },
+    mixins: [QueryPersistMixin],
+    components: {
+      SparkCard,
+      TranslatedText,
+      TrellisModal,
+      ConditionTagAutocomplete,
+      UserAutocomplete,
+      RespondentsSearch,
+      RespondentChip,
+    },
     props: {
       study: String,
       locale: Object,
@@ -120,14 +174,20 @@
       return {
         showTag: false,
         showUser: false,
+        showRespondents: false,
         hasLoaded: false,
         isLoading: false,
         isDownloading: false,
         onlyPublished: true,
         users: [] as User[],
-        conditionTags: [] as ConditionTag[],
-        forms: {} as {[key: string]: { form: Form, data: SparkData }}
+        conditionTags: [] as string[],
+        respondents: [] as string[],
+        forms: {} as {[key: string]: { form: Form, data: SparkData }},
+        persistKeys: ['respondents', 'conditionTags', 'onlyPublished']
       }
+    },
+    created () {
+      this.readQueryState(...this.persistKeys)
     },
     watch: {
       study () {
@@ -163,11 +223,13 @@
       async load () {
         this.isLoading = true
         try {
+          this.updateQueryState(...this.persistKeys)
           const res = await adminInst.get(`study/${this.study}/dashboard/forms`, {
             params: {
               min: this.min,
               max: this.max,
               users: this.users.map(u => u.id),
+              respondents: this.respondents,
               conditionTags: this.conditionTags,
               onlyPublished: +this.onlyPublished
             }
@@ -210,6 +272,18 @@
           this.conditionTags.splice(index, 1)
           this.load()
         }
+      },
+      removeRespondent (id: string) {
+        const index = this.respondents.indexOf(id)
+        if (index > -1) {
+          this.respondents.splice(index, 1)
+          this.load()
+        }
+      },
+      updateRespondents (respondents: string[]) {
+        this.respondents = respondents
+        this.showRespondents = false
+        this.load()
       },
       downloadForms () {
         const headers = [["Date", "Count", "Form", "Form id"]]
