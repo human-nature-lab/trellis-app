@@ -67,6 +67,22 @@
               :canAddRespondent="false"
               :canRemoveGeos="false" />
           </TrellisModal>
+          <TrellisModal v-model="showGeos" :title="$t('add_geo')">
+            <template #activator="{ on, attrs }">
+              <v-list-item v-on="on" v-bind="attrs">
+                <v-list-item-avatar>
+                  <v-icon>mdi-map-marker</v-icon>
+                </v-list-item-avatar>
+                {{$t('add_geo')}}
+              </v-list-item>
+            </template>
+            <GeoSearch 
+              :showRespondentsLink="false"
+              :showCart="true"
+              :isSelectable="true"
+              :shouldUpdateRoute="false"
+              @doneSelecting="updateGeos" />
+          </TrellisModal>
           <v-list-item>
             <v-switch
               v-model="onlyPublished"
@@ -102,6 +118,13 @@
         :value="respondent"
         class="mr-2"
         />
+      <GeoChip 
+        v-for="geo in geos"
+        :key="geo"
+        @click:close="removeGeo(geo)"
+        close
+        :value="geo"
+        class="mr-2" />
     </v-row>
     <v-row v-if="isLoading">
       <v-col cols="12" md="6" v-for="i in 4" :key="i">
@@ -140,6 +163,8 @@
   import UserAutocomplete from '../user/UserAutocomplete.vue'
   import RespondentsSearch from '../respondent/RespondentsSearch.vue'
   import RespondentChip from '../respondent/RespondentChip.vue'
+  import GeoChip from '../geo/GeoChip.vue'
+  import GeoSearch from '../geo/GeoSearch.vue'
   import UserChip from '../user/UserChip.vue'
   import StudyForm from '../../entities/trellis/StudyForm'
   import TranslationService from '../../services/TranslationService'
@@ -147,6 +172,7 @@
   import { saveAs } from 'file-saver'
   import { QueryPersistMixin } from '../../mixins/QueryPersistMixin'
   import debounce from 'lodash/debounce'
+  import Geo from '../../entities/trellis/Geo'
 
   export default Vue.extend({
     name: 'DashboardForms',
@@ -160,6 +186,8 @@
       RespondentsSearch,
       RespondentChip,
       UserChip,
+      GeoChip,
+      GeoSearch,
     },
     props: {
       study: String,
@@ -172,16 +200,18 @@
         showTag: false,
         showUser: false,
         showRespondents: false,
+        showGeos: false,
         hasLoaded: false,
         isLoading: false,
         isDownloading: false,
         onlyPublished: true,
         users: [] as string[],
+        geos: [] as string[],
         conditionTags: [] as string[],
         respondents: [] as string[],
         forms: {} as {[key: string]: { form: Form, data: SparkData }},
         // Which data on the model to persist
-        persistKeys: ['respondents', 'conditionTags', 'onlyPublished', 'users']
+        persistKeys: ['respondents', 'conditionTags', 'onlyPublished', 'users', 'geos']
       }
     },
     created () {
@@ -232,6 +262,7 @@
               min: this.min,
               max: this.max,
               users: this.users,
+              geos: this.geos,
               respondents: this.respondents,
               conditionTags: this.conditionTags,
               onlyPublished: +this.onlyPublished
@@ -283,9 +314,21 @@
           this.loadDebounced()
         }
       },
+      removeGeo (id: string) {
+        const index = this.geos.indexOf(id)
+        if (index > -1) {
+          this.geos.splice(index, 1)
+          this.loadDebounced()
+        }
+      },
       updateRespondents (respondents: string[]) {
         this.respondents = respondents
         this.showRespondents = false
+        this.loadDebounced()
+      },
+      updateGeos (geos: Geo[]) {
+        this.geos = geos.map(g => g.id)
+        this.showGeos = false
         this.loadDebounced()
       },
       downloadForms () {

@@ -111,7 +111,7 @@
     props: {
       selectedGeos: {
         type: Array,
-        'default': () => []
+        default: () => []
       },
       baseFilters: {
         type: Object,
@@ -124,10 +124,10 @@
       },
       showRespondentsLink: {
         type: Boolean,
-        'default': true
+        default: true  
       },
       isSelectable: {
-        'default': false
+        default: false
       },
       showCart: {
         type: Boolean,
@@ -135,10 +135,11 @@
       },
       shouldUpdateRoute: {
         type: Boolean,
-        'default': true
+        default: true
       },
       limit: {
-        type: Number
+        type: Number,
+        default: 0
       }
     },
     data () {
@@ -265,7 +266,7 @@
         }
       },
       onDone () {
-        this.$emit('doneSelecting', this.selectedGeos.map(s => s.copy()))
+        this.$emit('doneSelecting', this.selectedGeos.slice())
         // Empty the array without breaking references
         while (this.selectedGeos.length) {
           this.selectedGeos.pop()
