@@ -332,7 +332,7 @@
         this.loadDebounced()
       },
       downloadForms () {
-        const headers = [["Date", "Count", "Form", "Form id"]]
+        const headers = [["Date", "Survey Count", "Form", "Form id"]]
         const rows = []
         for (const id in this.forms) {
           const f = this.forms[id]
