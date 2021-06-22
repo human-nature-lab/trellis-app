@@ -75,6 +75,11 @@ export class UserServiceWeb extends UserServiceAbstract {
       newPassword: newPass
     })
   }
+  
+  async getUser (id: string): Promise<User> {
+    const res = await adminInst.get(uriTemplate('/user/{userId}', [id]))
+    return new User().fromSnakeJSON(res.data.user)
+  }
 
 }
 

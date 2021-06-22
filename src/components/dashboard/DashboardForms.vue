@@ -29,8 +29,7 @@
               <UserAutocomplete
                 v-model="users"
                 :study="study"
-                return-object
-                @change="load"
+                @change="loadDebounced"
                 multiple />
             </v-container>
           </TrellisModal>
@@ -46,7 +45,7 @@
             <v-container>
               <ConditionTagAutocomplete
                 v-model="conditionTags"
-                @change="load" />
+                @change="loadDebounced" />
             </v-container>
           </TrellisModal>
           <TrellisModal v-model="showRespondents" :title="$t('add_respondent')">
@@ -72,22 +71,20 @@
             <v-switch
               v-model="onlyPublished"
               :label="$t('published')"
-              @change="load()" />
+              @change="loadDebounced()" />
           </v-list-item>
         </v-list>
       </v-menu>
     </v-card-title>
     <v-row no-gutters>
       <div v-if="!isLoading" class="pl-1 mr-4 subtitle-1">{{total}} surveys</div>
-      <v-chip
+      <UserChip
         v-for="user in users"
-        :key="user.id"
+        :key="user"
         @click:close="removeUser(user)"
         close
-        class="mr-2">
-        <v-icon small class="mr-2">mdi-account</v-icon>
-        {{user.name}}
-      </v-chip>
+        :value="user" 
+        class="mr-2" />
       <v-chip
         v-for="tag in conditionTags"
         :key="tag"
@@ -138,19 +135,18 @@
   import { adminInst } from '../../services/http/AxiosInstance'
   import SparkCard, { SparkData } from './SparkCard.vue'
   import TranslatedText from '../TranslatedText.vue'
-  import ConditionTag from '../../entities/trellis/ConditionTag'
-  import User from '../../entities/trellis/User'
   import TrellisModal from '../TrellisModal.vue'
   import ConditionTagAutocomplete from '../ConditionTagAutocomplete.vue'
   import UserAutocomplete from '../user/UserAutocomplete.vue'
   import RespondentsSearch from '../respondent/RespondentsSearch.vue'
   import RespondentChip from '../respondent/RespondentChip.vue'
+  import UserChip from '../user/UserChip.vue'
   import StudyForm from '../../entities/trellis/StudyForm'
   import TranslationService from '../../services/TranslationService'
   import PapaParse from 'papaparse'
   import { saveAs } from 'file-saver'
   import { QueryPersistMixin } from '../../mixins/QueryPersistMixin'
-
+  import debounce from 'lodash/debounce'
 
   export default Vue.extend({
     name: 'DashboardForms',
@@ -163,6 +159,7 @@
       UserAutocomplete,
       RespondentsSearch,
       RespondentChip,
+      UserChip,
     },
     props: {
       study: String,
@@ -179,11 +176,12 @@
         isLoading: false,
         isDownloading: false,
         onlyPublished: true,
-        users: [] as User[],
+        users: [] as string[],
         conditionTags: [] as string[],
         respondents: [] as string[],
         forms: {} as {[key: string]: { form: Form, data: SparkData }},
-        persistKeys: ['respondents', 'conditionTags', 'onlyPublished']
+        // Which data on the model to persist
+        persistKeys: ['respondents', 'conditionTags', 'onlyPublished', 'users']
       }
     },
     created () {
@@ -191,13 +189,16 @@
     },
     watch: {
       study () {
-        this.load()
+        console.log('DashboardForms.study', this.study)
+        this.loadDebounced()
       },
       min () {
-        this.load()
+        console.log('DashboardForms.min', this.min)
+        this.loadDebounced()
       },
       max () {
-        this.load()
+        console.log('DashboardForms.max', this.max)
+        this.loadDebounced()
       }
     },
     computed: {
@@ -220,7 +221,9 @@
           this.hasLoaded = true
         }
       },
+      loadDebounced: debounce(function () { this.load() }, 400),
       async load () {
+        if (!this.min || !this.max) return
         this.isLoading = true
         try {
           this.updateQueryState(...this.persistKeys)
@@ -228,7 +231,7 @@
             params: {
               min: this.min,
               max: this.max,
-              users: this.users.map(u => u.id),
+              users: this.users,
               respondents: this.respondents,
               conditionTags: this.conditionTags,
               onlyPublished: +this.onlyPublished
@@ -259,31 +262,31 @@
           this.isLoading = false
         }
       },
-      removeUser (user: User) {
+      removeUser (user: string) {
         const index = this.users.indexOf(user)
         if (index > -1) {
           this.users.splice(index, 1)
-          this.load()
+          this.loadDebounced()
         }
       },
-      removeTag (tag: ConditionTag) {
+      removeTag (tag: string) {
         const index = this.conditionTags.indexOf(tag)
         if (index > -1) {
           this.conditionTags.splice(index, 1)
-          this.load()
+          this.loadDebounced()
         }
       },
       removeRespondent (id: string) {
         const index = this.respondents.indexOf(id)
         if (index > -1) {
           this.respondents.splice(index, 1)
-          this.load()
+          this.loadDebounced()
         }
       },
       updateRespondents (respondents: string[]) {
         this.respondents = respondents
         this.showRespondents = false
-        this.load()
+        this.loadDebounced()
       },
       downloadForms () {
         const headers = [["Date", "Count", "Form", "Form id"]]

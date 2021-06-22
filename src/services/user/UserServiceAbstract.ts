@@ -102,4 +102,9 @@ export abstract class UserServiceAbstract {
    * @returns {PromiseLike<User>}
    */
   abstract updatePassword (user: User, oldPassword: string, newPassword: string): PromiseLike<void>
+  
+  /**
+   * Fetch a user object
+   */
+  abstract getUser (id: string): PromiseLike<User>
 }

@@ -185,7 +185,7 @@
           items: [{
             to: { name: 'Home' },
             icon: 'mdi-chart-line',
-            title: 'study'
+            title: 'dashboard'
           }, {
             to: {name: 'Users'},
             icon: 'mdi-account-box-multiple',

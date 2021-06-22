@@ -54,6 +54,11 @@ export class UserServiceCordova extends UserServiceAbstract {
   async updatePassword (user: User, oldPassword: string, newPassword: string): Promise<void> {
     throw Error('not implemented')
   }
+  
+  async getUser (id: string): Promise<User> {
+    const repo = await DatabaseService.getRepository(User)
+    return repo.find(id)
+  }
 
 }
 

@@ -44,6 +44,7 @@
     },
     methods: {
       async load () {
+        if (!this.min || !this.max) return
         this.isLoading = true
         try {
           const res = await adminInst.get(`study/${this.study}/dashboard/${this.dataKey}`, {

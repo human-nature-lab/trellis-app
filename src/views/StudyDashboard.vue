@@ -9,31 +9,20 @@
       <div class="pa-2">
         Dates:
       </div>
-      <v-dialog v-model="showMin" width="300">
+      <v-dialog v-model="showDates" width="300">
         <template #activator="{ on, attrs }">
           <v-btn v-on="on" v-bind="attrs" class="mx-2">
-            {{min}}
-          </v-btn>
-        </template>
-        <v-date-picker
-          :max="max"
-          v-model="min" 
-          @change="dateChange" />
-      </v-dialog>
-      <v-icon>
-        mdi-arrow-right
-      </v-icon>
-      <v-dialog v-model="showMax" width="300">
-        <template #activator="{ on, attrs }">
-          <v-btn v-on="on" v-bind="attrs" class="mx-2">
+            {{min}} 
+            <v-icon small class="mx-2">mdi-arrow-right</v-icon>
             {{max}}
           </v-btn>
         </template>
         <v-date-picker
-          :min="min"
-          v-model="max"
+          v-model="dates"
+          range
           @change="dateChange" />
       </v-dialog>
+
     </v-row>
     <v-row>
       <v-col cols="12" md="6">
@@ -98,11 +87,9 @@
       const today = moment()
       return {  
         global,
-        showMin: false,
-        showMax: false,
-        min: today.clone().subtract(1, 'year').format('YYYY-MM-DD'),
-        max: today.format('YYYY-MM-DD'),
-        persistKeys: ['min', 'max']
+        showDates: false,
+        dates: [today.clone().subtract(1, 'year').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],
+        persistKeys: ['dates']
       }
     },
     created () {
@@ -114,6 +101,14 @@
         this.showMin = false
         this.showMax = false
         this.updateQueryState(...this.persistKeys)
+      }
+    },
+    computed: {
+      min (): string {
+        return this.dates[0]
+      },
+      max (): string {
+        return this.dates[1]
       }
     }
   })

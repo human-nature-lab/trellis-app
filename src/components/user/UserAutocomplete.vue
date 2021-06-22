@@ -1,16 +1,23 @@
 <template>
-  <v-autocomplete
-    v-on="$listeners"
-    :value="value"
-    item-key="id"
-    item-text="name"
-    :label="$t('users')"
-    @input="$emit('input', $event)"
-    :search-input.sync="search"
-    :items="users"
-    :hide-no-data="!hasLoaded"
-    :loading="isLoading"
-    v-bind="$attrs" />
+  <div>
+    <v-autocomplete
+      v-on="$listeners"
+      :value="value"
+      item-value="id"
+      item-text="name"
+      chips
+      :label="$t('users')"
+      @input="$emit('input', $event)"
+      :search-input.sync="search"
+      :items="users"
+      :error="!!error"
+      :hide-no-data="!hasLoaded"
+      :loading="isLoading"
+      v-bind="$attrs" />
+    <v-alert :value="error" type="error" dismissable>
+      {{error}}
+    </v-alert>
+  </div>
 </template>
 
 <script lang="ts">
@@ -41,6 +48,7 @@
           users.sort((a, b) => a.name.localeCompare(b.name))
           this.users = users
           this.hasLoaded = true
+          this.error = null
         } catch(err) {
           this.error = err
         } finally {
