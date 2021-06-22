@@ -354,6 +354,12 @@
         if (this.users.length) {
           downloadName += `_user_${this.users.map(u => u.username)}`
         }
+        if (this.geos.length) {
+          downloadName += `_geo_${this.geos.join('_')}`
+        }
+        if (this.respondents.length) {
+          downloadName += `_resp_${this.respondents.join('_')}`
+        }
         downloadName += '.csv'
         const blob = new Blob([csv], { type: 'text/csv' })
         saveAs(blob, downloadName)
