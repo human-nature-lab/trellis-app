@@ -12,8 +12,10 @@ class SyncAdminService {
     return res.data.snapshots
   }
 
-  async processUploads () {
-    return adminInst.post(`process-uploads`)
+  async processUploads (uploads: string[]) {
+    return adminInst.post(`process-uploads`, {
+      uploads
+    })
   }
 
   async generateSnapshot () {
