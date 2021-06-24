@@ -103,7 +103,11 @@ class SyncService {
     if (source) { options.cancelToken = source.token }
     const deviceId = await DeviceService.getUUID()
     const http = await syncInstance()
-    return http.get(`device/${deviceId}/image/${fileName}`, options)
+    const res = await http.get(`device/${deviceId}/image/${fileName}`, options)
+    if (res.status > 300) {
+      throw new Error('Unable to download image')
+    }
+    return res
   }
 
   async hasSynced (): Promise<boolean> {

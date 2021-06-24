@@ -8,6 +8,9 @@
   <preference name="DisallowOverscroll" value="true" />
   <preference name="ShowSplashScreenSpinner" value="false"/>
   <preference name="AndroidLaunchMode" value="singleInstance"/>
+  {{#if DEV}}
+    <preference name="loadUrlTimeoutValue" value="120000" />
+  {{/if}}
   {{#if ACCESS_ORIGIN}}
     <access origin="{{ACCESS_ORIGIN}}" />
   {{/if}}

@@ -62,8 +62,10 @@
             const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'snapshots')
             const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
             const syncAuth = await getSyncAuthentication()
+            console.log('starting download')
             this.fileServicePromise = FileService.download(uri, fileEntry, this.onDownloadProgress, syncAuth)
             await this.fileServicePromise
+            console.log('download complete')
             this.success = true
             this.$emit('download-snapshot-done', fileEntry)
             this.downloading = false
@@ -75,10 +77,20 @@
           }
         },
         onDownloadProgress: function (progressEvent) {
-          let curProgress = (progressEvent.loaded / progressEvent.total) * 100
-          // Only update at 5% increments, without this the progress bar does not update
-          if ((curProgress - this.downloadProgress) > 5) {
-            this.downloadProgress = curProgress
+          let { lengthComputable, total, loaded } = progressEvent
+          if (!total) {
+            total = +this.snapshotFileSize
+            lengthComputable = total > 0 && loaded > 0
+          }
+          this.lastDownloadProgress = lengthComputable ? (loaded / total) * 100 : this.lastDownloadProgress + 0.001
+          if (lengthComputable) {
+            console.log('progress', lengthComputable, total, loaded, this.lastDownloadProgress)
+          }
+          // Only update at 1% increments, without this the progress bar does not update
+          if ((this.lastDownloadProgress - this.downloadProgress) > 1) {
+            this.downloadProgress = this.lastDownloadProgress
+          } else if (this.lastDownloadProgress >= 99) {
+            this.downloadProgress = 100
           }
         },
         stopDownload: function () {

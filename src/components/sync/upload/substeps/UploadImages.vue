@@ -55,6 +55,7 @@
             this.working = true
             this.progressIndeterminate = false
             const photoFile = this.imagesToUpload.pop()
+            console.log('uploading', photoFile)
             const deviceId = await DeviceService.getUUID()
             const apiRoot = await DatabaseService.getServerIPAddress()
             const uri = apiRoot + `/sync/device/${deviceId}/upload/image`

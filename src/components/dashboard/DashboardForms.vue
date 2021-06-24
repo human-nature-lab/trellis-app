@@ -93,20 +93,20 @@
       </v-menu>
     </v-card-title>
     <v-row no-gutters>
-      <div v-if="!isLoading" class="pl-1 mr-4 subtitle-1">{{total}} surveys</div>
+      <div class="pl-1 mr-4 subtitle-1">{{total}} surveys</div>
       <UserChip
         v-for="user in users"
         :key="user"
         @click:close="removeUser(user)"
         close
         :value="user" 
-        class="mr-2" />
+        class="mr-2 mb-2" />
       <v-chip
         v-for="tag in conditionTags"
         :key="tag"
         @click:close="removeTag(tag)"
         close
-        class="mr-2">
+        class="mr-2 mb-2">
         <v-icon small class="mr-2">mdi-tag</v-icon>
         {{tag}}
       </v-chip>
@@ -116,7 +116,7 @@
         @click:close="removeRespondent(respondent)"
         close
         :value="respondent"
-        class="mr-2"
+        class="mr-2 mb-2"
         />
       <GeoChip 
         v-for="geo in geos"
@@ -124,7 +124,7 @@
         @click:close="removeGeo(geo)"
         close
         :value="geo"
-        class="mr-2" />
+        class="mr-2 mb-2" />
     </v-row>
     <v-row v-if="isLoading">
       <v-col cols="12" md="6" v-for="i in 4" :key="i">
