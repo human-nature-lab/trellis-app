@@ -15,7 +15,7 @@ the web.
 ### Locations
 A respondent can be assigned to one or more locations in Trellis. These locations can be modified directly
 from this section. Click the "+" button in the top right corner of this section to create a new location. If
-a respondent needs to be moved, click the (<i class="icon material-icons">edit</i>) icon next to
+a respondent needs to be moved, click the (<i class="icon mdi mdi-pencil"></i>) icon next to
 the location which should be moved to start moving the respondent. This action triggers a census
 
 ### Condition tags

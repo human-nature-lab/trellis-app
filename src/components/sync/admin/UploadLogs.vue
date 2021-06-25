@@ -1,21 +1,21 @@
 <template>
-  <tr v-if="isOpen" >
-    <td colspan="6">
-      <v-data-table
-        :loading="isLoading"
-        :headers="headers"
-        :pagination.sync="pagination"
-        :items="meta">
-        <template v-slot:item="{ item  }">
-          <tr class="dense">
-            <td>{{item.name}}</td>
-            <td>{{item.inserted}}</td>
-            <td>{{item.updated}}</td>
-          </tr>
-        </template>
-      </v-data-table>
-    </td>
-  </tr>
+  <td>
+    <v-data-table
+      :loading="isLoading"
+      :headers="headers"
+      :error="error"
+      :items-per-page="10"
+      :options.sync="pagination"
+      :items="meta">
+      <template v-slot:item="{ item  }">
+        <tr class="dense">
+          <td>{{item.name}}</td>
+          <td>{{item.inserted}}</td>
+          <td>{{item.updated}}</td>
+        </tr>
+      </template>
+    </v-data-table>
+  </td>
 </template>
 
 <script lang="ts">
@@ -43,9 +43,9 @@
     data () {
       return {
         pagination: {
-          sortBy: 'name',
-          rowsPerPage: 25
+          sortBy: ['name'],
         },
+        error: null,
         showFull: false,
         isLoading: false,
         headers: [{
@@ -63,10 +63,13 @@
       }
     },
     watch: {
-      isOpen (newVal) {
-        if (newVal) {
-          this.showLogs()
-        }
+      upload () {
+        this.showLogs()
+      }
+    },
+    created () {
+      if (this.isOpen) {
+        this.showLogs()
       }
     },
     methods: {
@@ -79,7 +82,9 @@
         }
       },
       async showLogs () {
-        if (!this.logs || !this.logs.length) {
+        try {
+          this.logs = []
+          this.meta = []
           this.isLoading = true
           this.logs = await UploadLogService.getLogs(this.upload.id)
           const rows = [{
@@ -119,6 +124,9 @@
           for (let d of rows) {
             this.meta.push(this.getMeta(this.logs, d.name, d.key))
           }
+        } catch (err) {
+          this.error = err
+        } finally {
           this.isLoading = false
         }
       }

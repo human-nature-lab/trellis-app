@@ -202,7 +202,13 @@ module.exports = {
   devServer: {
     hot: true,
     port: process.env.PORT || config.dev.port,
-    host: process.env.HOST || config.dev.host || '0.0.0.0'
+    host: process.env.HOST || config.dev.host || '0.0.0.0',
+    before (app) {
+      app.use((req, res, next) => {
+        console.log(req.method, req.path)
+        next()
+      })
+    }
   },
   module: {
     rules: [

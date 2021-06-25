@@ -1,157 +1,135 @@
 <template>
-  <v-container fluid>
-    <v-layout row wrap>
-      <v-flex xs12 sm12 md6 lg6 xl6>
-        <v-card>
-          <v-card-title>
-            <h3 class="headline mb-0">
-              {{ $t('snapshots') }}
-            </h3>
-          </v-card-title>
-          <v-card-text>
-            <v-data-table
-              sort-by="created_at"
-              sort-desc
-              :loading="snapshotsLoading"
-              :headers="snapshotColumns"
-              :items="snapshots">
-              <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
-              <template v-slot:item="{ item }">
-                <tr>
-                  <td>{{ item.created_at }}</td>
-                  <td>{{ item.file_name }}</td>
-                </tr>
-              </template>
-              <template v-slot:no-data>
-                <v-alert :value="!snapshotsLoading" type="info">
-                  {{ $t('no_results') }}
-                </v-alert>
-                <span v-if="snapshotsLoading">
-                  {{ $t('loading') }}
-                </span>
-              </template>
-            </v-data-table>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn
-              text
-              :loading="generatingSnapshot"
-              :disabled="generatingSnapshot"
-              @click="generateSnapshot">
-              {{ $t('generate_snapshot') }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
-      <v-flex xs12 sm12 md6 lg6 xl6>
-        <v-card>
-          <v-card-title>
-            <h3 class="headline mb-0">
-              {{ $t('uploads') }}
-            </h3>
-            <v-spacer></v-spacer>
+  <v-container>
+    <v-col>
+      <v-card>
+        <v-card-title>
+          <h3 class="headline mb-0">
+            {{ $t('snapshots') }}
+          </h3>
+          <v-spacer />
+          <v-btn
+            text
+            :loading="generatingSnapshot"
+            :disabled="generatingSnapshot"
+            @click="generateSnapshot">
+            {{ $t('generate_snapshot') }}
+          </v-btn>
+          <v-btn icon @click="getSnapshots" :disabled="snapshotsLoading">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-data-table
+            sort-by="created_at"
+            sort-desc
+            :items-per-page="5"
+            :loading="snapshotsLoading"
+            :headers="snapshotColumns"
+            :items="snapshots">
+            <template v-slot:item="{ item }">
+              <tr>
+                <td>{{ item.created_at }}</td>
+                <td>{{ item.file_name }}</td>
+              </tr>
+            </template>
+            <template v-slot:no-data>
+              <v-alert :value="!snapshotsLoading" type="info">
+                {{ $t('no_results') }}
+              </v-alert>
+              <span v-if="snapshotsLoading">
+                {{ $t('loading') }}
+              </span>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+    </v-col>
+    <v-col>
+      <v-card>
+        <v-card-title>
+          <h3 class="headline mb-0">
+            {{ $t('uploads') }}
+          </h3>
+          <v-spacer />
+          <v-btn
+            text
+            :loading="uploadsProcessing"
+            :disabled="uploadsProcessing"
+            @click="processUploads">
+            {{ $t('process_uploads') }}
+          </v-btn>
+          <v-btn icon @click="getUploads" :disabled="uploadsLoading">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-text>
+          <v-row no-gutters class="mb-3">
             <v-text-field
               v-model="search"
-              append-icon="mdi-magnify"
+              prepend-icon="mdi-magnify"
+              type="search"
               :label="$t('search')"
               single-line
-              hide-details>
-            </v-text-field>
-          </v-card-title>
-          <v-card-text>
-            <v-data-table
-              sort-by="created_at"
-              sort-desc
-              :loading="uploadsLoading"
-              :headers="uploadColumns"
-              :items="uploadsFiltered">
-              <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
-              <template v-slot:item="props">
-                <tr>
-                  <td>
-                    <v-btn
-                      :disabled="props.item.status !== 'SUCCESS' && props.item.status !== 'FAILED'"
-                      icon
-                      @click="props.item.isOpen = !props.item.isOpen">
-                      <v-icon v-if="props.item.isOpen">mdi-arrow-down</v-icon>
-                      <v-icon v-else>mdi-arrow-right</v-icon>
-                    </v-btn>
-                  </td>
-                  <td>{{ props.item.created_at }}</td>
-                  <td>{{ props.item.status }}</td>
-                  <td>{{ (props.item.device_name) ? props.item.device_name : $t('not_found') }}</td>
-                  <td>{{ props.item.device_id }}</td>
-                  <td>{{ props.item.file_name }}</td>
-                </tr>
-                <UploadLogs
-                  :upload="props.item"
-                  :isOpen="props.item.status === 'SUCCESS' && props.item.isOpen"/>
-                <tr v-if="props.item.status === 'FAILED' && props.item.isOpen" >
-                  <td colspan="6">
-                    <v-alert
-                      value="true"
-                      type="error"
-                      outline>
-                      <v-layout row wrap>
-                        <v-flex>
-                          {{ props.item.error_message }}
-                        </v-flex>
-                      </v-layout>
-                      <v-layout row wrap>
-                        <v-flex xs12>
-                          <div class="textarea-wrapper">
-                            <textarea
-                              readonly
-                              rows="10"
-                              :value="props.item.error_trace">
-                            </textarea>
-                          </div>
-                        </v-flex>
-                      </v-layout>
-                    </v-alert>
-                  </td>
-                </tr>
-              </template>
-              <template slot="no-data">
-                <v-alert :value="!uploadsLoading" type="info">
-                  {{ $t('no_results') }}
-                </v-alert>
-                <span v-if="uploadsLoading">
-                  {{ $t('loading') }}
-                </span>
-              </template>
-            </v-data-table>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn
-              text
-              :loading="uploadsProcessing"
-              :disabled="uploadsProcessing"
-              @click="processUploads">
-              {{ $t('process_uploads') }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
-    </v-layout>
+              hide-details />
+            <v-spacer />
+          </v-row>
+          <v-data-table
+            sort-by="created_at"
+            sort-desc
+            show-select
+            show-expand
+            single-expand
+            :items-per-page="5"
+            v-model="selectedUploads"
+            :loading="uploadsLoading"
+            :headers="uploadColumns"
+            :items="uploadsFiltered">
+            <template v-slot:expanded-item="{ item }">
+              <UploadError 
+                v-if="item.status === 'FAILED' || item.status === 'ERROR'" 
+                :error="item" 
+                colspan="8" />
+              <UploadLogs 
+                v-else-if="item.status === 'SUCCESS'"
+                :upload="item" 
+                :isOpen="true" 
+                colspan="8" />
+              <td v-else colspan="8">
+                Please process this upload to view more information about it.
+              </td>
+            </template>
+            <template slot="no-data">
+              <v-alert :value="!uploadsLoading" type="info">
+                {{ $t('no_results') }}
+              </v-alert>
+              <span v-if="uploadsLoading">
+                {{ $t('loading') }}
+              </span>
+            </template>
+          </v-data-table>
+        </v-card-text>
+      </v-card>
+    </v-col>
   </v-container>
 </template>
 
 <script>
   import SyncAdminService from '../../../services/SyncAdminService'
   import UploadLogs from './UploadLogs'
+  import UploadError from './UploadError'
   import DocsLinkMixin from '../../../mixins/DocsLinkMixin'
   import DocsFiles from '../../documentation/DocsFiles'
   export default {
     name: 'sync-admin',
     mixins: [DocsLinkMixin(DocsFiles.sync.admin)],
-    components: { UploadLogs },
+    components: { UploadLogs, UploadError },
     data () {
       return {
         generatingSnapshot: false,
         search: '',
         snapshotsLoading: false,
         snapshots: [],
+        selectedUploads: [],
         snapshotColumns: [
           {
             text: 'Created on',
@@ -206,6 +184,7 @@
     methods: {
       getUploads: async function () {
         this.uploadsLoading = true
+        this.selectedUploads = []
         try {
           const uploads = await SyncAdminService.listUploads()
           this.uploads = uploads.map(u => {
@@ -237,7 +216,7 @@
       processUploads: async function () {
         this.uploadsProcessing = true
         try {
-          await SyncAdminService.processUploads()
+          await SyncAdminService.processUploads(this.selectedUploads.map(u => u.id))
           this.getUploads()
         } catch (err) {
           if (this.isNotAuthError(err)) {

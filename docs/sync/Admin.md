@@ -26,8 +26,8 @@ The upload status can be one of the following:
 - PENDING: This is an upload that has been uploaded by the device but has not yet been processed. Clicking the 
 **Process Uploads** button will add data from all pending uploads to the database.
 - SUCCESS: This upload has been successfully processed. Click the arrow 
-(<i class="icon material-icons black--text">keyboard_arrow_right</i>) the the left of a successfully processed upload
+(<i class="mdi mdi-chevron-down"></i>) the the left of a successfully processed upload
 to display a summary of the data that was uploaded.
 - ERROR: If there is an error during the upload process you will have to contact your study 
-administrator for a resolution. Click the arrow (<i class="icon material-icons black--text">keyboard_arrow_right</i>) 
+administrator for a resolution. Click the arrow (<i class="mdi mdi-chevron-down"></i>) 
 to display more information about the error.
