@@ -15,6 +15,9 @@
         </v-btn>
       </v-card-title>
       <v-card-text>
+        <v-alert type="error" :value="!!error">
+          {{error}}
+        </v-alert>
         <v-stepper v-model="step" vertical>
 
           <v-stepper-step step="1" :complete="step > 1">{{$t('add_location')}}</v-stepper-step>
@@ -47,7 +50,7 @@
                 <geo-type-selector
                   :disable-button="locationTypeSelected"
                   :show-user-addable="true"
-                  v-on:geo-type-selected="onGeoTypeSelected">
+                  @geo-type-selected="onGeoTypeSelected">
                 </geo-type-selector>
               </v-card-text>
               <v-card-actions>
@@ -173,6 +176,7 @@
         locationTypeSelected: false,
         isSaving: false,
         geo: null,
+        error: null,
         checkingForCensus: false,
         isDone: false
       }
@@ -232,6 +236,7 @@
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err)
+            this.error = err
           }
         }
       },
@@ -241,6 +246,7 @@
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err)
+            this.error = err
           }
         }
         this.step++
@@ -261,6 +267,7 @@
         } catch (err) {
           if (this.isNotAuthError(err)) {
             this.logError(err)
+            this.error = err
           }
         }
       },
@@ -271,6 +278,7 @@
           await GeoService.removePhoto(photo)
           this.geo.photos.splice(this.geo.photos.indexOf(photo), 1)
         } catch (err) {
+          this.error = err
           console.error(err)
         }
       },

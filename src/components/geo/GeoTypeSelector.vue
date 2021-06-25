@@ -4,6 +4,7 @@
       <v-flex xs12>
         <v-select
           single-line
+          return-object
           :items="geoTypes"
           v-model="curGeoType"
           item-text="name"
@@ -22,7 +23,6 @@
 </template>
 
 <script>
-  import Geo from '../../entities/trellis/Geo'
   import GeoType from '../../entities/trellis/GeoType'
   import GeoService from '../../services/geo/GeoService'
   import global from '../../static/singleton'
