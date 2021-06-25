@@ -1,15 +1,15 @@
 <template>
   <v-container>
-    <v-flex xs12>
+    <v-col>
       <v-progress-linear
-        v-if="isLoading"
-        indeterminate></v-progress-linear>
+        v-show="isLoading"
+        indeterminate />
       <v-card class="mt-4" v-for="formType in numericFormTypes" :key="formType">
         <v-toolbar flat>
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer></v-spacer>
-          <permission :requires="TrellisPermission.ADD_FORM">
-            <v-menu offset-x>
+          <Permission :requires="TrellisPermission.ADD_FORM">
+            <v-menu  offset-y left>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   v-on="on"
@@ -24,7 +24,7 @@
                     <v-icon>mdi-plus</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
-                    Add Form
+                    {{ $t('add_form') }}
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item @click="showImportForm = true; importFormType = Number(formType)">
@@ -32,12 +32,12 @@
                     <v-icon>mdi-swap-vertical</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
-                    Import Form
+                    {{ $t('import_form') }}
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
             </v-menu>
-          </permission>
+          </Permission>
         </v-toolbar>
         <v-data-table
           :sort-by.sync="sortBy"
@@ -48,6 +48,7 @@
           <template v-slot:body="props">
             <draggable
               handle=".drag-handle"
+              @start="isDragging = true"
               :list="props.items"
               @end="reorderForms"
               tag="tbody">
@@ -57,6 +58,7 @@
                 :form="item.form"
                 :study-form="item"
                 :form-type="formType"
+                :dragging="isDragging"
                 v-model="item.showHidden"
                 @toggleFormSkips="toggleFormSkips"
                 @save="updateForm"
@@ -67,13 +69,17 @@
           </template>
         </v-data-table>
       </v-card>
-    </v-flex>
-    <v-dialog v-model="showImportForm" @formImported="onFormImported(importedForm)" max-width="50em">
-      <form-import :form-type="importFormType"></form-import>
-    </v-dialog>
-    <v-dialog v-model="showFormSkips">
-      <form-skips :form="formSkipsForm" @dismissFormSkips="showFormSkips=false"></form-skips>
-    </v-dialog>
+    </v-col>
+    <TrellisModal v-model="showImportForm" :title="$t('import_form')">
+      <FormImport 
+        :form-type="importFormType"
+        @formImported="onFormImported(importedForm)" />
+    </TrellisModal>
+    <TrellisModal v-model="showFormSkips" :title="$t('form_skips')">
+      <FormSkips 
+        :form="formSkipsForm"
+        @dismissFormSkips="showFormSkips=false" />
+    </TrellisModal>
   </v-container>
 </template>
 
@@ -94,6 +100,7 @@
   import FormImport from '../components/import/FormImport'
   import groupBy from 'lodash/groupBy'
   import draggable from 'vuedraggable'
+import { delay } from '../classes/delay'
 
   export default Vue.extend({
     name: 'Forms',
@@ -109,6 +116,7 @@
         studyForms: null,
         isAddingNewForm: false,
         isLoading: false,
+        isDragging: false,
         showImportForm: false,
         importFormType: formTypes.CENSUS,
         sortBy: 'sortOrder',
@@ -156,9 +164,6 @@
         hdr = hdr.concat([{
           text: 'Published',
           align: 'center'
-        }, {
-          text: 'Skip',
-          align: 'center'
         }])
 
         return hdr.map((h, i) => {
@@ -187,6 +192,12 @@
         }
       },
       async reorderForms(evt) {
+        if (this.isLoading) return
+        if (evt.newIndex === evt.oldIndex) {
+          this.isDragging = false
+          return
+        }
+        this.isLoading = true
         let tempStudyForms = this.studyFormsByType[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
         let shifted = tempStudyForms[evt.oldIndex]
         tempStudyForms.splice(evt.oldIndex, 1)
@@ -204,6 +215,10 @@
             this.logError(err, this.$t('failed_resource_update', [this.$t('forms')]))
           }
           // TODO: Should probably return to the original order here
+        } finally {
+          await delay(1000)
+          this.isDragging = false
+          this.isLoading = false
         }
       },
       formImported(importedForm: Form) {

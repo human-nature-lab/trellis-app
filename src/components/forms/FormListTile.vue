@@ -1,12 +1,12 @@
 <template>
   <tr class="form-list-row">
     <td class="medium drag-handle" v-if="Number(formType) !== formTypes.CENSUS" >
-      <span class="text-button">{{ studyForm.sortOrder }}</span>
+      <span v-show="dragging" class="text-button">{{ studyForm.sortOrder }}</span>
       <span class="ml-2"><v-icon>mdi-drag-horizontal-variant</v-icon></span>
     </td>
     <td class="small">
-      <v-menu offset-x v-model="showMenu">
-        <template v-slot:activator="{ on, attrs }">
+      <v-menu offset-y right v-model="showMenu">
+        <template #activator="{ on, attrs }">
           <v-list-item-action v-on="on" v-bind="attrs">
             <v-btn
               :disabled="isBusy"
@@ -30,6 +30,13 @@
               }"
             >
               <v-list-item-content> Edit </v-list-item-content>
+            </v-list-item>
+          </Permission>
+          <Permission :requires="TrellisPermission.EDIT_FORM">
+            <v-list-item @click="$emit('toggleFormSkips', studyForm.form)">
+              <v-list-item-content>
+                {{ $t('edit_skips') }}
+              </v-list-item-content>
             </v-list-item>
           </Permission>
           <v-list-item
@@ -73,11 +80,6 @@
     <td>
       <v-checkbox v-model="memForm.isPublished" @change="save"></v-checkbox>
     </td>
-    <td>
-      <v-btn icon @click="$emit('toggleFormSkips', studyForm.form)">
-        <v-icon :class="{ 'primary--text': (studyForm.form.skips.length > 0) }">{{ icons.mdiArrowDecision }}</v-icon>
-      </v-btn>
-    </td>
   </tr>
 </template>
 
@@ -96,7 +98,6 @@
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";
   import StudyForm from "../../entities/trellis/StudyForm";
-  import { mdiArrowDecision } from '@mdi/js';
 
   export default Vue.extend({
     name: "form-list-tile",
@@ -108,9 +109,6 @@
     },
     data() {
       return {
-        icons: {
-          mdiArrowDecision
-        },
         isBusy: false,
         formTypes,
         showMenu: false,
@@ -128,6 +126,10 @@
       value: {
         type: Boolean,
       },
+      dragging: {
+        type: Boolean,
+        default: false
+      }
     },
     watch: {
       form(newForm: Form) {
