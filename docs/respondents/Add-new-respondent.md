@@ -7,9 +7,9 @@ on the respondent info page after adding the respondent.
 After entering the name, click the **Continue** button.
 
 ### Take a photo of the respondent
-Tap the plus (<i class="icon material-icons black--text">add</i>) button to add one or more photos of the respondent. Click 
-the star icon (<i class="icon material-icons black--text">star_border</i>) to choose the default photo to display. Click the menu 
-button (<i class="icon material-icons black--text">more_vert</i>) to add notes or delete photos.
+Tap the plus (<i class="mdi mdi-plus"></i>) button to add one or more photos of the respondent. Click 
+the star icon (<i class="mdi mdi-star-outline"></i>) to choose the default photo to display. Click the menu 
+button (<i class="mdi mdi-dots-vertical"></i>) to add notes or delete photos.
 
 *Note: adding photos is currently (as of v3.0.23) unimplemented for the web app. Photos must be added using the tablet 
 app.*
