@@ -4,6 +4,7 @@
       :loading="isLoading"
       :headers="headers"
       :error="error"
+      :items-per-page="10"
       :options.sync="pagination"
       :items="meta">
       <template v-slot:item="{ item  }">
@@ -43,7 +44,6 @@
       return {
         pagination: {
           sortBy: ['name'],
-          itemsPerPage: 25
         },
         error: null,
         showFull: false,

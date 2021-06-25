@@ -14,6 +14,9 @@
             @click="generateSnapshot">
             {{ $t('generate_snapshot') }}
           </v-btn>
+          <v-btn icon @click="getSnapshots" :disabled="snapshotsLoading">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
         </v-card-title>
         <v-card-text>
           <v-data-table
@@ -55,6 +58,9 @@
             @click="processUploads">
             {{ $t('process_uploads') }}
           </v-btn>
+          <v-btn icon @click="getUploads" :disabled="uploadsLoading">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
         </v-card-title>
         <v-card-text>
           <v-row no-gutters class="mb-3">
@@ -84,54 +90,14 @@
                 :error="item" 
                 colspan="8" />
               <UploadLogs 
-                v-else
+                v-else-if="item.status === 'SUCCESS'"
                 :upload="item" 
-                :isOpen="item.status === 'SUCCESS'" 
+                :isOpen="true" 
                 colspan="8" />
+              <td v-else colspan="8">
+                Please process this upload to view more information about it.
+              </td>
             </template>
-            <!-- <template v-slot:item="props">
-              <tr>
-                <td>
-                  <v-btn
-                    :disabled="props.item.status !== 'SUCCESS' && props.item.status !== 'FAILED'"
-                    icon
-                    @click="props.item.isOpen = !props.item.isOpen">
-                    <v-icon v-if="props.item.isOpen">mdi-arrow-down</v-icon>
-                    <v-icon v-else>mdi-arrow-right</v-icon>
-                  </v-btn>
-                </td>
-                <td>{{ props.item.created_at }}</td>
-                <td>{{ props.item.status }}</td>
-                <td>{{ (props.item.device_name) ? props.item.device_name : $t('not_found') }}</td>
-                <td>{{ props.item.device_id }}</td>
-                <td>{{ props.item.file_name }}</td>
-              </tr>
-              <tr v-if="props.item.status === 'FAILED' && props.item.isOpen" >
-                <td colspan="6">
-                  <v-alert
-                    value="true"
-                    type="error"
-                    outline>
-                    <v-layout row wrap>
-                      <v-flex>
-                        {{ props.item.error_message }}
-                      </v-flex>
-                    </v-layout>
-                    <v-layout row wrap>
-                      <v-flex xs12>
-                        <div class="textarea-wrapper">
-                          <textarea
-                            readonly
-                            rows="10"
-                            :value="props.item.error_trace">
-                          </textarea>
-                        </div>
-                      </v-flex>
-                    </v-layout>
-                  </v-alert>
-                </td>
-              </tr>
-            </template> -->
             <template slot="no-data">
               <v-alert :value="!uploadsLoading" type="info">
                 {{ $t('no_results') }}
