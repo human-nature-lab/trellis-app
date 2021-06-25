@@ -1,5 +1,5 @@
 <template>
-  <td v-if="isOpen" colspan="8">
+  <td>
     <v-data-table
       :loading="isLoading"
       :headers="headers"
@@ -63,10 +63,8 @@
       }
     },
     watch: {
-      isOpen (newVal) {
-        if (newVal) {
-          this.showLogs()
-        }
+      upload () {
+        this.showLogs()
       }
     },
     created () {

@@ -19,6 +19,7 @@
           <v-data-table
             sort-by="created_at"
             sort-desc
+            :items-per-page="5"
             :loading="snapshotsLoading"
             :headers="snapshotColumns"
             :items="snapshots">
@@ -50,7 +51,7 @@
           <v-btn
             text
             :loading="uploadsProcessing"
-            :disabled="!selectedUploads.length || uploadsProcessing"
+            :disabled="uploadsProcessing"
             @click="processUploads">
             {{ $t('process_uploads') }}
           </v-btn>
@@ -72,14 +73,21 @@
             show-select
             show-expand
             single-expand
+            :items-per-page="5"
             v-model="selectedUploads"
             :loading="uploadsLoading"
             :headers="uploadColumns"
             :items="uploadsFiltered">
             <template v-slot:expanded-item="{ item }">
-              <UploadLogs
-                :upload="item"
-                :isOpen="item.status === 'SUCCESS'"/>
+              <UploadError 
+                v-if="item.status === 'ERROR'" 
+                :error="item" 
+                colspan="8" />
+              <UploadLogs 
+                v-else
+                :upload="item" 
+                :isOpen="item.status === 'SUCCESS'" 
+                colspan="8" />
             </template>
             <!-- <template v-slot:item="props">
               <tr>
@@ -142,12 +150,13 @@
 <script>
   import SyncAdminService from '../../../services/SyncAdminService'
   import UploadLogs from './UploadLogs'
+  import UploadError from './UploadError'
   import DocsLinkMixin from '../../../mixins/DocsLinkMixin'
   import DocsFiles from '../../documentation/DocsFiles'
   export default {
     name: 'sync-admin',
     mixins: [DocsLinkMixin(DocsFiles.sync.admin)],
-    components: { UploadLogs },
+    components: { UploadLogs, UploadError },
     data () {
       return {
         generatingSnapshot: false,
