@@ -3,23 +3,21 @@
     <v-alert
       :value="true"
       type="error"
-      outline>
-      <v-layout row wrap>
-        <v-flex>
+      outlined>
+      <v-row wrap>
+        <v-col>
           {{ error.error_message }}
-        </v-flex>
-      </v-layout>
-      <v-layout row wrap>
-        <v-flex xs12>
-          <div class="textarea-wrapper">
-            <textarea
-              readonly
-              rows="10"
-              :value="error.error_trace">
-            </textarea>
-          </div>
-        </v-flex>
-      </v-layout>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-textarea
+            readonly
+            rows="10"
+            :value="error.error_trace">
+          </v-textarea>
+        </v-col>
+      </v-row>
     </v-alert>
   </td>
 </template>

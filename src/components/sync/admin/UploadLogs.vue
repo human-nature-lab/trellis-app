@@ -82,9 +82,9 @@
         }
       },
       async showLogs () {
-        if (this.logs && this.logs.length) return
-
         try {
+          this.logs = []
+          this.meta = []
           this.isLoading = true
           this.logs = await UploadLogService.getLogs(this.upload.id)
           const rows = [{

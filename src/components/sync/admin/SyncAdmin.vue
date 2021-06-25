@@ -86,7 +86,7 @@
             :items="uploadsFiltered">
             <template v-slot:expanded-item="{ item }">
               <UploadError 
-                v-if="item.status === 'ERROR'" 
+                v-if="item.status === 'FAILED' || item.status === 'ERROR'" 
                 :error="item" 
                 colspan="8" />
               <UploadLogs 
@@ -184,6 +184,7 @@
     methods: {
       getUploads: async function () {
         this.uploadsLoading = true
+        this.selectedUploads = []
         try {
           const uploads = await SyncAdminService.listUploads()
           this.uploads = uploads.map(u => {
