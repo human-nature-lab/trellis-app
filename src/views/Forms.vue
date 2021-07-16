@@ -43,16 +43,16 @@
           :sort-by.sync="sortBy"
           :headers="headers(formType)"
           hide-default-footer
+          :items-per-page="-1"
           :items="studyFormsByType[formType]">
-          :item-key="form.id"
-          <template v-slot:body="props">
+          <template #body="{ items }">
             <draggable
               handle=".drag-handle"
-              :list="props.items"
+              :list="items"
               @end="reorderForms"
               tag="tbody">
               <form-list-tile
-                v-for="item in props.items"
+                v-for="item in items"
                 :key="item.id"
                 :form="item.form"
                 :study-form="item"
@@ -61,7 +61,7 @@
                 @toggleFormSkips="toggleFormSkips"
                 @save="updateForm"
                 @updateStudyForm="updateStudyForm"
-                @delete="deleteForm(props.item)">
+                @delete="deleteForm(item)">
               </form-list-tile>
             </draggable>
           </template>
