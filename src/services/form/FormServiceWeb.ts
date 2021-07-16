@@ -79,6 +79,11 @@ export class FormServiceWeb implements FormServiceInterface {
     const res = await adminInst.patch(uriTemplate('study/{study}/forms/reorder', [studyId]), { study_forms: studyForms })
     return res.data.forms.map(f => new StudyForm().fromSnakeJSON(f))
   }
+  
+  async publishForm (studyId: string, formId: string): Promise<object> {
+    const res = await adminInst.post(uriTemplate('study/{study}/form/{form}/publish', [studyId, formId]))
+    return res.data
+  }
 
 }
 

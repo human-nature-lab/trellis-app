@@ -63,7 +63,7 @@
                 @toggleFormSkips="toggleFormSkips"
                 @save="updateForm"
                 @updateStudyForm="updateStudyForm"
-                @delete="deleteForm(props.item)">
+                @delete="deleteForm(item)">this.studyForm.studyId, 
               </form-list-tile>
             </draggable>
           </template>
@@ -162,7 +162,7 @@ import { delay } from '../classes/delay'
         }
 
         hdr = hdr.concat([{
-          text: 'Published',
+          text: 'Version',
           align: 'center'
         }])
 

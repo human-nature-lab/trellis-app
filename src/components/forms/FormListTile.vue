@@ -13,10 +13,7 @@
               @click.stop.prevent="showMenu = !showMenu"
               icon
             >
-              <TrellisLoadingCircle
-                v-if="isBusy"
-                size="100%"
-              ></TrellisLoadingCircle>
+              <v-progress-circular v-if="isBusy" indeterminate />
               <v-icon v-else>mdi-dots-vertical</v-icon>
             </v-btn>
           </v-list-item-action>
@@ -36,6 +33,13 @@
             <v-list-item @click="$emit('toggleFormSkips', studyForm.form)">
               <v-list-item-content>
                 {{ $t('edit_skips') }}
+              </v-list-item-content>
+            </v-list-item>
+          </Permission>
+          <Permission :requires="TrellisPermission.EDIT_FORM">
+            <v-list-item @click="publishForm">
+              <v-list-item-content>
+                {{ $t('publish_form') }}
               </v-list-item-content>
             </v-list-item>
           </Permission>
@@ -73,12 +77,19 @@
         :items="censusTypes"
         v-model="studyForm.censusTypeId"
         @change="changeCensusType"
-        hide-details
-        label="Census type"
-      ></v-select>
+        hide-detail />
     </td>
     <td>
-      <v-checkbox v-model="memForm.isPublished" @change="save"></v-checkbox>
+      <v-select
+        v-model="version"
+        :items="form.versions"
+        item-text="version"
+        item-value="id">
+        <template #item="{ item }">
+          v{{ item.version }}
+          <span v-if="item.id === form.studyForm.currentVersionId">(published)</span>
+        </template>
+      </v-select>
     </td>
   </tr>
 </template>
@@ -114,6 +125,7 @@
         showMenu: false,
         isOpen: false,
         memForm: this.form.copy(),
+        version: this.studyForm.currentVersionId,
         saveThrottled: debounce(async () => {
           this.$emit("save", this.memForm);
         }, 2000),
@@ -134,6 +146,7 @@
     watch: {
       form(newForm: Form) {
         this.memForm = newForm.copy();
+        this.version = this.studyForm.currentVersionId
       },
     },
     computed: {
@@ -146,7 +159,7 @@
           });
         }
         return returnTypes;
-      },
+      }
     },
     methods: {
       idFrom(key: string): string {
@@ -163,6 +176,22 @@
           }
         } finally {
           this.isBusy = false;
+        }
+      },
+      async publishForm () {
+        if (!this.version) {
+          return alert('Select a version to publish')
+        } else if (this.studyForm.currentVersionId && 
+          this.studyForm.currentVersionId !== this.version && 
+          !confirm('You are attempting to publish an old version. Is this desired?')) {
+          return
+        }
+        this.isBusy = true
+        try {
+          const res = await FormService.publishForm(this.studyForm.studyId, this.version)
+          console.log(res)
+        } finally {
+          this.isBusy = false
         }
       },
       save() {
