@@ -14,7 +14,18 @@ class StudyServiceCordova extends StudyServiceAbstract {
         id: studyId,
         deletedAt: IsNull()
       },
-      relations: ['locales']
+      relations: ['locales', 'testStudy']
+    })
+  }
+  
+  async getProdStudyFromTest (studyId: string): Promise<Study> {
+    const repo = await DatabaseService.getRepository(Study)
+    return repo.findOne({
+      where: {
+        testStudyId: studyId,
+        deletedAt: IsNull(),
+      },
+      relations: ['locales', 'testStudy'],
     })
   }
 
@@ -49,7 +60,7 @@ class StudyServiceCordova extends StudyServiceAbstract {
         where: {
           deletedAt: IsNull()
         },
-        relations: ['locales']
+        relations: ['locales', 'testStudy']
       })
     } else {
       return this.getUserStudies(user.id)

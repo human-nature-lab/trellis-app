@@ -526,3 +526,4 @@ moving_db,Moving database,,
 closing_db,Closing database,,
 edit_skips,Edit skips,,
 add_form,Add form,,
+test_mode,Test mode,,Whether or not we're collecting test data

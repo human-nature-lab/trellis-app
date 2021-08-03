@@ -69,11 +69,12 @@
   import Vue from 'vue'
   import PermissionMixin from '../../mixins/PermissionMixin'
   import { TrellisPermission } from '../../static/permissions.base'
+  import StudyService from '../../services/study/StudyService'
 
   export default {
     mixins: [ IsAdminMixin, IsLoggedInMixin, PermissionMixin],
     components: { UserPassword, TrellisModal},
-    name: 'dropdown-menu',
+    name: 'main-menu',
     data: () => ({
       global,
       showPasswordModal: false
@@ -138,6 +139,17 @@
         SingletonService.setOnlineOffline(offline)
         setTimeout(() => this.refresh(), 50)
       },
+      async toggleTestMode () {
+        if (this.isTestMode) {
+          const study = await StudyService.getProdStudyFromTest(this.global.study.id)
+          if (study) {
+            SingletonService.setCurrentStudy(study)
+          }
+        } else {
+          SingletonService.setCurrentStudy(this.global.study.testStudy)
+        }
+        setTimeout(() => this.refresh(), 50)
+      },
       changePassword () {
         this.showPasswordModal = true
       },
@@ -151,6 +163,9 @@
     computed: {
       isDebug () {
         return config.debug
+      },
+      isTestMode () {
+        return !!this.global.study && !this.global.study.testStudy
       },
       isCordovaBuild () {
         return config.appEnv === APP_ENV.CORDOVA
@@ -225,6 +240,13 @@
             click: this.openLocaleSelector,
             title: 'change_locale',
             icon: 'mdi-web'
+          }, {
+            click: this.toggleTestMode,
+            icon: this.isTestMode ? 'mdi-test-tube' : 'mdi-test-tube-empty',
+            title: 'test_mode',
+            switchColor: 'yellow',
+            iconColor: null,
+            switchValue: this.isTestMode
           }, {
             click: this.toggleDarkTheme,
             icon: 'mdi-theme-light-dark',

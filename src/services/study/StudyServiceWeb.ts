@@ -12,6 +12,11 @@ export default class StudyServiceWeb extends StudyServiceAbstract {
     const res = await http().get(`study/${studyId}`)
     return new Study().fromSnakeJSON(res.data.study)
   }
+  
+  async getProdStudyFromTest (studyId: string): Promise<Study> {
+    const res = await http().get(uriTemplate('study/{study}/prod', [studyId]))
+    return new Study().fromSnakeJSON(res.data.study)
+  }
 
   async getUserStudies (userId: string): Promise<Study[]> {
     // TODO: implement this correctly for web

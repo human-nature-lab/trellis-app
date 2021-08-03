@@ -19,13 +19,18 @@ export default abstract class StudyServiceAbstract {
   setCurrentStudy (study: Study): void {
     SingletonService.setCurrentStudy(study)
   }
+  
+  /**
+   * Get a prod study from a test study id
+   */
+  abstract getProdStudyFromTest (studyId: string): PromiseLike<Study | undefined>
 
   /**
    * Get a study by the study id
    * @param {string} studyId
    * @returns {Promise<Study>}
    */
-  abstract getStudy (studyId): PromiseLike<Study | undefined>
+  abstract getStudy (studyId: string): PromiseLike<Study | undefined>
 
   /**
    * Get all of the studies assigned to me
