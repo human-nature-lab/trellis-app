@@ -241,6 +241,7 @@
             title: 'change_locale',
             icon: 'mdi-web'
           }, {
+            showIf: !!this.global.study,
             click: this.toggleTestMode,
             icon: this.isTestMode ? 'mdi-test-tube' : 'mdi-test-tube-empty',
             title: 'test_mode',
