@@ -4,7 +4,7 @@ import Study from '../../entities/trellis/Study'
 import UserService from '../user/UserService'
 import UserStudy from '../../entities/trellis/UserStudy'
 import User from '../../entities/trellis/User'
-import { IsNull } from 'typeorm'
+import { IsNull, Not } from 'typeorm'
 
 class StudyServiceCordova extends StudyServiceAbstract {
   async getStudy (studyId: string): Promise<Study> {
@@ -38,7 +38,9 @@ class StudyServiceCordova extends StudyServiceAbstract {
         .from(UserStudy, 'user_study')
         .where('user_study.userId = :userId', { userId })
         .getQuery()
-      ).getMany()
+      )
+      .where('study.test_study_id is not null')
+      .getMany()
   }
   
   async getStudyUsers (studyId: string): Promise<User[]> {
@@ -58,7 +60,8 @@ class StudyServiceCordova extends StudyServiceAbstract {
       let repo = await DatabaseService.getRepository(Study)
       return repo.find({
         where: {
-          deletedAt: IsNull()
+          deletedAt: IsNull(),
+          testStudyId: Not(IsNull())
         },
         relations: ['locales', 'testStudy']
       })
