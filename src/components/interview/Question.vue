@@ -11,11 +11,7 @@
     <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
     <v-card-text class="question-content">
       <v-flex class="question-text title">
-        <AsyncTranslationText
-          passive
-          :translation="question.questionTranslation"
-          :location="location">
-        </AsyncTranslationText>
+        <QuestionText :location="location" :question="question" />
       </v-flex>
       <div
         :is="currentQuestionComponent"
@@ -57,6 +53,7 @@
   import TextAreaQuestion from './questions/TextAreaQuestion'
   import TimeQuestion from './questions/TimeQuestion'
   import QuestionTimer from './QuestionTimer'
+  import QuestionText from './QuestionText.vue'
 
   const typeMap = {
     [questionTypes.year]: DateQuestion,
@@ -81,6 +78,24 @@
   export default {
     name: 'question',
     mixins: [TranslationMixin],
+    components: {
+      AsyncTranslationText,
+      QuestionTimer,
+      DateQuestion,
+      DecimalQuestion,
+      DontKnowRefused,
+      GeoQuestion,
+      IntegerQuestion,
+      IntroQuestion,
+      ImageQuestion,
+      MultipleSelectQuestion,
+      RelationshipQuestion,
+      RosterQuestion,
+      RespondentGeoQuestion,
+      TextQuestion,
+      TimeQuestion,
+      QuestionText,
+    },
     props: {
       question: {
         type: Object,
@@ -112,6 +127,7 @@
       'question': {
         handler () {
           this.hasChanged = true
+          this.translation = this.question.questionTranslation
         },
         deep: true
       },
@@ -145,23 +161,6 @@
         const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.show_timer_controls)
         return questionParameter ? !!questionParameter.val : true
       }
-    },
-    components: {
-      AsyncTranslationText,
-      QuestionTimer,
-      DateQuestion,
-      DecimalQuestion,
-      DontKnowRefused,
-      GeoQuestion,
-      IntegerQuestion,
-      IntroQuestion,
-      ImageQuestion,
-      MultipleSelectQuestion,
-      RelationshipQuestion,
-      RosterQuestion,
-      RespondentGeoQuestion,
-      TextQuestion,
-      TimeQuestion
     }
   }
 </script>

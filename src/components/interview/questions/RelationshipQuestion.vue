@@ -13,6 +13,7 @@
         <Photo
           :photo="edge.targetRespondent.photos.length ? edge.targetRespondent.photos[0] : null"
           :showAlt="false"
+          immediate
           width="20"
           height="20"/>
       </v-avatar>

@@ -8,7 +8,7 @@
           <v-tooltip
             right
             v-if="form.isComplete">
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-icon
                 v-on="on"
                 v-bind="attrs"
@@ -21,7 +21,7 @@
           <v-tooltip
             right
             v-else-if="form.isStarted">
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-icon
                 v-on="on"
                 v-bind="attrs"
@@ -34,8 +34,9 @@
           <v-tooltip
             right
             v-else>
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-icon
+                @click="tryCreatingSurvey"
                 v-on="on"
                 v-bind="attrs">
                 mdi-play-circle-outline
@@ -59,8 +60,8 @@
             :disabled="!form.surveys.length"
             icon
             @click="isOpen = !isOpen">
-            <v-icon v-if="!isOpen">mdi-arrow-down</v-icon>
-            <v-icon v-else>mdi-arrow-up</v-icon>
+            <v-icon v-if="!isOpen">mdi-chevron-down</v-icon>
+            <v-icon v-else>mdi-chevron-up</v-icon>
           </v-btn>
         </v-flex>
       </v-row>

@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid fill-height class="ma-0 pa-0">
-    <v-layout column>
-      <v-toolbar flat>
+  <v-container fluid fill-height class="ma-0 pa-0 justify-start align-start">
+    <v-col>
+      <v-toolbar flat dense class="flex-grow-0">
         <v-toolbar-title>
           <AsyncTranslationText
             v-if="section"
@@ -38,7 +38,7 @@
               :conditionTags="interviewConditionTags"
               :interview="interview" />
       </v-flex>
-    </v-layout>
+    </v-col>
     <v-dialog
       v-model="dialog.beginning">
       <v-card>

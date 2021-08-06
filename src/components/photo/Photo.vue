@@ -71,6 +71,10 @@
       },
       height: {
         type: String
+      },
+      immediate: {
+        type: Boolean,
+        default: false
       }
     },
     data: function () {
@@ -88,7 +92,11 @@
       }
     },
     mounted () {
-      observer.observe(this.$refs.container)
+      if (!this.immediate){
+        observer.observe(this.$refs.container)
+      } else {
+        this.load()
+      }
       this.resetPhoto()
     },
     watch: {
