@@ -36,6 +36,7 @@
             v-else>
             <template v-slot:activator="{ on, attrs }">
               <v-icon
+                @click="tryCreatingSurvey"
                 v-on="on"
                 v-bind="attrs">
                 mdi-play-circle-outline

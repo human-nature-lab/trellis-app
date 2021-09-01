@@ -30,19 +30,24 @@
           @overrideCurrent="toggleIsCurrent(props.item)"
           :show-history="!!props.item.history && !!props.item.history.length"
           :show-controls="true"
-          v-model="props.expanded"
+          :value="props.isExpanded"
+          @input="props.expand($event)"
           :respondent-geo="props.item" />
       </template>
       <template v-slot:expanded-item="props">
-        <v-data-table
-          sort-by="translated"
-          :headers="locationHeaders"
-          :items="props.item.history"
-          hide-default-footer>
-          <template v-slot:item="historyProps">
-            <RespondentGeoRow :respondentGeo="historyProps.item"></RespondentGeoRow>
-          </template>
-        </v-data-table>
+        <tr>
+          <td colspan="4">
+            <v-data-table
+              sort-by="translated"
+              :headers="locationHeaders"
+              :items="props.item.history"
+              hide-default-footer>
+              <template v-slot:item="historyProps">
+                <RespondentGeoRow colspan="4" :respondentGeo="historyProps.item"></RespondentGeoRow>
+              </template>
+            </v-data-table>
+          </td>
+        </tr>
       </template>
     </v-data-table>
     <add-respondent-geo-form
