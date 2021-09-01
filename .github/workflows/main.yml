@@ -55,6 +55,7 @@ jobs:
       
       - name: Build dev APK
         run: |
+          cordova platform add android
           npm run build:dev:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-dev.apk
       
