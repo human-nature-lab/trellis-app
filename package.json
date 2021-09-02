@@ -11,8 +11,8 @@
   "scripts": {
     "build:mobile": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile",
     "build:dev:android": "npm run mobile && cordova run android",
-    "release:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile && cordova run android",
-    "release:prod:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile && cordova run android --release",
+    "release:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile && cordova build android",
+    "release:prod:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile && cordova build android --release",
     "build:dev:web": "npm run web",
     "build:web": "cross-env NODE_ENV=production npm run web",
     "web": "webpack --config=build/webpack.web.conf.js",
