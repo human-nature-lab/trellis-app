@@ -60,6 +60,7 @@ jobs:
 #           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-dev.apk
       
       - name: Build debug APK
+        continue-on-error: true
         run: |
           npm run mobile
           cordova platform add android
