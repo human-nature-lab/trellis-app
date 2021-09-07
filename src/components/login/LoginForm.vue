@@ -85,7 +85,7 @@
     methods: {
       login () {
         if (this.isValid && this.$refs.form.validate()) {
-          this.$emit('login', this.username, this.password)
+          this.$emit('login', this.username.trim(), this.password.trim())
           if (this.clearCredentials) {
             this.username = ''
             this.password = ''

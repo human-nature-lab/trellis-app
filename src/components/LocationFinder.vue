@@ -99,6 +99,7 @@
 <script>
   import * as moment from 'moment'
   import GeoLocationService from '../services/geolocation/index'
+  import { FakePosition } from '../services/geolocation/GeoLocationAbstract'
 
   const PositionError = {
     PERMISSION_DENIED: 1,
@@ -166,14 +167,15 @@
         const lastPos = await GeoLocationService.getLatestPosition()
         this.resolve(lastPos.coords)
       },
-      retry () {
+      async retry () {
         this.state = 'detecting'
-        this.getPosition().then(pos => {
+        try {
+          const pos = await this.getPosition()
           this.state = 'found-location'
           setTimeout(() => {
             this.resolve(pos.coords)
           }, this.dialogCloseDelay)
-        }).catch(err => {
+        } catch (err) {
           this.log(err)
           if (err.code === PositionError.PERMISSION_DENIED) {
             this.state = 'permission-denied'
@@ -192,21 +194,29 @@
           } else {
             this.state = 'position-unavailable'
           }
-          console.log('location finder state', this.state)
-        })
+        }
       },
-      getPosition () {
+      async getPosition () {
         this.showSkip = false
         this.attempts++
         const tol = 5 * 60 * 1000
         setTimeout(() => {
           this.showSkip = true
         }, this.skipAvailableDelay)
-        return GeoLocationService.getLocationTolerance(tol).then(pos => {
+        try {
+          const pos = await GeoLocationService.getLocationTolerance(tol)
           this.lastKnownCoordinates = pos.coords
           this.lastKnownTime = moment(pos.timestamp)
           return pos
-        })
+        } catch (err) {
+          if (err && err.message && err.message.toLowerCase().startsWith("only secure origins are allowed")) {
+            // necessary for dev over http
+            this.lastKnownCoordinates = FakePosition.coords
+            this.lastKnownTime = moment(FakePosition.timestamp)
+            return FakePosition
+          }
+          throw err
+        }
       }
     }
   }

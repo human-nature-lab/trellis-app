@@ -54,7 +54,11 @@ export class RouteQueue {
   }
 
   private routesAreSame (routeA: QueuableRoute, routeB: QueuableRoute): boolean {
-    return routeA && routeB && (routeA.name === routeB.name || routeA.path === routeB.path)
+    if (routeA === routeB) return true
+    if (!routeA || !routeB) return false
+    if (routeA.name !== routeB.name) return false
+    if (routeA.path !== routeB.path) return false
+    return true
   }
 
   push (nextRoute: QueuableRoute) {
