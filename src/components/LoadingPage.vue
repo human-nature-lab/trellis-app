@@ -60,6 +60,7 @@
 .loading-container
   transition: opacity .3s
   opacity: 1
+  overflow: hidden
 .hidden
   opacity: 0
 </style>

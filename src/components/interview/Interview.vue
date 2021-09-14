@@ -1,7 +1,7 @@
 <template>
   <v-container fluid fill-height class="ma-0 pa-0">
     <v-layout column>
-      <v-toolbar flat>
+      <v-toolbar flat dense>
         <v-toolbar-title>
           <AsyncTranslationText
             v-if="section"

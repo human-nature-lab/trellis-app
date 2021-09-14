@@ -50,8 +50,10 @@
           class="centered clickable"
           @click="$emit('click')">
           <AsyncTranslationText
-            :translation="form.nameTranslation">
-          </AsyncTranslationText>
+            :translation="form.nameTranslation" />
+          <span class="version">
+            (v{{form.version}})
+          </span>
         </v-flex>
         <v-spacer />
         <v-flex class="icon-container">
@@ -239,6 +241,9 @@
 </script>
 
 <style lang="sass" scoped>
+  .version
+    margin-left: 10px
+    font-size: 14px
   table
     &.striped
       >tbody
