@@ -3,6 +3,29 @@ import { LoggingLevel } from '../logging/LoggingTypes'
 import global from '../../static/singleton'
 import config from 'config'
 
+export type Coordinates = {
+  latitude: number
+  longitude: number
+  altitude?: number
+  altitudeAccuracy?: number
+  heading?: number
+  speed?: number
+}
+
+export type Position = {
+  coords: Coordinates
+  timestamp: number
+}
+
+
+export const FakePosition: Position = {
+  coords: {
+    latitude: 40.8,
+    longitude: 50.7,
+  },
+  timestamp: Date.now(),
+}
+
 export default abstract class GeoLocationAbstract {
 
   protected options = {

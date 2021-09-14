@@ -5,7 +5,7 @@
         icon
         v-if="showHistory"
         @click="$emit('input', !value)">
-        <v-icon v-if="value">mdi-arrow-down</v-icon>
+        <v-icon v-if="value">mdi-chevron-down</v-icon>
         <v-icon v-else>mdi-chevron-right</v-icon>
       </v-btn>
     </td>

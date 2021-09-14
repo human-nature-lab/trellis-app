@@ -15,6 +15,7 @@ import Survey from '../../entities/trellis/Survey'
 import Datum from '../../entities/trellis/Datum'
 import InterviewDataInterface from './InterviewDataInterface'
 import { randomIntBits } from '../../classes/M'
+import { Coordinates } from '../geolocation/GeoLocationAbstract'
 
 export default class InterviewServiceCordova extends InterviewServiceAbstract {
 
@@ -37,7 +38,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
     interview.startTime = now()
     interview.surveyId = surveyId
     interview.userId = user.id
-    if (coordinates && coordinates.latitude) {
+    if (coordinates) {
       interview.latitude = coordinates.latitude ? coordinates.latitude.toString(): null
       interview.longitude = coordinates.longitude ? coordinates.longitude.toString(): null
       interview.altitude = coordinates.altitude ? coordinates.altitude.toString(): null

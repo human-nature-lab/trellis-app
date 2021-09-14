@@ -4,7 +4,7 @@
       :id="'form-' + form.id"
       :class="{'open': isOpen}">
       <v-row>
-        <v-flex class="centered icon-container clickable" @click.once="tryCreatingSurvey">
+        <v-flex class="centered icon-container clickable" @click="tryCreatingSurvey">
           <v-tooltip
             right
             v-if="form.isComplete">
@@ -61,8 +61,8 @@
             :disabled="!form.surveys.length"
             icon
             @click="isOpen = !isOpen">
-            <v-icon v-if="!isOpen">mdi-arrow-down</v-icon>
-            <v-icon v-else>mdi-arrow-up</v-icon>
+            <v-icon v-if="!isOpen">mdi-chevron-down</v-icon>
+            <v-icon v-else>mdi-chevron-up</v-icon>
           </v-btn>
         </v-flex>
       </v-row>
@@ -201,6 +201,8 @@
           }
           if (survey) {
             this.tryStartingSurvey(survey)
+          } else {
+            alert('unable to start survey')
           }
           //this.global.loading.active = false
         }
