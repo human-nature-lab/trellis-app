@@ -37,7 +37,7 @@
             </v-list-item>
           </Permission>
           <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-item @click="publishForm">
+            <v-list-item @click="showPublish = true">
               <v-list-item-content>
                 {{ $t('publish_form') }}
               </v-list-item-content>
@@ -80,17 +80,22 @@
         hide-detail />
     </td>
     <td>
-      <v-select
+      v{{ studyForm.form.version }}
+      <!-- <v-select
         v-model="version"
         :items="form.versions"
         item-text="version"
         item-value="id">
         <template #item="{ item }">
-          v{{ item.version }}
+          
           <span v-if="item.id === form.studyForm.currentVersionId">(published)</span>
         </template>
-      </v-select>
+      </v-select> -->
     </td>
+    <PublishModal
+      v-model="showPublish"
+      :studyForm="studyForm"
+      @close="onPublish" />
   </tr>
 </template>
 
@@ -109,6 +114,7 @@
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";
   import StudyForm from "../../entities/trellis/StudyForm";
+  import PublishModal from './PublishModal.vue'
 
   export default Vue.extend({
     name: "form-list-tile",
@@ -117,15 +123,16 @@
       TranslationTextField,
       TrellisLoadingCircle,
       Permission,
+      PublishModal,
     },
     data() {
       return {
         isBusy: false,
         formTypes,
         showMenu: false,
+        showPublish: false,
         isOpen: false,
         memForm: this.form.copy(),
-        version: this.studyForm.currentVersionId,
         saveThrottled: debounce(async () => {
           this.$emit("save", this.memForm);
         }, 2000),
@@ -146,7 +153,6 @@
     watch: {
       form(newForm: Form) {
         this.memForm = newForm.copy();
-        this.version = this.studyForm.currentVersionId
       },
     },
     computed: {
@@ -178,21 +184,8 @@
           this.isBusy = false;
         }
       },
-      async publishForm () {
-        if (!this.version) {
-          return alert('Select a version to publish')
-        } else if (this.studyForm.currentVersionId && 
-          this.studyForm.currentVersionId !== this.version && 
-          !confirm('You are attempting to publish an old version. Is this desired?')) {
-          return
-        }
-        this.isBusy = true
-        try {
-          const res = await FormService.publishForm(this.studyForm.studyId, this.version)
-          console.log(res)
-        } finally {
-          this.isBusy = false
-        }
+      onPublish () {
+        this.$emit('update')
       },
       save() {
         this.$emit("save", this.memForm);

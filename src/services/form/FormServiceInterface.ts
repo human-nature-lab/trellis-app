@@ -26,6 +26,11 @@ export default interface FormServiceInterface {
    * @returns {PromiseLike<Form>}
    */
   getForm (formId: string, bareBones: boolean): PromiseLike<Form>
+  
+  /**
+   * Get all version of a form
+   */
+  getVersions (formId: string): PromiseLike<Form[]>
 
   /**
    * Create a new form in the database

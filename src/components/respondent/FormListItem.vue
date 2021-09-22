@@ -1,9 +1,10 @@
 <template>
-  <v-container class="ma-1">
+  <v-container fill-width class="ma-1">
     <v-col
       :id="'form-' + form.id"
+      class="w-full"
       :class="{'open': isOpen}">
-      <v-row>
+      <v-row class="fill-width">
         <v-flex class="centered icon-container clickable" @click="tryCreatingSurvey">
           <v-tooltip
             right
