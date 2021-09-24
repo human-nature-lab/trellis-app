@@ -80,17 +80,19 @@
         hide-detail />
     </td>
     <td>
-      v{{ studyForm.form.version }}
-      <!-- <v-select
-        v-model="version"
+      <v-select
+        :value="studyForm.currentVersionId"
         :items="form.versions"
         item-text="version"
         item-value="id">
         <template #item="{ item }">
-          
-          <span v-if="item.id === form.studyForm.currentVersionId">(published)</span>
+          <v-list-ite></v-list-ite>
+            {{item.version}}
+            <span v-if="item.id === studyForm.currentVersionId">(dev)</span>
+            <span v-if="item.isPublished === '1' || item.isPublished === 1 || item.isPublished === true">(published)</span>
+          </v-list-item>
         </template>
-      </v-select> -->
+      </v-select>
     </td>
     <PublishModal
       v-model="showPublish"

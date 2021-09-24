@@ -62,6 +62,7 @@
                 v-model="item.showHidden"
                 @toggleFormSkips="toggleFormSkips"
                 @save="updateForm"
+                @update="loadForms"
                 @updateStudyForm="updateStudyForm"
                 @delete="deleteForm(item)">
               </form-list-tile>
@@ -100,7 +101,7 @@
   import FormImport from '../components/import/FormImport'
   import groupBy from 'lodash/groupBy'
   import draggable from 'vuedraggable'
-import { delay } from '../classes/delay'
+  import { delay } from '../classes/delay'
 
   export default Vue.extend({
     name: 'Forms',

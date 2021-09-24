@@ -65,6 +65,7 @@
         </v-tooltip>
       </v-app-bar>
       <v-dialog
+        class="loading-dialog"
         max-width="300"
         :value="global.loading.fullscreen && global.loading.active"
         persistent>
@@ -229,6 +230,8 @@
 </script>
 
 <style lang="sass">
+  .loading-dialog
+    overflow: hidden
   // .container
   //   &.fill-height
   //     align-items: start

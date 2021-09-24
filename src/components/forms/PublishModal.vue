@@ -11,17 +11,16 @@
           :label="$t('versions')"
           v-model="version" 
           :loading="loading"
+          item-value="id"
           :items="versions">
           <template #item="{ item: form }">
-            <v-list-item>
-              v{{form.version}}
-              <span v-if="form.id === studyForm.currentVersionId"> (most recent)</span>
-              <span v-if="form.published === '1' || form.published"> (published)</span>
-            </v-list-item>
+            v{{form.version}}
+            <span v-if="form.id === studyForm.currentVersionId"> (dev)</span>
+            <span v-if="form.published === '1' || form.published"> (published)</span>
           </template>
           <template #selection="{ item: form}">
             v{{form.version}}
-            <span v-if="form.id === studyForm.currentVersionId"> (most recent)</span>
+            <span v-if="form.id === studyForm.currentVersionId"> (dev)</span>
           </template>
         </v-select>
       </v-row>
@@ -68,7 +67,7 @@
         this.loading = true
         try {
           this.versions = await FormService.getVersions(this.studyForm.formMasterId)
-          this.version = this.versions.find(v => v.id === this.studyForm.currentVersionId)
+          this.version = this.studyForm.currentVersionId
         } catch (err) {
 
         } finally {
@@ -79,15 +78,15 @@
         if (!this.version) {
           return alert('Select a version to publish')
         } else if (this.studyForm.currentVersionId && 
-          this.studyForm.currentVersionId !== this.version.id && 
+          this.studyForm.currentVersionId !== this.version && 
           !confirm('You are attempting to publish an old version. Is this desired?')) {
           return
         }
-        this.loading = true
         try {
-          const res = await FormService.publishForm(this.studyForm.studyId, this.version.id)
+          this.loading = true 
+          const res = await FormService.publishForm(this.studyForm.studyId, this.version)
           this.$emit('input', false)
-          this.$emit('close')
+          this.$emit('close', res)
         } catch (err) {
           this.alert('Unable to publish form', 'error')
         } finally {

@@ -47,6 +47,9 @@ export default class Form extends TimestampedSoftDelete {
 
   fromSnakeJSON(json: any) {
     super.fromSnakeJSON(json)
+    if (this.versions) {
+      this.versions.sort((a, b) => b.version - a.version)
+    }
     // Simple way to convert into an integer and then to a boolean. Possible values for this are '1', '0', 1, 0, true, false
     // and all of them are interpreted correctly by this statement
     this.isPublished = !!+this.isPublished
