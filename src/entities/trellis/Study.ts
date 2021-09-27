@@ -28,5 +28,6 @@ export default class Study extends TimestampedSoftDelete {
 
   @Relationship(type => Study)
   @OneToOne(type => Study)
+  @JoinColumn({ name: "test_study_id" })
   testStudy?: Study
 }

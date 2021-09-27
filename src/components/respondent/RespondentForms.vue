@@ -93,6 +93,7 @@
   async function load(to): Promise<object> {
     let respondentId = to.params.respondentId;
     let studyId = to.params.studyId;
+    
     const [respondent, surveys, forms] = await Promise.all([
       RespondentService.getRespondentById(respondentId),
       SurveyService.getRespondentSurveys(studyId, respondentId),

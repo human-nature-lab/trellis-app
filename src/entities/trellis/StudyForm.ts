@@ -22,7 +22,7 @@ export default class StudyForm extends TimestampedSoftDelete {
 
   @Relationship(type => Form)
   @OneToOne(type => Form, { eager: true })
-  @JoinColumn({ name : 'form_master_id' })
+  @JoinColumn({ name : 'current_version_id' })
   form: Form
 
   fromSnakeJSON (json: any) {
