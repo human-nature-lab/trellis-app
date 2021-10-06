@@ -24,11 +24,28 @@ export default class SurveyServiceWeb implements SurveyServiceInterface {
     return res.data.surveys.map(s => new Survey().fromSnakeJSON(s))
   }
 
+  async getGeoSurveys (studyId: string, geoId: string): Promise<Survey[]> {
+    studyId = encodeURIComponent(studyId)
+    geoId = encodeURIComponent(geoId)
+    let res = await http().get(`study/${studyId}/geo/${geoId}/surveys`)
+    return res.data.surveys.map(s => new Survey().fromSnakeJSON(s))
+  }
+
+  // Respondent
   async create (studyId, respondentId, formId) {
     studyId = encodeURIComponent(studyId)
     formId = encodeURIComponent(formId)
     respondentId = encodeURIComponent(respondentId)
     let res = await http().post(`study/${studyId}/respondent/${respondentId}/form/${formId}/survey`)
+    return new Survey().fromSnakeJSON(res.data.survey)
+  }
+
+  // Geo
+  async createGeoSurvey (studyId, geoId, formId) {
+    studyId = encodeURIComponent(studyId)
+    formId = encodeURIComponent(formId)
+    geoId = encodeURIComponent(geoId)
+    let res = await http().post(`study/${studyId}/geo/${geoId}/form/${formId}/survey`)
     return new Survey().fromSnakeJSON(res.data.survey)
   }
 

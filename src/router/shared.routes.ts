@@ -19,6 +19,7 @@ const LocaleSelectorPage = () => import(/* webpackChunkName: "locale-selector" *
 const StudySelectorPage = () => import(/* webpackChunkName: "study-selector" */'../views/StudySelectorPage.vue')
 const RespondentsSearch = () => import(/* webpackChunkName: "respondent-search" */'../components/respondent/RespondentsSearch.vue')
 const RespondentForms = () => import(/* webpackChunkName: "respondent-forms" */'../components/respondent/RespondentForms.vue')
+const GeoForms = () => import(/* webpackChunkName: "geo-forms" */'../components/geo/GeoForms.vue')
 const RespondentInfo = () => import(/* webpackChunkName: "respondent-info" */'../components/respondent/RespondentInfo.vue')
 const DocsRoute = () => import(/* webpackChunkName: "documentation" */'../components/documentation/DocsRoute.vue')
 const Changelog = () => import(/* webpackChunkName: "changelog" */'../components/Changelog.vue')
@@ -33,6 +34,11 @@ export default [{
   path: '/study/:studyId/respondent/:respondentId/forms',
   name: 'RespondentForms',
   component: RespondentForms,
+  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+}, {
+  path: '/study/:studyId/geo/:geoId/forms',
+  name: 'GeoForms',
+  component: GeoForms,
   beforeEnter: guardQueue([StudyGuard, LocaleGuard])
 }, {
   path: '/search/respondents',

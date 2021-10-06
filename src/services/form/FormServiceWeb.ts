@@ -18,8 +18,19 @@ export class FormServiceWeb implements FormServiceInterface {
     })
   }
 
+  getGeoTypeForms (studyId: string, geoTypeId: string): Promise<StudyForm[]> {
+    return http().get(uriTemplate('study/{study}/geo-type/{geoTypeId}/forms/published', [studyId, geoTypeId])).then(res => {
+      if (res.data.forms) {
+        return res.data.forms.map(form => new StudyForm().fromSnakeJSON(form))
+      } else {
+        console.error(res)
+        throw Error('Unable to retrieve forms')
+      }
+    })
+  }
+
   async getAllStudyForms (studyId: string): Promise<StudyForm[]> {
-    const res = await adminInst.get(uriTemplate('study/{}/form', [studyId]))
+    const res = await adminInst.get(uriTemplate('study/{studyId}/form', [studyId]))
     return res.data.forms.map(f => new StudyForm().fromSnakeJSON(f))
   }
 

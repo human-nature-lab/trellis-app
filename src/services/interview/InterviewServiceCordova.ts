@@ -353,10 +353,10 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
     return null
   }
 
-  public async getLatestInterviewPosition (respondentId: string, tolerance: number) {
+  public async getLatestInterviewPosition (surveyId: string, tolerance: number) {
     const repo = await DatabaseService.getRepository(Interview)
     const interview = await repo.createQueryBuilder('interview')
-      .where('interview.survey_id in (select id from survey where respondent_id = :respondentId)', { respondentId })
+      .where('interview.survey_id = :surveyId', { surveyId })
       .andWhere('interview.createdAt >= :oldestDate', {oldestDate: this.getDateFromTolerance(tolerance)})
       .andWhere('interview.latitude is not NULL')
       .getOne()

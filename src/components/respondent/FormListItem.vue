@@ -137,7 +137,11 @@
     props: {
       respondent: {
         type: Object,
-        required: true
+        required: false
+      },
+      geo: {
+        type: Object,
+        required: false
       },
       form: {
         type: Object,
@@ -190,7 +194,11 @@
           // Start a new survey
           let survey
           try {
-            survey = await SurveyService.create(this.global.study.id, this.respondent.id, this.form.id)
+            if (this.respondent) {
+              survey = await SurveyService.create(this.global.study.id, this.respondent.id, this.form.id)
+            } else {
+              survey = await SurveyService.createGeoSurvey(this.global.study.id, this.geo.id, this.form.id)
+            }
           } catch (err) {
             if (this.isNotAuthError(err)) {
               err.component = 'FormListItem.vue@tryCreatingSurvey'
@@ -209,7 +217,7 @@
           alert(this.$t('cant_resume_survey'))
         } else {
           try {
-            coords = await InterviewService.getLatestInterviewPosition(survey.respondentId, this.previousInterviewCoordinatesTolerance)
+            coords = await InterviewService.getLatestInterviewPosition(survey.id, this.previousInterviewCoordinatesTolerance)
           } catch (err) {
             console.log('no previous interview matching this tolerance found')
             try {

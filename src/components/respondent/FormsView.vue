@@ -5,6 +5,7 @@
       :key="form.id"
       :form="form"
       :respondent="respondent"
+      :geo="geo"
       :allowMultipleSurveys="allowMultipleSurveys"
       :canCreateSurveys="canCreateSurveys"
       @newInterview="newInterview"
@@ -24,7 +25,11 @@
     props: {
       respondent: {
         type: Object,
-        required: true
+        required: false
+      },
+      geo: {
+        type: Object,
+        required: false
       },
       forms: {
         type: Array,

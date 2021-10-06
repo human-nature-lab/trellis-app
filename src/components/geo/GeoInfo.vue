@@ -3,7 +3,7 @@
     <v-card>
       <v-container>
         <v-row>
-          <v-col cols="12" lg="8">
+          <v-col cols="12" lg="6">
             <TranslationTextField
               v-if="hasPermission(TrellisPermission.EDIT_GEO)"
               :translation="geo.nameTranslation"
@@ -22,6 +22,11 @@
           <v-col cols="12" lg="2">
             <v-btn class="ml-2" @click="viewRespondents">
               {{ $t('respondents') }}
+            </v-btn>
+          </v-col>
+          <v-col cols="12" lg="2">
+            <v-btn class="ml-2" :to="{name: 'GeoForms', params: {studyId: global.study.id, geoId: geo.id}}">
+              {{ $t('forms') }}
             </v-btn>
           </v-col>
         </v-row>
