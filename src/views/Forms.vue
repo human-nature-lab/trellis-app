@@ -63,7 +63,8 @@
                 @toggleFormSkips="toggleFormSkips"
                 @save="updateForm"
                 @update="loadForms"
-                @updateStudyForm="updateStudyForm"
+                @update:studyForm="updateStudyForm"
+                @changeStudyForm="changeStudyForm"
                 @delete="deleteForm(item)">
               </form-list-tile>
             </draggable>
@@ -76,10 +77,10 @@
         :form-type="importFormType"
         @formImported="onFormImported(importedForm)" />
     </TrellisModal>
-    <TrellisModal v-model="showFormSkips" :title="$t('form_skips')">
-      <FormSkips 
-        :form="formSkipsForm"
-        @dismissFormSkips="showFormSkips=false" />
+    <TrellisModal v-model="showFormSkips" :title="$t('skips')">
+      <FormSkips
+        @close="showFormSkips = false"
+        :form="formSkipsForm" />
     </TrellisModal>
   </v-container>
 </template>
@@ -118,11 +119,11 @@
         isAddingNewForm: false,
         isLoading: false,
         isDragging: false,
-        showImportForm: false,
         importFormType: formTypes.CENSUS,
         sortBy: 'sortOrder',
+        formSkipsForm: null,
         showFormSkips: false,
-        formSkipsForm: null
+        showImportForm: false,
       }
     },
     computed: {
@@ -237,7 +238,7 @@
           }
         }
       },
-      async updateStudyForm(studyForm: StudyForm) {
+      async changeStudyForm(studyForm: StudyForm) {
         try {
           const newStudyForm = await FormService.updateStudyForm(studyForm.studyId, studyForm)
           const sf = this.studyForms.find((sf: StudyForm) => sf.id === newStudyForm.id)
@@ -247,6 +248,13 @@
           if (this.isNotAuthError(err)) {
             this.logError(err, this.$t('failed_resource_update', [this.formName(studyForm.form)]))
           }
+        }
+      },
+      async updateStudyForm(studyForm: StudyForm) {
+        const index = this.studyForms.findIndex(sf => sf.id === studyForm.id)
+        if (index > -1) {
+          studyForm.form = this.studyForms[index].form
+          this.studyForms[index] = studyForm
         }
       },
       async loadForms() {

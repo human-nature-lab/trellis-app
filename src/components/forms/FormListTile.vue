@@ -5,67 +5,16 @@
       <span class="ml-2"><v-icon>mdi-drag-horizontal-variant</v-icon></span>
     </td>
     <td class="small">
-      <v-menu offset-y right v-model="showMenu">
-        <template #activator="{ on, attrs }">
-          <v-list-item-action v-on="on" v-bind="attrs">
-            <v-btn
-              :disabled="isBusy"
-              @click.stop.prevent="showMenu = !showMenu"
-              icon
-            >
-              <v-progress-circular v-if="isBusy" indeterminate />
-              <v-icon v-else>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </template>
-        <v-list>
-          <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-item
-              :to="{
-                name: 'FormBuilder',
-                params: { formId: form.id, mode: 'builder' },
-              }"
-              :disabled="!isTestStudy"
-            >
-              <v-list-item-content> Edit </v-list-item-content>
-            </v-list-item>
-          </Permission>
-          <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-item @click="$emit('toggleFormSkips', studyForm.form)" :disabled="!isTestStudy">
-              <v-list-item-content>
-                {{ $t('edit_skips') }}
-              </v-list-item-content>
-            </v-list-item>
-          </Permission>
-          <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-item @click="onPublish" :disabled="!isTestStudy">
-              <v-list-item-content>
-                {{ $t('publish_form') }}
-              </v-list-item-content>
-            </v-list-item>
-          </Permission>
-          <v-list-item
-            :to="{ name: 'InterviewPreview', params: { formId: form.id } }"
-          >
-            <v-list-item-content> Preview </v-list-item-content>
-          </v-list-item>
-          <!--v-list-item :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
-              <v-list-item-content>
-                Print
-              </v-list-item-content>
-            </v-list-item-->
-          <v-list-item @click="exportForm">
-            <v-list-item-content> Export </v-list-item-content>
-          </v-list-item>
-          <Permission :requires="TrellisPermission.REMOVE_FORM">
-            <v-list-item @click="$emit('delete')">
-              <v-list-item-content>
-                <span color="error--text">Delete</span>
-              </v-list-item-content>
-            </v-list-item>
-          </Permission>
-        </v-list>
-      </v-menu>
+      <FormActions 
+        :isBusy="isBusy" 
+        :form="form" 
+        :studyForm="studyForm"
+        @delete="$emit('delete', $event)"
+        @export="exportForm"
+        @publish="onPublish"
+        @revert="showVersionModal = true"
+        @toggleFormSkips="$emit('toggleFormSkips', $event)"
+        />
     </td>
     <td>
       <TranslationTextField
@@ -88,11 +37,12 @@
         item-value="id">
         <template #item="{ item }">
           <v-list-item>
-            <v-list-item-icon >
-              <v-icon color="success" v-if="item.isPublished === '1' || item.isPublished === 1 || item.isPublished === true">
+            <v-list-item-icon>
+              <v-icon color="success" v-if="!isTestStudy && item.id === studyForm.currentVersionId">
                 mdi-check
               </v-icon>
-              <v-icon color="info" v-else>
+              <v-icon color="info" 
+                v-else-if="(isTestStudy && item.id === studyForm.currentVersionId) || (!isTestStudy && !item.isPublished)">
                 mdi-dev-to
               </v-icon>
             </v-list-item-icon>
@@ -101,6 +51,10 @@
         </template>
       </v-select>
     </td>
+    <VersionModal 
+      v-model="showVersionModal"
+      @update:studyForm="$emit('update:studyForm', $event)"
+      :studyForm="studyForm" />
   </tr>
 </template>
 
@@ -109,7 +63,7 @@
   import Form from "../../entities/trellis/Form";
   // @ts-ignore
   import AsyncTranslationText from "../AsyncTranslationText";
-  import Permission from "../Permission";
+  import Permission from "../Permission.vue";
   // @ts-ignore
   import TranslationTextField from "../TranslationTextField";
   // @ts-ignore
@@ -121,15 +75,19 @@
   import StudyForm from "../../entities/trellis/StudyForm";
   import singleton from '../../static/singleton'
   import PermissionMixin from "../../mixins/PermissionMixin";
+  import FormActions from './FormActions.vue'
+  import VersionModal from './VersionModal.vue'
 
   export default Vue.extend({
     name: "form-list-tile",
     mixins: [PermissionMixin],
     components: {
+      FormActions,
       AsyncTranslationText,
       TranslationTextField,
       TrellisLoadingCircle,
       Permission,
+      VersionModal,
     },
     data() {
       return {
@@ -137,6 +95,7 @@
         formTypes,
         global: singleton,
         showMenu: false,
+        showVersionModal: false,
         isOpen: false,
         memForm: this.form.copy(),
         saveThrottled: debounce(async () => {
@@ -211,12 +170,12 @@
       changeSortOrder (sortOrder) {
         let sf = this.studyForm.copy();
         sf.sortOrder = sortOrder;
-        this.$emit("updateStudyForm", sf);
+        this.$emit("changeStudyForm", sf);
       },
       changeCensusType(censusTypeId) {
         let sf = this.studyForm.copy();
         sf.censusTypeId = censusTypeId;
-        this.$emit("updateStudyForm", sf);
+        this.$emit("changeStudyForm", sf);
       },
     },
   });

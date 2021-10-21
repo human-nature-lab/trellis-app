@@ -72,4 +72,9 @@ export default interface FormServiceInterface {
    * @param studyForms
    */
   reorderForms (studyId: string, studyForms: StudyForm[]): PromiseLike<StudyForm[]>
+
+  /**
+   * Specify which version to collect data from
+   */
+  revertVersion (formMasterId: string, formVersionId: string): PromiseLike<StudyForm>
 }

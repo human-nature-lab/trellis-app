@@ -91,6 +91,11 @@ export class FormServiceWeb implements FormServiceInterface {
     versions.sort((a, b) => b.version - a.version)
     return versions
   }
+  
+  async revertVersion (formMasterId: string, formVersionId: string): Promise<StudyForm> {
+    const res = await adminInst.put(uriTemplate('form/{form}/revert/{version}',[formMasterId, formVersionId]))
+    return new StudyForm().fromSnakeJSON(res.data)
+  }
 
 }
 
