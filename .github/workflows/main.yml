@@ -53,6 +53,9 @@ jobs:
         uses: coturiv/setup-ionic@v1
         with:
           cordova-version: 9
+
+      - name: Uninstall  build-tool version 31.0.0
+        run: $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
       
 #       - name: Build dev APK
 #         run: |
