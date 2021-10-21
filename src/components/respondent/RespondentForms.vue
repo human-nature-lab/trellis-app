@@ -141,9 +141,10 @@
         data.forms.sort((a, b) => {
           return a.sortOrder - b.sortOrder;
         });
+        console.log(data)
         const forms: DisplayForm[] = data.forms.map((studyForm: StudyForm) => {
           let formSurveys = data.surveys.filter(
-            (survey: Survey) => survey.formId === studyForm.formMasterId
+            (survey: Survey) => survey.formId === studyForm.currentVersionId
           );
           const conditionTags: Set<string> = new Set(
             data.conditionTags.map((c: RespondentConditionTag) => {
@@ -155,7 +156,7 @@
             conditionTags
           );
           return {
-            id: studyForm.formMasterId,
+            id: studyForm.currentVersionId,
             nameTranslation: studyForm.form.nameTranslation,
             surveys: formSurveys,
             isPublished: studyForm.form.isPublished,

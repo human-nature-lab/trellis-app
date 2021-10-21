@@ -89,6 +89,17 @@
         </v-list>
       </div>
     </v-col>
+    <v-fab-transition v-if="showAddLocationButton">
+      <v-btn
+        class="deep-orange"
+        @click="$emit('add')"
+        fab
+        dark
+        fixed
+        right>
+        <v-icon style="height:auto;">mdi-plus</v-icon>
+      </v-btn>
+    </v-fab-transition>
   </v-card>
 </template>
 
@@ -121,6 +132,10 @@
             includeChildren: false
           }
         }
+      },
+      showAddLocationButton: {
+        type: Boolean,
+        default: false
       },
       showRespondentsLink: {
         type: Boolean,

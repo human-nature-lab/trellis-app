@@ -25,19 +25,20 @@
                 name: 'FormBuilder',
                 params: { formId: form.id, mode: 'builder' },
               }"
+              :disabled="!isTestStudy"
             >
               <v-list-item-content> Edit </v-list-item-content>
             </v-list-item>
           </Permission>
           <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-item @click="$emit('toggleFormSkips', studyForm.form)">
+            <v-list-item @click="$emit('toggleFormSkips', studyForm.form)" :disabled="!isTestStudy">
               <v-list-item-content>
                 {{ $t('edit_skips') }}
               </v-list-item-content>
             </v-list-item>
           </Permission>
           <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-item @click="showPublish = true">
+            <v-list-item @click="onPublish" :disabled="!isTestStudy">
               <v-list-item-content>
                 {{ $t('publish_form') }}
               </v-list-item-content>
@@ -86,18 +87,20 @@
         item-text="version"
         item-value="id">
         <template #item="{ item }">
-          <v-list-ite></v-list-ite>
+          <v-list-item>
+            <v-list-item-icon >
+              <v-icon color="success" v-if="item.isPublished === '1' || item.isPublished === 1 || item.isPublished === true">
+                mdi-check
+              </v-icon>
+              <v-icon color="info" v-else>
+                mdi-dev-to
+              </v-icon>
+            </v-list-item-icon>
             {{item.version}}
-            <span v-if="item.id === studyForm.currentVersionId">(dev)</span>
-            <span v-if="item.isPublished === '1' || item.isPublished === 1 || item.isPublished === true">(published)</span>
           </v-list-item>
         </template>
       </v-select>
     </td>
-    <PublishModal
-      v-model="showPublish"
-      :studyForm="studyForm"
-      @close="onPublish" />
   </tr>
 </template>
 
@@ -116,23 +119,24 @@
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";
   import StudyForm from "../../entities/trellis/StudyForm";
-  import PublishModal from './PublishModal.vue'
+  import singleton from '../../static/singleton'
+  import PermissionMixin from "../../mixins/PermissionMixin";
 
   export default Vue.extend({
     name: "form-list-tile",
+    mixins: [PermissionMixin],
     components: {
       AsyncTranslationText,
       TranslationTextField,
       TrellisLoadingCircle,
       Permission,
-      PublishModal,
     },
     data() {
       return {
         isBusy: false,
         formTypes,
+        global: singleton,
         showMenu: false,
-        showPublish: false,
         isOpen: false,
         memForm: this.form.copy(),
         saveThrottled: debounce(async () => {
@@ -186,8 +190,20 @@
           this.isBusy = false;
         }
       },
-      onPublish () {
-        this.$emit('update')
+      async onPublish () {
+        if (!confirm(this.$t('confirm_publish'))) {
+          return
+        }
+        try {
+          this.loading = true 
+          const res = await FormService.publishForm(this.studyForm.studyId, this.form.id)
+          this.$emit('input', false)
+          this.$emit('update', res)
+        } catch (err) {
+          this.alert('Unable to publish form', 'error')
+        } finally {
+          this.loading = false
+        }
       },
       save() {
         this.$emit("save", this.memForm);

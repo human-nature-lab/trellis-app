@@ -527,3 +527,5 @@ closing_db,Closing database,,
 edit_skips,Edit skips,,
 add_form,Add form,,
 test_mode,Test mode,,Whether or not we're collecting test data
+publish_form,Publish form,,
+confirm_publish,Are you sure you would like to publish this form? This action cannot be undone.,,

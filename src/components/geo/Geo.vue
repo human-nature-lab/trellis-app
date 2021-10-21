@@ -4,6 +4,7 @@
       <v-flex>
         <geo-search
           :show-add-location-button="true"
+          @add="addLocation"
           v-on:parent-geo-id-changed="onParentGeoChanged">
         </geo-search>
       </v-flex>

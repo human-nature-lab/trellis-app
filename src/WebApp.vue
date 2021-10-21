@@ -29,8 +29,13 @@
                 class="subheading"
                 v-on="on"
                 v-bind="attrs"
+                :color="isTestStudy ? 'error' : null"
+                text
                 @click="toStudySelector">
                 {{global.study.name}}
+                <v-icon class="ml-2" v-if="isTestStudy" color="error">
+                  mdi-dev-to
+                </v-icon>
               </v-btn>
             </template>
             <span>{{$t('change_study')}}</span>
@@ -128,10 +133,11 @@
   import config from 'config'
   import IsLoggedInMixin from './mixins/IsLoggedInMixin'
   import Banner from './components/Banner'
+  import PermissionMixin from './mixins/PermissionMixin'
 
   export default {
     name: 'WebApp',
-    mixins: [IsLoggedInMixin],
+    mixins: [IsLoggedInMixin, PermissionMixin],
     data () {
       return {
         global: singleton,

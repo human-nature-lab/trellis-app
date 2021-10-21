@@ -75,23 +75,7 @@
         }
       },
       async publish () {
-        if (!this.version) {
-          return alert('Select a version to publish')
-        } else if (this.studyForm.currentVersionId && 
-          this.studyForm.currentVersionId !== this.version && 
-          !confirm('You are attempting to publish an old version. Is this desired?')) {
-          return
-        }
-        try {
-          this.loading = true 
-          const res = await FormService.publishForm(this.studyForm.studyId, this.version)
-          this.$emit('input', false)
-          this.$emit('close', res)
-        } catch (err) {
-          this.alert('Unable to publish form', 'error')
-        } finally {
-          this.loading = false
-        }
+        
       },
     },
   })
