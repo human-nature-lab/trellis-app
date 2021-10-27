@@ -6,13 +6,13 @@
     <v-stepper v-model="step" vertical>
       <v-stepper-step step="1" :complete="step > 1">{{
         isAssociatedWithRespondent
-          ? $t("add_other_respondent")
-          : $t("add_respondent")
+          ? $t('add_other_respondent')
+          : $t('add_respondent')
       }}</v-stepper-step>
       <v-stepper-content step="1">
         <v-card>
           <v-card-text>
-            <v-subheader>{{ $t("respondent_name_instructions") }}</v-subheader>
+            <v-subheader>{{ $t('respondent_name_instructions') }}</v-subheader>
             <v-text-field
               required
               :label="$t('respondent_full_name')"
@@ -24,14 +24,14 @@
             <v-spacer></v-spacer>
             <v-btn @click="save">
               <v-progress-circular v-if="isSaving" />
-              <span v-else>{{ $t("continue") }}</span>
+              <span v-else>{{ $t('continue') }}</span>
             </v-btn>
           </v-card-actions>
         </v-card>
       </v-stepper-content>
 
       <v-stepper-step step="2" :complete="step > 2">{{
-        $t("add_photos")
+        $t('add_photos')
       }}</v-stepper-step>
       <v-stepper-content step="2">
         <v-card v-if="respondent">
@@ -46,28 +46,28 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="checkCensus">{{ $t("continue") }}</v-btn>
+            <v-btn @click="checkCensus">{{ $t('continue') }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-stepper-content>
 
       <v-stepper-step step="3" :complete="step > 3">{{
-        $t("census")
+        $t('census')
       }}</v-stepper-step>
       <v-stepper-content step="3">
         <v-card>
           <v-card-text>
             <v-flex v-if="checkingForCensus">
               <v-progress-circular indeterminate />
-              {{ $t("checking_census_form") }}
+              {{ $t('checking_census_form') }}
             </v-flex>
             <v-flex v-else-if="hasCensusForm">
               <v-icon color="success">mdi-check</v-icon>
-              {{ $t("census_form_found") }}
+              {{ $t('census_form_found') }}
             </v-flex>
             <v-flex v-else>
               <v-icon color="error">mdi-clear</v-icon>
-              {{ $t("census_form_not_found") }}
+              {{ $t('census_form_not_found') }}
             </v-flex>
           </v-card-text>
           <!--<v-card-actions>-->
@@ -237,6 +237,3 @@
     }
   }
 </script>
-
-<style scoped>
-</style>

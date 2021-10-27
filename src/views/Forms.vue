@@ -194,6 +194,7 @@
         }
       },
       async reorderForms(evt) {
+        // bail early if nothing has changed or we're currently reordering the forms
         if (this.isLoading) return
         if (evt.newIndex === evt.oldIndex) {
           this.isDragging = false

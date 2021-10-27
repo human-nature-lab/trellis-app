@@ -5,7 +5,7 @@
       <v-card>
         <v-toolbar flat>
           <v-toolbar-title>
-            {{ $t("respondent_forms", [respondent.name]) }}
+            {{ $t('respondent_forms', [respondent.name]) }}
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-menu offset-y>
@@ -19,7 +19,7 @@
                 <v-list-item-action>
                   <v-icon v-if="showHidden">mdi-check</v-icon>
                 </v-list-item-action>
-                <v-list-item-title>{{ $t("show_all") }}</v-list-item-title>
+                <v-list-item-title>{{ $t('show_all') }}</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -37,7 +37,7 @@
       </v-card>
       <v-card>
         <v-toolbar flat>
-          <v-toolbar-title>{{ $t("census_forms") }}</v-toolbar-title>
+          <v-toolbar-title>{{ $t('census_forms') }}</v-toolbar-title>
         </v-toolbar>
         <forms-view
           v-if="censusForms"
@@ -109,10 +109,10 @@
   }
 
   export default Vue.extend({
-    name: "respondent-forms",
+    name: 'respondent-forms',
     mixins: [
       RoutePreloadMixin(load),
-      DocsLinkMixin("./respondents/RespondentForms.md"),
+      DocsLinkMixin('./respondents/RespondentForms.md'),
     ],
     data() {
       return {
@@ -123,7 +123,7 @@
         conditionTags: [] as RespondentConditionTag[],
         showHidden: false,
         showUnpublished: false,
-        error: "",
+        error: '',
       };
     },
     components: {
@@ -132,8 +132,8 @@
     methods: {
       async startInterview(interview: Interview) {
         routeQueue.replaceAndReturnToCurrent({
-          name: "Interview",
-          params: { studyId: this.global["study"].id, interviewId: interview.id },
+          name: 'Interview',
+          params: { studyId: this.global['study'].id, interviewId: interview.id },
         });
       },
       hydrate(data: RespondentFormsData) {
