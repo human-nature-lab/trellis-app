@@ -4,7 +4,7 @@
       {{error}}
     </div>
     <v-chip
-      :close="!edge.isLoading && !isQuestionDisabled"
+      :close="!isQuestionDisabled"
       @click:close="remove(edge.id)"
       :id="edge.id"
       :key="edge.id"

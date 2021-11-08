@@ -14,7 +14,47 @@
   import Translation from '../../entities/trellis/Translation'
   import Geo from '../../entities/trellis/Geo'
   import AsyncDataFetcher from '../AsyncDataFetcher.vue'
-import Edge from '../../entities/trellis/Edge'
+  import Edge from '../../entities/trellis/Edge'
+  import Respondent from '../../entities/trellis/Respondent'
+  import RespondentService from '../../services/respondent/RespondentService'
+
+  function RespondentHandler(location: InterviewLocation): ProxyHandler<Record<string | symbol, Edge[] | undefined>> {
+    return {
+      get (target, key, receiver) {
+        console.log('get', key, 'on', target, receiver)
+        if (typeof key === 'symbol' || key.startsWith('_') || key === 'state') {
+          return target[key]
+        }
+        if (target[key]) {
+          console.log('returning val')
+          return target[key]
+        }
+        if (!target._loading) {
+          // @ts-ignore
+          target._loading = {}
+        }
+        if (target._loading[key]) {
+          console.log('already loading')
+          return
+        }
+        const { question, datum, data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
+        target._loading[key] = true
+        console.log(data)
+        if (data.length) {
+          const edgeIds = data.map(d => d.edgeId)
+          EdgeService.getEdges(edgeIds).then((edges: Edge[]) => {
+            console.log('loaded edges')
+            target[key] = edges
+            target._loading[key] = false
+          }).catch(err => {
+            console.error(err)
+            target[key] = err
+          })
+        }
+        return
+      }
+    }
+  }
 
   export default Vue.extend({
     name: 'QuestionText',
@@ -26,6 +66,9 @@ import Edge from '../../entities/trellis/Edge'
     },
     data () {
       return {
+        data: {} as Record<string, Datum>,
+        respondent: new Proxy({}, RespondentHandler(this.question)),
+        edge: {} as Record<string, Edge>,
         geo: {} as Record<string, Geo>,
         fills: {} as Record<string, string>,
       }
