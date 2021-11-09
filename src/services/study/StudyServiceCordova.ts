@@ -27,7 +27,9 @@ class StudyServiceCordova extends StudyServiceAbstract {
         .from(UserStudy, 'user_study')
         .where('user_study.userId = :userId', { userId })
         .getQuery()
-      ).getMany()
+      )
+      .andWhere('deletedAt', null)
+      .getMany()
   }
   
   async getStudyUsers (studyId: string): Promise<User[]> {
