@@ -122,7 +122,7 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
   import Page from './Page'
   import ConditionTagList from './ConditionTagList'
   import AsyncTranslationText from '../AsyncTranslationText'
@@ -166,7 +166,9 @@
     name: 'interview',
     head: {
       title: function () {
-        let d = {}
+        let d = {
+          inner: 'Interview'
+        }
         if (this.type === 'preview') {
           d.inner = 'Form preview: ' + interviewState.blueprint.id
         } else if (this.interview.survey) {

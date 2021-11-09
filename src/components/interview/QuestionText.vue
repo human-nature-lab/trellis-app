@@ -6,52 +6,101 @@
   import { InterviewLocation } from './services/InterviewAlligator'
   import Photo from '../photo/Photo.vue'
   import Question from '../../entities/trellis/Question'
-  import QuestionDatum from '../../entities/trellis/Question'
+  import QuestionDatum from '../../entities/trellis/QuestionDatum'
   import EdgeService from '../../services/edge/EdgeService'
+  import GeoService from '../../services/geo/GeoService'
   import Datum from '../../entities/trellis/Datum'
-  import { AsyncCacheMixin, AsyncObj } from '../../mixins/AsyncCacheMixin'
-  import TranslationMixin from '../../mixins/TranslationMixin'
-  import Translation from '../../entities/trellis/Translation'
   import Geo from '../../entities/trellis/Geo'
   import AsyncDataFetcher from '../AsyncDataFetcher.vue'
   import Edge from '../../entities/trellis/Edge'
-  import Respondent from '../../entities/trellis/Respondent'
-  import RespondentService from '../../services/respondent/RespondentService'
+  import TranslationMixin from '../../mixins/TranslationMixin'
+  import Translation from '../../entities/trellis/Translation'
+  import Roster from '../../entities/trellis/Roster'
+  import RosterService from '../../services/roster/RosterService'
+  
+  const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props'])
 
-  function RespondentHandler(location: InterviewLocation): ProxyHandler<Record<string | symbol, Edge[] | undefined>> {
+  function loadData<T extends any> (target: any, key: string | symbol, location: InterviewLocation, handler: (data: { question: Question, data: Datum[], datum: QuestionDatum }) => Promise<T>): Promise<T> {
+    console.log('get', key, 'on', target)
+    if (!target._loading) {
+      // @ts-ignore
+      target._loading = {}
+    }
+    if (target._loading[key]) {
+      console.log('already loading')
+      return
+    }
+    const data = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
+    target._loading[key] = true
+    handler(data).then(res => {
+      Vue.set(target, key, res)
+      target[key] = res
+    }).catch(err => {
+      Vue.set(target, key, err)
+    }).then(() => {
+      target._loading[key] = false
+    })
+  }
+
+  function EdgeHandler(location: InterviewLocation): ProxyHandler<Record<string | symbol, Edge[] | undefined>> {
     return {
       get (target, key, receiver) {
-        console.log('get', key, 'on', target, receiver)
-        if (typeof key === 'symbol' || key.startsWith('_') || key === 'state') {
+        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
           return target[key]
         }
-        if (target[key]) {
-          console.log('returning val')
-          return target[key]
-        }
-        if (!target._loading) {
-          // @ts-ignore
-          target._loading = {}
-        }
-        if (target._loading[key]) {
-          console.log('already loading')
-          return
-        }
-        const { question, datum, data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
-        target._loading[key] = true
-        console.log(data)
-        if (data.length) {
-          const edgeIds = data.map(d => d.edgeId)
-          EdgeService.getEdges(edgeIds).then((edges: Edge[]) => {
-            console.log('loaded edges')
-            target[key] = edges
-            target._loading[key] = false
-          }).catch(err => {
-            console.error(err)
-            target[key] = err
-          })
-        }
+        loadData(target, key, location, async ({ data }) => {
+          const edgeIds = data.filter(d => !!d.edgeId).map(d => d.edgeId)
+          const edges = await EdgeService.getEdges(edgeIds)
+          console.log('loaded edges')
+          return edges
+        })
         return
+      }
+    }
+  }
+
+  function GeoHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, Geo[] | undefined>> {
+    return {
+      get (target, key, receiver) {
+        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
+          return target[key]
+        }
+        loadData(target, key, location, async ({ data }) => {
+          const geoIds = data.filter(d => !!d.geoId).map(d => d.geoId)
+          const geos = await GeoService.getGeosById(geoIds)
+          console.log('loaded geos')
+          return geos
+        })
+        return
+      }
+    }
+  }
+
+  function RosterHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, Roster[] | undefined>> {
+    return {
+      get (target, key, receiver) {
+        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
+          return target[key]
+        }
+        loadData(target, key, location, async ({ data }) => {
+          const rosterIds = data.filter(d => !!d.rosterId).map(d => d.rosterId)
+          const rosters = await RosterService.getRosterRows(rosterIds)
+          console.log('loaded rosters')
+          return rosters
+        })
+        return
+      }
+    }
+  }
+
+  function DataHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, Datum[]>> {
+    return {
+      get (target, key, receiver) {
+        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
+          return target[key]
+        }
+        const data = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
+        Vue.set(target, key, data)
       }
     }
   }
@@ -66,10 +115,10 @@
     },
     data () {
       return {
-        data: {} as Record<string, Datum>,
-        respondent: new Proxy({}, RespondentHandler(this.question)),
-        edge: {} as Record<string, Edge>,
-        geo: {} as Record<string, Geo>,
+        data: new Proxy({}, DataHandler(this.location)) as Record<string, Datum[]>,
+        edge: new Proxy({}, EdgeHandler(this.location)) as Record<string, Edge[]>,
+        geo: new Proxy({}, GeoHandler(this.location)) as Record<string, Geo[]>,
+        roster: new Proxy({}, RosterHandler(this.location)) as Record<string, Roster[]>,
         fills: {} as Record<string, string>,
       }
     },
@@ -87,7 +136,7 @@
         deep: true,
         handler () {
           this.updateFills()
-        }
+        },
       }
     },
     methods: {
