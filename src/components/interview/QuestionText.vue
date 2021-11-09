@@ -11,7 +11,6 @@
   import GeoService from '../../services/geo/GeoService'
   import Datum from '../../entities/trellis/Datum'
   import Geo from '../../entities/trellis/Geo'
-  import AsyncDataFetcher from '../AsyncDataFetcher.vue'
   import Edge from '../../entities/trellis/Edge'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import Translation from '../../entities/trellis/Translation'
@@ -21,13 +20,11 @@
   const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props'])
 
   function loadData<T extends any> (target: any, key: string | symbol, location: InterviewLocation, handler: (data: { question: Question, data: Datum[], datum: QuestionDatum }) => Promise<T>): Promise<T> {
-    console.log('get', key, 'on', target)
     if (!target._loading) {
       // @ts-ignore
       target._loading = {}
     }
     if (target._loading[key]) {
-      console.log('already loading')
       return
     }
     const data = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
@@ -50,9 +47,7 @@
         }
         loadData(target, key, location, async ({ data }) => {
           const edgeIds = data.filter(d => !!d.edgeId).map(d => d.edgeId)
-          const edges = await EdgeService.getEdges(edgeIds)
-          console.log('loaded edges')
-          return edges
+          return EdgeService.getEdges(edgeIds)
         })
         return
       }
@@ -67,9 +62,7 @@
         }
         loadData(target, key, location, async ({ data }) => {
           const geoIds = data.filter(d => !!d.geoId).map(d => d.geoId)
-          const geos = await GeoService.getGeosById(geoIds)
-          console.log('loaded geos')
-          return geos
+          return GeoService.getGeosById(geoIds)
         })
         return
       }
@@ -84,9 +77,7 @@
         }
         loadData(target, key, location, async ({ data }) => {
           const rosterIds = data.filter(d => !!d.rosterId).map(d => d.rosterId)
-          const rosters = await RosterService.getRosterRows(rosterIds)
-          console.log('loaded rosters')
-          return rosters
+          return RosterService.getRosterRows(rosterIds)
         })
         return
       }
@@ -107,7 +98,7 @@
 
   export default Vue.extend({
     name: 'QuestionText',
-    components: { Photo, AsyncDataFetcher },
+    components: { Photo },
     mixins: [TranslationMixin],
     props: {
       question: Object as PropOptions<Question>,
@@ -141,7 +132,6 @@
     },
     methods: {
       convertTemplate () {
-        console.log('converting template')
         if (!this.question || !this.translated) {
           this.$options.template = '<span />'
           return
@@ -160,14 +150,12 @@
           tmp = `<span>${tmp}</span>`
         }
 
-        console.log('setting template', tmp)
         this.$options.template = tmp
       },
       async updateFills () {
         if (!this.useOldFills) return
         const fills = {}
         const keys = this.oldFillKeys.slice()
-        console.log('updateFills', keys)
         for (const key of keys) {
           fills[key] = this.$t('loading')
         }

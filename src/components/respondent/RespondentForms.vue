@@ -129,7 +129,6 @@
     },
     methods: {
       async startInterview (interview: Interview) {
-        console.log('starting interview', interview)
         routeQueue.replaceAndReturnToCurrent({ name: 'Interview', params: { studyId: this.global['study'].id, interviewId: interview.id } })
       },
       hydrate (data: RespondentFormsData) {
