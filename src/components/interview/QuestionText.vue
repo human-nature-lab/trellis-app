@@ -9,80 +9,13 @@
   import QuestionDatum from '../../entities/trellis/QuestionDatum'
   import EdgeService from '../../services/edge/EdgeService'
   import GeoService from '../../services/geo/GeoService'
-  import Datum from '../../entities/trellis/Datum'
-  import Geo from '../../entities/trellis/Geo'
-  import Edge from '../../entities/trellis/Edge'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import Translation from '../../entities/trellis/Translation'
-  import Roster from '../../entities/trellis/Roster'
   import RosterService from '../../services/roster/RosterService'
+  import questionTypes from '../../static/question.types'
+  import Datum from '../../entities/trellis/Datum'
   
   const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props'])
-
-  function loadData<T extends any> (target: any, key: string | symbol, location: InterviewLocation, handler: (data: { question: Question, data: Datum[], datum: QuestionDatum }) => Promise<T>): Promise<T> {
-    if (!target._loading) {
-      // @ts-ignore
-      target._loading = {}
-    }
-    if (target._loading[key]) {
-      return
-    }
-    const data = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
-    target._loading[key] = true
-    handler(data).then(res => {
-      Vue.set(target, key, res)
-      target[key] = res
-    }).catch(err => {
-      Vue.set(target, key, err)
-    }).then(() => {
-      target._loading[key] = false
-    })
-  }
-
-  function EdgeHandler(location: InterviewLocation): ProxyHandler<Record<string | symbol, Edge[] | undefined>> {
-    return {
-      get (target, key, receiver) {
-        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
-          return target[key]
-        }
-        loadData(target, key, location, async ({ data }) => {
-          const edgeIds = data.filter(d => !!d.edgeId).map(d => d.edgeId)
-          return EdgeService.getEdges(edgeIds)
-        })
-        return
-      }
-    }
-  }
-
-  function GeoHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, Geo[] | undefined>> {
-    return {
-      get (target, key, receiver) {
-        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
-          return target[key]
-        }
-        loadData(target, key, location, async ({ data }) => {
-          const geoIds = data.filter(d => !!d.geoId).map(d => d.geoId)
-          return GeoService.getGeosById(geoIds)
-        })
-        return
-      }
-    }
-  }
-
-  function RosterHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, Roster[] | undefined>> {
-    return {
-      get (target, key, receiver) {
-        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
-          return target[key]
-        }
-        loadData(target, key, location, async ({ data }) => {
-          const rosterIds = data.filter(d => !!d.rosterId).map(d => d.rosterId)
-          return RosterService.getRosterRows(rosterIds)
-        })
-        return
-      }
-    }
-  }
 
   function DataHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, Datum[]>> {
     return {
@@ -90,8 +23,66 @@
         if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
           return target[key]
         }
-        const data = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
+        const { data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
         Vue.set(target, key, data)
+      }
+    }
+  }
+  
+  function VarsHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, any>> {
+    return {
+      get (target, key, receiver) {
+        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
+          return target[key]
+        }
+
+        // Get the datum for the referenced var_name
+        const { question, datum, data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
+
+        // Select the correct data handler
+        let handler: () => Promise<any>
+        switch (question.questionTypeId) {
+          case (questionTypes.relationship):
+            handler = async () => {
+              const edgeIds = data.filter(d => !!d.edgeId).map(d => d.edgeId)
+              return EdgeService.getEdges(edgeIds)
+            }
+            break
+          case (questionTypes.roster):
+            handler = async () => {
+              const rosterIds = data.filter(d => !!d.rosterId).map(d => d.rosterId)
+              return RosterService.getRosterRows(rosterIds)
+            }
+            break
+          case (questionTypes.geo):
+            handler = async () => {
+              const geoIds = data.filter(d => !!d.geoId).map(d => d.geoId)
+              return GeoService.getGeosById(geoIds)
+            }
+            break
+          default:
+            target[key] = data
+            return target[key]
+        }
+
+        // Set loading flag
+        if (!target._loading) {
+          // @ts-ignore
+          target._loading = {}
+        }
+        if (target._loading[key]) {
+          return
+        }
+
+        // Fetch the data
+        target._loading[key] = true
+        handler().then(res => {
+          Vue.set(target, key, res)
+        }).catch(err => {
+          Vue.set(target, key, err)
+        }).then(() => {
+          target._loading[key] = false
+        })
       }
     }
   }
@@ -106,10 +97,8 @@
     },
     data () {
       return {
+        vars: new Proxy({}, VarsHandler(this.location)) as Record<string, any>,
         data: new Proxy({}, DataHandler(this.location)) as Record<string, Datum[]>,
-        edge: new Proxy({}, EdgeHandler(this.location)) as Record<string, Edge[]>,
-        geo: new Proxy({}, GeoHandler(this.location)) as Record<string, Geo[]>,
-        roster: new Proxy({}, RosterHandler(this.location)) as Record<string, Roster[]>,
         fills: {} as Record<string, string>,
       }
     },
@@ -165,10 +154,6 @@
           fills[keys[i]] = data[i]
         }
         this.fills = fills
-      },
-      async getEdge (id: string): Promise<Edge> {
-        const edges = await EdgeService.getEdges([id])
-        return edges[0]
       }
     },
     computed: {
@@ -177,13 +162,6 @@
       },
       oldFillKeys (): string[] {
         return StringInterpolationService.getInterpolationKeys(this.translated)
-      },
-      locationStr (): string {
-        return JSON.stringify(this.location)
-      },
-      pageQuestions (): Question[] {
-        const int = sharedInterviewInstance as InterviewManager
-        return int.getCurrentPageQuestions()
       },
       questionDatum (): QuestionDatum {
         return this.question.datum || sharedInterviewInstance.getSingleDatumByQuestionVarName(this.question.varName, this.location.sectionFollowUpDatumId)
