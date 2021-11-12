@@ -1,5 +1,5 @@
 <template>
-  <v-col class="fill-height">
+  <v-col class="fill-height content">
     <v-toolbar>
       <v-btn icon v-if="parentGeo !== null" @click.stop="upOneLevelDone">
         <v-icon>mdi-arrow-left</v-icon>
@@ -444,21 +444,25 @@
   @media print
     .floating-button
       display: none
+    .v-main
+      overflow: hidden
 
   .print-mode
-    .toolbar
+    .v-toolbar
       display: none
     .leaflet-control-container
       display: none
-    .progress-linear
+    .v-progress-linear
       display: none
-    .content
-      padding: 0 0 0 !important
-      width: 8.5in
-      height: 11in
+    .v-main
+      padding: 0 0 !important
+      width: 8in
+      height: 10.5in
       position: absolute
       top: 0
       left: 0
+    .container, .content
+      padding: 0
 
   .snack
     z-index: 3000 !important
