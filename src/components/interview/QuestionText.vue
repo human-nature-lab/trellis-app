@@ -14,6 +14,8 @@
   import RosterService from '../../services/roster/RosterService'
   import questionTypes from '../../static/question.types'
   import Datum from '../../entities/trellis/Datum'
+  import Respondent from '../../entities/trellis/Respondent'
+  import Geo from '../../entities/trellis/Geo'
   
   const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props'])
 
@@ -25,6 +27,18 @@
         }
         const { data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
         Vue.set(target, key, data)
+      }
+    }
+  }
+
+  function ConditionTagHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, boolean>> {
+    return {
+      get (target, key, receiver) {
+        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
+          return target[key]
+        }
+        const tags: string[] = sharedInterviewInstance.getConditionTags(location.sectionRepetition, location.sectionFollowUpDatumId)
+        return tags.includes(key)
       }
     }
   }
@@ -92,6 +106,7 @@
     components: { Photo },
     mixins: [TranslationMixin],
     props: {
+      subject: Object as PropOptions<Respondent | Geo>,
       question: Object as PropOptions<Question>,
       location: Object as PropOptions<InterviewLocation>,
     },
@@ -99,6 +114,7 @@
       return {
         vars: new Proxy({}, VarsHandler(this.location)) as Record<string, any>,
         data: new Proxy({}, DataHandler(this.location)) as Record<string, Datum[]>,
+        conditionTag: new Proxy({}, ConditionTagHandler(this.location) as Record<string, boolean>),
         fills: {} as Record<string, string>,
       }
     },

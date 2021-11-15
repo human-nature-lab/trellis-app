@@ -47,6 +47,13 @@ In this example we're assuming this question follows up to a relationship questi
 </v-col>
 ```
 
+### Use subject's name in question
+```html
+<div>
+  Hello, {{subject.name || 'Loading...'}}!
+</div>
+```
+
 [0]: https://vuejs.org
 [1]: https://vuejs.org/v2/guide/syntax.html
 [2]: https://vuetifyjs.com

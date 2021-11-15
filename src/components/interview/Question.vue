@@ -11,7 +11,10 @@
     <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
     <v-card-text class="question-content">
       <v-flex class="question-text title">
-        <QuestionText :location="location" :question="question" />
+        <QuestionText 
+          :location="location"
+          :question="question"
+          :subject="interview.survey.respondent" />
       </v-flex>
       <div
         :is="currentQuestionComponent"
@@ -29,31 +32,34 @@
 </template>
 
 
-<script>
+<script lang="ts">
   // This parent component servers the purpose of handling general functionality that is used across all questions.
   // For example, question title and message fills will be applied here. The question header text will be applied here
-  // import translationService from '../services/TranslationService'
+  import Vue, { PropOptions } from 'Vue'
   import DontKnowRefused from './DontKnowRefused.vue'
-  import AsyncTranslationText from '../AsyncTranslationText'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import questionTypes from '../../static/question.types'
   import ParameterType from '../../static/parameter.types'
 
-  import DateQuestion from './questions/DateQuestion'
-  import DecimalQuestion from './questions/DecimalQuestion'
-  import GeoQuestion from './questions/GeoQuestion'
-  import IntegerQuestion from './questions/IntegerQuestion'
-  import IntroQuestion from './questions/IntroQuestion'
-  import ImageQuestion from './questions/ImageQuestion'
-  import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
-  import RelationshipQuestion from './questions/RelationshipQuestion'
-  import RespondentGeoQuestion from './questions/RespondentGeoQuestion'
-  import RosterQuestion from './questions/RosterQuestion'
-  import TextQuestion from './questions/TextQuestion'
-  import TextAreaQuestion from './questions/TextAreaQuestion'
-  import TimeQuestion from './questions/TimeQuestion'
-  import QuestionTimer from './QuestionTimer'
+  import DateQuestion from './questions/DateQuestion.vue'
+  import DecimalQuestion from './questions/DecimalQuestion.vue'
+  import GeoQuestion from './questions/GeoQuestion.vue'
+  import IntegerQuestion from './questions/IntegerQuestion.vue'
+  import IntroQuestion from './questions/IntroQuestion.vue'
+  import ImageQuestion from './questions/ImageQuestion.vue'
+  import MultipleSelectQuestion from './questions/MultipleSelectQuestion.vue'
+  import RelationshipQuestion from './questions/RelationshipQuestion.vue'
+  import RespondentGeoQuestion from './questions/RespondentGeoQuestion.vue'
+  import RosterQuestion from './questions/RosterQuestion.vue'
+  import TextQuestion from './questions/TextQuestion.vue'
+  import TextAreaQuestion from './questions/TextAreaQuestion.vue'
+  import TimeQuestion from './questions/TimeQuestion.vue'
+  import QuestionTimer from './QuestionTimer.vue'
   import QuestionText from './QuestionText.vue'
+  import Question from '../../entities/trellis/Question'
+  import Interview from '../../entities/trellis/Interview'
+  import { InterviewLocation } from './services/InterviewAlligator'
 
   const typeMap = {
     [questionTypes.year]: DateQuestion,
@@ -100,15 +106,15 @@
       question: {
         type: Object,
         required: true
-      },
+      } as PropOptions<Question>,
       interview: {
         type: Object,
         required: true
-      },
+      } as PropOptions<Interview>,
       location: {
         type: Object,
         required: true
-      },
+      } as PropOptions<InterviewLocation>,
       disabled: {
         type: Boolean,
         required: true
@@ -120,7 +126,7 @@
         hasChanged: false
       }
     },
-    update () {
+    updated () {
       this.hasChanged = true
     },
     watch: {
@@ -139,24 +145,24 @@
       }
     },
     computed: {
-      currentQuestionComponent () {
+      currentQuestionComponent (): string {
         return typeMap[this.question.questionTypeId]
       },
-      validationError () {
+      validationError (): null | Error {
         if (!this.hasChanged || (this.question.dkRf !== null && this.question.dkRf !== undefined)) {
           return null
         }
         return this.question.validationError
       },
-      timerDuration () {
+      timerDuration (): number {
         if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return 0
         const qp = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.allowed_time)
         return qp ? +qp.val : 0
       },
-      showTimer () {
+      showTimer (): boolean {
         return this.timerDuration !== 0
       },
-      showTimerControls () {
+      showTimerControls (): boolean {
         if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return true
         const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.show_timer_controls)
         return questionParameter ? !!questionParameter.val : true
