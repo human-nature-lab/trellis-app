@@ -129,7 +129,6 @@
       }
     },
     created () {
-      console.log('QuestionText.created', this.$options.template)
       this.convertTemplate()
       this.updateFills()
     },
@@ -218,7 +217,6 @@
         return this.question.datum || sharedInterviewInstance.getSingleDatumByQuestionVarName(this.question.varName, this.location.sectionFollowUpDatumId)
       },
       translated (): string | null {
-        console.log('QuestionText.translated', this.translation)
         return this.translation ? TranslationService.getAny(this.translation, this.global.locale) : null
       },
       followUpDatum (): Datum | undefined {
