@@ -11,11 +11,10 @@
     <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
     <v-card-text class="question-content">
       <v-flex class="question-text title">
-        <AsyncTranslationText
-          passive
-          :translation="question.questionTranslation"
-          :location="location">
-        </AsyncTranslationText>
+        <QuestionText 
+          :location="location"
+          :question="question"
+          :subject="interview.survey.respondent" />
       </v-flex>
       <div
         :is="currentQuestionComponent"
@@ -33,30 +32,34 @@
 </template>
 
 
-<script>
+<script lang="ts">
   // This parent component servers the purpose of handling general functionality that is used across all questions.
   // For example, question title and message fills will be applied here. The question header text will be applied here
-  // import translationService from '../services/TranslationService'
+  import Vue, { PropOptions } from 'Vue'
   import DontKnowRefused from './DontKnowRefused.vue'
-  import AsyncTranslationText from '../AsyncTranslationText'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import questionTypes from '../../static/question.types'
   import ParameterType from '../../static/parameter.types'
 
-  import DateQuestion from './questions/DateQuestion'
-  import DecimalQuestion from './questions/DecimalQuestion'
-  import GeoQuestion from './questions/GeoQuestion'
-  import IntegerQuestion from './questions/IntegerQuestion'
-  import IntroQuestion from './questions/IntroQuestion'
-  import ImageQuestion from './questions/ImageQuestion'
-  import MultipleSelectQuestion from './questions/MultipleSelectQuestion'
-  import RelationshipQuestion from './questions/RelationshipQuestion'
-  import RespondentGeoQuestion from './questions/RespondentGeoQuestion'
-  import RosterQuestion from './questions/RosterQuestion'
-  import TextQuestion from './questions/TextQuestion'
-  import TextAreaQuestion from './questions/TextAreaQuestion'
-  import TimeQuestion from './questions/TimeQuestion'
-  import QuestionTimer from './QuestionTimer'
+  import DateQuestion from './questions/DateQuestion.vue'
+  import DecimalQuestion from './questions/DecimalQuestion.vue'
+  import GeoQuestion from './questions/GeoQuestion.vue'
+  import IntegerQuestion from './questions/IntegerQuestion.vue'
+  import IntroQuestion from './questions/IntroQuestion.vue'
+  import ImageQuestion from './questions/ImageQuestion.vue'
+  import MultipleSelectQuestion from './questions/MultipleSelectQuestion.vue'
+  import RelationshipQuestion from './questions/RelationshipQuestion.vue'
+  import RespondentGeoQuestion from './questions/RespondentGeoQuestion.vue'
+  import RosterQuestion from './questions/RosterQuestion.vue'
+  import TextQuestion from './questions/TextQuestion.vue'
+  import TextAreaQuestion from './questions/TextAreaQuestion.vue'
+  import TimeQuestion from './questions/TimeQuestion.vue'
+  import QuestionTimer from './QuestionTimer.vue'
+  import QuestionText from './QuestionText.vue'
+  import Question from '../../entities/trellis/Question'
+  import Interview from '../../entities/trellis/Interview'
+  import { InterviewLocation } from './services/InterviewAlligator'
 
   const typeMap = {
     [questionTypes.year]: DateQuestion,
@@ -81,71 +84,6 @@
   export default {
     name: 'question',
     mixins: [TranslationMixin],
-    props: {
-      question: {
-        type: Object,
-        required: true
-      },
-      interview: {
-        type: Object,
-        required: true
-      },
-      location: {
-        type: Object,
-        required: true
-      },
-      disabled: {
-        type: Boolean,
-        required: true
-      }
-    },
-    data () {
-      return {
-        translation: this.question.questionTranslation,
-        hasChanged: false
-      }
-    },
-    update () {
-      this.hasChanged = true
-    },
-    watch: {
-      'question': {
-        handler () {
-          this.hasChanged = true
-        },
-        deep: true
-      },
-      location: {
-        handler () {
-          this.hasChanged = true
-        },
-        deep: true
-      }
-    },
-    computed: {
-      currentQuestionComponent () {
-        return typeMap[this.question.questionTypeId]
-      },
-      validationError () {
-        if (!this.hasChanged || (this.question.dkRf !== null && this.question.dkRf !== undefined)) {
-          return null
-        }
-        return this.question.validationError
-      },
-      timerDuration () {
-        if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return 0
-        const qp = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.allowed_time)
-        return qp ? +qp.val : 0
-      },
-      showTimer () {
-        return this.timerDuration !== 0
-      },
-      showTimerControls () {
-        if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return true
-        const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.show_timer_controls)
-        return questionParameter ? !!questionParameter.val : true
-      }
-    },
     components: {
       AsyncTranslationText,
       QuestionTimer,
@@ -161,7 +99,74 @@
       RosterQuestion,
       RespondentGeoQuestion,
       TextQuestion,
-      TimeQuestion
+      TimeQuestion,
+      QuestionText,
+    },
+    props: {
+      question: {
+        type: Object,
+        required: true
+      } as PropOptions<Question>,
+      interview: {
+        type: Object,
+        required: true
+      } as PropOptions<Interview>,
+      location: {
+        type: Object,
+        required: true
+      } as PropOptions<InterviewLocation>,
+      disabled: {
+        type: Boolean,
+        required: true
+      }
+    },
+    data () {
+      return {
+        translation: this.question.questionTranslation,
+        hasChanged: false
+      }
+    },
+    updated () {
+      this.hasChanged = true
+    },
+    watch: {
+      'question': {
+        handler () {
+          this.hasChanged = true
+          this.translation = this.question.questionTranslation
+        },
+        deep: true
+      },
+      location: {
+        handler () {
+          this.hasChanged = true
+        },
+        deep: true
+      }
+    },
+    computed: {
+      currentQuestionComponent (): string {
+        return typeMap[this.question.questionTypeId]
+      },
+      validationError (): null | Error {
+        if (!this.hasChanged || (this.question.dkRf !== null && this.question.dkRf !== undefined)) {
+          return null
+        }
+        return this.question.validationError
+      },
+      timerDuration (): number {
+        if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return 0
+        const qp = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.allowed_time)
+        return qp ? +qp.val : 0
+      },
+      showTimer (): boolean {
+        return this.timerDuration !== 0
+      },
+      showTimerControls (): boolean {
+        if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return true
+        const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.show_timer_controls)
+        return questionParameter ? !!questionParameter.val : true
+      }
     }
   }
 </script>

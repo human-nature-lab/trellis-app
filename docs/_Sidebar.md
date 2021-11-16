@@ -16,6 +16,7 @@
   - [Question parameters](form-builder/Question-parameters.md)
   - [Conditions](form-builder/Conditions.md)
   - [Interpolated values](form-builder/InterpolatedValues.md)
+  - [Templates](form-builder/Templates.md)
 
 #### Locations
 - [Search](locations/Search.md)

@@ -143,6 +143,10 @@ export default function () {
             makeSkip(['two']).show().any(),
             makeSkip(['three']).show().any()
           ], new Set(['two']))
+          shouldShow([
+            makeSkip(['two', 'three']).show().all(),
+            makeSkip(['two', 'four']).show().all()
+          ], new Set(['two', 'four', 'five']))
         })
         it('should hide at the first positive hide result', () => {
           shouldHide([

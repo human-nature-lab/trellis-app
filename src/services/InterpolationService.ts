@@ -73,6 +73,21 @@ export default class InterpolationService {
     }
     return Promise.all(promises)
   }
+  
+  static getVarData (varName: string, manager: InterviewManager, location: InterviewLocation): { question: Question, datum: QuestionDatum, data: Datum[] } {
+    const datum: QuestionDatum = manager.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpDatumId)
+    const question: Question = manager.questionIndex.get(datum.questionId)
+    let data = datum.data
+    if (location.sectionFollowUpDatumId) {
+      let d = datum.data.find(d => d.id === location.sectionFollowUpDatumId)
+      data = [d]
+    }
+    return {
+      question,
+      datum,
+      data,
+    }
+  }
 
   /**
    * Get a fill value using the varName of a question and the current location within the interview
@@ -83,16 +98,8 @@ export default class InterpolationService {
    */
   static async getFillByVarName (varName: string, interviewManager: InterviewManager, location: InterviewLocation) {
     try {
-      let questionDatum: QuestionDatum = interviewManager.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpDatumId)
-      let question: Question = interviewManager.questionIndex.get(questionDatum.questionId)
-      let vals: string[]
-      if (location.sectionFollowUpDatumId) {
-        // Find the specific datum for this follow up repetition
-        let datum = questionDatum.data.find(d => d.id === location.sectionFollowUpDatumId)
-        vals = await InterpolationService.getInterpolatedData([datum], question)
-      } else {
-        vals = await InterpolationService.getInterpolatedData(questionDatum.data, question)
-      }
+      const { question, data } = InterpolationService.getVarData(varName, interviewManager, location)
+      const vals = await InterpolationService.getInterpolatedData(data, question)
       return vals.join(', ')
     } catch (err) {
       let fill = interviewManager.getRespondentFillByVarName(varName)
