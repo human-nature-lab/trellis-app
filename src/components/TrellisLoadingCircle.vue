@@ -42,7 +42,10 @@
     },
     computed: {
       borderColor () {
-        return this.$vuetify.theme.currentTheme[this.color]
+        if (this.$vuetify && this.$vuetify.theme) {
+          const theme = this.$vuetify.theme.isDark ? this.$vuetify.theme.themes.dark : this.$vuetify.theme.themes.light
+          return theme[this.color]
+        }
       },
       containerStyles (): object {
         return {

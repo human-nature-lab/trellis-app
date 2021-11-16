@@ -7,7 +7,7 @@
       :respondent="respondent"
       :allowMultipleSurveys="allowMultipleSurveys"
       :canCreateSurveys="canCreateSurveys"
-      @newInterview="newInterview"
+      @newInterview="$emit('newInterview', $event)"
       v-if="showForm(form)" />
   </v-flex>
 </template>
@@ -48,9 +48,6 @@
       }
     },
     methods: {
-      newInterview (interview: Interview) {
-        this.$emit('newInterview', interview)
-      },
       showForm (form): boolean {
         if (form.isPublished && !form.isSkipped) {
           return true
