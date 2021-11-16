@@ -1,5 +1,13 @@
+<template>
+  <div>
+    <v-progress-linear v-if="isLoading || !component" indeterminate/>
+    <component v-else :is="component" v-bind="Object.assign({}, $props, $data)" />
+  </div>
+</template>
+
 <script lang="ts">
-  import Vue, { PropOptions } from 'vue'
+
+  import Vue, { PropOptions, Component } from 'vue'
   import InterpolationService from '../../services/InterpolationService'
   import StringInterpolationService from '../../services/StringInterpolationService'
   import InterviewManager, { sharedInterviewInstance } from './classes/InterviewManager'
@@ -9,13 +17,14 @@
   import QuestionDatum from '../../entities/trellis/QuestionDatum'
   import EdgeService from '../../services/edge/EdgeService'
   import GeoService from '../../services/geo/GeoService'
-  import TranslationMixin from '../../mixins/TranslationMixin'
-  import Translation from '../../entities/trellis/Translation'
   import RosterService from '../../services/roster/RosterService'
   import questionTypes from '../../static/question.types'
   import Datum from '../../entities/trellis/Datum'
   import Respondent from '../../entities/trellis/Respondent'
   import Geo from '../../entities/trellis/Geo'
+  import singleton from '../../static/singleton'
+  import TranslationTextService from '../../services/translation-text/TranslationTextService'
+  import TranslationService from '../../services/TranslationService'
   
   const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props'])
 
@@ -103,8 +112,6 @@
 
   export default Vue.extend({
     name: 'QuestionText',
-    components: { Photo },
-    mixins: [TranslationMixin],
     props: {
       subject: Object as PropOptions<Respondent | Geo>,
       question: Object as PropOptions<Question>,
@@ -112,13 +119,17 @@
     },
     data () {
       return {
+        isLoading: false,
         vars: new Proxy({}, VarsHandler(this.location)) as Record<string, any>,
         data: new Proxy({}, DataHandler(this.location)) as Record<string, Datum[]>,
         conditionTag: new Proxy({}, ConditionTagHandler(this.location) as Record<string, boolean>),
         fills: {} as Record<string, string>,
+        global: singleton,
+        translation: this.question ? this.question.questionTranslation : null,
       }
     },
     created () {
+      console.log('QuestionText.created', this.$options.template)
       this.convertTemplate()
       this.updateFills()
     },
@@ -133,29 +144,28 @@
         handler () {
           this.updateFills()
         },
-      }
+      },
     },
     methods: {
-      convertTemplate () {
-        if (!this.question || !this.translated) {
-          this.$options.template = '<span />'
+      async convertTemplate () {
+        if (!this.question || this.isLoading) {
           return
         }
-        let tmp = this.translated.trim()
-        
-        // Convert old string iterpolation into Vue templates
-        if (this.useOldFills) {
-          for (const key of this.oldFillKeys) {
-            tmp = tmp.replace(`[${key}]`, `{{fills.${key}}}`)
+        this.translation = null
+        try {
+          const trans = this.question.questionTranslation
+          if (trans && (!trans.translationText || !trans.translationText.length)) {
+            this.isLoading = true
+            this.question.questionTranslation.translationText = await TranslationTextService.getTranslatedTextByTranslationId(trans.id)
           }
+        } catch (err) {
+          this.log(err)
         }
-
-        // Add a single root to the component if we're using old fill method
-        if (this.useOldFills) {
-          tmp = `<span>${tmp}</span>`
+        this.translation = this.question.questionTranslation
+        if (this.isLoading) {
+          this.updateFills()
         }
-
-        this.$options.template = tmp
+        this.isLoading = false
       },
       async updateFills () {
         if (!this.useOldFills) return
@@ -173,8 +183,33 @@
       }
     },
     computed: {
+      component (): Component {
+        let tmp = this.translated ? this.translated.trim() : 'Loading...'
+        
+        // Convert old string iterpolation into Vue templates
+        if (this.useOldFills) {
+          for (const key of this.oldFillKeys) {
+            tmp = tmp.replace(`[${key}]`, `{{fills['${key}']}}`)
+          }
+        }
+
+        // Ensure a single root to the component if we're using the old fill method
+        if (this.useOldFills) {
+          tmp = `<span>${tmp}</span>`
+        }
+
+        const compiled = Vue.compile(tmp)
+        const keys = Object.keys(this.$props).concat(['vars', 'fills', 'data', 'conditionTag'])
+        return {
+          name: this.question.varName,
+          components: { Photo },
+          render: compiled.render,
+          staticRenderFns: compiled.staticRenderFns,
+          props: keys,
+        }
+      },
       useOldFills (): boolean {
-        return this.translated.trim()[0] !== '<'
+        return this.translated ? this.translated.trim()[0] !== '<' : false
       },
       oldFillKeys (): string[] {
         return StringInterpolationService.getInterpolationKeys(this.translated)
@@ -182,8 +217,9 @@
       questionDatum (): QuestionDatum {
         return this.question.datum || sharedInterviewInstance.getSingleDatumByQuestionVarName(this.question.varName, this.location.sectionFollowUpDatumId)
       },
-      translation (): Translation {
-        return this.question.questionTranslation
+      translated (): string | null {
+        console.log('QuestionText.translated', this.translation)
+        return this.translation ? TranslationService.getAny(this.translation, this.global.locale) : null
       },
       followUpDatum (): Datum | undefined {
         if (this.questionDatum && this.questionDatum.followUpDatumId) {
