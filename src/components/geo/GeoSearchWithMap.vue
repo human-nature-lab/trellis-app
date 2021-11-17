@@ -449,6 +449,13 @@
   
   .print-mode
     .v-main
+      width: 90%
+      margin: auto
+      padding: 0 0 !important
+      position: absolute
+      right: 0
+      top: 0
+      left: 0
       width: 8in
       height: 10.5in
 

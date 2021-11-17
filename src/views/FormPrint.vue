@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="pa-2">
     <v-row>
       <v-spacer />
       <v-btn icon @click="showOpts = !showOpts" class="opts-btn">
@@ -18,9 +18,9 @@
       </v-col>
     </v-slide-y-transition>
     <v-progress-linear v-if="isLoading" indeterminate />
-    <v-col v-else v-for="section in form.sections" :key="section.id" class="section mb-4">
+    <v-col v-else v-for="section in form.sections" :key="section.id" class="section mt-2">
       <div v-if="opts.locationIndicators" class="section-indicator" />
-      <v-row v-if="opts.sectionHeaders" no-gutters title="Section details">
+      <v-row v-if="opts.sectionHeaders" no-gutters title="Section details" class="pl-1">
         {{translate(section.nameTranslation, global.locale)}}
         <v-spacer />
         <v-chip v-if="section.formSections[0].maxRepetitions > 0" label>
@@ -32,7 +32,7 @@
       </v-row>
       <v-col v-for="(page, pageIndex) in section.questionGroups" :key="page.id" class="page mb-2">
         <div v-if="opts.locationIndicators" class="page-indicator" />
-        <v-row v-if="opts.pageHeaders" no-gutters class="pa-2">
+        <v-row v-if="opts.pageHeaders" no-gutters class="pt-1 pl-1">
           Page: {{pageIndex + 1}}
         </v-row>
         <v-row v-for="question in page.questions" :key="question.id" class="question mb-2">
@@ -41,10 +41,10 @@
               <span v-if="opts.questionNumbers" class="mr-1">{{questionIndices[question.id] + 1}}.</span>
               <span title="Variable name">{{question.varName}}</span>
               <v-spacer />
-              <span title="Question type">({{question.questionType.name}})</span>
+              <span title="Question type">type: {{question.questionType.name}}</span>
             </v-row>
             <v-row no-gutter class="pa-4">
-              {{translate(question.questionTranslation, global.locale)}}
+              <pre class="code">{{translate(question.questionTranslation, global.locale)}}</pre>
             </v-row>
             <v-radio-group v-if="opts.choices && question.questionType.name === 'multiple_choice'">
               <v-radio
@@ -165,7 +165,17 @@
 <style lang="sass">
   .print-mode
     .v-main
-      overflow: visible
+      overflow-x: hidden
+      padding: 10px !important
+      margin: 0 !important
+      height: 100%
+  .code
+    max-width: 100%
+    white-space: pre-wrap       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap  /* Mozilla, since 1999 */
+    white-space: -pre-wrap      /* Opera 4-6 */
+    white-space: -o-pre-wrap    /* Opera 7 */
+    word-wrap: break-word       /* Internet Explorer 5.5+ */
   .section, .page
     position: relative
   .page-indicator, .section-indicator
@@ -173,14 +183,15 @@
     top: 0
     left: 0
     width: 5px
-    height: 90%
+    height: 100%
   .section-indicator
-    margin-top: 24px
+    margin-top: 26px
     border-left: 1px solid grey
     border-top: 1px solid grey
     border-bottom: 1px solid grey
   .page-indicator
     margin-top: 30px
+    margin-bottom: 30px
     border-left: 1px solid lightgrey
     border-top: 1px solid lightgrey
     border-bottom: 1px solid lightgrey
