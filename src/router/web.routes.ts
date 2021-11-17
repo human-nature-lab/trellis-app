@@ -11,6 +11,7 @@ const SyncAdmin = () => import(/* webpackChunkName: "sync-admin" */'../component
 const Users = () => import(/* webpackChunkName: "users" */'../views/Users.vue')
 const Reports = () => import(/* webpackChunkName: "reports" */'../views/Reports.vue')
 const FormBuilder = () => import(/* webpackChunkName: "form-builder" */'../views/FormBuilder.vue')
+const FormPrint = () => import(/* webpackChunkName: "form-print" */'../views/FormPrint.vue')
 const Devices = () => import(/* webpackChunkName: "devices" */'../views/Devices.vue')
 const Studies = () => import(/* webpackChunkName: "studies" */'../views/Studies.vue')
 const GeoTypes = () => import(/* webpackChunkName: "geo-types" */'../views/GeoTypes.vue')
@@ -50,6 +51,11 @@ export default [{
   name: 'FormBuilder',
   component: FormBuilder,
   beforeEnter: guardQueue([PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
+}, {
+  path: '/form/:formId/print',
+  name: 'FormPrint',
+  component: FormPrint,
+  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard])
 }, {
   path: '/forms',
   name: 'Forms',

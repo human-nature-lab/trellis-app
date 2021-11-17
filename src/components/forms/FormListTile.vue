@@ -45,10 +45,15 @@
           <v-list-item @click="exportForm">
             <v-list-item-content> Export </v-list-item-content>
           </v-list-item>
+          <v-list-item :to="{ name: 'FormPrint', params: { formId: form.id } }" target="_blank">
+            <v-list-item-content>
+              {{$t('print_form')}}
+            </v-list-item-content>
+          </v-list-item>
           <Permission :requires="TrellisPermission.REMOVE_FORM">
             <v-list-item @click="$emit('delete')">
               <v-list-item-content>
-                <span color="error--text">Delete</span>
+                <span class="error--text">Delete</span>
               </v-list-item-content>
             </v-list-item>
           </Permission>
