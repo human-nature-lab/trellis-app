@@ -197,7 +197,7 @@
         return this.reports.filter(r => r.status === ReportStatus.queued)
       },
       selected (): HasReport[] {
-        return this.selectedForms.concat(this.selectedStudyTypes)
+        return this.selectedForms ? this.selectedForms.concat(this.selectedStudyTypes) : []
       },
       formIds (): string[] {
         return this.selectedForms.map(f => f.id)
@@ -206,7 +206,7 @@
         return this.selectedStudyTypes.map(s => s.value)
       },
       hasSelectedReports (): boolean {
-        return !!this.selectedStudyTypes.length || !!this.selectedForms.length
+        return !!this.selectedStudyTypes || !!this.selectedStudyTypes.length || !!this.selectedForms.length
       }
     }
   })

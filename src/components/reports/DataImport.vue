@@ -6,22 +6,18 @@
       </v-toolbar-title>
     </v-toolbar>
     <v-container>
-      <v-layout>
-        <v-flex>
-          <v-layout column>
-            <GeoImport />
-            <GeoPhotoImport />
-            <RespondentGeoImport />
-          </v-layout>
-        </v-flex>
-        <v-flex>
-          <v-layout column align-content-end align-end>
-            <RespondentImport />
-            <RespondentPhotoImport />
-            <RespondentConditionTagImport />
-          </v-layout>
-        </v-flex>
-      </v-layout>
+      <v-row>
+        <v-col>
+          <GeoImport class="mb-2" />
+          <GeoPhotoImport class="mb-2" />
+          <RespondentGeoImport class="mb-2" />
+        </v-col>
+        <v-col>
+          <RespondentImport class="mb-2" />
+          <RespondentPhotoImport class="mb-2" />
+          <RespondentConditionTagImport class="mb-2" />
+        </v-col>
+      </v-row>
     </v-container>
   </v-flex>
 </template>

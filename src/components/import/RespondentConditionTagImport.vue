@@ -1,29 +1,21 @@
 <template>
-  <v-flex>
-    <file-upload
-      input-id="respondent-condition-tag"
-      class="btn primary"
-      extensions="csv"
-      :drop="true"
-      @input="importConditionTags" >
-      <TrellisLoadingCircle size="25px" v-if="isWorking" />
-      <div class="btn__content" v-else>
-        {{$t('import_respondent_tags')}}
-      </div>
-    </file-upload>
-  </v-flex>
+  <TrellisFileUpload
+    input-id="respondent-condition-tag"
+    extensions="csv"
+    @input="importConditionTags">
+    {{$t('import_respondent_tags')}}
+  </TrellisFileUpload>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
   import global from '../../static/singleton'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
-  import FileUpload from 'vue-upload-component'
   import ConditionTagService from '../../services/condition-tag'
+  import TrellisFileUpload from './TrellisFileUpload.vue'
 
   export default Vue.extend({
     name: 'RespondentConditionTagImport',
-    components: { FileUpload, TrellisLoadingCircle },
+    components: { TrellisFileUpload },
     data () {
       return {
         isWorking: false,

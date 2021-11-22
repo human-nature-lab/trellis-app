@@ -1,27 +1,20 @@
 <template>
-  <file-upload
-    input-id="respondent-photo"
-    class="btn primary"
+  <TrellisFileUpload
     extensions="zip"
-    :drop="true"
     @input="importPhotos">
-    <TrellisLoadingCircle size="25px" v-if="isWorking" />
-    <div class="btn__content" v-else>
-      {{$t('import_respondent_photos')}}
-    </div>
-  </file-upload>
+    {{$t('import_respondent_photos')}}
+  </TrellisFileUpload>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
   import RespondentService from '../../services/respondent/RespondentService'
   import global from '../../static/singleton'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
-  import FileUpload from 'vue-upload-component'
+  import TrellisFileUpload from './TrellisFileUpload.vue'
 
   export default Vue.extend({
     name: 'RespondentPhotoImport',
-    components: { TrellisLoadingCircle, FileUpload },
+    components: { TrellisFileUpload },
     data () {
       return {
         global,

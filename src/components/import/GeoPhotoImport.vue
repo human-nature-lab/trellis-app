@@ -1,30 +1,21 @@
 <template>
-    <v-flex>
-      <file-upload
-        input-id="geo-photo"
-        class="btn primary"
-        extensions="zip"
-        :drop="true"
-        v-model="files"
-        @input="importPhotos" >
-        <TrellisLoadingCircle size="25px" v-if="isWorking" />
-        <div class="btn__content" v-else>
-          {{$t('import_location_photos')}}
-        </div>
-      </file-upload>
-    </v-flex>
+  <TrellisFileUpload
+    extensions="zip"
+    v-model="files"
+    @input="importPhotos">
+    {{$t('import_location_photos')}}
+  </TrellisFileUpload>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
-  import FileUpload from 'vue-upload-component'
   import GeoService from '../../services/geo/GeoService'
   import global from '../../static/singleton'
+  import TrellisFileUpload from './TrellisFileUpload.vue'
 
   export default Vue.extend({
     name: 'GeoPhotoImport',
-    components: { TrellisLoadingCircle, FileUpload },
+    components: { TrellisFileUpload },
     data () {
       return {
         global,
