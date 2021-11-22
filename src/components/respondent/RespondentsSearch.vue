@@ -49,7 +49,9 @@
         </v-col>
       </v-col>
     </v-scale-transition>
-    <v-divider v-if="filters.geos && filters.geos.length" />
+    <v-row>
+      <v-divider v-if="filters.geos && filters.geos.length" />
+    </v-row>
     <v-row no-gutter v-if="filters.geos && filters.geos.length">
       <v-col class="subheading">
         <v-container>{{ $t("filters") }}</v-container>
@@ -69,7 +71,9 @@
         <GeoBreadcrumbs :geoId="geo" :maxDepth="2" />
       </v-chip>
     </v-row>
-    <v-divider v-if="selected.length > 0" />
+    <v-row>
+      <v-divider v-if="selected.length > 0" />
+    </v-row>
     <v-col v-if="selected.length > 0">
       <v-col>
         <v-chip
