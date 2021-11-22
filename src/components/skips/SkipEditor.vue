@@ -1,24 +1,35 @@
 <template>
   <v-col no-gutter>
-    <SkipRow
-      v-if="conditionTags !== null"
+    <div 
+      v-if="conditionTags !== null" 
       v-for="skip in sortedSkips"
-      :key="skip.id"
-      :conditionTags="conditionTags"
-      :subject="subject"
-      @save="updateSkip"
-      @remove="removeSkip(skip)"
-      :skip="skip"
-    />
-    <SkipRow
-      v-if="showNewSkip && conditionTags !== null"
-      :conditionTags="conditionTags"
-      :disabled="lockNewSkip"
-      @save="storeNewSkip"
-      @remove="removeNewSkip"
-      :subject="subject"
-      :skip="tempSkip"
-    />
+      :key="skip.id">
+      <v-card dense outlined class="mb-4">
+        <v-container fluid>
+          <SkipRow
+            :conditionTags="conditionTags"
+            :subject="subject"
+            @save="updateSkip"
+            @remove="removeSkip(skip)"
+            :skip="skip"
+          />
+        </v-container>
+      </v-card>
+    </div>
+    <v-card>
+      <v-container fluid>
+        <SkipRow
+          v-if="showNewSkip && conditionTags !== null"
+          :conditionTags="conditionTags"
+          :disabled="lockNewSkip"
+          @save="storeNewSkip"
+          @remove="removeNewSkip"
+          :subject="subject"
+          :skip="tempSkip"
+        />
+      </v-container>
+    </v-card>
+    
     <v-row no-gutter class="mt-4">
       <v-btn @click="addSkip">
         {{ $t("add_skip") }} <v-icon right>mdi-plus</v-icon>
