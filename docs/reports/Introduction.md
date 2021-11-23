@@ -13,3 +13,4 @@ A description of each of the reports can be found here.
 - [Edge report](EdgeReport.md)
 - [Respondent location report](RespondentLocationReport.md)
 - [Interview report](InterviewReport.md)
+- [Importing data](Importing.md)

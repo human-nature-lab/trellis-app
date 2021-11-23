@@ -11,6 +11,7 @@
           <GeoImport class="mb-2" />
           <GeoPhotoImport class="mb-2" />
           <RespondentGeoImport class="mb-2" />
+          <PreloadImport class="mb-2" />
         </v-col>
         <v-col>
           <RespondentImport class="mb-2" />
@@ -31,17 +32,19 @@
   import RespondentImport from '../import/RespondentImport.vue'
   import RespondentPhotoImport from '../import/RespondentPhotoImport.vue'
   import RespondentGeoImport from '../import/RespondentGeoImport.vue'
+  import PreloadImport from '../import/PreloadImport.vue'
 
   export default Vue.extend({
     name: 'DataImport',
     components: {
-      GeoImport,
-      GeoPhotoImport,
-      RespondentImport,
-      RespondentPhotoImport,
-      DocsLinkBadge,
-      RespondentConditionTagImport,
-      RespondentGeoImport
+        GeoImport,
+        GeoPhotoImport,
+        RespondentImport,
+        RespondentPhotoImport,
+        DocsLinkBadge,
+        RespondentConditionTagImport,
+        RespondentGeoImport,
+        PreloadImport
     }
   })
 </script>
