@@ -1,10 +1,8 @@
 <template>
   <TrellisFileUpload 
-    input-id="respondent-geo"
-    extensions="csv"
-    @input="importRespondentGeos">
-    {{$t('import_respondent_geos')}}
-  </TrellisFileUpload>
+    :extensions="['csv']"
+    :uploadFile="importRespondentGeos"
+    :title="$t('import_respondent_geos')" />
 </template>
 
 <script lang="ts">
@@ -16,24 +14,13 @@
   export default Vue.extend({
     name: 'RespondentGeoImport',
     components: { TrellisFileUpload },
-    data () {
-      return {
-        isWorking: false,
-        global
-      }
-    },
     methods: {
-      async importRespondentGeos (files: File[]) {
+      async importRespondentGeos (file: File) {
         try {
-          this.isWorking = true
-          await RespondentService.importRespondentGeos(files[0]['file'], this.global.study.id)
-          this.alert('success', this.$t('import_success'))
+          await RespondentService.importRespondentGeos(file, global.study.id)
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('import_failed'))
-          }
-        } finally {
-          this.isWorking = false
+          console.error(err)
+          throw err
         }
       }
     }

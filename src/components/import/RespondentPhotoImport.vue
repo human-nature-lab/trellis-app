@@ -1,9 +1,8 @@
 <template>
   <TrellisFileUpload
-    extensions="zip"
-    @input="importPhotos">
-    {{$t('import_respondent_photos')}}
-  </TrellisFileUpload>
+    :extensions="['zip']"
+    :title="$t('import_respondent_photos')"
+    :uploadFile="importPhotos" />
 </template>
 
 <script lang="ts">
@@ -15,25 +14,13 @@
   export default Vue.extend({
     name: 'RespondentPhotoImport',
     components: { TrellisFileUpload },
-    data () {
-      return {
-        global,
-        isWorking: false
-      }
-    },
     methods: {
-      async importPhotos (files: object[]) {
+      async importPhotos (file: File) {
         try {
-          this.isWorking = true
-          await RespondentService.importRespondentPhotos(files[0]['file'], this.global.study.id)
-          this.alert('success', this.$t('import_success'))
-          this.$emit('import-photos')
+          await RespondentService.importRespondentPhotos(file, global.study.id)
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('import_failed'))
-          }
-        } finally {
-          this.isWorking = false
+          console.error(err)
+          throw err
         }
       }
     }

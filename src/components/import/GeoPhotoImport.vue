@@ -1,10 +1,8 @@
 <template>
   <TrellisFileUpload
-    extensions="zip"
-    v-model="files"
-    @input="importPhotos">
-    {{$t('import_location_photos')}}
-  </TrellisFileUpload>
+    :extensions="['zip']"
+    :title="$t('import_location_photos')"
+    :uploadFile="importPhotos" />
 </template>
 
 <script lang="ts">
@@ -16,26 +14,13 @@
   export default Vue.extend({
     name: 'GeoPhotoImport',
     components: { TrellisFileUpload },
-    data () {
-      return {
-        global,
-        isWorking: false,
-        files: []
-      }
-    },
     methods: {
-      async importPhotos (files: object[]) {
+      async importPhotos (file: File) {
         try {
-          this.isWorking = true
-          await GeoService.importGeoPhotos(this.global.study.id, files[0]['file'])
-          this.alert('success', this.$t('import_success'))
-          this.$emit('import-photos')
+          await GeoService.importGeoPhotos(global.study.id, file)
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('import_failed'))
-          }
-        } finally {
-          this.isWorking = false
+          console.error(err)
+          throw err
         }
       }
     }

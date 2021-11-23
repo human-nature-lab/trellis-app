@@ -1,9 +1,8 @@
 <template>
   <TrellisFileUpload
-    extensions="csv"
-    @input="importRespondents">
-    {{$t('import_respondents')}}
-  </TrellisFileUpload>
+    :extensions="['csv']"
+    :title="$t('import_respondents')"
+    :uploadFile="importRespondents" />
 </template>
 
 <script lang="ts">
@@ -15,25 +14,13 @@
   export default Vue.extend({
     name: 'RespondentImport',
     components: { TrellisFileUpload },
-    data () {
-      return {
-        global,
-        isWorking: false
-      }
-    },
     methods: {
-      async importRespondents (files: object[]) {
+      async importRespondents (file: File) {
         try {
-          this.isWorking = true
-          const respondents = await RespondentService.importRespondents(files[0]['file'], this.global.study.id)
-          this.alert('success', this.$t('import_success'))
-          this.$emit('import-respondents', respondents)
+          const respondents = await RespondentService.importRespondents(file, global.study.id)
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('import_failed'))
-          }
-        } finally {
-          this.isWorking = false
+          console.error(err)
+          throw err
         }
       }
     }

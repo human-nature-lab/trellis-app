@@ -1,10 +1,8 @@
 <template>
   <TrellisFileUpload
-    input-id="respondent-condition-tag"
-    extensions="csv"
-    @input="importConditionTags">
-    {{$t('import_respondent_tags')}}
-  </TrellisFileUpload>
+    :extensions="['csv']"
+    :title="$t('import_respondent_tags')"
+    :uploadFile="importConditionTags" />
 </template>
 
 <script lang="ts">
@@ -16,24 +14,13 @@
   export default Vue.extend({
     name: 'RespondentConditionTagImport',
     components: { TrellisFileUpload },
-    data () {
-      return {
-        isWorking: false,
-        global
-      }
-    },
     methods: {
-      async importConditionTags (files: File[]) {
+      async importConditionTags (file: File) {
         try {
-          this.isWorking = true
-          await ConditionTagService.importRespondentConditionTags(files[0]['file'], this.global.study.id)
-          this.alert('success', 'Imported respondent condition tags successfully')
+          await ConditionTagService.importRespondentConditionTags(file, global.study.id)
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('import_failed'))
-          }
-        } finally {
-          this.isWorking = false
+          console.error(err)
+          throw err
         }
       }
     }

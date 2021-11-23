@@ -1,10 +1,8 @@
 <template>
   <TrellisFileUpload
-    extensions="csv"
-    input-id="preload-actions"
-    @input="upload">
-    {{$t('import_preload_actions')}}
-  </TrellisFileUpload>
+    :extensions="['csv']"
+    :title="$t('import_preload_actions')"
+    :uploadFile="upload" />
 </template>
 
 <script lang="ts">
@@ -22,10 +20,10 @@
       }
     },
     methods: {
-      async upload (files: object[]) {
+      async upload (file: File) {
         this.busy = true
         try {
-          const actions = await PreloadService.importPreloadActions(singleton.study.id, files[0]['file'])
+          const actions = await PreloadService.importPreloadActions(singleton.study.id, file)
           console.log(actions)
         } finally {
           this.busy = false
