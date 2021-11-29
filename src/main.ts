@@ -1,6 +1,7 @@
 // import './timeoutTracker'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
+import './assets/main.sass'
 
 import Vue from 'vue'
 import VueCordova from 'vue-cordova'

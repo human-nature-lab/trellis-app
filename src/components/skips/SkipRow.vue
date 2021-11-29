@@ -116,11 +116,11 @@
         logicTypes: [
           {
             text: "any",
-            value: true,
+            value: false,
           },
           {
             text: "all",
-            value: false,
+            value: true,
           },
         ],
         saveThrottled: null,

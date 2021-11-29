@@ -21,3 +21,54 @@ Photos can be added to locations in bulk by uploading a ZIP file filled with JPG
 
 ## Respondent locations
 Respondents can be assigned to locations in bulk by uploading a CSV file with the following columns: `id, geo_id, primary`. The `id` is the internal id of the respondent or the assigned id that was used when the respondent was imported. Likewise, the `geo_id` is the 
+
+## Preload data
+Surveys can have prefilled data which will is shown when they start a new survey. This data is linked using the question and respondent that the data should be associated with. The following examples are actions that can be preloaded and the question types they are valid for.
+  - select-choice => multiple_choice, multiple_select
+  - other-choice-text => multiple_choice, multiple_select
+  - number-change => decimal, integer
+  - add-edge => relationship
+  - no-one => relationship
+  - add-roster-row => roster,
+  - set-val => text, text_area
+  - add-geo => geo
+  - add-photo => image
+  - set-date => year, year_month, year_month_day, year_month_day_time
+  - set-text => text, text_area
+  - set-time => time, year_month_day_time
+
+### Roster preload example
+
+#### By question id
+| respondent_id | question.id | action_type | roster.val |
+|--------------|-------------|-------------|------------|
+| 0c927692-c449-45c9-a999-f1447c0f2883 | e449d86c-466d-4c04-8b8e-1f13effbdb8b | add-roster-row | child one |
+| 0c927692-c449-45c9-a999-f1447c0f2883 | e449d86c-466d-4c04-8b8e-1f13effbdb8b | add-roster-row | child two |
+
+#### By question var_name of "children"
+| respondent_id | question.var_name | action_type | roster.val |
+|---------------|-------------------|-------------|------------|
+| 0c927692-c449-45c9-a999-f1447c0f2883 | children | add-roster-row | child one |
+| 0c927692-c449-45c9-a999-f1447c0f2883 | children | add-roster-row | child two |
+
+
+### Relationship preload example
+| respondent_id | question.id | action_type | edge.target_respondent_id | edge.source_respondent_id |
+|--------------|-------------|-------------|------------|-------------|
+| 0c927692-c449-45c9-a999-f1447c0f2883 | e449d86c-466d-4c04-8b8e-1f13effbdb8b | add-edge | 0c927692-c449-45c9-a999-f1447c0f2883 | 12689236-3c85-4eb0-b03f-e0a23735fde1 |
+
+### Text preload example
+| respondent_id | question.var_name | action_type | payload.val |
+|--------------|-------------|-------------|------------|
+| 0c927692-c449-45c9-a999-f1447c0f2883 | fav_book | set-text | Shadow of the Wind |
+| 0c927692-c449-45c9-a999-f1447c0f2883 | fav_book | set-text | The Road |
+
+### Photo preload example
+| respondent_id | question.var_name | action_type | photo.id |
+|--------------|-------------|-------------|------------|
+| 0c927692-c449-45c9-a999-f1447c0f2883 | selfie | add-photo | e449d86c-466d-4c04-8b8e-1f13effbdb8b |
+
+### Select preload example
+| respondent_id | question.var_name | action_type | choice.val |
+|--------------|-------------|-------------|------------|
+| 0c927692-c449-45c9-a999-f1447c0f2883 | best_pets | select-choice | cats |

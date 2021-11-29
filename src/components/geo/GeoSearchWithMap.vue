@@ -446,23 +446,18 @@
       display: none
     .v-main
       overflow: hidden
-
+  
   .print-mode
-    .v-toolbar
-      display: none
-    .leaflet-control-container
-      display: none
-    .v-progress-linear
-      display: none
     .v-main
+      width: 90%
+      margin: auto
       padding: 0 0 !important
-      width: 8in
-      height: 10.5in
       position: absolute
+      right: 0
       top: 0
       left: 0
-    .container, .content
-      padding: 0
+      width: 8in
+      height: 10.5in
 
   .snack
     z-index: 3000 !important

@@ -1,48 +1,28 @@
 <template>
-  <v-flex>
-    <file-upload
-      input-id="respondent-geo"
-      class="btn primary"
-      extensions="csv"
-      :drop="true"
-      @input="importRespondentGeos" >
-      <TrellisLoadingCircle size="25px" v-if="isWorking" />
-      <div class="btn__content" v-else>
-        {{$t('import_respondent_geos')}}
-      </div>
-    </file-upload>
-  </v-flex>
+  <TrellisFileUpload 
+    v-bind="$attrs"
+    v-on="$listeners"
+    :extensions="['csv']"
+    :uploadFile="importRespondentGeos"
+    :title="$t('import_respondent_geos')">
+    <template #error="{ error }">
+      {{error.response.data.msg}}
+    </template>
+  </TrellisFileUpload>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
   import global from '../../static/singleton'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
-  import FileUpload from 'vue-upload-component'
   import RespondentService from '../../services/respondent/RespondentService'
+  import TrellisFileUpload from './TrellisFileUpload.vue'
 
   export default Vue.extend({
     name: 'RespondentGeoImport',
-    components: { FileUpload, TrellisLoadingCircle },
-    data () {
-      return {
-        isWorking: false,
-        global
-      }
-    },
+    components: { TrellisFileUpload },
     methods: {
-      async importRespondentGeos (files: File[]) {
-        try {
-          this.isWorking = true
-          await RespondentService.importRespondentGeos(files[0]['file'], this.global.study.id)
-          this.alert('success', this.$t('import_success'))
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('import_failed'))
-          }
-        } finally {
-          this.isWorking = false
-        }
+      importRespondentGeos (file: File) {
+        return RespondentService.importRespondentGeos(file, global.study.id)
       }
     }
   })

@@ -169,7 +169,7 @@ export default interface RespondentServiceInterface {
    * @param file
    * @param studyId
    */
-  importRespondentPhotos (file: File, studyId: string): Promise<void>
+  importRespondentPhotos (file: File, studyId: string): Promise<object>
 
   /**
    * Import respondent locations from a csv file

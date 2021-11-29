@@ -111,5 +111,5 @@ export default abstract class GeoServiceInterface {
    * @param studyId
    * @param file
    */
-  abstract importGeoPhotos (studyId: string, file: File): PromiseLike<void>
+  abstract importGeoPhotos (studyId: string, file: File): PromiseLike<any>
 }
