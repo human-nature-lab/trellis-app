@@ -1,6 +1,11 @@
 <template>
   <v-col>
     <v-row>
+      <h4 class="text-h4">
+        {{$t('data_import')}}
+      </h4>
+    </v-row>
+    <v-row class="mt-4">
       <v-select 
         v-model="type" 
         :items="importItems"
