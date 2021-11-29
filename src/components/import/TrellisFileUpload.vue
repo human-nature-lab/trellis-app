@@ -1,6 +1,6 @@
 <template>
-  <TrellisModal :title="title">
-    <template #activator="{ on, attrs }">
+  <TrellisModal :title="title" :max-width="800" v-bind="$attrs" v-on="$listeners">
+    <template #activator="{ on, attrs }" v-if="showButton">
       <v-btn v-bind="attrs" v-on="on">
         <slot>
           {{title}}
@@ -20,7 +20,7 @@
         <slot name="dropzone">
           <v-col class="justify-space-around text-center">
             <h5 class="text-h5">
-              Drop files here or Click to select
+              {{$t('dropzone')}}
             </h5>
             <div v-if="accept">
               {{accept}}
@@ -33,18 +33,18 @@
           <v-simple-table>
             <thead>
               <tr>
-                <th>Status</th>
-                <th>Name</th>
-                <th>Size</th>
-                <th>Type</th>
+                <th>{{$t('status')}}</th>
+                <th>{{$t('filename')}}</th>
+                <th>{{$t('filesize')}}</th>
+                <th>{{$t('type')}}</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="file in files" :key="file.name">
                 <td>
-                  <v-icon v-if="file.status === 'uploaded'" color="success">mdi-check</v-icon>
-                  <v-icon v-if="file.status === 'failed'" color="error" :title="file.error">mdi-alert-circle-outline</v-icon>
+                  <v-icon v-if="file.status === 'uploaded'" color="success" @click="visibleResponse = file.response">mdi-check</v-icon>
+                  <v-icon v-if="file.status === 'failed'" color="error" @click="visibleError = file.error">mdi-alert-circle-outline</v-icon>
                   <v-progress-circular v-else-if="file.status === 'uploading' " color="warning" indeterminate small/>
                 </td>
                 <td>{{file.name}}</td>
@@ -64,14 +64,14 @@
         <v-spacer />
         <v-btn v-if="isUploading" @click="cancel" color="warning">
           <slot name="cancel">
-            Cancel
+            {{$t('cancel')}}
           </slot>
         </v-btn>
         <v-btn v-else @click="upload" color="success" :disabled="!files.length">
           <slot name="upload">
-            Upload
+            {{$t('upload')}}
           </slot>
-          <v-icon>mdi-upload</v-icon>
+          <v-icon class="ml-2">mdi-upload</v-icon>
         </v-btn>
       </v-row>
     </v-col>
@@ -82,6 +82,25 @@
       class="hidden"
       :multiple="multiple"
       @change="onChange">
+    <TrellisModal :title="$t('error')" :value="!!visibleError" @input="visibleError = null" :max-width="500">
+      <v-col v-if="visibleError">
+        <slot name="error" :error="visibleError">
+          <div v-if="axiosResponse">
+            {{visibleError.response.data}}
+          </div>
+          <div v-else>
+            {{visibleError}}
+          </div>
+        </slot>
+      </v-col>
+    </TrellisModal>
+    <TrellisModal :title="$t('success')" :value="!!visibleResponse" @input="visibleResponse = null">
+      <v-col v-if="visibleResponse">
+        <slot name="response" :response="visibleResponse">
+          {{visibleResponse}}
+        </slot>
+      </v-col>
+    </TrellisModal>
   </TrellisModal>
 </template>
 
@@ -92,7 +111,7 @@
   import formatBytes from '../../filters/format-bytes.filter'
 
 
-  type UFile = File & { status: 'uploaded' | 'uploading' | 'failed', error: string }
+  type UFile = File & { status: 'uploaded' | 'uploading' | 'failed', error: any, response: any }
 
   export default Vue.extend({
     name: 'TrellisFileUpload',
@@ -108,6 +127,14 @@
       multiple: {
         type: Boolean,
         default: true,
+      },
+      axiosResponse: {
+        type: Boolean,
+        default: false,
+      },
+      showButton: {
+        type: Boolean,
+        default: false,
       }
     },
     data () {
@@ -116,31 +143,31 @@
         isInvalid: false,
         isDragging: false,
         isUploading: false,
+        visibleError: null,
+        visibleResponse: null,
       }
     },
     methods: {
       async upload () {
         this.isUploading = true
-        try {
-          for (const file of this.files) {
-            if (this.isUploading) {
-              await this.uploadOne(file)
-            }
+        for (const file of this.files) {
+          if (this.isUploading && file.status !== 'uploaded') {
+            await this.uploadOne(file)
           }
-        } finally {
-          this.isUploading = false
         }
+        this.isUploading = false
       },
       async uploadOne (file: UFile) {
         try {
           file.status = 'uploading'
           this.$forceUpdate()
-          await this.uploadFile(file)
+          file.response = await this.uploadFile(file)
           file.status = 'uploaded'
         } catch (err) {
+          console.error(err)
+          console.dir(err)
           file.status = 'failed'
-          // @ts-ignore
-          file.error = err.response.data.msg
+          file.error = err
         }
         this.$forceUpdate()
       },
@@ -157,12 +184,6 @@
             break
           }
         }
-      },
-      dragend (event: Event) {
-        console.log('dragend', event)
-      },
-      dragenter (event: Event) {
-        console.log('dragenter', event)
       },
       dragleave () {
         this.isInvalid = false

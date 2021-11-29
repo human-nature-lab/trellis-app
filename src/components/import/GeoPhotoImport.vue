@@ -1,8 +1,14 @@
 <template>
   <TrellisFileUpload
+    v-bind="$attrs"
+    v-on="$listeners"
     :extensions="['zip']"
     :title="$t('import_location_photos')"
-    :uploadFile="importPhotos" />
+    :uploadFile="importPhotos">
+    <template #error="{ error }">
+      {{error.response.data.msg}}
+    </template>
+  </TrellisFileUpload>
 </template>
 
 <script lang="ts">
@@ -15,13 +21,8 @@
     name: 'GeoPhotoImport',
     components: { TrellisFileUpload },
     methods: {
-      async importPhotos (file: File) {
-        try {
-          await GeoService.importGeoPhotos(global.study.id, file)
-        } catch (err) {
-          console.error(err)
-          throw err
-        }
+      importPhotos (file: File) {
+        return GeoService.importGeoPhotos(global.study.id, file)
       }
     }
   })

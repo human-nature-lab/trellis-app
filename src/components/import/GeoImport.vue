@@ -1,8 +1,14 @@
 <template>
   <TrellisFileUpload
+    v-bind="$attrs"
+    v-on="$listeners"
     :extensions="['csv']"
     :title="$t('import_locations')"
-    :uploadFile="importGeos" />
+    :uploadFile="importGeos">
+    <template #error="{ error }">
+      <div v-html="error.response.data" />
+    </template>
+  </TrellisFileUpload>
 </template>
 
 <script lang="ts">
@@ -21,13 +27,8 @@
       }
     },
     methods: {
-      async importGeos (file: File) {
-        try {
-          const geos = await GeoService.importGeos(global.study.id, file)
-        } catch (err) {
-          console.error(err)
-          throw err
-        }
+      importGeos (file: File) {
+        return GeoService.importGeos(global.study.id, file)
       }
     }
   })

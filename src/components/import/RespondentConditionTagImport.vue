@@ -1,5 +1,7 @@
 <template>
   <TrellisFileUpload
+    v-bind="$attrs"
+    v-on="$listeners"
     :extensions="['csv']"
     :title="$t('import_respondent_tags')"
     :uploadFile="importConditionTags" />
@@ -15,13 +17,8 @@
     name: 'RespondentConditionTagImport',
     components: { TrellisFileUpload },
     methods: {
-      async importConditionTags (file: File) {
-        try {
-          await ConditionTagService.importRespondentConditionTags(file, global.study.id)
-        } catch (err) {
-          console.error(err)
-          throw err
-        }
+      importConditionTags (file: File) {
+        return ConditionTagService.importRespondentConditionTags(file, global.study.id)
       }
     }
   })

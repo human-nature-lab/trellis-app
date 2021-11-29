@@ -201,6 +201,11 @@
             title: 'reports',
             showIf: this.hasPermission(TrellisPermission.VIEW_REPORTS)
           }, {
+            to: { name: 'DataImport' },
+            icon: 'mdi-upload',
+            title: 'data_import',
+            showIf: this.hasPermission(TrellisPermission.IMPORT_RESPONDENTS),
+          }, {
             to: {name: 'Devices'},
             icon: 'mdi-cellphone-link',
             title: 'devices',

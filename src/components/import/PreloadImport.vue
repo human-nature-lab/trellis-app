@@ -1,8 +1,21 @@
 <template>
   <TrellisFileUpload
+    v-bind="$attrs"
+    v-on="$listeners"
     :extensions="['csv']"
     :title="$t('import_preload_actions')"
-    :uploadFile="upload" />
+    :uploadFile="upload">
+    <template #error="{ error }">
+      {{error.response.data.msg}}
+    </template>
+    <template #response="{ response }">
+      <TrellisDataTable
+        download
+        filename="imported-preload-actions.csv"
+        :headers="headers"
+        :items="response" />
+    </template>
+  </TrellisFileUpload>
 </template>
 
 <script lang="ts">
@@ -10,24 +23,31 @@
   import TrellisFileUpload from './TrellisFileUpload.vue'
   import PreloadService from '../../services/preload/PreloadService'
   import singleton from '../../static/singleton'
+  const TrellisDataTable = () => import('../TrellisDataTable.vue')
 
   export default Vue.extend({
     name: 'PreloadImport',
-    components: { TrellisFileUpload },
+    components: { TrellisFileUpload, TrellisDataTable },
     data () {
       return {
-        busy: false
+        headers: [{
+          text: 'Type',
+          value: 'actionType'
+        }, {
+          text: 'Payload',
+          value: 'payload'
+        }, {
+          text: 'Question',
+          value: 'questionId'
+        }, {
+          text: 'Respondent',
+          value: 'respondentId'
+        }]
       }
     },
     methods: {
-      async upload (file: File) {
-        this.busy = true
-        try {
-          const actions = await PreloadService.importPreloadActions(singleton.study.id, file)
-          console.log(actions)
-        } finally {
-          this.busy = false
-        }
+      upload (file: File) {
+        return PreloadService.importPreloadActions(singleton.study.id, file)
       }
     }
   })

@@ -1,5 +1,7 @@
 <template>
   <TrellisFileUpload
+    v-bind="$attrs"
+    v-on="$listeners"
     :extensions="['zip']"
     :title="$t('import_respondent_photos')"
     :uploadFile="importPhotos" />
@@ -15,13 +17,8 @@
     name: 'RespondentPhotoImport',
     components: { TrellisFileUpload },
     methods: {
-      async importPhotos (file: File) {
-        try {
-          await RespondentService.importRespondentPhotos(file, global.study.id)
-        } catch (err) {
-          console.error(err)
-          throw err
-        }
+      importPhotos (file: File) {
+        return RespondentService.importRespondentPhotos(file, global.study.id)
       }
     }
   })

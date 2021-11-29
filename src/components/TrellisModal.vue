@@ -1,6 +1,8 @@
 <template>
     <v-dialog
       ref="dialog"
+      v-bind="$attrs"
+      v-on="$listeners"
       :value="value"
       @input="$emit('input', $event)">
       <slot name="title">

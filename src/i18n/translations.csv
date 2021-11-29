@@ -532,3 +532,7 @@ confirm_publish,Are you sure you would like to publish this form? This action ca
 revert_version,Revert version,Revertir version,
 print_form,Print form,,
 import_preload_actions,Import preload actions,,
+dropzone,Drop files here or Click to select,,
+filename,Filename,,
+filesize,File size,Tamaño de archivo,
+upload,Upload,,Appears on a button to star the upload

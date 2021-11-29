@@ -115,7 +115,7 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
     return res.data.geos.map(r => new Geo().fromSnakeJSON(r))
   }
 
-  async importGeoPhotos (studyId: string, file: File): Promise<void> {
+  async importGeoPhotos (studyId: string, file: File): Promise<any> {
     const formData = new FormData()
     formData.append('file', file)
     const res = await adminInst.post(uriTemplate('study/{studyId}/geo-photo/import', [studyId]), formData, {
@@ -123,6 +123,7 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
         'Content-Type': 'multipart/form-data'
       }
     })
+    return res.data
   }
 
 }
