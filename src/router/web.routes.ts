@@ -20,7 +20,7 @@ const DemoSignUp = () => import(/* webpackChunkName: "signup" */'../views/DemoSi
 const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'../views/EmailConfirmation.vue')
 const Permissions = () => import(/* webpackChunkName: "permissions" */'../views/Permissions.vue')
 const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'../views/StudyDashboard.vue')
-const DataImport = () => import('../views/DataImport.vue')
+const DataImport = () => import(/* webpackChunkName: "data-import" */'../views/DataImport.vue')
 
 export default [{
   path: '/',
@@ -48,7 +48,7 @@ export default [{
   component: Reports,
   beforeEnter: guardQueue([PermissionGuard(TrellisPermission.VIEW_REPORTS), StudyGuard])
 }, {
-  path: '/import/data',
+  path: '/import-data',
   name: 'DataImport',
   component: DataImport,
   beforeEnter: guardQueue([PermissionGuard(TrellisPermission.IMPORT_RESPONDENTS), StudyGuard]),
