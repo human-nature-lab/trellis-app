@@ -91,7 +91,7 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container fluid fill-height>
+        <v-container fluid fill-height class="align-start">
           <router-view class="route-container fade-in" />
         </v-container>
       </v-main>
@@ -233,7 +233,7 @@
   //   &.fill-height
   //     align-items: start
   html, body
-    overflow: auto !important
+    // overflow: auto !important
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
   // .route-loading

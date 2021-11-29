@@ -1,9 +1,16 @@
 .print-mode
-  .v-toolbar
+  .v-progress-linear
+    display: none
+  .v-app-bar
     display: none
   .leaflet-control-container
     display: none
-  .v-progress-linear
-    display: none
   .container, .content
     padding: 0
+  .v-main
+    min-height: 100vh
+
+@media print
+  .main-wrapper
+    overflow: visible !important
+    height: auto !important
