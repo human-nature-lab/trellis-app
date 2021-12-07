@@ -1,45 +1,38 @@
 <template>
-  <v-col no-gutter>
+  <v-col>
     <div 
       v-if="conditionTags !== null" 
       v-for="skip in sortedSkips"
       :key="skip.id">
-      <v-card dense outlined class="mb-4">
-        <v-container fluid>
-          <SkipRow
-            :conditionTags="conditionTags"
-            :subject="subject"
-            @save="updateSkip"
-            @remove="removeSkip(skip)"
-            :skip="skip"
-          />
-        </v-container>
-      </v-card>
+      <SkipRow
+        :conditionTags="conditionTags"
+        :subject="subject"
+        @save="updateSkip"
+        @remove="removeSkip(skip)"
+        :skip="skip"
+      />
     </div>
-    <v-card>
-      <v-container fluid>
-        <SkipRow
-          v-if="showNewSkip && conditionTags !== null"
-          :conditionTags="conditionTags"
-          :disabled="lockNewSkip"
-          @save="storeNewSkip"
-          @remove="removeNewSkip"
-          :subject="subject"
-          :skip="tempSkip"
-        />
-      </v-container>
-    </v-card>
-    
-    <v-row no-gutter class="mt-4">
-      <v-btn @click="addSkip">
-        {{ $t("add_skip") }} <v-icon right>mdi-plus</v-icon>
-      </v-btn>
-    </v-row>
+    <SkipRow
+      v-if="showNewSkip && conditionTags !== null"
+      :conditionTags="conditionTags"
+      :disabled="lockNewSkip"
+      @save="storeNewSkip"
+      @remove="removeNewSkip"
+      :subject="subject"
+      :skip="tempSkip"
+    />
+    <slot name="activator" :on="{ click: addSkip }">
+      <v-row no-gutter class="mt-4" v-if="!hideAdd">
+        <v-btn @click="addSkip">
+          {{ $t("add_skip") }} <v-icon right>mdi-plus</v-icon>
+        </v-btn>
+      </v-row>
+    </slot>
   </v-col>
 </template>
 
 <script lang="ts">
-  import Vue from "vue";
+  import Vue, { PropOptions } from "vue";
   import Skip from "../../entities/trellis/Skip";
   import SkipRow from "./SkipRow.vue";
   import ConditionTag from "../../entities/trellis/ConditionTag";
@@ -54,14 +47,12 @@
         type: String,
         required: true,
       },
-      newSkip: {
-        type: Function as () => Function,
-        required: true,
-      },
-      deleteSkip: {
-        type: Function as () => Function,
-        required: true,
-      },
+      newSkip: Function as PropOptions<(Skip) => Promise<Skip>>,
+      deleteSkip: Function as PropOptions<(Skip) => Promise<any>>,
+      hideAdd: {
+        type: Boolean,
+        default: false
+      }
     },
     data() {
       return {

@@ -27,7 +27,8 @@ export class FormServiceWeb implements FormServiceInterface {
     return http().get(uriTemplate('form/{form}', [formId]))
       .then(res => {
         if (res.data.form) {
-          return new Form().fromSnakeJSON(res.data.form)
+          const form = new Form().fromSnakeJSON(res.data.form)
+          return form
         } else {
           console.error(res)
           throw Error('Unable to retrieve form')

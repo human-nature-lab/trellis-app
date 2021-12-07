@@ -398,7 +398,6 @@ cant_resume_survey,Can't resume a completed survey.,No puede con tinuar una encu
 gps_error,Error accessing GPS: {0},Error al accesar el GPS: {0},
 select,Select,Seleccionar,
 logs,Logs,Logaritmos,
-page,Page,Pagina,The current page within the section
 repetition,Repetition,Repeticion,The current repetition of the the section
 information,Information,Informacion,Menu item
 storage,Storage,Almacenaje,Referencing files and database
@@ -536,3 +535,7 @@ dropzone,Drop files here or Click to select,,
 filename,Filename,,
 filesize,File size,Tamaño de archivo,
 upload,Upload,,Appears on a button to star the upload
+import,Import,Importar,
+page,Page {0},Pagina {0},The current page within the section
+skip_count,no skips | one skip | {0} skips,,How many skips there are
+assigns_condition_tags,Assigns {0},,

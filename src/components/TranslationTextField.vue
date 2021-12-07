@@ -138,9 +138,7 @@
               );
             } else if (tt.translatedText !== mTt.translatedText) {
               // Update an existing translation text
-              this.memCopy.translationText[
-                i
-              ] = await TranslationTextService.updateTranslatedTextById(
+              this.memCopy.translationText[i] = await TranslationTextService.updateTranslatedTextById(
                 mTt.id,
                 mTt.translatedText
               );

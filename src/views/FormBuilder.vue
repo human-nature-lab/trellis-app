@@ -1,71 +1,82 @@
 <template>
-  <v-col class="full-height">
-    <TrellisLoadingCircle v-if="isLoading"/>
-    <iframe
-      ref="iframe"
-      v-show="!isLoading"
-      :src="iframeSrc"
-      frameborder="0" />
+  <v-col>
+    <v-progress-linear v-if="isLoading" indeterminate />
+    <v-col v-else>
+      <Section
+        v-for="(section, index) in form.sections"
+        :key="section.id"
+        v-model="form.sections[index]"
+        :questions="questions"
+        :questionTypes="questionTypes"
+        :conditionTags="conditionTags"
+        :locale="locale" />
+    </v-col>
   </v-col>
 </template>
 
 <script lang="ts">
+  import Form from '../entities/trellis/Form'
   import Vue from 'vue'
-  import config from 'config'
-  import { Route } from 'vue-router/types/router'
-  import { getToken } from '../services/http/AxiosInstance'
-  import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
-  import global from '../static/singleton'
+  import FormService from '../services/form/FormService'
+  import ConditionTagService from '../services/condition-tag'
+  import Section from '../components/builder/Section.vue'
+  import singleton from '../static/singleton'
+  import Question from '../entities/trellis/Question'
+  import ConditionTag from '../entities/trellis/ConditionTag'
+  import QuestionType from '../entities/trellis/QuestionType'
+  import FormBuilderService from '../services/builder'
+
   export default Vue.extend({
     name: 'FormBuilder',
-    components: { TrellisLoadingCircle },
+    components: { Section },
     data () {
       return {
-        global,
-        formId: this.$route.params.formId,
-        formBuilderUrl: config.formBuilderUrl,
-        isLoading: true,
-        intervalId: null
+        form: null as Form,
+        locale: singleton.locale,
+        conditionTags: [] as ConditionTag[],
+        questionTypes: [] as QuestionType[],
+        isLoading: false,
       }
     },
-    beforeRouteUpdate (to: Route, from: Route, next) {
-      this.formId = to.params.formId
-      next()
-    },
     created () {
-      setTimeout(() => {
-        this.isLoading = false
-      }, 1000)
-    },
-    mounted () {
-      this.intervalId = setInterval(this.resizeIframe, 500)
-    },
-    beforeDestroy () {
-      clearInterval(this.intervalId)
+      this.load()
     },
     methods: {
-      resizeIframe () {
-        const height = this.$refs.iframe.contentWindow.document.body.scrollHeight + 'px'
-        this.$refs.iframe.height = height
+      async load () {
+        this.isLoading = true
+        try {
+          const form = await FormService.getForm(this.$route.params.formId)
+          this.conditionTags = await ConditionTagService.all()
+          this.questionTypes = await FormBuilderService.getQuestionTypes()
+          this.questionTypes.sort((a, b) => a.name.localeCompare(b.name))
+          form.sort()
+          this.form = form
+        } catch (err) {
+          this.alert('error', err)
+        } finally {
+          this.isLoading = false
+        }
       }
     },
     computed: {
-      iframeSrc (): string {
-        const url = this.formBuilderUrl.replace('{form_id}', this.formId)
-          .replace('{token}', JSON.stringify(getToken()))
-          .replace('{study}', JSON.stringify(this.global.study.toSnakeJSON({includeRelationships: true})))
-          .replace('{locale}', JSON.stringify(this.global.locale.toSnakeJSON({includeRelationships: true})))
-          .replace('{apiRoot}', JSON.stringify(config.apiRoot))
-        return encodeURI(url)
+      questions (): Record<string, Question> {
+        const m = {}
+        if (!this.form) {
+          return m
+        }
+        for (const section of this.form.sections) {
+          for (const page of section.questionGroups) {
+            for (const question of page.questions) {
+              m[question.id] = question
+            }
+          }
+        }
+        return m
       }
     }
   })
 </script>
 
-<style lang="sass" scoped>
-  iframe
-    min-height: 99%
-    width: 100%
-  .full-height
-    height: 100%
+<style lang="sass">
+  
 </style>

@@ -10,6 +10,7 @@ const RespondentsSearch = () => import(/* webpackChunkName: "respondents-search"
 const SyncAdmin = () => import(/* webpackChunkName: "sync-admin" */'../components/sync/admin/SyncAdmin.vue')
 const Users = () => import(/* webpackChunkName: "users" */'../views/Users.vue')
 const Reports = () => import(/* webpackChunkName: "reports" */'../views/Reports.vue')
+const OldFormBuilder = () => import(/* webpackChunkName: "old-form-build" */'../views/OldFormBuilder.vue')
 const FormBuilder = () => import(/* webpackChunkName: "form-builder" */'../views/FormBuilder.vue')
 const FormPrint = () => import(/* webpackChunkName: "form-print" */'../views/FormPrint.vue')
 const Devices = () => import(/* webpackChunkName: "devices" */'../views/Devices.vue')
@@ -52,6 +53,11 @@ export default [{
   name: 'DataImport',
   component: DataImport,
   beforeEnter: guardQueue([PermissionGuard(TrellisPermission.IMPORT_RESPONDENTS), StudyGuard]),
+}, {
+  path: '/form/:formId/old-builder',
+  name: 'OldFormBuilder',
+  component: OldFormBuilder,
+  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
 }, {
   path: '/form/:formId/builder',
   name: 'FormBuilder',

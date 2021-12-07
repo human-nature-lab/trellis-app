@@ -1,62 +1,45 @@
 <template>
   <div>
-    <v-card dense outlined class="mb-4">
-      <v-container fluid>
-        <v-row dense>
-          <v-col cols="12" lg="1">
-            <v-select
-              dense
-              :disabled="disabled"
-              v-model="memSkip.showHide"
-              :items="skipTypes"
-              style="max-width: 8em"
-              :hint="'the ' + subject"
-              persistent-hint
-            />
-          </v-col>
-          <v-col cols="12" lg="1">
-            <v-select
-              dense
-              :disabled="disabled"
-              v-model="memSkip.anyAll"
-              :items="logicTypes"
-              style="max-width: 8em"
-              :hint="'if ' + scope + ' has'"
-              persistent-hint
-            />
-          </v-col>
-          <v-col cols="12" lg="9">
-            <v-autocomplete
-              dense
-              deletable-chips
-              chips
-              small-chips
-              multiple
-              :loading="isLoading"
-              :disabled="disabled || isLoading"
-              v-show="!isLoading"
-              :items="existingConditionTagNames"
-              append-icon="mdi-plus"
-              @click:append="showCreateConditionTag"
-              :value="selectedConditionTags"
-              @input="updateConditionTags"
-              hint="conditions"
-              persistent-hint
-            />
-          </v-col>
-          <v-col cols="12" lg="1">
-            <v-btn
-              class="align-end"
-              icon
-              :disabled="isDirty || disabled"
-              @click="remove()"
-              :loading="isDirty">
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card>
+    <v-container fluid>
+      <v-row no-gutters>
+        <span>
+          <v-select
+            dense
+            :disabled="disabled"
+            v-model="memSkip.showHide"
+            :items="skipTypes"
+            style="max-width: 8em" />
+        </span>
+        <span class="py-2 px-4">
+          the {{subject}} if {{scope}} has
+        </span>
+        <span>
+          <v-select
+            dense
+            :disabled="disabled"
+            v-model="memSkip.anyAll"
+            :items="logicTypes"
+            style="max-width: 8em"
+            single-line
+          />
+        </span>
+        <span class="py-2 px-4">conditions</span>
+        <v-autocomplete
+            dense
+            deletable-chips
+            chips
+            small-chips
+            multiple
+            :loading="isLoading"
+            :disabled="disabled || isLoading"
+            v-show="!isLoading"
+            :items="existingConditionTagNames"
+            append-icon="mdi-plus"
+            @click:append="showCreateConditionTag"
+            :value="selectedConditionTags"
+            @input="updateConditionTags" />
+      </v-row>
+    </v-container>
     <TrellisModal title="New condition tag" v-model="showConditionTag">
       <v-text-field
         label="Condition tag"
