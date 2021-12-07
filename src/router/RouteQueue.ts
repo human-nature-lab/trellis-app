@@ -27,6 +27,7 @@ export class RouteQueue {
       this.queue = []
       this.saveQueue()
     }
+    router.afterEach(this.afterEach)
     setTimeout(this.init.bind(this), 500)
   }
 
@@ -39,6 +40,10 @@ export class RouteQueue {
 
   setDefault (route: QueuableRoute) {
     this.defaultRoute = route
+  }
+
+  private afterEach = (to: VueRouter.Route, from: VueRouter.Route) => {
+    this.setCurrentRoute(to)
   }
 
   private saveQueue () {
@@ -61,9 +66,13 @@ export class RouteQueue {
     return true
   }
 
+  private setCurrentRoute (route: QueuableRoute) {
+    this.currentRoute = JSON.parse(JSON.stringify(copyWhitelist(route, CURRENT_ROUTE_PROPS)))
+  }
+
   push (nextRoute: QueuableRoute) {
     this.router.push(nextRoute)
-    this.currentRoute = JSON.parse(JSON.stringify(nextRoute))
+    this.setCurrentRoute(nextRoute)
   }
 
   append (route: QueuableRoute) {
@@ -125,7 +134,7 @@ export class RouteQueue {
 
   replace (route: QueuableRoute) {
     this.router.replace(route)
-    this.currentRoute = JSON.parse(JSON.stringify(route))
+    this.setCurrentRoute(route)
   }
 
   redirect (route: QueuableRoute) {
@@ -138,7 +147,7 @@ export class RouteQueue {
       this.push(route)
     } else {
       this.router.go(-1)
-      this.currentRoute = copyWhitelist(this.router.currentRoute, CURRENT_ROUTE_PROPS)
+      this.setCurrentRoute(this.router.currentRoute)
     }
   }
 
