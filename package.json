@@ -1,6 +1,6 @@
 {
   "name": "trellis",
-  "version": "3.2.0-alpha.16",
+  "version": "3.2.0-alpha.16.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/human-nature-lab/trellis-app"
@@ -110,8 +110,8 @@
     "mv": "^2.1.1",
     "nightwatch": "^0.9.21",
     "phonegap-plugin-barcodescanner": "^8.0.1",
-    "postcss": "^8.2.4",
-    "postcss-loader": "^4.2.0",
+    "postcss": "8.2.4",
+    "postcss-loader": "4.2.0",
     "raw-loader": "^0.5.1",
     "sass": "^1.32.2",
     "sass-loader": "^10.1.1",
