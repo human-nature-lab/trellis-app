@@ -23,8 +23,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
-      # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
-      - uses: c-hive/gha-npm-cache@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          # cache: 'npm'
       - run: npm install
 
       - name: Copy config files
