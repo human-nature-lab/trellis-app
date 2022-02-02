@@ -4,7 +4,7 @@ import Study from '../../entities/trellis/Study'
 import UserService from '../user/UserService'
 import UserStudy from '../../entities/trellis/UserStudy'
 import User from '../../entities/trellis/User'
-import { IsNull } from 'typeorm'
+import { IsNull, Not } from 'typeorm'
 
 class StudyServiceCordova extends StudyServiceAbstract {
   async getStudy (studyId: string): Promise<Study> {
@@ -14,7 +14,18 @@ class StudyServiceCordova extends StudyServiceAbstract {
         id: studyId,
         deletedAt: IsNull()
       },
-      relations: ['locales']
+      relations: ['locales', 'testStudy']
+    })
+  }
+  
+  async getProdStudyFromTest (studyId: string): Promise<Study> {
+    const repo = await DatabaseService.getRepository(Study)
+    return repo.findOne({
+      where: {
+        testStudyId: studyId,
+        deletedAt: IsNull(),
+      },
+      relations: ['locales', 'testStudy'],
     })
   }
 
@@ -28,6 +39,7 @@ class StudyServiceCordova extends StudyServiceAbstract {
         .where('user_study.userId = :userId', { userId })
         .getQuery()
       )
+      .andWhere('study.test_study_id is not null')
       .andWhere('deletedAt', null)
       .getMany()
   }
@@ -49,9 +61,10 @@ class StudyServiceCordova extends StudyServiceAbstract {
       let repo = await DatabaseService.getRepository(Study)
       return repo.find({
         where: {
-          deletedAt: IsNull()
+          deletedAt: IsNull(),
+          testStudyId: Not(IsNull())
         },
-        relations: ['locales']
+        relations: ['locales', 'testStudy']
       })
     } else {
       return this.getUserStudies(user.id)

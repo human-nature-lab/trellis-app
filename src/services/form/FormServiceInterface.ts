@@ -26,6 +26,11 @@ export default interface FormServiceInterface {
    * @returns {PromiseLike<Form>}
    */
   getForm (formId: string, bareBones: boolean): PromiseLike<Form>
+  
+  /**
+   * Get all version of a form
+   */
+  getVersions (formId: string): PromiseLike<Form[]>
 
   /**
    * Create a new form in the database
@@ -67,4 +72,9 @@ export default interface FormServiceInterface {
    * @param studyForms
    */
   reorderForms (studyId: string, studyForms: StudyForm[]): PromiseLike<StudyForm[]>
+
+  /**
+   * Specify which version to collect data from
+   */
+  revertVersion (formMasterId: string, formVersionId: string): PromiseLike<StudyForm>
 }

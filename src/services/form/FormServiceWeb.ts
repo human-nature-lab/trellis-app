@@ -79,6 +79,23 @@ export class FormServiceWeb implements FormServiceInterface {
     const res = await adminInst.patch(uriTemplate('study/{study}/forms/reorder', [studyId]), { study_forms: studyForms })
     return res.data.forms.map(f => new StudyForm().fromSnakeJSON(f))
   }
+  
+  async publishForm (studyId: string, formId: string): Promise<object> {
+    const res = await adminInst.post(uriTemplate('study/{study}/form/{form}/publish', [studyId, formId]))
+    return res.data
+  }
+  
+  async getVersions (formId: string): Promise<Form[]> {
+    const res = await adminInst.get(uriTemplate('form/{form}/versions', [formId]))
+    const versions = res.data.versions.map(f => new Form().fromSnakeJSON(f))
+    versions.sort((a, b) => b.version - a.version)
+    return versions
+  }
+  
+  async revertVersion (formMasterId: string, formVersionId: string): Promise<StudyForm> {
+    const res = await adminInst.put(uriTemplate('form/{form}/revert/{version}',[formMasterId, formVersionId]))
+    return new StudyForm().fromSnakeJSON(res.data)
+  }
 
 }
 

@@ -16,6 +16,11 @@
           </v-flex>
           <v-spacer />
           <v-btn
+            :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}"
+            icon>
+            <v-icon :large="$vuetify.breakpoint.smAndDown">mdi-form-select</v-icon>
+          </v-btn>
+          <v-btn
             @click="showFullscreen = true"
             icon>
             <v-icon :large="$vuetify.breakpoint.smAndDown">mdi-fullscreen</v-icon>
@@ -47,6 +52,7 @@
   import FullscreenPhoto from '../photo/FullscreenPhoto'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
+  import global from '../../static/singleton'
 
   export default Vue.extend({
     name: 'respondent-item',
@@ -73,6 +79,7 @@
     },
     data () {
       return {
+        global: global,
         showInfo: false,
         showFullscreen: false
       }

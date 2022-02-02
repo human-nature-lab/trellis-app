@@ -1,64 +1,20 @@
 <template>
   <tr class="form-list-row">
     <td class="medium drag-handle" v-if="Number(formType) !== formTypes.CENSUS" >
-      <span class="text-button">{{ studyForm.sortOrder }}</span>
+      <span v-show="dragging" class="text-button">{{ studyForm.sortOrder }}</span>
       <span class="ml-2"><v-icon>mdi-drag-horizontal-variant</v-icon></span>
     </td>
     <td class="small">
-      <v-menu offset-x v-model="showMenu">
-        <template v-slot:activator="{ on, attrs }">
-          <v-list-item-action v-on="on" v-bind="attrs">
-            <v-btn
-              :disabled="isBusy"
-              @click.stop.prevent="showMenu = !showMenu"
-              icon
-            >
-              <TrellisLoadingCircle
-                v-if="isBusy"
-                size="100%"
-              ></TrellisLoadingCircle>
-              <v-icon v-else>mdi-dots-vertical</v-icon>
-            </v-btn>
-          </v-list-item-action>
-        </template>
-        <v-list>
-          <Permission :requires="TrellisPermission.EDIT_FORM">
-            <v-list-item
-              :to="{
-                name: 'FormBuilder',
-                params: { formId: form.id, mode: 'builder' },
-              }"
-            >
-              <v-list-item-content> Edit </v-list-item-content>
-            </v-list-item>
-          </Permission>
-          <v-list-item
-            :to="{ name: 'InterviewPreview', params: { formId: form.id } }"
-          >
-            <v-list-item-content> Preview </v-list-item-content>
-          </v-list-item>
-          <!--v-list-item :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
-              <v-list-item-content>
-                Print
-              </v-list-item-content>
-            </v-list-item-->
-          <v-list-item @click="exportForm">
-            <v-list-item-content> Export </v-list-item-content>
-          </v-list-item>
-          <v-list-item :to="{ name: 'FormPrint', params: { formId: form.id } }" target="_blank">
-            <v-list-item-content>
-              {{$t('print_form')}}
-            </v-list-item-content>
-          </v-list-item>
-          <Permission :requires="TrellisPermission.REMOVE_FORM">
-            <v-list-item @click="$emit('delete')">
-              <v-list-item-content>
-                <span class="error--text">Delete</span>
-              </v-list-item-content>
-            </v-list-item>
-          </Permission>
-        </v-list>
-      </v-menu>
+      <FormActions 
+        :isBusy="isBusy" 
+        :form="form" 
+        :studyForm="studyForm"
+        @delete="$emit('delete', $event)"
+        @export="exportForm"
+        @publish="onPublish"
+        @revert="showVersionModal = true"
+        @toggleFormSkips="$emit('toggleFormSkips', $event)"
+        />
     </td>
     <td>
       <TranslationTextField
@@ -71,18 +27,34 @@
         :items="censusTypes"
         v-model="studyForm.censusTypeId"
         @change="changeCensusType"
-        hide-details
-        label="Census type"
-      ></v-select>
+        hide-detail />
     </td>
     <td>
-      <v-checkbox v-model="memForm.isPublished" @change="save"></v-checkbox>
+      <v-select
+        :value="studyForm.currentVersionId"
+        :items="form.versions"
+        item-text="version"
+        item-value="id">
+        <template #item="{ item }">
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon color="success" v-if="!isTestStudy && item.id === studyForm.currentVersionId">
+                mdi-check
+              </v-icon>
+              <v-icon color="info" 
+                v-else-if="(isTestStudy && item.id === studyForm.currentVersionId) || (!isTestStudy && !item.isPublished)">
+                mdi-dev-to
+              </v-icon>
+            </v-list-item-icon>
+            {{item.version}}
+          </v-list-item>
+        </template>
+      </v-select>
     </td>
-    <td>
-      <v-btn icon @click="$emit('toggleFormSkips', studyForm.form)">
-        <v-icon :class="{ 'primary--text': (studyForm.form.skips.length > 0) }">{{ icons.mdiArrowDecision }}</v-icon>
-      </v-btn>
-    </td>
+    <VersionModal 
+      v-model="showVersionModal"
+      @update:studyForm="$emit('update:studyForm', $event)"
+      :studyForm="studyForm" />
   </tr>
 </template>
 
@@ -91,7 +63,7 @@
   import Form from "../../entities/trellis/Form";
   // @ts-ignore
   import AsyncTranslationText from "../AsyncTranslationText";
-  import Permission from "../Permission";
+  import Permission from "../Permission.vue";
   // @ts-ignore
   import TranslationTextField from "../TranslationTextField";
   // @ts-ignore
@@ -101,24 +73,29 @@
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";
   import StudyForm from "../../entities/trellis/StudyForm";
-  import { mdiArrowDecision } from '@mdi/js';
+  import singleton from '../../static/singleton'
+  import PermissionMixin from "../../mixins/PermissionMixin";
+  import FormActions from './FormActions.vue'
+  import VersionModal from './VersionModal.vue'
 
   export default Vue.extend({
     name: "form-list-tile",
+    mixins: [PermissionMixin],
     components: {
+      FormActions,
       AsyncTranslationText,
       TranslationTextField,
       TrellisLoadingCircle,
       Permission,
+      VersionModal,
     },
     data() {
       return {
-        icons: {
-          mdiArrowDecision
-        },
         isBusy: false,
         formTypes,
+        global: singleton,
         showMenu: false,
+        showVersionModal: false,
         isOpen: false,
         memForm: this.form.copy(),
         saveThrottled: debounce(async () => {
@@ -133,6 +110,10 @@
       value: {
         type: Boolean,
       },
+      dragging: {
+        type: Boolean,
+        default: false
+      }
     },
     watch: {
       form(newForm: Form) {
@@ -149,7 +130,7 @@
           });
         }
         return returnTypes;
-      },
+      }
     },
     methods: {
       idFrom(key: string): string {
@@ -168,18 +149,33 @@
           this.isBusy = false;
         }
       },
+      async onPublish () {
+        if (!confirm(this.$t('confirm_publish'))) {
+          return
+        }
+        try {
+          this.loading = true 
+          const res = await FormService.publishForm(this.studyForm.studyId, this.form.id)
+          this.$emit('input', false)
+          this.$emit('update', res)
+        } catch (err) {
+          this.alert('Unable to publish form', 'error')
+        } finally {
+          this.loading = false
+        }
+      },
       save() {
         this.$emit("save", this.memForm);
       },
       changeSortOrder (sortOrder) {
         let sf = this.studyForm.copy();
         sf.sortOrder = sortOrder;
-        this.$emit("updateStudyForm", sf);
+        this.$emit("changeStudyForm", sf);
       },
       changeCensusType(censusTypeId) {
         let sf = this.studyForm.copy();
         sf.censusTypeId = censusTypeId;
-        this.$emit("updateStudyForm", sf);
+        this.$emit("changeStudyForm", sf);
       },
     },
   });

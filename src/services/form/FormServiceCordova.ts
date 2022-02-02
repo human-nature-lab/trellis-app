@@ -6,7 +6,6 @@ import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'
 import { In, IsNull } from 'typeorm'
 import { removeSoftDeleted } from '../database/SoftDeleteHelper'
-import { isEqual } from 'lodash'
 
 export default class FormServiceCordova implements FormServiceInterface {
 
@@ -19,7 +18,7 @@ export default class FormServiceCordova implements FormServiceInterface {
       }
     })
     removeSoftDeleted(studyForms)
-    return studyForms.filter(s => (s.form.isPublished && s.form.deletedAt === null))
+    return studyForms
   }
 
   async getAllStudyForms (studyId: string): Promise<StudyForm[]> {

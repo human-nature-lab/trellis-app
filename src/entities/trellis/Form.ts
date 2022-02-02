@@ -1,9 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, JoinTable, ManyToMany, OneToOne } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, JoinTable, ManyToMany, OneToOne, OneToMany } from 'typeorm'
 import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Section from './Section'
 import Skip from './Skip'
 import Translation from './Translation'
+import StudyForm from './StudyForm'
 
 @Entity()
 export default class Form extends TimestampedSoftDelete {
@@ -33,12 +34,22 @@ export default class Form extends TimestampedSoftDelete {
   @JoinColumn()
   nameTranslation: Translation
 
+  @Relationship(type => StudyForm)
+  @OneToOne(type => StudyForm)
+  studyForm: StudyForm
+
   // Inverse relationships
   @OneToOne(type => Form)
   form: Form
+  
+  @Relationship(type => Form)
+  versions: Form[]
 
   fromSnakeJSON(json: any) {
     super.fromSnakeJSON(json)
+    if (this.versions) {
+      this.versions.sort((a, b) => b.version - a.version)
+    }
     // Simple way to convert into an integer and then to a boolean. Possible values for this are '1', '0', 1, 0, true, false
     // and all of them are interpreted correctly by this statement
     this.isPublished = !!+this.isPublished

@@ -40,5 +40,10 @@ export default Vue.extend({
     notInRole (roles: string[]): boolean {
       return !this.hasRole(roles)
     }
+  },
+  computed: {
+    isTestStudy (): boolean {
+      return !!this.global.study && !this.global.study.testStudyId
+    }
   }
 })

@@ -7,6 +7,7 @@
       :respondent="respondent"
       :allowMultipleSurveys="allowMultipleSurveys"
       :canCreateSurveys="canCreateSurveys"
+      @update="$emit('update')"
       @newInterview="$emit('newInterview', $event)"
       v-if="showForm(form)" />
   </v-flex>
@@ -17,6 +18,7 @@
   // @ts-ignore
   import FormListItem from './FormListItem'
   import { DisplayForm } from './RespondentForms'
+  import singleton from '../../static/singleton'
   import Interview from '../../entities/trellis/Interview'
 
   export default Vue.extend({
@@ -47,8 +49,17 @@
         default: true
       }
     },
+    data () {
+      return {
+        global: singleton,
+      }
+    },
     methods: {
       showForm (form): boolean {
+        const isTestStudy = this.global.study.testStudyId === null
+        if (isTestStudy) {
+          return true
+        }
         if (form.isPublished && !form.isSkipped) {
           return true
         } else if (form.isPublished) {
