@@ -39,7 +39,8 @@ class StudyServiceCordova extends StudyServiceAbstract {
         .where('user_study.userId = :userId', { userId })
         .getQuery()
       )
-      .where('study.test_study_id is not null')
+      .andWhere('study.test_study_id is not null')
+      .andWhere('deletedAt', null)
       .getMany()
   }
   

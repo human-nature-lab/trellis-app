@@ -7,8 +7,8 @@
       :respondent="respondent"
       :allowMultipleSurveys="allowMultipleSurveys"
       :canCreateSurveys="canCreateSurveys"
-      @newInterview="newInterview"
       @update="$emit('update')"
+      @newInterview="$emit('newInterview', $event)"
       v-if="showForm(form)" />
   </v-flex>
 </template>
@@ -55,9 +55,6 @@
       }
     },
     methods: {
-      newInterview (interview: Interview) {
-        this.$emit('newInterview', interview)
-      },
       showForm (form): boolean {
         const isTestStudy = this.global.study.testStudyId === null
         if (isTestStudy) {

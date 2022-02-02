@@ -1,5 +1,8 @@
 <template>
     <v-dialog
+      ref="dialog"
+      v-bind="$attrs"
+      v-on="$listeners"
       :value="value"
       @input="$emit('input', $event)">
       <slot name="title">
@@ -19,19 +22,28 @@
 </template>
 
 <script lang="ts">
+  import Vue from 'vue'
   import ModalTitle from './ModalTitle.vue'
-  export default {
+  export default Vue.extend({
     name: 'TrellisModal',
     components: { ModalTitle },
     props: {
-      value: Boolean,
-      title: String
+      value: {
+        type: Boolean,
+        required: false,
+      },
+      title: {
+        type: String,
+        required: false,
+      },
     },
     methods: {
-      onClose () {
+      onClose ($event: any) {
+        // @ts-ignore
+        this.$refs.dialog.onClickOutside($event)
         this.$emit('close')
         this.$emit('input', false)
       }
     }
-  }
+  })
 </script>

@@ -530,3 +530,9 @@ test_mode,Test mode,Modo de prueba,Whether or not we're collecting test data
 publish_form,Publish form,Publicar formulario,
 confirm_publish,Are you sure you would like to publish this form? This action cannot be undone.,Esta seguro que quiere publicar este formulario? Esta accion no se puede revertir.,
 revert_version,Revert version,Revertir version,
+print_form,Print form,,
+import_preload_actions,Import preload actions,,
+dropzone,Drop files here or Click to select,,
+filename,Filename,,
+filesize,File size,Tamaño de archivo,
+upload,Upload,,Appears on a button to star the upload

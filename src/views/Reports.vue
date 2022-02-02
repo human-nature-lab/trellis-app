@@ -19,7 +19,7 @@
           <v-btn
             :disabled="isDownloading"
             @click="downloadReports">
-            {{$t('download_latest')}} ({{reportsToDownload.length}})
+            {{$t('download_reports')}} ({{reportsToDownload.length}})
           </v-btn>
         </v-layout>
       </v-container>
@@ -31,17 +31,11 @@
             :loading="isLoading" />
         </v-card>
       </v-container>
-      <v-container>
-        <v-card>
-          <DataImport />
-        </v-card>
-      </v-container>
     </v-card>
   </v-flex>
 </template>
 
 <script lang="ts">
-  import DataImport from '../components/reports/DataImport.vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import StudyReports from '../components/reports/StudyReports.vue'
   import FormReports from '../components/reports/FormReports.vue'
@@ -68,12 +62,13 @@
     components: {
       StudyReports,
       FormReports,
-      DataImport
     },
     data () {
       return {
         global,
         isLoading: false,
+        isPolling: false,
+        isDispatching: false,
         isDownloading: false,
         downloadProgress: 0,
         selectedStudyTypes: [],
@@ -197,7 +192,7 @@
         return this.reports.filter(r => r.status === ReportStatus.queued)
       },
       selected (): HasReport[] {
-        return this.selectedForms.concat(this.selectedStudyTypes)
+        return this.selectedForms ? this.selectedForms.concat(this.selectedStudyTypes) : []
       },
       formIds (): string[] {
         return this.selectedForms.map(f => f.id)
@@ -206,7 +201,7 @@
         return this.selectedStudyTypes.map(s => s.value)
       },
       hasSelectedReports (): boolean {
-        return !!this.selectedStudyTypes.length || !!this.selectedForms.length
+        return !!this.selectedStudyTypes || !!this.selectedStudyTypes.length || !!this.selectedForms.length
       }
     }
   })

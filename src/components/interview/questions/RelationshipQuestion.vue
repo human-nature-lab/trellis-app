@@ -4,7 +4,7 @@
       {{error}}
     </div>
     <v-chip
-      :close="!edge.isLoading && !isQuestionDisabled"
+      :close="!isQuestionDisabled"
       @click:close="remove(edge.id)"
       :id="edge.id"
       :key="edge.id"
@@ -13,6 +13,7 @@
         <Photo
           :photo="edge.targetRespondent.photos.length ? edge.targetRespondent.photos[0] : null"
           :showAlt="false"
+          immediate
           width="20"
           height="20"/>
       </v-avatar>

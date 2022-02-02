@@ -1,7 +1,7 @@
 <template>
-  <v-container fluid fill-height class="ma-0 pa-0">
-    <v-layout column>
-      <v-toolbar flat class="flex-grow-0">
+  <v-container fluid fill-height class="ma-0 pa-0 justify-start align-start">
+    <v-col>
+      <v-toolbar flat dense class="flex-grow-0">
         <v-toolbar-title>
           <AsyncTranslationText
             v-if="section"
@@ -38,7 +38,7 @@
               :conditionTags="interviewConditionTags"
               :interview="interview" />
       </v-flex>
-    </v-layout>
+    </v-col>
     <v-dialog
       v-model="dialog.beginning">
       <v-card>
@@ -122,7 +122,7 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
   import Page from './Page'
   import ConditionTagList from './ConditionTagList'
   import AsyncTranslationText from '../AsyncTranslationText'
@@ -166,7 +166,9 @@
     name: 'interview',
     head: {
       title: function () {
-        let d = {}
+        let d = {
+          inner: 'Interview'
+        }
         if (this.type === 'preview') {
           d.inner = 'Form preview: ' + interviewState.blueprint.id
         } else if (this.interview.survey) {

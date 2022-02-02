@@ -1,4 +1,4 @@
-const restrictedGlobals = ['window', 'self', 'top', 'document', 'XMLHttpRequest', 'fetch', 'WebAssembly']
+const restrictedGlobals = ['window', 'self', 'top', 'document', 'XMLHttpRequest', 'fetch', 'WebAssembly', 'global', 'process']
 export default class ConditionAssignmentService {
   public conditionAssignmentMethods: Map<string, Function> = new Map()
 

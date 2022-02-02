@@ -11,6 +11,7 @@ const SyncAdmin = () => import(/* webpackChunkName: "sync-admin" */'../component
 const Users = () => import(/* webpackChunkName: "users" */'../views/Users.vue')
 const Reports = () => import(/* webpackChunkName: "reports" */'../views/Reports.vue')
 const FormBuilder = () => import(/* webpackChunkName: "form-builder" */'../views/FormBuilder.vue')
+const FormPrint = () => import(/* webpackChunkName: "form-print" */'../views/FormPrint.vue')
 const Devices = () => import(/* webpackChunkName: "devices" */'../views/Devices.vue')
 const Studies = () => import(/* webpackChunkName: "studies" */'../views/Studies.vue')
 const GeoTypes = () => import(/* webpackChunkName: "geo-types" */'../views/GeoTypes.vue')
@@ -19,6 +20,7 @@ const DemoSignUp = () => import(/* webpackChunkName: "signup" */'../views/DemoSi
 const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'../views/EmailConfirmation.vue')
 const Permissions = () => import(/* webpackChunkName: "permissions" */'../views/Permissions.vue')
 const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'../views/StudyDashboard.vue')
+const DataImport = () => import(/* webpackChunkName: "data-import" */'../views/DataImport.vue')
 
 export default [{
   path: '/',
@@ -46,10 +48,20 @@ export default [{
   component: Reports,
   beforeEnter: guardQueue([PermissionGuard(TrellisPermission.VIEW_REPORTS), StudyGuard])
 }, {
+  path: '/import-data',
+  name: 'DataImport',
+  component: DataImport,
+  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.IMPORT_RESPONDENTS), StudyGuard]),
+}, {
   path: '/form/:formId/builder',
   name: 'FormBuilder',
   component: FormBuilder,
   beforeEnter: guardQueue([PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
+}, {
+  path: '/form/:formId/print',
+  name: 'FormPrint',
+  component: FormPrint,
+  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard])
 }, {
   path: '/forms',
   name: 'Forms',

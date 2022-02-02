@@ -1,49 +1,56 @@
 <template>
-  <v-flex>
-    <file-upload
-      input-id="respondent"
-      class="btn primary"
-      extensions="csv"
-      :drop="true"
-      @input="importRespondents" >
-      <TrellisLoadingCircle size="25px" v-if="isWorking" />
-      <div class="btn__content" v-else>
-        {{$t('import_respondents')}}
-      </div>
-    </file-upload>
-  </v-flex>
+  <TrellisFileUpload
+    v-bind="$attrs"
+    v-on="$listeners"
+    :extensions="['csv']"
+    :title="$t('import_respondents')"
+    :uploadFile="importRespondents">
+    <template #error="{ error }">
+      <div v-html="error.response.data" />
+    </template>
+    <template #response="{ response: respondents }">
+      <TrellisDataTable
+        :headers="headers"
+        :items="respondents"
+        download 
+        filename="imported-respondents.csv" />
+    </template>
+  </TrellisFileUpload>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
   import RespondentService from '../../services/respondent/RespondentService'
   import global from '../../static/singleton'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
-  import FileUpload from 'vue-upload-component'
+  import TrellisFileUpload from './TrellisFileUpload.vue'
+  const TrellisDataTable = () => import('../TrellisDataTable.vue')
 
   export default Vue.extend({
     name: 'RespondentImport',
-    components: { TrellisLoadingCircle, FileUpload },
+    components: { TrellisFileUpload, TrellisDataTable },
     data () {
       return {
-        global,
-        isWorking: false
+        headers: [{
+          text: 'Id',
+          value: 'id',
+        }, {
+          text: 'Assigned Id',
+          value: 'assignedId',
+        }, {
+          text: 'Name',
+          value: 'name',
+        }, {
+          text: 'Photos',
+          value: 'photos.length',
+        }, {
+          text: 'Condition tags',
+          value: 'respondentConditionTags.length'
+        }]
       }
     },
     methods: {
-      async importRespondents (files: object[]) {
-        try {
-          this.isWorking = true
-          const respondents = await RespondentService.importRespondents(files[0]['file'], this.global.study.id)
-          this.alert('success', this.$t('import_success'))
-          this.$emit('import-respondents', respondents)
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('import_failed'))
-          }
-        } finally {
-          this.isWorking = false
-        }
+      importRespondents (file: File) {
+        return RespondentService.importRespondents(file, global.study.id)
       }
     }
   })

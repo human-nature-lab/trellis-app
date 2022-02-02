@@ -6,7 +6,7 @@
           <v-text-field label="Form name" v-model="formName" required></v-text-field>
           <file-upload
             input-id="form"
-            class="btn primary"
+            class="v-btn primary"
             extensions="csv"
             v-model="files"
             :drop="true"
