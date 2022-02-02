@@ -37,7 +37,7 @@ export function removeToken () {
 function requestInterceptor (request) {
   const token = storage.get(TOKEN_KEY)
   if (token && token.hash) {
-    request.headers['X-Token'] = token.hash
+    request.headers['Authorization'] = `bearer ${token.hash}`
   }
   return request
 }
@@ -67,11 +67,14 @@ async function responseError (err) {
  */
 export default function defaultInstance (): AxiosInstance {
   if (!defaultInst) {
-    defaultInst = axios.create({
+    const axConf: AxiosRequestConfig = {
       baseURL: config.apiRoot + '/survey-view',
       timeout: 120000,
-      headers: {'X-Key': config.xKey}
-    })
+    }
+    if (config.xKey) {
+      axConf.headers = {'X-Key': config.xKey}
+    }
+    defaultInst = axios.create(axConf)
 
     // Handle authentication using axios [interceptors](https://github.com/axios/axios#interceptors)
     defaultInst.interceptors.request.use(requestInterceptor)
@@ -81,11 +84,14 @@ export default function defaultInstance (): AxiosInstance {
 }
 
 export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance> {
-  return axios.create({
+  const axConf: AxiosRequestConfig = {
     baseURL: apiRoot + '/sync',
     timeout: 0,
-    headers: {'X-Key': config.xKey}
-  })
+  }
+  if (config.xKey) {
+    axConf.headers = {'X-Key': config.xKey}
+  }
+  return axios.create(axConf)
 }
 
 const minuteMs = 60 * 1000
@@ -135,7 +141,6 @@ export async function getSyncAuthentication () {
 
 export const adminInst = axios.create({
   baseURL: config.apiRoot,
-  headers: { 'X-Key': config.xKey }
 })
 
 adminInst.interceptors.request.use(requestInterceptor)

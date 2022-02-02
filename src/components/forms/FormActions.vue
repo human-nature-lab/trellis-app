@@ -36,7 +36,7 @@
         </v-list-item>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
-        <v-list-item @click="$emit('revert', form)">
+        <v-list-item @click="$emit('revert', form)" :disabled="isTestStudy">
           <v-list-item-content>
             {{ $t('revert_version') }}
           </v-list-item-content>
