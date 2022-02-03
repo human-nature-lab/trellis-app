@@ -42,7 +42,7 @@
     <preference name="android-targetSdkVersion" value="28" />
     <hook type="before_build" src="hooks/android_before_build.sh" />
   </platform>
-  <platform name="ios">
+  {{!-- <platform name="ios">
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
     <icon src="static/img/icons/apple-icon-57x57.png" width="57" height="57" />
@@ -53,10 +53,10 @@
     <icon src="static/img/icons/apple-icon-120x120.png" width="120" height="120" />
     <icon src="static/img/icons/apple-icon-144x144.png" width="144" height="144" />
     <icon src="static/img/icons/apple-icon-152x152.png" width="152" height="152" />
-    <icon src="static/img/icons/apple-icon-180x180.png" width="180" height="180" />
+    <icon src="static/img/icons/apple-icon-180x180.png" width="180" height="180" /> --}}
 
     <!-- TODO iOS splash screens -->
-  </platform>
+  {{!-- </platform> --}}
   {{#if DEV}}
       <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
           <application android:usesCleartextTraffic="true" />
