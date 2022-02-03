@@ -47,10 +47,11 @@ jobs:
           distribution: zulu
           java-version: '8'
       
+      - run: npm i @ionic/cli@6.12
+      
       - uses: human-nature-lab/setup-ionic@v1
         with:
           install-java: false
-          ionic-version: 6.12
           cordova-version: 9
 
       - name: Uninstall build-tool version 31.0.0
