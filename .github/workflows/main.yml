@@ -42,19 +42,18 @@ jobs:
           npm run build:web
           zip -r trellis-web.zip www/
       
-      - name: Setup java
-        uses: actions/setup-java@v2
+      - uses: actions/setup-java@v2
         with:
           distribution: zulu
           java-version: '8'
       
-      - name: Use coturiv/setup-ionic
-        uses: coturiv/setup-ionic@v1
+      - uses: human-nature-lab/setup-ionic@v1
         with:
           install-java: false
+          ionic-version: 6.12
           cordova-version: 9
 
-      - name: Uninstall  build-tool version 31.0.0
+      - name: Uninstall build-tool version 31.0.0
         run: $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
       
 #       - name: Build dev APK
