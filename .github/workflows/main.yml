@@ -42,16 +42,16 @@ jobs:
           npm run build:web
           zip -r trellis-web.zip www/
       
-      # - name: Cache platforms and plugins
-      #   path: |
-      #     platforms
-      #     plugins
-      #   key: ${{ runner.os }}-cordova-9-android-9
       - name: Setup java
         uses: actions/setup-java@v2
         with:
           distribution: zulu
           java-version: '8'
+      
+      - name: Use coturiv/setup-ionic
+        uses: coturiv/setup-ionic@v1
+        with:
+          java-version: 8
 
       - name: Use coturiv/setup-ionic
         uses: coturiv/setup-ionic@v1
