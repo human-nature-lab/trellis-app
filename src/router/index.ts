@@ -38,6 +38,15 @@ export const routeQueue = new RouteQueue(router, { name: 'Home' })
 // If we're in offline mode, require that the application is synced
 if (singleton.offline) {
   router.beforeEach(guardQueue([SyncGuard]))
+} else {
+  router.beforeEach((to, from, next) => {
+    if (to && to.query && to.query.key !== undefined) {
+      singleton.maintenanceKey = to.query.key
+    } else if (from && from.query && from.query.key !== undefined) {
+      singleton.maintenanceKey = from.query.key
+    }
+    next()
+  })
 }
 
 // Always require we're logged in
