@@ -117,6 +117,11 @@
 
 <script lang="ts">
   import Vue from 'vue'
+  import singleton from './static/singleton'
+  // Do not remove!
+  import SingletonService from './services/SingletonService'
+  import config from 'config'
+
   import MainMenu from './components/main-menu/MainMenu.vue'
   import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
@@ -128,10 +133,6 @@
   import Banner from './components/Banner.vue'
   import Maintenance from './components/Maintenance.vue'
   import router, { routeQueue } from './router'
-  import singleton from './static/singleton'
-  // Do not remove!
-  import SingletonService from './services/SingletonService'
-  import config from 'config'
   import { defaultLoggingService } from './services/logging/LoggingService'
   import AlertService from './services/AlertService'
   import GeoLocationService from './services/geolocation'
