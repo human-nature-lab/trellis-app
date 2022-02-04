@@ -115,39 +115,38 @@
   </div>
 </template>
 
-<script lang="ts">
-  import Vue from 'vue'
+<script >
+  import MainMenu from './components/main-menu/MainMenu'
+  import CensusFormChecker from './components/CensusFormChecker'
+  import LoginModal from './components/login/LoginModal.vue'
+  import VDivider from 'vuetify/src/components/VDivider/VDivider'
+  import AlertService from './services/AlertService'
+  import TrellisAlert from './components/TrellisAlert.vue'
+  import TrellisLoadingCircular from './components/TrellisLoadingCircle'
+  import LocationFinder from './components/LocationFinder'
+  import router, { routeQueue } from './router'
   import singleton from './static/singleton'
   // Do not remove!
   import SingletonService from './services/SingletonService'
-  import config from 'config'
-
-  import MainMenu from './components/main-menu/MainMenu.vue'
-  import CensusFormChecker from './components/CensusFormChecker.vue'
-  import LoginModal from './components/login/LoginModal.vue'
-  import SnackbarQueue from './components/SnackbarQueue.vue'
-  import DocsSidebar from './components/documentation/DocsSidebar.vue'
-  import TrellisAlert from './components/TrellisAlert.vue'
-  import TrellisLoadingCircular from './components/TrellisLoadingCircle.vue'
-  import LocationFinder from './components/LocationFinder.vue'
-  import Banner from './components/Banner.vue'
-  import Maintenance from './components/Maintenance.vue'
-  import router, { routeQueue } from './router'
   import { defaultLoggingService } from './services/logging/LoggingService'
-  import AlertService from './services/AlertService'
   import GeoLocationService from './services/geolocation'
+  import SnackbarQueue from './components/SnackbarQueue'
+  import DocsSidebar from './components/documentation/DocsSidebar'
   import UserService from './services/user/UserService'
-  import maintenanceService, { MaintenanceData } from './services/maintenance'
+  import config from 'config'
   import IsLoggedInMixin from './mixins/IsLoggedInMixin'
+  import Banner from './components/Banner'
   import PermissionMixin from './mixins/PermissionMixin'
+  import Maintenance from './components/Maintenance.vue'
+  import maintenanceService, { MaintenanceData } from './services/maintenance'
 
-  export default Vue.extend({
+  export default {
     name: 'WebApp',
     mixins: [IsLoggedInMixin, PermissionMixin],
     data () {
       return {
         global: singleton,
-        maintenance: null as MaintenanceData,
+        maintenance: null,
         maintenanceMode: false,
         error: null,
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
@@ -164,11 +163,6 @@
         document.addEventListener('resume', this.onResume, false)
         document.addEventListener('backbutton', this.onBackButton)
         this.startGPSWatch()
-      } else {
-        this.maintenance = await maintenanceService.getStatus()
-        if (this.maintenance.active) {
-          this.maintenanceMode = this.global.maintenanceKey !== this.maintenance.key
-        }
       }
       try {
         const user = await UserService.loadCurrentUser()
@@ -178,6 +172,12 @@
           console.log(err)
           this.log(err)
           this.alert('error', 'Unable to load user', {timeout: 0})
+        }
+      }
+      if (!this.withinCordova) {
+        this.maintenance = await maintenanceService.getStatus()
+        if (this.maintenance.active) {
+          this.maintenanceMode = this.global.maintenanceKey !== this.maintenance.key
         }
       }
     },
@@ -191,7 +191,7 @@
       }
     },
     watch: {
-      'global.maintenanceKey' (val: string) {
+      'global.maintenanceKey' (val) {
         if (val && this.maintenance && this.maintenance.active) {
           this.maintenanceMode = val === this.maintenance.key
         }
@@ -210,7 +210,7 @@
       Maintenance,
     },
     computed: {
-      withinCordova (): boolean {
+      withinCordova () {
         return window.cordova && typeof cordova === 'object'
       }
     },
@@ -252,7 +252,7 @@
         }
       },
     }
-  })
+  }
 </script>
 
 <style lang="sass">

@@ -92,7 +92,7 @@
     data() {
       return {
         isBusy: false,
-        formTypes,
+        formTypes: formTypes,
         global: singleton,
         showMenu: false,
         showVersionModal: false,

@@ -8,7 +8,7 @@
         <v-toolbar flat>
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer></v-spacer>
-          <Permission :requires="TrellisPermission.ADD_FORM">
+          <Permission :requires="TrellisPermission.ADD_FORM" v-if="isTestStudy">
             <v-menu  offset-y left>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -103,10 +103,11 @@
   import groupBy from 'lodash/groupBy'
   import draggable from 'vuedraggable'
   import { delay } from '../classes/delay'
+  import PermissionMixin from '../mixins/PermissionMixin'
 
   export default Vue.extend({
     name: 'Forms',
-    mixins: [DocsLinkMixin(DocsFiles.getting_started.create_form)],
+    mixins: [DocsLinkMixin(DocsFiles.getting_started.create_form), PermissionMixin],
     components: {FormListTile, TrellisModal, FormSkips, Permission, FormImport, draggable},
     created() {
       this.loadForms()
