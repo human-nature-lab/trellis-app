@@ -1,7 +1,7 @@
 <template>
-  <v-col class="mb-4">
-    <v-row class="secondary py-2 px-2 question-drag-handle">
-      <span class="text-subtitle-1">{{value.varName}}</span>
+  <v-col class="mb-4 ml-4">
+    <v-row class="secondary py-2 px-2 question-drag-handle align-center">
+      <EditText v-model="value.varName" @save="updateQuestion" editable :loading="isWorking" :disabled="isWorking" />
       <v-spacer />
       <v-chip v-if="value.assignConditionTags && value.assignConditionTags.length" color="primary" label>
         {{$t('assigns_condition_tags', ['"' + value.assignConditionTags.map(act => act.conditionTag.name).join('","') + '"'])}}
@@ -14,14 +14,15 @@
         @change="updateQuestion"
         item-value="id"
         item-text="name"
-        :items="questionTypes" />
+        :items="builder.questionTypes" />
       <span class="pa-1 lowercase">{{$t('type')}}: {{value.questionType.name}}</span>
     </v-row>
     <v-row>
       <Translation
         v-model="value.questionTranslation"
-        :locale="locale"
+        :locale="builder.locale"
         class="text-body-1"
+        autogrow
         editable />
     </v-row>
   </v-col>
@@ -32,11 +33,12 @@
   import Question from '../../entities/trellis/Question'
   import BuilderMixin from '../../mixins/BuilderMixin'
   import Translation from './Translation.vue'
+import EditText from './EditText.vue'
 
   export default Vue.extend({
     name: 'Question',
     mixins: [BuilderMixin],
-    components: { Translation },
+    components: { Translation, EditText },
     props: {
       value: Object as PropOptions<Question>,
     },

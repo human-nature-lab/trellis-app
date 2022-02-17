@@ -135,8 +135,13 @@ export async function getSyncAuthentication () {
 
 export const adminInst = axios.create({
   baseURL: config.apiRoot,
-  headers: { 'X-Key': config.xKey }
 })
 
 adminInst.interceptors.request.use(requestInterceptor)
 adminInst.interceptors.response.use(responseInterceptor, responseError)
+
+export const builderInst = axios.create({
+  baseURL: config.apiRoot + "/builder",
+})
+builderInst.interceptors.request.use(requestInterceptor)
+builderInst.interceptors.response.use(responseInterceptor, responseError)
