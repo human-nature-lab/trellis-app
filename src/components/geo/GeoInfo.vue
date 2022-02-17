@@ -88,8 +88,8 @@
 <script lang="ts">
   import Translation from '../../entities/trellis/Translation'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import TranslationTextField from '../TranslationTextField'
-  import TrellisModal from '../TrellisModal'
+  import TranslationTextField from '../TranslationTextField.vue'
+  import TrellisModal from '../TrellisModal.vue'
 
   // @ts-ignore
   import GeoBreadcrumbs from './GeoBreadcrumbs'

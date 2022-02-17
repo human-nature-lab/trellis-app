@@ -6,8 +6,8 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import LoginForm from './LoginForm'
-  import TrellisModal from '../TrellisModal'
+  import LoginForm from './LoginForm.vue'
+  import TrellisModal from '../TrellisModal.vue'
 
   let component: typeof Vue
   

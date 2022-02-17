@@ -1,42 +1,41 @@
-import Axios, { AxiosError, AxiosInstance, AxiosInterceptorManager, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { AxiosError, AxiosResponse } from 'axios'
 import config from 'config'
 import { TranslateResult } from 'vue-i18n'
 import { APP_ENV } from '../static/constants'
-import Vue, { Component } from 'vue'
+import Vue from 'vue'
 import { defaultLoggingService } from '../services/logging/LoggingService'
 import Log from '../entities/trellis-config/Log'
 import { TrellisPermission } from '../static/permissions.base'
-import i18n from '../i18n'
-// @ts-ignore
-import { AddSnack } from '../components/SnackbarQueue'
+import { i18n } from '../i18n'
+import { AddSnack } from '../components/SnackbarQueue.vue'
 
 export default Vue.mixin({
-  data () {
+  data() {
     return {
       TrellisPermission
     }
   },
   methods: {
-    log (log: any): Promise<Log> {
+    log(log: any): Promise<Log> {
       if (log && !log.component) {
         log.component = this.$options.name
       }
       return defaultLoggingService.log(log)
     },
-    addSnack (msg, config?) {
+    addSnack(msg, config?) {
       AddSnack(msg, config)
     },
-    alert (color: string, msg, config?) {
+    alert(color: string, msg, config?) {
       config = config ? config : {}
       config.color = color
       AddSnack(msg, config)
     },
-    logError (err, message?: string | TranslateResult) {
+    logError(err, message?: string | TranslateResult) {
       message = message || err.message
       this.log(err)
       this.alert('error', message, { timeout: 0 })
     },
-    isNotAuthError (err: AxiosError | AxiosResponse): boolean {
+    isNotAuthError(err: AxiosError | AxiosResponse): boolean {
       // @ts-ignore
       const isAuthError = err && ((err.response && err.response.status === 401) || err.status === 401)
       if (isAuthError) {
@@ -46,13 +45,13 @@ export default Vue.mixin({
     }
   },
   computed: {
-    isWeb (): boolean {
+    isWeb(): boolean {
       return config.appEnv === APP_ENV.WEB
     },
-    isCordova (): boolean {
+    isCordova(): boolean {
       return config.appEnv === APP_ENV.CORDOVA
     },
-    isDebug (): boolean {
+    isDebug(): boolean {
       return config.debug
     }
   }
@@ -60,15 +59,15 @@ export default Vue.mixin({
 
 declare module 'vue/types/vue' {
   interface Vue {
-    log (log: any): Promise<Log>
-    addSnack (msg, config?): void
-    alert (color: string, msg, config?): void
-    logError (err: Error, msg?: string | TranslateResult): void
-    isNotAuthError (err: AxiosError): boolean
+    log(log: any): Promise<Log>
+    addSnack(msg, config?): void
+    alert(color: string, msg, config?): void
+    logError(err: Error, msg?: string | TranslateResult): void
+    isNotAuthError(err: AxiosError): boolean
     isWeb: boolean
     isCordova: boolean
     isDebug: boolean
-    hydrate (data: any): any
-    leaving (): any
+    hydrate(data: any): any
+    leaving(): any
   }
 }

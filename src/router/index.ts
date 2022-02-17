@@ -1,6 +1,6 @@
 import { Mutex } from 'async-mutex'
 import Vue from 'vue'
-import Router, { RouteConfig } from 'vue-router'
+import Router from 'vue-router'
 import { defaultLoggingService as logger } from '../services/logging/LoggingService'
 import singleton from '../static/singleton'
 import SyncGuard from './guards/SyncGuard'
@@ -13,8 +13,9 @@ import webRoutes from './web.routes'
 import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
 // @ts-ignore
-import { AddSnack } from '../components/SnackbarQueue'
+import { AddSnack } from '../components/SnackbarQueue.vue'
 import PhotoService from '../services/photo/PhotoService'
+import { loadLanguageAsync } from '../i18n'
 
 let routes = sharedRoutes
 if (singleton.offline) {
@@ -34,6 +35,12 @@ export const router = new Router({
 })
 
 export const routeQueue = new RouteQueue(router, { name: 'Home' })
+
+// Load our locale dynamically
+router.beforeEach((to, from, next) => {
+  const lang = singleton.locale.languageTag
+  loadLanguageAsync(lang).then(() => next())
+})
 
 // If we're in offline mode, require that the application is synced
 if (singleton.offline) {

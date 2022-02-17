@@ -1,14 +1,14 @@
-const APP_ENV = {
+export const APP_ENV = {
   CORDOVA: 'CORDOVA', // Sync, local sqlite storage
   WEB: 'WEB' // No sync, REST
 }
 
-const APP_MODE = {
+export const APP_MODE = {
   TEST: 'TEST', // Sync, local sqlite storage
   PROD: 'PROD'
 }
 
-const COMPARE_SNAPSHOTS_RESULTS = {
+export const COMPARE_SNAPSHOTS_RESULTS = {
   NONE: 0, // Not run yet
   NO_DOWNLOAD: 1, // No local snapshot found, don't check last upload, auto-start download
   DOWNLOAD_OLDER: 2, // Local snapshot older than server snapshot, no local upload or local upload older than server snapshot, auto-start download
@@ -18,7 +18,7 @@ const COMPARE_SNAPSHOTS_RESULTS = {
   DOWNLOAD_NEWER: 6 // Local snapshot newer than server snapshot, don't check last upload, stop and warn
 }
 
-const COMPARE_DOWNLOAD_RESULTS = {
+export const COMPARE_DOWNLOAD_RESULTS = {
   NONE: 0, // Not run yet
   NO_DOWNLOAD: 1, // No local snapshot found, don't check last upload, auto-start download
   DOWNLOAD_OLDER: 2, // Local snapshot older than server snapshot
@@ -26,26 +26,17 @@ const COMPARE_DOWNLOAD_RESULTS = {
   DOWNLOAD_NEWER: 4 // Local snapshot newer than server snapshot, don't check last upload, stop and warn
 }
 
-const COMPARE_UPLOAD_RESULTS = {
+export const COMPARE_UPLOAD_RESULTS = {
   NONE: 0, // Not run yet
   NONE_PENDING: 1, // No pending uploads
   PENDING_THIS_DEVICE: 2, // Pending uploads from this device
   PENDING_OTHER: 3 // Pending uploads not from this device
 }
 
-const BUTTON_STATUS = {
+export const BUTTON_STATUS = {
   DISABLED: 0,
   ENABLED: 1,
   WARNING: 2,
   AUTO_CONTINUE: 2,
   DONE: 3
-}
-
-module.exports = {
-  APP_ENV,
-  APP_MODE,
-  COMPARE_UPLOAD_RESULTS,
-  COMPARE_DOWNLOAD_RESULTS,
-  COMPARE_SNAPSHOTS_RESULTS,
-  BUTTON_STATUS
 }

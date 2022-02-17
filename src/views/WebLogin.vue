@@ -20,7 +20,7 @@
 
 <script>
   import LoginService from '../services/login'
-  import LoginForm from '../components/login/LoginForm'
+  import LoginForm from '../components/login/LoginForm.vue'
   import { routeQueue } from '../router'
 
   export default {

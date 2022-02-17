@@ -62,14 +62,14 @@
   import Vue from "vue";
   import Form from "../../entities/trellis/Form";
   // @ts-ignore
-  import AsyncTranslationText from "../AsyncTranslationText";
+  import AsyncTranslationText from "../AsyncTranslationText.vue";
   import Permission from "../Permission.vue";
   // @ts-ignore
-  import TranslationTextField from "../TranslationTextField";
+  import TranslationTextField from "../TranslationTextField.vue";
   // @ts-ignore
-  import TrellisLoadingCircle from "../TrellisLoadingCircle";
+  import TrellisLoadingCircle from "../TrellisLoadingCircle.vue";
   import FormService from "../../services/form/FormService";
-  import debounce from "lodash/debounce";
+  import { debounce } from "lodash";
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";
   import StudyForm from "../../entities/trellis/StudyForm";

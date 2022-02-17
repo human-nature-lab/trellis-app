@@ -57,15 +57,15 @@
   /* global L */
   import 'leaflet'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
-  import DocsFiles from '../documentation/DocsFiles'
+  import DocsFiles from '../documentation/DocsFiles.vue'
   import GeoService from '../../services/geo/GeoService'
-  import GeoSearch from './GeoSearch'
+  import GeoSearch from './GeoSearch.vue'
   import TranslationService from '../../services/TranslationService'
   import global from '../../static/singleton'
   import createGraph from 'ngraph.graph'
   import forceDirectedLayout from 'ngraph.forcelayout'
   import GeoEditPanel from './GeoEditPanel.vue'
-  import Permission from '../Permission'
+  import Permission from '../Permission.vue'
   import StudyService from '../../services/study/StudyService'
   import config from 'config'
 

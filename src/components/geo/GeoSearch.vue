@@ -104,9 +104,9 @@
 </template>
 
 <script>
-  import GeoListTile from './GeoListTile'
-  import Cart from '../Cart'
-  import debounce from 'lodash/debounce'
+  import GeoListTile from './GeoListTile.vue'
+  import Cart from '../Cart.vue'
+  import { debounce } from 'lodash'
   import GeoService from '../../services/geo/GeoService'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'

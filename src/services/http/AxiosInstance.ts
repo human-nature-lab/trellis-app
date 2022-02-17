@@ -7,7 +7,7 @@ import singleton from '../../static/singleton'
 import DatabaseService from '../database/DatabaseService'
 import DeviceService from '../device/DeviceService'
 import { makeBasicAuthHeader } from '../util'
-import { requestCredentials } from '../../components/login/LoginModal'
+import { requestCredentials } from '../../components/login/LoginModal.vue'
 import { ExpiringValue } from '../../classes/ExpiringValue'
 
 export interface Token {

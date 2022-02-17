@@ -33,7 +33,7 @@
   import Device from '../../entities/trellis/Device'
   import CompareService from '../../services/CompareService'
   import ValidationMixin from '../../mixins/ValidationMixin'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
   export default Vue.extend({
     name: 'DeviceModal',
     mixins: [ValidationMixin],

@@ -37,6 +37,7 @@ config/config-xml.dev.js
 
 src/entities/**/*.js
 src/entities/**/*.map
+src/i18n/*.json
 
 releases
 *.jks

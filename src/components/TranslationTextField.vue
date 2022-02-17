@@ -28,7 +28,7 @@
   import LocaleService from "../services/locale/LocaleService";
   import SingletonService from "../services/SingletonService";
   import TranslationTextService from "../services/translation-text/TranslationTextService";
-  import ClickToEdit from "./ClickToEdit";
+  import ClickToEdit from "./ClickToEdit.vue";
   import singleton, { Singleton } from "../static/singleton";
   import Vue from "vue";
 

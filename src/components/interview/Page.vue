@@ -60,7 +60,7 @@
 
 <script>
   import Question from './Question.vue'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
   import questionDatumRecycler from './services/recyclers/QuestionDatumRecycler'
   import datumRecycler from './services/recyclers/DatumRecycler'
   import ActionMixin from './mixins/ActionMixin'

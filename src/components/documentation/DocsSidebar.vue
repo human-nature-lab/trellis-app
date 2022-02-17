@@ -47,8 +47,8 @@
 </template>
 
 <script lang="ts">
-  import DocsTOC from './DocsTOC'
-  import Documentation from './Documentation'
+  import DocsTOC from './DocsTOC.vue'
+  import Documentation from './Documentation.vue'
   import Vue from 'vue'
   import bus, {DocsEventTypes} from './DocsEventBus'
   import { routeQueue } from '../../router'

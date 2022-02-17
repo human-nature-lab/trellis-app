@@ -20,7 +20,7 @@
 <script>
   import PhotoService from '../../services/photo/PhotoService'
   import URL_PLACEHOLDER from '../../assets/baseline-image-24px.svg'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 
   const observer = new IntersectionObserver(handleIntersections, {
     threshold: 0.5
