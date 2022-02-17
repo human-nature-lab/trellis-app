@@ -20,7 +20,7 @@
         :is="currentQuestionComponent"
         :question="question"
         :location="location"
-        :disabled="disabled"
+        :disabled="disabled || hasDkRf"
         :respondent="interview.survey.respondent"></div>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
@@ -166,6 +166,9 @@
         if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return true
         const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.show_timer_controls)
         return questionParameter ? !!questionParameter.val : true
+      },
+      hasDkRf (): boolean {
+        return this.question.dkRf !== null && this.question.dkRf !== undefined
       }
     }
   }
