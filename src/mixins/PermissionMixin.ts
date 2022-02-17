@@ -33,12 +33,17 @@ export default Vue.extend({
       if (!Array.isArray(roles)) {
         roles = [roles]
       }
-      if (!roles.length || !this.global.user || !this.global.user.role || typeof this.global.user.role !== 'string') return false
+      if (!roles.length || !this.global || !this.global.user || !this.global.user.role || typeof this.global.user.role !== 'string') return false
       let role = this.global.user.role.toLowerCase()
       return roles.map(r => r.toLowerCase()).indexOf(role) !== -1
     },
     notInRole (roles: string[]): boolean {
       return !this.hasRole(roles)
+    }
+  },
+  computed: {
+    isTestStudy (): boolean {
+      return !!this.global.study && !this.global.study.testStudyId
     }
   }
 })

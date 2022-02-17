@@ -1,11 +1,14 @@
 <template>
   <v-container>
     <v-layout>
-      <v-alert v-if="error">{{error}}</v-alert>
+      <v-alert v-if="error">{{ error }}</v-alert>
     </v-layout>
     <v-stepper v-model="step" vertical>
-
-      <v-stepper-step step="1" :complete="step > 1">{{isAssociatedWithRespondent ? $t('add_other_respondent') : $t('add_respondent')}}</v-stepper-step>
+      <v-stepper-step step="1" :complete="step > 1">{{
+        isAssociatedWithRespondent
+          ? $t('add_other_respondent')
+          : $t('add_respondent')
+      }}</v-stepper-step>
       <v-stepper-content step="1">
         <v-card>
           <v-card-text>
@@ -14,19 +17,22 @@
               required
               :label="$t('respondent_full_name')"
               :disabled="respondentExists"
-              v-model="name"/>
+              v-model="name"
+            />
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn @click="save">
-              <v-progress-circular v-if="isSaving"/>
-              <span v-else>{{$t('continue')}}</span>
+              <v-progress-circular v-if="isSaving" />
+              <span v-else>{{ $t('continue') }}</span>
             </v-btn>
           </v-card-actions>
         </v-card>
       </v-stepper-content>
 
-      <v-stepper-step step="2" :complete="step > 2">{{$t('add_photos')}}</v-stepper-step>
+      <v-stepper-step step="2" :complete="step > 2">{{
+        $t('add_photos')
+      }}</v-stepper-step>
       <v-stepper-content step="2">
         <v-card v-if="respondent">
           <v-card-text>
@@ -35,42 +41,44 @@
               :photos="respondent.photos"
               @photo="addPhoto"
               @delete-photo="onDeletePhoto"
-              @update-photos="onUpdatePhotos"></photo-album>
+              @update-photos="onUpdatePhotos"
+            ></photo-album>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="checkCensus">{{$t('continue')}}</v-btn>
+            <v-btn @click="checkCensus">{{ $t('continue') }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-stepper-content>
 
-      <v-stepper-step step="3" :complete="step > 3">{{$t('census')}}</v-stepper-step>
+      <v-stepper-step step="3" :complete="step > 3">{{
+        $t('census')
+      }}</v-stepper-step>
       <v-stepper-content step="3">
         <v-card>
           <v-card-text>
             <v-flex v-if="checkingForCensus">
               <v-progress-circular indeterminate />
-              {{$t('checking_census_form')}}
+              {{ $t('checking_census_form') }}
             </v-flex>
-            <v-flex v-else-if="hasCensusForm" >
+            <v-flex v-else-if="hasCensusForm">
               <v-icon color="success">mdi-check</v-icon>
-              {{$t('census_form_found')}}
+              {{ $t('census_form_found') }}
             </v-flex>
             <v-flex v-else>
               <v-icon color="error">mdi-clear</v-icon>
-              {{$t('census_form_not_found')}}
+              {{ $t('census_form_not_found') }}
             </v-flex>
           </v-card-text>
           <!--<v-card-actions>-->
-            <!--<v-spacer></v-spacer>-->
-            <!--<v-btn @click="step++" :disabled="checkingForCensus">-->
-              <!--<v-progress-circular indeterminate v-if="checkingForCensus || hasCensusForm" />-->
-              <!--<span v-else>{{$t('continue')}}</span>-->
-            <!--</v-btn>-->
+          <!--<v-spacer></v-spacer>-->
+          <!--<v-btn @click="step++" :disabled="checkingForCensus">-->
+          <!--<v-progress-circular indeterminate v-if="checkingForCensus || hasCensusForm" />-->
+          <!--<span v-else>{{$t('continue')}}</span>-->
+          <!--</v-btn>-->
           <!--</v-card-actions>-->
         </v-card>
       </v-stepper-content>
-
     </v-stepper>
   </v-container>
 </template>
@@ -97,11 +105,11 @@
       onRespondentAdded: Function
     },
     computed: {
-      isAssociatedWithRespondent () {
+      isAssociatedWithRespondent() {
         return !!this.associatedRespondentId
       }
     },
-    data () {
+    data() {
       return {
         step: 1,
         error: null,
@@ -115,7 +123,7 @@
       }
     },
     methods: {
-      async addPhoto (photo) {
+      async addPhoto(photo) {
         try {
           let returnPhoto = await RespondentService.addPhoto(this.respondent.id, photo)
           this.respondent.photos.push(returnPhoto)
@@ -125,7 +133,7 @@
           }
         }
       },
-      async onUpdatePhotos (photos) {
+      async onUpdatePhotos(photos) {
         try {
           await RespondentService.updatePhotos(photos)
         } catch (err) {
@@ -134,7 +142,7 @@
           }
         }
       },
-      async onDeletePhoto (photo) {
+      async onDeletePhoto(photo) {
         let confirmMessage = this.$t('remove_photo_confirm') + ''
         if (!window.confirm(confirmMessage)) return
         try {
@@ -146,7 +154,7 @@
           }
         }
       },
-      async save () {
+      async save() {
         if (!this.name.length) return
         this.isSaving = true
         try {
@@ -165,67 +173,67 @@
           this.isSaving = false
         }
       },
-      async checkCensus () {
+      async checkCensus() {
         const censusDelay = 1500
         this.step++
         this.checkingForCensus = true
         const censusTypeId = this.isAssociatedWithRespondent ? censusTypes.add_associated_respondent : censusTypes.add_respondent
-        this.hasCensusForm = await CensusFormService.hasCensusForm(this.studyId, censusTypeId)
-        this.checkingForCensus = false
-        if (this.hasCensusForm) {
-          if (this.onRespondentAdded) {
-            await this.onRespondentAdded(this.respondent.copy())
-          }
-          setTimeout(() => {
-            if (this.redirectToRespondentInfo) {
-              routeQueue.unshift({
-                name: 'Respondent',
-                params: {
-                  studyId: this.studyId,
-                  respondentId: this.respondent.id
-                },
-                replace: true
-              })
-              routeQueue.replace({
-                name: 'StartCensusForm',
-                params: {
-                  studyId: this.studyId,
-                  censusTypeId: censusTypeId
-                },
-                query: {
-                  respondentId: this.respondent.id
-                }
-              })
-            } else {
-              const nextRoute = merge(routeQueue.currentRoute, {
-                query: {
-                  associatedRespondentId: this.associatedRespondentId,
-                  associatedRespondentName: this.name
-                }
-              })
-              routeQueue.unshift(nextRoute)
-              routeQueue.replace({
-                name: 'StartCensusForm',
-                params: {
-                  studyId: this.studyId,
-                  censusTypeId: censusTypeId
-                },
-                query: {
-                  respondentId: this.respondent.id
-                }
-              })
+        try {
+          this.hasCensusForm = await CensusFormService.hasCensusForm(this.studyId, censusTypeId)
+          this.checkingForCensus = false
+          if (this.hasCensusForm) {
+            if (this.onRespondentAdded) {
+              await this.onRespondentAdded(this.respondent.copy())
             }
-          }, censusDelay)
-        } else {
-          setTimeout(() => {
-            this.$emit('close', this.respondent)
-          }, censusDelay)
+            setTimeout(() => {
+              if (this.redirectToRespondentInfo) {
+                routeQueue.unshift({
+                  name: 'Respondent',
+                  params: {
+                    studyId: this.studyId,
+                    respondentId: this.respondent.id
+                  },
+                  replace: true
+                })
+                routeQueue.replace({
+                  name: 'StartCensusForm',
+                  params: {
+                    studyId: this.studyId,
+                    censusTypeId: censusTypeId
+                  },
+                  query: {
+                    respondentId: this.respondent.id
+                  }
+                })
+              } else {
+                const nextRoute = merge(routeQueue.currentRoute, {
+                  query: {
+                    associatedRespondentId: this.associatedRespondentId,
+                    associatedRespondentName: this.name
+                  }
+                })
+                routeQueue.unshift(nextRoute)
+                routeQueue.replace({
+                  name: 'StartCensusForm',
+                  params: {
+                    studyId: this.studyId,
+                    censusTypeId: censusTypeId
+                  },
+                  query: {
+                    respondentId: this.respondent.id
+                  }
+                })
+              }
+            }, censusDelay)
+          } else {
+            setTimeout(() => {
+              this.$emit('close', this.respondent)
+            }, censusDelay)
+          }
+        } catch (err) {
+          this.$emit('close', this.respondent)
         }
       }
     }
   }
 </script>
-
-<style scoped>
-
-</style>

@@ -25,6 +25,7 @@ export default function RoutePreloadMixin (loadCallback: Function, fullscreen: b
         data = await loadCallback(to)
         next()
       } catch (err) {
+        console.error(err)
         err.component = err.component || 'RoutePreloadMixin.js@beforeRouteEnter'
         this.logError(err, `Unable to enter route: ${to.name}`)
       } finally {

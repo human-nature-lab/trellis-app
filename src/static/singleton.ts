@@ -47,6 +47,7 @@ export interface Singleton {
     data: any,
     conditionTags: any
   }
+  maintenanceKey: string
 }
 
 export default {

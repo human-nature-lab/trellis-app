@@ -26,6 +26,7 @@
       <v-progress-linear :active="isLoading" indeterminate :height="3" />
       <v-data-table
         hide-default-footer
+        :items-per-page="-1"
         :items="filteredPermissions">
         <template v-slot:header>
           <tr>

@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar dense flat outlined @click.stop>
+  <v-row class="justify-between" @click.stop>
     <ClickToEdit
       v-model="editingText"
       :editing="isEditing"
@@ -18,7 +18,7 @@
       v-model="selectedLocale"
       :disabled="saving || isEditing"
     />
-  </v-toolbar>
+  </v-row>
 </template>
 
 <script lang="ts">

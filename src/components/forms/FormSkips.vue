@@ -2,10 +2,6 @@
   <v-layout>
     <v-flex xs12>
       <v-card>
-        <ModalTitle
-          @close="$emit('dismissFormSkips')">
-          <AsyncTranslationText :translation="form.nameTranslation"></AsyncTranslationText> <span>{{ $t("skips") | TitleCase }}</span>
-        </ModalTitle>
         <v-card-text>
           <SkipEditor
             :newSkip="addFormSkip"
@@ -17,7 +13,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer/>
-          <v-btn class="mb-2 mr-2" @click="$emit('dismissFormSkips')">Done</v-btn>
+          <v-btn class="mb-2 mr-2" @click="$emit('close')">Done</v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>

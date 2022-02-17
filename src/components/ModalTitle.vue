@@ -24,7 +24,7 @@
     props: {
       title: {
         type: String
-      }
+      },
     },
     name: 'ModalTitle'
   })

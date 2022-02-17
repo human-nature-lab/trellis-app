@@ -12,6 +12,8 @@ export default class StudyForm extends TimestampedSoftDelete {
   @Column() @Serializable
   formMasterId: string
   @Column() @Serializable
+  currentVersionId: string
+  @Column() @Serializable
   sortOrder: number
   @Column() @Serializable
   formTypeId: number
@@ -20,7 +22,7 @@ export default class StudyForm extends TimestampedSoftDelete {
 
   @Relationship(type => Form)
   @OneToOne(type => Form, { eager: true })
-  @JoinColumn({ name : 'form_master_id' })
+  @JoinColumn({ name : 'current_version_id' })
   form: Form
 
   fromSnakeJSON (json: any) {

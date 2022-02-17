@@ -16,6 +16,7 @@
         elevate-on-scroll
         scroll-target="#trellis-main">
         <v-app-bar-nav-icon
+          :disabled="maintenanceMode"
           @click="global.menuDrawer.open = !global.menuDrawer.open" />
         <v-toolbar-title class="logo">
           <router-link :to="{name: 'Home'}" class="deep-orange--text">
@@ -29,8 +30,13 @@
                 class="subheading"
                 v-on="on"
                 v-bind="attrs"
+                :color="isTestStudy ? 'error' : null"
+                text
                 @click="toStudySelector">
                 {{global.study.name}}
+                <v-icon class="ml-2" v-if="isTestStudy" color="error">
+                  mdi-dev-to
+                </v-icon>
               </v-btn>
             </template>
             <span>{{$t('change_study')}}</span>
@@ -91,8 +97,11 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container fluid fill-height class="align-start">
+        <v-container fluid fill-height class="align-start" v-if="!maintenanceMode">
           <router-view class="route-container fade-in" />
+        </v-container>
+        <v-container fluid fill-height class="align-start" v-else>
+          <Maintenance v-model="maintenanceMode" />
         </v-container>
       </v-main>
 
@@ -106,7 +115,7 @@
   </div>
 </template>
 
-<script>
+<script >
   import MainMenu from './components/main-menu/MainMenu'
   import CensusFormChecker from './components/CensusFormChecker'
   import LoginModal from './components/login/LoginModal.vue'
@@ -127,13 +136,18 @@
   import config from 'config'
   import IsLoggedInMixin from './mixins/IsLoggedInMixin'
   import Banner from './components/Banner'
+  import PermissionMixin from './mixins/PermissionMixin'
+  import Maintenance from './components/Maintenance.vue'
+  import maintenanceService, { MaintenanceData } from './services/maintenance'
 
   export default {
     name: 'WebApp',
-    mixins: [IsLoggedInMixin],
+    mixins: [IsLoggedInMixin, PermissionMixin],
     data () {
       return {
         global: singleton,
+        maintenance: null,
+        maintenanceMode: false,
         error: null,
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
         alerts: AlertService.alerts,
@@ -160,6 +174,12 @@
           this.alert('error', 'Unable to load user', {timeout: 0})
         }
       }
+      if (!this.withinCordova) {
+        this.maintenance = await maintenanceService.getStatus()
+        if (this.maintenance.active) {
+          this.maintenanceMode = this.global.maintenanceKey !== this.maintenance.key
+        }
+      }
     },
     beforeDestroy () {
       if (this.withinCordova) {
@@ -170,8 +190,14 @@
         GeoLocationService.clearWatch()
       }
     },
+    watch: {
+      'global.maintenanceKey' (val) {
+        if (val && this.maintenance && this.maintenance.active) {
+          this.maintenanceMode = val === this.maintenance.key
+        }
+      }
+    },
     components: {
-      VDivider,
       MainMenu,
       TrellisAlert,
       LocationFinder,
@@ -180,7 +206,8 @@
       DocsSidebar,
       TrellisLoadingCircular,
       Banner,
-      LoginModal
+      LoginModal,
+      Maintenance,
     },
     computed: {
       withinCordova () {
