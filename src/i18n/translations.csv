@@ -541,3 +541,9 @@ skip_count,no skips | one skip | {n} skips,,How many skips there are
 assigns_condition_tags,Assigns {n},,
 follow_up_to,Follow up to {0},,Which question variable we're following up on
 repeated,Repeated once | Repeated {n} times,,
+no_translation_for,No translation for {0},No hay traduccion para {0},No translation for a specific language
+add_text,Add text,,
+locked,Locked,,
+unlocked,Unlocked,,
+add_section,Add section,,
+add_page,Add page,,

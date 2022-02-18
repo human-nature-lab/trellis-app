@@ -121,7 +121,7 @@ export function routerReady () {
       isReady = true
       clearInterval(intervalId)
       resolve(false)
-    }, 5000)
+    }, 1000)
     check()
   })
 }

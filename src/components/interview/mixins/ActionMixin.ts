@@ -1,7 +1,7 @@
 import actionBus from '../services/actions/ActionBus'
 import Action from '../../../entities/trellis/Action'
 import Vue from 'vue'
-import debounce from 'lodash/debounce'
+import { debounce } from 'lodash'
 import { ActionPayload } from '../services/actions/ActionPayload'
 
 export default Vue.extend({

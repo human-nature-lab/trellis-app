@@ -100,7 +100,7 @@
   import DocsFiles from '../components/documentation/DocsFiles'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import FormImport from '../components/import/FormImport.vue'
-  import groupBy from 'lodash/groupBy'
+  import { groupBy } from 'lodash'
   import draggable from 'vuedraggable'
   import { delay } from '../classes/delay'
   import PermissionMixin from '../mixins/PermissionMixin'

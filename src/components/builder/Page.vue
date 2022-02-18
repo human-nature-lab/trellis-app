@@ -55,11 +55,11 @@ import Question from './Question.vue'
 import QuestionGroup from '../../entities/trellis/QuestionGroup'
 import draggable from 'vuedraggable'
 import SkipEditor from '../skips/SkipEditor.vue'
-import BuilderMixin from '../../mixins/BuilderMixin'
+import { builder } from '../../symbols/builder'
 
 export default Vue.extend({
   name: 'Page',
-  mixins: [BuilderMixin],
+  inject: { builder },
   components: { Question, draggable, SkipEditor },
   props: {
     value: Object as PropOptions<QuestionGroup>,

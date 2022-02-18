@@ -1,12 +1,12 @@
 <template>
   <v-row no-gutters class="align-center">
-    <Translation v-model="section.nameTranslation" :locale="locale" editable />
+    <Translation v-model="section.nameTranslation" editable :locale="builder.locale" :locked="builder.locked" />
     <v-spacer />
-    <v-chip v-if="followUpId">{{ $t('follow_up_to', questions[followUpId].varName) }}</v-chip>
+    <v-chip v-if="followUpId">{{ $t('follow_up_to', questions[followUpId] ? questions[followUpId].varName : 'Loading...') }}</v-chip>
     <v-chip v-if="isRepeatable">{{ $tc('repeated', maxRepetitions) }}</v-chip>
     <v-menu>
       <template #activator="{ attrs, on }">
-        <v-btn icon v-bind="attrs" v-on="on">
+        <v-btn icon text v-bind="attrs" v-on="on">
           <v-icon>mdi-dots-vertical</v-icon>
         </v-btn>
       </template>
@@ -22,16 +22,17 @@
 <script lang="ts">
 import Section from '../../entities/trellis/Section'
 import Vue, { PropOptions } from 'vue'
-import Locale from '../../entities/trellis/Locale'
 import Translation from './Translation.vue'
+import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
+import { builder } from '../../symbols/builder'
 
 export default Vue.extend({
   name: 'SectionHeader',
+  mixins: [FormQuestionsMixin],
   components: { Translation },
+  inject: { builder },
   props: {
     section: Object as PropOptions<Section>,
-    locale: Object as PropOptions<Locale>,
-    questions: Object,
   },
   computed: {
     followUpId(): string {

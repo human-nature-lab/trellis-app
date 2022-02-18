@@ -5,7 +5,7 @@ import SurveyConditionTag from '../entities/trellis/SurveyConditionTag'
 import RespondentConditionTag from '../entities/trellis/RespondentConditionTag'
 import { ConditionTagInterface } from './interview/InterviewDataInterface'
 import * as Moment from 'moment'
-import union from 'lodash/union'
+import { union } from 'lodash'
 export default class DiffService {
   /**
    * Take two maps and return their

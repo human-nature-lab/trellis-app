@@ -1,18 +1,27 @@
 <template>
   <v-col>
-    <v-row v-if="form" no-gutters>
-      <div class="title" v-if="form">
-        <TranslatedText :translation="form.nameTranslation" :locale="locale" />
+    <v-row v-if="builder.form" no-gutters>
+      <div class="title">
+        <Translation
+          editable
+          :locked="builder.locked"
+          v-model="builder.form.nameTranslation"
+          :locale="builder.locale"
+        />
       </div>
       <v-spacer />
-      <BuilderMenu @addSection="addSection" />
+      <BuilderMenu
+        :locale.sync="builder.locale"
+        :locked.sync="builder.locked"
+        @addSection="addSection"
+      />
     </v-row>
     <v-progress-linear v-if="isLoading" indeterminate />
     <v-col v-else>
       <Section
-        v-for="(section, index) in form.sections"
+        v-for="(section, index) in builder.form.sections"
         :key="section.id"
-        v-model="form.sections[index]"
+        v-model="builder.form.sections[index]"
       />
     </v-col>
   </v-col>
@@ -29,34 +38,59 @@ import ConditionTag from '../entities/trellis/ConditionTag'
 import QuestionType from '../entities/trellis/QuestionType'
 import FormBuilderService from '../services/builder'
 import TrellisModal from '../components/TrellisModal.vue'
-import TranslatedText from '../components/TranslatedText.vue'
+import Translation from '../components/builder/Translation.vue'
 import BuilderMenu from '../components/builder/BuilderMenu.vue'
+import { builder } from '../symbols/builder'
+import { study } from '../symbols/main'
 
 export default Vue.extend({
   name: 'FormBuilder',
-  components: { Section, TrellisModal, TranslatedText, BuilderMenu },
+  components: { Section, TrellisModal, Translation, BuilderMenu },
   data() {
     return {
       isLoading: false,
-      form: null as Form,
-      locale: singleton.locale,
-      questionTypes: [] as QuestionType[],
-      conditionTags: [] as ConditionTag[],
+      builder: {
+        form: null as Form,
+        locale: singleton.locale ? singleton.locale.copy() : null,
+        locked: true,
+        questionTypes: [] as QuestionType[],
+        conditionTags: [] as ConditionTag[],
+      },
     }
   },
   provide() {
-    const p = {}
-    Object.defineProperty(p, 'builder', {
-      enumerable: true,
-      get: () => ({
-        form: this.form,
-        studyId: singleton.study.id,
-        locale: this.locale,
-        questionTypes: this.questionTypes,
-        conditionTags: this.conditionTags,
-      }),
-    })
-    return p
+    return {
+      [builder]: this.builder,
+      [study]: Vue.observable(singleton.study),
+    }
+    // const p = {}
+    // Object.defineProperties(p, {
+    //   [form]: {
+    //     enumerable: true,
+    //     get: () => this.form,
+    //   },
+    //   [study]: {
+    //     enumerable: true,
+    //     get: () => singleton.study,
+    //   },
+    //   [locale]: {
+    //     enumerable: true,
+    //     get: () => this.locale,
+    //   },
+    //   [builder]: {
+    //     enumerable: true,
+    //     get: () => this.builder,
+    //   },
+    //   [questionTypes]: {
+    //     enumerable: true,
+    //     get: () => this.questionTypes,
+    //   },
+    //   [conditionTags]: {
+    //     enumerable: true,
+    //     get: () => this.conditionTags,
+    //   },
+    // })
+    // return p
   },
   created() {
     this.load()
@@ -66,11 +100,11 @@ export default Vue.extend({
       this.isLoading = true
       try {
         const form = await FormService.getForm(this.$route.params.formId)
-        this.conditionTags = await ConditionTagService.all()
-        this.questionTypes = await FormBuilderService.getQuestionTypes()
-        this.questionTypes.sort((a, b) => a.name.localeCompare(b.name))
+        this.builder.conditionTags = await ConditionTagService.all()
+        this.builder.questionTypes = await FormBuilderService.getQuestionTypes()
+        this.builder.questionTypes.sort((a, b) => a.name.localeCompare(b.name))
         form.sort()
-        this.form = form
+        this.builder.form = form
       } catch (err) {
         this.alert('error', err)
       } finally {
@@ -81,7 +115,7 @@ export default Vue.extend({
       this.isLoading = true
       try {
         const section = await FormService.createSection(this.$route.params.formId)
-        this.form.sections.push(section)
+        this.builder.form.sections.push(section)
       } finally {
         this.isLoading = false
       }

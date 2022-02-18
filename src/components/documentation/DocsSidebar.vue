@@ -60,7 +60,7 @@
       bus.$on(DocsEventTypes.close, () => {
         this.isOpen = false
       })
-      const docs = (await import('./docs')).default
+      const docs = (await import(/* webpackChunkName: "documentation" */'./docs')).default
       this.names = docs.names
     },
     destroyed () {

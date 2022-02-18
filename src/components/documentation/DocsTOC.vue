@@ -32,7 +32,8 @@
   export default Vue.extend({
     components: {Markdown},
     async created () {
-      const docs = (await import(/* webpackChunkName: "documentation" */'./docs')).default
+      const d = await import(/* webpackChunkName: "documentation" */'./docs')
+      const docs = d.default
       this.content = docs.content['./' + this.fileName]
     },
     data () {

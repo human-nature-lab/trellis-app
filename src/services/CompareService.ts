@@ -1,4 +1,4 @@
-import isEqualWith from 'lodash/isEqualWith'
+import { isEqualWith } from 'lodash'
 
 export default class CompareService {
   static entitiesAreEqual (a, b) {

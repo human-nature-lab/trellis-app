@@ -139,7 +139,7 @@
   import router, { routeQueue } from '../../router'
   import InterviewLoader from './services/InterviewLoader'
   import SurveyService from '../../services/survey'
-  import cloneDeep from 'lodash/cloneDeep'
+  import { cloneDeep } from 'lodash'
 
   function load (to) {
     return new Promise(async (resolve, reject) => {

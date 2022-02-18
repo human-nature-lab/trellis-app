@@ -1,4 +1,4 @@
-import debounce from 'lodash/debounce'
+import { debounce } from 'lodash'
 import { setDot } from '../services/JSONUtil'
 export default {
   methods: {

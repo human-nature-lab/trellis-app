@@ -1,33 +1,71 @@
 <template>
   <span>
-    <v-text-field
+    <AutoTextField
       v-if="editing"
       v-model="copy"
       autofocus
+      :textarea="textarea"
       @blur="onBlur"
       append-icon="mdi-content-save"
       append-outer-icon="mdi-close"
       @click:append="save"
       @click:append-outer="cancel"
+      @keyup.enter="saveEnter"
       v-bind="$attrs"
       v-on="$listeners"
     />
+    <!-- Handle empty values -->
+    <span v-else-if="value === ''">
+      <slot name="empty" :editable="canEdit" :textarea="textarea">
+        <span v-if="canEdit">
+          <v-btn @click="startEdit" :disabled="!canEdit" :text="!textarea">
+            {{ missingText }}
+            <v-icon class="ml-2">mdi-plus</v-icon>
+          </v-btn>
+        </span>
+        <span v-else>{{ missingText }}</span>
+      </slot>
+    </span>
+    <!-- Handle code formatting -->
+    <pre
+      v-else-if="code"
+      @click="startEdit"
+      :class="{ pointer: canEdit }"
+      v-bind="$attrs"
+      v-on="$listeners"
+    ><code>{{ value }}</code></pre>
+    <!-- Handle non-editable text -->
     <span
-       v-else
-       :class="{ pointer: !disabled && editable }" 
-       @click="startEdit" v-bind="$attrs" v-on="$listeners">{{ value }}</span>
+      v-else
+      :class="{ pointer: canEdit }"
+      @click="startEdit"
+      v-bind="$attrs"
+      v-on="$listeners"
+    >{{ value }}</span>
   </span>
 </template>
 
 <script lang="ts">
+import { builder } from '../../symbols/builder'
 import Vue from 'vue'
+import AutoTextField from './AutoTextField.vue'
+import { i18n } from '../../i18n'
 
 export default Vue.extend({
   name: 'EditText',
+  components: { AutoTextField },
+  inject: { builder },
   props: {
     value: String,
+    locked: Boolean,
     editable: Boolean,
-    loading: Boolean,
+    disabled: Boolean,
+    textarea: Boolean,
+    code: Boolean,
+    missingText: {
+      type: String,
+      default: () => i18n.t('add_text')
+    }
   },
   data() {
     return {
@@ -46,21 +84,33 @@ export default Vue.extend({
         this.$emit('update', this.copy)
         this.$emit('save', this.copy)
       }
-      this.editing = false
+      this.setEditing(false)
+    },
+    setEditing(val: boolean) {
+      this.editing = val
+      this.$emit('update:editing', val)
+    },
+    saveEnter() {
+      if (!this.textarea) {
+        this.save()
+      }
     },
     cancel() {
-      this.editing = false
+      this.setEditing(false)
     },
     startEdit() {
-      if (this.editable) {
+      if (this.canEdit) {
         this.copy = this.value
-        this.editing = true
+        this.setEditing(true)
       }
     }
   },
   computed: {
     dirty(): boolean {
       return this.value !== this.copy
+    },
+    canEdit(): boolean {
+      return !this.locked && !this.disabled && this.editable
     }
   }
 })

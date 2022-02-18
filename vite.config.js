@@ -11,9 +11,10 @@ import Components from 'unplugin-vue-components/vite';
 process.env.TARGET = process.env.TARGET || 'web'
 const isCordova = process.env.TARGET === 'cordova'
 
-const SRC_DIR = path.resolve(__dirname, './src');
-const PUBLIC_DIR = path.resolve(__dirname, './public')
-const BUILD_DIR = path.resolve(__dirname, './www')
+const resolve = (p) => path.resolve(__dirname, p)
+const SRC_DIR = resolve('./src')
+const PUBLIC_DIR = resolve('./static')
+const BUILD_DIR = resolve('./www')
 
 export default defineConfig(({ command, mode }) => {
   console.log(`command: ${command}, mode: ${mode}, target: ${process.env.TARGET}`)
@@ -25,18 +26,19 @@ export default defineConfig(({ command, mode }) => {
       viteExternalsPlugin({
         'config': 'config',
       }),
-      Components({
-        // generate `components.d.ts` global declarations
-        dts: true,
-        
-        // auto import for directives
-        directives: false,
-        // resolvers for custom components
-        resolvers: [
-          // Vuetify
-          VuetifyResolver(),
-        ],
-      }),
+      // Components({
+      //   // generate `components.d.ts` global declarations
+      //   dts: true,
+
+      //   // auto import for directives
+      //   directives: false,
+      //   exclude: [/\.vue$/],
+      //   // resolvers for custom components
+      //   resolvers: [
+      //     // Vuetify
+      //     VuetifyResolver(),
+      //   ],
+      // }),
     ],
     define: {
       'process.env': {
@@ -47,12 +49,13 @@ export default defineConfig(({ command, mode }) => {
     },
     // root: SRC_DIR,
     // base: '',
-    publicDir: 'static',
-    // build: {
-    //   outDir: BUILD_DIR,
-    //   assetsInlineLimit: 0,
-    //   emptyOutDir: true,
-    // },
+    publicDir: PUBLIC_DIR,
+    build: {
+      outDir: BUILD_DIR,
+      assetsInlineLimit: 0,
+      emptyOutDir: true,
+      sourcemap: true,
+    },
     resolve: {
       alias: {
         'vue': 'vue/dist/vue.esm.js',
@@ -63,6 +66,7 @@ export default defineConfig(({ command, mode }) => {
         './images/marker-icon-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon-2x.png'),
         './images/marker-shadow.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-shadow.png')
       },
+      extensions: ['.vite.ts', '.vite.js', '.esnext.tx', '.esnext.js', '.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
     },
     // assetsInclude: ['./static/**/*'],
     // server: {
@@ -76,7 +80,7 @@ export default defineConfig(({ command, mode }) => {
   if (process.env.TARGET === 'web') {
     config.resolve.alias['typeorm'] = 'nop-typeorm'
     // config.resolve.alias.push({ find: /typeorm$/, replacement: path.resolve(__dirname, './src/typeorm/nop.ts') })
-    config.resolve.extensions = ['.web.ts', '.browser.ts', '.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+    config.resolve.extensions = ['.web.ts', '.browser.ts'].concat(config.resolve.extensions)
   }
   // TODO: customize imports based on the command
   return config

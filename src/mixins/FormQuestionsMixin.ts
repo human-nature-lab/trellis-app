@@ -1,8 +1,9 @@
-import Vue, { PropOptions } from 'vue'
+import Vue from 'vue'
 import Question from '../entities/trellis/Question'
+import { builder } from '../symbols/builder'
 
 export default Vue.extend({
-  inject: ['builder'],
+  inject: { builder },
   computed: {
     questions (): Record<string, Question> {
       const m = {}

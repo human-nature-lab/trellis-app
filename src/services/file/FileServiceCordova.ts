@@ -1,6 +1,6 @@
 import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
-import merge from 'lodash/merge'
+import { merge } from 'lodash'
 import CancellablePromise from '../../classes/CancellablePromise'
 declare var md5chksum, FileTransfer, cordova
 /* global md5chksum, FileTransfer */

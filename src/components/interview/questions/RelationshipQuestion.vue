@@ -70,7 +70,7 @@
   import parameterTypes from '../../../static/parameter.types'
   import GeoService from '../../../services/geo/GeoService'
   import RespondentService from '../../../services/respondent/RespondentService'
-  import uniq from 'lodash/uniq'
+  import { uniq } from 'lodash'
 
   export default {
     name: 'relationship-question',
