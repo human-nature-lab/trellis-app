@@ -12,10 +12,8 @@ import { RouteQueue } from './RouteQueue'
 import webRoutes from './web.routes'
 import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
-// @ts-ignore
 import { AddSnack } from '../components/SnackbarQueue.vue'
 import PhotoService from '../services/photo/PhotoService'
-import { loadLanguageAsync } from '../i18n'
 
 let routes = sharedRoutes
 if (singleton.offline) {
@@ -35,12 +33,6 @@ export const router = new Router({
 })
 
 export const routeQueue = new RouteQueue(router, { name: 'Home' })
-
-// Load our locale dynamically
-router.beforeEach((to, from, next) => {
-  const lang = singleton.locale.languageTag
-  loadLanguageAsync(lang).then(() => next())
-})
 
 // If we're in offline mode, require that the application is synced
 if (singleton.offline) {

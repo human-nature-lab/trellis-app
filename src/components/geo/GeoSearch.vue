@@ -81,9 +81,9 @@
               <v-list-item-title>
                 {{ $t('displaying_first_results',[defaultSearchResultsLimit]) }}
               </v-list-item-title>
-              <v-list-item-sub-title>
+              <v-list-item-title>
                 {{ $t('use_search_field_results') }}
-              </v-list-item-sub-title>
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>

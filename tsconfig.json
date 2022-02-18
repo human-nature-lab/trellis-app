@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "allowJs": false,
+    "allowJs": true,
     "declaration": false,
     "sourceMap": true,
     "noImplicitThis": true,

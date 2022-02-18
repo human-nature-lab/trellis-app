@@ -63,18 +63,12 @@
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import { routeQueue } from '../../router'
 
-  // @ts-ignore
-  import Permission from '../Permission'
-  // @ts-ignore
-  import RespondentNames from './RespondentNames'
-  // @ts-ignore
-  import RespondentGeos from './RespondentGeos'
-  // @ts-ignore
-  import PhotoAlbum from '../photo/PhotoAlbum'
-  // @ts-ignore
-  import RespondentConditionTags from './RespondentConditionTags'
-  // @ts-ignore
-  import RespondentFill from './RespondentFill'
+  import Permission from '../Permission.vue'
+  import RespondentNames from './RespondentNames.vue'
+  import RespondentGeos from './RespondentGeos.vue'
+  import PhotoAlbum from '../photo/PhotoAlbum.vue'
+  import RespondentConditionTags from './RespondentConditionTags.vue'
+  import RespondentFill from './RespondentFill.vue'
 
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import RespondentService from '../../services/respondent/RespondentService'

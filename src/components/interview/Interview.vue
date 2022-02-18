@@ -123,10 +123,10 @@
 </template>
 
 <script lang="ts">
-  import Page from './Page'
-  import ConditionTagList from './ConditionTagList'
-  import AsyncTranslationText from '../AsyncTranslationText'
-  import ConditionAssignmentErrors from './ConditionAssignmentErrors'
+  import Page from './Page.vue'
+  import ConditionTagList from './ConditionTagList.vue'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
+  import ConditionAssignmentErrors from './ConditionAssignmentErrors.vue'
   import menuBus from '../main-menu/MenuBus'
   import global from '../../static/singleton'
   import AT from '../../static/action.types'

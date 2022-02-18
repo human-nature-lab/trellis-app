@@ -65,10 +65,8 @@
 </template>
 
 <script lang="ts">
-  // @ts-ignore
-  import Permission from '../Permission'
-  // @ts-ignore
-  import RespondentNameForm from './RespondentNameForm'
+  import Permission from '../Permission.vue'
+  import RespondentNameForm from './RespondentNameForm.vue'
   import Vue from 'vue'
   import RespondentName from '../../entities/trellis/RespondentName'
   import RespondentService from '../../services/respondent/RespondentService'

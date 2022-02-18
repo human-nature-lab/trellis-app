@@ -70,8 +70,8 @@
 
 <script>
   import { TrellisPermission } from '../../static/permissions.base'
-  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
-  import Permission from '../Permission'
+  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs.vue'
+  import Permission from '../Permission.vue'
   import PermissionMixin from '../../mixins/PermissionMixin'
   export default {
     name: 'RespondentGeoRow',

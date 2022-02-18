@@ -57,7 +57,7 @@
   import ConditionTag from "../../entities/trellis/ConditionTag";
   import TrellisLoadingCircle from "../TrellisLoadingCircle.vue";
   import TrellisModal from "../TrellisModal.vue";
-  import debounce from "lodash/debounce";
+  import { debounce } from "lodash";
   import SkipConditionTag from "../../entities/trellis/SkipConditionTag";
   import CompareService from "../../services/CompareService";
 

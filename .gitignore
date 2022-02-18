@@ -43,3 +43,4 @@ releases
 *.jks
 
 .sentryclirc
+components.d.ts

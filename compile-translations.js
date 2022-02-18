@@ -33,7 +33,7 @@ let locales = translations.shift().filter(t => t !== 'key' && t !== 'comment')
 console.log('compiling locales', locales)
 
 
-// Transform the translations into the required format for the vue-index plugin
+// Transform the translations into this format
 /**
  * {
  *    en: {
@@ -59,9 +59,7 @@ messages = translations.reduce((coll, t) => {
       const l = locales[i]
       const key = t[0]
       const msg = t[i + 1]
-      coll[l][key] = {
-        message: msg
-      }
+      coll[l][key] = msg
       
       // Simple length check to identify errors
       if (msg.length < 2) {

@@ -7,7 +7,7 @@
 </template>
 
 <script>
-  import AsyncTranslationText from '../../AsyncTranslationText'
+  import AsyncTranslationText from '../../AsyncTranslationText.vue'
   import TranslationMixin from '../../../mixins/TranslationMixin'
   import Translation from '../../../entities/trellis/Translation'
   export default {

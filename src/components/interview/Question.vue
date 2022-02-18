@@ -35,7 +35,7 @@
 <script lang="ts">
   // This parent component servers the purpose of handling general functionality that is used across all questions.
   // For example, question title and message fills will be applied here. The question header text will be applied here
-  import Vue, { PropOptions } from 'Vue'
+  import Vue, { PropOptions } from 'vue'
   import DontKnowRefused from './DontKnowRefused.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
   import TranslationMixin from '../../mixins/TranslationMixin'

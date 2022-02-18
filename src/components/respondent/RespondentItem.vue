@@ -46,10 +46,8 @@
 </template>
 
 <script lang="ts">
-  // @ts-ignore
-  import Photo from '../photo/Photo'
-  // @ts-ignore
-  import FullscreenPhoto from '../photo/FullscreenPhoto'
+  import Photo from '../photo/Photo.vue'
+  import FullscreenPhoto from '../photo/FullscreenPhoto.vue'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
   import global from '../../static/singleton'

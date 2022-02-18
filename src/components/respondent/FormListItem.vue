@@ -126,14 +126,13 @@
 </template>
 
 <script>
-  // @ts-ignore
   import AsyncTranslationText from '../AsyncTranslationText.vue'
 
   import Vue from 'vue'
   import global from '../../static/singleton'
   import SurveyService from '../../services/survey'
   import InterviewService from '../../services/interview/InterviewService'
-  import { getCurrentPosition } from '../LocationFinder'
+  import { getCurrentPosition } from '../LocationFinder.vue'
   import singleton from '../../static/singleton'
 
   export default Vue.extend({

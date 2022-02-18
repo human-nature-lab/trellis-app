@@ -3,6 +3,8 @@ import path from 'path';
 import { defineConfig } from 'vite'
 import { viteExternalsPlugin } from 'vite-plugin-externals'
 import { createVuePlugin } from 'vite-plugin-vue2'
+import { VuetifyResolver } from 'unplugin-vue-components/resolvers';
+import Components from 'unplugin-vue-components/vite';
 // import { esbuildDecorators } from '@anatine/esbuild-decorators'
 // import { injectHtml } from 'vite-plugin-html'
 
@@ -23,16 +25,18 @@ export default defineConfig(({ command, mode }) => {
       viteExternalsPlugin({
         'config': 'config',
       }),
-
-      // Handle emitDecoratorMetadata: true flag required by typeorm
-      // esbuildDecorators(),
-      // injectHtml({
-      //   injectData: {
-      //     'process.env': process.env,
-      //     TARGET: process.env.TARGET,
-      //     IS_CORDOVA: isCordova,
-      //   },
-      // }),
+      Components({
+        // generate `components.d.ts` global declarations
+        dts: true,
+        
+        // auto import for directives
+        directives: false,
+        // resolvers for custom components
+        resolvers: [
+          // Vuetify
+          VuetifyResolver(),
+        ],
+      }),
     ],
     define: {
       'process.env': {
@@ -51,6 +55,7 @@ export default defineConfig(({ command, mode }) => {
     // },
     resolve: {
       alias: {
+        'vue': 'vue/dist/vue.esm.js',
         '@': SRC_DIR,
         './images/layers.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers.png'),
         './images/layers-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers-2x.png'),

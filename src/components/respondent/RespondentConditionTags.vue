@@ -54,10 +54,8 @@
 </template>
 
 <script lang="ts">
-  // @ts-ignore
-  import Permission from '../Permission'
-  // @ts-ignore
-  import RespondentConditionTagForm from './RespondentConditionTagForm'
+  import Permission from '../Permission.vue'
+  import RespondentConditionTagForm from './RespondentConditionTagForm.vue'
   import Vue from 'vue'
 
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'

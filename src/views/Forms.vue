@@ -99,7 +99,7 @@
   import FormSkips from '../components/forms/FormSkips.vue'
   import DocsFiles from '../components/documentation/DocsFiles'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
-  import FormImport from '../components/import/FormImport'
+  import FormImport from '../components/import/FormImport.vue'
   import groupBy from 'lodash/groupBy'
   import draggable from 'vuedraggable'
   import { delay } from '../classes/delay'

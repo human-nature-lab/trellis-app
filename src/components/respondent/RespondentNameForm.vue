@@ -49,7 +49,7 @@
 </template>
 
 <script>
-  import ModalTitle from '../ModalTitle'
+  import ModalTitle from '../ModalTitle.vue'
   import LocaleService from '../../services/locale/LocaleService'
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusFormService from '../../services/census/index'

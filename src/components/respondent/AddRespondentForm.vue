@@ -87,9 +87,9 @@
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
-  import PhotoAlbum from '../photo/PhotoAlbum'
+  import PhotoAlbum from '../photo/PhotoAlbum.vue'
   import { routeQueue } from '../../router'
-  import merge from 'lodash/merge'
+  import { merge } from 'lodash'
 
   export default {
     components: { PhotoAlbum },

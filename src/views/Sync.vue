@@ -61,14 +61,14 @@
 
 <script>
   import AlertService from '../services/AlertService'
-  import SyncStatus from '../components/sync/SyncStatus'
+  import SyncStatus from '../components/sync/SyncStatus.vue'
   import DatabaseService from '../services/database/DatabaseService'
-  import Download from '../components/sync/download/Download'
-  import Upload from '../components/sync/upload/Upload'
-  import ServerIpConfig from './ServerIPConfig'
+  import Download from '../components/sync/download/Download.vue'
+  import Upload from '../components/sync/upload/Upload.vue'
+  import ServerIpConfig from './ServerIPConfig.vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import DocsFiles from '../components/documentation/DocsFiles'
-  import TrellisModal from '../components/TrellisModal'
+  import TrellisModal from '../components/TrellisModal.vue'
 
   export default {
     name: 'sync',

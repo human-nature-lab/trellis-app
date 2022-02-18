@@ -61,12 +61,9 @@
 <script lang="ts">
   import Vue from "vue";
   import Form from "../../entities/trellis/Form";
-  // @ts-ignore
   import AsyncTranslationText from "../AsyncTranslationText.vue";
   import Permission from "../Permission.vue";
-  // @ts-ignore
   import TranslationTextField from "../TranslationTextField.vue";
-  // @ts-ignore
   import TrellisLoadingCircle from "../TrellisLoadingCircle.vue";
   import FormService from "../../services/form/FormService";
   import { debounce } from "lodash";
