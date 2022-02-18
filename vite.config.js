@@ -3,6 +3,7 @@ import path from 'path';
 import { defineConfig } from 'vite'
 import { viteExternalsPlugin } from 'vite-plugin-externals'
 import { createVuePlugin } from 'vite-plugin-vue2'
+// import { esbuildDecorators } from '@anatine/esbuild-decorators'
 // import { injectHtml } from 'vite-plugin-html'
 
 process.env.TARGET = process.env.TARGET || 'web'
@@ -13,14 +14,18 @@ const PUBLIC_DIR = path.resolve(__dirname, './public')
 const BUILD_DIR = path.resolve(__dirname, './www')
 
 export default defineConfig(({ command, mode }) => {
-  const base = {
+  console.log(`command: ${command}, mode: ${mode}, target: ${process.env.TARGET}`)
+  const config = {
     plugins: [
       createVuePlugin({
         // target: 'es5',
       }),
       viteExternalsPlugin({
-        'config': './static/config.js',
+        'config': 'config',
       }),
+
+      // Handle emitDecoratorMetadata: true flag required by typeorm
+      // esbuildDecorators(),
       // injectHtml({
       //   injectData: {
       //     'process.env': process.env,
@@ -29,9 +34,16 @@ export default defineConfig(({ command, mode }) => {
       //   },
       // }),
     ],
+    define: {
+      'process.env': {
+        APP_ENV: process.env.APP_ENV,
+        TARGET: process.env.TARGET,
+      },
+      VERSION: JSON.stringify(require('./package.json').version),
+    },
     // root: SRC_DIR,
     // base: '',
-    // publicDir: PUBLIC_DIR,
+    publicDir: 'static',
     // build: {
     //   outDir: BUILD_DIR,
     //   assetsInlineLimit: 0,
@@ -40,7 +52,6 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       alias: {
         '@': SRC_DIR,
-        // Stupid leaflet CSS import workaround. Might be fixed in newer versions of leaflet, but I'm not opening that can of worms.
         './images/layers.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers.png'),
         './images/layers-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers-2x.png'),
         './images/marker-icon.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon.png'),
@@ -48,6 +59,7 @@ export default defineConfig(({ command, mode }) => {
         './images/marker-shadow.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-shadow.png')
       },
     },
+    // assetsInclude: ['./static/**/*'],
     // server: {
     //   host: true,
     // },
@@ -56,6 +68,11 @@ export default defineConfig(({ command, mode }) => {
     //   jsxFragment: '"Fragment"',
     // },
   }
+  if (process.env.TARGET === 'web') {
+    config.resolve.alias['typeorm'] = 'nop-typeorm'
+    // config.resolve.alias.push({ find: /typeorm$/, replacement: path.resolve(__dirname, './src/typeorm/nop.ts') })
+    config.resolve.extensions = ['.web.ts', '.browser.ts', '.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+  }
   // TODO: customize imports based on the command
-  return base
+  return config
 })

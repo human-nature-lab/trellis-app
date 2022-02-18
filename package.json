@@ -48,11 +48,13 @@
     "moment": "^2.22.2",
     "ngraph.forcelayout": "^0.5.0",
     "ngraph.graph": "0.0.14",
+    "nop-typeorm": "file:../../nop-typeorm",
     "papaparse": "^5.3.1",
+    "path": "^0.12.7",
     "reflect-metadata": "^0.1.12",
     "regenerator-runtime": "^0.13.7",
     "typeface-roboto": "0.0.54",
-    "typeorm": "^0.2.7",
+    "typeorm": "^0.2.11",
     "uuid": "^3.3.2",
     "vue": "^2.6.12",
     "vue-cordova": "^0.1.2",
@@ -64,6 +66,7 @@
     "vuetify": "^2.4.3"
   },
   "devDependencies": {
+    "@anatine/esbuild-decorators": "^0.2.18",
     "@babel/core": "^7.12.10",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.3.4",

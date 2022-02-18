@@ -20,7 +20,7 @@
           @click="global.menuDrawer.open = !global.menuDrawer.open" />
         <v-toolbar-title class="logo">
           <router-link :to="{name: 'Home'}" class="deep-orange--text">
-            <img src="../static/img/trellis-logo.png" alt="trellis" />
+            <img src="/img/trellis-logo.png?url" alt="trellis" />
           </router-link>
         </v-toolbar-title>
         <v-toolbar-title v-if="global.study" class="study">

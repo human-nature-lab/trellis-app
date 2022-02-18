@@ -1,5 +1,5 @@
 import { ValidationRules } from '../../../classes/Validators'
-import v18n from '../../../i18n/index'
+import { i18n as v18n } from '../../../i18n'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import Question from '../../../entities/trellis/Question'
 import QuestionParameter from '../../../entities/trellis/QuestionParameter'

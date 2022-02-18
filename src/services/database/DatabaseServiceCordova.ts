@@ -1,5 +1,4 @@
 import DeviceService from '../device/DeviceService'
-import 'reflect-metadata'
 import { createConnection, Entity, getConnection, QueryRunner } from 'typeorm'
 import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'

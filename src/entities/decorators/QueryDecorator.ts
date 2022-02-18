@@ -44,6 +44,9 @@ export function LazyQuery (type: any, queryCallback: QueryCallback<typeof type>,
   return function (target: any, propertyKey: string): any {
     async function defaultGetter (this: typeof type) {
       const DatabaseService = require('../../services/database/DatabaseService').default
+      if (type instanceof Function) {
+        type = type()
+      }
       const repo = await DatabaseService.getRepository(type)
       console.log('Running async query for', type, propertyKey)
       return queryCallback(repo, this)
