@@ -97,7 +97,7 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container fluid fill-height class="align-start" v-if="!maintenanceMode">
+        <v-container fluid fill-height class="pa-0 align-start" v-if="!maintenanceMode">
           <router-view class="route-container fade-in" />
         </v-container>
         <v-container fluid fill-height class="align-start" v-else>
@@ -259,6 +259,7 @@
   //   &.fill-height
   //     align-items: start
   html, body
+    overflow: auto !important
     // overflow: auto !important
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
@@ -318,7 +319,7 @@
   .scroll-container
     overflow: auto
     flex: 1 1 auto !important
-    margin-bottom: 64px
+    // margin-bottom: 64px
   // .study
   //   margin-left: 0
   .fade-in

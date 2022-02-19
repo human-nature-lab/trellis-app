@@ -4,6 +4,7 @@
       v-if="editing"
       v-model="copy"
       autofocus
+      dense
       :textarea="textarea"
       @blur="onBlur"
       append-icon="mdi-content-save"

@@ -1,25 +1,27 @@
 <template>
-  <v-col>
+  <v-col class="mb-8">
     <SectionHeader :section="value" @addPage="addPage" />
-    <v-col class="section-content">
-      <!-- <div class="section-indicator" /> -->
-      <!-- <draggable
-        v-model="value.questionGroups"
-        handle=".page-drag-handle"
-        :group="{ name: 'pages', type: 'move' }"
-        :animation="200"
-        :setData="setData"
-        @add="updatePage"
-      @update="reorderPages">-->
-      <Page
-        v-for="(page, index) in value.questionGroups"
-        :key="page.id"
-        ref="pages"
-        :index="page.sectionQuestionGroup.questionGroupOrder"
-        v-model="value.questionGroups[index]"
-      />
-      <!-- </draggable> -->
-    </v-col>
+    <div class="section-content">
+      <div class="section-indicator" />
+      <v-col class="pl-4">
+        <!-- <draggable
+          v-model="value.questionGroups"
+          handle=".page-drag-handle"
+          :group="{ name: 'pages', type: 'move' }"
+          :animation="200"
+          :setData="setData"
+          @add="updatePage"
+        @update="reorderPages">-->
+        <Page
+          v-for="(page, index) in value.questionGroups"
+          :key="page.id"
+          ref="pages"
+          :index="index"
+          v-model="value.questionGroups[index]"
+        />
+        <!-- </draggable> -->
+      </v-col>
+    </div>
   </v-col>
 </template>
 
@@ -32,10 +34,11 @@ import SectionHeader from './SectionHeader.vue'
 import Section from '../../entities/trellis/Section'
 import FormBuilderService from '../../services/builder'
 import QuestionGroup from '../../entities/trellis/QuestionGroup';
+import TCard from '../styles/TCard.vue';
 
 export default Vue.extend({
   name: 'Section',
-  components: { Translation, Page, draggable, SectionHeader },
+  components: { Translation, Page, draggable, SectionHeader, TCard },
   props: {
     value: Object as PropOptions<Section>,
   },
@@ -94,14 +97,17 @@ export default Vue.extend({
 </script>
 
 <style lang="sass">
-  // .section-content
-  //   position: relative
-    // .section-indicator
-    //   position: absolute
-    //   left: 0
-    //   top: 0
-    //   height: 100%
-    //   width: 5px
-    //   border-left: 2px solid lightgrey
-    //   border-bottom: 2px solid lightgrey
+
+.section-content
+  position: relative
+  .section-indicator
+    position: absolute
+    left: 0
+    top: -18px
+      // top: -45px
+    height: calc(100%)
+    width: 15px
+    border-top: 2px solid lightgrey
+    border-left: 2px solid lightgrey
+      // border-bottom: 2px solid lightgrey
 </style>

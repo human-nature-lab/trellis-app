@@ -1,9 +1,11 @@
 <template>
-  <v-row no-gutters class="align-center">
-    <Translation v-model="section.nameTranslation" editable :locale="builder.locale" :locked="builder.locked" />
+  <v-row no-gutters class="align-bottom px-1">
+    <div class="text-h6">
+      <Translation v-model="section.nameTranslation" editable :locale="builder.locale" :locked="builder.locked" />
+    </div>
     <v-spacer />
-    <v-chip v-if="followUpId">{{ $t('follow_up_to', questions[followUpId] ? questions[followUpId].varName : 'Loading...') }}</v-chip>
-    <v-chip v-if="isRepeatable">{{ $tc('repeated', maxRepetitions) }}</v-chip>
+    <v-chip v-if="followUpId">{{ $t('follow_up_to', builder.locale.languageTag, [questions[followUpId] ? questions[followUpId].varName : 'Loading...']) }}</v-chip>
+    <v-chip v-if="isRepeatable">{{ $tc('repeated', maxRepetitions, builder.locale.languageTag) }}</v-chip>
     <v-menu>
       <template #activator="{ attrs, on }">
         <v-btn icon text v-bind="attrs" v-on="on">
@@ -11,9 +13,9 @@
         </v-btn>
       </template>
       <v-list>
-        <v-list-item @click="$emit('addPage')">{{ $t('add_page') }}</v-list-item>
-        <v-list-item>{{ $t('follow_up') }}</v-list-item>
-        <v-list-item>{{ $t('repeated') }}</v-list-item>
+        <v-list-item @click="$emit('addPage')">{{ $t('add_page', builder.locale.languageTag) }}</v-list-item>
+        <v-list-item>{{ $t('show_follow_up', builder.locale.languageTag) }}</v-list-item>
+        <v-list-item>{{ $tc('repeated', maxRepetitions, builder.locale.languageTag) }}</v-list-item>
       </v-list>
     </v-menu>
   </v-row>

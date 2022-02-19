@@ -1,33 +1,7 @@
 <template>
-  <v-col class="mb-4 ml-4">
-    <v-row class="secondary py-2 px-2 question-drag-handle align-center">
-      <EditText
-        v-model="value.varName"
-        @save="updateQuestion"
-        editable
-        :locked="builder.locked"
-        :loading="isWorking"
-        :disabled="isWorking"
-      />
-      <v-spacer />
-      <v-chip
-        v-if="value.assignConditionTags && value.assignConditionTags.length"
-        color="primary"
-        label
-      >{{ $t('assigns_condition_tags', ['"' + value.assignConditionTags.map(act => act.conditionTag.name).join('","') + '"']) }}</v-chip>
-      <v-autocomplete
-        v-model="value.questionTypeId"
-        single-line
-        dense
-        :disabled="builder.locked || isWorking"
-        @change="updateQuestion"
-        item-value="id"
-        item-text="name"
-        :items="builder.questionTypes"
-      />
-      <span class="pa-1 lowercase">{{ $t('type') }}: {{ value.questionType.name }}</span>
-    </v-row>
-    <v-row>
+  <v-col class="mb-4">
+    <QuestionHeader :value="value" @change="updateQuestion" :loading="isWorking" />
+    <v-col class="question-content">
       <Translation
         :locale="builder.locale"
         :locked="builder.locked"
@@ -37,7 +11,7 @@
         editable
         textarea
       />
-    </v-row>
+    </v-col>
   </v-col>
 </template>
 
@@ -47,14 +21,15 @@ import Question from '../../entities/trellis/Question'
 import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
 import Translation from './Translation.vue'
 import EditText from './EditText.vue'
+import QuestionHeader from './QuestionHeader.vue'
 import { builder } from '../../symbols/builder'
 
 export default Vue.extend({
   name: 'Question',
   inject: { builder },
   mixins: [FormQuestionsMixin],
-  components: { Translation, EditText },
-  props: {
+  components: { Translation, EditText, QuestionHeader },
+ props: {
     value: Object as PropOptions<Question>,
   },
   data() {
@@ -66,7 +41,7 @@ export default Vue.extend({
     async updateQuestion() {
       this.isWorking = true
       try {
-
+        
       } finally {
         this.isWorking = false
       }
@@ -79,4 +54,6 @@ export default Vue.extend({
 
 .lowercase
   text-transform: lowercase
+.question-content
+  border: 1px solid lightgrey
 </style>

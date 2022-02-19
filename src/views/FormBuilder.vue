@@ -1,5 +1,5 @@
 <template>
-  <v-col>
+  <v-col class="grey lighten-3 min-h-screen">
     <v-row v-if="builder.form" no-gutters>
       <div class="title">
         <Translation

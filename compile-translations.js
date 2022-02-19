@@ -44,13 +44,12 @@ console.log('compiling locales', locales)
  *    }
  * }
  */
-const errors = locales.reduce((agg, l) => {
-  agg[l] = {}
-  return agg
-}, {})
+const errors = {
+  general: [],
+  duplicates: [],
+}
 let messages = locales.reduce((agg, l) => {
   agg[l] = {}
-
   return agg
 }, {})
 messages = translations.reduce((coll, t) => {
@@ -59,12 +58,17 @@ messages = translations.reduce((coll, t) => {
       const l = locales[i]
       const key = t[0]
       const msg = t[i + 1]
-      coll[l][key] = msg
       
       // Simple length check to identify errors
       if (msg.length < 2) {
-        errors[l][key] = msg
+        errors.general.push({ locale: l,  key, msg, line: i })
       }
+      if (key in coll[l]) {
+        const dup = coll[l][key]
+        errors.duplicates.push({ locale: l, key, msg, dup, line: i })
+      }
+      
+      coll[l][key] = msg
     }
   }
   return coll
@@ -74,11 +78,14 @@ messages = translations.reduce((coll, t) => {
 // Write the files
 for (const l of locales) {
   let data = messages[l]
-  let errs = errors[l]
-  fs.writeFileSync(path.join(root, `${l}.json`), JSON.stringify(data, null, 2), 'utf8')
-  
-  // Write any discovered errors
-  if (Object.keys(errs).length) {
-    fs.writeFileSync(path.join(root, `${l}-errors.json`), JSON.stringify(errs, null, 2), 'utf8')
-  }
+  let f = path.join(root, `${l}.json`)
+  console.log('writing file', f)
+  fs.writeFileSync(f, JSON.stringify(data, null, 2), 'utf8')
+}
+
+// Write any discovered errors
+if (errors.duplicates.length || errors.general.length) {
+  f = path.join(root, 'errors.json')
+  console.log('writing errors', f)
+  fs.writeFileSync(f, JSON.stringify(errors, null, 2), 'utf8')
 }

@@ -20,11 +20,9 @@
 import Locale from '../../entities/trellis/Locale'
 import Vue, { PropOptions } from 'vue'
 import LocaleService from '../../services/locale/LocaleService'
-import StripPropsMixin from '../../mixins/StripPropsMixin'
 
 export default Vue.extend({
   name: 'LocaleSelectorMenu',
-  mixins: [StripPropsMixin],
   props: {
     value: Object as PropOptions<Locale>,
     studyId: String,

@@ -1,6 +1,6 @@
 import VueI18n from 'vue-i18n'
 import Vue from 'vue'
-// import en from './en.json'
+import en from './en.json'
 Vue.use(VueI18n)
 
 const langMap = {
@@ -9,11 +9,14 @@ const langMap = {
 }
 
 export const i18n = new VueI18n({
-  // locale: 'en',
+  locale: 'en',
   fallbackLocale: 'en',
+  messages: {
+    en,
+  }
 })
 
-const loadedLanguages = []
+const loadedLanguages = ['en']
 
 function setI18nLanguage(lang) {
   i18n.locale = lang
@@ -23,7 +26,6 @@ function setI18nLanguage(lang) {
 }
 
 export function loadLanguageAsync(lang: string) {
-  console.log('loading language', lang)
   // If the language was already loaded or the same language
   if (loadedLanguages.includes(lang) || i18n.locale === lang) {
     return Promise.resolve(setI18nLanguage(lang))
