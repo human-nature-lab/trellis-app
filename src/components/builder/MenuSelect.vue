@@ -1,14 +1,17 @@
 <template>
-  <v-menu offset-y v-bind="$attrs">
+  <v-menu offset-y v-bind="$attrs" :disabled="disabled" max-height="400">
     <template #activator="{ attrs, on }">
-      <v-chip v-bind="attrs" v-on="on" color="primary lighten-3">{{ selected }}</v-chip>
+      <v-chip v-bind="attrs" v-on="disabled ? null : on" :color="color">
+      {{ selected }}
+      <v-icon v-if="!disabled">mdi-chevron-down</v-icon>
+      </v-chip>
     </template>
     <v-list>
       <v-list-item
         v-for="item in items"
         :key="item[itemValue]"
         @click="select(item)"
-      >{{ item[itemTitle] }}</v-list-item>
+      >{{ item[itemText] }}</v-list-item>
     </v-list>
   </v-menu>
 </template>
@@ -21,9 +24,11 @@ export default Vue.extend({
   props: {
     items: Array,
     value: Object,
-    itemTitle: {
+    disabled: Boolean,
+    color: String,
+    itemText: {
       type: String,
-      default: 'title',
+      default: 'text',
     },
     itemValue: {
       type: String,
@@ -46,9 +51,9 @@ export default Vue.extend({
     selected(): string {
       for (const item of this.items) {
         if (this.returnObject && item === this.value) {
-          return item[this.itemTitle]
+          return item[this.itemText]
         } else if (item[this.itemValue] === this.value) {
-          return item[this.itemTitle]
+          return item[this.itemText]
         }
       }
     }

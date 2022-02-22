@@ -19,10 +19,10 @@
     "release:prod:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile && cordova build android --release",
     "build:dev:web": "npm run web",
     "build:web": "cross-env NODE_ENV=production npm run web",
-    "web": "webpack --config=build/webpack.web.conf.js",
-    "mobile": "webpack --config=build/webpack.mobile.conf.js",
-    "start": "webpack-dev-server --config=build/webpack.mobile.conf.js",
-    "start:web": "webpack-dev-server --config=build/webpack.web.conf.js"
+    "web": "npm run compile && webpack --config=build/webpack.web.conf.js",
+    "mobile": "npm run compile && webpack --config=build/webpack.mobile.conf.js",
+    "start": "npm run compile && webpack-dev-server --config=build/webpack.mobile.conf.js",
+    "start:web": "npm run compile && webpack-dev-server --config=build/webpack.web.conf.js"
   },
   "dependencies": {
     "@mdi/font": "^5.9.55",

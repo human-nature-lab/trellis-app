@@ -80,7 +80,7 @@ failed_login,"Could not login, please try again.","No se pudo iniciar sesión, p
 change_study,Change study,Cambiar estudio,
 change_locale,Change locale,Cambiar localidad,
 copy_url,Copy URL,Copiar URL,
-refresh,Refresh app,Refrescar la aplicación,
+refresh_app,Refresh app,Refrescar la aplicación,
 logout,Logout,Cerrar sesión,
 close,Close,Cerrar,
 copied_url,Current URL copied to clipboard,URL actual copiado al portapapeles,
@@ -532,7 +532,7 @@ import_preload_actions,Import preload actions,,
 dropzone,Drop files here or Click to select,,
 filename,Filename,,
 filesize,File size,Tamaño de archivo,
-upload,Upload,,Appears on a button to star the upload
+upload,Upload,,Appears on a button to start the upload
 import,Import,Importar,
 page_n,Page {0},Pagina {0},The current page within the section
 skip_count,no skips | one skip | {n} skips,,How many skips there are
@@ -549,3 +549,5 @@ show_skips,Show skips,,
 show_repeated,Show repeated,,
 show_follow_up,Show follow up,,
 page,Page,,
+refresh,Refresh,,
+question_parameters_n,No Parameters | One Parameter | {n} Parameters,,

@@ -1,55 +1,94 @@
 <template>
   <v-row no-gutters class="align-center">
-    <MenuSelect v-model="value.showHide" :items="showOpts" :disabled="disabled" />
-    <span class="mx-1">the page if the respondent has</span>
-    <MenuSelect v-model="value.anyAll" :items="anyOpts" :disabled="disabled" />
-    <span class="mx-1">of the conditions</span>
-    <v-chip
-      color="primary lighten-3"
-      v-for="condition in selectedConditionTags"
-      :key="condition"
-      label
-    >{{ condition }}</v-chip>
+    <v-col md="auto" cols="12" class="px-1">
+      <MenuSelect
+        v-model="value.showHide"
+        :items="showOpts"
+        :disabled="disabled"
+        color="primary lighten-3"
+      />
+      <span class="mx-1">the page if the respondent has</span>
+      <MenuSelect
+        v-model="value.anyAll"
+        :items="anyOpts"
+        :disabled="disabled"
+        color="primary lighten-3"
+      />
+      <span class="mx-1">of the conditions</span>
+      <span v-if="disabled">
+        <v-chip
+          color="primary lighten-3"
+          v-for="condition in selectedConditionTags"
+          :key="condition"
+          label
+        >{{ condition }}</v-chip>
+      </span>
+    </v-col>
+    <v-col cols="auto" class="flex-grow-1" v-if="!disabled">
+      <v-autocomplete
+        :value="selectedConditionTags"
+        @change="updateConditionTags"
+        :items="conditionTagNames"
+        multiple
+        dense
+        single-line
+        chips
+        color="primary lighten-3"
+      />
+    </v-col>
   </v-row>
 </template>
 
 <script lang="ts">
 import Skip from '../../entities/trellis/Skip'
 import Vue, { PropType } from 'vue'
-import { builder } from '../../symbols/builder';
 import titleCase from '../../filters/TitleCase'
 import MenuSelect from './MenuSelect.vue';
+import ConditionTag from '../../entities/trellis/ConditionTag';
 
 export default Vue.extend({
   name: 'SkipRow',
   components: { MenuSelect },
-  inject: { builder },
   filters: { titleCase },
   props: {
     value: Object as PropType<Skip>,
     disabled: Boolean,
+    conditionTags: Array as PropType<ConditionTag[]>,
   },
   computed: {
     selectedConditionTags(): string[] {
-      return this.value.conditionTags.map((sct) => sct.conditionTagName);
+      const r = this.value.conditionTags.map((sct) => sct.conditionTagName)
+      r.sort()
+      return r
+    },
+    conditionTagNames(): string[] {
+      const r = this.conditionTags.map(c => c.name)
+      r.sort()
+      return r
     },
     showOpts(): object[] {
       return [{
-        title: this.$t('show'),
+        text: this.$t('show'),
         value: true,
       }, {
-        title: this.$t('hide'),
+        text: this.$t('hide'),
         value: false,
       }]
     },
     anyOpts(): object {
       return [{
-        title: this.$t('any'),
+        text: this.$t('any'),
         value: false,
       }, {
-        title: this.$t('all'),
+        text: this.$t('all'),
         value: true,
       }]
+    }
+  },
+  methods: {
+    updateConditionTags(newConds: string[]) {
+      console.log('updateConditionTags', newConds)
+      this.$emit('change', newConds)
     }
   }
 })

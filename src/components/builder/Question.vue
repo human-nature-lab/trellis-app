@@ -1,6 +1,11 @@
 <template>
   <v-col class="mb-4">
-    <QuestionHeader :value="value" @change="updateQuestion" :loading="isWorking" />
+    <QuestionHeader
+      :value="value"
+      :showParameters.sync="showParameters"
+      @change="updateQuestion"
+      :loading="isWorking"
+    />
     <v-col class="question-content">
       <Translation
         :locale="builder.locale"
@@ -12,6 +17,14 @@
         textarea
       />
     </v-col>
+    <v-slide-y-transition>
+      <QuestionParameters
+        v-if="showParameters"
+        :disabled="builder.locked"
+        v-model="value.questionParameters"
+        :parameters="builder.parameters"
+      />
+    </v-slide-y-transition>
   </v-col>
 </template>
 
@@ -22,26 +35,29 @@ import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
 import Translation from './Translation.vue'
 import EditText from './EditText.vue'
 import QuestionHeader from './QuestionHeader.vue'
+import QuestionParameters from './QuestionParameters.vue'
 import { builder } from '../../symbols/builder'
 
 export default Vue.extend({
   name: 'Question',
   inject: { builder },
   mixins: [FormQuestionsMixin],
-  components: { Translation, EditText, QuestionHeader },
- props: {
+  components: { Translation, EditText, QuestionHeader, QuestionParameters },
+  props: {
     value: Object as PropOptions<Question>,
   },
   data() {
     return {
       isWorking: false,
+      showParameters: true,
+      showChoices: true,
     }
   },
   methods: {
     async updateQuestion() {
       this.isWorking = true
       try {
-        
+
       } finally {
         this.isWorking = false
       }

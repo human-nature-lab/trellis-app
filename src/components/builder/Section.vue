@@ -1,8 +1,8 @@
 <template>
-  <v-col class="mb-8">
+  <v-col class="section-content mb-8">
+    <div class="section-indicator" />
     <SectionHeader :section="value" @addPage="addPage" />
-    <div class="section-content">
-      <div class="section-indicator" />
+    <div class="">
       <v-col class="pl-4">
         <!-- <draggable
           v-model="value.questionGroups"
@@ -103,9 +103,9 @@ export default Vue.extend({
   .section-indicator
     position: absolute
     left: 0
-    top: -18px
+    top: 0
       // top: -45px
-    height: calc(100%)
+    height: 100%
     width: 15px
     border-top: 2px solid lightgrey
     border-left: 2px solid lightgrey

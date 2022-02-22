@@ -20,11 +20,7 @@
           </v-list-item-action>
           {{ $t('add_section') }}
         </v-list-item>
-        <LocaleSelectorMenu
-          :value="locale"
-          @input="updateLocale"
-          :studyId="study.id"
-        >
+        <LocaleSelectorMenu :value="locale" @input="updateLocale" :studyId="study.id">
           <template #activator="{ attrs, on }">
             <v-list-item v-bind="attrs" v-on="on">
               <v-list-item-action>
@@ -34,6 +30,12 @@
             </v-list-item>
           </template>
         </LocaleSelectorMenu>
+        <v-list-item @click="$emit('refresh')">
+          <v-list-item-action>
+            <v-icon>mdi-refresh</v-icon>
+          </v-list-item-action>
+          {{ $t('refresh') }}
+        </v-list-item>
       </v-list>
     </v-menu>
   </span>

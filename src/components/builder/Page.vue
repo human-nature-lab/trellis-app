@@ -23,7 +23,13 @@
     </template>
     <v-slide-y-transition>
       <v-col v-if="showSkips">
-        <SkipRow v-for="(skip, index) in value.skips" :key="skip.id" v-model="value.skips[index]" :disabled="builder.locked" />
+        <SkipRow
+          v-for="(skip, index) in value.skips"
+          :key="skip.id"
+          v-model="value.skips[index]"
+          :disabled="builder.locked"
+          :conditionTags="builder.conditionTags"
+        />
 
         <!-- <SkipEditor
           :disabled="builder.locked"

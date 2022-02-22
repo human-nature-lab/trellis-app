@@ -5,6 +5,7 @@ import { uriTemplate } from '../http/WebUtils'
 import QuestionType from '../../entities/trellis/QuestionType'
 import Section from '../../entities/trellis/Section'
 import Question from '../../entities/trellis/Question'
+import Parameter from '../../entities/trellis/Parameter'
 
 export default class FormBuilderService {
   
@@ -40,6 +41,11 @@ export default class FormBuilderService {
   static async updateQuestion(question: Question) {
     const res = await builderInst.put(uriTemplate('/question/{question}', [question.id]), question.toSnakeJSON())
     return new Question().fromSnakeJSON(res.data)
+  }
+  
+  static async getParameterTypes() {
+    const res = await adminInst.get('study/parameter/types')
+    return res.data.parameters.map(p => new Parameter().fromSnakeJSON(p))
   }
 
 }

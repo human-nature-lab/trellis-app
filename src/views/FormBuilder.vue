@@ -14,6 +14,7 @@
         :locale.sync="builder.locale"
         :locked.sync="builder.locked"
         @addSection="addSection"
+        @refresh="load"
       />
     </v-row>
     <v-progress-linear v-if="isLoading" indeterminate />
@@ -42,6 +43,7 @@ import Translation from '../components/builder/Translation.vue'
 import BuilderMenu from '../components/builder/BuilderMenu.vue'
 import { builder } from '../symbols/builder'
 import { study } from '../symbols/main'
+import Parameter from '../entities/trellis/Parameter'
 
 export default Vue.extend({
   name: 'FormBuilder',
@@ -54,6 +56,7 @@ export default Vue.extend({
         locale: singleton.locale ? singleton.locale.copy() : null,
         locked: true,
         questionTypes: [] as QuestionType[],
+        parameters: [] as Parameter[],
         conditionTags: [] as ConditionTag[],
       },
     }
@@ -99,12 +102,19 @@ export default Vue.extend({
     async load() {
       this.isLoading = true
       try {
-        const form = await FormService.getForm(this.$route.params.formId)
-        this.builder.conditionTags = await ConditionTagService.all()
-        this.builder.questionTypes = await FormBuilderService.getQuestionTypes()
-        this.builder.questionTypes.sort((a, b) => a.name.localeCompare(b.name))
+        const [form, tags, questionTypes, parameters] = await Promise.all([
+          FormService.getForm(this.$route.params.formId),
+          ConditionTagService.all(),
+          FormBuilderService.getQuestionTypes(),
+          FormBuilderService.getParameterTypes(),
+        ])
+        questionTypes.sort((a, b) => a.name.localeCompare(b.name))
         form.sort()
+        parameters.sort((a, b) => a.name.localeCompare(b.name))
         this.builder.form = form
+        this.builder.questionTypes = questionTypes
+        this.builder.conditionTags = tags
+        this.builder.parameters = parameters
       } catch (err) {
         this.alert('error', err)
       } finally {

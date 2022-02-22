@@ -314,7 +314,7 @@
           }, {
             click: this.refresh,
             icon: 'mdi-refresh',
-            title: 'refresh'
+            title: 'refresh_app'
           }, {
             showIf: this.isDebug,
             to: { name: 'ServiceTesting' },
