@@ -22,6 +22,7 @@ export function camelToSnake (str: string) {
  * @param {string} str
  * @returns {string}
  */
+
 export function snakeToCamel (str: string) {
   const sections = str.split('_')
   return sections.map((s, i) => {
@@ -31,21 +32,6 @@ export function snakeToCamel (str: string) {
     return s
   }).join('')
 }
-
-/**
- * Converts all properties to snake case and returns
- * @returns {object}
- */
-export function toJSONSnake (obj: object) {
-  const props = Object.getOwnPropertyNames(obj)
-  let o = {}
-  for (let prop of props) {
-    let snake = camelToSnake(prop)
-    o[snake] = obj[prop]
-  }
-  return JSON.stringify(o)
-}
-
 
 /**
  * Take a generic object and assign all properties to this object using camel case property names. If the map is an
@@ -95,10 +81,6 @@ export function mapFromSnakeJSON (target: object, source: object, keyMap: object
  * @returns {AssignerFunction}
  */
 export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpts): AssignerFunction {
-
-  if (opts.hasOwnProperty('constructor') && !opts.constructor) {
-    debugger
-  }
 
   function assign (key: string, to: object, value: any): void {
     if (typeof opts === 'object' && opts.async) {

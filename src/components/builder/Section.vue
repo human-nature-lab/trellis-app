@@ -1,8 +1,13 @@
 <template>
-  <v-col class="section-content mb-8">
-    <div class="section-indicator" />
-    <SectionHeader :section="value" @addPage="addPage" />
-    <div class="">
+  <v-col class="section-content">
+    <div v-if="visible" class="section-indicator" />
+    <SectionHeader
+      :visible.sync="visible"
+      :section="value"
+      @addPage="addPage"
+      @delete="$emit('delete', $event)"
+    />
+    <div v-if="visible">
       <v-col class="pl-4">
         <!-- <draggable
           v-model="value.questionGroups"
@@ -45,6 +50,7 @@ export default Vue.extend({
   data() {
     return {
       isBusy: false,
+      visible: this.value.formSections[0].sortOrder < 3,
     }
   },
   methods: {
@@ -57,8 +63,11 @@ export default Vue.extend({
       delete page.skips
       data.setData('text/json', JSON.stringify({ questionGroup: page.toSnakeJSON() }))
     },
-    addPage() {
-
+    async addPage() {
+      const page = await FormBuilderService.newQuestionGroup(sectionId, null)
+      const s = this.value
+      s.pages.push(page)
+      this.$emit('input', s)
     },
     async updatePage(event: MoveEvent<typeof Page>) {
       const data: { questionGroup: QuestionGroup } = JSON.parse(event.originalEvent.dataTransfer.getData('text/json'))

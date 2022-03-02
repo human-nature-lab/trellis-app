@@ -184,13 +184,7 @@ export default class InterviewManager extends InterviewManagerBase {
     let questionBlueprint: Question = null
     if (action.questionId) {
       questionDatum = this.navigator.getActionQuestionDatum(action)
-      if (!questionDatum) {
-        debugger
-      }
       questionBlueprint = this.questionIndex.get(action.questionId)
-      if (!questionBlueprint) {
-        debugger
-      }
     } else if (action.actionType !== 'next' && action.actionType !== 'previous') {
       console.error(action)
       throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
@@ -446,7 +440,6 @@ export default class InterviewManager extends InterviewManagerBase {
       }
       if (c > 10) {
         console.error(`passed through ${c} pages`)
-        debugger
       }
     } else {
       this.navigator.seekTo({section, sectionRepetition, sectionFollowUpRepetition, page})

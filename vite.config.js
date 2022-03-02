@@ -3,8 +3,10 @@ import path from 'path';
 import { defineConfig } from 'vite'
 import { viteExternalsPlugin } from 'vite-plugin-externals'
 import { createVuePlugin } from 'vite-plugin-vue2'
-import { VuetifyResolver } from 'unplugin-vue-components/resolvers';
-import Components from 'unplugin-vue-components/vite';
+import mdPlugin, { Mode } from 'vite-plugin-markdown'
+// import { VuetifyResolver } from 'unplugin-vue-components/resolvers';
+// import Components from 'unplugin-vue-components/vite';
+import inlineImportPlugin from 'esbuild-plugin-inline-import'
 // import { esbuildDecorators } from '@anatine/esbuild-decorators'
 // import { injectHtml } from 'vite-plugin-html'
 
@@ -20,25 +22,19 @@ export default defineConfig(({ command, mode }) => {
   console.log(`command: ${command}, mode: ${mode}, target: ${process.env.TARGET}`)
   const config = {
     plugins: [
+      {
+        ...inlineImportPlugin({
+          filter: /\.md$/,
+        }),
+        enforce: 'pre',
+      },
       createVuePlugin({
         // target: 'es5',
       }),
       viteExternalsPlugin({
         'config': 'config',
       }),
-      // Components({
-      //   // generate `components.d.ts` global declarations
-      //   dts: true,
-
-      //   // auto import for directives
-      //   directives: false,
-      //   exclude: [/\.vue$/],
-      //   // resolvers for custom components
-      //   resolvers: [
-      //     // Vuetify
-      //     VuetifyResolver(),
-      //   ],
-      // }),
+      mdPlugin({ mode: Mode.VUE }),
     ],
     define: {
       'process.env': {

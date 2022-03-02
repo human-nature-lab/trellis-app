@@ -1,6 +1,6 @@
 <template>
   <v-col class="grey lighten-3 min-h-screen">
-    <v-row v-if="builder.form" no-gutters>
+    <v-row v-if="builder.form" no-gutters class="dheader align-center">
       <div class="title">
         <Translation
           editable
@@ -11,6 +11,7 @@
       </div>
       <v-spacer />
       <BuilderMenu
+        class="mr-6"
         :locale.sync="builder.locale"
         :locked.sync="builder.locked"
         @addSection="addSection"
@@ -44,6 +45,8 @@ import BuilderMenu from '../components/builder/BuilderMenu.vue'
 import { builder } from '../symbols/builder'
 import { study } from '../symbols/main'
 import Parameter from '../entities/trellis/Parameter'
+import GeoType from '../entities/trellis/GeoType'
+import GeoTypeService from '../services/geotype'
 
 export default Vue.extend({
   name: 'FormBuilder',
@@ -58,6 +61,7 @@ export default Vue.extend({
         questionTypes: [] as QuestionType[],
         parameters: [] as Parameter[],
         conditionTags: [] as ConditionTag[],
+        geoTypes: [] as GeoType[],
       },
     }
   },
@@ -102,11 +106,12 @@ export default Vue.extend({
     async load() {
       this.isLoading = true
       try {
-        const [form, tags, questionTypes, parameters] = await Promise.all([
+        const [form, tags, questionTypes, parameters, geoTypes] = await Promise.all([
           FormService.getForm(this.$route.params.formId),
           ConditionTagService.all(),
           FormBuilderService.getQuestionTypes(),
           FormBuilderService.getParameterTypes(),
+          GeoTypeService.allStudyGeoTypes(singleton.study.id),
         ])
         questionTypes.sort((a, b) => a.name.localeCompare(b.name))
         form.sort()
@@ -115,6 +120,7 @@ export default Vue.extend({
         this.builder.questionTypes = questionTypes
         this.builder.conditionTags = tags
         this.builder.parameters = parameters
+        this.builder.geoTypes = geoTypes
       } catch (err) {
         this.alert('error', err)
       } finally {
@@ -134,6 +140,10 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass">
-
+<style lang="sass" scoped>
+ .header
+    background: #f5f5f5
+    top: 0px
+    z-index: 100
+    // width: calc(100% - 10px)
 </style>

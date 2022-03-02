@@ -27,6 +27,20 @@
       color="white"
       @click="$emit('update:showParameters', !showParameters)"
     >{{ $tc('question_parameters_n', value.questionParameters.length) }}</v-chip>
+    <DotsMenu dark>
+      <v-list>
+        <v-list-item
+          @click="$emit('update:showParameters', !showParameters)"
+        >{{ $t(showParameters ? 'hide_parameters' : 'show_parameters') }}</v-list-item>
+        <v-list-item
+          @click="$emit('update:showConditions', !showConditions)"
+        >{{ $t(showConditions ? 'hide_conditions' : 'show_conditions') }}</v-list-item>
+        <v-list-item
+          v-if="allowChoices"
+          @click="$emit('update:showChoices', !showChoices)"
+        >{{ $t(showChoices ? 'hide_choices' : 'show_choices') }}</v-list-item>
+      </v-list>
+    </DotsMenu>
   </v-row>
 </template>
 
@@ -36,15 +50,19 @@ import Vue, { PropType } from 'vue'
 import EditText from './EditText.vue'
 import MenuSelect from './MenuSelect.vue'
 import { builder } from '../../symbols/builder'
+import DotsMenu from './DotsMenu.vue'
 
 export default Vue.extend({
   name: 'QuestionHeader',
   inject: { builder },
-  components: { EditText, MenuSelect, },
+  components: { EditText, MenuSelect, DotsMenu },
   props: {
     value: Object as PropType<Question>,
     loading: Boolean,
     showParameters: Boolean,
+    showConditions: Boolean,
+    showChoices: Boolean,
+    allowChoices: Boolean,
   },
   methods: {
     updateQuestionType(typeId: string) {

@@ -151,9 +151,7 @@ class FileServiceCordova {
       const path = cordova.file.dataDirectory + filePath
       console.log('getFile', path)
       const fs = await this.requestFileSystem()
-      debugger
       fs.root.getFile(filePath, {create: false, exclusive: false}, (file: FileEntry) => {
-        debugger
       }, reject)
     })
   }

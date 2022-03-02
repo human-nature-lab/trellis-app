@@ -28,7 +28,7 @@
 <script>
   import requireAll from '../classes/requireAll'
   import global from '../static/singleton'
-  import Markdown from './Markdown'
+  import Markdown from './Markdown.vue'
 
   const changelog =  requireAll(require.context('../../changelog/', true, /\.md$/))
   export default {

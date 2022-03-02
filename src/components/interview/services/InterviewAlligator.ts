@@ -166,7 +166,6 @@ export default class InterviewAlligator {
       if (section.followUpQuestionId) {
         const sortMethod: SortMethod = section.formSections[0].randomizeFollowUp ? SortMethod.RANDOM : SortMethod.NATURAL
         let data: Datum[] = this.getFollowUpQuestionDatum(section.followUpQuestionId)
-        // debugger
         // console.log('follow up data', data.length)
         // if (!data.length) {
         //   // Marking skipped repeated section

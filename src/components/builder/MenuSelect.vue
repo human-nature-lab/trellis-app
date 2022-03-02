@@ -1,5 +1,5 @@
 <template>
-  <v-menu offset-y v-bind="$attrs" :disabled="disabled" max-height="400">
+  <v-menu offset-y :disabled="disabled" max-height="400">
     <template #activator="{ attrs, on }">
       <v-chip v-bind="attrs" v-on="disabled ? null : on" :color="color">
       {{ selected }}
@@ -23,7 +23,7 @@ export default Vue.extend({
   name: 'MenuSelect',
   props: {
     items: Array,
-    value: Object,
+    value: [Object, String, Number, Symbol],
     disabled: Boolean,
     color: String,
     itemText: {

@@ -45,8 +45,10 @@ export default Vue.extend({
   },
   methods: {
     async save() {
+      if (this.isWorking) return
       try {
         this.isWorking = true
+        // TODO: Need to create new translationText records when none are present already
         const updatedTt = await TranslationTextService.updateTranslatedTextById(this.translationText.id, this.editingValue)
         const t: Translation = this.value.copy()
         t.translationText[this.translationTextIndex] = updatedTt
@@ -67,7 +69,8 @@ export default Vue.extend({
         return ''
       },
       set(val: string) {
-        this.translationText.translatedText = val
+        if (this.translationText)
+          this.translationText.translatedText = val
       }
     },
     translationTextIndex(): number {

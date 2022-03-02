@@ -68,7 +68,6 @@ export default class PhotoServiceCordova extends PhotoServiceAbstract {
   resize (uri: string, quality: number): Promise<string> {
     return new Promise((resolve, reject) => {
       window.ImageResizer.resize({uri, quality}, resolve, err => {
-        debugger
         reject('Failed to resize the image ' + JSON.stringify(err))
       })
     })

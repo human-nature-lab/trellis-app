@@ -34,7 +34,7 @@
 <script>
   /* TODO: Consider adding information about the last upload here. */
   import DateService from '../../services/DateService'
-  import DocsLinkBadge from '../documentation/DocsLinkBadge'
+  import DocsLinkBadge from '../documentation/DocsLinkBadge.vue'
   export default {
     components: {DocsLinkBadge},
     name: 'sync-status',

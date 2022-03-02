@@ -115,8 +115,8 @@
 
 <script>
   import SyncAdminService from '../../../services/SyncAdminService'
-  import UploadLogs from './UploadLogs'
-  import UploadError from './UploadError'
+  import UploadLogs from './UploadLogs.vue'
+  import UploadError from './UploadError.vue'
   import DocsLinkMixin from '../../../mixins/DocsLinkMixin'
   import DocsFiles from '../../documentation/DocsFiles'
   export default {
