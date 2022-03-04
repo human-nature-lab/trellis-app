@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import TranslationTextService from '../services/translation-text/TranslationTextService'
+  import TranslationTextService from '../services/translation-text'
   import TranslationService from '../services/TranslationService'
   import InterpolationService from '../services/InterpolationService'
   import global from '../static/singleton'

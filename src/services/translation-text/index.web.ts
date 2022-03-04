@@ -3,7 +3,7 @@ import { uriTemplate } from '../http/WebUtils'
 import TranslationTextServiceInterface from './TranslationTextServiceInterface'
 import TranslationText from '../../entities/trellis/TranslationText'
 
-export default class TranslationTextServiceWeb implements TranslationTextServiceInterface {
+class TranslationTextServiceWeb implements TranslationTextServiceInterface {
 
   async createTranslationText (translationId: string, translationText: TranslationText): Promise<TranslationText> {
     const res = await http().post(uriTemplate('translation/{id}/translation-text', [translationId]), translationText.toSnakeJSON())
@@ -27,3 +27,5 @@ export default class TranslationTextServiceWeb implements TranslationTextService
   }
 
 }
+
+export default new TranslationTextServiceWeb()

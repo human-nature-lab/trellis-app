@@ -23,7 +23,7 @@
   import Respondent from '../../entities/trellis/Respondent'
   import Geo from '../../entities/trellis/Geo'
   import singleton from '../../static/singleton'
-  import TranslationTextService from '../../services/translation-text/TranslationTextService'
+  import TranslationTextService from '../../services/translation-text'
   import TranslationService from '../../services/TranslationService'
   
   const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props'])

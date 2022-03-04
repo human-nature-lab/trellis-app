@@ -1,9 +1,9 @@
 <template>
   <v-card class="question" :question-id="question.id">
-    <v-card-title class="primary question-title white--text flex justify-end">
-      <v-flex sm6 class="text-right">
+    <v-card-title class="primary question-title white--text flex justify-end py-0">
+      <v-col cols="12" class="text-right">
         {{question.varName}} : {{question.questionType.name}}
-      </v-flex>
+      </v-col>
     </v-card-title>
     <v-alert color="error" v-show="validationError" transition="slide-y-transition">
       {{validationError}}
