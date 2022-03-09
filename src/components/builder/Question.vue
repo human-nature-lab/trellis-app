@@ -35,6 +35,7 @@
           v-model="value.questionParameters"
           :parameters="builder.parameters"
           :conditionTags="builder.conditionTags"
+          :locale="builder.locale"
           :geoTypes="builder.geoTypes"
           :questionId="value.id"
           :choices="value.choices"

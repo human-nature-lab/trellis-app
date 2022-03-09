@@ -9,9 +9,9 @@
     <v-list>
       <v-list-item
         v-for="item in items"
-        :key="item[itemValue]"
+        :key="string ? item : item[itemValue]"
         @click="select(item)"
-      >{{ item[itemText] }}</v-list-item>
+      >{{ string ? item : item[itemText] }}</v-list-item>
     </v-list>
   </v-menu>
 </template>
@@ -37,8 +37,9 @@ export default Vue.extend({
     returnObject: Boolean,
   },
   methods: {
-    select(item: object): void {
-      if (this.returnObject) {
+    select(item: object | string): void {
+      console.log('select', this.string, item)
+      if (this.string || this.returnObject) {
         this.$emit('input', item)
         this.$emit('change', item)
       } else {
@@ -48,7 +49,14 @@ export default Vue.extend({
     },
   },
   computed: {
+    string (): boolean {
+      return this.items ? typeof this.items[0] === 'string' : false
+    },
     selected(): string {
+      console.log('selected')
+      if (this.string) {
+        return this.value
+      }
       for (const item of this.items) {
         if (this.returnObject && item === this.value) {
           return item[this.itemText]

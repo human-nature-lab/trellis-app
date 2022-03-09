@@ -4,21 +4,17 @@
       v-model="value.parameterId"
       :items="parameters"
       :disabled="disabled"
+      :loading="working"
+      @change="onChange"
       item-text="name"
       item-value="id"
     />
     <v-col class="ml-2">
       <v-text-field
-        v-if="isText"
+        v-if="isNumber"
         :readonly="disabled"
         v-model="value.val"
-        :label="$t('value')"
-        @change="onChange"
-      />
-      <v-text-field
-        v-else-if="isNumber"
-        :readonly="disabled"
-        v-model="value.val"
+        :loading="working"
         type="number"
         :label="$t('value')"
         @change="onChange"
@@ -26,17 +22,27 @@
       <v-checkbox
         v-else-if="isBoolean"
         :disabled="disabled"
+        :loading="working"
         v-model="value.val"
         @change="onChange"
       />
-      <v-select
-        v-else-if="isConditionTag"
+      <ChoiceSelector
+        v-else-if="isChoice"
+        :loading="working"
         :disabled="disabled"
         v-model="value.val"
-        :items="conditionTags"
+        :questionChoices="choices"
+        itemValue="val"
+        :locale="locale"
       />
-      <v-select v-else-if="isChoice" :disabled="disabled" v-model="value.val" :items="choices" />
-      <v-select v-else-if="isGeoType" :disabled="disabled" v-model="value.val" :items="geoTypes" />
+      <v-text-field
+        v-else
+        :readonly="disabled"
+        v-model="value.val"
+        :loading="working"
+        :label="$t('value')"
+        @change="onChange"
+      />
     </v-col>
     <v-menu v-if="!disabled">
       <template #activator="{ attrs, on }">
@@ -59,26 +65,50 @@
 <script lang="ts">
 import Parameter, { ParameterType } from '../../entities/trellis/Parameter'
 import Vue, { PropType } from 'vue'
-import QuestionParameter from '../../entities/trellis/QuestionParameter'
+import type QuestionParameter from '../../entities/trellis/QuestionParameter'
 import MenuSelect from './MenuSelect.vue'
-import ConditionTag from '../../entities/trellis/ConditionTag'
-import Choice from '../../entities/trellis/Choice'
-import GeoType from '../../entities/trellis/GeoType'
+import type ConditionTag from '../../entities/trellis/ConditionTag'
+import type Choice from '../../entities/trellis/Choice'
+import type GeoType from '../../entities/trellis/GeoType'
+import builder from '../../services/builder'
+import ChoiceSelector from './ChoiceSelector.vue'
+import type Locale from '../../entities/trellis/Locale'
 
 export default Vue.extend({
   name: 'ParameterRow',
-  components: { MenuSelect },
+  components: { MenuSelect, ChoiceSelector },
   props: {
     value: Object as PropType<QuestionParameter>,
     parameters: Array as PropType<Parameter[]>,
     conditionTags: Array as PropType<ConditionTag[]>,
+    locale: Object as PropType<Locale>,
     choices: Array as PropType<Choice[]>,
     geoTypes: Array as PropType<GeoType[]>,
     disabled: Boolean,
   },
+  data() {
+    return {
+      working: false
+    }
+  },
   methods: {
-    onChange() {
+    async onChange() {
+      this.working = true
+      try {
+        const payload = {
+          id: this.value.id,
+          question_id: this.value.questionId,
+          name: this.parameter?.name,
+          val: this.value.val,
+        }
+        const updated = await builder.createOrUpdateParameter(payload)
+        this.$emit('input', updated)
+        this.$emit('save', updated)
+      } catch (err) {
 
+      } finally {
+        this.working = false
+      }
     }
   },
   computed: {

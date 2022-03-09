@@ -1,7 +1,7 @@
 <template>
   <v-col>
     <v-row no-gutters class="align-center">
-      <h4>{{ $t('assign_conditions') }}</h4>
+      <h4>{{ $t('assigns_conditions') }}</h4>
       <v-spacer />
       <v-tooltip v-if="!disabled" left>
         <template #activator="{ on, attrs }">
@@ -13,13 +13,11 @@
       </v-tooltip>
     </v-row>
     <v-list>
-      <v-list-item v-for="act in value">
-        <v-col cols="3">
-          <v-autocomplete v-model="act.conditionTagId" :readonly="disabled" :items="conditionTags" />
-        </v-col>
-        <v-col cols="9">
-          <EditText editable :locked="disabled" code v-model="act.logic" />
-        </v-col>
+      <v-list-item v-for="(act, index) in value" :ke="act.id">
+        <ConditionRow v-model="value[index]" :disabled="disabled" :conditionTags="conditionTags" />
+      </v-list-item>
+      <v-list-item v-if="placeholder">
+        <ConditionRow v-model="placeholder" :disabled="disabled" :conditionTags="conditionTags" />
       </v-list-item>
     </v-list>
   </v-col>
@@ -27,10 +25,14 @@
 
 <script lang="ts">
 import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
-import ConditionTag from '../../entities/trellis/ConditionTag'
+import type ConditionTag from '../../entities/trellis/ConditionTag'
 import Vue, { PropType } from 'vue'
-import EditText from './EditText.vue'
+import ConditionRow from './ConditionRow.vue'
 
+const defaultLogic = `
+function (vars, api) {
+  return true;
+}`
 export default Vue.extend({
   props: {
     value: Array as PropType<AssignConditionTag[]>,
@@ -38,11 +40,22 @@ export default Vue.extend({
     questionId: String,
     disabled: Boolean,
   },
+  data () {
+    return {
+      placeholder: null as AssignConditionTag,
+    }
+  },
   methods: {
-    async add() {
+    add() {
+      this.placeholder = new AssignConditionTag()
+      this.placeholder.logic = defaultLogic
+      this.placeholder.scope = 'form'
+    },
+    async create () {
+
     },
   },
-  components: { EditText }
+  components: { ConditionRow }
 })
 
 </script>

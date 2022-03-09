@@ -1,5 +1,5 @@
 <template>
-  <TrellisModal title="Web Login" v-model="isOpen" @close="onClose">
+  <TrellisModal title="Web Login" v-model="isOpen" @close="onClose" persistent>
     <LoginForm @login="done" />
   </TrellisModal>
 </template>

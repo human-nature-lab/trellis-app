@@ -7,6 +7,9 @@ import Section from '../../entities/trellis/Section'
 import Question from '../../entities/trellis/Question'
 import Parameter from '../../entities/trellis/Parameter'
 import QuestionChoice from '../../entities/trellis/QuestionChoice'
+import QuestionParameter from '../../entities/trellis/QuestionParameter'
+import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
+import ConditionTag from '../../entities/trellis/ConditionTag'
 
 class FormBuilderService {
   
@@ -57,6 +60,38 @@ class FormBuilderService {
 
   async removeQuestionChoice(choice: QuestionChoice) {
     await builderInst.delete(uriTemplate('choice/{choice_id}', [choice.id]))
+  }
+
+  async updateQuestionChoice(choice: QuestionChoice) {
+    await builderInst.put(uriTemplate('choice/{choice_id}', [choice.id]), choice)
+  }
+  
+  async createOrUpdateParameter (param: { id: string, question_id: string, name: string, val: string }) {
+    const res = await builderInst.post(uriTemplate('question/{question_id}/parameter', [param.question_id]), param)
+    return new QuestionParameter().fromSnakeJSON(res.data.parameter)
+  }
+  
+  async deleteQuestionParameter (param: { id: string }) {
+    await builderInst.delete(uriTemplate('parameter/{parameter_id}', [param.id]))
+  }
+  
+  async createAssignConditionTag (questionId: string, tag: { logic: string, scope: string, condition: ConditionTag }) {
+    const res = await builderInst.post(uriTemplate('question/{question_id}/assign_condition_tag', [questionId]), tag)
+    return new AssignConditionTag().fromSnakeJSON(res.data.assign_condition_tag)
+  }
+
+  async updateAssignConditionTag(questionId: string, tag: { logic: string, scope: string, condition: ConditionTag }) {
+    const res = await builderInst.put(uriTemplate('question/{}/assign_condition_tag', [questionId]), tag)
+    return new AssignConditionTag().fromSnakeJSON(res.data.assign_condition_tag)
+  }
+  
+  async deleteAssignConditionTag(tag: { id: string }) {
+    await builderInst.delete(uriTemplate('condition/{id}', [tag.id]))
+  }
+  
+  async createConditionTag(tag: string) {
+    const res = await builderInst.post('/condition-tag', { tag })
+    return new ConditionTag().fromSnakeJSON(res.data.condition)
   }
 
 }

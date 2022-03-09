@@ -12,7 +12,7 @@
         {{ $t('add_parameter') }}
       </v-tooltip>
     </v-row>
-    <v-list v-if="value && value.length">
+    <v-list>
       <v-list-item v-for="(p, index) in value" :key="p.id">
         <ParameterRow
           v-model="value[index]"
@@ -20,8 +20,22 @@
           :conditionTags="conditionTags"
           :geoTypes="geoTypes"
           :choices="choices"
+          :locale="locale"
           :disabled="disabled"
-          @delete="remove"
+          @delete="remove(p)"
+        />
+      </v-list-item>
+      <v-list-item v-if="placeholder">
+        <ParameterRow
+          v-model="placeholder"
+          :parameters="parameters"
+          :conditionTags="conditionTags"
+          :geoTypes="geoTypes"
+          :choices="choices"
+          :disabled="disabled"
+          :locale="locale"
+          @save="savedPlaceholder"
+          @delete="placeholder = null"
         />
       </v-list-item>
     </v-list>
@@ -29,14 +43,17 @@
 </template>
 
 <script lang="ts">
-import Parameter from '../../entities/trellis/Parameter'
-import ParameterRow from './ParameterRow.vue'
-import QPType from '../../entities/trellis/QuestionParameter'
-import Vue, { PropType } from 'vue'
+import builder from '../../services/builder'
 import MenuSelect from './MenuSelect.vue'
-import ConditionTag from '../../entities/trellis/ConditionTag'
-import Choice from '../../entities/trellis/Choice'
-import GeoType from '../../entities/trellis/GeoType'
+import ParameterRow from './ParameterRow.vue'
+import QuestionParameter from '../../entities/trellis/QuestionParameter'
+import type Choice from '../../entities/trellis/Choice'
+import type ConditionTag from '../../entities/trellis/ConditionTag'
+import type GeoType from '../../entities/trellis/GeoType'
+import type Locale from '../../entities/trellis/Locale'
+import type Parameter from '../../entities/trellis/Parameter'
+import type QPType from '../../entities/trellis/QuestionParameter'
+import Vue, { PropType } from 'vue'
 
 export default Vue.extend({
   name: "QuestionParameters",
@@ -48,18 +65,39 @@ export default Vue.extend({
     choices: Array as PropType<Choice[]>,
     geoTypes: Array as PropType<GeoType[]>,
     questionId: String,
+    locale: Object as PropType<Locale>,
   },
   components: { MenuSelect, ParameterRow },
-  methods: {
-    onChange() {
-
-    },
-    async add() {
-
-    },
-    async remove(p: Parameter) {
-
+  data() {
+    return {
+      working: false,
+      placeholder: null as QuestionParameter
     }
+  },
+  methods: {
+    add() {
+      this.placeholder = new QuestionParameter()
+      this.placeholder.questionId = this.questionId
+      this.placeholder.val = ''
+      this.placeholder.parameterId = this.parameters[0].id
+      console.log(this.placeholder)
+    },
+    async savedPlaceholder (saved: QuestionParameter) {
+      this.$emit('input', this.value.concat([saved]))
+      this.placeholder = null
+    },
+    async remove(p: QuestionParameter) {
+      this.working = true
+      try {
+        await builder.deleteQuestionParameter(p)
+        const index = this.value.indexOf(p)
+        const v = this.value.slice()
+        v.splice(index, 1)
+        this.$emit('input', v)
+      } finally {
+        this.working = false
+      }
+    },
   }
 })
 </script>

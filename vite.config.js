@@ -77,6 +77,8 @@ export default defineConfig(({ command, mode }) => {
     config.resolve.alias['typeorm'] = 'nop-typeorm'
     // config.resolve.alias.push({ find: /typeorm$/, replacement: path.resolve(__dirname, './src/typeorm/nop.ts') })
     config.resolve.extensions = ['.web.ts', '.browser.ts'].concat(config.resolve.extensions)
+  } else {
+    config.resolve.extensions = ['.cordova.ts', '.mobile.ts'].concat(config.resolve.extensions)
   }
   // TODO: customize imports based on the command
   return config

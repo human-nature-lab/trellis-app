@@ -13,32 +13,13 @@
       </v-tooltip>
     </v-row>
     <v-list>
-      <v-list-item v-for="choice in value" :key="choice.id">
-        <v-row no-gutters class="align-center">
-          <v-col cols="1">
-            <v-text-field v-model="choice.choice.val" :readonly="disabled" />
-          </v-col>
-          <v-col cols="10">
-            <Translation
-              v-model="choice.choice.choiceTranslation"
-              :disabled="disabled"
-              editable
-              :locale="locale"
-            />
-          </v-col>
-          <v-col cols="1">
-            <DotsMenu>
-              <v-list>
-                <v-list-item @click="remove(choice)">
-                  <v-list-item-action>
-                    <v-icon>mdi-delete</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>{{ $t('delete') }}</v-list-item-content>
-                </v-list-item>
-              </v-list>
-            </DotsMenu>
-          </v-col>
-        </v-row>
+      <v-list-item v-for="(choice, index) in value" :key="choice.id">
+        <ChoiceRow
+          v-model="value[index]"
+          :locale="locale"
+          :disabled="disabled"
+          @remove="remove(choice)"
+        />
       </v-list-item>
     </v-list>
   </v-col>
@@ -51,6 +32,7 @@ import QuestionChoice from '../../entities/trellis/QuestionChoice'
 import Translation from './Translation.vue'
 import builder from '../../services/builder'
 import DotsMenu from './DotsMenu.vue'
+import ChoiceRow from './ChoiceRow.vue'
 
 export default Vue.extend({
   props: {
@@ -58,6 +40,11 @@ export default Vue.extend({
     locale: Object as PropType<Locale>,
     questionId: String,
     value: Array as PropType<QuestionChoice[]>,
+  },
+  data() {
+    return {
+      working: false,
+    }
   },
   methods: {
     async add() {
@@ -71,7 +58,7 @@ export default Vue.extend({
       this.$emit('input', this.value.slice(0, index).concat(this.value.slice(index + 1)))
     },
   },
-  components: { Translation, DotsMenu }
+  components: { Translation, DotsMenu, ChoiceRow }
 })
 
 </script>

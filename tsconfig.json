@@ -26,6 +26,8 @@
   },
   "include": [
     "./src/**/*",
+    "./src/**/*.mobile.ts",
+    "./src/**/*.web.ts",
     "plugins/cordova-plugin-file/types/index.d.ts"
   ],
   "exclude": [

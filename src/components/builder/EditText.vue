@@ -9,16 +9,16 @@
       @blur="onBlur"
       append-icon="mdi-content-save"
       append-outer-icon="mdi-close"
+      :outlined="outlined"
       @click:append="save"
       @click:append-outer="cancel"
       @keyup.enter="saveEnter"
       v-bind="$attrs"
-      v-on="$listeners"
     />
     <!-- Handle empty values -->
     <span v-else-if="value === ''">
       <slot name="empty" :editable="canEdit" :textarea="textarea">
-        <span v-if="canEdit">
+        <span v-if="canEdit" :class="{ outlined: outlined && canEdit }">
           <v-btn @click="startEdit" :disabled="!canEdit" :text="!textarea">
             {{ missingText }}
             <v-icon class="ml-2">mdi-plus</v-icon>
@@ -31,10 +31,10 @@
     <pre
       v-else-if="code"
       @click="startEdit"
-      :class="{ pointer: canEdit }"
+      :class="{ pointer: canEdit, outlined: outlined && canEdit }"
       v-bind="$attrs"
       v-on="$listeners"
-    ><code>{{ value }}</code></pre>
+    ><code>{{ loading ? copy : value }}</code></pre>
     <!-- Handle non-editable text -->
     <span
       v-else
@@ -42,7 +42,8 @@
       @click="startEdit"
       v-bind="$attrs"
       v-on="$listeners"
-    >{{ value }}</span>
+    >{{ loading ? copy : value }}</span>
+    <v-progress-linear v-if="loading" :height="2" indeterminate />
   </span>
 </template>
 
@@ -59,10 +60,12 @@ export default Vue.extend({
   props: {
     value: String,
     locked: Boolean,
+    loading: Boolean,
     editable: Boolean,
     disabled: Boolean,
     textarea: Boolean,
     code: Boolean,
+    outlined: Boolean,
     missingText: {
       type: String,
       default: () => i18n.t('add_text')
@@ -70,7 +73,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      copy: '',
+      copy: this.value,
       editing: false,
     }
   },
@@ -117,6 +120,8 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass">
-
+<style lang="sass" scoped>
+.outlined
+  border: 2px solid lightgrey
+  border-radius: 5px
 </style>
