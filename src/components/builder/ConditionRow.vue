@@ -1,5 +1,5 @@
 <template>
-  <v-row no-gutters class="align-center text-center">
+  <v-row no-gutters class="align-center text-center justify-center">
     <v-col cols="1">{{$t('assigns')}}</v-col>
     <v-col cols="2">
       <v-combobox
@@ -12,10 +12,10 @@
     </v-col>
     <v-col cols="1">{{$t('to_the') }}</v-col>
     <v-col cols="1">
-      <MenuSelect v-model="value.scope" :items="scopes" @change="update" />
+      <MenuSelect v-model="value.scope" :items="scopes" @change="update" :disabled="disabled" />
     </v-col>
-    <v-col cols="2" class="text-center">{{ $t('if') }}</v-col>
-    <v-col cols="4">
+    <v-col cols="2">{{ $t('if') }}</v-col>
+    <v-col cols="4" class="text-left">
       <EditText
         outlined
         class="mx-1"
