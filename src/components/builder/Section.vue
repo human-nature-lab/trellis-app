@@ -5,8 +5,9 @@
       :visible.sync="visible"
       :section="value"
       @addPage="addPage"
-      @delete="$emit('delete', $event)"
+      @remove="$emit('remove', $event)"
     />
+    <v-progress-linear v-if="working" indeterminate />
     <div v-if="visible">
       <v-col class="pl-4">
         <!-- <draggable
@@ -22,6 +23,7 @@
           :key="page.id"
           ref="pages"
           :index="index"
+          @remove="removePage(page)"
           v-model="value.questionGroups[index]"
         />
         <!-- </draggable> -->
@@ -49,7 +51,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      isBusy: false,
+      working: false,
       visible: this.value.formSections[0].sortOrder < 3,
     }
   },
@@ -57,30 +59,60 @@ export default Vue.extend({
     setData(data: DataTransfer, elem: HTMLElement) {
       console.log('setData', data, elem)
       const pageIndex = this.$refs.pages.findIndex(c => c.$el === elem.__vue__)
-      console.log(pageIndex)
       const page: QuestionGroup = this.value.questionGroups[pageIndex].copy()
       delete page.questions
       delete page.skips
       data.setData('text/json', JSON.stringify({ questionGroup: page.toSnakeJSON() }))
     },
     async addPage() {
-      const page = await FormBuilderService.newQuestionGroup(sectionId, null)
-      const s = this.value
-      s.pages.push(page)
-      this.$emit('input', s)
+      if (this.working) return
+      this.working = true
+      try {
+        const page = await FormBuilderService.newQuestionGroup(this.value.id)
+        const s = this.value
+        s.pages.push(page)
+        this.$emit('input', s)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.working = false
+      }
+    },
+    async removePage(page: QuestionGroup) {
+      if (this.working) return
+      this.working = true
+      try {
+        await FormBuilderService.removeQuestionGroup(page.id)
+        const index = this.value.questionGroups.indexOf(page)
+        if (index >=0) {
+          this.value.questionGroups.splice(index, 1)
+          this.$emit('input', this.value)
+        }
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.working = false
+      }
     },
     async updatePage(event: MoveEvent<typeof Page>) {
-      const data: { questionGroup: QuestionGroup } = JSON.parse(event.originalEvent.dataTransfer.getData('text/json'))
-      if (!data.questionGroup) return false
-      const page = new QuestionGroup().fromSnakeJSON(data.questionGroup)
-      console.log('updatePage', data.questionGroup)
-      data.questionGroup.sectionQuestionGroup[0].sectionId = page
-      data.questionGroup.sectionQuestionGroup[0]
-      await FormBuilderService.updateQuestionGroup(data.questionGroup)
+      if (this.working) return
+      this.working = true
+      try {
+        const data: { questionGroup: QuestionGroup } = JSON.parse(event.originalEvent.dataTransfer.getData('text/json'))
+        if (!data.questionGroup) return false
+        const page = new QuestionGroup().fromSnakeJSON(data.questionGroup)
+        data.questionGroup.sectionQuestionGroup[0].sectionId = page
+        data.questionGroup.sectionQuestionGroup[0]
+        await FormBuilderService.updateQuestionGroup(data.questionGroup)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.working = false
+      }
     },
     async reorderPages(event: { originalEvent: DragEvent, fromIndex: number, toIndex: number }) {
       console.log('reorderPages', event)
-      if (this.isBusy) return
+      if (this.working) return
       const a = this.value.questionGroups[event.fromIndex]
       const b = this.value.questionGroups[event.toIndex]
       try {

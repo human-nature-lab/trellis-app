@@ -13,26 +13,38 @@
       </v-tooltip>
     </v-row>
     <v-list>
-      <v-list-item v-for="(act, index) in value" :ke="act.id">
-        <ConditionRow v-model="value[index]" :disabled="disabled" :conditionTags="conditionTags" />
+      <v-list-item v-for="(act, index) in value" :key="act.id">
+        <ConditionRow
+          :value="value[index]"
+          :disabled="disabled"
+          :loading="workingIndex === index"
+          :conditionTags="conditionTags"
+          @input="update"
+          @delete="remove(act)"
+        />
       </v-list-item>
       <v-list-item v-if="placeholder">
-        <ConditionRow v-model="placeholder" :disabled="disabled" :conditionTags="conditionTags" />
+        <ConditionRow
+          :value="placeholder"
+          :disabled="disabled"
+          :conditionTags="conditionTags"
+          :loading="placeholderWorking"
+          @input="create"
+          @delete="placeholder = null"
+        />
       </v-list-item>
     </v-list>
   </v-col>
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from 'vue'
 import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
 import type ConditionTag from '../../entities/trellis/ConditionTag'
-import Vue, { PropType } from 'vue'
 import ConditionRow from './ConditionRow.vue'
+import builderService from '../../services/builder'
 
-const defaultLogic = `
-function (vars, api) {
-  return true;
-}`
+const defaultLogic = 'function (vars, api) {\n  return true;\n}'
 export default Vue.extend({
   props: {
     value: Array as PropType<AssignConditionTag[]>,
@@ -40,9 +52,11 @@ export default Vue.extend({
     questionId: String,
     disabled: Boolean,
   },
-  data () {
+  data() {
     return {
       placeholder: null as AssignConditionTag,
+      workingIndex: -1,
+      placeholderWorking: false,
     }
   },
   methods: {
@@ -51,8 +65,57 @@ export default Vue.extend({
       this.placeholder.logic = defaultLogic
       this.placeholder.scope = 'form'
     },
-    async create () {
+    async create(act: AssignConditionTag) {
+      if (this.placeholderWorking || !act) return
+      try {
+        this.placeholderWorking = true
+        const res = await builderService.createAssignConditionTag(this.questionId, {
+          logic: act.logic,
+          scope: act.scope,
+          condition: act.conditionTag,
+        })
+        const v = this.value.slice()
+        v.push(res)
+        this.$emit('input', v)
+        this.placeholder = null
+      } catch (err) {
 
+      } finally {
+        this.placeholderWorking = true
+      }
+    },
+    async update(act: AssignConditionTag) {
+      if (this.workingIndex >= 0) return
+      try {
+        this.workingIndex = this.value.findIndex(a => a.id === act.id)
+        const res = await builderService.updateAssignConditionTag(this.questionId, {
+          id: act.id,
+          logic: act.logic,
+          scope: act.scope,
+          condition: act.conditionTag,
+        })
+        const v = this.value.slice()
+        v.splice(this.workingIndex, 1, res)
+        this.$emit('input', v)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.workingIndex = -1
+      }
+    },
+    async remove(act: AssignConditionTag) {
+      if (this.workingIndex >= 0) return
+      try {
+        this.workingIndex = this.value.indexOf(act)
+        await builderService.deleteAssignConditionTag(act)
+        const v = this.value.slice()
+        v.splice(this.workingIndex, 1)
+        this.$emit('input', v)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.workingIndex = -1
+      }
     },
   },
   components: { ConditionRow }

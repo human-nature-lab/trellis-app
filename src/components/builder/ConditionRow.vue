@@ -1,48 +1,46 @@
 <template>
-  <v-row no-gutters class="align-center text-center justify-center">
-    <v-col cols="1">{{$t('assigns')}}</v-col>
-    <v-col cols="2">
-      <v-combobox
-        class="mx-1"
-        :value="value.conditionTag"
-        :readonly="disabled"
-        :items="conditionTags"
-        @change="updateConditionTag"
-      />
-    </v-col>
-    <v-col cols="1">{{$t('to_the') }}</v-col>
-    <v-col cols="1">
-      <MenuSelect v-model="value.scope" :items="scopes" @change="update" :disabled="disabled" />
-    </v-col>
-    <v-col cols="2">{{ $t('if') }}</v-col>
-    <v-col cols="4" class="text-left">
-      <EditText
-        outlined
-        class="mx-1"
-        editable
-        :locked="disabled"
-        code
-        auto-grow
-        textarea
-        v-model="value.logic"
-        @change="update"
-      />
-    </v-col>
-    <v-col cols="1" class="text-right">
-      <DotsMenu>
-        <v-list>
-          <v-list-item @click="$emit('delete')">
-            <v-list-item-icon>
-              <v-icon>mdi-delete</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              {{$t('delete')}}
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </DotsMenu>
-    </v-col>
-  </v-row>
+  <v-col>
+    <v-row no-gutters class="align-center text-center justify-center">
+      <v-col cols="1">{{ $t('assigns') }}</v-col>
+      <v-col cols="2">
+        <v-combobox
+          class="mx-1"
+          :value="value.conditionTag"
+          :readonly="disabled"
+          :items="conditionTags"
+          item-text="name"
+          @change="updateConditionTag"
+        />
+      </v-col>
+      <v-col cols="1">{{ $t('to_the') }}</v-col>
+      <v-col cols="2">
+        <MenuSelect
+          v-model="value.scope"
+          :items="scopes"
+          @change="update({ ...value })"
+          :disabled="disabled"
+        />
+      </v-col>
+      <v-col cols="1">{{ $t('if') }}</v-col>
+      <v-col cols="4" class="text-left">
+        <EditText
+          outlined
+          class="mx-1"
+          editable
+          :locked="disabled"
+          code
+          auto-grow
+          textarea
+          v-model="value.logic"
+          @save="updateLogic"
+        />
+      </v-col>
+      <v-col cols="1" class="text-right">
+        <DotsMenu removable @remove="$emit('remove')" />
+      </v-col>
+    </v-row>
+    <v-progress-linear v-if="loading || working" indeterminate />
+  </v-col>
 </template>
 
 <script lang="ts">
@@ -60,6 +58,7 @@ export default Vue.extend({
     value: Object as PropType<AssignConditionTag>,
     conditionTags: Array as PropType<ConditionTag[]>,
     disabled: Boolean,
+    loading: Boolean,
   },
   data() {
     return {
@@ -70,21 +69,32 @@ export default Vue.extend({
   components: { EditText, MenuSelect, DotsMenu },
   methods: {
     async updateConditionTag(newVal: string | ConditionTag) {
+      console.log('updateConditionTag', newVal)
       if (this.working) return
       if (typeof newVal === 'string') {
         try {
-           this.working = true
-           this.$emit('input', await builder.createConditionTag(newVal))
+          this.working = true
+          const val = this.value.copy()
+          val.conditionTag = await builder.createConditionTag(newVal)
+          val.conditionTagId = val.conditionTag.id
+          this.update(val)
+        } catch (err) {
+          this.logError(err)
         } finally {
           this.working = false
         }
       } else {
-        this.update()
+        const v = this.value.copy()
+        v.conditionTag = newVal
+        v.conditionTagId = newVal.id
+        this.update(v)
       }
     },
-    async update () {
-      console.log('update', arguments)
-      this.$emit('input', this.value)
+    async update(val: AssignConditionTag) {
+      this.$emit('input', val)
+    },
+    updateLogic(logic: string) {
+      this.update({ ...this.value, logic })
     }
   }
 })

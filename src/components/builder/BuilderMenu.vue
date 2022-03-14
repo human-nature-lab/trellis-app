@@ -8,7 +8,7 @@
         </v-list-item-action>
         {{ locked ? $t('locked') : $t('unlocked') }}
       </v-list-item>
-      <v-list-item @click="$emit('addSection')">
+      <v-list-item @click="$emit('addSection')" :disabled="locked">
         <v-list-item-action>
           <v-icon>mdi-plus</v-icon>
         </v-list-item-action>

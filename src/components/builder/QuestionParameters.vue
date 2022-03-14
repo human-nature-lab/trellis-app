@@ -82,7 +82,7 @@ export default Vue.extend({
       this.placeholder.parameterId = this.parameters[0].id
       console.log(this.placeholder)
     },
-    async savedPlaceholder (saved: QuestionParameter) {
+    async savedPlaceholder(saved: QuestionParameter) {
       this.$emit('input', this.value.concat([saved]))
       this.placeholder = null
     },
@@ -94,6 +94,8 @@ export default Vue.extend({
         const v = this.value.slice()
         v.splice(index, 1)
         this.$emit('input', v)
+      } catch (err) {
+        this.logError(err)
       } finally {
         this.working = false
       }

@@ -1,30 +1,29 @@
 <template>
-  <v-row no-gutters class="align-center">
-    <v-col cols="1">
-      <v-text-field v-model="value.choice.val" :readonly="disabled" @change="update" :loading="working" />
-    </v-col>
-    <v-col cols="10">
-      <Translation
-        v-model="value.choice.choiceTranslation"
-        :disabled="disabled"
-        :loading="working"
-        editable
-        :locale="locale"
-      />
-    </v-col>
-    <v-col cols="1">
-      <DotsMenu>
-        <v-list>
-          <v-list-item @click="$emit('remove')">
-            <v-list-item-action>
-              <v-icon>mdi-delete</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>{{ $t('delete') }}</v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </DotsMenu>
-    </v-col>
-  </v-row>
+  <v-col>
+    <v-row no-gutters class="align-center">
+      <v-col cols="1">
+        <v-text-field
+          v-model="value.choice.val"
+          :readonly="busy || disabled"
+          @change="update"
+          :label="$t('value')"
+          hide-details
+        />
+      </v-col>
+      <v-col cols="10">
+        <Translation
+          v-model="value.choice.choiceTranslation"
+          :disabled="disabled"
+          editable
+          :locale="locale"
+        />
+      </v-col>
+      <v-col cols="1" class="text-right">
+        <DotsMenu :disabled="disabled" removable @remove="$emit('remove')" />
+      </v-col>
+    </v-row>
+    <v-progress-linear v-if="busy" indeterminate />
+  </v-col>
 </template>
 
 <script lang="ts">
@@ -40,29 +39,32 @@ export default Vue.extend({
   props: {
     value: Object as PropType<QuestionChoice>,
     locale: Object as PropType<Locale>,
+    loading: Boolean,
     disabled: Boolean,
   },
   data() {
     return {
       working: false
-    };
+    }
   },
   methods: {
     async update() {
       this.working = true;
       try {
-        await builder.updateQuestionChoice(this.value);
+        await builder.updateQuestionChoice({ questionChoiceId: this.value.id, val: this.value.choice.val });
         this.$emit("input", this.value);
-      }
-      finally {
+      } catch (err) {
+        this.logError(err)
+      } finally {
         this.working = false;
       }
     },
   },
+  computed: {
+    busy(): boolean {
+      return this.working || this.loading
+    }
+  },
   components: { DotsMenu, Translation }
 })
 </script>
-
-<style lang="sass">
-
-</style>

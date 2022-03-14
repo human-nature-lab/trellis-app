@@ -42,7 +42,7 @@ export default Vue.mixin({
         this.alert('info', i18n.t('not_logged_in'), { unique: true })
       }
       return !isAuthError
-    }
+    },
   },
   computed: {
     isWeb(): boolean {

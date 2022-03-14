@@ -17,29 +17,28 @@
     />
     <v-spacer />
     <v-chip
-      v-if="value.assignConditionTags && value.assignConditionTags.length"
+      v-if="!showConditions && value.assignConditionTags && value.assignConditionTags.length"
       color="white"
       class="black--text"
       label
-    >{{ $t('assigns_condition_tags', ['"' + value.assignConditionTags.map(act => act.conditionTag.name).join('","') + '"']) }}</v-chip>
+      @click="$emit('update:showConditions', true)"
+    >{{ $t('assigns_condition_tags', ['"' + value.assignConditionTags.map(act => act.conditionTag ? act.conditionTag.name : 'Unknown').join('","') + '"']) }}</v-chip>
     <v-chip
-      v-if="value.questionParameters && value.questionParameters.length"
+      v-if="!showParameters && value.questionParameters && value.questionParameters.length"
       color="white"
       @click="$emit('update:showParameters', !showParameters)"
     >{{ $tc('question_parameters_n', value.questionParameters.length) }}</v-chip>
-    <DotsMenu dark>
-      <v-list>
-        <v-list-item
-          @click="$emit('update:showParameters', !showParameters)"
-        >{{ $t(showParameters ? 'hide_parameters' : 'show_parameters') }}</v-list-item>
-        <v-list-item
-          @click="$emit('update:showConditions', !showConditions)"
-        >{{ $t(showConditions ? 'hide_conditions' : 'show_conditions') }}</v-list-item>
-        <v-list-item
-          v-if="allowChoices"
-          @click="$emit('update:showChoices', !showChoices)"
-        >{{ $t(showChoices ? 'hide_choices' : 'show_choices') }}</v-list-item>
-      </v-list>
+    <DotsMenu :disabled="builder.locked" dark removable @remove="$emit('remove')">
+      <v-list-item
+        @click="$emit('update:showParameters', !showParameters)"
+      >{{ $t(showParameters ? 'hide_parameters' : 'show_parameters') }}</v-list-item>
+      <v-list-item
+        @click="$emit('update:showConditions', !showConditions)"
+      >{{ $t(showConditions ? 'hide_conditions' : 'show_conditions') }}</v-list-item>
+      <v-list-item
+        v-if="allowChoices"
+        @click="$emit('update:showChoices', !showChoices)"
+      >{{ $t(showChoices ? 'hide_choices' : 'show_choices') }}</v-list-item>
     </DotsMenu>
   </v-row>
 </template>

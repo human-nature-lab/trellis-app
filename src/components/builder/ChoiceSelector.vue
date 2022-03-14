@@ -1,10 +1,13 @@
 <template>
   <v-select
+    v-on="$listeners"
     :value="value"
+    :label="$t('choice')"
     @input="$emit('input', $event)"
     :items="choices ? choices : qChoices"
     :disabled="disabled"
     :loading="loading"
+    hide-details
     :item-value="itemValue"
   >
     <template #item="{ item }">

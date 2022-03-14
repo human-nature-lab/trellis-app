@@ -1,65 +1,54 @@
 <template>
-  <v-row class="align-center">
-    <MenuSelect
-      v-model="value.parameterId"
-      :items="parameters"
-      :disabled="disabled"
-      :loading="working"
-      @change="onChange"
-      item-text="name"
-      item-value="id"
-    />
-    <v-col class="ml-2">
-      <v-text-field
-        v-if="isNumber"
-        :readonly="disabled"
-        v-model="value.val"
-        :loading="working"
-        type="number"
-        :label="$t('value')"
-        @change="onChange"
-      />
-      <v-checkbox
-        v-else-if="isBoolean"
+  <v-col class="ma-0">
+    <v-row class="align-center">
+      <MenuSelect
+        v-model="value.parameterId"
+        :items="parameters"
         :disabled="disabled"
-        :loading="working"
-        v-model="value.val"
         @change="onChange"
+        item-text="name"
+        item-value="id"
       />
-      <ChoiceSelector
-        v-else-if="isChoice"
-        :loading="working"
-        :disabled="disabled"
-        v-model="value.val"
-        :questionChoices="choices"
-        itemValue="val"
-        :locale="locale"
-      />
-      <v-text-field
-        v-else
-        :readonly="disabled"
-        v-model="value.val"
-        :loading="working"
-        :label="$t('value')"
-        @change="onChange"
-      />
-    </v-col>
-    <v-menu v-if="!disabled">
-      <template #activator="{ attrs, on }">
-        <v-btn icon v-bind="attrs" v-on="on">
-          <v-icon>mdi-dots-vertical</v-icon>
-        </v-btn>
-      </template>
-      <v-list>
-        <v-list-item @click="$emit('delete')">
-          <v-list-item-action>
-            <v-icon color="error">mdi-delete</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>{{ $t('delete') }}</v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-menu>
-  </v-row>
+      <v-col class="ml-2">
+        <v-text-field
+          v-if="isNumber"
+          :readonly="disabled"
+          v-model="value.val"
+          type="number"
+          :label="$t('value')"
+          @change="onChange"
+          hide-details
+        />
+        <v-checkbox
+          v-else-if="isBoolean"
+          :disabled="disabled"
+          v-model="value.val"
+          hide-details
+          @change="onChange"
+        />
+        <ChoiceSelector
+          v-else-if="isChoice"
+          :disabled="disabled"
+          v-model="value.val"
+          @change="onChange"
+          :questionChoices="choices"
+          itemValue="val"
+          hide-details
+          :locale="locale"
+        />
+        <v-text-field
+          v-else
+          :readonly="disabled"
+          v-model="value.val"
+          :label="$t('value')"
+          hide-details
+          @change="onChange"
+        />
+      </v-col>
+      <DotsMenu v-if="!disabled" removable @remove="$emit('delete')" />
+    </v-row>
+    <v-progress-linear v-if="working" indeterminate />
+  </v-col>
 </template>
 
 <script lang="ts">
@@ -73,10 +62,11 @@ import type GeoType from '../../entities/trellis/GeoType'
 import builder from '../../services/builder'
 import ChoiceSelector from './ChoiceSelector.vue'
 import type Locale from '../../entities/trellis/Locale'
+import DotsMenu from './DotsMenu.vue'
 
 export default Vue.extend({
   name: 'ParameterRow',
-  components: { MenuSelect, ChoiceSelector },
+  components: { MenuSelect, ChoiceSelector, DotsMenu },
   props: {
     value: Object as PropType<QuestionParameter>,
     parameters: Array as PropType<Parameter[]>,
@@ -93,23 +83,23 @@ export default Vue.extend({
   },
   methods: {
     async onChange() {
+      if (this.working) return
       this.working = true
       try {
-        const payload = {
+        const updated = await builder.createOrUpdateParameter({
           id: this.value.id,
           question_id: this.value.questionId,
           name: this.parameter?.name,
           val: this.value.val,
-        }
-        const updated = await builder.createOrUpdateParameter(payload)
+        })
         this.$emit('input', updated)
         this.$emit('save', updated)
       } catch (err) {
-
+        this.logError(err)
       } finally {
         this.working = false
       }
-    }
+    },
   },
   computed: {
     parameter(): Parameter {

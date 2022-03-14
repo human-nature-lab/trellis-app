@@ -7,6 +7,7 @@
       :showChoices.sync="showChoices"
       :allowChoices="isChoiceType"
       @change="updateQuestion"
+      @remove="$emit('remove')"
       :loading="isWorking"
     />
     <v-col class="question-content">
@@ -45,6 +46,7 @@
         <QuestionConditions
           v-if="showConditions"
           :questionId="value.id"
+          :conditionTags="builder.conditionTags"
           :disabled="builder.locked"
           v-model="value.assignConditionTags"
         />
@@ -77,9 +79,9 @@ export default Vue.extend({
   data() {
     return {
       isWorking: false,
-      showParameters: true,
-      showChoices: true,
-      showConditions: true,
+      showParameters: this.value && !!this.value.questionParameters.length,
+      showChoices: this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select,
+      showConditions: this.value && !!this.value.assignConditionTags.length,
     }
   },
   methods: {

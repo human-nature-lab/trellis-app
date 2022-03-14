@@ -19,11 +19,12 @@
       />
     </v-row>
     <v-progress-linear v-if="isLoading" indeterminate />
-    <v-col v-else>
+    <v-col v-if="builder.form">
       <Section
         v-for="(section, index) in builder.form.sections"
         :key="section.id"
         v-model="builder.form.sections[index]"
+        @remove="removeSection(section)"
       />
     </v-col>
   </v-col>
@@ -31,6 +32,7 @@
 
 <script lang="ts">
 import Form from '../entities/trellis/Form'
+import SectionModel from '../entities/trellis/Section'
 import Vue from 'vue'
 import FormService from '../services/form/FormService'
 import ConditionTagService from '../services/condition-tag'
@@ -38,7 +40,7 @@ import Section from '../components/builder/Section.vue'
 import singleton from '../static/singleton'
 import ConditionTag from '../entities/trellis/ConditionTag'
 import QuestionType from '../entities/trellis/QuestionType'
-import FormBuilderService from '../services/builder'
+import builderService from '../services/builder'
 import TrellisModal from '../components/TrellisModal.vue'
 import Translation from '../components/builder/Translation.vue'
 import BuilderMenu from '../components/builder/BuilderMenu.vue'
@@ -53,7 +55,7 @@ export default Vue.extend({
   components: { Section, TrellisModal, Translation, BuilderMenu },
   data() {
     return {
-      isLoading: false,
+      isLoading: true,
       builder: {
         form: null as Form,
         locale: singleton.locale ? singleton.locale.copy() : null,
@@ -70,34 +72,6 @@ export default Vue.extend({
       [builder]: this.builder,
       [study]: Vue.observable(singleton.study),
     }
-    // const p = {}
-    // Object.defineProperties(p, {
-    //   [form]: {
-    //     enumerable: true,
-    //     get: () => this.form,
-    //   },
-    //   [study]: {
-    //     enumerable: true,
-    //     get: () => singleton.study,
-    //   },
-    //   [locale]: {
-    //     enumerable: true,
-    //     get: () => this.locale,
-    //   },
-    //   [builder]: {
-    //     enumerable: true,
-    //     get: () => this.builder,
-    //   },
-    //   [questionTypes]: {
-    //     enumerable: true,
-    //     get: () => this.questionTypes,
-    //   },
-    //   [conditionTags]: {
-    //     enumerable: true,
-    //     get: () => this.conditionTags,
-    //   },
-    // })
-    // return p
   },
   created() {
     this.load()
@@ -109,29 +83,48 @@ export default Vue.extend({
         const [form, tags, questionTypes, parameters, geoTypes] = await Promise.all([
           FormService.getForm(this.$route.params.formId),
           ConditionTagService.all(),
-          FormBuilderService.getQuestionTypes(),
-          FormBuilderService.getParameterTypes(),
+          builderService.getQuestionTypes(),
+          builderService.getParameterTypes(),
           GeoTypeService.allStudyGeoTypes(singleton.study.id),
         ])
         questionTypes.sort((a, b) => a.name.localeCompare(b.name))
         form.sort()
         parameters.sort((a, b) => a.name.localeCompare(b.name))
+        tags.sort((a, b) => a.name.localeCompare(b.name))
         this.builder.form = form
         this.builder.questionTypes = questionTypes
         this.builder.conditionTags = tags
         this.builder.parameters = parameters
         this.builder.geoTypes = geoTypes
       } catch (err) {
-        this.alert('error', err)
+        this.logError(err)
       } finally {
         this.isLoading = false
       }
     },
     async addSection() {
+      if (this.isLoading) return
       this.isLoading = true
       try {
-        const section = await FormService.createSection(this.$route.params.formId)
+        const section = await builderService.createSection(this.$route.params.formId, { sort_order: this.builder.form.sections.length })
+        console.log(JSON.stringify(section))
         this.builder.form.sections.push(section)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.isLoading = false
+      }
+    },
+    async removeSection(section: SectionModel) {
+      this.isLoading = true
+      try {
+        await builderService.removeSection(section.id)
+        const index = this.builder.form.sections.indexOf(section)
+        if (index > -1) {
+          this.builder.form.sections.splice(index, 1)
+        }
+      } catch (err) {
+        this.logError(err)
       } finally {
         this.isLoading = false
       }
@@ -141,9 +134,10 @@ export default Vue.extend({
 </script>
 
 <style lang="sass" scoped>
- .header
-    background: #f5f5f5
-    top: 0px
-    z-index: 100
+
+.header
+  background: #f5f5f5
+  top: 0px
+  z-index: 100
     // width: calc(100% - 10px)
 </style>

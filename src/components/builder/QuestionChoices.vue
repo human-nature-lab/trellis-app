@@ -18,6 +18,7 @@
           v-model="value[index]"
           :locale="locale"
           :disabled="disabled"
+          :loading="workingIndex === index"
           @remove="remove(choice)"
         />
       </v-list-item>
@@ -31,7 +32,6 @@ import Locale from '../../entities/trellis/Locale'
 import QuestionChoice from '../../entities/trellis/QuestionChoice'
 import Translation from './Translation.vue'
 import builder from '../../services/builder'
-import DotsMenu from './DotsMenu.vue'
 import ChoiceRow from './ChoiceRow.vue'
 
 export default Vue.extend({
@@ -43,22 +43,34 @@ export default Vue.extend({
   },
   data() {
     return {
-      working: false,
+      workingIndex: -1,
     }
   },
   methods: {
     async add() {
-      const choice = await builder.createQuestionChoice(this.questionId)
-      debugger
-      this.$emit('input', this.value.concat(choice))
+      try {
+        const choice = await builder.createQuestionChoice(this.questionId)
+        this.$emit('input', this.value.concat(choice))
+      } catch (err) {
+        this.logError(err)
+      }
     },
     async remove(choice: QuestionChoice) {
-      await builder.removeQuestionChoice(choice)
-      const index = this.value.indexOf(choice)
-      this.$emit('input', this.value.slice(0, index).concat(this.value.slice(index + 1)))
+      if (this.workingIndex >= 0) return
+      this.workingIndex = this.value.indexOf(choice)
+      try {
+        await builder.removeQuestionChoice(choice)
+        const v = this.value.slice()
+        v.splice(this.workingIndex, 1)
+        this.$emit('input', v)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.workingIndex = -1
+      }
     },
   },
-  components: { Translation, DotsMenu, ChoiceRow }
+  components: { Translation, ChoiceRow }
 })
 
 </script>
