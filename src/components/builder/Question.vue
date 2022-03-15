@@ -8,7 +8,7 @@
       :allowChoices="isChoiceType"
       @change="updateQuestion"
       @remove="$emit('remove')"
-      :loading="isWorking"
+      :loading="working"
     />
     <v-col class="question-content">
       <Translation
@@ -67,6 +67,7 @@ import { builder } from '../../symbols/builder'
 import QuestionChoices from './QuestionChoices.vue'
 import questionTypes from '../../static/question.types'
 import QuestionConditions from './QuestionConditions.vue'
+import builderService from '../../services/builder'
 
 export default Vue.extend({
   name: 'Question',
@@ -78,7 +79,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      isWorking: false,
+      working: false,
       showParameters: this.value && !!this.value.questionParameters.length,
       showChoices: this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select,
       showConditions: this.value && !!this.value.assignConditionTags.length,
@@ -86,11 +87,14 @@ export default Vue.extend({
   },
   methods: {
     async updateQuestion() {
-      this.isWorking = true
+      if (this.working) return
+      this.working = true
       try {
-
+        await builderService.updateQuestion(this.value)
+      } catch (err) {
+        this.logError(err)
       } finally {
-        this.isWorking = false
+        this.working = false
       }
     }
   },

@@ -12,20 +12,28 @@
       </div>
       <v-spacer />
       <v-chip
-        v-if="followUpId"
+        v-if="followUpId && !showFollowUp"
       >{{ $t('follow_up_to', builder.locale.languageTag, [questions[followUpId] ? questions[followUpId].varName : 'Loading...']) }}</v-chip>
-      <v-chip v-if="isRepeatable">{{ $tc('repeated', maxRepetitions, builder.locale.languageTag) }}</v-chip>
+      <v-chip v-if="isRepeatable && !showRepeated">{{ $tc('repeated', maxRepetitions, builder.locale.languageTag) }}</v-chip>
       <DotsMenu :disabled="builder.locked" removable @remove="$emit('remove')">
-        <v-list-item
-          :disabled="builder.locked"
-          @click="$emit('addPage')"
-        >
+        <v-list-item :disabled="builder.locked" @click="$emit('addPage')">
           <v-list-item-icon>
             <v-icon>mdi-plus</v-icon>
           </v-list-item-icon>
-          <v-list-item-content>{{ $t('add_page', builder.locale.languageTag) }}</v-list-item-content></v-list-item>
-        <v-list-item>{{ $t('show_follow_up', builder.locale.languageTag) }}</v-list-item>
-        <v-list-item>{{ $tc('repeated', maxRepetitions, builder.locale.languageTag) }}</v-list-item>
+          <v-list-item-content>{{ $t('add_page', builder.locale.languageTag) }}</v-list-item-content>
+        </v-list-item>
+        <ToggleItem
+          :value="showFollowUp"
+          @input="$emit('update:showFollowUp', $event)"
+          :onTitle="$t('hide_follow_up')"
+          :offTitle="$t('show_follow_up')"
+        />
+        <ToggleItem
+          :value="showRepeated"
+          @input="$emit('update:showRepeated', $event)"
+          :onTitle="$t('hide_repeated')"
+          :offTitle="$t('show_repeated')"
+        />
       </DotsMenu>
     </v-row>
     <v-row class="ml-8 ma-0 pa-0" no-gutters v-if="!visible">
@@ -42,15 +50,18 @@ import Translation from './Translation.vue'
 import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
 import { builder } from '../../symbols/builder'
 import DotsMenu from './DotsMenu.vue'
+import ToggleItem from './ToggleItem.vue'
 
 export default Vue.extend({
   name: 'SectionHeader',
   mixins: [FormQuestionsMixin],
-  components: { Translation, DotsMenu },
+  components: { Translation, DotsMenu, ToggleItem },
   inject: { builder },
   props: {
     section: Object as PropOptions<Section>,
     visible: Boolean,
+    showFollowUp: Boolean,
+    showRepeated: Boolean,
   },
   methods: {
     setVisible(val: boolean) {

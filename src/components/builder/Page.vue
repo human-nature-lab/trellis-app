@@ -8,16 +8,11 @@
         <v-spacer />
         <v-chip
           class="mr-2"
-          v-if="value.skips"
+          v-if="!showSkips"
           @click="showSkips = !showSkips"
         >{{ $tc('skip_count', value.skips.length) }}</v-chip>
         <DotsMenu :disabled="builder.locked" removable @remove="$emit('remove')">
-          <v-list-item @click="showSkips = !showSkips">
-            <v-list-item-icon>
-              <v-icon>mdi-eye</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>{{ $t('show_skips') }}</v-list-item-content>
-          </v-list-item>
+          <ToggleItem v-model="showSkips" :onTitle="$t('hide_skips')" :offTitle="$t('show_skips')" />
           <v-list-item :disabled="builder.locked" @click="addQuestion">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
@@ -29,24 +24,13 @@
       <v-progress-linear v-if="working" indeterminate />
     </template>
     <v-slide-y-transition>
-      <v-col v-if="showSkips">
-        <SkipRow
-          v-for="(skip, index) in value.skips"
-          :key="skip.id"
-          v-model="value.skips[index]"
-          :disabled="builder.locked"
-          :conditionTags="builder.conditionTags"
-        />
-
-        <!-- <SkipEditor
-          :disabled="builder.locked"
-          :skips="value.skips"
-          :conditionTags="builder.conditionTags"
-          subject="page"
-          :newSkip="newSkip"
-          :deleteSkip="deleteSkip"
-        />-->
-      </v-col>
+      <PageSkips
+        v-if="showSkips"
+        v-model="value.skips"
+        :pageId="value.id"
+        :disabled="builder.locked"
+        :conditionTags="builder.conditionTags"
+      />
     </v-slide-y-transition>
     <!-- <draggable
         tag="div"
@@ -77,11 +61,13 @@ import TCard from '../styles/TCard.vue'
 import { builder } from '../../symbols/builder'
 import DotsMenu from './DotsMenu.vue'
 import builderService from '../../services/builder'
+import PageSkips from './PageSkips.vue'
+import ToggleItem from './ToggleItem.vue'
 
 export default Vue.extend({
   name: 'Page',
   inject: { builder },
-  components: { Question, draggable, SkipEditor, TCard, SkipRow, DotsMenu },
+  components: { Question, draggable, SkipEditor, TCard, SkipRow, DotsMenu, PageSkips, ToggleItem },
   props: {
     value: Object as PropOptions<QuestionGroup>,
     index: Number,

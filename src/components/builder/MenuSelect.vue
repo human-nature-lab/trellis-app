@@ -23,7 +23,7 @@ export default Vue.extend({
   name: 'MenuSelect',
   props: {
     items: Array,
-    value: [Object, String, Number, Symbol],
+    value: [Object, String, Number, Symbol, Boolean],
     disabled: Boolean,
     color: String,
     itemText: {

@@ -10,6 +10,8 @@ import QuestionChoice from '../../entities/trellis/QuestionChoice'
 import QuestionParameter from '../../entities/trellis/QuestionParameter'
 import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'
+import Skip from '../../entities/trellis/Skip'
+import QuestionGroupSkip from '../../entities/trellis/QuestionGroupSkip'
 
 class FormBuilderService {
 
@@ -17,7 +19,6 @@ class FormBuilderService {
     const res = await adminInst.get('/question/type')
     return res.data.questionTypes.map(t => new QuestionType().fromSnakeJSON(t))
   }
-
 
   async updateSectionQuestionGroup(sqg: SectionQuestionGroup): Promise<SectionQuestionGroup> {
     const res = await builderInst.put(uriTemplate('/section-group/{id}', [sqg.id]), sqg)
@@ -105,6 +106,24 @@ class FormBuilderService {
   async createConditionTag(tag: string) {
     const res = await builderInst.post('/condition-tag', { tag })
     return new ConditionTag().fromSnakeJSON(res.data.condition)
+  }
+
+  async createPageSkip (pageId: string, data: { show_hide: boolean, any_all: boolean, precedence: number, conditions: { condition_tag_name: string }[]}) {
+    const res = await builderInst.post(uriTemplate('/group/{page}/skip', [pageId]), data)
+    return new Skip().fromSnakeJSON(res.data.question_group_skip.skip)
+  }
+  
+  async updateSkip (skip: Skip, conditionTags?: string[]) {
+    const data = skip.toSnakeJSON({ includeRelationships: true })
+    if (conditionTags) {
+      data.conditions = conditionTags.map(c => ({ condition_tag_name: c }))
+    }
+    const res = await builderInst.put(uriTemplate('/skip/{skip}', [skip.id]), data)
+    return new Skip().fromSnakeJSON(res.data.skip)
+  }
+  
+  async removePageSkip (skipId: string) {
+    return builderInst.delete(uriTemplate('/group/skip/{id}', [skipId]))
   }
 
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-col class="translation">
+  <v-col class="translation" v-bind="$attrs">
     <EditText
       :class="{ code: isCode }"
       :value="editingValue"

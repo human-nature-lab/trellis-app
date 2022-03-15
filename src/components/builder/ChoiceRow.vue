@@ -1,28 +1,27 @@
 <template>
-  <v-col>
-    <v-row no-gutters class="align-center">
-      <v-col cols="1">
+  <v-col class="px-0">
+    <v-row no-gutters class="align-end">
+      <v-col cols="2" class="px-0">
         <v-text-field
           v-model="value.choice.val"
           :readonly="busy || disabled"
           @change="update"
           :label="$t('value')"
           hide-details
+          dense
         />
       </v-col>
-      <v-col cols="10">
-        <Translation
-          v-model="value.choice.choiceTranslation"
-          :disabled="disabled"
-          editable
-          :locale="locale"
-        />
-      </v-col>
-      <v-col cols="1" class="text-right">
-        <DotsMenu :disabled="disabled" removable @remove="$emit('remove')" />
+      <Translation
+        cols="9"
+        v-model="value.choice.choiceTranslation"
+        :disabled="disabled"
+        editable
+        :locale="locale"
+      />
+      <v-col cols="1" class="px-0 text-right">
+        <DotsMenu :disabled="disabled" removable @remove="$emit('remove')" :loading="loading || working" />
       </v-col>
     </v-row>
-    <v-progress-linear v-if="busy" indeterminate />
   </v-col>
 </template>
 

@@ -1,8 +1,9 @@
 <template>
   <v-menu left offset-x>
     <template #activator="{ on, attrs }">
-      <v-btn class="ml-3" text icon v-on="on" v-bind="{ ...attrs, ...$attrs }">
-        <v-icon>mdi-dots-vertical</v-icon>
+      <v-btn  class="ml-3" text icon v-on="on" v-bind="{ ...attrs, ...$attrs }">
+        <v-progress-circular v-if="loading" indeterminate color="primary" />
+        <v-icon v-else>mdi-dots-vertical</v-icon>
       </v-btn>
     </template>
     <v-list>
@@ -23,6 +24,7 @@ export default Vue.extend({
   props: {
     removable: Boolean,
     disabled: Boolean,
+    loading: Boolean,
   }
 })
 </script>

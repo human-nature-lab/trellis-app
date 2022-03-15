@@ -81,7 +81,7 @@ export default Vue.extend({
       } catch (err) {
 
       } finally {
-        this.placeholderWorking = true
+        this.placeholderWorking = false
       }
     },
     async update(act: AssignConditionTag) {

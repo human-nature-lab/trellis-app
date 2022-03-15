@@ -1,15 +1,17 @@
 <template>
-  <v-col class="ma-0">
+  <v-col>
     <v-row class="align-center">
-      <MenuSelect
-        v-model="value.parameterId"
-        :items="parameters"
-        :disabled="disabled"
-        @change="onChange"
-        item-text="name"
-        item-value="id"
-      />
-      <v-col class="ml-2">
+      <v-col class="flex-grow-0 px-0">
+        <MenuSelect
+          v-model="value.parameterId"
+          :items="parameters"
+          :disabled="disabled"
+          @change="onChange"
+          item-text="name"
+          item-value="id"
+        />
+      </v-col>
+      <v-col class="flex-grow-1 py-0">
         <v-text-field
           v-if="isNumber"
           :readonly="disabled"
@@ -19,12 +21,12 @@
           @change="onChange"
           hide-details
         />
-        <v-checkbox
+        <v-simple-checkbox
           v-else-if="isBoolean"
           :disabled="disabled"
           v-model="value.val"
-          hide-details
           @change="onChange"
+          color="primary"
         />
         <ChoiceSelector
           v-else-if="isChoice"
@@ -45,9 +47,10 @@
           @change="onChange"
         />
       </v-col>
-      <DotsMenu v-if="!disabled" removable @remove="$emit('delete')" />
+      <v-col cols="1" class="px-0 text-right">
+        <DotsMenu v-if="!disabled" removable @remove="$emit('delete')" :loading="working" />
+      </v-col>
     </v-row>
-    <v-progress-linear v-if="working" indeterminate />
   </v-col>
 </template>
 

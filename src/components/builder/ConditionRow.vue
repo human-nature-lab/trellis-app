@@ -1,6 +1,6 @@
 <template>
-  <v-col>
-    <v-row no-gutters class="align-center text-center justify-center">
+  <v-col class="my-0 pa-0">
+    <v-row no-gutters class="align-center justify-center">
       <v-col cols="1">{{ $t('assigns') }}</v-col>
       <v-col cols="2">
         <v-combobox
@@ -12,7 +12,7 @@
           @change="updateConditionTag"
         />
       </v-col>
-      <v-col cols="1">{{ $t('to_the') }}</v-col>
+      <v-col cols="1" class="text-center">{{ $t('to_the') }}</v-col>
       <v-col cols="2">
         <MenuSelect
           v-model="value.scope"
@@ -21,7 +21,7 @@
           :disabled="disabled"
         />
       </v-col>
-      <v-col cols="1">{{ $t('if') }}</v-col>
+      <v-col cols="1" class="text-center">{{ $t('if') }}</v-col>
       <v-col cols="4" class="text-left">
         <EditText
           outlined
@@ -35,11 +35,10 @@
           @save="updateLogic"
         />
       </v-col>
-      <v-col cols="1" class="text-right">
-        <DotsMenu removable @remove="$emit('remove')" />
+      <v-col cols="1" class="px-0 text-right">
+        <DotsMenu removable @remove="$emit('remove')" :loading="loading" />
       </v-col>
     </v-row>
-    <v-progress-linear v-if="loading || working" indeterminate />
   </v-col>
 </template>
 

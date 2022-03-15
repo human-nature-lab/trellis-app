@@ -4,6 +4,7 @@ import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 import Form from './Form'
 import QuestionGroup from './QuestionGroup'
 import SkipConditionTag from './SkipConditionTag'
+import QuestionGroupSkip from './QuestionGroupSkip'
 
 @Entity()
 export default class Skip extends SparseTimestampedSoftDelete {

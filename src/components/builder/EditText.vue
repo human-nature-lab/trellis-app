@@ -1,10 +1,11 @@
 <template>
-  <span>
+  <div>
     <AutoTextField
       v-if="editing"
       v-model="copy"
       autofocus
       dense
+      hide-details
       :textarea="textarea"
       @blur="onBlur"
       append-icon="mdi-content-save"
@@ -44,7 +45,7 @@
       v-on="$listeners"
     >{{ loading ? copy : value }}</span>
     <v-progress-linear v-if="loading" :height="2" indeterminate />
-  </span>
+  </div>
 </template>
 
 <script lang="ts">
