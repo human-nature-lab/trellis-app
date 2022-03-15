@@ -7,20 +7,11 @@ import SyncGuard from './guards/SyncGuard'
 import LoginGuard from './guards/LoginGuard'
 import { guardQueue } from './GuardQueue'
 
-import appRoutes from './app.routes'
+import routes from './routes'
 import { RouteQueue } from './RouteQueue'
-import webRoutes from './web.routes'
-import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
 import { AddSnack } from '../components/SnackbarQueue.vue'
 import PhotoService from '../services/photo/PhotoService'
-
-let routes = sharedRoutes
-if (singleton.offline) {
-  routes = routes.concat(appRoutes)
-} else {
-  routes = routes.concat(webRoutes)
-}
 
 Vue.use(Router)
 

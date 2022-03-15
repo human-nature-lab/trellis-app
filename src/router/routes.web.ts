@@ -23,7 +23,7 @@ const Permissions = () => import(/* webpackChunkName: "permissions" */'../views/
 const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'../views/StudyDashboard.vue')
 const DataImport = () => import(/* webpackChunkName: "data-import" */'../views/DataImport.vue')
 
-export default [{
+export default sharedRoutes.concat([{
   path: '/',
   name: 'Home',
   default: true,
@@ -104,4 +104,4 @@ export default [{
   path: '/permissions',
   name: 'Permissions',
   component: Permissions
-}]
+}])

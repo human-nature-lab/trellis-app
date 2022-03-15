@@ -3,6 +3,7 @@ import AlreadyHaveDeviceKeyGuard from './guards/AlreadyHaveDeviceKeyGuard'
 import ServerConfigGuard from './guards/ServerConfigGuard'
 import DeviceKeyGuard from './guards/DeviceKeyGuard'
 import { guardQueue } from './GuardQueue'
+import sharedRoutes from './shared.routes'
 
 const Sync = () => import(/* webpackChunkName: "sync" */'../views/Sync.vue')
 const Logs = () => import(/* webpackChunkName: "logs" */'../views/Logs.vue')
@@ -10,7 +11,7 @@ const Storage = () => import(/* webpackChunkName: "storage" */'../views/Storage.
 const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'../views/RegisterDevice.vue')
 const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'../views/ServerIPConfig.vue')
 
-export default [{
+export default sharedRoutes.concat([{
   path: '/',
   name: 'Home',
   component: Sync,
@@ -38,4 +39,4 @@ export default [{
   name: 'ConfigureServer',
   component: ConfigureServer,
   beforeEnter: guardQueue([AlreadyConfiguredServerGuard])
-}]
+}])
