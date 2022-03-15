@@ -23,7 +23,7 @@ export default class CensusServiceCordova extends CensusServiceAbstract {
       .andWhere('sf.studyId = :studyId', {studyId})
       .andWhere('sf.censusTypeId = :censusTypeId', {censusTypeId})
       .andWhere(sq =>
-        'sf.formMasterId in ' + sq.subQuery()
+        'sf.currentVersionId in ' + sq.subQuery()
           .select('id')
           .from(Form)
           .where('form.isPublished = 1')
