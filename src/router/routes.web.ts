@@ -2,6 +2,7 @@ import { guardQueue } from './GuardQueue'
 import LocaleGuard from './guards/LocaleGuard'
 import StudyGuard from './guards/StudyGuard'
 import PermissionGuard from './guards/PermissionGuard'
+import sharedRoutes from './shared.routes'
 import { TrellisPermission } from '../static/permissions.base'
 
 const Forms = () => import(/* webpackChunkName: "forms" */'../views/Forms.vue')
