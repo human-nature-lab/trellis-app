@@ -141,7 +141,8 @@
         data.forms.sort((a, b) => {
           return a.sortOrder - b.sortOrder;
         });
-        console.log(data)
+        const censusForms = data.forms.filter(f => f.censusTypeId)
+        console.log(data, censusForms)
         const forms: DisplayForm[] = data.forms.map((studyForm: StudyForm) => {
           let formSurveys = data.surveys.filter(
             (survey: Survey) => survey.formId === studyForm.currentVersionId

@@ -18,7 +18,7 @@ const trellisConfigConnection = {
   name: 'trellis-config',
   location: 'default',
   entities: requireAllModules(require.context('../../entities/trellis-config', true, /\.[tj]s$/)),
-  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error'],
+  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['error'],
   synchronize: true
 }
 

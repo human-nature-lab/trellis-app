@@ -37,7 +37,7 @@
             v-else>
             <template #activator="{ on, attrs }">
               <v-icon
-                @click="tryCreatingSurvey"
+                @click.stop="tryCreatingSurvey"
                 v-on="on"
                 v-bind="attrs">
                 mdi-play-circle-outline
@@ -125,8 +125,7 @@
   </v-container>
 </template>
 
-<script>
-  // @ts-ignore
+<script lang="ts">
   import AsyncTranslationText from '../AsyncTranslationText.vue'
 
   import Vue from 'vue'
@@ -164,13 +163,13 @@
       }
     },
     computed: {
-      isComplete () {
+      isComplete (): boolean {
         return this.form.isComplete
       },
-      isStarted () {
+      isStarted (): boolean {
         return this.form.isStarted
       },
-      nSurveys () {
+      nSurveys (): number {
         return this.form.surveys.length
       }
     },

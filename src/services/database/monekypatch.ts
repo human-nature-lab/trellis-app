@@ -15,41 +15,41 @@ class CordovaQueryRunnerPatched extends CordovaQueryRunner {
   private _releaseMutex: MutexInterface.Releaser | null
 
   async startTransaction (): Promise<void> {
-    console.debug('monekypatch CordovaQueryRunnerPatched.startTransaction')
+    // console.debug('monekypatch CordovaQueryRunnerPatched.startTransaction')
     this._releaseMutex = await mutex.acquire()
-    console.debug('monekypatch CordovaQueryRunnerPatched.startTransaction -> acquired mutex')
+    // console.debug('monekypatch CordovaQueryRunnerPatched.startTransaction -> acquired mutex')
     return super.startTransaction()
   }
 
   async commitTransaction (): Promise<void> {
-    console.debug('monekypatch CordovaQueryRunnerPatched.commitTransaction')
+    // console.debug('monekypatch CordovaQueryRunnerPatched.commitTransaction')
     if (!this._releaseMutex) {
       throw new Error('monekypatch CordovaQueryRunnerPatched.commitTransaction -> mutex releaser unknown')
     }
     await super.commitTransaction()
     this._releaseMutex()
     this._releaseMutex = null
-    console.debug('monekypatch CordovaQueryRunnerPatched.commitTransaction -> released mutex')
+    // console.debug('monekypatch CordovaQueryRunnerPatched.commitTransaction -> released mutex')
   }
 
   async rollbackTransaction (): Promise<void> {
-    console.debug('monekypatch CordovaQueryRunnerPatched.rollbackTransaction')
+    // console.debug('monekypatch CordovaQueryRunnerPatched.rollbackTransaction')
     if (!this._releaseMutex) {
       throw new Error('CordovaQueryRunnerPatched.rollbackTransaction -> mutex releaser unknown')
     }
     await super.rollbackTransaction()
     this._releaseMutex()
     this._releaseMutex = null
-    console.debug('CordovaQueryRunnerPatched.rollbackTransaction -> released mutex')
+    // console.debug('CordovaQueryRunnerPatched.rollbackTransaction -> released mutex')
   }
 
   async connect (): Promise<any> {
-    console.debug('monekypatch CordovaQueryRunnerPatched.connect')
+    // console.debug('monekypatch CordovaQueryRunnerPatched.connect')
     if (!this.isTransactionActive) {
-      console.debug('monekypatch CordovaQueryRunnerPatched.connect -> wait for a lock to be released')
+      // console.debug('monekypatch CordovaQueryRunnerPatched.connect -> wait for a lock to be released')
       const release = await mutex.acquire()
       release()
-      console.debug('monekypatch CordovaQueryRunnerPatched.connect -> lock is released')
+      // console.debug('monekypatch CordovaQueryRunnerPatched.connect -> lock is released')
     }
     return super.connect()
   }
@@ -81,7 +81,7 @@ class CordovaDriverPatched extends CordovaDriver {
 
 class DriverFactoryPatched extends DriverFactory {
   create (connection: Connection): Driver {
-    console.log('monekypatch DriverFactory.create', connection)
+    // console.log('monekypaitch DriverFactory.create', connection)
     const type = connection.options.type
     if (type === 'cordova' ) {
       return new CordovaDriverPatched(connection)
@@ -101,7 +101,7 @@ class ConnectionPatched extends Connection {
 export const monekypatch = () => {
   ConnectionManager.prototype.create = function (options: ConnectionOptions): Connection {
     const that = this as any
-    console.log('monekypatch ConnectionManager.create', options)
+    // console.log('monekypatch ConnectionManager.create', options)
     const existConnection = that.connections.find((conn: any) => conn.name === (options.name || 'default'))
     if (existConnection) {
       // if connection is registered and its not closed then throw an error
