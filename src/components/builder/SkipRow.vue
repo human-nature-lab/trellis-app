@@ -1,9 +1,16 @@
 <template>
   <v-row no-gutters class="align-end">
     <v-col v-if="!disabled" cols="1">
-      <DotsMenu removable @remove="$emit('remove')" :loading="loading" />
+      <DotsMenu removable @remove="$emit('remove')" :loading="loading">
+        <ToggleItem
+          :value="!!value.customLogic"
+          @input="toggleCustomLogic"
+          :onTitle="$t('hide_custom_logic')"
+          :offTitle="$t('show_custom_logic')"
+        />
+      </DotsMenu>
     </v-col>
-    <v-col md="auto" cols="11" class="px-1">
+    <v-col v-if="!value.customLogic" md="auto" cols="11" class="px-1">
       <MenuSelect
         v-model="value.showHide"
         :items="showOpts"
@@ -29,7 +36,7 @@
         >{{ condition }}</v-chip>
       </span>
     </v-col>
-    <v-col cols="auto" class="flex-grow-1" v-if="!disabled">
+    <v-col v-if="!disabled&& !value.customLogic" cols="auto" class="flex-grow-1">
       <v-autocomplete
         :value="selectedConditionTags"
         @change="updateConditionTags"
@@ -42,7 +49,9 @@
         color="primary lighten-3"
       />
     </v-col>
-
+    <v-col v-if="value.customLogic">
+      <EditText v-model="value.customLogic" editable :disabled="loading || disabled" :label="$t('custom_logic')" code textarea />
+    </v-col>
   </v-row>
 </template>
 
@@ -53,10 +62,12 @@ import titleCase from '../../filters/TitleCase'
 import MenuSelect from './MenuSelect.vue';
 import ConditionTag from '../../entities/trellis/ConditionTag';
 import DotsMenu from './DotsMenu.vue';
+import ToggleItem from './ToggleItem.vue';
+import EditText from './EditText.vue';
 
 export default Vue.extend({
   name: 'SkipRow',
-  components: { MenuSelect, DotsMenu },
+  components: { MenuSelect, DotsMenu, ToggleItem, EditText },
   filters: { titleCase },
   props: {
     value: Object as PropType<Skip>,
@@ -98,13 +109,22 @@ export default Vue.extend({
     updateConditionTags(newConds: string[]) {
       this.$emit('changeConditions', this.value, newConds)
     },
-    updateShowHide (val: boolean) {
+    updateShowHide(val: boolean) {
       this.value.showHide = val
       this.$emit('change', this.value)
     },
-    updateAnyAll (val: boolean) {
+    updateAnyAll(val: boolean) {
       this.value.anyAll = val
       this.$emit('change', this.value)
+    },
+    toggleCustomLogic(show: boolean) {
+      if (show) {
+        this.value.customLogic = 'function (api) {\n  return true;\n}'
+      } else {
+        if (confirm(this.$t('delete_custom_logic_confirm'))) {
+          this.value.customLogic = null
+        }
+      }
     },
   }
 })

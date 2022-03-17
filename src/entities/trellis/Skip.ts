@@ -16,6 +16,8 @@ export default class Skip extends SparseTimestampedSoftDelete {
   anyAll: boolean
   @Column({ type: 'tinyint' }) @Serializable
   precedence: number
+  @Column() @Serializable
+  customLogic: string
 
   @Relationship({
     constructor: () => SkipConditionTag,
