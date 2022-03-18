@@ -18,6 +18,7 @@
     "release:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile && cordova build android",
     "release:prod:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile && cordova build android --release",
     "build:dev:web": "npm run web",
+    "check:translations": "node check-translations.js",
     "build:web": "cross-env NODE_ENV=production npm run web",
     "web": "npm run compile && webpack --config=build/webpack.web.conf.js",
     "mobile": "npm run compile && webpack --config=build/webpack.mobile.conf.js",
@@ -25,6 +26,11 @@
     "start:web": "npm run compile && webpack-dev-server --config=build/webpack.web.conf.js"
   },
   "dependencies": {
+    "@codemirror/basic-setup": "^0.19.1",
+    "@codemirror/lang-html": "^0.19.4",
+    "@codemirror/lang-javascript": "^0.19.7",
+    "@codemirror/state": "^0.19.9",
+    "@codemirror/view": "^0.19.47",
     "@mdi/font": "^5.9.55",
     "@mdi/js": "^5.9.55",
     "@sentry/browser": "^4.5.3",

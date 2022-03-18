@@ -1,7 +1,7 @@
 <template>
-  <v-row no-gutters class="align-end">
+  <v-row no-gutters class="align-center">
     <v-col v-if="!disabled" cols="1">
-      <DotsMenu removable @remove="$emit('remove')" :loading="loading">
+      <DotsMenu removable @remove="$emit('remove')" :loading="loading" right>
         <ToggleItem
           :value="!!value.customLogic"
           @input="toggleCustomLogic"
@@ -36,7 +36,7 @@
         >{{ condition }}</v-chip>
       </span>
     </v-col>
-    <v-col v-if="!disabled&& !value.customLogic" cols="auto" class="flex-grow-1">
+    <v-col v-if="!disabled && !value.customLogic" cols="auto" class="flex-grow-1">
       <v-autocomplete
         :value="selectedConditionTags"
         @change="updateConditionTags"
@@ -50,7 +50,17 @@
       />
     </v-col>
     <v-col v-if="value.customLogic">
-      <EditText v-model="value.customLogic" editable :disabled="loading || disabled" :label="$t('custom_logic')" code textarea />
+      <CodeEditor v-model="value.customLogic" @change="updateCustomLogic" :readonly="disabled" />
+      {{value.customLogic}}
+      <!-- <EditText
+        v-model="value.customLogic"
+        editable
+        :disabled="loading || disabled"
+        :label="$t('show_if')"
+        code
+        textarea
+        @save="updateCustomLogic"
+      /> -->
     </v-col>
   </v-row>
 </template>
@@ -64,10 +74,13 @@ import ConditionTag from '../../entities/trellis/ConditionTag';
 import DotsMenu from './DotsMenu.vue';
 import ToggleItem from './ToggleItem.vue';
 import EditText from './EditText.vue';
+import CodeEditor from '../CodeEditor.vue';
+
+const defaultLogic = 'function showIf(api) {\n  return true;\n}'
 
 export default Vue.extend({
   name: 'SkipRow',
-  components: { MenuSelect, DotsMenu, ToggleItem, EditText },
+  components: { MenuSelect, DotsMenu, ToggleItem, EditText, CodeEditor },
   filters: { titleCase },
   props: {
     value: Object as PropType<Skip>,
@@ -119,12 +132,18 @@ export default Vue.extend({
     },
     toggleCustomLogic(show: boolean) {
       if (show) {
-        this.value.customLogic = 'function (api) {\n  return true;\n}'
+        this.value.customLogic = defaultLogic
+        this.$emit('change', this.value)
       } else {
         if (confirm(this.$t('delete_custom_logic_confirm'))) {
           this.value.customLogic = null
+          this.$emit('change', this.value)
         }
       }
+    },
+    updateCustomLogic (newVal: string) {
+      this.value.customLogic = newVal
+      this.$emit('change', this.value)
     },
   }
 })
