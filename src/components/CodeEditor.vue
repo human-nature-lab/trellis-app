@@ -44,18 +44,19 @@ export default Vue.extend({
     view.destroy()
   },
   watch: {
-    readonly () {
-      const c = this.compartments as Compartments
-      const v = this.view as EditorView
-      v.dispatch
-      c.readonly.reconfigure(EditorState.readOnly.of(this.readonly))
+    readonly() {
+      // const c = this.compartments as Compartments
+      // const v = this.view as EditorView
+      // c.readonly.reconfigure(EditorState.readOnly.of(this.readonly))
     }
   },
   methods: {
     update(update: ViewUpdate) {
-      const val = update.state.doc.sliceString(0)
-      this.$emit('input', val)
-      this.$emit('change', val)
+      if (update.docChanged) {
+        const val = update.state.doc.sliceString(0)
+        this.$emit('input', val)
+        this.$emit('change', val)
+      }
     }
   }
 })
