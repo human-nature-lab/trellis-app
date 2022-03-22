@@ -83,15 +83,17 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+  import Vue from 'vue'
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
-  import PhotoAlbum from '../photo/PhotoAlbum'
+  import PhotoAlbum from '../photo/PhotoAlbum.vue'
   import { routeQueue } from '../../router'
-  import merge from 'lodash/merge'
+  import { merge } from 'lodash'
+  import Respondent from '../../entities/trellis/Respondent'
 
-  export default {
+  export default Vue.extend({
     components: { PhotoAlbum },
     name: 'add-respondent-form',
     props: {
@@ -105,7 +107,7 @@
       onRespondentAdded: Function
     },
     computed: {
-      isAssociatedWithRespondent() {
+      isAssociatedWithRespondent(): boolean {
         return !!this.associatedRespondentId
       }
     },
@@ -119,7 +121,7 @@
         checkingForCensus: false,
         hasCensusForm: false,
         isSaving: false,
-        respondent: null
+        respondent: null as Respondent | null
       }
     },
     methods: {
@@ -172,6 +174,13 @@
         } finally {
           this.isSaving = false
         }
+      },
+      resetForm () {
+        this.name = ''
+        this.respondent = null
+        this.step = 1
+        this.respondentExists = false
+        this.checkingForCensus = false
       },
       async checkCensus() {
         const censusDelay = 1500
@@ -228,12 +237,14 @@
           } else {
             setTimeout(() => {
               this.$emit('close', this.respondent)
+              this.resetForm()
             }, censusDelay)
           }
         } catch (err) {
           this.$emit('close', this.respondent)
+          this.resetForm()
         }
       }
     }
-  }
+  })
 </script>

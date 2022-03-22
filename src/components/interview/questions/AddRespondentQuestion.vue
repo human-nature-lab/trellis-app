@@ -34,7 +34,3 @@
     mixins: [QuestionDisabledMixin]
   }
 </script>
-
-<style scoped>
-
-</style>

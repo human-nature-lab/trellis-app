@@ -213,8 +213,3 @@
     },
   });
 </script>
-
-<style lang="sass" scoped>
-.h-full
-  height: 100%
-</style>

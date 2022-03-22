@@ -1,6 +1,6 @@
 <template>
-  <v-card class="geo-search h100" :class="{'cart-spacing': selectedGeos.length}">
-    <v-col class="h100">
+  <v-card class="geo-search h-full" :class="{'cart-spacing': selectedGeos.length}">
+    <v-col class="h-full">
       <div class="search-header">
         <v-container fluid class="pb-0">
           <v-row>
@@ -342,8 +342,6 @@
   .geo-list
     overflow-y: auto
     flex-grow: 1
-  .h100
-    height: 100%
   .geo-breadcrumbs
     .geo-name:not(:first-child):before
       content: ' \\ '
