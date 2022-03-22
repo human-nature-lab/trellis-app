@@ -1,5 +1,5 @@
 <template>
-  <v-alert type="error" :value="errors.length">
+  <v-alert type="error" :value="!!errors.length">
     <v-layout>
       <v-flex>{{$t('form_has_condition_errors')}}</v-flex>
       <v-btn @click="showErrors = true">{{$t('view')}}</v-btn>
