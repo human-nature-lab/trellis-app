@@ -164,8 +164,8 @@
         }
       },
       async validateLoggedIn () {
-        await (new LoginServiceCordova()).login(config.user.username, config.user.password)
-        await (new LoginServiceWeb()).login(config.user.username, config.user.password)
+        await (new LoginServiceCordova()).login(config.user?.username, config.user?.password)
+        await (new LoginServiceWeb()).login(config.user?.username, config.user?.password)
         return true
       },
       async validateDataVersion () {
@@ -184,9 +184,10 @@
           console.error(err)
         }
         mocha.setup('bdd')
-        this.modulesToRun.forEach(name => {
-          testModules[name].default()
-        })
+        for (const name of this.modulesToRun) {
+          const module = await testModules[name]()
+          module.default()
+        }
         runner = mocha.run()
         runner.on('pass', test => {
           this.tests.push(this.testToDisplay(test))

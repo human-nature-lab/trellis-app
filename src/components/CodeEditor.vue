@@ -37,17 +37,18 @@ export default Vue.extend({
     })
     this.view = view
     this.compartments = compartments
-    // view.dispatch({ effects: [EditorState.readOnly.of(this.readonly)] })
   },
   beforeDestroy() {
     const view = this.view as EditorView
     view.destroy()
   },
   watch: {
-    readonly() {
-      // const c = this.compartments as Compartments
-      // const v = this.view as EditorView
-      // c.readonly.reconfigure(EditorState.readOnly.of(this.readonly))
+    readonly(newVal: boolean) {
+      const c = this.compartments as Compartments
+      const v = this.view as EditorView
+      v.dispatch({
+        effects: c.readonly.reconfigure(EditorState.readOnly.of(newVal)),
+      })
     }
   },
   methods: {

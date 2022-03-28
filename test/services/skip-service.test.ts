@@ -1,31 +1,42 @@
 import SkipService from '../../src/services/SkipService'
-import {expect} from 'chai'
-import Skip from "../../src/entities/trellis/Skip";
+import InterviewManager from '../../src/components/interview/classes/InterviewManager'
+import { expect } from 'chai'
+import Skip from '../../src/entities/trellis/Skip'
+import { uniqueId } from 'lodash'
+import { createForm } from './util'
+import Interview from '../../src/entities/trellis/Interview'
+import Form from '../../src/entities/trellis/Form'
+import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
+import Datum from '../../src/entities/trellis/Datum'
 
-function anyAllString (val: boolean): string {
+function anyAllString(val: boolean): string {
   return val ? 'all' : 'any'
 }
 
-function showHideString (val: boolean): string {
+function showHideString(val: boolean): string {
   return val ? 'show' : 'hide'
 }
 
-function shouldHide (skips: Skip[], conditions: Set<string>): void {
-  expect(SkipService.shouldSkip(skips, conditions)).to.equal(true, 'This page should hide')
+function shouldHide(skips: Skip[], conditions: Set<string>, interview?: InterviewManager): void {
+  const service = new SkipService()
+  service.register(skips)
+  expect(service.shouldSkip(skips, conditions, interview)).to.equal(true, 'This page should hide')
 }
 
-function shouldShow (skips: Skip[], conditions: Set<string>): void {
-  expect(SkipService.shouldSkip(skips, conditions)).to.equal(false, 'This page should show')
+function shouldShow(skips: Skip[], conditions: Set<string>, interview?: InterviewManager): void {
+  const service = new SkipService()
+  service.register(skips)
+  expect(service.shouldSkip(skips, conditions, interview)).to.equal(false, 'This page should show')
 }
 
 interface SkipHelper extends Skip {
-  show (): this
-  hide (): this
-  any (): this
-  all (): this
+  show(): this
+  hide(): this
+  any(): this
+  all(): this
 }
 
-function makeSkip (conditions: string[]): SkipHelper {
+function makeSkip(conditions: string[]): SkipHelper {
   let skip = new Skip().fromSnakeJSON({
     show_hide: true,
     any_all: true,
@@ -57,6 +68,13 @@ function makeSkip (conditions: string[]): SkipHelper {
   }
 
   return skip as SkipHelper
+}
+
+function customSkip(logic: string): Skip {
+  return new Skip().fromSnakeJSON({
+    id: uniqueId(),
+    custom_logic: logic,
+  })
 }
 
 export default function () {
@@ -164,6 +182,36 @@ export default function () {
           ], new Set(['two']))
         })
       })
+    })
+    describe('simple custom logic', () => {
+      it('should show when return true;', () => {
+        shouldShow([customSkip('function () { return true; }')], new Set())
+      })
+      it('should hide when return false;', () => {
+        shouldHide([customSkip('function () { return false; }')], new Set())
+      })
+    })
+    describe('custom vars access', () => {
+      const q1 = new QuestionDatum().fromSnakeJSON({ question_id: '1', data: [] })
+      q1.data.push(new Datum().fromSnakeJSON({ val: 'world' }))
+      const q2 = new QuestionDatum().fromSnakeJSON({ question_id: '2', data : [] })
+      q2.data.push(new Datum().fromSnakeJSON({ val: 'bar' }))
+      const form = createForm({
+        sections: [{
+          pages: [{
+            questions: [{
+              id: '1',
+              var_name: 'hello',
+            }, {
+              id: '2',
+              var_name: 'foo',
+            }]
+          }]
+        }]
+      })
+      const manager = new InterviewManager(new Interview(), form, [], [q1, q2])
+      shouldShow([customSkip(`function ({ vars }) { return vars.hello === 'world'; }`)], manager)
+      shouldHide([customSkip(`function ({ vars }) { return vars.foo === 'nobar'; }`)], manager)
     })
   })
 }

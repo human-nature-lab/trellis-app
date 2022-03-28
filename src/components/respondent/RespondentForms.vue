@@ -123,6 +123,7 @@
         conditionTags: [] as RespondentConditionTag[],
         showHidden: false,
         showUnpublished: false,
+        skipService: new SkipService(),
         error: '',
       };
     },
@@ -142,6 +143,7 @@
           return a.sortOrder - b.sortOrder;
         });
         console.log(data)
+        this.skipService.register(data.forms.reduce((skips, form) => skips.concat(form.form.skips), []))
         const forms: DisplayForm[] = data.forms.map((studyForm: StudyForm) => {
           let formSurveys = data.surveys.filter(
             (survey: Survey) => survey.formId === studyForm.currentVersionId
@@ -151,7 +153,7 @@
               return c.conditionTag.name;
             })
           );
-          const isSkipped = SkipService.shouldSkip(
+          const isSkipped = this.skipService.shouldSkip(
             studyForm.form.skips,
             conditionTags
           );

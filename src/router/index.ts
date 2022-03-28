@@ -76,6 +76,7 @@ router.onReady(() => {
 })
 
 router.onError(err => {
+  console.error(err)
   err.severity = LoggingLevel.error
   err.component = err.component ? err.component : 'router/index.js@onError'
   logger.log(err)

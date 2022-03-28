@@ -41,6 +41,7 @@ export default class InterviewAlligator {
   private sectionToNumIndex: Map<string, number> = new Map()
   private pageToNumIndex: Map<string, number> = new Map()
   private varNameToQuestionIndex: Map<string, Question> = new Map()
+  private skipService = new SkipService()
 
   private hasDataChanges: boolean = true
 
@@ -83,6 +84,7 @@ export default class InterviewAlligator {
       this.sectionToNumIndex.set(section.id, s)
       for (let p = 0; p < section.questionGroups.length; p++) {
         const page = section.questionGroups[p]
+        this.skipService.register(page.skips)
         this.pageIndex.set(page.id, page)
         this.pageToNumIndex.set(page.id, p)
         for (const question of page.questions) {
@@ -223,7 +225,7 @@ export default class InterviewAlligator {
   private shouldSkipPage (loc: InterviewLocation): boolean {
     const conditionTagNames = this.getConditionTagSet(loc.sectionRepetition, loc.sectionFollowUpDatumId)
     const page = this.pageIndex.get(loc.pageId)
-    return SkipService.shouldSkip(page.skips, conditionTagNames)
+    return this.skipService.shouldSkip(page.skips, conditionTagNames)
   }
 
   public seekTo (loc: InterviewLocation): boolean {

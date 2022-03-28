@@ -21,6 +21,7 @@ import Action from '../../../entities/trellis/Action'
 import { cloneDeep } from 'lodash'
 import InterviewService from '../../../services/interview/InterviewService'
 import { Mutex, MutexInterface } from 'async-mutex'
+import { InterviewLocation } from '../services/InterviewAlligator'
 
 export interface FindFunction<T> {
   (o: T, i?: number, a?: T[]): boolean
@@ -412,6 +413,10 @@ export default class DataStore extends Emitter {
     ) !== -1
   }
 
+  getQuestionDatumByVarName (varName: string) {
+    
+  }
+
   /**
    * Get a question datum by id
    * @param id
@@ -439,7 +444,7 @@ export default class DataStore extends Emitter {
       }
     }
     for (const tag of this.conditionTags[ConditionTagScope.SECTION]) {
-      if (tag.repetition === sectionRepetition && tag.followUpDatumId === followUpDatumId) {
+      if (tag.repetition === sectionRepetition && tag.followUpDatumId === followUpDatumId && tag.conditionTag && tag.conditionTag.name === name) {
         return true
       }
     }

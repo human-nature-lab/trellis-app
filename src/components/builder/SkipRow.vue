@@ -51,16 +51,6 @@
     </v-col>
     <v-col v-if="value.customLogic">
       <CodeEditor v-model="value.customLogic" @change="updateCustomLogic" :readonly="disabled" />
-      {{value.customLogic}}
-      <!-- <EditText
-        v-model="value.customLogic"
-        editable
-        :disabled="loading || disabled"
-        :label="$t('show_if')"
-        code
-        textarea
-        @save="updateCustomLogic"
-      /> -->
     </v-col>
   </v-row>
 </template>
@@ -75,8 +65,9 @@ import DotsMenu from './DotsMenu.vue';
 import ToggleItem from './ToggleItem.vue';
 import EditText from './EditText.vue';
 import CodeEditor from '../CodeEditor.vue';
+import { debounce } from 'lodash';
 
-const defaultLogic = 'function showIf(api) {\n  return true;\n}'
+const defaultLogic = 'function showIf({ vars, tags }) {\n  return true;\n}'
 
 export default Vue.extend({
   name: 'SkipRow',
@@ -87,6 +78,13 @@ export default Vue.extend({
     disabled: Boolean,
     loading: Boolean,
     conditionTags: Array as PropType<ConditionTag[]>,
+  },
+  data () {
+    return {
+      emitChangeDebounced: debounce((value: Skip) => {
+        this.$emit('change', value)
+      }, 500)
+    }
   },
   computed: {
     selectedConditionTags(): string[] {
@@ -143,7 +141,7 @@ export default Vue.extend({
     },
     updateCustomLogic (newVal: string) {
       this.value.customLogic = newVal
-      this.$emit('change', this.value)
+      this.emitChangeDebounced(this.value)
     },
   }
 })
