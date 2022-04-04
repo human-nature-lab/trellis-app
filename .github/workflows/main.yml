@@ -84,11 +84,6 @@ jobs:
       #   if: ${{ failure() }}
       #   run: sleep 1h # Prevent to killing instance after failure
       
-      - name: Release content
-        run: node ./make-release-content.js ${{ github.ref }}
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-      
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
