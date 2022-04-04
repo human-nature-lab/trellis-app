@@ -16,32 +16,78 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
-      - name: Setup Cordova
-        # You may pin to the exact commit or the version.
-        # uses: oxr463/setup-cordova@cfd9f1c03c813dddb8a934257f159147bb15bcd4
-        uses: oxr463/setup-cordova@0.0.2
-        with:
-          # Apache Cordova command to execute
-          exec: cordova -v
 
-      - name: Build debug APK
-        id: debug_apk
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      
+      # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
+      - uses: c-hive/gha-npm-cache@v1
+      - run: npm ci
+
+      - name: Copy config files
         run: |
-          npm run build:android
-          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
-          
+          cp static/config.default.js static/config.js
+          cp config/config-xml.dev.default.js config/config-xml.dev.js
+      
       - name: Build web bundle
         id: web_bundle
         run: |
           npm run build:web
           zip -r trellis-web.zip www/
+      
+      - uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: '8'
+      
+      - name: Uninstall corrupt sdk build-tools
+        run: |
+          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
+          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
+      
+      - run: npm i -g @ionic/cli@6
+      
+      - uses: human-nature-lab/setup-ionic@v1
+        with:
+          install-java: false
+          cordova-version: 9
+      
+#       - name: Build dev APK
+#         run: |
+#           cordova platform add android
+#           npm run build:dev:android
+#           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-dev.apk
+      
+      - name: Build debug APK
+        continue-on-error: true
+        run: |
+          npm run mobile
+          cordova prepare
+          npm run release:android
+          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
+      
+      # - name: SSH Debug
+      #   if: ${{ failure() }}
+      #   run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
+      #   env:
+      #     NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+      #     USER_PASS: ${{ secrets.NGROK_USER_PASS }}
+
+      # - name: Keep alive if failure
+      #   if: ${{ failure() }}
+      #   run: sleep 1h # Prevent to killing instance after failure
+      
+      - name: Release content
+        run: node ./make-release-content.js ${{ github.ref }}
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       
       - name: Create Release
         id: create_release
@@ -50,9 +96,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
           tag_name: ${{ github.ref }}
-          release_name: Trellis release ${{ github.ref }}
-          draft: true
-          prerelease: false
+          release_name: ${{ env.RELEASE_TITLE }}
+          body_path: ${{ env.RELEASE_FILE }}
+          draft: ${{ env.IS_PRERELEASE == 'false' }}
+          prerelease: ${{ env.IS_PRERELEASE }}
+      
+#       - name: Upload dev APK
+#         id: upload-dev-apk
+#         uses: actions/upload-release-asset@v1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+#           asset_path: ./trellis-dev.apk
+#           asset_name: trellis-dev.apk
+#           asset_content_type: application/octet-stream
         
       - name: Upload debug APK
         id: upload-debug-apk
@@ -62,7 +120,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: ./trellis-debug.apk
-          asset_name: trellis-debug-${{github.ref}}.apk
+          asset_name: trellis-debug.apk
           asset_content_type: application/octet-stream
       
       - name: Upload web bundle
@@ -73,7 +131,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: ./trellis-web.zip
-          asset_name: trellis-web-${{github.ref}}.zip
+          asset_name: trellis-web.zip
           asset_content_type: application/zip
-      
-
