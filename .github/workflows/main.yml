@@ -34,7 +34,7 @@ jobs:
       - name: Copy config files
         run: |
           cp static/config.default.js static/config.js
-          cp config/config-xml.dev.default.js config/config-xml.dev.js
+          cp config/config-xml.default.js config/config-xml.dev.js
       
       - name: Build web bundle
         id: web_bundle
