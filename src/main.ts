@@ -22,7 +22,6 @@ import theme from './static/theme'
 import { APP_ENV } from './static/constants'
 import './logging'
 import './filters/toFixed.filter'
-import './checkWebviewVersion'
 
 async function init () {
   // Wait for the configuration to load before doing anything else
