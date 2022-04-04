@@ -56,10 +56,6 @@
     },
     methods: {
       showForm (form): boolean {
-        const isTestStudy = this.global.study.testStudyId === null
-        if (isTestStudy) {
-          return true
-        }
         if (form.isPublished && !form.isSkipped) {
           return true
         } else if (form.isPublished) {

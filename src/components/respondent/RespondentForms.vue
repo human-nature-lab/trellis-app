@@ -26,10 +26,10 @@
         </v-toolbar>
         <forms-view
           v-if="forms"
-          :forms="forms"
+          :forms="standardForms"
           :respondent="respondent"
           :showHidden="showHidden"
-          :showUnpublished="showUnpublished"
+          :showUnpublished="showUnpublished || isTestStudy"
           :allowMultipleSurveys="false"
           @newInterview="startInterview"
         >
@@ -44,6 +44,7 @@
           :forms="censusForms"
           :respondent="respondent"
           :canCreateSurveys="true"
+          :showUnpublished="showUnpublished || isTestStudy"
           @newInterview="startInterview"
         >
         </forms-view>
@@ -117,8 +118,8 @@
     data() {
       return {
         global,
-        forms: [] as DisplayForm[],
-        censusForms: [] as DisplayForm[],
+        surveys: [] as Survey[],
+        forms: [] as StudyForm[],
         respondent: null as Respondent,
         conditionTags: [] as RespondentConditionTag[],
         showHidden: false,
@@ -141,20 +142,36 @@
         data.forms.sort((a, b) => {
           return a.sortOrder - b.sortOrder;
         });
-        const censusForms = data.forms.filter(f => f.censusTypeId)
-        console.log(data, censusForms)
-        const forms: DisplayForm[] = data.forms.map((studyForm: StudyForm) => {
-          let formSurveys = data.surveys.filter(
+        this.forms = data.forms
+        this.conditionTags = data.conditionTags
+        this.surveys = data.surveys
+        this.respondent = data.respondent;
+      },
+    },
+    computed: {
+      isTestStudy(): boolean {
+        return !!(this.global.study && this.global.study.testStudyId)
+      },
+      censusForms (): DisplayForm[] {
+        return this.displayForms.filter(f => f.censusTypeId)
+      },
+      standardForms (): DisplayForm[] {
+        return this.displayForms.filter(f => !f.censusTypeId)
+      },
+      displayForms (): DisplayForm[] {
+        const tagSet: Set<string> = new Set(
+          this.conditionTags.map((c: RespondentConditionTag) => {
+            return c.conditionTag.name
+          })
+        )
+        return this.forms.map((studyForm: StudyForm) => {
+          let formSurveys = this.surveys.filter(
             (survey: Survey) => survey.formId === studyForm.currentVersionId
           );
-          const conditionTags: Set<string> = new Set(
-            data.conditionTags.map((c: RespondentConditionTag) => {
-              return c.conditionTag.name;
-            })
-          );
+          
           const isSkipped = SkipService.shouldSkip(
             studyForm.form.skips,
-            conditionTags
+            tagSet,
           );
           return {
             id: studyForm.currentVersionId,
@@ -168,11 +185,8 @@
             nComplete: 0,
             version: studyForm.form.version,
           } as DisplayForm;
-        });
-        this.respondent = data.respondent;
-        this.censusForms = forms.filter((f) => f.censusTypeId);
-        this.forms = forms.filter((f) => !f.censusTypeId);
-      },
+        })
+      }
     },
   });
 </script>
