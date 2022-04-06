@@ -6,22 +6,22 @@ import FormService from '../form/FormService'
 
 export default class CensusServiceCordova extends CensusServiceAbstract {
 
-  async getCensusForm (studyId: string, censusTypeId: string): Promise<Form> {
+  async getCensusForm(studyId: string, censusTypeId: string): Promise<Form> {
     const studyForm: StudyForm = await this.getCensusStudyForm(studyId, censusTypeId)
-    return FormService.getForm(studyForm.formMasterId)
+    return FormService.getForm(studyForm.currentVersionId)
   }
 
-  async hasCensusForm (studyId: string, censusTypeId: string): Promise<boolean> {
+  async hasCensusForm(studyId: string, censusTypeId: string): Promise<boolean> {
     const studyForm: StudyForm = await this.getCensusStudyForm(studyId, censusTypeId)
     return (studyForm instanceof StudyForm)
   }
 
-  async getCensusStudyForm (studyId: string, censusTypeId: string): Promise<StudyForm> {
+  async getCensusStudyForm(studyId: string, censusTypeId: string): Promise<StudyForm> {
     const repo = await DatabaseService.getRepository(StudyForm)
     return repo.createQueryBuilder('sf')
       .where('sf.deletedAt is NULL')
-      .andWhere('sf.studyId = :studyId', {studyId})
-      .andWhere('sf.censusTypeId = :censusTypeId', {censusTypeId})
+      .andWhere('sf.studyId = :studyId', { studyId })
+      .andWhere('sf.censusTypeId = :censusTypeId', { censusTypeId })
       .andWhere(sq =>
         'sf.currentVersionId in ' + sq.subQuery()
           .select('id')

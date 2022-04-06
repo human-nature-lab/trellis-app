@@ -25,42 +25,61 @@
   import singleton from '../../static/singleton'
   import TranslationTextService from '../../services/translation-text'
   import TranslationService from '../../services/TranslationService'
+  import { isEqual } from 'lodash'
   
-  const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props'])
+  const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props', '__ob__'])
 
-  function DataHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, Datum[]>> {
+  function DataHandler (location: () => InterviewLocation): ProxyHandler<Record<string | symbol, Datum[]>> {
+    let prevLocation: InterviewLocation
     return {
       get (target, key, receiver) {
-        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
+        if (typeof key === 'symbol' || vueKeywords.has(key)) {
           return target[key]
         }
-        const { data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
+        const l = location()
+        if (target[key] !== null && target[key] !== undefined && isEqual(l, prevLocation)) {
+          return target[key]
+        }
+        prevLocation = Object.assign({}, l)
+        const { data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, l)
         Vue.set(target, key, data)
       }
     }
   }
 
-  function ConditionTagHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, boolean>> {
+  function ConditionTagHandler (location: () =>InterviewLocation): ProxyHandler<Record<string | symbol, boolean>> {
+    let prevLocation: InterviewLocation
     return {
       get (target, key, receiver) {
-        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
+        if (typeof key === 'symbol' || vueKeywords.has(key)) {
           return target[key]
         }
-        const tags: string[] = sharedInterviewInstance.getConditionTags(location.sectionRepetition, location.sectionFollowUpDatumId)
+        const l = location()
+        if (target[key] !== null && target[key] !== undefined && isEqual(l, prevLocation)) {
+          return target[key]
+        }
+        prevLocation = Object.assign({}, l)
+        const tags: string[] = sharedInterviewInstance.getConditionTags(l.sectionRepetition, l.sectionFollowUpDatumId)
         return tags.includes(key)
       }
     }
   }
   
-  function VarsHandler (location: InterviewLocation): ProxyHandler<Record<string | symbol, any>> {
+  function VarsHandler (location: () => InterviewLocation): ProxyHandler<Record<string | symbol, any>> {
+    let prevLocation: InterviewLocation
     return {
       get (target, key, receiver) {
-        if (target[key] || typeof key === 'symbol' || vueKeywords.has(key)) {
+        if (typeof key === 'symbol' || vueKeywords.has(key)) {
           return target[key]
         }
+        const l = location()
+        if (target[key] !== null && target[key] !== undefined && isEqual(l, prevLocation)) {
+          return target[key]
+        }
+        prevLocation = Object.assign({}, l)
 
         // Get the datum for the referenced var_name
-        const { question, datum, data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, location)
+        const { question, data } = InterpolationService.getVarData(key as string, sharedInterviewInstance, l)
 
         // Select the correct data handler
         let handler: () => Promise<any>
@@ -120,9 +139,9 @@
     data () {
       return {
         isLoading: false,
-        vars: new Proxy({}, VarsHandler(this.location)) as Record<string, any>,
-        data: new Proxy({}, DataHandler(this.location)) as Record<string, Datum[]>,
-        conditionTag: new Proxy({}, ConditionTagHandler(this.location) as Record<string, boolean>),
+        vars: new Proxy({}, VarsHandler(() => this.location)) as Record<string, any>,
+        data: new Proxy({}, DataHandler(() => this.location)) as Record<string, Datum[]>,
+        conditionTag: new Proxy({}, ConditionTagHandler(() => this.location) as Record<string, boolean>),
         fills: {} as Record<string, string>,
         global: singleton,
         translation: this.question ? this.question.questionTranslation : null,

@@ -186,8 +186,8 @@
     .photo-actions
       background: white
       width: 100%
-      position: absolute
-      bottom: 0
+      // position: absolute
+      // bottom: 0
     .photo-album-carousel-container
       height: 100%
       .photo-album-carousel-card

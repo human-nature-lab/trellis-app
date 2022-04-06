@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height class="ma-0 pa-0 justify-start align-start">
+  <v-container fluid fill-height class="ma-0 pa-0 justify-start align-start trellis-interview">
     <v-col>
       <v-toolbar flat dense class="flex-grow-0">
         <v-toolbar-title>
@@ -431,6 +431,7 @@
 </script>
 
 <style lang="sass">
+.trellis-interview
   .light
     color: grey
   .condition-tag-dialog

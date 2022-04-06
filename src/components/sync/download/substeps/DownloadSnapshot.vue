@@ -83,9 +83,6 @@
             lengthComputable = total > 0 && loaded > 0
           }
           this.lastDownloadProgress = lengthComputable ? (loaded / total) * 100 : this.lastDownloadProgress + 0.001
-          if (lengthComputable) {
-            console.log('progress', lengthComputable, total, loaded, this.lastDownloadProgress)
-          }
           // Only update at 1% increments, without this the progress bar does not update
           if ((this.lastDownloadProgress - this.downloadProgress) > 1) {
             this.downloadProgress = this.lastDownloadProgress

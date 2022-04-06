@@ -36,7 +36,3 @@
     name: 'FullscreenPhoto'
   }
 </script>
-
-<style scoped>
-
-</style>
