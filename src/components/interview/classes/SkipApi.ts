@@ -1,4 +1,5 @@
-import Datum from "src/entities/trellis/Datum";
+import Datum from "../../../entities/trellis/Datum";
+import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 import { InterviewLocation } from "../services/InterviewAlligator";
 import DataStore from "./DataStore";
 import InterviewManager from "./InterviewManager";
@@ -7,16 +8,8 @@ export function createSkipApi(interview: InterviewManager, location: InterviewLo
   const vars = createVarsProxy(interview, location)
   const tags = createTagsProxy(interview.data, location)
   const data = createDataProxy(interview, location)
-  console.log('createSkipApi')
-  return { vars, tags, data }
-}
-
-export function createTagsProxy(data: DataStore, location: InterviewLocation) {
-  return new Proxy({} as Record<string, boolean>, {
-    get(target, conditionTagName: string, receiver) {
-      return data.hasConditionTag(conditionTagName, location.sectionRepetition, location.sectionFollowUpDatumId)
-    }
-  })
+  const qd = createQuestionDatumProxy(interview, location)
+  return { vars, tags, data, qd }
 }
 
 function getVarNameData(varName: string, interview: InterviewManager, location: InterviewLocation): Datum | Datum[] | undefined {
@@ -30,7 +23,26 @@ function getVarNameData(varName: string, interview: InterviewManager, location: 
   return qd.data
 }
 
-// Support for old-style access to the data in the form
+// Check for the existence of condition tags
+export function createTagsProxy(data: DataStore, location: InterviewLocation) {
+  return new Proxy({} as Record<string, boolean>, {
+    get(target, conditionTagName: string, receiver) {
+      return data.hasConditionTag(conditionTagName, location.sectionRepetition, location.sectionFollowUpDatumId)
+    }
+  }) as Record<string, boolean>
+}
+
+// Support for direct access to the questionDatum object. To check dkRf and 
+// noOne values
+export function createQuestionDatumProxy(interview: InterviewManager, location: InterviewLocation) {
+  return new Proxy({}, {
+    get(target, varName: string, receiver) {
+      return interview.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpDatumId)
+    }
+  }) as Record<string, QuestionDatum | void>
+}
+
+// Support for full data access
 export function createDataProxy(interview: InterviewManager, location: InterviewLocation) {
   return new Proxy({}, {
     get(target, varName: string, receiver) {
@@ -39,6 +51,8 @@ export function createDataProxy(interview: InterviewManager, location: Interview
   }) as Record<string, Datum | Datum[]>
 }
 
+// Support for legacy-style acces to data in the form. Should be identical to 
+// legacy condition assignment
 export function createVarsProxy(interview: InterviewManager, location: InterviewLocation) {
   return new Proxy({}, {
     get(target, varName: string, receiver) {
@@ -51,5 +65,5 @@ export function createVarsProxy(interview: InterviewManager, location: Interview
         }
       }
     }
-  })
+  }) as Record<string, string | number>
 }

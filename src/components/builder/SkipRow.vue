@@ -67,7 +67,7 @@ import EditText from './EditText.vue';
 import CodeEditor from '../CodeEditor.vue';
 import { debounce } from 'lodash';
 
-const defaultLogic = 'function showIf({ vars, tags }) {\n  return true;\n}'
+const defaultLogic = 'function showIf({ vars, tags, data }) {\n  return true;\n}'
 
 export default Vue.extend({
   name: 'SkipRow',

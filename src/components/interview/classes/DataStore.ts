@@ -51,7 +51,7 @@ export default class DataStore extends Emitter {
   private mutex = new Mutex()
   private releaseMutex!: MutexInterface.Releaser
 
-  constructor (throttleRate = 10000) {
+  constructor(throttleRate = 10000) {
     super()
     this.reset()
     DatumRecycler.clear()
@@ -64,7 +64,7 @@ export default class DataStore extends Emitter {
   /**
    * Intitialize the datastore. Emits an initialState event to any subscribers
    */
-  initialize () {
+  initialize() {
     this.previousState = this.getState()
     this.emit('initialState', this.data)
   }
@@ -72,7 +72,7 @@ export default class DataStore extends Emitter {
   /**
    * Persist any changes to the data here
    */
-  public async save (interviewId: string) {
+  public async save(interviewId: string) {
     this.releaseMutex = await this.mutex.acquire()
     try {
       const newState = this.getState()
@@ -86,7 +86,7 @@ export default class DataStore extends Emitter {
   /**
    * Get state
    */
-  private getState (): InterviewDataInterface {
+  private getState(): InterviewDataInterface {
     return cloneDeep({
       data: this.data,
       conditionTags: this.conditionTags
@@ -96,7 +96,7 @@ export default class DataStore extends Emitter {
   /**
    * Reset the state of the data and conditionTags
    */
-  reset () {
+  reset() {
     // Clear all arrays without dereferencing
     this.data.splice(0, this.data.length)
     this.conditionTags.section.splice(0, this.conditionTags.section.length)
@@ -115,7 +115,7 @@ export default class DataStore extends Emitter {
    * @param data
    * @MOVE_TO_SERVICE_LAYER
    */
-  loadData (data: QuestionDatum[]) {
+  loadData(data: QuestionDatum[]) {
     data = data.map(c => c.copy())
     let datum = []
     let questionDatum = []
@@ -139,7 +139,7 @@ export default class DataStore extends Emitter {
    * @param {RespondentConditionTag[]} baseRespondentConditionTags - respondent condition tags that were not assigned by this form and should not be removed
    * @MOVE_TO_SERVICE_LAYER
    */
-  loadConditionTags (tags: any, baseRespondentConditionTags?: RespondentConditionTag[]) {
+  loadConditionTags(tags: any, baseRespondentConditionTags?: RespondentConditionTag[]) {
     if (baseRespondentConditionTags) {
       this.baseRespondentConditionTags = baseRespondentConditionTags
     } else if (tags && tags.respondent) {
@@ -162,7 +162,7 @@ export default class DataStore extends Emitter {
    * @param {QuestionDatum} questionDatum - A single questionDatum
    * @param {Boolean} [shouldPersist = false] - Whether the persist method should be called after adding the data
    */
-  add (questionDatum: QuestionDatum) {
+  add(questionDatum: QuestionDatum) {
     this.data.push(questionDatum)
     this.questionDatumIdMap.set(questionDatum.id, questionDatum)
     let questionIdIndex = this.questionDatumQuestionIdIndex.get(questionDatum.questionId)
@@ -175,7 +175,7 @@ export default class DataStore extends Emitter {
     this.emitChange()
   }
 
-  getDatumById (datumId: string): Datum|null {
+  getDatumById(datumId: string): Datum | null {
     for (let j = 0; j < this.data.length; j++) {
       for (let i = 0; i < this.data[j].data.length; i++) {
         if (this.data[j].data[i].id === datumId) {
@@ -190,7 +190,7 @@ export default class DataStore extends Emitter {
    * @param {string} questionDatumId
    * @returns {string}
    */
-  public getFollowUpActionId (questionId: string, sectionFollowUpDatumId: string, sectionRepetition: number): string {
+  public getFollowUpActionId(questionId: string, sectionFollowUpDatumId: string, sectionRepetition: number): string {
     const questionData: QuestionDatum[] = this.questionDatumQuestionIdIndex.get(questionId)
     let questionDatum = questionData.find(qd => qd.followUpDatumId === sectionFollowUpDatumId &&
       qd.sectionRepetition === sectionRepetition)
@@ -200,7 +200,7 @@ export default class DataStore extends Emitter {
     return datum.actionId
   }
 
-  public emitChange () {
+  public emitChange() {
     this.emit('change', {
       data: this.data,
       conditionTags: this.conditionTags
@@ -214,7 +214,7 @@ export default class DataStore extends Emitter {
    * @param {Action} action
    * @returns {Datum}
    */
-  public addDatum (questionDatum: QuestionDatum, qd: QuestionDatum, action: Action): Datum {
+  public addDatum(questionDatum: QuestionDatum, qd: QuestionDatum, action: Action): Datum {
     // console.log('adding datum', arguments)
     const datum = DatumRecycler.getNoKey(qd, action)
     datum.randomSortOrder = action.randomSortOrder
@@ -234,7 +234,7 @@ export default class DataStore extends Emitter {
    * @param {Function} findFunc
    * @returns {boolean}
    */
-  public removeDatum (questionDatum: QuestionDatum, findFunc: FindFunction<Datum>): boolean {
+  public removeDatum(questionDatum: QuestionDatum, findFunc: FindFunction<Datum>): boolean {
     let removedData = false
     const datumIndex = questionDatum.data.findIndex(findFunc)
     if (datumIndex > -1) {
@@ -255,7 +255,7 @@ export default class DataStore extends Emitter {
    * @param {FilterFunction<Datum>} filterFunc
    * @returns {boolean} - returns true if any data were removed
    */
-  public filterDatum (questionDatum: QuestionDatum, filterFunc: FilterFunction<Datum>): boolean {
+  public filterDatum(questionDatum: QuestionDatum, filterFunc: FilterFunction<Datum>): boolean {
     let removedData = false
     let i = questionDatum.data.length
     while (i--) {
@@ -272,7 +272,7 @@ export default class DataStore extends Emitter {
    * @param {QuestionDatum} questionDatum
    * @returns {boolean}
    */
-  public removeAllDatum (questionDatum: QuestionDatum): boolean {
+  public removeAllDatum(questionDatum: QuestionDatum): boolean {
     const dataWasRemoved = questionDatum.data.length > 0
     questionDatum.data.splice(0)
     this.emitChange()
@@ -285,7 +285,7 @@ export default class DataStore extends Emitter {
    * @param {RespondentConditionTag | SectionConditionTag | SurveyConditionTag} tag
    * @param {ConditionTag} conditionTag
    */
-  addTag (type: ConditionTagScope, tag: RespondentConditionTag | SectionConditionTag | SurveyConditionTag, conditionTag?: ConditionTag): void {
+  addTag(type: ConditionTagScope, tag: RespondentConditionTag | SectionConditionTag | SurveyConditionTag, conditionTag?: ConditionTag): void {
     // @ts-ignore
     this.conditionTags[type].push(tag)
     if (tag.conditionTag) {
@@ -305,7 +305,7 @@ export default class DataStore extends Emitter {
    * @param args
    * @returns {QuestionDatum | null}
    */
-  getSingleQuestionDatumByLocation (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string, ...args): QuestionDatum|undefined {
+  getSingleQuestionDatumByLocation(questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string, ...args): QuestionDatum | undefined {
     return this.questionDatumQuestionIdIndex.get(questionId).find(qD =>
       qD.sectionRepetition === sectionRepetition &&
       qD.followUpDatumId === sectionFollowUpDatumId)
@@ -316,7 +316,7 @@ export default class DataStore extends Emitter {
    * @param {string} questionId
    * @returns {QuestionDatum[] | undefined}
    */
-  getQuestionDataByQuestionId (questionId: string) {
+  getQuestionDataByQuestionId(questionId: string) {
     return this.questionDatumQuestionIdIndex.get(questionId)
   }
 
@@ -328,7 +328,7 @@ export default class DataStore extends Emitter {
    * @returns {boolean}
    * @private
    */
-  private _locationMatchesQuestionDatum (questionDatum: QuestionDatum, sectionRepetition: number, sectionFollowUpDatumId: string) {
+  private _locationMatchesQuestionDatum(questionDatum: QuestionDatum, sectionRepetition: number, sectionFollowUpDatumId: string) {
     return questionDatum.sectionRepetition === sectionRepetition &&
       questionDatum.followUpDatumId === sectionFollowUpDatumId
   }
@@ -339,7 +339,7 @@ export default class DataStore extends Emitter {
    * @param sectionFollowUpDatumId
    * @returns {Array}
    */
-  public getAllConditionTagsForLocation (sectionRepetition: number, sectionFollowUpDatumId: string): ConditionTag[] {
+  public getAllConditionTagsForLocation(sectionRepetition: number, sectionFollowUpDatumId: string): ConditionTag[] {
     const tags = []
     for (let rct of this.conditionTags.respondent) {
       tags.push(this.conditionTagStore.getTagById(rct.conditionTagId))
@@ -356,14 +356,14 @@ export default class DataStore extends Emitter {
     return tags
   }
 
-  public getAllConditionTags (): ConditionTag[] {
+  public getAllConditionTags(): ConditionTag[] {
     let tags: ConditionTag[] = this.conditionTags.respondent.map(rct => this.conditionTagStore.getTagById(rct.conditionTagId))
     tags = tags.concat(this.conditionTags.survey.map(sct => this.conditionTagStore.getTagById(sct.conditionId)))
     tags = tags.concat(this.conditionTags.section.map(sct => this.conditionTagStore.getTagById(sct.conditionId)))
     return tags
   }
 
-  public getAllConditionTagNames (): string[] {
+  public getAllConditionTagNames(): string[] {
     return this.getAllConditionTags().map(tag => tag.name)
   }
 
@@ -373,7 +373,7 @@ export default class DataStore extends Emitter {
    * @param sectionFollowUpDatumId
    * @returns {String[}
    */
-  public getLocationConditionTagNames (sectionRepetition: number, sectionFollowUpDatumId: string): string[] {
+  public getLocationConditionTagNames(sectionRepetition: number, sectionFollowUpDatumId: string): string[] {
     return this.getAllConditionTagsForLocation(sectionRepetition, sectionFollowUpDatumId).map(tag => tag.name)
   }
 
@@ -384,7 +384,7 @@ export default class DataStore extends Emitter {
    * @param {String} sectionFollowUpDatumId
    * @returns {Array}
    */
-  getQuestionDataByIds (questionIds: string[], sectionRepetition: number, sectionFollowUpDatumId: string): QuestionDatum[] {
+  getQuestionDataByIds(questionIds: string[], sectionRepetition: number, sectionFollowUpDatumId: string): QuestionDatum[] {
     let data = []
     for (let id of questionIds) {
       if (this.questionDatumQuestionIdIndex.has(id)) {
@@ -406,15 +406,16 @@ export default class DataStore extends Emitter {
    * @param {string} sectionFollowUpDatumId
    * @returns {boolean}
    */
-  locationHasQuestionDatum (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string) {
+  locationHasQuestionDatum(questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string) {
     return this.data.findIndex(qD => {
       return this._locationMatchesQuestionDatum(qD, sectionRepetition, sectionFollowUpDatumId) &&
-        qD.questionId === questionId}
+        qD.questionId === questionId
+    }
     ) !== -1
   }
 
-  getQuestionDatumByVarName (varName: string) {
-    
+  getQuestionDatumByVarName(varName: string) {
+
   }
 
   /**
@@ -422,7 +423,7 @@ export default class DataStore extends Emitter {
    * @param id
    * @returns {Object | undefined}
    */
-  getQuestionDatumById (id: string) {
+  getQuestionDatumById(id: string) {
     return this.questionDatumIdMap.get(id)
   }
 
@@ -432,19 +433,23 @@ export default class DataStore extends Emitter {
    * @param sectionRepetition
    * @param followUpDatumId
    */
-  hasConditionTag (name: string, sectionRepetition: number, followUpDatumId: string): boolean {
+  hasConditionTag(name: string, sectionRepetition: number, followUpDatumId: string): boolean {
+    console.log('hasConditionTag', name, this.conditionTags)
     for (const tag of this.conditionTags[ConditionTagScope.RESPONDENT]) {
-      if (tag.conditionTag && tag.conditionTag.name === name) {
+      const conditionTagName = this.conditionTagStore.getNameFromId(tag.conditionId)
+      if (conditionTagName === name) {
         return true
       }
     }
     for (const tag of this.conditionTags[ConditionTagScope.SURVEY]) {
-      if (tag.conditionTag && tag.conditionTag.name === name) {
+      const conditionTagName = this.conditionTagStore.getNameFromId(tag.conditionId)
+      if (conditionTagName === name) {
         return true
       }
     }
     for (const tag of this.conditionTags[ConditionTagScope.SECTION]) {
-      if (tag.repetition === sectionRepetition && tag.followUpDatumId === followUpDatumId && tag.conditionTag && tag.conditionTag.name === name) {
+      const conditionTagName = this.conditionTagStore.getNameFromId(tag.conditionId)
+      if (tag.repetition === sectionRepetition && tag.followUpDatumId === followUpDatumId && conditionTagName === name) {
         return true
       }
     }
@@ -458,6 +463,6 @@ export default class DataStore extends Emitter {
  * @param json
  * @returns {object|array}
  */
-export function copy (json: object) {
+export function copy(json: object) {
   return JSON.parse(JSON.stringify(json))
 }
