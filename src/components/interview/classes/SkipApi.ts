@@ -3,10 +3,11 @@ import { InterviewLocation } from "../services/InterviewAlligator";
 import DataStore from "./DataStore";
 import InterviewManager from "./InterviewManager";
 
-export function createSkipApi(interview: InterviewManager) {
-  const vars = createVarsProxy(interview, interview.location)
-  const tags = createTagsProxy(interview.data, interview.location)
-  const data = createDataProxy(interview, interview.location)
+export function createSkipApi(interview: InterviewManager, location: InterviewLocation) {
+  const vars = createVarsProxy(interview, location)
+  const tags = createTagsProxy(interview.data, location)
+  const data = createDataProxy(interview, location)
+  console.log('createSkipApi')
   return { vars, tags, data }
 }
 
@@ -20,7 +21,6 @@ export function createTagsProxy(data: DataStore, location: InterviewLocation) {
 
 function getVarNameData(varName: string, interview: InterviewManager, location: InterviewLocation): Datum | Datum[] | undefined {
   const qd = interview.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpDatumId)
-  console.log(varName, qd)
   if (!qd) {
     return
   }

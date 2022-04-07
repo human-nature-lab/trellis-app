@@ -1,3 +1,4 @@
+import { InterviewLocation } from '../components/interview/services/InterviewAlligator'
 import InterviewManager from '../components/interview/classes/InterviewManager'
 import { createSkipApi } from '../components/interview/classes/SkipApi'
 import Skip from '../entities/trellis/Skip'
@@ -21,9 +22,9 @@ export default class SkipService {
    * @param {Set<string>} conditionTags - A Set of existing condition names
    * @returns {boolean}
    */
-  shouldSkip (skips: Skip[], conditionTags: Set<string>, interview?: InterviewManager): boolean {
+  shouldSkip (skips: Skip[], conditionTags: Set<string>, interview?: InterviewManager, location?: InterviewLocation): boolean {
     let shouldShow = true
-    let api = this.evalService.size() > 0 && interview ? createSkipApi(interview) : undefined
+    let api = this.evalService.size() > 0 && interview ? createSkipApi(interview, location) : undefined
     for (let skip of skips) {
       if (skip.customLogic) {
         shouldShow = this.evalService.run(skip.id, api)

@@ -509,7 +509,7 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param {string} sectionFollowUpDatumId
    * @returns {QuestionDatum}
    */
-  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpDatumId: string): QuestionDatum {
+  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpDatumId: string): QuestionDatum | undefined {
     let questionId = this.varNameIndex.get(varName)
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
@@ -524,8 +524,6 @@ export default class InterviewManager extends InterviewManagerBase {
       }
     } else if (questionData.length === 1) {
       return questionData[0]
-    } else {
-      throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
     }
   }
 

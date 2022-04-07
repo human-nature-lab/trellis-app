@@ -10,7 +10,7 @@
           class="mr-2"
           v-if="!showSkips"
           @click="showSkips = !showSkips"
-        >{{ $tc('skip_count', value.skips.length) }}</v-chip>
+        >{{ $tc('skip_count', value.skips ? value.skips.length : 0) }}</v-chip>
         <DotsMenu :disabled="builder.locked" removable @remove="$emit('remove')">
           <ToggleItem v-model="showSkips" :onTitle="$t('hide_skips')" :offTitle="$t('show_skips')" />
           <v-list-item :disabled="builder.locked" @click="addQuestion">

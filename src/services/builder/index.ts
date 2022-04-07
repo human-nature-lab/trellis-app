@@ -32,7 +32,7 @@ class FormBuilderService {
 
   async newQuestionGroup(sectionId: string): Promise<QuestionGroup> {
     const res = await builderInst.post(uriTemplate('/section/{section_id}/group', [sectionId]))
-    return new QuestionGroup().fromSnakeJSON(res.data)
+    return new QuestionGroup().fromSnakeJSON(res.data.questionGroup)
   }
 
   async removeQuestionGroup(pageId: string): Promise<void> {

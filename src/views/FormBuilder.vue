@@ -14,6 +14,7 @@
         class="mr-6"
         :locale.sync="builder.locale"
         :locked.sync="builder.locked"
+        :formId="builder.form.id"
         @addSection="addSection"
         @refresh="load"
       />

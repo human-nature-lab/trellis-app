@@ -14,6 +14,14 @@
         </v-list-item-action>
         {{ $t('add_section') }}
       </v-list-item>
+      <v-list-item :to="{ name: 'InterviewPreview', params: { formId: formId } }" target="_blank">  
+        <v-list-item-action>
+          <v-icon>mdi-eye</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          {{ $t('preview_form') }}
+        </v-list-item-content>
+      </v-list-item>
       <LocaleSelectorMenu :value="locale" @input="updateLocale" :studyId="study.id">
         <template #activator="{ attrs, on }">
           <v-list-item v-bind="attrs" v-on="on">
@@ -48,6 +56,7 @@ export default Vue.extend({
   props: {
     locked: Boolean,
     locale: Object as PropType<Locale>,
+    formId: String,
   },
   data() {
     return {

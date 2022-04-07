@@ -70,6 +70,9 @@ export default Vue.extend({
       try {
         const page = await FormBuilderService.newQuestionGroup(this.value.id)
         const s = this.value
+        page.questions = []
+        page.skips = []
+        console.log('added page', page)
         s.pages.push(page)
         this.$emit('input', s)
       } catch (err) {

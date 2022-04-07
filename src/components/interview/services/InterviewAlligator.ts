@@ -225,7 +225,7 @@ export default class InterviewAlligator {
   private shouldSkipPage (loc: InterviewLocation): boolean {
     const conditionTagNames = this.getConditionTagSet(loc.sectionRepetition, loc.sectionFollowUpDatumId)
     const page = this.pageIndex.get(loc.pageId)
-    return this.skipService.shouldSkip(page.skips, conditionTagNames)
+    return this.skipService.shouldSkip(page.skips, conditionTagNames, this.manager, loc)
   }
 
   public seekTo (loc: InterviewLocation): boolean {
