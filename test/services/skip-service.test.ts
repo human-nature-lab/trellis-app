@@ -3,7 +3,7 @@ import InterviewManager from '../../src/components/interview/classes/InterviewMa
 import { expect } from 'chai'
 import Skip from '../../src/entities/trellis/Skip'
 import { uniqueId } from 'lodash'
-import { createForm } from './util'
+import { createForm, createFormData } from './util'
 import Interview from '../../src/entities/trellis/Interview'
 import Form from '../../src/entities/trellis/Form'
 import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
@@ -191,27 +191,33 @@ export default function () {
         shouldHide([customSkip('function () { return false; }')], new Set())
       })
     })
-    describe('custom vars access', () => {
-      const q1 = new QuestionDatum().fromSnakeJSON({ question_id: '1', data: [] })
-      q1.data.push(new Datum().fromSnakeJSON({ val: 'world' }))
-      const q2 = new QuestionDatum().fromSnakeJSON({ question_id: '2', data : [] })
-      q2.data.push(new Datum().fromSnakeJSON({ val: 'bar' }))
+    describe('custom vars access', async () => {
       const form = createForm({
         sections: [{
           pages: [{
             questions: [{
-              id: '1',
               var_name: 'hello',
             }, {
-              id: '2',
               var_name: 'foo',
             }]
           }]
         }]
       })
-      const manager = new InterviewManager(new Interview(), form, [], [q1, q2])
-      shouldShow([customSkip(`function ({ vars }) { return vars.hello === 'world'; }`)], manager)
-      shouldHide([customSkip(`function ({ vars }) { return vars.foo === 'nobar'; }`)], manager)
+      const data = createFormData(form, [{ 
+        varName: 'hello', 
+        data: [{ val: 'world' }],
+      }, {
+        varName: 'foo',
+        data: [{ val: 'bar' }],
+      }])
+      console.log('form data', form, data)
+      const manager = new InterviewManager(new Interview(), form, [], data)
+      await manager.initialize()
+      shouldShow([customSkip(`function ({ vars }) { 
+        console.log('vars.hello', vars.hello);
+        return vars.hello === 'world';
+      }`)], new Set(), manager)
+      shouldHide([customSkip(`function ({ vars }) { return vars.foo === 'nobar'; }`)], new Set(), manager)
     })
   })
 }

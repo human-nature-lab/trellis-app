@@ -5,6 +5,7 @@ import Section from './Section'
 import Skip from './Skip'
 import Translation from './Translation'
 import StudyForm from './StudyForm'
+import Question from './Question'
 
 @Entity()
 export default class Form extends TimestampedSoftDelete {
@@ -74,5 +75,17 @@ export default class Form extends TimestampedSoftDelete {
         }
       }
     }
+  }
+
+  varNameQuestionMap () {
+    const m = new Map<string, Question>()
+    for (const section of this.sections) {
+      for (const page of section.pages) {
+        for (const question of page.questions) {
+          m.set(question.varName, question)
+        }
+      }
+    }
+    return m
   }
 }
