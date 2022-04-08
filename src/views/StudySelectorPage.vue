@@ -17,7 +17,7 @@
 
 <script>
   import { routeQueue } from '../router'
-  import StudySelector from '../components/StudySelector'
+  import StudySelector from '../components/StudySelector.vue'
   export default {
     name: 'study-selector-page',
     methods: {

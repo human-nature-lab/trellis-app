@@ -63,14 +63,14 @@
   import ActionTypes from '../../../static/action.types'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import ActionMixin from '../mixins/ActionMixin'
-  import Photo from '../../photo/Photo'
-  import RespondentsSearch from '../../respondent/RespondentsSearch'
-  import ModalTitle from '../../ModalTitle'
+  import Photo from '../../photo/Photo.vue'
+  import RespondentsSearch from '../../respondent/RespondentsSearch.vue'
+  import ModalTitle from '../../ModalTitle.vue'
   import EdgeService from '../../../services/edge/EdgeService'
   import parameterTypes from '../../../static/parameter.types'
   import GeoService from '../../../services/geo/GeoService'
   import RespondentService from '../../../services/respondent/RespondentService'
-  import uniq from 'lodash/uniq'
+  import { uniq } from 'lodash'
 
   export default {
     name: 'relationship-question',

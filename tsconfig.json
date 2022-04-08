@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
-    "lib": ["es6", "es2015.promise", "dom", "es2015", "es2018.promise"],
-    "target": "es5",
+    "lib": [
+      "dom",
+      "es2016"
+    ],
+    "target": "es6",
     "module": "esnext",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "allowJs": true,
     "declaration": false,
     "sourceMap": true,
     "noImplicitThis": true,
@@ -15,11 +19,15 @@
     "baseUrl": ".",
     "jsx": "preserve",
     "paths": {
-      "@": ["./src"]
+      "@": [
+        "./src"
+      ]
     }
   },
   "include": [
     "./src/**/*",
+    "./src/**/*.mobile.ts",
+    "./src/**/*.web.ts",
     "plugins/cordova-plugin-file/types/index.d.ts"
   ],
   "exclude": [

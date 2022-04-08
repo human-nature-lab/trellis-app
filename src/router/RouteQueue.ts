@@ -67,7 +67,7 @@ export class RouteQueue {
   }
 
   private setCurrentRoute (route: QueuableRoute) {
-    this.currentRoute = JSON.parse(JSON.stringify(copyWhitelist(route, CURRENT_ROUTE_PROPS)))
+    this.currentRoute = copyWhitelist(route, CURRENT_ROUTE_PROPS)
   }
 
   push (nextRoute: QueuableRoute) {

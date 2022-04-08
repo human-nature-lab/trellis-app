@@ -12,20 +12,8 @@ export default class SortedArray<T> extends Array {
   constructor (readonly __comparator__: CompareFunction<T> = (a: T, b: T) => (<any>a - <any>b)) {
     super()
     this.insertSorted = function (item: T) {
-      // if (Array.isArray(item)) {
-      //   for (let item of items) {
-      //     this.insertSorted(item)
-      //   }
-      // }
-      // if (this.length) {
-      //   this.splice(idx, 0, items)
-      // } else {
-      //   this.push(items)
-      // }
       // TODO: This is basically useless and it should be possible to insert after a binary search instead, but we don't
-      // debugger
       // let idx = SortedArray.binarySearch(this, items, this.__comparator__)
-      // console.log(idx)
       this.push(item)
       this.sort(this.__comparator__)
     }

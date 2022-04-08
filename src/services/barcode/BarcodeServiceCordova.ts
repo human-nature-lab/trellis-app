@@ -1,5 +1,5 @@
 import BarcodeServiceInterface from './BarcodeServiceInterface'
-import merge from 'lodash/merge'
+import { merge } from 'lodash'
 
 export default class BarcodeServiceCordova implements BarcodeServiceInterface {
 

@@ -6,6 +6,7 @@
       :key="skip.id">
       <SkipRow
         :conditionTags="conditionTags"
+        :disabled="disabled"
         :subject="subject"
         @save="updateSkip"
         @remove="removeSkip(skip)"
@@ -15,7 +16,7 @@
     <SkipRow
       v-if="showNewSkip && conditionTags !== null"
       :conditionTags="conditionTags"
-      :disabled="lockNewSkip"
+      :disabled="disabled || lockNewSkip"
       @save="storeNewSkip"
       @remove="removeNewSkip"
       :subject="subject"
@@ -42,6 +43,7 @@
     components: { SkipRow },
     props: {
       skips: Array as () => Skip[],
+      disabled: Boolean,
       conditionTags: Array as () => ConditionTag[] | null,
       subject: {
         type: String,

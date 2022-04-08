@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import AsyncTranslationText from '../AsyncTranslationText'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
   import GeoService from '../../services/geo/GeoService'
   import singleton from '../../static/singleton'
   export default {

@@ -15,9 +15,8 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  // @ts-ignore
-  import FormListItem from './FormListItem'
-  import { DisplayForm } from './RespondentForms'
+  import FormListItem from './FormListItem.vue'
+  import { DisplayForm } from './RespondentForms.vue'
   import singleton from '../../static/singleton'
   import Interview from '../../entities/trellis/Interview'
 
@@ -86,7 +85,3 @@
     }
   })
 </script>
-
-<style lang="sass" scoped>
-
-</style>

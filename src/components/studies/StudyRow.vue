@@ -37,7 +37,7 @@
   import StudyLocale from '../../entities/trellis/StudyLocale'
   import PermissionMixin from '../../mixins/PermissionMixin'
   import LocaleService from '../../services/locale/LocaleService'
-  import CRUDMenu from '../CRUDMenu'
+  import CRUDMenu from '../CRUDMenu.vue'
   export default Vue.extend({
     name: 'StudyRow',
     mixins: [PermissionMixin],
@@ -104,7 +104,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

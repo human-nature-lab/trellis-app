@@ -19,7 +19,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Markdown from '../Markdown'
+  import Markdown from '../Markdown.vue'
   export default Vue.extend({
     components: {Markdown},
     name: 'Documentation',

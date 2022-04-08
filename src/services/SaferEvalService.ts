@@ -1,6 +1,10 @@
 const restrictedGlobals = ['window', 'self', 'top', 'document', 'XMLHttpRequest', 'fetch', 'WebAssembly', 'global', 'process', 'imports', 'webpack']
-export default class ConditionAssignmentService {
-  public conditionAssignmentMethods: Map<string, Function> = new Map()
+export default class SaferEvalService {
+  public methods: Map<string, Function> = new Map()
+
+  size () {
+    return this.methods.size
+  }
 
   /**
    * Register an eval function with a unique name
@@ -9,7 +13,7 @@ export default class ConditionAssignmentService {
    */
   register(id: string, functionString: string): void {
     // TODO: Do this safely instead. Maybe consider using -> https://github.com/andywer/threads.js/tree/master
-    this.conditionAssignmentMethods.set(id, Function(`'use strict';
+    this.methods.set(id, Function(`'use strict';
       return (function (${restrictedGlobals.join(',')}) {
         return ${functionString}
       })()
@@ -21,7 +25,7 @@ export default class ConditionAssignmentService {
    * @param id
    */
   unregister(id: string): void {
-    this.conditionAssignmentMethods.delete(id)
+    this.methods.delete(id)
   }
 
   /**
@@ -31,8 +35,8 @@ export default class ConditionAssignmentService {
    * @returns {*}
    */
   run(id: string, ...args): boolean {
-    if (this.conditionAssignmentMethods.get(id)) {
-      return this.conditionAssignmentMethods.get(id).call(null, ...args)
+    if (this.methods.get(id)) {
+      return this.methods.get(id).call(null, ...args)
     } else {
       return false
     }
@@ -42,6 +46,6 @@ export default class ConditionAssignmentService {
    * Remove all registered functions
    */
   clear() {
-    this.conditionAssignmentMethods.clear()
+    this.methods.clear()
   }
 }

@@ -16,7 +16,7 @@
   import Vue from 'vue'
   import Documentation from './Documentation.vue'
   import DocsTOC from './DocsTOC.vue'
-  import { Route } from 'vue-router/types/router'
+  import { Route } from 'vue-router'
   import global from '../../static/singleton'
   export default Vue.extend({
     components: {Documentation, DocsTOC},
@@ -56,7 +56,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

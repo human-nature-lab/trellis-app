@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height class="ma-0 pa-0 justify-start align-start">
+  <v-container fluid fill-height class="ma-0 pa-0 justify-start align-start trellis-interview">
     <v-col>
       <v-toolbar flat dense class="flex-grow-0">
         <v-toolbar-title>
@@ -123,10 +123,10 @@
 </template>
 
 <script lang="ts">
-  import Page from './Page'
-  import ConditionTagList from './ConditionTagList'
-  import AsyncTranslationText from '../AsyncTranslationText'
-  import ConditionAssignmentErrors from './ConditionAssignmentErrors'
+  import Page from './Page.vue'
+  import ConditionTagList from './ConditionTagList.vue'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
+  import ConditionAssignmentErrors from './ConditionAssignmentErrors.vue'
   import menuBus from '../main-menu/MenuBus'
   import global from '../../static/singleton'
   import AT from '../../static/action.types'
@@ -139,7 +139,7 @@
   import router, { routeQueue } from '../../router'
   import InterviewLoader from './services/InterviewLoader'
   import SurveyService from '../../services/survey'
-  import cloneDeep from 'lodash/cloneDeep'
+  import { cloneDeep } from 'lodash'
 
   function load (to) {
     return new Promise(async (resolve, reject) => {
@@ -431,6 +431,7 @@
 </script>
 
 <style lang="sass">
+.trellis-interview
   .light
     color: grey
   .condition-tag-dialog

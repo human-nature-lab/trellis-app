@@ -1,18 +1,31 @@
 <template>
-  <v-col>
-    <v-row v-if="form" no-gutters>
-      <div class="title" v-if="form">
-        <TranslatedText :translation="form.nameTranslation" :locale="locale" />
+  <v-col class="grey lighten-3 min-h-screen">
+    <v-row v-if="builder.form" no-gutters class="dheader align-center">
+      <div class="title">
+        <Translation
+          editable
+          :locked="builder.locked"
+          v-model="builder.form.nameTranslation"
+          :locale="builder.locale"
+        />
       </div>
       <v-spacer />
-      <BuilderMenu @addSection="addSection" />
+      <BuilderMenu
+        class="mr-6"
+        :locale.sync="builder.locale"
+        :locked.sync="builder.locked"
+        :formId="builder.form.id"
+        @addSection="addSection"
+        @refresh="load"
+      />
     </v-row>
     <v-progress-linear v-if="isLoading" indeterminate />
-    <v-col v-else>
+    <v-col v-if="builder.form">
       <Section
-        v-for="(section, index) in form.sections"
+        v-for="(section, index) in builder.form.sections"
         :key="section.id"
-        v-model="form.sections[index]"
+        v-model="builder.form.sections[index]"
+        @remove="removeSection(section)"
       />
     </v-col>
   </v-col>
@@ -20,6 +33,7 @@
 
 <script lang="ts">
 import Form from '../entities/trellis/Form'
+import SectionModel from '../entities/trellis/Section'
 import Vue from 'vue'
 import FormService from '../services/form/FormService'
 import ConditionTagService from '../services/condition-tag'
@@ -27,36 +41,38 @@ import Section from '../components/builder/Section.vue'
 import singleton from '../static/singleton'
 import ConditionTag from '../entities/trellis/ConditionTag'
 import QuestionType from '../entities/trellis/QuestionType'
-import FormBuilderService from '../services/builder'
+import builderService from '../services/builder'
 import TrellisModal from '../components/TrellisModal.vue'
-import TranslatedText from '../components/TranslatedText.vue'
+import Translation from '../components/builder/Translation.vue'
 import BuilderMenu from '../components/builder/BuilderMenu.vue'
+import { builder } from '../symbols/builder'
+import { study } from '../symbols/main'
+import Parameter from '../entities/trellis/Parameter'
+import GeoType from '../entities/trellis/GeoType'
+import GeoTypeService from '../services/geotype'
 
 export default Vue.extend({
   name: 'FormBuilder',
-  components: { Section, TrellisModal, TranslatedText, BuilderMenu },
+  components: { Section, TrellisModal, Translation, BuilderMenu },
   data() {
     return {
-      isLoading: false,
-      form: null as Form,
-      locale: singleton.locale,
-      questionTypes: [] as QuestionType[],
-      conditionTags: [] as ConditionTag[],
+      isLoading: true,
+      builder: {
+        form: null as Form,
+        locale: singleton.locale ? singleton.locale.copy() : null,
+        locked: true,
+        questionTypes: [] as QuestionType[],
+        parameters: [] as Parameter[],
+        conditionTags: [] as ConditionTag[],
+        geoTypes: [] as GeoType[],
+      },
     }
   },
   provide() {
-    const p = {}
-    Object.defineProperty(p, 'builder', {
-      enumerable: true,
-      get: () => ({
-        form: this.form,
-        studyId: singleton.study.id,
-        locale: this.locale,
-        questionTypes: this.questionTypes,
-        conditionTags: this.conditionTags,
-      }),
-    })
-    return p
+    return {
+      [builder]: this.builder,
+      [study]: Vue.observable(singleton.study),
+    }
   },
   created() {
     this.load()
@@ -65,23 +81,51 @@ export default Vue.extend({
     async load() {
       this.isLoading = true
       try {
-        const form = await FormService.getForm(this.$route.params.formId)
-        this.conditionTags = await ConditionTagService.all()
-        this.questionTypes = await FormBuilderService.getQuestionTypes()
-        this.questionTypes.sort((a, b) => a.name.localeCompare(b.name))
+        const [form, tags, questionTypes, parameters, geoTypes] = await Promise.all([
+          FormService.getForm(this.$route.params.formId),
+          ConditionTagService.all(),
+          builderService.getQuestionTypes(),
+          builderService.getParameterTypes(),
+          GeoTypeService.allStudyGeoTypes(singleton.study.id),
+        ])
+        questionTypes.sort((a, b) => a.name.localeCompare(b.name))
         form.sort()
-        this.form = form
+        parameters.sort((a, b) => a.name.localeCompare(b.name))
+        tags.sort((a, b) => a.name.localeCompare(b.name))
+        this.builder.form = form
+        this.builder.questionTypes = questionTypes
+        this.builder.conditionTags = tags
+        this.builder.parameters = parameters
+        this.builder.geoTypes = geoTypes
       } catch (err) {
-        this.alert('error', err)
+        this.logError(err)
       } finally {
         this.isLoading = false
       }
     },
     async addSection() {
+      if (this.isLoading) return
       this.isLoading = true
       try {
-        const section = await FormService.createSection(this.$route.params.formId)
-        this.form.sections.push(section)
+        const section = await builderService.createSection(this.$route.params.formId, { sort_order: this.builder.form.sections.length })
+        console.log(JSON.stringify(section))
+        this.builder.form.sections.push(section)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.isLoading = false
+      }
+    },
+    async removeSection(section: SectionModel) {
+      this.isLoading = true
+      try {
+        await builderService.removeSection(section.id)
+        const index = this.builder.form.sections.indexOf(section)
+        if (index > -1) {
+          this.builder.form.sections.splice(index, 1)
+        }
+      } catch (err) {
+        this.logError(err)
       } finally {
         this.isLoading = false
       }
@@ -90,6 +134,11 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 
+.header
+  background: #f5f5f5
+  top: 0px
+  z-index: 100
+    // width: calc(100% - 10px)
 </style>

@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import Camera from './WebCamera'
+  import Camera from './WebCamera.vue'
   export default {
     name: 'camera-test',
     components: {

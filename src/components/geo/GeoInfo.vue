@@ -88,19 +88,14 @@
 <script lang="ts">
   import Translation from '../../entities/trellis/Translation'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import TranslationTextField from '../TranslationTextField'
-  import TrellisModal from '../TrellisModal'
+  import TranslationTextField from '../TranslationTextField.vue'
+  import TrellisModal from '../TrellisModal.vue'
 
-  // @ts-ignore
-  import GeoBreadcrumbs from './GeoBreadcrumbs'
-  // @ts-ignore
-  import PhotoAlbum from '../photo/PhotoAlbum'
-  // @ts-ignore
-  import GeoTypeSelector from './GeoTypeSelector'
-  // @ts-ignore
-  import AsyncTranslationText from '../AsyncTranslationText'
-  // @ts-ignore
-  import Permission from '../Permission'
+  import GeoBreadcrumbs from './GeoBreadcrumbs.vue'
+  import PhotoAlbum from '../photo/PhotoAlbum.vue'
+  import GeoTypeSelector from './GeoTypeSelector.vue'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
+  import Permission from '../Permission.vue'
   import Photo from '../../entities/trellis/Photo'
   import TranslationMixin from '../../mixins/TranslationMixin'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'

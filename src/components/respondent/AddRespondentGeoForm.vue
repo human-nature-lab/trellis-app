@@ -43,12 +43,9 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  // @ts-ignore
-  import GeoSearch from '../geo/GeoSearch'
-  // @ts-ignore
-  import ModalTitle from '../ModalTitle'
-  // @ts-ignore
-  import AsyncTranslationText from '../AsyncTranslationText'
+  import GeoSearch from '../geo/GeoSearch.vue'
+  import ModalTitle from '../ModalTitle.vue'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
 
   import RespondentService from '../../services/respondent/RespondentService'
   import RespondentGeo from '../../entities/trellis/RespondentGeo'
@@ -102,7 +99,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

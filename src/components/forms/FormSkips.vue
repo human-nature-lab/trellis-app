@@ -24,7 +24,7 @@
   import Vue from 'vue'
   import Form from '../../entities/trellis/Form'
   import Skip from '../../entities/trellis/Skip'
-  import SkipEditor from '../skips/SkipEditor'
+  import SkipEditor from '../skips/SkipEditor.vue'
   import ConditionTagService from '../../services/condition-tag'
   import SkipService from '../../services/skip'
   import FormSkip from '../../entities/trellis/FormSkip'
@@ -82,7 +82,3 @@
     }
   })
 </script>
-
-<style scoped>
-
-</style>

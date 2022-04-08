@@ -1,27 +1,17 @@
 import { Mutex } from 'async-mutex'
 import Vue from 'vue'
-import Router, { RouteConfig } from 'vue-router'
+import Router from 'vue-router'
 import { defaultLoggingService as logger } from '../services/logging/LoggingService'
 import singleton from '../static/singleton'
 import SyncGuard from './guards/SyncGuard'
 import LoginGuard from './guards/LoginGuard'
 import { guardQueue } from './GuardQueue'
 
-import appRoutes from './app.routes'
+import routes from './routes'
 import { RouteQueue } from './RouteQueue'
-import webRoutes from './web.routes'
-import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
-// @ts-ignore
-import { AddSnack } from '../components/SnackbarQueue'
+import { AddSnack } from '../components/SnackbarQueue.vue'
 import PhotoService from '../services/photo/PhotoService'
-
-let routes = sharedRoutes
-if (singleton.offline) {
-  routes = routes.concat(appRoutes)
-} else {
-  routes = routes.concat(webRoutes)
-}
 
 Vue.use(Router)
 
@@ -86,6 +76,7 @@ router.onReady(() => {
 })
 
 router.onError(err => {
+  console.error(err)
   err.severity = LoggingLevel.error
   err.component = err.component ? err.component : 'router/index.js@onError'
   logger.log(err)
@@ -122,7 +113,7 @@ export function routerReady () {
       isReady = true
       clearInterval(intervalId)
       resolve(false)
-    }, 5000)
+    }, 1000)
     check()
   })
 }

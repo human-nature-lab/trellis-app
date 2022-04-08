@@ -12,7 +12,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import config from 'config'
-  import { Route } from 'vue-router/types/router'
+  import { Route } from 'vue-router'
   import { getToken } from '../services/http/AxiosInstance'
   import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import global from '../static/singleton'

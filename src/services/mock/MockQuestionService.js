@@ -1,6 +1,5 @@
 import faker from 'faker'     // https://github.com/marak/Faker.js/
-import merge from 'lodash/merge'
-import cloneDeep from 'lodash/cloneDeep'
+import { merge, cloneDeep } from 'lodash'
 import GeneratorService from './GeneratorService'
 import MockService from './MockService'
 

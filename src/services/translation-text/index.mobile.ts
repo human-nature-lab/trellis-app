@@ -3,7 +3,7 @@ import TranslationText from '../../entities/trellis/TranslationText'
 import TranslationTextServiceInterface from './TranslationTextServiceInterface'
 import { IsNull } from 'typeorm'
 
-export default class TranslationTextServiceCordova implements TranslationTextServiceInterface {
+class TranslationTextServiceCordova implements TranslationTextServiceInterface {
 
   async createTranslationText (translationId: string, translationText: TranslationText): Promise<TranslationText> {
     const repo = await DatabaseService.getRepository(TranslationText)
@@ -27,3 +27,5 @@ export default class TranslationTextServiceCordova implements TranslationTextSer
     })
   }
 }
+
+export default new TranslationTextServiceCordova()

@@ -111,8 +111,8 @@
 <script>
   import TrellisAlert from '../../TrellisAlert.vue'
   import SyncStep from '../SyncStep.vue'
-  import CheckConnection from '../common/substeps/CheckConnection'
-  import AuthenticateDevice from '../common/substeps/AuthenticateDevice'
+  import CheckConnection from '../common/substeps/CheckConnection.vue'
+  import AuthenticateDevice from '../common/substeps/AuthenticateDevice.vue'
   import EmptyUploadsDirectory from './substeps/EmptyUploadsDirectory.vue'
   import CreateUpload from './substeps/CreateUpload.vue'
   import CompressUpload from './substeps/CompressUpload.vue'

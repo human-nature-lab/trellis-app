@@ -14,6 +14,12 @@ function mobileOnly (req, res, next) {
 const isProd = process.env.NODE_ENV === 'production'
 console.log('isProd', isProd, process.env.NODE_ENV, process.env.APP_ENV)
 module.exports = webpackMerge(config, {
+  resolve: {
+    extensions: [
+      '.mobile.ts',
+      '.mobile.js',
+    ]
+  },
   devServer: {
     before (app, server, compiler) {
       app.get('/cordova.js', mobileOnly, (req, res) => {

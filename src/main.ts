@@ -6,7 +6,7 @@ import './assets/main.sass'
 import Vue from 'vue'
 import VueCordova from 'vue-cordova'
 import VueHead from 'vue-head'
-import i18n from './i18n/index'
+import { i18n } from './i18n'
 import './mixins/GlobalMixin'
 import 'typeface-roboto/index.css'
 import Debug from './components/Debug.vue'
@@ -19,7 +19,7 @@ import vuetify from './plugins/vuetify'
 import { APP_ENV } from './static/constants'
 import './logging'
 import './filters/toFixed.filter'
-import './checkWebviewVersion'
+// import './checkWebviewVersion'
 
 async function init () {
   // Wait for the configuration to load before doing anything else

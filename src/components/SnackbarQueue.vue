@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-  import merge from 'lodash/merge'
+  import { merge } from 'lodash'
   import Vue, {Component} from 'vue'
 
   interface SnackConfig {

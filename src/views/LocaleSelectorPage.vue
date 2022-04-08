@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  import LocaleSelector from '../components/LocaleSelector'
+  import LocaleSelector from '../components/LocaleSelector.vue'
   import { routeQueue } from '../router'
   export default {
     name: 'locale-selector',

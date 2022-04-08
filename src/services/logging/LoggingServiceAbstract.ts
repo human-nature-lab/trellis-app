@@ -1,4 +1,4 @@
-import merge from 'lodash/merge'
+import { merge } from 'lodash'
 import uuid from 'uuid/v4'
 import Log from '../../entities/trellis-config/Log'
 import { isUndefined } from '../util'

@@ -44,7 +44,7 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   photos: Photo[]
 
   @Relationship({ generator: rctGenerator, async: true })
-  @LazyQuery(RespondentConditionTag, (repo, respondent) => {
+  @LazyQuery(type => RespondentConditionTag, (repo, respondent) => {
     return repo.find({
       respondentId: respondent.id,
       deletedAt: null

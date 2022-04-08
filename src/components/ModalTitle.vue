@@ -29,7 +29,3 @@
     name: 'ModalTitle'
   })
 </script>
-
-<style scoped>
-
-</style>

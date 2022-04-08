@@ -221,7 +221,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

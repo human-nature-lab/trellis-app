@@ -100,11 +100,11 @@
 </template>
 
 <script>
-  import ModalTitle from '../ModalTitle'
-  import GeoSearch from '../geo/GeoSearch'
-  import AsyncTranslationText from '../AsyncTranslationText'
+  import ModalTitle from '../ModalTitle.vue'
+  import GeoSearch from '../geo/GeoSearch.vue'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
   import RespondentService from '../../services/respondent/RespondentService'
-  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs'
+  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs.vue'
 
   export default {
     name: 'MoveRespondentGeoForm',

@@ -1,13 +1,13 @@
 <template>
-  <TrellisModal title="Web Login" v-model="isOpen" @close="onClose">
+  <TrellisModal title="Web Login" v-model="isOpen" @close="onClose" persistent>
     <LoginForm @login="done" />
   </TrellisModal>
 </template>
 
 <script lang="ts">
   import Vue from 'vue'
-  import LoginForm from './LoginForm'
-  import TrellisModal from '../TrellisModal'
+  import LoginForm from './LoginForm.vue'
+  import TrellisModal from '../TrellisModal.vue'
 
   let component: typeof Vue
   

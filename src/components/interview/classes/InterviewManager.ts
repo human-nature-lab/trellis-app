@@ -184,13 +184,7 @@ export default class InterviewManager extends InterviewManagerBase {
     let questionBlueprint: Question = null
     if (action.questionId) {
       questionDatum = this.navigator.getActionQuestionDatum(action)
-      if (!questionDatum) {
-        debugger
-      }
       questionBlueprint = this.questionIndex.get(action.questionId)
-      if (!questionBlueprint) {
-        debugger
-      }
     } else if (action.actionType !== 'next' && action.actionType !== 'previous') {
       console.error(action)
       throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
@@ -446,7 +440,6 @@ export default class InterviewManager extends InterviewManagerBase {
       }
       if (c > 10) {
         console.error(`passed through ${c} pages`)
-        debugger
       }
     } else {
       this.navigator.seekTo({section, sectionRepetition, sectionFollowUpRepetition, page})
@@ -499,8 +492,6 @@ export default class InterviewManager extends InterviewManagerBase {
     }
   }
 
-
-
   /**
    * Returns the value for a respondent fill with the specified varName
    * @param {string} varName
@@ -516,13 +507,13 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param {string} sectionFollowUpDatumId
    * @returns {QuestionDatum}
    */
-  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpDatumId: string): QuestionDatum {
-    let questionId = this.varNameIndex.get(varName)
+  getSingleDatumByQuestionVarName (varName: string, sectionFollowUpDatumId: string): QuestionDatum | undefined {
+    const questionId = this.varNameIndex.get(varName)
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
     // Find the question which has this specific datu1m id
-    let questionData = this.data.getQuestionDataByQuestionId(questionId) || []
+    const questionData = this.data.getQuestionDataByQuestionId(questionId) || []
     if (sectionFollowUpDatumId) {
       for (let qD of questionData) {
         if (qD.data.findIndex(d => d.id === sectionFollowUpDatumId) > -1) {
@@ -531,9 +522,18 @@ export default class InterviewManager extends InterviewManagerBase {
       }
     } else if (questionData.length === 1) {
       return questionData[0]
-    } else {
-      throw Error(`No question datum matches the var_name, ${varName}. Does it appear later in the survey?`)
     }
+  }
+
+  /**
+   * Access all QuestionDatum associated with a varName
+   */
+  getAllQuestionDatumByVarName (varName: string) {
+    const questionId = this.varNameIndex.get(varName)
+    if (!questionId) {
+      return []
+    }
+    return this.data.getQuestionDataByQuestionId(questionId) || []
   }
 
   /**

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import AutoClickButton from '../AutoClickButton'
+  import AutoClickButton from '../AutoClickButton.vue'
   export default {
     name: 'sync-step',
     data () {

@@ -20,7 +20,7 @@
           @click="global.menuDrawer.open = !global.menuDrawer.open" />
         <v-toolbar-title class="logo">
           <router-link :to="{name: 'Home'}" class="deep-orange--text">
-            <img src="../static/img/trellis-logo.png" alt="trellis" />
+            <img src="/img/trellis-logo.png?url" alt="trellis" />
           </router-link>
         </v-toolbar-title>
         <v-toolbar-title v-if="global.study" class="study">
@@ -97,7 +97,7 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container fluid fill-height class="align-start" v-if="!maintenanceMode">
+        <v-container fluid fill-height class="pa-0 align-start" v-if="!maintenanceMode">
           <router-view class="route-container fade-in" />
         </v-container>
         <v-container fluid fill-height class="align-start" v-else>
@@ -115,30 +115,29 @@
   </div>
 </template>
 
-<script >
-  import MainMenu from './components/main-menu/MainMenu'
-  import CensusFormChecker from './components/CensusFormChecker'
+<script lang="ts">
+  import MainMenu from './components/main-menu/MainMenu.vue'
+  import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
-  import VDivider from 'vuetify/src/components/VDivider/VDivider'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
-  import TrellisLoadingCircular from './components/TrellisLoadingCircle'
-  import LocationFinder from './components/LocationFinder'
+  import TrellisLoadingCircular from './components/TrellisLoadingCircle.vue'
+  import LocationFinder from './components/LocationFinder.vue'
   import router, { routeQueue } from './router'
   import singleton from './static/singleton'
   // Do not remove!
   import SingletonService from './services/SingletonService'
   import { defaultLoggingService } from './services/logging/LoggingService'
   import GeoLocationService from './services/geolocation'
-  import SnackbarQueue from './components/SnackbarQueue'
-  import DocsSidebar from './components/documentation/DocsSidebar'
+  import SnackbarQueue from './components/SnackbarQueue.vue'
+  import DocsSidebar from './components/documentation/DocsSidebar.vue'
   import UserService from './services/user/UserService'
   import config from 'config'
   import IsLoggedInMixin from './mixins/IsLoggedInMixin'
-  import Banner from './components/Banner'
+  import Banner from './components/Banner.vue'
   import PermissionMixin from './mixins/PermissionMixin'
   import Maintenance from './components/Maintenance.vue'
-  import maintenanceService, { MaintenanceData } from './services/maintenance'
+  import maintenanceService from './services/maintenance'
 
   export default {
     name: 'WebApp',
@@ -260,6 +259,7 @@
   //   &.fill-height
   //     align-items: start
   html, body
+    overflow: auto !important
     // overflow: auto !important
     /*padding-top: constant(safe-area-inset-top)*/
     /*padding-top: env(safe-area-inset-top)*/
@@ -319,7 +319,7 @@
   .scroll-container
     overflow: auto
     flex: 1 1 auto !important
-    margin-bottom: 64px
+    // margin-bottom: 64px
   // .study
   //   margin-left: 0
   .fade-in

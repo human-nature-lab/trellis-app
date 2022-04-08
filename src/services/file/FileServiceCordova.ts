@@ -1,6 +1,6 @@
 import DeviceService from '../device/DeviceService'
 import md5 from 'js-md5'
-import merge from 'lodash/merge'
+import { merge } from 'lodash'
 import CancellablePromise from '../../classes/CancellablePromise'
 declare var md5chksum, FileTransfer, cordova
 /* global md5chksum, FileTransfer */
@@ -151,9 +151,7 @@ class FileServiceCordova {
       const path = cordova.file.dataDirectory + filePath
       console.log('getFile', path)
       const fs = await this.requestFileSystem()
-      debugger
       fs.root.getFile(filePath, {create: false, exclusive: false}, (file: FileEntry) => {
-        debugger
       }, reject)
     })
   }

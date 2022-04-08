@@ -55,9 +55,9 @@
   import Vue from "vue";
   import Skip from "../../entities/trellis/Skip";
   import ConditionTag from "../../entities/trellis/ConditionTag";
-  import TrellisLoadingCircle from "../TrellisLoadingCircle";
-  import TrellisModal from "../TrellisModal";
-  import debounce from "lodash/debounce";
+  import TrellisLoadingCircle from "../TrellisLoadingCircle.vue";
+  import TrellisModal from "../TrellisModal.vue";
+  import { debounce } from "lodash";
   import SkipConditionTag from "../../entities/trellis/SkipConditionTag";
   import CompareService from "../../services/CompareService";
 
@@ -196,8 +196,3 @@
     },
   });
 </script>
-
-<style lang="sass" scoped>
-.h-full
-  height: 100%
-</style>

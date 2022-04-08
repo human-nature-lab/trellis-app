@@ -1,66 +1,115 @@
 <template>
-  <v-col class="mb-4 ml-4">
-    <v-row class="secondary py-2 px-2 question-drag-handle align-center">
-      <EditText v-model="value.varName" @save="updateQuestion" editable :loading="isWorking" :disabled="isWorking" />
-      <v-spacer />
-      <v-chip v-if="value.assignConditionTags && value.assignConditionTags.length" color="primary" label>
-        {{$t('assigns_condition_tags', ['"' + value.assignConditionTags.map(act => act.conditionTag.name).join('","') + '"'])}}
-      </v-chip>
-      <v-autocomplete
-        v-model="value.questionTypeId"
-        single-line
-        dense
-        :disabled="isWorking"
-        @change="updateQuestion"
-        item-value="id"
-        item-text="name"
-        :items="builder.questionTypes" />
-      <span class="pa-1 lowercase">{{$t('type')}}: {{value.questionType.name}}</span>
-    </v-row>
-    <v-row>
+  <v-col class="mb-4">
+    <QuestionHeader
+      :value="value"
+      :showParameters.sync="showParameters"
+      :showConditions.sync="showConditions"
+      :showChoices.sync="showChoices"
+      :allowChoices="isChoiceType"
+      @change="updateQuestion"
+      @remove="$emit('remove')"
+      :loading="working"
+    />
+    <v-col class="question-content">
       <Translation
-        v-model="value.questionTranslation"
         :locale="builder.locale"
+        :locked="builder.locked"
+        v-model="value.questionTranslation"
         class="text-body-1"
         autogrow
-        editable />
-    </v-row>
+        editable
+        textarea
+      />
+      <v-slide-y-transition>
+        <QuestionChoices
+          v-if="isChoiceType && showChoices"
+          :questionId="value.id"
+          :disabled="builder.locked"
+          v-model="value.choices"
+          :locale="builder.locale"
+        />
+      </v-slide-y-transition>
+      <v-slide-y-transition>
+        <QuestionParameters
+          v-if="showParameters"
+          :disabled="builder.locked"
+          v-model="value.questionParameters"
+          :parameters="builder.parameters"
+          :conditionTags="builder.conditionTags"
+          :locale="builder.locale"
+          :geoTypes="builder.geoTypes"
+          :questionId="value.id"
+          :choices="value.choices"
+        />
+      </v-slide-y-transition>
+      <v-slide-y-transition>
+        <QuestionConditions
+          v-if="showConditions"
+          :questionId="value.id"
+          :conditionTags="builder.conditionTags"
+          :disabled="builder.locked"
+          v-model="value.assignConditionTags"
+        />
+      </v-slide-y-transition>
+    </v-col>
   </v-col>
 </template>
 
 <script lang="ts">
-  import Vue, { PropOptions } from 'vue'
-  import Question from '../../entities/trellis/Question'
-  import BuilderMixin from '../../mixins/BuilderMixin'
-  import Translation from './Translation.vue'
+import Vue, { PropOptions } from 'vue'
+import Question from '../../entities/trellis/Question'
+import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
+import Translation from './Translation.vue'
 import EditText from './EditText.vue'
+import QuestionHeader from './QuestionHeader.vue'
+import QuestionParameters from './QuestionParameters.vue'
+import { builder } from '../../symbols/builder'
+import QuestionChoices from './QuestionChoices.vue'
+import questionTypes from '../../static/question.types'
+import QuestionConditions from './QuestionConditions.vue'
+import builderService from '../../services/builder'
 
-  export default Vue.extend({
-    name: 'Question',
-    mixins: [BuilderMixin],
-    components: { Translation, EditText },
-    props: {
-      value: Object as PropOptions<Question>,
-    },
-    data () {
-      return {
-        isWorking: false,
-      }
-    },
-    methods: {
-      async updateQuestion () {
-        this.isWorking = true
-        try {
-
-        } finally {
-          this.isWorking = false
-        }
+export default Vue.extend({
+  name: 'Question',
+  inject: { builder },
+  mixins: [FormQuestionsMixin],
+  components: { Translation, EditText, QuestionHeader, QuestionParameters, QuestionChoices, QuestionConditions },
+  props: {
+    value: Object as PropOptions<Question>,
+  },
+  data() {
+    return {
+      working: false,
+      showParameters: this.value && !!this.value.questionParameters.length,
+      showChoices: this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select,
+      showConditions: this.value && !!this.value.assignConditionTags.length,
+    }
+  },
+  methods: {
+    async updateQuestion() {
+      if (this.working) return
+      this.working = true
+      try {
+        await builderService.updateQuestion(this.value)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.working = false
       }
     }
-  })
+  },
+  computed: {
+    isChoiceType(): boolean {
+      return this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select
+    }
+  }
+})
 </script>
 
 <style lang="sass">
-  .lowercase
-    text-transform: lowercase
+
+.lowercase
+  text-transform: lowercase
+.question-content
+  border: 1px solid lightgrey
 </style>

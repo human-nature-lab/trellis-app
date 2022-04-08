@@ -66,18 +66,12 @@
 </template>
 
 <script lang="ts">
-  // @ts-ignore
-  import GeoSearch from '../geo/GeoSearch'
-  // @ts-ignore
-  import Permission from '../Permission'
-  // @ts-ignore
-  import RespondentGeoRow from './RespondentGeoRow'
-  // @ts-ignore
-  import AddRespondentGeoForm from './AddRespondentGeoForm'
-  // @ts-ignore
-  import MoveRespondentGeoForm from './MoveRespondentGeoForm'
-  // @ts-ignore
-  import { checkForCensusForm } from '../CensusFormChecker'
+  import GeoSearch from '../geo/GeoSearch.vue'
+  import Permission from '../Permission.vue'
+  import RespondentGeoRow from './RespondentGeoRow.vue'
+  import AddRespondentGeoForm from './AddRespondentGeoForm.vue'
+  import MoveRespondentGeoForm from './MoveRespondentGeoForm.vue'
+  import { checkForCensusForm } from '../CensusFormChecker.vue'
 
   import RespondentService from '../../services/respondent/RespondentService'
   import CensusTypes from '../../static/census.types'

@@ -1,6 +1,6 @@
 <template>
-  <v-card class="geo-search h100" :class="{'cart-spacing': selectedGeos.length}">
-    <v-col class="h100">
+  <v-card class="geo-search h-full" :class="{'cart-spacing': selectedGeos.length}">
+    <v-col class="h-full">
       <div class="search-header">
         <v-container fluid class="pb-0">
           <v-row>
@@ -81,9 +81,9 @@
               <v-list-item-title>
                 {{ $t('displaying_first_results',[defaultSearchResultsLimit]) }}
               </v-list-item-title>
-              <v-list-item-sub-title>
+              <v-list-item-title>
                 {{ $t('use_search_field_results') }}
-              </v-list-item-sub-title>
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -104,9 +104,9 @@
 </template>
 
 <script>
-  import GeoListTile from './GeoListTile'
-  import Cart from '../Cart'
-  import debounce from 'lodash/debounce'
+  import GeoListTile from './GeoListTile.vue'
+  import Cart from '../Cart.vue'
+  import { debounce } from 'lodash'
   import GeoService from '../../services/geo/GeoService'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
@@ -342,8 +342,6 @@
   .geo-list
     overflow-y: auto
     flex-grow: 1
-  .h100
-    height: 100%
   .geo-breadcrumbs
     .geo-name:not(:first-child):before
       content: ' \\ '

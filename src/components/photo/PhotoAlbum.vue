@@ -71,10 +71,10 @@
 </template>
 
 <script>
-  import Photo from './Photo'
-  import AddPhoto from './AddPhoto'
-  import FullscreenPhoto from './FullscreenPhoto'
-  import orderBy from 'lodash/orderBy'
+  import Photo from './Photo.vue'
+  import AddPhoto from './AddPhoto.vue'
+  import FullscreenPhoto from './FullscreenPhoto.vue'
+  import { orderBy } from 'lodash'
   import global from '../../static/singleton'
 
   export default {
@@ -186,8 +186,8 @@
     .photo-actions
       background: white
       width: 100%
-      position: absolute
-      bottom: 0
+      // position: absolute
+      // bottom: 0
     .photo-album-carousel-container
       height: 100%
       .photo-album-carousel-card

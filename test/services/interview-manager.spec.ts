@@ -200,7 +200,7 @@ function getCurrentQuestions (manager: InterviewManager): Question[] {
   return manager.getPageQuestions(manager.location.section, manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId, manager.location.page)
 }
 
-async function setupInterviewManager (formId: string, rId?: string, sId?: string, customActions?: Action[]) {
+export async function setupInterviewManager (formId: string, rId?: string, sId?: string, customActions?: Action[]) {
   const interview = await createNewSurvey(formId, rId, sId)
   const res = await InterviewLoader.loadInterview(interview.id)
   let {form, actions, data, respondentFills, baseRespondentConditionTags} = res

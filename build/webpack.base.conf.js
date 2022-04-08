@@ -175,6 +175,10 @@ module.exports = {
   },
   resolve: {
     extensions: [
+      '.webpack.ts',
+      '.webpack.js',
+      '.esnext.tx',
+      '.esnext.js',
       '.tsx',
       '.ts',
       '.mjs',

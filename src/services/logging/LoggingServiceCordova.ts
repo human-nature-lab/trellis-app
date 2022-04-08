@@ -1,7 +1,7 @@
 import AlertService from '../../services/AlertService'
 import LoggingServiceAbstract from './LoggingServiceAbstract'
 import Log from '../../entities/trellis-config/Log'
-import throttle from 'lodash/throttle'
+import { throttle } from 'lodash'
 import { LoggingLevel, LogRequest } from './LoggingTypes'
 import { IsNull, Not } from 'typeorm'
 import { Mutex, MutexInterface } from 'async-mutex'

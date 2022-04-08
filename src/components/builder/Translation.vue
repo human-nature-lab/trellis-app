@@ -1,48 +1,37 @@
 <template>
-  <v-col class="translation" :class="{ pointer: editable }">
-    <component
-      v-if="isEditing"
-      ref="input"
-      :is="useTextArea ? 'v-textarea' : 'v-text-field'"
+  <v-col class="translation" v-bind="$attrs">
+    <EditText
       :class="{ code: isCode }"
-      v-model="editingValue"
+      :value="editingValue"
+      :textarea="useTextArea"
       :label="locale.languageNative"
-      :loading="isWorking"
-      append-icon="mdi-content-save"
-      append-outer-icon="mdi-close"
+      :loading="loading || isWorking"
       autofocus
       :rows="rows"
-      @blur="onBlur"
+      :missingText="$t('no_translation_for', [locale.languageName])"
       :error-messages="error ? [error.toString()] : []"
       v-bind="$attrs"
-      @keyup.enter="saveEnter"
-      @click:append="save"
-      @click:append-outer="isEditing = false"
+      @save="save"
+      :code="isCode"
     />
-    <div v-else @click="startEditing">
-      <pre v-if="isCode"><code>{{ editingValue || translationText.translatedText }}</code></pre>
-      <span v-else>{{ editingValue || translationText.translatedText }}</span>
-      <v-icon @click="save" v-if="dirty" color="warning">mdi-content-save</v-icon>
-    </div>
   </v-col>
 </template>
 
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
-import Locale from '../../entities/trellis/Locale'
+import EditText from './EditText.vue'
 import Translation from '../../entities/trellis/Translation'
 import TranslationText from '../../entities/trellis/TranslationText'
-import TranslationTextService from '../../services/translation-text/TranslationTextService'
+import TranslationTextService from '../../services/translation-text'
+import Locale from '../../entities/trellis/Locale'
 
 export default Vue.extend({
   name: 'Translation',
+  components: { EditText },
   props: {
     value: Object as PropOptions<Translation>,
     locale: Object as PropOptions<Locale>,
-    editable: {
-      type: Boolean,
-      default: false,
-    },
+    loading: Boolean,
     textarea: {
       type: Boolean,
       default: false,
@@ -50,36 +39,33 @@ export default Vue.extend({
   },
   data() {
     return {
-      isEditing: false,
       isWorking: false,
       height: 100,
-      editingValue: null as string,
       error: null as Error,
     }
   },
   methods: {
-    startEditing() {
-      if (this.editable) {
-        this.isEditing = true
-        this.editingValue = this.translationText.translatedText
-      }
-    },
-    onBlur() {
-      this.isEditing = false
-    },
-    saveEnter() {
-      if (!this.useTextArea) {
-        this.save()
-      }
-    },
-    async save() {
+    async save(newText: string) {
+      if (this.isWorking) return
       try {
         this.isWorking = true
-        const updatedTt = await TranslationTextService.updateTranslatedTextById(this.translationText.id, this.editingValue)
-        const t: Translation = this.value.copy()
-        t.translationText[this.translationTextIndex] = updatedTt
-        this.$emit('input', t)
-        this.isEditing = false
+        if (this.translationText) {
+          // Update the existing translation text
+          const updatedTt = await TranslationTextService.updateTranslatedTextById(this.translationText.id, newText)
+          const t: Translation = this.value.copy()
+          t.translationText[this.translationTextIndex] = updatedTt
+          this.$emit('input', t)
+        } else {
+          // create a new translation text
+          let tt = new TranslationText()
+          tt.translatedText = newText
+          tt.localeId = this.locale.id
+          tt.translationId = this.value.id
+          tt = await TranslationTextService.createTranslationText(this.value.id, tt)
+          const t: Translation = this.value.copy()
+          t.translationText[this.translationTextIndex] = tt
+          this.$emit('input', t)
+        }
       } catch (err) {
         this.error = err.response.data.msg
       } finally {
@@ -88,11 +74,19 @@ export default Vue.extend({
     }
   },
   computed: {
+    editingValue(): string {
+      if (this.translationText) {
+        return this.translationText.translatedText
+      }
+      return ''
+    },
     translationTextIndex(): number {
       return this.value.translationText.findIndex(tt => tt.localeId === this.locale.id)
     },
-    translationText(): TranslationText {
-      return this.value.translationText[this.translationTextIndex]
+    translationText(): TranslationText | undefined {
+      if (this.value && this.value.translationText && this.value.translationText.length) {
+        return this.value.translationText[this.translationTextIndex]
+      }
     },
     isCode(): boolean {
       const t = this.translationText ? this.translationText.translatedText.trim() : ''
@@ -104,9 +98,6 @@ export default Vue.extend({
     useTextArea(): boolean {
       return this.textarea || this.isCode
     },
-    dirty(): boolean {
-      return this.editingValue && this.editingValue !== this.translationText.translatedText
-    }
   }
 })
 </script>

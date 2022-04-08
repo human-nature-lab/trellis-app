@@ -1,5 +1,4 @@
 import DeviceService from '../device/DeviceService'
-import 'reflect-metadata'
 import { createConnection, Entity, getConnection, QueryRunner } from 'typeorm'
 import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'
@@ -18,7 +17,7 @@ const trellisConfigConnection = {
   name: 'trellis-config',
   location: 'default',
   entities: requireAllModules(require.context('../../entities/trellis-config', true, /\.[tj]s$/)),
-  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error'],
+  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['error'],
   synchronize: true
 }
 

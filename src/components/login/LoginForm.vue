@@ -39,7 +39,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import TrellisLoadingCircle from '../TrellisLoadingCircle'
+  import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
   export default Vue.extend({
     name: 'LoginForm',
     components: { TrellisLoadingCircle },
