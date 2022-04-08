@@ -4,12 +4,32 @@ import { InterviewLocation } from "../services/InterviewAlligator";
 import DataStore from "./DataStore";
 import InterviewManager from "./InterviewManager";
 
+type API = {
+  vars: ReturnType<typeof createVarsProxy>
+  tags: ReturnType<typeof createTagsProxy>
+  data: ReturnType<typeof createDataProxy>
+}
+
 export function createSkipApi(interview: InterviewManager, location: InterviewLocation) {
-  const vars = createVarsProxy(interview, location)
-  const tags = createTagsProxy(interview.data, location)
-  const data = createDataProxy(interview, location)
-  const qd = createQuestionDatumProxy(interview, location)
-  return { vars, tags, data, qd }
+  return new Proxy({} as API, {
+    get(target, name: string) {
+      if (target[name]) {
+        return target[name]
+      }
+      switch (name) {
+        case 'vars':
+          target.vars = createVarsProxy(interview, location)
+          return target.vars
+        case 'tags':
+          target.tags = createTagsProxy(interview.data, location)
+          return target.tags
+        case 'data':
+          target.data = createDataProxy(interview, location)
+          return target.data
+      }
+      return target[name]
+    }
+  })
 }
 
 function getVarNameData(varName: string, interview: InterviewManager, location: InterviewLocation): Datum | Datum[] | undefined {
@@ -32,21 +52,11 @@ export function createTagsProxy(data: DataStore, location: InterviewLocation) {
   }) as Record<string, boolean>
 }
 
-// Support for direct access to the questionDatum object. To check dkRf and 
-// noOne values
-export function createQuestionDatumProxy(interview: InterviewManager, location: InterviewLocation) {
-  return new Proxy({}, {
-    get(target, varName: string, receiver) {
-      return interview.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpDatumId)
-    }
-  }) as Record<string, QuestionDatum | void>
-}
-
 // Support for full data access
 export function createDataProxy(interview: InterviewManager, location: InterviewLocation) {
   return new Proxy({}, {
     get(target, varName: string, receiver) {
-      return getVarNameData(varName, interview, location)
+      return new VarDataWrapper(interview, location, varName)
     }
   }) as Record<string, Datum | Datum[]>
 }
@@ -66,4 +76,56 @@ export function createVarsProxy(interview: InterviewManager, location: Interview
       }
     }
   }) as Record<string, string | number>
+}
+
+
+class VarDataWrapper {
+  constructor(private interview: InterviewManager, private location: InterviewLocation, private varName: string) { }
+
+  get currentData() {
+    const qd = this.currentQuestionDatum
+    if (!qd) {
+      return
+    }
+    if (this.location.sectionFollowUpDatumId) {
+      return qd.data[this.location.sectionFollowUpRepetition]
+    }
+    return qd.data
+  }
+
+  get val() {
+    const d = this.currentData
+    if (!d) {
+      return
+    }
+    return Array.isArray(d) ? d[0].val : d.val
+  }
+
+  get vals() {
+    const d = this.currentData
+    if (!d) {
+      return
+    }
+    return Array.isArray(d) ? d.map(d => d.val) : [d.val]
+  }
+
+  get joinedVals() {
+    const d = this.currentData
+    if (!d) {
+      return
+    }
+    return Array.isArray(d) ? d.map(d => d.val).join(', ') : d.val
+  }
+
+  get firstDatum() {
+    return this.currentData ? this.currentData[0] : undefined
+  }
+
+  get currentQuestionDatum() {
+    return this.interview.getSingleDatumByQuestionVarName(this.varName, this.location.sectionFollowUpDatumId)
+  }
+
+  get allQuestionDatum() {
+    return this.interview.getAllQuestionDatumByVarName(this.varName)
+  }
 }

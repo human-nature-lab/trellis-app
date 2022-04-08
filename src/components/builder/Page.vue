@@ -8,7 +8,7 @@
         <v-spacer />
         <v-chip
           class="mr-2"
-          v-if="!showSkips"
+          v-if="value.skips && value.skips.length && !showSkips"
           @click="showSkips = !showSkips"
         >{{ $tc('skip_count', value.skips ? value.skips.length : 0) }}</v-chip>
         <DotsMenu :disabled="builder.locked" removable @remove="$emit('remove')">

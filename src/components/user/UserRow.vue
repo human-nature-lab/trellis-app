@@ -34,7 +34,7 @@
   import UserService from '../../services/user/UserService'
   import global from '../../static/singleton'
   import IsAdminMixin from '../../mixins/IsAdminMixin'
-  import CRUDMenu from '../CRUDMenu'
+  import CRUDMenu from '../CRUDMenu.vue'
 
   export default Vue.extend({
     name: 'UserRow',

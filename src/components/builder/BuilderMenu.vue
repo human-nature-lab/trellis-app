@@ -14,13 +14,11 @@
         </v-list-item-action>
         {{ $t('add_section') }}
       </v-list-item>
-      <v-list-item :to="{ name: 'InterviewPreview', params: { formId: formId } }" target="_blank">  
+      <v-list-item :to="{ name: 'InterviewPreview', params: { formId: formId } }" target="_blank">
         <v-list-item-action>
-          <v-icon>mdi-eye</v-icon>
+          <v-icon>mdi-open-in-new</v-icon>
         </v-list-item-action>
-        <v-list-item-content>
-          {{ $t('preview_form') }}
-        </v-list-item-content>
+        <v-list-item-content>{{ $t('preview_form') }}</v-list-item-content>
       </v-list-item>
       <LocaleSelectorMenu :value="locale" @input="updateLocale" :studyId="study.id">
         <template #activator="{ attrs, on }">
@@ -28,7 +26,7 @@
             <v-list-item-action>
               <v-icon>mdi-web</v-icon>
             </v-list-item-action>
-            {{ $t('change_locale') }}
+            <v-list-item-content>{{ $t('change_locale') }}</v-list-item-content>
           </v-list-item>
         </template>
       </LocaleSelectorMenu>
@@ -36,7 +34,7 @@
         <v-list-item-action>
           <v-icon>mdi-refresh</v-icon>
         </v-list-item-action>
-        {{ $t('refresh') }}
+        <v-list-item-content>{{ $t('refresh') }}</v-list-item-content>
       </v-list-item>
     </v-list>
   </DotsMenu>

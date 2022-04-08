@@ -81,6 +81,9 @@ export default class InterviewManagerBase extends Emitter {
         })
         for (let question of page.questions) {
           question.varName = question.varName.trim()
+          if (this.varNameIndex.has(question.varName)) {
+            throw new Error(`The var_name "${question.varName}" occurs more than once in this form. Make sure all variables are unique.`)
+          }
           this.varNameIndex.set(question.varName, question.id)
           this.questionIndex.set(question.id, question)
           if (question.choices) {

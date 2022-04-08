@@ -492,8 +492,6 @@ export default class InterviewManager extends InterviewManagerBase {
     }
   }
 
-
-
   /**
    * Returns the value for a respondent fill with the specified varName
    * @param {string} varName
@@ -510,12 +508,12 @@ export default class InterviewManager extends InterviewManagerBase {
    * @returns {QuestionDatum}
    */
   getSingleDatumByQuestionVarName (varName: string, sectionFollowUpDatumId: string): QuestionDatum | undefined {
-    let questionId = this.varNameIndex.get(varName)
+    const questionId = this.varNameIndex.get(varName)
     if (!questionId) {
       throw Error(`No question matches the var_name, ${varName}. Are you sure you spelled it correctly?`)
     }
     // Find the question which has this specific datu1m id
-    let questionData = this.data.getQuestionDataByQuestionId(questionId) || []
+    const questionData = this.data.getQuestionDataByQuestionId(questionId) || []
     if (sectionFollowUpDatumId) {
       for (let qD of questionData) {
         if (qD.data.findIndex(d => d.id === sectionFollowUpDatumId) > -1) {
@@ -525,6 +523,17 @@ export default class InterviewManager extends InterviewManagerBase {
     } else if (questionData.length === 1) {
       return questionData[0]
     }
+  }
+
+  /**
+   * Access all QuestionDatum associated with a varName
+   */
+  getAllQuestionDatumByVarName (varName: string) {
+    const questionId = this.varNameIndex.get(varName)
+    if (!questionId) {
+      return []
+    }
+    return this.data.getQuestionDataByQuestionId(questionId) || []
   }
 
   /**

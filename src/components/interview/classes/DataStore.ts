@@ -414,10 +414,6 @@ export default class DataStore extends Emitter {
     ) !== -1
   }
 
-  getQuestionDatumByVarName(varName: string) {
-
-  }
-
   /**
    * Get a question datum by id
    * @param id
