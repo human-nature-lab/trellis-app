@@ -1,20 +1,20 @@
-// http://eslint.org/docs/user-guide/configuring
+/* eslint-env node */
+require("@rushstack/eslint-patch/modern-module-resolution");
 
 module.exports = {
   root: true,
   parser: 'vue-eslint-parser',
   parserOptions: {
-    parser: 'typescript-eslint-parser'
+    parser: '@typescript-eslint/parser',
   },
-  // parser: 'typescript-eslint-parser',
-  // parserOptions: {
-  //   sourceType: 'module'
-  // },
   env: {
     browser: true,
   },
-  // https://github.com/feross/standard/blob/master/RULES.md#javascript-standard-style
-  extends: 'standard',
+  extends: [
+    'plugin:vue/essential',
+    'plugin:vue/strongly-recommended',
+    'standard',
+  ],
   // required to lint *.vue files
   plugins: [
     'html'

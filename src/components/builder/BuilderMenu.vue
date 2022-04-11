@@ -8,6 +8,15 @@
         </v-list-item-action>
         {{ locked ? $t('locked') : $t('unlocked') }}
       </v-list-item>
+      <v-list-item @click="toggleExpandAll">
+        <v-list-item-action>
+          <v-icon v-if="expandAll">mdi-arrow-expand-vertical</v-icon>
+          <v-icon v-else>mdi-arrow-expand-vertical</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          {{ expandAll ? $t('close_all') : $t('expand_all') }}
+        </v-list-item-content>
+      </v-list-item>
       <v-list-item @click="$emit('addSection')" :disabled="locked">
         <v-list-item-action>
           <v-icon>mdi-plus</v-icon>
@@ -46,6 +55,7 @@ import Vue, { PropType } from 'vue'
 import Locale from '../../entities/trellis/Locale'
 import LocaleSelectorMenu from '../locale/LocaleSelectorMenu.vue'
 import DotsMenu from './DotsMenu.vue'
+import expandAll from '../../events/builder/expandAll'
 
 export default Vue.extend({
   name: "BuilderMenu",
@@ -59,12 +69,17 @@ export default Vue.extend({
   data() {
     return {
       openLocales: false,
+      expandAll: false,
     }
   },
   methods: {
     updateLocale(newLocale: Locale) {
       console.log('update locale', newLocale)
       this.$emit('update:locale', newLocale)
+    },
+    toggleExpandAll () {
+      this.expandAll = !this.expandAll
+      expandAll.$emit('change', this.expandAll)
     }
   }
 })

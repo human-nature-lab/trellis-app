@@ -18,6 +18,9 @@ export default Vue.extend({
         }
       }
       return m
+    },
+    questionsList () {
+      return Object.values(this.questions)
     }
   }
 })

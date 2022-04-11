@@ -7,6 +7,9 @@
       </v-chip>
     </template>
     <v-list>
+      <v-list-item v-if="nullable" @click="select(null)">
+        {{ $t('none') }}
+      </v-list-item>
       <v-list-item
         v-for="item in items"
         :key="string ? item : item[itemValue]"
@@ -25,7 +28,9 @@ export default Vue.extend({
     items: Array,
     value: [Object, String, Number, Symbol, Boolean],
     disabled: Boolean,
+    nullable: Boolean,
     color: String,
+    label: String,
     itemText: {
       type: String,
       default: 'text',
@@ -37,9 +42,8 @@ export default Vue.extend({
     returnObject: Boolean,
   },
   methods: {
-    select(item: object | string): void {
-      console.log('select', this.string, item)
-      if (this.string || this.returnObject) {
+    select(item: object | string | null): void {
+      if (!item || this.string || this.returnObject) {
         this.$emit('input', item)
         this.$emit('change', item)
       } else {
@@ -53,7 +57,9 @@ export default Vue.extend({
       return this.items ? typeof this.items[0] === 'string' : false
     },
     selected(): string {
-      console.log('selected')
+      if (!this.value && this.label) {
+        return this.label
+      }
       if (this.string) {
         return this.value
       }

@@ -1,7 +1,7 @@
 <template>
   <TCard elevation="1">
     <template #header>
-      <v-row no-gutters class="pa-2 page-drag-handle align-center">
+      <v-row no-gutters class="px-2 py-1 page-drag-handle align-center">
         <v-card-title>
           <span class="text-h6">{{ $t('page_n', builder.locale.languageTag, [index + 1]) }}</span>
         </v-card-title>
@@ -23,15 +23,15 @@
       </v-row>
       <v-progress-linear v-if="working" indeterminate />
     </template>
-    <v-slide-y-transition>
+    <ExpandSection v-model="showSkips">
       <PageSkips
         v-if="showSkips"
         v-model="value.skips"
         :pageId="value.id"
         :disabled="builder.locked"
         :conditionTags="builder.conditionTags"
-      />
-    </v-slide-y-transition>
+        />
+    </ExpandSection>
     <!-- <draggable
         tag="div"
         class="px-4 pb-2 page-list"
@@ -63,11 +63,12 @@ import DotsMenu from './DotsMenu.vue'
 import builderService from '../../services/builder'
 import PageSkips from './PageSkips.vue'
 import ToggleItem from './ToggleItem.vue'
+import ExpandSection from './ExpandSection.vue'
 
 export default Vue.extend({
   name: 'Page',
   inject: { builder },
-  components: { Question, draggable, SkipEditor, TCard, SkipRow, DotsMenu, PageSkips, ToggleItem },
+  components: { Question, draggable, SkipEditor, TCard, SkipRow, DotsMenu, PageSkips, ToggleItem, ExpandSection },
   props: {
     value: Object as PropOptions<QuestionGroup>,
     index: Number,

@@ -12,6 +12,7 @@ import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'
 import Skip from '../../entities/trellis/Skip'
 import QuestionGroupSkip from '../../entities/trellis/QuestionGroupSkip'
+import FormSection from '../../entities/trellis/FormSection'
 
 class FormBuilderService {
 
@@ -44,11 +45,16 @@ class FormBuilderService {
     return new Section().fromSnakeJSON(res.data.section)
   }
 
+  async updateFormSection (section: FormSection) {
+    const res = await builderInst.put(uriTemplate('/form_section/{section}', [section.id]), section.toSnakeJSON())
+    return new FormSection().fromSnakeJSON(res.data.section.form_sections[0])
+  }
+
   async removeSection(sectionId: string) {
     await builderInst.delete(uriTemplate('section/{section}', [sectionId]))
   }
 
-  async createQuestion(pageId: string, question:  { translated_text: string, var_name: string, question_type_id: string, locale_id }) {
+  async createQuestion(pageId: string, question: { translated_text: string, var_name: string, question_type_id: string, locale_id }) {
     const res = await builderInst.post(uriTemplate('/group/{group}/question', [pageId]), question)
     return new Question().fromSnakeJSON(res.data.question)
   }

@@ -2,10 +2,10 @@
   <v-col class="mb-4">
     <QuestionHeader
       :value="value"
-      :showParameters.sync="showParameters"
-      :showConditions.sync="showConditions"
-      :showChoices.sync="showChoices"
-      :allowChoices="isChoiceType"
+      :show-parameters.sync="showParameters"
+      :show-conditions.sync="showConditions"
+      :show-choices.sync="showChoices"
+      :allow-choices="isChoiceType"
       @change="updateQuestion"
       @remove="$emit('remove')"
       :loading="working"
@@ -20,37 +20,39 @@
         editable
         textarea
       />
-      <v-slide-y-transition>
+      <ExpandSection
+        v-if="isChoiceType"
+        v-model="showChoices"
+      >
         <QuestionChoices
-          v-if="isChoiceType && showChoices"
-          :questionId="value.id"
+          :question-id="value.id"
           :disabled="builder.locked"
           v-model="value.choices"
           :locale="builder.locale"
         />
-      </v-slide-y-transition>
-      <v-slide-y-transition>
+      </ExpandSection>
+      <ExpandSection v-model="showParameters">
         <QuestionParameters
           v-if="showParameters"
           :disabled="builder.locked"
           v-model="value.questionParameters"
           :parameters="builder.parameters"
-          :conditionTags="builder.conditionTags"
+          :condition-tags="builder.conditionTags"
           :locale="builder.locale"
-          :geoTypes="builder.geoTypes"
-          :questionId="value.id"
+          :geo-types="builder.geoTypes"
+          :question-id="value.id"
           :choices="value.choices"
         />
-      </v-slide-y-transition>
-      <v-slide-y-transition>
+      </ExpandSection>
+      <ExpandSection v-model="showConditions">
         <QuestionConditions
           v-if="showConditions"
-          :questionId="value.id"
-          :conditionTags="builder.conditionTags"
+          :question-id="value.id"
+          :condition-tags="builder.conditionTags"
           :disabled="builder.locked"
           v-model="value.assignConditionTags"
         />
-      </v-slide-y-transition>
+      </ExpandSection>
     </v-col>
   </v-col>
 </template>
@@ -68,25 +70,26 @@ import QuestionChoices from './QuestionChoices.vue'
 import questionTypes from '../../static/question.types'
 import QuestionConditions from './QuestionConditions.vue'
 import builderService from '../../services/builder'
+import ExpandSection from './ExpandSection.vue'
 
 export default Vue.extend({
   name: 'Question',
   inject: { builder },
   mixins: [FormQuestionsMixin],
-  components: { Translation, EditText, QuestionHeader, QuestionParameters, QuestionChoices, QuestionConditions },
+  components: { Translation, EditText, QuestionHeader, QuestionParameters, QuestionChoices, QuestionConditions, ExpandSection },
   props: {
-    value: Object as PropOptions<Question>,
+    value: Object as PropOptions<Question>
   },
-  data() {
+  data () {
     return {
       working: false,
       showParameters: this.value && !!this.value.questionParameters.length,
       showChoices: this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select,
-      showConditions: this.value && !!this.value.assignConditionTags.length,
+      showConditions: this.value && !!this.value.assignConditionTags.length
     }
   },
   methods: {
-    async updateQuestion() {
+    async updateQuestion () {
       if (this.working) return
       this.working = true
       try {
@@ -99,7 +102,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    isChoiceType(): boolean {
+    isChoiceType (): boolean {
       return this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select
     }
   }

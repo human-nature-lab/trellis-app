@@ -1,5 +1,4 @@
 import Datum from "../../../entities/trellis/Datum";
-import QuestionDatum from "../../../entities/trellis/QuestionDatum";
 import { InterviewLocation } from "../services/InterviewAlligator";
 import DataStore from "./DataStore";
 import InterviewManager from "./InterviewManager";
