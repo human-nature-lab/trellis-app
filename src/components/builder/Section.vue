@@ -11,7 +11,6 @@
       @remove="$emit('remove', $event)"
       @update:followUp="updateFollowUp"
       @update:randomizeFollowUp="randomizeFollowUp"
-      :show-options.sync="showOptions"
     />
     <v-progress-linear
       v-if="working"
@@ -51,7 +50,7 @@ import SectionHeader from './SectionHeader.vue'
 import Section from '../../entities/trellis/Section'
 import FormBuilderService from '../../services/builder'
 import QuestionGroup from '../../entities/trellis/QuestionGroup'
-import FormSection from 'src/entities/trellis/FormSection'
+import FormSection from '../../entities/trellis/FormSection'
 
 export default Vue.extend({
   name: 'Section',
@@ -63,7 +62,6 @@ export default Vue.extend({
     return {
       working: false,
       visible: this.value.formSections[0].sortOrder < 3,
-      showOptions: false
     }
   },
   methods: {

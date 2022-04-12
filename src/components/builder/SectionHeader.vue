@@ -16,37 +16,47 @@
         />
       </div>
       <v-spacer />
-      <v-slide-x-transition>
-        <v-chip
-          v-if="!visible"
-          @click="setVisible(true)"
-        >
-          {{ $tc('n_pages', pageCount) }}
-        </v-chip>
-      </v-slide-x-transition>
-      <v-slide-x-transition>
-        <v-chip
-          v-if="!visible"
-          @click="setVisible(true)"
-        >
-          {{ $tc('n_questions', questionCount) }}
-        </v-chip>
-      </v-slide-x-transition>
-      <v-chip
-        v-if="!showOptions && followUpId"
-        @click="$emit('update:showOptions', true)"
+      <BuilderChip
+        :visible="!visible"
+        @click="setVisible(true)"
       >
-        {{
-          $t('follow_up_to', builder.locale.languageTag, [questions[followUpId]
-            ? questions[followUpId].varName : 'Loading...'])
-        }}
-      </v-chip>
-      <v-chip
-        v-if="!showOptions && isRepeatable"
-        @click="$emit('update:showOptions', true)"
+        {{ $tc('n_pages', pageCount) }}
+      </BuilderChip>
+      <BuilderChip
+        :visible="!visible"
+        @click="setVisible(true)"
+      >
+        {{ $tc('n_questions', questionCount) }}
+      </BuilderChip>
+      <MenuSelect
+        :disabled="builder.locked"
+        nullable
+        @change="$emit('update:followUp', $event)"
+        v-model="section.formSections[0].followUpQuestionId"
+        :items="questionsList"
+        item-value="id"
+        class="ml-2"
+        item-text="varName"
+      >
+        <template #selected="{ item: questionId }">
+        {{ questionId ? $t('follow_up_to', [questionId in questions ? questions[questionId].varName : $t('unknown_question')]) : $t('no_follow_up') }}
+        </template>
+      </MenuSelect>
+      <v-slide-x-transition>
+        <MenuSelect
+          v-if="section.formSections[0].followUpQuestionId"
+          class="ml-2"
+          :disabled="builder.locked"
+          @change="$emit('update:randomizeFollowUp', $event)"
+          :value="!!section.formSections[0].randomizeFollowUp"
+          :items="randomizeOptions"
+        />
+      </v-slide-x-transition>
+      <BuilderChip
+        :visible="isRepeatable"
       >
         {{ $tc('repeated', maxRepetitions, builder.locale.languageTag) }}
-      </v-chip>
+      </BuilderChip>
       <DotsMenu
         :disabled="disabled || builder.locked"
         removable
@@ -61,42 +71,8 @@
           </v-list-item-icon>
           <v-list-item-content>{{ $t('add_page', builder.locale.languageTag) }}</v-list-item-content>
         </v-list-item>
-        <ToggleItem
-          :value="showOptions"
-          @input="$emit('update:showOptions', $event)"
-          :on-title="$t('hide_section_options')"
-          :off-title="$t('show_section_options')"
-        />
       </DotsMenu>
     </v-row>
-    <ExpandSection
-      :value="showOptions"
-      @input="$emit('update:showOptions', $event)"
-    >
-      <v-row
-        no-gutters
-        class="px-2 align-center"
-      >
-        <MenuSelect
-          :disabled="builder.locked"
-          nullable
-          @change="$emit('update:followUp', $event)"
-          v-model="section.formSections[0].followUpQuestionId"
-          :items="questionsList"
-          item-value="id"
-          class="mr-2"
-          :label="$t('no_follow_up_question')"
-          item-text="varName"
-        />
-        <v-checkbox
-          v-if="followUpId"
-          :disabled="builder.locked"
-          @change="$emit('update:randomizeFollowUp', $event)"
-          v-model="section.formSections[0].randomizeFollowUp"
-          :label="$t('randomize_follow_up')"
-        />
-      </v-row>
-    </ExpandSection>
   </v-col>
 </template>
 
@@ -110,17 +86,28 @@ import DotsMenu from './DotsMenu.vue'
 import ToggleItem from './ToggleItem.vue'
 import MenuSelect from './MenuSelect.vue'
 import ExpandSection from './ExpandSection.vue'
+import BuilderChip from './BuilderChip.vue'
 
 export default Vue.extend({
   name: 'SectionHeader',
   mixins: [FormQuestionsMixin],
-  components: { Translation, DotsMenu, ToggleItem, MenuSelect, ExpandSection },
+  components: { Translation, DotsMenu, ToggleItem, MenuSelect, ExpandSection, BuilderChip },
   inject: { builder },
   props: {
     section: Object as PropOptions<Section>,
     visible: Boolean,
     disabled: Boolean,
-    showOptions: Boolean
+  },
+  data () {
+    return {
+      randomizeOptions: [{
+        text: 'Randomized',
+        value: true,
+      }, {
+        text: 'Ordered',
+        value: false,
+      }]
+    }
   },
   methods: {
     setVisible (val: boolean) {
