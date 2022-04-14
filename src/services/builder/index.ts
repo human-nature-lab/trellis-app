@@ -15,32 +15,31 @@ import QuestionGroupSkip from '../../entities/trellis/QuestionGroupSkip'
 import FormSection from '../../entities/trellis/FormSection'
 
 class FormBuilderService {
-
-  async getQuestionTypes(): Promise<QuestionType[]> {
+  async getQuestionTypes (): Promise<QuestionType[]> {
     const res = await adminInst.get('/question/type')
     return res.data.questionTypes.map(t => new QuestionType().fromSnakeJSON(t))
   }
 
-  async updateSectionQuestionGroup(sqg: SectionQuestionGroup): Promise<SectionQuestionGroup> {
+  async updateSectionQuestionGroup (sqg: SectionQuestionGroup): Promise<SectionQuestionGroup> {
     const res = await builderInst.put(uriTemplate('/section-group/{id}', [sqg.id]), sqg)
     return new SectionQuestionGroup().fromSnakeJSON(res.data)
   }
 
-  async updateQuestionGroup(page: QuestionGroup): Promise<QuestionGroup> {
+  async updateQuestionGroup (page: QuestionGroup): Promise<QuestionGroup> {
     const res = await builderInst.put(uriTemplate('/group/{page}', [page.id]), page)
     return new QuestionGroup().fromSnakeJSON(res.data)
   }
 
-  async newQuestionGroup(sectionId: string): Promise<QuestionGroup> {
+  async newQuestionGroup (sectionId: string): Promise<QuestionGroup> {
     const res = await builderInst.post(uriTemplate('/section/{section_id}/group', [sectionId]))
     return new QuestionGroup().fromSnakeJSON(res.data.questionGroup)
   }
 
-  async removeQuestionGroup(pageId: string): Promise<void> {
+  async removeQuestionGroup (pageId: string): Promise<void> {
     return builderInst.delete(uriTemplate('/group/{group}', [pageId]))
   }
 
-  async createSection(formId: string, body: { sort_order: number }) {
+  async createSection (formId: string, body: { sort_order: number }) {
     const res = await builderInst.post(uriTemplate('{form}/section', [formId]), body)
     return new Section().fromSnakeJSON(res.data.section)
   }
@@ -50,66 +49,74 @@ class FormBuilderService {
     return new FormSection().fromSnakeJSON(res.data.section.form_sections[0])
   }
 
-  async removeSection(sectionId: string) {
+  async removeSection (sectionId: string) {
     await builderInst.delete(uriTemplate('section/{section}', [sectionId]))
   }
 
-  async createQuestion(pageId: string, question: { translated_text: string, var_name: string, question_type_id: string, locale_id }) {
+  async createQuestion (pageId: string, question: { translated_text: string, var_name: string, question_type_id: string, locale_id }) {
     const res = await builderInst.post(uriTemplate('/group/{group}/question', [pageId]), question)
     return new Question().fromSnakeJSON(res.data.question)
   }
 
-  async updateQuestion(question: Question) {
+  async updateQuestion (question: Question) {
     const res = await builderInst.put(uriTemplate('/question/{question}', [question.id]), question.toSnakeJSON())
     return new Question().fromSnakeJSON(res.data)
   }
 
-  async removeQuestion(questionId: string) {
+  async removeQuestion (questionId: string) {
     return builderInst.delete(uriTemplate('/question/{question}', [questionId]))
   }
 
-  async getParameterTypes() {
+  async getParameterTypes () {
     const res = await adminInst.get('study/parameter/types')
     return res.data.parameters.map(p => new Parameter().fromSnakeJSON(p))
   }
 
-  async createQuestionChoice(questionId: string) {
+  async createQuestionChoice (questionId: string) {
     const res = await builderInst.post(uriTemplate('question/{question_id}/choice', [questionId]))
     return new QuestionChoice().fromSnakeJSON(res.data.choice)
   }
 
-  async removeQuestionChoice(choice: QuestionChoice) {
+  async removeQuestionChoice (choice: QuestionChoice) {
     await builderInst.delete(uriTemplate('choice/{choice_id}', [choice.id]))
   }
 
-  async updateQuestionChoice({ questionChoiceId, val }: { questionChoiceId: string, val: string }) {
+  async updateChoice ({ questionChoiceId, val }: { questionChoiceId: string, val: string }) {
     await builderInst.put(uriTemplate('choice/{choice_id}', [questionChoiceId]), { id: questionChoiceId, val })
   }
 
-  async createOrUpdateParameter(param: { id: string, question_id: string, name: string, val: string }) {
+  async addExistingQuestionChoice (qc: QuestionChoice) {
+    await builderInst.put(uriTemplate('question/choice/{id}/add', [qc.id]), qc.toSnakeJSON())
+  }
+
+  async moveQuestionChoice (qc: QuestionChoice) {
+    await builderInst.put(uriTemplate('question/choice/{id}/move', [qc.id]), qc.toSnakeJSON())
+  }
+
+  async createOrUpdateParameter (param: { id: string, question_id: string, name: string, val: string }) {
     const res = await builderInst.post(uriTemplate('question/{question_id}/parameter', [param.question_id]), param)
     return new QuestionParameter().fromSnakeJSON(res.data.parameter)
   }
 
-  async deleteQuestionParameter(param: { id: string }) {
+  async deleteQuestionParameter (param: { id: string }) {
     await builderInst.delete(uriTemplate('parameter/{parameter_id}', [param.id]))
   }
 
-  async createAssignConditionTag(questionId: string, tag: { logic: string, scope: string, condition: ConditionTag }) {
+  async createAssignConditionTag (questionId: string, tag: { logic: string, scope: string, condition: ConditionTag }) {
     const res = await builderInst.post(uriTemplate('question/{question_id}/assign_condition_tag', [questionId]), tag)
     return new AssignConditionTag().fromSnakeJSON(res.data.assign_condition_tag)
   }
 
-  async updateAssignConditionTag(questionId: string, tag: { id: string, logic: string, scope: string, condition: ConditionTag }) {
+  async updateAssignConditionTag (questionId: string, tag: { id: string, logic: string, scope: string, condition: ConditionTag }) {
     const res = await builderInst.put(uriTemplate('question/{}/assign_condition_tag', [questionId]), tag)
     return new AssignConditionTag().fromSnakeJSON(res.data.assign_condition_tag)
   }
 
-  async deleteAssignConditionTag(tag: { id: string }) {
+  async deleteAssignConditionTag (tag: { id: string }) {
     await builderInst.delete(uriTemplate('condition/{id}', [tag.id]))
   }
 
-  async createConditionTag(tag: string) {
+  async createConditionTag (tag: string) {
     const res = await builderInst.post('/condition-tag', { tag })
     return new ConditionTag().fromSnakeJSON(res.data.condition)
   }
@@ -118,7 +125,7 @@ class FormBuilderService {
     const res = await builderInst.post(uriTemplate('/group/{page}/skip', [pageId]), data)
     return new Skip().fromSnakeJSON(res.data.question_group_skip.skip)
   }
-  
+
   async updateSkip (skip: Skip, conditionTags?: string[]) {
     const data = skip.toSnakeJSON({ includeRelationships: true })
     if (conditionTags) {
@@ -127,11 +134,10 @@ class FormBuilderService {
     const res = await builderInst.put(uriTemplate('/skip/{skip}', [skip.id]), data)
     return new Skip().fromSnakeJSON(res.data.skip)
   }
-  
+
   async removePageSkip (skipId: string) {
     return builderInst.delete(uriTemplate('/group/skip/{id}', [skipId]))
   }
-
 }
 
 export default new FormBuilderService()

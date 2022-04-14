@@ -15,17 +15,17 @@ export default Vue.extend({
   props: {
     value: Boolean,
   },
-  created() {
+  created () {
     expandAll.$on('change', this.update)
   },
-  beforeDestroy() {
+  beforeDestroy () {
     expandAll.$off('change', this.update)
   },
   methods: {
-    update(visible: boolean) {
+    update (visible: boolean) {
       console.log('updating', visible)
       this.$emit('input', visible)
-    }
-  }
+    },
+  },
 })
 </script>

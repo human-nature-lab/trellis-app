@@ -1,7 +1,13 @@
 <template>
-  <TCard elevation="1">
+  <TCard
+    elevation="1"
+    :loading="working"
+  >
     <template #header>
-      <v-row no-gutters class="px-2 py-1 page-drag-handle align-center">
+      <v-row
+        no-gutters
+        class="px-2 py-1 page-drag-handle align-center"
+      >
         <v-card-title>
           <span class="text-h6">{{ $t('page_n', builder.locale.languageTag, [index + 1]) }}</span>
         </v-card-title>
@@ -10,10 +16,23 @@
           class="mr-2"
           v-if="value.skips && value.skips.length && !showSkips"
           @click="showSkips = !showSkips"
-        >{{ $tc('skip_count', value.skips ? value.skips.length : 0) }}</v-chip>
-        <DotsMenu :disabled="builder.locked" removable @remove="$emit('remove')">
-          <ToggleItem v-model="showSkips" :onTitle="$t('hide_skips')" :offTitle="$t('show_skips')" />
-          <v-list-item :disabled="builder.locked" @click="addQuestion">
+        >
+          {{ $tc('skip_count', value.skips ? value.skips.length : 0) }}
+        </v-chip>
+        <DotsMenu
+          :disabled="builder.locked"
+          removable
+          @remove="$emit('remove')"
+        >
+          <ToggleItem
+            v-model="showSkips"
+            :on-title="$t('hide_skips')"
+            :off-title="$t('show_skips')"
+          />
+          <v-list-item
+            :disabled="builder.locked"
+            @click="addQuestion"
+          >
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
@@ -21,22 +40,21 @@
           </v-list-item>
         </DotsMenu>
       </v-row>
-      <v-progress-linear v-if="working" indeterminate />
     </template>
     <ExpandSection v-model="showSkips">
       <PageSkips
         v-if="showSkips"
         v-model="value.skips"
-        :pageId="value.id"
+        :page-id="value.id"
         :disabled="builder.locked"
-        :conditionTags="builder.conditionTags"
-        />
+        :condition-tags="builder.conditionTags"
+      />
     </ExpandSection>
     <!-- <draggable
         tag="div"
         class="px-4 pb-2 page-list"
         v-model="value.questions"
-        handle=".question-drag-handle" 
+        handle=".question-drag-handle"
         :group="{ name: 'questions' }"
     :animation="200">-->
     <Question
@@ -73,14 +91,14 @@ export default Vue.extend({
     value: Object as PropOptions<QuestionGroup>,
     index: Number,
   },
-  data() {
+  data () {
     return {
       working: false,
       showSkips: false,
     }
   },
   methods: {
-    async addQuestion() {
+    async addQuestion () {
       if (this.working) return
       try {
         this.working = true
@@ -98,7 +116,7 @@ export default Vue.extend({
         this.working = false
       }
     },
-    async removeQuestion(question: QuestionModel) {
+    async removeQuestion (question: QuestionModel) {
       if (this.working) return
       try {
         this.working = true
@@ -114,7 +132,7 @@ export default Vue.extend({
         this.working = false
       }
     },
-  }
+  },
 })
 </script>
 

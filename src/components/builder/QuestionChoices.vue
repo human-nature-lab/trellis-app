@@ -1,19 +1,41 @@
 <template>
   <v-col>
-    <v-row no-gutters class="align-center">
+    <v-row
+      no-gutters
+      class="align-center"
+    >
       <h4>{{ $t('choices') }}</h4>
       <v-spacer />
-      <v-tooltip v-if="!disabled" left>
+      <v-tooltip
+        v-if="!disabled"
+        left
+      >
         <template #activator="{ on, attrs }">
-          <v-btn @click="add" text icon v-bind="attrs" v-on="on">
+          <v-btn
+            @click="add"
+            text
+            icon
+            :disabled="adding"
+            v-bind="attrs"
+            v-on="on"
+          >
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </template>
         {{ $t('add_choice') }}
       </v-tooltip>
     </v-row>
-    <v-list>
-      <v-list-item v-for="(choice, index) in value" :key="choice.id">
+    <v-progress-linear
+      v-if="adding"
+      indeterminate
+    />
+    <SortableList
+      :value="value"
+      group="choices"
+      @added="addExistingChoice"
+      @moved="movedChoice"
+    >
+      <template #item="{ index }">
         <ChoiceRow
           v-model="value[index]"
           :locale="locale"
@@ -21,8 +43,8 @@
           :loading="workingIndex === index"
           @remove="remove(choice)"
         />
-      </v-list-item>
-    </v-list>
+      </template>
+    </SortableList>
   </v-col>
 </template>
 
@@ -30,9 +52,9 @@
 import Vue, { PropType } from 'vue'
 import Locale from '../../entities/trellis/Locale'
 import QuestionChoice from '../../entities/trellis/QuestionChoice'
-import Translation from './Translation.vue'
 import builder from '../../services/builder'
 import ChoiceRow from './ChoiceRow.vue'
+import SortableList, { Added, Moved } from './SortableList.vue'
 
 export default Vue.extend({
   props: {
@@ -41,21 +63,49 @@ export default Vue.extend({
     questionId: String,
     value: Array as PropType<QuestionChoice[]>,
   },
-  data() {
+  data () {
     return {
+      adding: false,
       workingIndex: -1,
     }
   },
   methods: {
-    async add() {
+    async add () {
       try {
+        this.adding = true
         const choice = await builder.createQuestionChoice(this.questionId)
         this.$emit('input', this.value.concat(choice))
       } catch (err) {
         this.logError(err)
+      } finally {
+        this.adding = false
       }
     },
-    async remove(choice: QuestionChoice) {
+    async addExistingChoice (d: Added<QuestionChoice>) {
+      try {
+        this.workingIndex = d.newIndex
+        d.element.questionId = this.questionId
+        d.element.sortOrder = d.newIndex
+        await builder.addExistingQuestionChoice(d.element)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.workingIndex = -1
+      }
+    },
+    async movedChoice (d: Moved<QuestionChoice>) {
+      console.log('moved', d)
+      try {
+        this.workingIndex = d.newIndex
+        d.element.sortOrder = d.newIndex
+        await builder.moveQuestionChoice(d.element)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.workingIndex = -1
+      }
+    },
+    async remove (choice: QuestionChoice) {
       if (this.workingIndex >= 0) return
       this.workingIndex = this.value.indexOf(choice)
       try {
@@ -70,7 +120,7 @@ export default Vue.extend({
       }
     },
   },
-  components: { Translation, ChoiceRow }
+  components: { ChoiceRow, SortableList },
 })
 
 </script>

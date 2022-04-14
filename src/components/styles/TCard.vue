@@ -14,6 +14,10 @@
         <slot name="header-right" />
       </v-row>
     </slot>
+    <v-progress-linear
+      v-if="loading"
+      indeterminate
+    />
     <v-col class="pt-0 pb-1">
       <slot />
     </v-col>
@@ -26,8 +30,9 @@ import Vue from 'vue'
 export default Vue.extend({
   name: 'TCard',
   props: {
-    title: String
-  }
+    title: String,
+    loading: Boolean,
+  },
 })
 </script>
 
