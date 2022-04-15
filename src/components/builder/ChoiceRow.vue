@@ -33,6 +33,7 @@
           :disabled="disabled"
           removable
           @remove="$emit('remove')"
+          class-name="choice-handle"
           :loading="loading || working"
         />
       </v-col>

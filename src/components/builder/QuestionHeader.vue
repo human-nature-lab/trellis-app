@@ -27,35 +27,50 @@
         class="black--text"
         label
         @click="$emit('update:showConditions', true)"
-      >{{ $t('assigns_condition_tags', ['"' + value.assignConditionTags.map(act => act.conditionTag ? act.conditionTag.name : 'Unknown').join('","') + '"']) }}</v-chip>
+      >
+        {{ $t('assigns_condition_tags', ['"' + value.assignConditionTags.map(act => act.conditionTag ? act.conditionTag.name : 'Unknown').join('","') + '"']) }}
+      </v-chip>
       <v-chip
         v-if="!showParameters && value.questionParameters && value.questionParameters.length"
         color="white"
         @click="$emit('update:showParameters', !showParameters)"
-      >{{ $tc('question_parameters_n', value.questionParameters.length) }}</v-chip>
-      <DotsMenu :disabled="builder.locked" dark removable @remove="$emit('remove')">
+      >
+        {{ $tc('question_parameters_n', value.questionParameters.length) }}
+      </v-chip>
+      <DotsMenu
+        :disabled="builder.locked"
+        dark
+        removable
+        class-name="question-handle"
+        @remove="$emit('remove')"
+      >
         <ToggleItem
           :value="showParameters"
           @input="$emit('update:showParameters', $event)"
-          :onTitle="$t('hide_parameters')"
-          :offTitle="$t('show_parameters')"
+          :on-title="$t('hide_parameters')"
+          :off-title="$t('show_parameters')"
         />
         <ToggleItem
           :value="showConditions"
           @input="$emit('update:showConditions', $event)"
-          :onTitle="$t('hide_conditions')"
-          :offTitle="$t('show_conditions')"
+          :on-title="$t('hide_conditions')"
+          :off-title="$t('show_conditions')"
         />
         <ToggleItem
           v-if="allowChoices"
           :value="showChoices"
           @input="$emit('update:showChoices', $event)"
-          :onTitle="$t('hide_choices')"
-          :offTitle="$t('show_choices')"
+          :on-title="$t('hide_choices')"
+          :off-title="$t('show_choices')"
         />
       </DotsMenu>
     </v-row>
-    <v-progress-linear :active="loading" indeterminate absolute bottom />
+    <v-progress-linear
+      :active="loading"
+      indeterminate
+      absolute
+      bottom
+    />
   </v-col>
 </template>
 
@@ -81,14 +96,14 @@ export default Vue.extend({
     allowChoices: Boolean,
   },
   methods: {
-    updateQuestionType(typeId: string) {
+    updateQuestionType (typeId: string) {
       this.value.questionTypeId = typeId
       this.$emit('change', this.value)
     },
-    updateVarName(varName: string) {
+    updateVarName (varName: string) {
       this.value.varName = varName
       this.$emit('change', this.value)
     },
-  }
+  },
 })
 </script>

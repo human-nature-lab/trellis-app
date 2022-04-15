@@ -14,9 +14,12 @@ export default Vue.extend({
   name: 'ExpandSection',
   props: {
     value: Boolean,
+    global: Boolean,
   },
   created () {
-    expandAll.$on('change', this.update)
+    if (this.global) {
+      expandAll.$on('change', this.update)
+    }
   },
   beforeDestroy () {
     expandAll.$off('change', this.update)

@@ -23,6 +23,7 @@
           :disabled="builder.locked"
           removable
           @remove="$emit('remove')"
+          class-name="page-handle"
         >
           <ToggleItem
             v-model="showSkips"
@@ -41,7 +42,7 @@
         </DotsMenu>
       </v-row>
     </template>
-    <ExpandSection v-model="showSkips">
+    <ExpandSection v-model="showSkips" global>
       <PageSkips
         v-if="showSkips"
         v-model="value.skips"
@@ -55,6 +56,7 @@
       group="questions"
       :disabled="builder.locked"
       tag="div"
+      handle=".question-handle"
       @moved="questionMoved"
       @added="questionMoved"
     >

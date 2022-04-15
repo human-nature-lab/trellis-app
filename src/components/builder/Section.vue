@@ -23,6 +23,7 @@
         tag="v-col"
         class="pa-0"
         :disabled="builder.locked"
+        handle=".page-handle"
         @moved="movedPage"
         @added="movedPage"
       >
@@ -48,9 +49,9 @@ import Page from './Page.vue'
 import QuestionGroup from '../../entities/trellis/QuestionGroup'
 import Section from '../../entities/trellis/Section'
 import SectionHeader from './SectionHeader.vue'
-import SectionQuestionGroup from '../../entities/trellis/SectionQuestionGroup'
 import SortableList, { Added, Moved } from './SortableList.vue'
 import { builder } from '../../symbols/builder'
+import FormSection from '../../entities/trellis/FormSection'
 
 export default Vue.extend({
   name: 'Section',
@@ -76,6 +77,20 @@ export default Vue.extend({
       const s = this.value.formSections[0]
       s.randomizeFollowUp = randomize
       this.updateFormSection(s)
+    },
+    async updateFormSection (val: FormSection) {
+      if (this.working) return
+      this.working = true
+      try {
+        const section = await FormBuilderService.updateFormSection(val)
+        const s = this.value
+        s.formSections[0] = section
+        this.$emit('input', s)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.working = false
+      }
     },
     async addPage () {
       if (this.working) return

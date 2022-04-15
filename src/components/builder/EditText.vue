@@ -1,7 +1,37 @@
 <template>
   <div>
+    <v-row
+      v-if="code"
+      v-click-outside="onBlur"
+    >
+      <v-col>
+        <CodeEditor
+          v-model="copy"
+          :readonly="disabled || locked || !editing"
+          language="html"
+          @click="startEdit"
+        />
+      </v-col>
+      <v-col
+        v-if="editing"
+        cols="1"
+      >
+        <v-btn
+          icon
+          @click="save"
+        >
+          <v-icon>mdi-content-save</v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          @click="cancel"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
     <AutoTextField
-      v-if="editing"
+      v-else-if="editing"
       v-model="copy"
       autofocus
       dense
@@ -18,9 +48,20 @@
     />
     <!-- Handle empty values -->
     <span v-else-if="value === ''">
-      <slot name="empty" :editable="canEdit" :textarea="textarea">
-        <span v-if="canEdit" :class="{ outlined: outlined && canEdit }">
-          <v-btn @click="startEdit" :disabled="!canEdit" :text="!textarea">
+      <slot
+        name="empty"
+        :editable="canEdit"
+        :textarea="textarea"
+      >
+        <span
+          v-if="canEdit"
+          :class="{ outlined: outlined && canEdit }"
+        >
+          <v-btn
+            @click="startEdit"
+            :disabled="!canEdit"
+            :text="!textarea"
+          >
             {{ missingText }}
             <v-icon class="ml-2">mdi-plus</v-icon>
           </v-btn>
@@ -28,14 +69,6 @@
         <span v-else>{{ missingText }}</span>
       </slot>
     </span>
-    <!-- Handle code formatting -->
-    <pre
-      v-else-if="code"
-      @click="startEdit"
-      :class="{ pointer: canEdit, outlined: outlined && canEdit }"
-      v-bind="$attrs"
-      v-on="$listeners"
-    ><code>{{ loading ? copy : value }}</code></pre>
     <!-- Handle non-editable text -->
     <span
       v-else
@@ -44,7 +77,11 @@
       v-bind="$attrs"
       v-on="$listeners"
     >{{ loading ? copy : value }}</span>
-    <v-progress-linear v-if="loading" :height="2" indeterminate />
+    <v-progress-linear
+      v-if="loading"
+      :height="2"
+      indeterminate
+    />
   </div>
 </template>
 
@@ -53,10 +90,11 @@ import { builder } from '../../symbols/builder'
 import Vue from 'vue'
 import AutoTextField from './AutoTextField.vue'
 import { i18n } from '../../i18n'
+import CodeEditor from '../CodeEditor.vue'
 
 export default Vue.extend({
   name: 'EditText',
-  components: { AutoTextField },
+  components: { AutoTextField, CodeEditor },
   inject: { builder },
   props: {
     value: String,
@@ -69,55 +107,55 @@ export default Vue.extend({
     outlined: Boolean,
     missingText: {
       type: String,
-      default: () => i18n.t('add_text')
-    }
+      default: () => i18n.t('add_text'),
+    },
   },
-  data() {
+  data () {
     return {
       copy: this.value,
       editing: false,
     }
   },
   methods: {
-    onBlur() {
+    onBlur () {
       if (!this.dirty) {
         this.cancel()
       }
     },
-    save() {
+    save () {
       if (this.dirty) {
         this.$emit('update', this.copy)
         this.$emit('save', this.copy)
       }
       this.setEditing(false)
     },
-    setEditing(val: boolean) {
+    setEditing (val: boolean) {
       this.editing = val
       this.$emit('update:editing', val)
     },
-    saveEnter() {
+    saveEnter () {
       if (!this.textarea) {
         this.save()
       }
     },
-    cancel() {
+    cancel () {
       this.setEditing(false)
     },
-    startEdit() {
+    startEdit () {
       if (this.canEdit) {
         this.copy = this.value
         this.setEditing(true)
       }
-    }
+    },
   },
   computed: {
-    dirty(): boolean {
+    dirty (): boolean {
       return this.value !== this.copy
     },
-    canEdit(): boolean {
+    canEdit (): boolean {
       return !this.locked && !this.disabled && this.editable
-    }
-  }
+    },
+  },
 })
 </script>
 

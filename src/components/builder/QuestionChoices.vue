@@ -33,6 +33,7 @@
       :value="value"
       group="choices"
       :disabled="disabled"
+      handle=".choice-handle"
       @added="updateQuestionChoice"
       @moved="updateQuestionChoice"
     >

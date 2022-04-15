@@ -40,7 +40,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue'
 import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
-import type ConditionTag from '../../entities/trellis/ConditionTag'
+import ConditionTag from '../../entities/trellis/ConditionTag'
 import ConditionRow from './ConditionRow.vue'
 import builderService from '../../services/builder'
 

@@ -60,6 +60,7 @@
       <DotsMenu
         :disabled="disabled || builder.locked"
         removable
+        class-name="section-handle"
         @remove="$emit('remove')"
       >
         <v-list-item

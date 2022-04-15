@@ -7,6 +7,9 @@
     :tag="tag"
     :group="group"
     @change="onChange"
+    :scroll-sensitivity="200"
+    :force-fallback="true"
+    :handle="handle"
   >
     <template v-for="(item, index) in value">
       <slot
@@ -48,6 +51,7 @@ export default Vue.extend({
       type: String,
       default: 'v-list',
     },
+    handle: String,
   },
   data () {
     return {

@@ -23,6 +23,7 @@
       <ExpandSection
         v-if="isChoiceType"
         v-model="showChoices"
+        global
       >
         <QuestionChoices
           :question-id="value.id"
@@ -31,7 +32,10 @@
           :locale="builder.locale"
         />
       </ExpandSection>
-      <ExpandSection v-model="showParameters">
+      <ExpandSection
+        v-model="showParameters"
+        global
+      >
         <QuestionParameters
           v-if="showParameters"
           :disabled="builder.locked"
@@ -44,7 +48,10 @@
           :choices="value.choices"
         />
       </ExpandSection>
-      <ExpandSection v-model="showConditions">
+      <ExpandSection
+        v-model="showConditions"
+        global
+      >
         <QuestionConditions
           v-if="showConditions"
           :question-id="value.id"

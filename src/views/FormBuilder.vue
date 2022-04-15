@@ -1,6 +1,10 @@
 <template>
   <v-col class="grey lighten-3 min-h-screen">
-    <v-row v-if="builder.form" no-gutters class="dheader align-center">
+    <v-row
+      v-if="builder.form"
+      no-gutters
+      class="dheader align-center"
+    >
       <div class="title">
         <Translation
           editable
@@ -14,20 +18,32 @@
         class="mr-6"
         :locale.sync="builder.locale"
         :locked.sync="builder.locked"
-        :formId="builder.form.id"
+        :form-id="builder.form.id"
         @addSection="addSection"
         @refresh="load"
       />
     </v-row>
-    <v-progress-linear v-if="isLoading" indeterminate />
-    <v-col v-if="builder.form">
-      <Section
-        v-for="(section, index) in builder.form.sections"
-        :key="section.id"
-        v-model="builder.form.sections[index]"
-        @remove="removeSection(section)"
-      />
-    </v-col>
+    <v-progress-linear
+      v-if="isLoading"
+      indeterminate
+    />
+    <SortableList
+      v-if="builder.form"
+      :value="builder.form.sections"
+      handle=".section-handle"
+      @moved="sectionMoved"
+      :disabled="builder.locked"
+      tag="v-col"
+    >
+      <template #item="{ index, item: section }">
+        <Section
+          :key="section.id"
+          v-model="builder.form.sections[index]"
+          @remove="removeSection(section)"
+        />
+      </template>
+    </SortableList>
+    <v-col v-if="builder.form" />
   </v-col>
 </template>
 
@@ -42,7 +58,6 @@ import singleton from '../static/singleton'
 import ConditionTag from '../entities/trellis/ConditionTag'
 import QuestionType from '../entities/trellis/QuestionType'
 import builderService from '../services/builder'
-import TrellisModal from '../components/TrellisModal.vue'
 import Translation from '../components/builder/Translation.vue'
 import BuilderMenu from '../components/builder/BuilderMenu.vue'
 import { builder } from '../symbols/builder'
@@ -50,11 +65,13 @@ import { study } from '../symbols/main'
 import Parameter from '../entities/trellis/Parameter'
 import GeoType from '../entities/trellis/GeoType'
 import GeoTypeService from '../services/geotype'
+import SortableList, { Added, Moved } from '../components/builder/SortableList.vue'
+import FormSection from 'src/entities/trellis/FormSection'
 
-export default Vue.extend({
+export default {
   name: 'FormBuilder',
-  components: { Section, TrellisModal, Translation, BuilderMenu },
-  data() {
+  components: { Section, Translation, BuilderMenu, SortableList },
+  data () {
     return {
       isLoading: true,
       builder: {
@@ -68,17 +85,17 @@ export default Vue.extend({
       },
     }
   },
-  provide() {
+  provide () {
     return {
       [builder]: this.builder,
       [study]: Vue.observable(singleton.study),
     }
   },
-  created() {
+  created () {
     this.load()
   },
   methods: {
-    async load() {
+    async load () {
       this.isLoading = true
       try {
         const [form, tags, questionTypes, parameters, geoTypes] = await Promise.all([
@@ -103,7 +120,7 @@ export default Vue.extend({
         this.isLoading = false
       }
     },
-    async addSection() {
+    async addSection () {
       if (this.isLoading) return
       this.isLoading = true
       try {
@@ -116,7 +133,7 @@ export default Vue.extend({
         this.isLoading = false
       }
     },
-    async removeSection(section: SectionModel) {
+    async removeSection (section: SectionModel) {
       this.isLoading = true
       try {
         await builderService.removeSection(section.id)
@@ -129,9 +146,24 @@ export default Vue.extend({
       } finally {
         this.isLoading = false
       }
-    }
+    },
+    sectionMoved (e: Moved<SectionModel> | Added<SectionModel>) {
+      const fs = e.element.formSections[0]
+      fs.sortOrder = e.newIndex
+      this.updateFormSection(fs)
+    },
+    async updateFormSection (s: FormSection) {
+      try {
+        this.isLoading = true
+        await builderService.updateFormSection(s)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.isLoading = false
+      }
+    },
   },
-})
+}
 </script>
 
 <style lang="sass" scoped>
