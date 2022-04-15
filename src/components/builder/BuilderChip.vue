@@ -3,6 +3,7 @@
     <v-chip
       v-if="visible"
       v-bind="$attrs"
+      v-on="$listeners"
       class="ml-2"
     >
       <slot />

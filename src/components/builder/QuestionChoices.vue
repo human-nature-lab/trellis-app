@@ -32,8 +32,9 @@
     <SortableList
       :value="value"
       group="choices"
-      @added="addExistingChoice"
-      @moved="movedChoice"
+      :disabled="disabled"
+      @added="updateQuestionChoice"
+      @moved="updateQuestionChoice"
     >
       <template #item="{ index }">
         <ChoiceRow
@@ -81,24 +82,12 @@ export default Vue.extend({
         this.adding = false
       }
     },
-    async addExistingChoice (d: Added<QuestionChoice>) {
+    async updateQuestionChoice (d: Moved<QuestionChoice>) {
       try {
         this.workingIndex = d.newIndex
         d.element.questionId = this.questionId
         d.element.sortOrder = d.newIndex
-        await builder.addExistingQuestionChoice(d.element)
-      } catch (err) {
-        this.logError(err)
-      } finally {
-        this.workingIndex = -1
-      }
-    },
-    async movedChoice (d: Moved<QuestionChoice>) {
-      console.log('moved', d)
-      try {
-        this.workingIndex = d.newIndex
-        d.element.sortOrder = d.newIndex
-        await builder.moveQuestionChoice(d.element)
+        await builder.updateQuestionChoice(d.element)
       } catch (err) {
         this.logError(err)
       } finally {

@@ -1,5 +1,5 @@
 <template>
-  <v-col class="px-0">
+  <v-list-item>
     <v-row
       no-gutters
       class="align-end"
@@ -37,7 +37,7 @@
         />
       </v-col>
     </v-row>
-  </v-col>
+  </v-list-item>
 </template>
 
 <script lang="ts">

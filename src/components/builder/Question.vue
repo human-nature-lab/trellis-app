@@ -62,7 +62,6 @@ import Vue, { PropOptions } from 'vue'
 import Question from '../../entities/trellis/Question'
 import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
 import Translation from './Translation.vue'
-import EditText from './EditText.vue'
 import QuestionHeader from './QuestionHeader.vue'
 import QuestionParameters from './QuestionParameters.vue'
 import { builder } from '../../symbols/builder'
@@ -76,22 +75,23 @@ export default Vue.extend({
   name: 'Question',
   inject: { builder },
   mixins: [FormQuestionsMixin],
-  components: { Translation, EditText, QuestionHeader, QuestionParameters, QuestionChoices, QuestionConditions, ExpandSection },
+  components: { Translation, QuestionHeader, QuestionParameters, QuestionChoices, QuestionConditions, ExpandSection },
   props: {
-    value: Object as PropOptions<Question>
+    value: Object as PropOptions<Question>,
   },
   data () {
     return {
       working: false,
       showParameters: this.value && !!this.value.questionParameters.length,
       showChoices: this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select,
-      showConditions: this.value && !!this.value.assignConditionTags.length
+      showConditions: this.value && !!this.value.assignConditionTags.length,
     }
   },
   methods: {
     async updateQuestion () {
       if (this.working) return
       this.working = true
+      this.showChoices = this.isChoiceType
       try {
         await builderService.updateQuestion(this.value)
       } catch (err) {
@@ -99,13 +99,13 @@ export default Vue.extend({
       } finally {
         this.working = false
       }
-    }
+    },
   },
   computed: {
     isChoiceType (): boolean {
       return this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select
-    }
-  }
+    },
+  },
 })
 </script>
 

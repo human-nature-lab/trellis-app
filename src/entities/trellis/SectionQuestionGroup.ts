@@ -7,10 +7,13 @@ import QuestionGroup from './QuestionGroup'
 export default class SectionQuestionGroup extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn() @Serializable
   id: string
+
   @Column({ select: false }) @Serializable
   sectionId: string
+
   @Column({ select: false }) @Serializable
   questionGroupId: string
+
   @Column({ type: 'integer' }) @Serializable
   questionGroupOrder: number
 

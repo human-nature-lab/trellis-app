@@ -16,48 +16,49 @@
       v-if="working"
       indeterminate
     />
-    <v-slide-y-transition>
-      <div v-if="visible">
-        <v-col class="py-0 pl-4">
-          <!-- <draggable
-          v-model="value.questionGroups"
-          handle=".page-drag-handle"
-          :group="{ name: 'pages', type: 'move' }"
-          :animation="200"
-          :setData="setData"
-          @add="updatePage"
-        @update="reorderPages">-->
+    <ExpandSection v-model="visible">
+      <SortableList
+        :value="value.questionGroups"
+        group="pages"
+        tag="v-col"
+        class="pa-0"
+        :disabled="builder.locked"
+        @moved="movedPage"
+        @added="movedPage"
+      >
+        <template #item="{ item: page, index }">
           <Page
-            v-for="(page, index) in value.questionGroups"
             :key="page.id"
             ref="pages"
             :index="index"
             @remove="removePage(page)"
             v-model="value.questionGroups[index]"
           />
-        <!-- </draggable> -->
-        </v-col>
-      </div>
-    </v-slide-y-transition>
+        </template>
+      </SortableList>
+    </ExpandSection>
   </v-col>
 </template>
 
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
-import draggable, { MoveEvent } from 'vuedraggable'
-import Page from './Page.vue'
-import SectionHeader from './SectionHeader.vue'
-import Section from '../../entities/trellis/Section'
+import ExpandSection from './ExpandSection.vue'
 import FormBuilderService from '../../services/builder'
+import Page from './Page.vue'
 import QuestionGroup from '../../entities/trellis/QuestionGroup'
-import FormSection from '../../entities/trellis/FormSection'
+import Section from '../../entities/trellis/Section'
+import SectionHeader from './SectionHeader.vue'
+import SectionQuestionGroup from '../../entities/trellis/SectionQuestionGroup'
+import SortableList, { Added, Moved } from './SortableList.vue'
+import { builder } from '../../symbols/builder'
 
 export default Vue.extend({
   name: 'Section',
-  components: { Page, draggable, SectionHeader },
+  components: { Page, SectionHeader, ExpandSection, SortableList },
   props: {
-    value: Object as PropOptions<Section>
+    value: Object as PropOptions<Section>,
   },
+  inject: { builder },
   data () {
     return {
       working: false,
@@ -65,14 +66,6 @@ export default Vue.extend({
     }
   },
   methods: {
-    setData (data: DataTransfer, elem: HTMLElement) {
-      console.log('setData', data, elem)
-      const pageIndex = this.$refs.pages.findIndex(c => c.$el === elem.__vue__)
-      const page: QuestionGroup = this.value.questionGroups[pageIndex].copy()
-      delete page.questions
-      delete page.skips
-      data.setData('text/json', JSON.stringify({ questionGroup: page.toSnakeJSON() }))
-    },
     updateFollowUp (followUpQuestionId?: string) {
       console.log('updateFollowUp', followUpQuestionId)
       const s = this.value.formSections[0]
@@ -83,20 +76,6 @@ export default Vue.extend({
       const s = this.value.formSections[0]
       s.randomizeFollowUp = randomize
       this.updateFormSection(s)
-    },
-    async updateFormSection (val: FormSection) {
-      if (this.working) return
-      this.working = true
-      try {
-        const section = await FormBuilderService.updateFormSection(val)
-        const s = this.value
-        s.formSections[0] = section
-        this.$emit('input', s)
-      } catch (err) {
-        this.logError(err)
-      } finally {
-        this.working = false
-      }
     },
     async addPage () {
       if (this.working) return
@@ -131,36 +110,19 @@ export default Vue.extend({
         this.working = false
       }
     },
-    async updatePage (event: MoveEvent<typeof Page>) {
-      if (this.working) return
+    async movedPage (e: Moved<QuestionGroup> | Added<QuestionGroup>) {
       this.working = true
       try {
-        const data: { questionGroup: QuestionGroup } = JSON.parse(event.originalEvent.dataTransfer.getData('text/json'))
-        if (!data.questionGroup) return false
-        const page = new QuestionGroup().fromSnakeJSON(data.questionGroup)
-        // data.questionGroup.sectionQuestionGroup[0].sectionId = page
-        // data.questionGroup.sectionQuestionGroup[0]
-        await FormBuilderService.updateQuestionGroup(data.questionGroup)
+        const page = e.element
+        page.sectionQuestionGroup.sectionId = this.value.id
+        page.sectionQuestionGroup.questionGroupOrder = e.newIndex
+        await FormBuilderService.updateSectionQuestionGroup(page.sectionQuestionGroup)
       } catch (err) {
         this.logError(err)
       } finally {
         this.working = false
       }
     },
-    async reorderPages (event: { originalEvent: DragEvent, fromIndex: number, toIndex: number }) {
-      console.log('reorderPages', event)
-      if (this.working) return
-      const a = this.value.questionGroups[event.fromIndex]
-      const b = this.value.questionGroups[event.toIndex]
-      try {
-        a.sectionQuestionGroup.questionGroupOrder = b.sectionQuestionGroup.questionGroupOrder
-        b.sectionQuestionGroup.questionGroupOrder = a.sectionQuestionGroup.questionGroupOrder
-        a.sectionQuestionGroup = await FormBuilderService.updateSectionQuestionGroup(a.sectionQuestionGroup)
-        b.sectionQuestionGroup = await FormBuilderService.updateSectionQuestionGroup(b.sectionQuestionGroup)
-      } catch (err) {
-        this.log(err)
-      }
-    }
   },
   computed: {
     pageMap (): Record<string, QuestionGroup> {
@@ -169,8 +131,8 @@ export default Vue.extend({
         m[qg.id] = qg
       }
       return m
-    }
-  }
+    },
+  },
 })
 </script>
 

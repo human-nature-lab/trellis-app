@@ -1,26 +1,25 @@
 <template>
-  <v-list>
-    <draggable
-      :list="value"
-      @start="onStart"
-      @end="onEnd"
-      :group="group"
-      @change="onChange"
-    >
-      <v-list-item
-        v-for="(item, index) in value"
-        :key="item[itemKey]"
+  <draggable
+    :disabled="disabled"
+    :list="value"
+    @start="onStart"
+    @end="onEnd"
+    :tag="tag"
+    :group="group"
+    @change="onChange"
+  >
+    <template v-for="(item, index) in value">
+      <slot
+        name="item"
+        :item="item"
+        :index="index"
       >
-        <slot
-          name="item"
-          :item="item"
-          :index="index"
-        >
+        <v-list-item :key="item[itemKey]">
           {{ item }}
-        </slot>
-      </v-list-item>
-    </draggable>
-  </v-list>
+        </v-list-item>
+      </slot>
+    </template>
+  </draggable>
 </template>
 
 <script lang="ts">
@@ -43,6 +42,11 @@ export default Vue.extend({
     itemKey: {
       type: String,
       default: 'id',
+    },
+    disabled: Boolean,
+    tag: {
+      type: String,
+      default: 'v-list',
     },
   },
   data () {

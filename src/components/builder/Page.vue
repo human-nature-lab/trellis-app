@@ -50,20 +50,22 @@
         :condition-tags="builder.conditionTags"
       />
     </ExpandSection>
-    <!-- <draggable
-        tag="div"
-        class="px-4 pb-2 page-list"
-        v-model="value.questions"
-        handle=".question-drag-handle"
-        :group="{ name: 'questions' }"
-    :animation="200">-->
-    <Question
-      v-for="(question, index) in value.questions"
-      :key="question.id"
-      v-model="value.questions[index]"
-      @remove="removeQuestion(question)"
-    />
-    <!-- </draggable> -->
+    <SortableList
+      :value="value.questions"
+      group="questions"
+      :disabled="builder.locked"
+      tag="div"
+      @moved="questionMoved"
+      @added="questionMoved"
+    >
+      <template #item="{ item: question, index }">
+        <Question
+          :key="question.id"
+          v-model="value.questions[index]"
+          @remove="removeQuestion(question)"
+        />
+      </template>
+    </SortableList>
   </TCard>
 </template>
 
@@ -72,9 +74,6 @@ import Vue, { PropOptions } from 'vue'
 import Question from './Question.vue'
 import QuestionGroup from '../../entities/trellis/QuestionGroup'
 import QuestionModel from '../../entities/trellis/Question'
-import draggable from 'vuedraggable'
-import SkipEditor from '../skips/SkipEditor.vue'
-import SkipRow from './SkipRow.vue'
 import TCard from '../styles/TCard.vue'
 import { builder } from '../../symbols/builder'
 import DotsMenu from './DotsMenu.vue'
@@ -82,11 +81,14 @@ import builderService from '../../services/builder'
 import PageSkips from './PageSkips.vue'
 import ToggleItem from './ToggleItem.vue'
 import ExpandSection from './ExpandSection.vue'
+import SortableList, { Added, Moved } from './SortableList.vue'
+import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
 
 export default Vue.extend({
   name: 'Page',
   inject: { builder },
-  components: { Question, draggable, SkipEditor, TCard, SkipRow, DotsMenu, PageSkips, ToggleItem, ExpandSection },
+  components: { Question, TCard, DotsMenu, PageSkips, ToggleItem, ExpandSection, SortableList },
+  mixins: [FormQuestionsMixin],
   props: {
     value: Object as PropOptions<QuestionGroup>,
     index: Number,
@@ -104,7 +106,7 @@ export default Vue.extend({
         this.working = true
         const q = await builderService.createQuestion(this.value.id, {
           translated_text: '',
-          var_name: `q${this.value.questions.length + 1}`,
+          var_name: `q${this.questionsList.length + 1}`,
           question_type_id: this.builder.questionTypes[0].id,
           locale_id: this.builder.locale.id,
         })
@@ -126,6 +128,18 @@ export default Vue.extend({
           this.value.questions.splice(index, 1)
           this.$emit('input', this.value)
         }
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.working = false
+      }
+    },
+    async questionMoved (e: Added<QuestionModel> | Moved<QuestionModel>) {
+      e.element.questionGroupId = this.value.id
+      e.element.sortOrder = e.newIndex
+      this.working = true
+      try {
+        await builderService.updateQuestion(e.element)
       } catch (err) {
         this.logError(err)
       } finally {

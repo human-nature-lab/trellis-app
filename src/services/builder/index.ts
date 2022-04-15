@@ -11,7 +11,6 @@ import QuestionParameter from '../../entities/trellis/QuestionParameter'
 import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'
 import Skip from '../../entities/trellis/Skip'
-import QuestionGroupSkip from '../../entities/trellis/QuestionGroupSkip'
 import FormSection from '../../entities/trellis/FormSection'
 
 class FormBuilderService {
@@ -20,9 +19,8 @@ class FormBuilderService {
     return res.data.questionTypes.map(t => new QuestionType().fromSnakeJSON(t))
   }
 
-  async updateSectionQuestionGroup (sqg: SectionQuestionGroup): Promise<SectionQuestionGroup> {
-    const res = await builderInst.put(uriTemplate('/section-group/{id}', [sqg.id]), sqg)
-    return new SectionQuestionGroup().fromSnakeJSON(res.data)
+  async updateSectionQuestionGroup (sqg: SectionQuestionGroup) {
+    await builderInst.put(uriTemplate('/section-question-group/{id}', [sqg.id]), sqg.toSnakeJSON())
   }
 
   async updateQuestionGroup (page: QuestionGroup): Promise<QuestionGroup> {
@@ -85,12 +83,8 @@ class FormBuilderService {
     await builderInst.put(uriTemplate('choice/{choice_id}', [questionChoiceId]), { id: questionChoiceId, val })
   }
 
-  async addExistingQuestionChoice (qc: QuestionChoice) {
-    await builderInst.put(uriTemplate('question/choice/{id}/add', [qc.id]), qc.toSnakeJSON())
-  }
-
-  async moveQuestionChoice (qc: QuestionChoice) {
-    await builderInst.put(uriTemplate('question/choice/{id}/move', [qc.id]), qc.toSnakeJSON())
+  async updateQuestionChoice (qc: QuestionChoice) {
+    await builderInst.put(uriTemplate('question/choice/{id}', [qc.id]), qc.toSnakeJSON())
   }
 
   async createOrUpdateParameter (param: { id: string, question_id: string, name: string, val: string }) {
