@@ -34,7 +34,7 @@
             mdi-delete
           </v-icon>
         </v-list-item-icon>
-        <v-list-item-content>{{ $t('remove') }}</v-list-item-content>
+        <v-list-item-content>{{ $t('delete') }}</v-list-item-content>
       </v-list-item>
     </v-list>
   </v-menu>

@@ -1,7 +1,7 @@
 <template>
   <v-row no-gutters class="align-center">
     <v-col v-if="!disabled" cols="1">
-      <DotsMenu removable @remove="$emit('remove')" :loading="loading" right>
+      <DotsMenu removable @remove="$emit('remove')" :loading="loading" right class-name="page-skip-handle">
         <ToggleItem
           :value="!!value.customLogic"
           @input="toggleCustomLogic"
