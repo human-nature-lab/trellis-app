@@ -1,6 +1,6 @@
 import './globals'
-import EdgeServiceWeb from '../../src/services/edge/EdgeServiceWeb'
-import EdgeServiceCordova from '../../src/services/edge/EdgeServiceCordova'
+import EdgeServiceWeb from '../../src/services/edge/EdgeService.web'
+import EdgeServiceCordova from '../../src/services/edge/EdgeService.mobile'
 
 import {expect} from 'chai'
 import {edgeIds, respondentId, respondentId2, respondentId3} from "../testing-ids";

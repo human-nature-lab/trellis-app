@@ -2,19 +2,24 @@
   <div>
     <v-row
       v-if="code"
+      no-gutters
       v-click-outside="onBlur"
     >
-      <v-col>
+      <v-col
+        class="ma-0"
+        cols="11"
+      >
         <CodeEditor
           v-model="copy"
           :readonly="disabled || locked || !editing"
-          language="html"
+          :language="language"
           @click="startEdit"
         />
       </v-col>
       <v-col
         v-if="editing"
         cols="1"
+        class="ma-0"
       >
         <v-btn
           icon
@@ -105,6 +110,10 @@ export default Vue.extend({
     textarea: Boolean,
     code: Boolean,
     outlined: Boolean,
+    language: {
+      type: String,
+      default: 'html',
+    },
     missingText: {
       type: String,
       default: () => i18n.t('add_text'),

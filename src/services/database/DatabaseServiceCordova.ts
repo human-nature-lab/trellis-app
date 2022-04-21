@@ -1,5 +1,5 @@
 import DeviceService from '../device/DeviceService'
-import { createConnection, Entity, getConnection, QueryRunner } from 'typeorm'
+import { createConnection, Entity, EntityTarget, getConnection, QueryRunner } from 'typeorm'
 import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'
 import Sync from '../../entities/trellis-config/Sync'
@@ -76,9 +76,9 @@ export default class DatabaseServiceCordova {
     return false
   }
 
-  async getRepository (entity: typeof Entity) {
+  async getRepository<T extends object> (entity: EntityTarget<T>) {
     const conn = await this.getDatabase()
-    return conn.getRepository(entity)
+    return conn.getRepository<T>(entity)
   }
 
   createConfigDatabase () {

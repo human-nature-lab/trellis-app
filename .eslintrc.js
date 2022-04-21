@@ -13,9 +13,8 @@ module.exports = {
   extends: [
     'plugin:vue/essential',
     'plugin:vue/strongly-recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
     'standard',
+    'plugin:@typescript-eslint/recommended',
   ],
   // required to lint *.vue files
   plugins: [
@@ -29,10 +28,14 @@ module.exports = {
   rules: {
     // allow paren-less arrow functions
     'arrow-parens': 0,
+    'max-len': ['warn', { code: 120, comments: 120 }],
+    'lines-between-class-members': ['warn', 'always', { exceptAfterSingleLine: true }],
     // allow async-await
     'generator-star-spacing': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+    'no-useless-constructor': 'off',
+    '@typescript-eslint/no-useless-constructor': ['error'],
     // typescript compiler has checks built into it
     'no-undef': 0,
     'comma-dangle': ['error', {

@@ -1,3 +1,4 @@
+import Edge from '../../../entities/trellis/Edge'
 import Datum from '../../../entities/trellis/Datum'
 import { InterviewLocation } from '../services/InterviewAlligator'
 import DataStore from './DataStore'
@@ -7,10 +8,24 @@ type API = {
   vars: ReturnType<typeof createVarsProxy>
   tags: ReturnType<typeof createTagsProxy>
   data: ReturnType<typeof createDataProxy>
+  location: InterviewLocation
+  interview: InterviewManager
+  cache: Map<any, any>
+  followUpDatum?: Datum
+  memo: <T>(key: string, fn: () => T) => T
+  getEdge: ReturnType<typeof getEdge>
+  getDatum: ReturnType<typeof getDatum>
 }
 
-export function createSkipApi (interview: InterviewManager, location: InterviewLocation) {
-  return new Proxy({} as API, {
+export function createSkipApi (interview: InterviewManager, location: InterviewLocation, cache: Map<any, any>) {
+  return new Proxy({
+    location,
+    interview,
+    memo: memo(cache),
+    cache,
+    getEdge: getEdge(interview),
+    getDatum: getDatum(interview),
+  } as API, {
     get (target, name: string) {
       if (target[name]) {
         return target[name]
@@ -25,13 +40,43 @@ export function createSkipApi (interview: InterviewManager, location: InterviewL
         case 'data':
           target.data = createDataProxy(interview, location)
           return target.data
+        case 'followUpDatum':
+          target.followUpDatum = interview.data.getDatumById(location.sectionFollowUpDatumId)
+          return target.followUpDatum
       }
       return target[name]
     },
   })
 }
 
-function getVarNameData (varName: string, interview: InterviewManager, location: InterviewLocation): Datum | Datum[] | undefined {
+function getEdge (interview: InterviewManager) {
+  return function (id: string) {
+    return interview.data.edges.get(id)
+  }
+}
+
+function getDatum (interview: InterviewManager) {
+  return function (id: string) {
+    return interview.data.getDatumById(id)
+  }
+}
+
+function memo (cache: Map<any, any>) {
+  return function<T> (key: string, fn: () => T): T {
+    if (cache.has(key)) {
+      return cache.get(key)
+    }
+    const res = fn()
+    cache.set(key, res)
+    return res
+  }
+}
+
+function getVarNameData (
+  varName: string,
+  interview: InterviewManager,
+  location: InterviewLocation,
+): Datum | Datum[] | undefined {
   const qd = interview.getSingleDatumByQuestionVarName(varName, location.sectionFollowUpDatumId)
   if (!qd) {
     return
@@ -91,6 +136,29 @@ class VarDataWrapper {
     return qd.data
   }
 
+  get currentEdge () {
+    const d = this.currentData
+    if (!d) {
+      return
+    }
+    const edgeId = Array.isArray(d) ? d[0].edgeId : d.edgeId
+    if (edgeId) {
+      return this.interview.data.edges.get(edgeId)
+    }
+  }
+
+  get allEdges () {
+    const edges: Edge[] = []
+    for (const qd of this.allQuestionDatum) {
+      for (const d of qd.data) {
+        if (d.edgeId) {
+          edges.push(this.interview.data.edges.get(d.edgeId))
+        }
+      }
+    }
+    return edges
+  }
+
   get val () {
     const d = this.currentData
     if (!d) {
@@ -117,6 +185,11 @@ class VarDataWrapper {
 
   get firstDatum () {
     return this.currentData ? this.currentData[0] : undefined
+  }
+
+  get followUpDatum () {
+    const qd = this.currentQuestionDatum
+    return qd && qd.followUpDatumId ? this.interview.data.getDatumById(qd.followUpDatumId) : undefined
   }
 
   get currentQuestionDatum () {

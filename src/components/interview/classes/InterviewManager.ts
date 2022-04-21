@@ -5,7 +5,7 @@ import ActionStore from './ActionStore'
 import DataStore from './DataStore'
 import AT from '../../../static/action.types'
 
-import { InterviewLocation } from '../services/InterviewAlligator'
+import InterviewAlligator, { InterviewLocation } from '../services/InterviewAlligator'
 import Form from '../../../entities/trellis/Form'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import Action from '../../../entities/trellis/Action'
@@ -17,18 +17,16 @@ import Question from '../../../entities/trellis/Question'
 import QT from '../../../static/question.types'
 import PT from '../../../static/parameter.types'
 import { locToNumber } from '../services/LocationHelpers'
-import InterviewAlligator from '../services/InterviewAlligator'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 import Section from '../../../entities/trellis/Section'
 
 export default class InterviewManager extends InterviewManagerBase {
-
   private _isReplaying: boolean
-  private hasAddedActions: boolean = true
-  private lastActionHasChanged: boolean = false
+  private hasAddedActions = true
+  private lastActionHasChanged = false
   private lastAction: Action = null
-  private isNavigating: boolean = false
-  private highWaterMark: number = 0       // A record of the furthest point reached in the survey so far
+  private isNavigating = false
+  private highWaterMark = 0 // A record of the furthest point reached in the survey so far
 
   constructor (
     interview: Interview,
@@ -37,7 +35,7 @@ export default class InterviewManager extends InterviewManagerBase {
     data?: QuestionDatum[],
     conditionTags?: ConditionTagInterface,
     respondentFills?: RespondentFill[],
-    baseRespondentConditionTags?: RespondentConditionTag[]
+    baseRespondentConditionTags?: RespondentConditionTag[],
   ) {
     super()
 
@@ -49,13 +47,12 @@ export default class InterviewManager extends InterviewManagerBase {
     this.actions = new ActionStore(this.blueprint)
 
     console.log('InterviewManager: initial data', data)
-    if (data) this.data.loadData(data)
+    if (data) this.data.loadData(data, actions)
     if (conditionTags) this.data.loadConditionTags(conditionTags, baseRespondentConditionTags)
     if (respondentFills) this.respondentFills.fill(respondentFills)
     if (actions) this.actions.load(actions)
 
     this.navigator = new InterviewAlligator(this)
-
   }
 
   /**
@@ -64,7 +61,7 @@ export default class InterviewManager extends InterviewManagerBase {
   async initialize () {
     console.log('Initial condition tags', this.data.conditionTags)
     this.actions.initialize() // This emits an initial state event to any subscribers (the actionsPersistSlave)
-    this.data.initialize()    // This emits an initial state event to any subscribers (the dataPersistSlave)
+    await this.data.initialize() // This emits an initial state event to any subscribers (the dataPersistSlave)
     this.data.reset()
     this.initializeConditionAssignment()
     this.navigator.initialize()
@@ -98,7 +95,7 @@ export default class InterviewManager extends InterviewManagerBase {
       } catch (err) {
         this.emit('error', {
           msg: 'Failed to save actions',
-          err
+          err,
         })
         throw err
       }
@@ -109,7 +106,7 @@ export default class InterviewManager extends InterviewManagerBase {
       } catch (err) {
         this.emit('error', {
           msg: 'Failed to save data',
-          err
+          err,
         })
         throw err
       }
@@ -179,7 +176,7 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param {Action} action
    * @param {Boolean} [actionWasInitiatedByAHuman = false]
    */
-  performAction (action: Action, actionWasInitiatedByAHuman: boolean = false) {
+  performAction (action: Action, actionWasInitiatedByAHuman = false) {
     let questionDatum: QuestionDatum = null
     let questionBlueprint: Question = null
     if (action.questionId) {
@@ -206,7 +203,7 @@ export default class InterviewManager extends InterviewManagerBase {
   private onPageExit () {
     // Remove any datum if they have responded with dk/rf
     const questions = this.questionsWithData()
-    for (let question of questions) {
+    for (const question of questions) {
       if (question.datum.dkRf != null) {
         console.log('dkRf found. Removing data for question', question.id)
         this.data.removeAllDatum(question.datum)
@@ -280,7 +277,7 @@ export default class InterviewManager extends InterviewManagerBase {
     this.isNavigating = false
   }
 
-  stepForward (dataHasChanged: boolean = true): boolean {
+  stepForward (dataHasChanged = true): boolean {
     if (dataHasChanged) this.onPageExit()
     if (this.navigator.isAtEnd) {
       this.atEnd()
@@ -326,10 +323,10 @@ export default class InterviewManager extends InterviewManagerBase {
       }
     }
     function isValid (question: Question): boolean {
-      let isIntro = question.questionTypeId === QT.intro
+      const isIntro = question.questionTypeId === QT.intro
       let isReadOnly = false
       let isRequired = true
-      for (let parameter of question.questionParameters) {
+      for (const parameter of question.questionParameters) {
         if (parameter.parameterId === PT.read_only.toString(10) && toBoolean(parameter.val)) {
           isReadOnly = true
         } else if (parameter.parameterId === PT.is_required.toString(10) && !toBoolean(parameter.val)) {
@@ -349,7 +346,7 @@ export default class InterviewManager extends InterviewManagerBase {
         }
       }
     }
-    for (let question of questions) {
+    for (const question of questions) {
       if (!isValid(question)) {
         return false
       }
@@ -375,7 +372,7 @@ export default class InterviewManager extends InterviewManagerBase {
 
     // if (pageQuestions.length && !pageActions.length) return false
 
-    for (let action of pageActions) {
+    for (const action of pageActions) {
       this.performAction(action, false)
     }
 
@@ -428,7 +425,7 @@ export default class InterviewManager extends InterviewManagerBase {
   seek (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
     // console.log('desired location', {section, page, sectionRepetition, sectionFollowUpRepetition})
     let currentLoc = locToNumber(this.navigator.loc)
-    const desiredLoc = locToNumber({section, page, sectionRepetition, sectionFollowUpRepetition})
+    const desiredLoc = locToNumber({ section, page, sectionRepetition, sectionFollowUpRepetition })
     // console.log('current location', currentLoc, desiredLoc)
     if (currentLoc < desiredLoc) {
       let c
@@ -442,7 +439,7 @@ export default class InterviewManager extends InterviewManagerBase {
         console.error(`passed through ${c} pages`)
       }
     } else {
-      this.navigator.seekTo({section, sectionRepetition, sectionFollowUpRepetition, page})
+      this.navigator.seekTo({ section, sectionRepetition, sectionFollowUpRepetition, page })
     }
   }
 
@@ -459,7 +456,7 @@ export default class InterviewManager extends InterviewManagerBase {
         while (this.currentLocationHasValidResponses() && this.navigator.locationIsAheadOfCurrent(lastLocation) && this.stepForward(false));
         this.stepBackward()
       } else {
-        this.navigator.seekTo({section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0})
+        this.navigator.seekTo({ section: 0, page: 0, sectionRepetition: 0, sectionFollowUpRepetition: 0 })
       }
     }
   }
@@ -480,7 +477,7 @@ export default class InterviewManager extends InterviewManagerBase {
     if (!this._isReplaying) {
       this.emit('atBeginning', JSON.parse(JSON.stringify(this.location)))
     }
-    console.log(`Reached the beginning of the survey`)
+    console.log('Reached the beginning of the survey')
   }
 
   /**
@@ -515,7 +512,7 @@ export default class InterviewManager extends InterviewManagerBase {
     // Find the question which has this specific datu1m id
     const questionData = this.data.getQuestionDataByQuestionId(questionId) || []
     if (sectionFollowUpDatumId) {
-      for (let qD of questionData) {
+      for (const qD of questionData) {
         if (qD.data.findIndex(d => d.id === sectionFollowUpDatumId) > -1) {
           return qD
         }
@@ -544,7 +541,6 @@ export default class InterviewManager extends InterviewManagerBase {
     return this.getPageQuestions(this.location.section, this.location.sectionRepetition, this.location.sectionFollowUpDatumId, this.location.page)
   }
 
-
   /**
    * Alias for follow up question datum for the current state of the survey
    * @returns {T}
@@ -552,17 +548,16 @@ export default class InterviewManager extends InterviewManagerBase {
   getCurrentFollowUpQuestionDatum () {
     return this.getFollowUpQuestionDatumData(this.location.sectionFollowUpDatumId)
   }
-
 }
 
 export let sharedInterviewInstance = null
 export function sharedInterview (interview: Interview,
-                                 blueprint: Form,
-                                 actions?: Action[],
-                                 data?: QuestionDatum[],
-                                 conditionTags?: ConditionTagInterface,
-                                 respondentFills?: RespondentFill[],
-                                 baseRespondentConditionTags?: RespondentConditionTag[]) {
+  blueprint: Form,
+  actions?: Action[],
+  data?: QuestionDatum[],
+  conditionTags?: ConditionTagInterface,
+  respondentFills?: RespondentFill[],
+  baseRespondentConditionTags?: RespondentConditionTag[]) {
   if (!sharedInterviewInstance) {
     sharedInterviewInstance = new InterviewManager(interview, blueprint, actions, data, conditionTags, respondentFills, baseRespondentConditionTags)
   }

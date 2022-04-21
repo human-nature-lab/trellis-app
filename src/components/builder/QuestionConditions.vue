@@ -20,7 +20,7 @@
           :loading="workingIndex === index"
           :conditionTags="conditionTags"
           @input="update"
-          @delete="remove(act)"
+          @remove="remove(act)"
         />
       </v-list-item>
       <v-list-item v-if="placeholder">
@@ -30,7 +30,7 @@
           :conditionTags="conditionTags"
           :loading="placeholderWorking"
           @input="create"
-          @delete="placeholder = null"
+          @remove="placeholder = null"
         />
       </v-list-item>
     </v-list>

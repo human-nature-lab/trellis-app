@@ -29,6 +29,7 @@
           editable
           :locked="disabled"
           code
+          language="javascript"
           auto-grow
           textarea
           v-model="value.logic"

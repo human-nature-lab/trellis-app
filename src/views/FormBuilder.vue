@@ -1,49 +1,51 @@
 <template>
   <v-col class="grey lighten-3 min-h-screen">
-    <v-row
-      v-if="builder.form"
-      no-gutters
-      class="dheader align-center"
-    >
-      <div class="title">
-        <Translation
-          editable
-          :locked="builder.locked"
-          v-model="builder.form.nameTranslation"
-          :locale="builder.locale"
+    <v-col class="w-full w-max-normal mx-auto">
+      <v-row
+        v-if="builder.form"
+        no-gutters
+        class="dheader align-center"
+      >
+        <div class="title">
+          <Translation
+            editable
+            :locked="builder.locked"
+            v-model="builder.form.nameTranslation"
+            :locale="builder.locale"
+          />
+        </div>
+        <v-spacer />
+        <BuilderMenu
+          class="mr-6"
+          :locale.sync="builder.locale"
+          :locked.sync="builder.locked"
+          :form-id="builder.form.id"
+          @addSection="addSection"
+          @refresh="load"
         />
-      </div>
-      <v-spacer />
-      <BuilderMenu
-        class="mr-6"
-        :locale.sync="builder.locale"
-        :locked.sync="builder.locked"
-        :form-id="builder.form.id"
-        @addSection="addSection"
-        @refresh="load"
+      </v-row>
+      <v-progress-linear
+        v-if="isLoading"
+        indeterminate
       />
-    </v-row>
-    <v-progress-linear
-      v-if="isLoading"
-      indeterminate
-    />
-    <SortableList
-      v-if="builder.form"
-      :value="builder.form.sections"
-      handle=".section-handle"
-      @moved="sectionMoved"
-      :disabled="builder.locked"
-      tag="v-col"
-    >
-      <template #item="{ index, item: section }">
-        <Section
-          :key="section.id"
-          v-model="builder.form.sections[index]"
-          @remove="removeSection(section)"
-        />
-      </template>
-    </SortableList>
-    <v-col v-if="builder.form" />
+      <SortableList
+        v-if="builder.form"
+        :value="builder.form.sections"
+        handle=".section-handle"
+        @moved="sectionMoved"
+        :disabled="builder.locked"
+        tag="v-col"
+      >
+        <template #item="{ index, item: section }">
+          <Section
+            :key="section.id"
+            v-model="builder.form.sections[index]"
+            @remove="removeSection(section)"
+          />
+        </template>
+      </SortableList>
+      <v-col v-if="builder.form" />
+    </v-col>
   </v-col>
 </template>
 

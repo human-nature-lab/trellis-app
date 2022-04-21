@@ -1,16 +1,33 @@
 <template>
-  <v-row no-gutters class="align-center">
-    <v-col v-if="!disabled" cols="1">
-      <DotsMenu removable @remove="$emit('remove')" :loading="loading" right class-name="page-skip-handle">
+  <v-row
+    no-gutters
+    class="align-center"
+  >
+    <v-col
+      v-if="!disabled"
+      cols="1"
+    >
+      <DotsMenu
+        removable
+        @remove="$emit('remove')"
+        :loading="loading"
+        right
+        class-name="page-skip-handle"
+      >
         <ToggleItem
           :value="!!value.customLogic"
           @input="toggleCustomLogic"
-          :onTitle="$t('hide_custom_logic')"
-          :offTitle="$t('show_custom_logic')"
+          :on-title="$t('hide_custom_logic')"
+          :off-title="$t('show_custom_logic')"
         />
       </DotsMenu>
     </v-col>
-    <v-col v-if="!value.customLogic" md="auto" cols="11" class="px-1">
+    <v-col
+      v-if="!value.customLogic"
+      md="auto"
+      cols="11"
+      class="px-1"
+    >
       <MenuSelect
         v-model="value.showHide"
         :items="showOpts"
@@ -36,7 +53,11 @@
         >{{ condition }}</v-chip>
       </span>
     </v-col>
-    <v-col v-if="!disabled && !value.customLogic" cols="auto" class="flex-grow-1">
+    <v-col
+      v-if="!disabled && !value.customLogic"
+      cols="auto"
+      class="flex-grow-1"
+    >
       <v-autocomplete
         :value="selectedConditionTags"
         @change="updateConditionTags"
@@ -50,7 +71,11 @@
       />
     </v-col>
     <v-col v-if="value.customLogic">
-      <CodeEditor v-model="value.customLogic" @change="updateCustomLogic" :readonly="disabled" />
+      <CodeEditor
+        v-model="value.customLogic"
+        @change="updateCustomLogic"
+        :readonly="disabled"
+      />
     </v-col>
   </v-row>
 </template>
@@ -59,13 +84,13 @@
 import Skip from '../../entities/trellis/Skip'
 import Vue, { PropType } from 'vue'
 import titleCase from '../../filters/TitleCase'
-import MenuSelect from './MenuSelect.vue';
-import ConditionTag from '../../entities/trellis/ConditionTag';
-import DotsMenu from './DotsMenu.vue';
-import ToggleItem from './ToggleItem.vue';
-import EditText from './EditText.vue';
-import CodeEditor from '../CodeEditor.vue';
-import { debounce } from 'lodash';
+import MenuSelect from './MenuSelect.vue'
+import ConditionTag from '../../entities/trellis/ConditionTag'
+import DotsMenu from './DotsMenu.vue'
+import ToggleItem from './ToggleItem.vue'
+import EditText from './EditText.vue'
+import CodeEditor from '../CodeEditor.vue'
+import { debounce } from 'lodash'
 
 const defaultLogic = 'function showIf({ vars, tags, data }) {\n  return true;\n}'
 
@@ -83,21 +108,21 @@ export default Vue.extend({
     return {
       emitChangeDebounced: debounce((value: Skip) => {
         this.$emit('change', value)
-      }, 500)
+      }, 500),
     }
   },
   computed: {
-    selectedConditionTags(): string[] {
+    selectedConditionTags (): string[] {
       const r = this.value.conditionTags.map((sct) => sct.conditionTagName)
       r.sort()
       return r
     },
-    conditionTagNames(): string[] {
+    conditionTagNames (): string[] {
       const r = this.conditionTags.map(c => c.name)
       r.sort()
       return r
     },
-    showOpts(): object[] {
+    showOpts (): object[] {
       return [{
         text: this.$t('show'),
         value: true,
@@ -106,7 +131,7 @@ export default Vue.extend({
         value: false,
       }]
     },
-    anyOpts(): object {
+    anyOpts (): object {
       return [{
         text: this.$t('any'),
         value: false,
@@ -114,21 +139,21 @@ export default Vue.extend({
         text: this.$t('all'),
         value: true,
       }]
-    }
+    },
   },
   methods: {
-    updateConditionTags(newConds: string[]) {
+    updateConditionTags (newConds: string[]) {
       this.$emit('changeConditions', this.value, newConds)
     },
-    updateShowHide(val: boolean) {
+    updateShowHide (val: boolean) {
       this.value.showHide = val
       this.$emit('change', this.value)
     },
-    updateAnyAll(val: boolean) {
+    updateAnyAll (val: boolean) {
       this.value.anyAll = val
       this.$emit('change', this.value)
     },
-    toggleCustomLogic(show: boolean) {
+    toggleCustomLogic (show: boolean) {
       if (show) {
         this.value.customLogic = defaultLogic
         this.$emit('change', this.value)
@@ -143,7 +168,7 @@ export default Vue.extend({
       this.value.customLogic = newVal
       this.emitChangeDebounced(this.value)
     },
-  }
+  },
 })
 </script>
 

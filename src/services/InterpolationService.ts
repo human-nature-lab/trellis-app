@@ -1,5 +1,5 @@
 import {default as InterviewManager, sharedInterviewInstance} from '../components/interview/classes/InterviewManager'
-import EdgeService from './edge/EdgeService'
+import EdgeService from './edge'
 import RosterService from './roster/RosterService'
 import StringInterpolationService from './StringInterpolationService'
 import { InterviewLocation } from '../components/interview/services/InterviewAlligator'

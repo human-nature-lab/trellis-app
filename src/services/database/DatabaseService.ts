@@ -1,14 +1,7 @@
-import { switchByModeEnv } from '../util'
-import DatabaseServiceMock from './DatabaseServiceMock'
 import DatabaseServiceCordova from './DatabaseServiceCordova'
 import config from 'config'
 
-export const DatabaseService = switchByModeEnv({
-  WEB: DatabaseServiceMock,
-  CORDOVA: DatabaseServiceCordova
-})
-
-const dbDefault = new DatabaseService()
+const dbDefault = new DatabaseServiceCordova()
 export default dbDefault
 
 // Add methods for running queries directly on the tablet
@@ -25,14 +18,14 @@ if (config.debug) {
   window.q = runQuery
   // @ts-ignore
   window.ql = async function (query, parameters, db) {
-    let r = await runQuery(query, parameters, db)
+    const r = await runQuery(query, parameters, db)
     console.log(r)
     return r
   }
   // @ts-ignore
   window.c = async function (query, parameters, db) {
-    let r = await runQuery(query, parameters, db)
-    for (let row of r) {
+    const r = await runQuery(query, parameters, db)
+    for (const row of r) {
       // console.log(JSON.stringify(row))
       console.log(row)
     }
@@ -42,4 +35,3 @@ if (config.debug) {
   // @ts-ignore
   window.dbDefault = dbDefault
 }
-
