@@ -45,7 +45,7 @@
       <v-list-item
         :to="{ name: 'InterviewPreview', params: { formId: form.id } }"
       >
-        <v-list-item-content>Preview</v-list-item-content>
+        <v-list-item-content>{{ $t('preview_form') }}</v-list-item-content>
       </v-list-item>
       <!--v-list-item :to="{name: 'FormBuilder', params: {formId: form.id, mode: 'print'}}">
           <v-list-item-content>
@@ -53,17 +53,19 @@
           </v-list-item-content>
         </v-list-item-->
       <v-list-item @click="$emit('export', form)">
-        <v-list-item-content>Export</v-list-item-content>
+        <v-list-item-content>{{ $t('export_form') }} </v-list-item-content>
       </v-list-item>
       <v-list-item :to="{ name: 'FormPrint', params: { formId: form.id } }" target="_blank">
         <v-list-item-content>
-          {{$t('print_form')}}
+          {{ $t('print_form') }}
         </v-list-item-content>
       </v-list-item>
       <Permission :requires="TrellisPermission.REMOVE_FORM">
         <v-list-item @click="$emit('delete', form)">
           <v-list-item-content>
-            <span color="error--text">Delete</span>
+            <span color="error--text">
+              {{ $t('delete') }}
+            </span>
           </v-list-item-content>
         </v-list-item>
       </Permission>
