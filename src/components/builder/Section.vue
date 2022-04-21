@@ -165,4 +165,11 @@ export default Vue.extend({
     border-top: 2px solid lightgrey
     border-left: 2px solid lightgrey
       // border-bottom: 2px solid lightgrey
+
+.theme--dark
+  .section-content
+    .section-indicator
+      border-top: 2px solid darken(lightgrey, 50)
+      border-left: 2px solid darken(lightgrey, 50)
+
 </style>

@@ -21,22 +21,24 @@
         :disabled="loading"
       />
       <v-spacer />
-      <v-chip
-        v-if="!showConditions && value.assignConditionTags && value.assignConditionTags.length"
-        color="white"
-        class="black--text"
-        label
+      <BuilderChip
+        :visible="!showChoices && value.choices && !!value.choices.length"
+        @click="$emit('update:showChoices', true)"
+      >
+        {{ $tc('question_choices_n', value.choices.length) }}
+      </BuilderChip>
+      <BuilderChip
+        :visible="!showConditions && value.assignConditionTags && !!value.assignConditionTags.length"
         @click="$emit('update:showConditions', true)"
       >
-        {{ $t('assigns_condition_tags', ['"' + value.assignConditionTags.map(act => act.conditionTag ? act.conditionTag.name : 'Unknown').join('","') + '"']) }}
-      </v-chip>
-      <v-chip
-        v-if="!showParameters && value.questionParameters && value.questionParameters.length"
-        color="white"
+        {{ $t('assigns_condition_tags', [`"${conditionTagNames}"`]) }}
+      </BuilderChip>
+      <BuilderChip
+        :visible="!showParameters && value.questionParameters && !!value.questionParameters.length"
         @click="$emit('update:showParameters', !showParameters)"
       >
         {{ $tc('question_parameters_n', value.questionParameters.length) }}
-      </v-chip>
+      </BuilderChip>
       <DotsMenu
         :disabled="builder.locked"
         dark
@@ -82,11 +84,12 @@ import MenuSelect from './MenuSelect.vue'
 import { builder } from '../../symbols/builder'
 import DotsMenu from './DotsMenu.vue'
 import ToggleItem from './ToggleItem.vue'
+import BuilderChip from './BuilderChip.vue'
 
 export default Vue.extend({
   name: 'QuestionHeader',
   inject: { builder },
-  components: { EditText, MenuSelect, DotsMenu, ToggleItem },
+  components: { EditText, MenuSelect, DotsMenu, ToggleItem, BuilderChip },
   props: {
     value: Object as PropType<Question>,
     loading: Boolean,
@@ -103,6 +106,11 @@ export default Vue.extend({
     updateVarName (varName: string) {
       this.value.varName = varName
       this.$emit('change', this.value)
+    },
+  },
+  computed: {
+    conditionTagNames (): string {
+      return this.value.assignConditionTags.map(act => act.conditionTag ? act.conditionTag.name : 'Unknown').join('","')
     },
   },
 })

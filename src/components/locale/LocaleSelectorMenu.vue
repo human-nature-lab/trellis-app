@@ -1,17 +1,36 @@
 <template>
-  <v-menu offset-x offset-y close-on-content-click>
+  <v-menu
+    offset-x
+    offset-y
+    close-on-content-click
+  >
     <template #activator="{ attrs, on }">
-      <slot name="activator" :attrs="attrs" :on="on" />
+      <slot
+        name="activator"
+        :attrs="attrs"
+        :on="on"
+      />
     </template>
-    <v-list>
+    <v-list
+      v-if="locales"
+    >
       <v-list-item
-        v-if="locales"
         v-for="l in locales"
         :key="l.id"
         @click="onChange(l)"
-      >{{ l.languageName }}</v-list-item>
-      <v-list-item v-else-if="loading">{{ $t('loading') }}</v-list-item>
-      <v-list-item v-else>{{ $t('no_results') }}</v-list-item>
+      >
+        {{ l.languageName }}
+      </v-list-item>
+    </v-list>
+    <v-list v-else-if="loading">
+      <v-list-item>
+        {{ $t('loading') }}
+      </v-list-item>
+    </v-list>
+    <v-list v-else>
+      <v-list-item>
+        {{ $t('no_results') }}
+      </v-list-item>
     </v-list>
   </v-menu>
 </template>
@@ -27,17 +46,17 @@ export default Vue.extend({
     value: Object as PropOptions<Locale>,
     studyId: String,
   },
-  data() {
+  data () {
     return {
       locales: [] as Locale[],
       loading: false,
     }
   },
-  created() {
+  created () {
     this.load()
   },
   methods: {
-    async load() {
+    async load () {
       this.loading = true
       try {
         this.locales = await LocaleService.getStudyLocales(this.studyId)
@@ -45,10 +64,10 @@ export default Vue.extend({
         this.loading = false
       }
     },
-    onChange(newLocale: Locale) {
+    onChange (newLocale: Locale) {
       console.log('locale change', newLocale)
       this.$emit('input', newLocale)
-    }
-  }
+    },
+  },
 })
 </script>

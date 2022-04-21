@@ -1,7 +1,12 @@
 <template>
   <v-col class="my-0 pa-0">
-    <v-row no-gutters class="align-center justify-center">
-      <v-col cols="1">{{ $t('assigns') }}</v-col>
+    <v-row
+      no-gutters
+      class="align-center justify-center"
+    >
+      <v-col cols="1">
+        {{ $t('assigns') }}
+      </v-col>
       <v-col cols="2">
         <v-combobox
           class="mx-1"
@@ -12,7 +17,12 @@
           @change="updateConditionTag"
         />
       </v-col>
-      <v-col cols="1" class="text-center">{{ $t('to_the') }}</v-col>
+      <v-col
+        cols="1"
+        class="text-center"
+      >
+        {{ $t('to_the') }}
+      </v-col>
       <v-col cols="2">
         <MenuSelect
           v-model="value.scope"
@@ -21,8 +31,16 @@
           :disabled="disabled"
         />
       </v-col>
-      <v-col cols="1" class="text-center">{{ $t('if') }}</v-col>
-      <v-col cols="4" class="text-left">
+      <v-col
+        cols="1"
+        class="text-center"
+      >
+        {{ $t('if') }}
+      </v-col>
+      <v-col
+        cols="4"
+        class="text-left"
+      >
         <EditText
           outlined
           class="mx-1"
@@ -36,16 +54,24 @@
           @save="updateLogic"
         />
       </v-col>
-      <v-col cols="1" class="px-0 text-right">
-        <DotsMenu removable @remove="$emit('remove')" :loading="loading" />
+      <v-col
+        cols="1"
+        class="px-0 text-right"
+      >
+        <DotsMenu
+          :disabled="disabled"
+          removable
+          @remove="$emit('remove')"
+          :loading="loading"
+        />
       </v-col>
     </v-row>
   </v-col>
 </template>
 
 <script lang="ts">
-import type AssignConditionTag from '../../entities/trellis/AssignConditionTag'
-import type ConditionTag from '../../entities/trellis/ConditionTag'
+import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
+import ConditionTag from '../../entities/trellis/ConditionTag'
 import Vue, { PropType } from 'vue'
 import EditText from './EditText.vue'
 import MenuSelect from './MenuSelect.vue'
@@ -53,14 +79,14 @@ import builder from '../../services/builder'
 import DotsMenu from './DotsMenu.vue'
 
 export default Vue.extend({
-  name: "ConditionRow",
+  name: 'ConditionRow',
   props: {
     value: Object as PropType<AssignConditionTag>,
     conditionTags: Array as PropType<ConditionTag[]>,
     disabled: Boolean,
     loading: Boolean,
   },
-  data() {
+  data () {
     return {
       working: false,
       scopes: ['respondent', 'form', 'section'],
@@ -68,7 +94,7 @@ export default Vue.extend({
   },
   components: { EditText, MenuSelect, DotsMenu },
   methods: {
-    async updateConditionTag(newVal: string | ConditionTag) {
+    async updateConditionTag (newVal: string | ConditionTag) {
       console.log('updateConditionTag', newVal)
       if (this.working) return
       if (typeof newVal === 'string') {
@@ -90,13 +116,13 @@ export default Vue.extend({
         this.update(v)
       }
     },
-    async update(val: AssignConditionTag) {
+    async update (val: AssignConditionTag) {
       this.$emit('input', val)
     },
-    updateLogic(logic: string) {
+    updateLogic (logic: string) {
       this.update({ ...this.value, logic })
-    }
-  }
+    },
+  },
 })
 </script>
 

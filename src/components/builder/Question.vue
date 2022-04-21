@@ -122,4 +122,7 @@ export default Vue.extend({
   text-transform: lowercase
 .question-content
   border: 1px solid lightgrey
+.theme--dark
+  .question-content
+    border: 1px solid darken(lightgrey, 50)
 </style>

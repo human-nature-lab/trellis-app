@@ -1,5 +1,5 @@
 <template>
-  <v-col class="grey lighten-3 min-h-screen">
+  <v-col class="bg-grey lighten-3 min-h-screen">
     <v-col class="w-full w-max-normal mx-auto">
       <v-row
         v-if="builder.form"
