@@ -68,7 +68,7 @@ import Parameter from '../entities/trellis/Parameter'
 import GeoType from '../entities/trellis/GeoType'
 import GeoTypeService from '../services/geotype'
 import SortableList, { Added, Moved } from '../components/builder/SortableList.vue'
-import FormSection from 'src/entities/trellis/FormSection'
+import FormSection from '../entities/trellis/FormSection'
 
 export default {
   name: 'FormBuilder',

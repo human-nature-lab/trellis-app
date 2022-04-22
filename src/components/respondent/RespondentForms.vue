@@ -140,32 +140,32 @@ export default Vue.extend({
     FormsView,
   },
   methods: {
-    async startInterview (interview: Interview) {
+    async startInterview(interview: Interview) {
       routeQueue.replaceAndReturnToCurrent({
         name: 'Interview',
-        params: { studyId: this.global.study.id, interviewId: interview.id },
-      })
+        params: { studyId: this.global['study'].id, interviewId: interview.id },
+      });
     },
-    hydrate (data: RespondentFormsData) {
+    hydrate(data: RespondentFormsData) {
       // Join any surveys that have been created with the possible forms
       data.forms.sort((a, b) => {
-        return a.sortOrder - b.sortOrder
-      })
-      console.log(data)
-      this.skipService.register(data.forms.reduce((skips, form) => skips.concat(form.form.skips), []))
+        return a.sortOrder - b.sortOrder;
+      });
+      const censusForms = data.forms.filter(f => f.censusTypeId)
+      console.log(data, censusForms)
       const forms: DisplayForm[] = data.forms.map((studyForm: StudyForm) => {
-        const formSurveys = data.surveys.filter(
-          (survey: Survey) => survey.formId === studyForm.currentVersionId,
-        )
+        let formSurveys = data.surveys.filter(
+          (survey: Survey) => survey.formId === studyForm.currentVersionId
+        );
         const conditionTags: Set<string> = new Set(
           data.conditionTags.map((c: RespondentConditionTag) => {
-            return c.conditionTag.name
-          }),
-        )
-        const isSkipped = this.skipService.shouldSkip(
+            return c.conditionTag.name;
+          })
+        );
+        const isSkipped = SkipService.shouldSkip(
           studyForm.form.skips,
-          conditionTags,
-        )
+          conditionTags
+        );
         return {
           id: studyForm.currentVersionId,
           nameTranslation: studyForm.form.nameTranslation,
@@ -177,11 +177,11 @@ export default Vue.extend({
           isStarted: formSurveys.length > 0,
           nComplete: 0,
           version: studyForm.form.version,
-        } as DisplayForm
-      })
-      this.respondent = data.respondent
-      this.censusForms = forms.filter((f) => f.censusTypeId)
-      this.forms = forms.filter((f) => !f.censusTypeId)
+        } as DisplayForm;
+      });
+      this.respondent = data.respondent;
+      this.censusForms = forms.filter((f) => f.censusTypeId);
+      this.forms = forms.filter((f) => !f.censusTypeId);
     },
   },
 })

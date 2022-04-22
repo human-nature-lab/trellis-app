@@ -52,6 +52,9 @@ export default defineConfig(({ command, mode }) => {
       emptyOutDir: true,
       sourcemap: true,
     },
+    optimizeDeps: {
+      exclude: ['test'],
+    },
     resolve: {
       alias: {
         'vue': 'vue/dist/vue.esm.js',
