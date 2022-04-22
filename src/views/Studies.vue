@@ -53,8 +53,8 @@
   import TrellisModal from '../components/TrellisModal.vue'
   import Study from '../entities/trellis/Study'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
-  import LocaleService from '../services/locale/LocaleService'
-  import StudyService from '../services/study/StudyService'
+  import LocaleService from '../services/locale'
+  import StudyService from '../services/study'
   export default Vue.extend({
     name: 'Studies',
     mixins: [DocsLinkMixin('./Studies.md')],

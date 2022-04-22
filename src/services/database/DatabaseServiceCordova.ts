@@ -1,4 +1,4 @@
-import DeviceService from '../device/DeviceService'
+import DeviceService from '../device'
 import { createConnection, Entity, EntityTarget, getConnection, QueryRunner } from 'typeorm'
 import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'

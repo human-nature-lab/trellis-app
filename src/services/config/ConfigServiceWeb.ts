@@ -2,7 +2,7 @@ import Config from '../../entities/trellis/Config'
 import { adminInst } from '../http/AxiosInstance'
 import ConfigServiceAbstract from './ConfigServiceAbstract'
 
-export default class ConfigServiceWeb extends ConfigServiceAbstract {
+export class ConfigServiceWeb extends ConfigServiceAbstract {
 
   protected async getAll (): Promise<Config[]> {
     const res = await adminInst.get('config')

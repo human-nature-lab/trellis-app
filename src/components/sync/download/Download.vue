@@ -183,11 +183,11 @@
   import DownloadImages from './substeps/DownloadImages.vue'
   import { BUTTON_STATUS, COMPARE_UPLOAD_RESULTS, COMPARE_DOWNLOAD_RESULTS } from '../../../static/constants'
   import SyncService from '../../../services/SyncService'
-  import DeviceService from '../../../services/device/DeviceService'
+  import DeviceService from '../../../services/device'
   import DatabaseService from '../../../services/database/DatabaseService'
   import Log from '../../../entities/trellis-config/Log'
   import Sync from '../../../entities/trellis-config/Sync'
-  import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
+  import LoggingService, { defaultLoggingService } from '../../../services/logging'
   import TrellisAlert from '../../TrellisAlert.vue'
   export default Vue.extend({
     name: 'download',

@@ -88,7 +88,7 @@ import GeoLocationService from '../../services/geolocation'
 import Vue from 'vue'
 import PermissionMixin from '../../mixins/PermissionMixin'
 import { TrellisPermission } from '../../static/permissions.base'
-import StudyService from '../../services/study/StudyService'
+import StudyService from '../../services/study'
 
 export default {
   mixins: [IsAdminMixin, IsLoggedInMixin, PermissionMixin],

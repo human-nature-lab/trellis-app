@@ -12,7 +12,7 @@
 <script>
     import FileService from '../../../../services/file/FileService'
     import SyncSubStep from '../../SyncSubStep.vue'
-    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     export default {
       name: 'remove-database',
       data () {

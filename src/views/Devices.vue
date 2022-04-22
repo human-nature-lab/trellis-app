@@ -47,7 +47,7 @@
   import Permission from '../components/Permission.vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
   import PermissionMixin from '../mixins/PermissionMixin'
-  import DeviceService from '../services/device/DeviceService'
+  import DeviceService from '../services/device'
   import TrellisModal from '../components/TrellisModal.vue'
   import DeviceForm from '../components/devices/DeviceForm.vue'
   import Pagination from '../types/Pagination'

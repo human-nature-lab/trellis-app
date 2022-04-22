@@ -24,7 +24,7 @@
   import PermissionMixin from '../../mixins/PermissionMixin'
   import global from '../../static/singleton'
   import User from '../../entities/trellis/User'
-  import UserService from '../../services/user/UserService'
+  import UserService from '../../services/user'
   import PasswordField from './PasswordField.vue'
   import Vue from 'vue'
 

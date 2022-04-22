@@ -1,7 +1,7 @@
 import Role from '../../entities/trellis/Role'
 import RoleServiceInterface from './RoleServiceInterface'
 
-export default class RoleServiceCordova implements RoleServiceInterface {
+export class RoleServiceCordova implements RoleServiceInterface {
 
   async create (role: Role): Promise<Role> {
     throw new Error('Not implemented')

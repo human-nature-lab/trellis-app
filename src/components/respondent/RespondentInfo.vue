@@ -71,7 +71,7 @@
   import RespondentFill from './RespondentFill.vue'
 
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
-  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentService from '../../services/respondent'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
   import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'

@@ -1,5 +1,5 @@
 import InterviewService from '../../src/services/interview/InterviewService'
-import RosterService from '../../src/services/roster/RosterService'
+import RosterService from '../../src/services/roster'
 import SurveyService from '../../src/services/survey'
 import { forms, respondentId2, studyId } from '../testing-ids'
 import InterviewDeltaInterface, {

@@ -10,7 +10,7 @@ declare global {
   interface Window {ImageResizer: any}
 }
 
-export default class PhotoServiceCordova extends PhotoServiceAbstract {
+export class PhotoServiceCordova extends PhotoServiceAbstract {
 
   async getPhotosByIds (photoIds: string[]): Promise<Photo[]> {
     if (!photoIds.length) return []

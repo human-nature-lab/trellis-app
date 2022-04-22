@@ -1,4 +1,4 @@
-import DeviceService from '../../services/device/DeviceService'
+import DeviceService from '../../services/device'
 import { GuardConfig } from '../GuardQueue'
 
 export default {

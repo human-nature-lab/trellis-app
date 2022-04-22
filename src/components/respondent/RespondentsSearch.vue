@@ -135,7 +135,7 @@
 
 <script>
 import { debounce, orderBy, merge } from 'lodash'
-import RespondentService from '../../services/respondent/RespondentService'
+import RespondentService from '../../services/respondent'
 import RespondentListItem from './RespondentListItem.vue'
 import RespondentItem from './RespondentItem.vue'
 import AddRespondentForm from './AddRespondentForm.vue'
@@ -145,7 +145,7 @@ import ConditionTagAutocomplete from '../ConditionTagAutocomplete.vue'
 import { routeQueue } from '../../router'
 import TranslationService from '../../services/TranslationService'
 import singleton from '../../static/singleton'
-import PhotoService from '../../services/photo/PhotoService'
+import PhotoService from '../../services/photo'
 import DocsLinkMixin from '../../mixins/DocsLinkMixin'
 import DocsFiles from '../documentation/DocsFiles'
 import TrellisModal from '../TrellisModal.vue'

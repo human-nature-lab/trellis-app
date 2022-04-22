@@ -12,7 +12,7 @@
 <script lang="ts">
   import Vue from 'vue'
 import User from '../../entities/trellis/User'
-import UserService from '../../services/user/UserService'
+import UserService from '../../services/user'
 
   export default Vue.extend({
     name: 'UserChip',

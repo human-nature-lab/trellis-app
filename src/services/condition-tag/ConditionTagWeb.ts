@@ -50,5 +50,3 @@ export class ConditionTagWeb implements ConditionTagInterface {
     })
   }
 }
-
-export default new ConditionTagWeb()

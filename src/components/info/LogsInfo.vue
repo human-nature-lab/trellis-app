@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-  import {defaultLoggingService as logger} from '../../services/logging/LoggingService'
+  import {defaultLoggingService as logger} from '../../services/logging'
   import Vue from 'vue'
   import InfoBlock from './InfoBlock.vue'
   export default Vue.extend({

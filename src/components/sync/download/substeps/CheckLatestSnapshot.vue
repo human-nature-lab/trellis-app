@@ -12,7 +12,7 @@
 <script>
     import axios from 'axios'
     import SyncService from '../../../../services/SyncService'
-    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     import SyncSubStep from '../../SyncSubStep.vue'
     export default {
       name: 'check-latest-snapshot',

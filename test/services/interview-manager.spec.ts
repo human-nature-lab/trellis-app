@@ -19,7 +19,7 @@ import {
 import SurveyService from "../../src/services/survey/index";
 import InterviewService from "../../src/services/interview/InterviewService";
 import FormService from "../../src/services/form/FormService";
-import RespondentService from "../../src/services/respondent/RespondentService";
+import RespondentService from "../../src/services/respondent";
 import AT from '../../src/static/action.types'
 import QT from '../../src/static/question.types'
 

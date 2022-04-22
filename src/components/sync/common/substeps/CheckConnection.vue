@@ -14,7 +14,7 @@
     import SyncService from '../../../../services/SyncService'
     import DatabaseService from '../../../../services/database/DatabaseService'
     import TrellisAlert from '../../../TrellisAlert.vue'
-    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     import SyncSubStep from '../../SyncSubStep.vue'
     export default {
       name: 'check-connection',

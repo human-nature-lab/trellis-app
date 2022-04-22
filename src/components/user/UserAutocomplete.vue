@@ -22,7 +22,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import StudyService from '../../services/study/StudyService'
+  import StudyService from '../../services/study'
 
   export default Vue.extend({
     name: 'UserAutocomplete',

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import StudyService from '../services/study/StudyService'
+  import StudyService from '../services/study'
   export default {
     name: 'study-selector',
     data () {

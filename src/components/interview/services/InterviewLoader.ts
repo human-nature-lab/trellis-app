@@ -1,7 +1,7 @@
 import FormService from '../../../services/form/FormService'
 import InterviewService from '../../../services/interview/InterviewService'
-import LocaleService from '../../../services/locale/LocaleService'
-import RespondentService from '../../../services/respondent/RespondentService'
+import LocaleService from '../../../services/locale'
+import RespondentService from '../../../services/respondent'
 import { Route } from 'vue-router'
 import RespondentFill from '../../../entities/trellis/RespondentFill'
 import Locale from '../../../entities/trellis/Locale'
@@ -11,7 +11,7 @@ import Form from '../../../entities/trellis/Form'
 import InterviewDataInterface, {ConditionTagInterface} from '../../../services/interview/InterviewDataInterface'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
-import {defaultLoggingService as logger} from '../../../services/logging/LoggingService'
+import {defaultLoggingService as logger} from '../../../services/logging'
 import { AddSnack } from '../../SnackbarQueue.vue'
 
 export interface InterviewData {

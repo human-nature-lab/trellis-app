@@ -9,7 +9,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentService from '../../services/respondent'
   import global from '../../static/singleton'
   import TrellisFileUpload from './TrellisFileUpload.vue'
 

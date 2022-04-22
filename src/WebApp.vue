@@ -127,11 +127,11 @@
   import singleton from './static/singleton'
   // Do not remove!
   import SingletonService from './services/SingletonService'
-  import { defaultLoggingService } from './services/logging/LoggingService'
+  import { defaultLoggingService } from './services/logging'
   import GeoLocationService from './services/geolocation'
   import SnackbarQueue from './components/SnackbarQueue.vue'
   import DocsSidebar from './components/documentation/DocsSidebar.vue'
-  import UserService from './services/user/UserService'
+  import UserService from './services/user'
   import config from 'config'
   import IsLoggedInMixin from './mixins/IsLoggedInMixin'
   import Banner from './components/Banner.vue'

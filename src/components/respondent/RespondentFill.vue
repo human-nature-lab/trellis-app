@@ -27,7 +27,7 @@
   import Vue from 'vue'
 
   import RespondentFill from '../../entities/trellis/RespondentFill'
-  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentService from '../../services/respondent'
 
   export default Vue.extend({
     data () {

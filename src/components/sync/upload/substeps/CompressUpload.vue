@@ -12,7 +12,7 @@
 
 <script>
   import SyncSubStep from '../../SyncSubStep.vue'
-  import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+  import LoggingService, { defaultLoggingService } from '../../../../services/logging'
   import ZipService from '../../../../services/zip/ZipService'
   import FileService from '../../../../services/file/FileService'
 

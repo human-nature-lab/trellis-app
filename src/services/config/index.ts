@@ -1,10 +1,3 @@
-import ConfigServiceCordova from './ConfigServiceCordova'
-import ConfigServiceWeb from './ConfigServiceWeb'
-import switchByModeEnv from '../util'
+import { ConfigServiceCordova } from './ConfigServiceCordova'
 
-const ConfigService = switchByModeEnv({
-  WEB: ConfigServiceWeb,
-  CORDOVA: ConfigServiceCordova
-})
-
-export default new ConfigService()
+export default new ConfigServiceCordova()

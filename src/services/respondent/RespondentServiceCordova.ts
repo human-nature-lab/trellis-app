@@ -14,7 +14,7 @@ import { removeSoftDeleted } from '../database/SoftDeleteHelper'
 import Geo from '../../entities/trellis/Geo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
-export default class RespondentServiceCordova implements RespondentServiceInterface {
+export class RespondentServiceCordova implements RespondentServiceInterface {
 
   async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     const repo = await DatabaseService.getRepository(RespondentPhoto)

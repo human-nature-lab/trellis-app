@@ -61,5 +61,3 @@ export class UserServiceCordova extends UserServiceAbstract {
   }
 
 }
-
-export default UserServiceCordova

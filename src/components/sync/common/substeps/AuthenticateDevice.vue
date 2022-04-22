@@ -7,9 +7,9 @@
 <script>
     import axios from 'axios'
     import SyncService from '../../../../services/SyncService'
-    import DeviceService from '../../../../services/device/DeviceService'
+    import DeviceService from '../../../../services/device'
     import SyncSubStep from '../../SyncSubStep.vue'
-    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     export default {
       name: 'authenticate-device',
       data () {

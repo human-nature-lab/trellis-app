@@ -1,4 +1,4 @@
-import UserService from '../../services/user/UserService'
+import UserService from '../../services/user'
 import { TrellisPermission } from '../../static/permissions.base'
 import PermissionService from '../../services/permission'
 import { GuardConfig } from '../GuardQueue'

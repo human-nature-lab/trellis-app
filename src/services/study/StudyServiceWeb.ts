@@ -4,7 +4,7 @@ import Study from '../../entities/trellis/Study'
 import User from '../../entities/trellis/User'
 import http, {adminInst} from '../http/AxiosInstance'
 
-export default class StudyServiceWeb extends StudyServiceAbstract {
+export class StudyServiceWeb extends StudyServiceAbstract {
 
   private allStudiesPromise!: Promise<Study[]>
 

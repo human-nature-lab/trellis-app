@@ -141,7 +141,7 @@
 </template>
 
 <script>
-  import StudyService from '../../services/study/StudyService'
+  import StudyService from '../../services/study'
   import GeoService from '../../services/geo/GeoService'
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'

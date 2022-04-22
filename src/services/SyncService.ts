@@ -1,7 +1,7 @@
 import Sync from '../entities/trellis-config/Sync'
 import uuid from 'uuid/v4'
 import DatabaseService from './database/DatabaseService'
-import DeviceService from './device/DeviceService'
+import DeviceService from './device'
 import { syncInstance } from './http/AxiosInstance'
 import { AxiosRequestConfig, CancelTokenSource } from 'axios'
 import { Connection } from 'typeorm'

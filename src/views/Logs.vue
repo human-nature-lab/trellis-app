@@ -106,7 +106,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
-  import { defaultLoggingService } from '../services/logging/LoggingService'
+  import { defaultLoggingService } from '../services/logging'
   import Log from '../entities/trellis-config/Log'
   import ModalTitle from '../components/ModalTitle.vue'
   import uploadLogs from '../services/upload/UploadLogs'

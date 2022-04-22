@@ -3,7 +3,7 @@ import { uriTemplate } from '../http/WebUtils'
 import RoleServiceInterface from './RoleServiceInterface'
 import { adminInst } from '../http/AxiosInstance'
 
-export default class RoleServiceWeb implements RoleServiceInterface {
+export class RoleServiceWeb implements RoleServiceInterface {
 
   async create (role: Role): Promise<Role> {
     const res = await adminInst.post('role', role.toSnakeJSON())

@@ -9,7 +9,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import Respondent from '../../entities/trellis/Respondent'
-  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentService from '../../services/respondent'
 
   export default Vue.extend({
     name: 'RespondentChip',

@@ -1,4 +1,4 @@
-import { defaultLoggingService } from './logging/LoggingService'
+import { defaultLoggingService } from './logging'
 import Emitter from '../classes/Emitter'
 class AlertService extends Emitter {
   constructor () {

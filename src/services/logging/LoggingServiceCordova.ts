@@ -6,7 +6,7 @@ import { LoggingLevel, LogRequest } from './LoggingTypes'
 import { IsNull, Not } from 'typeorm'
 import { Mutex, MutexInterface } from 'async-mutex'
 
-class LoggingServiceCordova extends LoggingServiceAbstract {
+export class LoggingServiceCordova extends LoggingServiceAbstract {
 
   private queue: Log[] = []
   private save: Function
@@ -114,4 +114,3 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
 
 }
 
-export default LoggingServiceCordova

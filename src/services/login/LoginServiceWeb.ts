@@ -1,10 +1,10 @@
 
-import UserService, {webService as userService} from '../user/UserService'
+import UserService, {webService as userService} from '../user'
 import http, {setToken, removeToken, Token} from '../http/AxiosInstance'
 import LoginServiceInterface from './LoginServiceInterface'
 import ConfigService from '../config'
 
-export default class LoginServiceWeb implements LoginServiceInterface {
+export class LoginServiceWeb implements LoginServiceInterface {
 
   async login (username, password) {
     let res = await http().post(`login`, {

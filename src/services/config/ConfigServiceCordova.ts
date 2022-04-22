@@ -2,8 +2,7 @@ import Config from '../../entities/trellis/Config'
 import ConfigServiceAbstract from './ConfigServiceAbstract'
 import DatabaseService from '../database/DatabaseService'
 
-export default class ConfigServiceCordova extends ConfigServiceAbstract {
-
+export class ConfigServiceCordova extends ConfigServiceAbstract {
   protected async getAll (): Promise<Config[]> {
     try {
       const repo = await DatabaseService.getRepository(Config)
@@ -20,5 +19,4 @@ export default class ConfigServiceCordova extends ConfigServiceAbstract {
   protected async resetRemote (key: string): Promise<Config> {
     throw Error('Not implemented')
   }
-
 }

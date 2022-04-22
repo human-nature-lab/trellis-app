@@ -29,7 +29,7 @@
   import TrellisLoadingCircle from '../components/TrellisLoadingCircle.vue'
   import Device from '../entities/trellis/Device'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'
-  import DeviceService from '../services/device/DeviceService'
+  import DeviceService from '../services/device'
   import { routeQueue } from '../router'
 
   export default Vue.extend({

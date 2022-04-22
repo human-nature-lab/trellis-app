@@ -1,4 +1,4 @@
-import LocaleService from '../../services/locale/LocaleService'
+import LocaleService from '../../services/locale'
 import SingletonService from '../../services/SingletonService'
 import StorageService from '../../services/StorageService'
 import { GuardConfig } from '../GuardQueue'

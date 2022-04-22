@@ -1,6 +1,6 @@
 import {default as InterviewManager, sharedInterviewInstance} from '../components/interview/classes/InterviewManager'
 import EdgeService from './edge'
-import RosterService from './roster/RosterService'
+import RosterService from './roster'
 import StringInterpolationService from './StringInterpolationService'
 import { InterviewLocation } from '../components/interview/services/InterviewAlligator'
 import TranslationText from '../entities/trellis/TranslationText'
@@ -12,7 +12,6 @@ import singleton from '../static/singleton'
 import QuestionDatum from '../entities/trellis/QuestionDatum'
 import GeoService from './geo/GeoService'
 import Geo from '../entities/trellis/Geo'
-import RespondentService from './respondent/RespondentService'
 
 export default class InterpolationService {
   /**

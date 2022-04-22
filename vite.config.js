@@ -43,7 +43,7 @@ export default defineConfig(({ command, mode }) => {
       },
       VERSION: JSON.stringify(require('./package.json').version),
     },
-    // root: SRC_DIR,
+    // root: './index.vite.html',
     // base: '',
     publicDir: PUBLIC_DIR,
     build: {

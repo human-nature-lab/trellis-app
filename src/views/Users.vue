@@ -45,7 +45,7 @@
   import User from '../entities/trellis/User'
   import UserEdit from '../components/user/UserEdit.vue'
   import UserRow from '../components/user/UserRow.vue'
-  import UserService from '../services/user/UserService'
+  import UserService from '../services/user'
   import TrellisModal from '../components/TrellisModal.vue'
   import Vue from 'vue'
   import DocsLinkMixin from '../mixins/DocsLinkMixin'

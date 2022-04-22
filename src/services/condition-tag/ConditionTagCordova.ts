@@ -67,5 +67,3 @@ export class ConditionTagCordova implements ConditionTagInterface {
     throw new Error('Not implemented')
   }
 }
-
-export default new ConditionTagCordova()

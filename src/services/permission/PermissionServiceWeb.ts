@@ -6,7 +6,7 @@ import Permission from '../../entities/trellis/Permission'
 import { uriTemplate } from '../http/WebUtils'
 import PermissionServiceAbstract from './PermissionServiceAbstract'
 
-export default class PermissionServiceWeb extends PermissionServiceAbstract {
+export class PermissionServiceWeb extends PermissionServiceAbstract {
 
   protected async fetchUserPermissions (user: User): Promise<string[]> {
     const res = await http().get(uriTemplate('role/{role}/permissions', [user.roleId]))

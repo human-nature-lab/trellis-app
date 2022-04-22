@@ -10,9 +10,9 @@
 
 <script>
     import FileService from '../../../../services/file/FileService'
-    import PhotoService from '../../../../services/photo/PhotoService'
+    import PhotoService from '../../../../services/photo'
     import SyncSubStep from '../../SyncSubStep.vue'
-    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     export default {
       name: 'generate-image-list',
       data () {

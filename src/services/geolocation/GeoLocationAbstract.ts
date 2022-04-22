@@ -1,4 +1,4 @@
-import {defaultLoggingService as logger} from '../logging/LoggingService'
+import {defaultLoggingService as logger} from '../logging'
 import { LoggingLevel } from '../logging/LoggingTypes'
 import global from '../../static/singleton'
 import config from 'config'

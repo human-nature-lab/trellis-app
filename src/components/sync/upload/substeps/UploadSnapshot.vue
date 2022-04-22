@@ -14,10 +14,10 @@
 
 <script>
   import SyncSubStep from '../../SyncSubStep.vue'
-  import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+  import LoggingService, { defaultLoggingService } from '../../../../services/logging'
   import FileService from '../../../../services/file/FileService'
   import DatabaseService from '../../../../services/database/DatabaseService'
-  import DeviceService from '../../../../services/device/DeviceService'
+  import DeviceService from '../../../../services/device'
 import { getSyncAuthentication } from '../../../../services/http/AxiosInstance'
 
   export default {

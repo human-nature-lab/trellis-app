@@ -1,17 +1,10 @@
-import { roughSizeOf } from '../../classes/M'
 import http from '../http/AxiosInstance'
 import axios from 'axios'
-import LRU from 'lru-cache'
-const cache = new LRU({
-  max: 1024 * 10000,
-  length: function (n, key) {
-    return roughSizeOf(n) + roughSizeOf(key)
-  }
-})
-import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'
+import { cache } from './cache'
+import PhotoServiceAbstract, { CancelFunction } from './PhotoServiceAbstract'
 import Photo from '../../entities/trellis/Photo'
 
-export default class PhotoServiceWeb extends PhotoServiceAbstract {
+export class PhotoServiceWeb extends PhotoServiceAbstract {
 
   private existingCancelTokens = new Set()
 

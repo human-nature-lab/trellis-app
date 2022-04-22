@@ -9,7 +9,7 @@ declare const cordova
 
 const deviceKeyKey = 'device-key'
 
-export default class DeviceServiceCordova implements DeviceServiceInterface {
+export class DeviceServiceCordova implements DeviceServiceInterface {
   private isReady: boolean = false
   private platform: string
   private uuid: string

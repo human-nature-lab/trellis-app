@@ -4,7 +4,7 @@ import LocaleServiceAbstract from './LocaleServiceAbstract'
 import Locale from '../../entities/trellis/Locale'
 import http, {adminInst} from '../http/AxiosInstance'
 
-class LocaleServiceWeb extends LocaleServiceAbstract {
+export class LocaleServiceWeb extends LocaleServiceAbstract {
   async getLocaleById (localeId: string): Promise<Locale> {
     const res = await http().get(uriTemplate('/locale/{locale}', [localeId]))
     return new Locale().fromSnakeJSON(res.data.locale)
@@ -32,5 +32,3 @@ class LocaleServiceWeb extends LocaleServiceAbstract {
     }
   }
 }
-
-export default new LocaleServiceWeb()
