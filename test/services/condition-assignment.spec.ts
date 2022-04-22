@@ -2,7 +2,7 @@ import './globals'
 import {expect} from 'chai'
 import Form from '../../src/entities/trellis/Form'
 
-import ConditionAssignmentService from '../../src/services/ConditionAssignmentService'
+import ConditionAssignmentService from '../../src/services/SaferEvalService'
 import { FormBuilder } from '../FormBuilder'
 import { SectionTemplate } from '../FormBuilderTypes'
 import { InterviewController } from '../InterviewController'
