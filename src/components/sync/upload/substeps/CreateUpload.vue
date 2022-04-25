@@ -14,7 +14,7 @@
 <script>
   import SyncSubStep from '../../SyncSubStep.vue'
   import LoggingService, { defaultLoggingService } from '../../../../services/logging'
-  import FileService from '../../../../services/file/FileService'
+  import FileService from '../../../../services/file'
   import SyncService from '../../../../services/SyncService'
   import uuid from 'uuid/v4'
 

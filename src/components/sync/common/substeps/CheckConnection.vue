@@ -12,7 +12,7 @@
 <script>
     import axios from 'axios'
     import SyncService from '../../../../services/SyncService'
-    import DatabaseService from '../../../../services/database/DatabaseService'
+    import DatabaseService from '../../../../services/database'
     import TrellisAlert from '../../../TrellisAlert.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     import SyncSubStep from '../../SyncSubStep.vue'

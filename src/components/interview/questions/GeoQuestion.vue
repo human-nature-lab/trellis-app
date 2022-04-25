@@ -49,7 +49,7 @@
 </template>
 
 <script>
-  import GeoService from '../../../services/geo/GeoService'
+  import GeoService from '../../../services/geo'
   import GeoSearch from '../../geo/GeoSearch.vue'
   import GeoBreadcrumbs from '../../geo/GeoBreadcrumbs.vue'
   import GeoListTile from '../../geo/GeoListTile.vue'

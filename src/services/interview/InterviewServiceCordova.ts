@@ -1,6 +1,6 @@
 import Interview from '../../entities/trellis/Interview'
 import { now } from '../DateService'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import InterviewServiceAbstract from './InterviewServiceAbstract'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'

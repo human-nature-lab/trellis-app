@@ -89,7 +89,7 @@
   import Vue from 'vue'
   import Permission from '../components/Permission.vue'
   import StudyForm from '../entities/trellis/StudyForm'
-  import FormService from '../services/form/FormService'
+  import FormService from '../services/form'
   import TranslationService from '../services/TranslationService'
   import formTypes from '../static/form.types'
   import global, {Singleton} from '../static/singleton'

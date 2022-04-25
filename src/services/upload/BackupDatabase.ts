@@ -1,4 +1,4 @@
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import config from 'config'
 import DeviceService from '../device'
 

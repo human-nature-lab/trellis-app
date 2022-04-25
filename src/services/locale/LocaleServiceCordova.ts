@@ -2,7 +2,7 @@ import StudyLocale from '../../entities/trellis/StudyLocale'
 import LocaleServiceAbstract from './LocaleServiceAbstract'
 import Locale from '../../entities/trellis/Locale'
 import StudyService from '../study'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 
 export class LocaleServiceCordova extends LocaleServiceAbstract {
   

@@ -1,7 +1,7 @@
 import ConfigService from '../config'
 
 import LoginServiceInterface from './LoginServiceInterface'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import UserService from '../user'
 import User from '../../entities/trellis/User'
 import bcrypt from 'bcryptjs'

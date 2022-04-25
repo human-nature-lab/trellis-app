@@ -12,9 +12,9 @@
 </template>
 
 <script>
-    import FileService from '../../../../services/file/FileService'
+    import FileService from '../../../../services/file'
     import DeviceService from '../../../../services/device'
-    import DatabaseService from '../../../../services/database/DatabaseService'
+    import DatabaseService from '../../../../services/database'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     import { getSyncAuthentication } from '../../../../services/http/AxiosInstance'

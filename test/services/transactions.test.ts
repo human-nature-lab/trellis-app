@@ -1,4 +1,4 @@
-import InterviewService from '../../src/services/interview/InterviewService'
+import InterviewService from '../../src/services/interview'
 import RosterService from '../../src/services/roster'
 import SurveyService from '../../src/services/survey'
 import { forms, respondentId2, studyId } from '../testing-ids'
@@ -10,7 +10,7 @@ import InterviewDeltaInterface, {
 import Datum from '../../src/entities/trellis/Datum'
 import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
 import { expect } from 'chai'
-import FormService from '../../src/services/form/FormService'
+import FormService from '../../src/services/form'
 import uuid from 'uuid/v4'
 
 export default function () {

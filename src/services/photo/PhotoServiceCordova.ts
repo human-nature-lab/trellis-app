@@ -1,5 +1,5 @@
-import FileService from '../file/FileService'
-import DatabaseService from '../database/DatabaseService'
+import FileService from '../file'
+import DatabaseService from '../database'
 import Photo from '../../entities/trellis/Photo'
 import uuid from 'uuid/v4'
 import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'

@@ -1,4 +1,4 @@
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import { isUndefined } from '../util'
 import GeoServiceAbstract, { GeoSearchParams } from './GeoServiceAbstract'
 import Geo from '../../entities/trellis/Geo'

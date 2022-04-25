@@ -100,7 +100,7 @@
   import TranslationMixin from '../../mixins/TranslationMixin'
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import router, { routeQueue } from '../../router'
   import { Route } from 'vue-router'
   import Geo from '../../entities/trellis/Geo'

@@ -13,8 +13,8 @@
 <script>
   import SyncSubStep from '../../SyncSubStep.vue'
   import LoggingService, { defaultLoggingService } from '../../../../services/logging'
-  import ZipService from '../../../../services/zip/ZipService'
-  import FileService from '../../../../services/file/FileService'
+  import ZipService from '../../../../services/zip'
+  import FileService from '../../../../services/file'
 
   export default {
     name: 'compress-upload',

@@ -142,7 +142,7 @@
 
 <script>
   import StudyService from '../../services/study'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum.vue'

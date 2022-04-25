@@ -35,7 +35,7 @@
 import Geo from '../../entities/trellis/Geo'
 import GeoSearch from './GeoSearch.vue'
 import AddGeoForm from './AddGeoForm.vue'
-import GeoService from '../../services/geo/GeoService'
+import GeoService from '../../services/geo'
 import DocsFiles from '../documentation/DocsFiles'
 import DocsLinkMixin from '../../mixins/DocsLinkMixin'
 import { routeQueue } from '../../router'

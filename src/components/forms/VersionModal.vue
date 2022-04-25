@@ -51,7 +51,7 @@
 
 <script lang="ts">
   import Vue, { PropOptions } from 'vue'
-  import FormService from '../../services/form/FormService'
+  import FormService from '../../services/form'
   import TrellisModal from '../TrellisModal.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
   import StudyForm from '../../entities/trellis/StudyForm'

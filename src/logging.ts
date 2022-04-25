@@ -8,7 +8,7 @@ import SentryOfflineTransport from './services/logging/SentryOfflineTransport'
 import { BrowserOptions } from '@sentry/browser/esm'
 import { APP_ENV } from './static/constants'
 import SingletonService from './services/SingletonService'
-import DatabaseService from './services/database/DatabaseService'
+import DatabaseService from './services/database'
 declare const VERSION: string
 
 async function asyncSetup () {

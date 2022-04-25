@@ -40,7 +40,7 @@ export class LoggingServiceCordova extends LoggingServiceAbstract {
     }
     console.info(`writing ${saving.length} logs to disk`)
     let succeeded = false
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     try {
       const connection = await DatabaseService.getConfigDatabase()
       await connection.manager.save(saving)
@@ -80,7 +80,7 @@ export class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async getLogPage (page: number, limit: number, sortBy?: string, descending?: boolean): Promise<Log[]> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     let order = sortBy ? {
       [sortBy]: descending ? 'DESC' : 'ASC'
@@ -93,13 +93,13 @@ export class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async getLogCount (): Promise<number> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.count()
   }
 
   public async getUploadedCount (): Promise<number> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.count({
       uploadedAt: Not(IsNull())
@@ -107,7 +107,7 @@ export class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async deleteUploaded (): Promise<void> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.delete()
   }

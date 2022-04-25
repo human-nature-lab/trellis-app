@@ -11,7 +11,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import SyncSubStep from '../../SyncSubStep.vue'
-  import DatabaseService from '../../../../services/database/DatabaseService'
+  import DatabaseService from '../../../../services/database'
 
   export default Vue.extend({
     name: 'CloseDatabase',

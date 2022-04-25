@@ -15,8 +15,8 @@
 <script>
   import SyncSubStep from '../../SyncSubStep.vue'
   import LoggingService, { defaultLoggingService } from '../../../../services/logging'
-  import FileService from '../../../../services/file/FileService'
-  import DatabaseService from '../../../../services/database/DatabaseService'
+  import FileService from '../../../../services/file'
+  import DatabaseService from '../../../../services/database'
   import DeviceService from '../../../../services/device'
 import { getSyncAuthentication } from '../../../../services/http/AxiosInstance'
 

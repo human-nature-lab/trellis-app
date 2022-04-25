@@ -1,8 +1,5 @@
-import DatabaseServiceCordova from './DatabaseServiceCordova'
 import config from 'config'
-
-const dbDefault = new DatabaseServiceCordova()
-export default dbDefault
+import dbDefault from './'
 
 // Add methods for running queries directly on the tablet
 if (config.debug) {

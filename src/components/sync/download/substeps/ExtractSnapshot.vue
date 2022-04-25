@@ -11,7 +11,7 @@
 </template>
 
 <script>
-    import ZipService from '../../../../services/zip/ZipService'
+    import ZipService from '../../../../services/zip'
     import SyncSubStep from '../../SyncSubStep.vue'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     export default {

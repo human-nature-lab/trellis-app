@@ -1,5 +1,5 @@
 import { Route } from 'vue-router'
-import CensusFormService from '../../services/census/index'
+import CensusFormService from '../../services/census'
 import { GuardConfig } from '../GuardQueue'
 
 export default {

@@ -94,7 +94,7 @@ const plugins = [
   new VuetifyLoaderPlugin(),
   new HtmlWebpackPlugin({
     filename: 'index.html',
-    template: config.build.index,
+    template: 'index.html',
     inject: true,
     minify: {
       removeComments: true,

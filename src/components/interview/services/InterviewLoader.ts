@@ -1,5 +1,5 @@
-import FormService from '../../../services/form/FormService'
-import InterviewService from '../../../services/interview/InterviewService'
+import FormService from '../../../services/form'
+import InterviewService from '../../../services/interview'
 import LocaleService from '../../../services/locale'
 import RespondentService from '../../../services/respondent'
 import { Route } from 'vue-router'

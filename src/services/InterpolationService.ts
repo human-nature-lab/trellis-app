@@ -10,7 +10,7 @@ import Question from '../entities/trellis/Question'
 import TranslationService from './TranslationService'
 import singleton from '../static/singleton'
 import QuestionDatum from '../entities/trellis/QuestionDatum'
-import GeoService from './geo/GeoService'
+import GeoService from './geo'
 import Geo from '../entities/trellis/Geo'
 
 export default class InterpolationService {

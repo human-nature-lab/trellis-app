@@ -1,5 +1,5 @@
 import singleton from '../../static/singleton'
-import FormService from '../../services/form/FormService'
+import FormService from '../../services/form'
 
 export default function (to, from, next) {
   let promises = [

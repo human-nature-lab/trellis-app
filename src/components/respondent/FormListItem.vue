@@ -131,7 +131,7 @@
   import Vue from 'vue'
   import global from '../../static/singleton'
   import SurveyService from '../../services/survey'
-  import InterviewService from '../../services/interview/InterviewService'
+  import InterviewService from '../../services/interview'
   import { getCurrentPosition } from '../LocationFinder.vue'
   import singleton from '../../static/singleton'
 

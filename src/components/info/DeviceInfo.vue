@@ -8,7 +8,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import DeviceService from '../../services/device'
-  import DatabaseService from '../../services/database/DatabaseService'
+  import DatabaseService from '../../services/database'
   import InfoBlock from './InfoBlock.vue'
   import config from 'config'
 

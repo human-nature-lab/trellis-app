@@ -83,7 +83,7 @@ import Locale from '../../entities/trellis/Locale'
 import LocaleSelectorMenu from '../locale/LocaleSelectorMenu.vue'
 import DotsMenu from './DotsMenu.vue'
 import expandAll from '../../events/builder/expandAll'
-import FormService from '../../services/form/FormService'
+import FormService from '../../services/form'
 
 export default Vue.extend({
   name: 'BuilderMenu',

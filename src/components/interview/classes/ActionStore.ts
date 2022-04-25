@@ -7,7 +7,7 @@ import AT from '../../../static/action.types'
 import { locToNumber } from '../services/LocationHelpers'
 import { ActionPayload } from '../services/actions/DatumOperations'
 import { randomIntBits } from '../../../classes/M'
-import InterviewService from '../../../services/interview/InterviewService'
+import InterviewService from '../../../services/interview'
 import { Mutex, MutexInterface }from 'async-mutex'
 
 /**

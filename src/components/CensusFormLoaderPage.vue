@@ -6,7 +6,7 @@
   import RouteMixinFactory from '../mixins/RoutePreloadMixin'
   import CensusService from '../services/census/index'
   import SurveyService from '../services/survey'
-  import InterviewService from '../services/interview/InterviewService'
+  import InterviewService from '../services/interview'
   import { routeQueue } from '../router'
   function setup (to) {
     let res = {

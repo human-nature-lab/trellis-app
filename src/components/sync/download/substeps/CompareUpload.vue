@@ -14,7 +14,7 @@
     import axios from 'axios'
     import SyncService from '../../../../services/SyncService'
     import DeviceService from '../../../../services/device'
-    import DatabaseService from '../../../../services/database/DatabaseService'
+    import DatabaseService from '../../../../services/database'
     import {COMPARE_UPLOAD_RESULTS as RESULTS} from '../../../../static/constants'
     import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     import SyncSubStep from '../../SyncSubStep.vue'

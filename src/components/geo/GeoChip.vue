@@ -12,7 +12,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import Geo from '../../entities/trellis/Geo'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import TranslationService from '../../services/TranslationService'
   import global from '../../static/singleton'
 

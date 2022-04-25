@@ -1,5 +1,5 @@
 import StudyServiceAbstract from './StudyServiceAbstract'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import Study from '../../entities/trellis/Study'
 import UserService from '../user'
 import UserStudy from '../../entities/trellis/UserStudy'

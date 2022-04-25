@@ -1,6 +1,6 @@
 import Config from '../../entities/trellis/Config'
 import ConfigServiceAbstract from './ConfigServiceAbstract'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 
 export class ConfigServiceCordova extends ConfigServiceAbstract {
   protected async getAll (): Promise<Config[]> {

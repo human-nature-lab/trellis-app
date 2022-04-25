@@ -65,7 +65,7 @@
   import Permission from "../Permission.vue";
   import TranslationTextField from "../TranslationTextField.vue";
   import TrellisLoadingCircle from "../TrellisLoadingCircle.vue";
-  import FormService from "../../services/form/FormService";
+  import FormService from "../../services/form";
   import { debounce } from "lodash";
   import formTypes from "../../static/form.types";
   import censusTypes from "../../static/census.types";

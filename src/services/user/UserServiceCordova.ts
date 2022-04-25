@@ -1,5 +1,5 @@
 import User from '../../entities/trellis/User'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import { UserServiceAbstract } from './UserServiceAbstract'
 import UserStudy from '../../entities/trellis/UserStudy'
 import Pagination from '../../types/Pagination'

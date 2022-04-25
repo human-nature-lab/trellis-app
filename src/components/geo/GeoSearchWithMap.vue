@@ -58,7 +58,7 @@
   import 'leaflet'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import DocsFiles from '../documentation/DocsFiles'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import GeoSearch from './GeoSearch.vue'
   import TranslationService from '../../services/TranslationService'
   import global from '../../static/singleton'

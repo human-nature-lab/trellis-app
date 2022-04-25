@@ -3,7 +3,7 @@ import { createConnection, Entity, EntityTarget, getConnection, QueryRunner } fr
 import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'
 import Sync from '../../entities/trellis-config/Sync'
-import FileService from '../file/FileService'
+import FileService from '../file'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 import config from 'config'
 import { monekypatch } from './monekypatch'

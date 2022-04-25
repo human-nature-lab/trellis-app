@@ -37,7 +37,7 @@
 
 <script>
   import { heartbeatInstance } from '../services/http/AxiosInstance'
-  import DatabaseService from '../services/database/DatabaseService'
+  import DatabaseService from '../services/database'
   import AlertService from '../services/AlertService'
   import { routeQueue } from '../router'
   import global from '../static/singleton'

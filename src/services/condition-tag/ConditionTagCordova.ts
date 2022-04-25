@@ -1,4 +1,4 @@
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import ConditionTagInterface from './ConditionTagInterface'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'

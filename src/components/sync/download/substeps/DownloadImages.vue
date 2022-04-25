@@ -13,7 +13,7 @@
 </template>
 
 <script>
-    import FileService from '../../../../services/file/FileService'
+    import FileService from '../../../../services/file'
     import SyncService from '../../../../services/SyncService'
     import axios from 'axios'
     import SyncSubStep from '../../SyncSubStep.vue'
