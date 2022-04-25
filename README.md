@@ -56,6 +56,10 @@ A simplified Docker configuration for development is in progress. Contact us if 
 This step is similar to the configuration required to create a release.
 1. Add `config.js` file in `static/`. Look at `static/config.default.js` for template. The `apiRoot` should point to your development API server.
 1. Add `config-xml.dev.js` file in `config/`. The template is `config/config-xml.dev.default.js`. Point the `CONTENT_SOURCE` to your Webpack development server.
+1. Prepare cordova
+    - Install [cordova][5]
+    - Install [cordova Android dependencies][6]
+    - run `cordova prepare`
 
 #### Android
 1. Start the Webpack development server with `npm start`
@@ -89,5 +93,7 @@ Update the `src/components/documentation/DocsFiles.ts` to add files to the docum
 [2]: https://cordova.apache.org/docs/en/latest/guide/cli/#installing-the-cordova-cli
 [3]: https://developer.android.com/studio/publish/app-signing
 [4]: https://github.com/human-nature-lab/trellis-api#trellis-app
+[5]: https://cordova.apache.org/docs/en/latest/guide/cli/index.html
+[6]: https://cordova.apache.org/docs/en/latest/guide/platforms/android/index.html#requirements-and-support
 
 [trellis]: https://github.com/human-nature-lab/trellis
