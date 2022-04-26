@@ -1,5 +1,5 @@
 import { AxiosError, AxiosResponse } from 'axios'
-import config from 'config'
+import config from '../config'
 import { TranslateResult } from 'vue-i18n'
 import { APP_ENV } from '../static/constants'
 import Vue from 'vue'

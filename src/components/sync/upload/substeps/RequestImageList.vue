@@ -13,9 +13,6 @@
 <script>
   import SyncSubStep from '../../SyncSubStep.vue'
   import LoggingService, { defaultLoggingService } from '../../../../services/logging'
-  import FileService from '../../../../services/file'
-  import config from 'config'
-  import DeviceService from '../../../../services/device'
   import SyncService from '../../../../services/SyncService'
   import * as axios from 'axios'
 

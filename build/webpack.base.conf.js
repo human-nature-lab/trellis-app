@@ -94,7 +94,7 @@ const plugins = [
   new VuetifyLoaderPlugin(),
   new HtmlWebpackPlugin({
     filename: 'index.html',
-    template: 'index.html',
+    template: 'index.webpack.html',
     inject: true,
     minify: {
       removeComments: true,
@@ -137,7 +137,7 @@ module.exports = {
     app: ['./src/main.ts'],
   },
   externals: {
-    config: 'config',
+    // config: { root: 'config' },
   },
   devtool,
   output: {

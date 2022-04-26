@@ -6,7 +6,7 @@ import { loadLanguageAsync } from '../i18n/index'
 import moment from 'moment'
 import DeviceService from './device'
 import DatabaseService from './database'
-import config from 'config'
+import config from '../config'
 import { APP_ENV } from '../static/constants'
 import theme from '../static/theme'
 

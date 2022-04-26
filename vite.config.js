@@ -1,5 +1,5 @@
 
-import path from 'path';
+import path from 'path'
 import { defineConfig } from 'vite'
 import { viteExternalsPlugin } from 'vite-plugin-externals'
 import { createVuePlugin } from 'vite-plugin-vue2'
@@ -32,7 +32,7 @@ export default defineConfig(({ command, mode }) => {
         // target: 'es5',
       }),
       viteExternalsPlugin({
-        'config': 'config',
+        config: 'config',
       }),
       mdPlugin({ mode: Mode.VUE }),
     ],
@@ -57,15 +57,15 @@ export default defineConfig(({ command, mode }) => {
     },
     resolve: {
       alias: {
-        'vue': 'vue/dist/vue.esm.js',
+        vue: 'vue/dist/vue.esm.js',
         '@': SRC_DIR,
         './images/layers.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers.png'),
         './images/layers-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers-2x.png'),
         './images/marker-icon.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon.png'),
         './images/marker-icon-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-icon-2x.png'),
-        './images/marker-shadow.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-shadow.png')
+        './images/marker-shadow.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/marker-shadow.png'),
       },
-      extensions: ['.vite.ts', '.vite.js', '.esnext.tx', '.esnext.js', '.mjs', '.js', '.ts', '.jsx', '.tsx', '.json']
+      extensions: ['.vite.ts', '.vite.js', '.esnext.tx', '.esnext.js', '.mjs', '.js', '.ts', '.jsx', '.tsx', '.json'],
     },
     // assetsInclude: ['./static/**/*'],
     // server: {
@@ -77,12 +77,11 @@ export default defineConfig(({ command, mode }) => {
     // },
   }
   if (process.env.TARGET === 'web') {
-    config.resolve.alias['typeorm'] = 'nop-typeorm'
+    config.resolve.alias.typeorm = 'nop-typeorm'
     // config.resolve.alias.push({ find: /typeorm$/, replacement: path.resolve(__dirname, './src/typeorm/nop.ts') })
     config.resolve.extensions = ['.web.ts', '.browser.ts'].concat(config.resolve.extensions)
   } else {
     config.resolve.extensions = ['.cordova.ts', '.mobile.ts'].concat(config.resolve.extensions)
   }
-  // TODO: customize imports based on the command
   return config
 })

@@ -73,7 +73,7 @@
 /*global mocha*/
 import { LoginServiceCordova } from '../services/login/LoginServiceCordova'
 import { LoginServiceWeb } from '../services/login/LoginServiceWeb'
-import config from 'config'
+import config from '../config'
 import { randomFrom } from '../classes/M'
 import 'mocha/mocha.js'
 import testModules from '../../test/services/index'

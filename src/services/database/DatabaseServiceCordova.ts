@@ -5,7 +5,7 @@ import Config from '../../entities/trellis-config/Config'
 import Sync from '../../entities/trellis-config/Sync'
 import FileService from '../file'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
-import config from 'config'
+import config from '../../config'
 import { monekypatch } from './monekypatch'
 import { requireAllModules } from '../../classes/requireAll'
 import { delay } from '../../classes/delay'
@@ -30,7 +30,7 @@ const trellisConnection = {
   namingStrategy: new SnakeCaseNamingStrategy(),
   // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
-  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error']
+  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['query', 'warning', 'error']
 }
 
 interface SnapshotProgress {
@@ -60,6 +60,12 @@ export default class DatabaseServiceCordova {
     return getConnection('trellis')
   }
 
+  async tableExists (table: string) {
+    const conn = await this.getDatabase()
+    const res = await conn.query(`select name from sqlite_master where type="table" and name="${table}"`)
+    return res && res.length && res[0].name.toLowerCase() === table
+  }
+
   async closeDatabase (timeout = 2000): Promise<boolean> {
     const conn = await this.getDatabase()
     let hasTimedOut = false
@@ -87,7 +93,9 @@ export default class DatabaseServiceCordova {
   }
 
   async getConfigDatabase () {
+    console.log('getConfigDatabase')
     await this.configDatabaseCreated
+    console.log('config database created')
     return getConnection('trellis-config')
   }
 

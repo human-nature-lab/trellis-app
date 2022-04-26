@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import config from 'config'
+import config from '../config'
 import { APP_ENV } from '../static/constants'
 
 export default Vue.extend({

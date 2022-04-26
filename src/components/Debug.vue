@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import config from 'config'
+import config from '../config'
 
 export default Vue.extend({
   name: 'debug',

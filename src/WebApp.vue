@@ -116,6 +116,7 @@
 </template>
 
 <script lang="ts">
+  import './services/device'
   import MainMenu from './components/main-menu/MainMenu.vue'
   import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
@@ -132,7 +133,7 @@
   import SnackbarQueue from './components/SnackbarQueue.vue'
   import DocsSidebar from './components/documentation/DocsSidebar.vue'
   import UserService from './services/user'
-  import config from 'config'
+  import config from './config'
   import IsLoggedInMixin from './mixins/IsLoggedInMixin'
   import Banner from './components/Banner.vue'
   import PermissionMixin from './mixins/PermissionMixin'

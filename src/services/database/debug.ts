@@ -1,4 +1,4 @@
-import config from 'config'
+import config from '../../config'
 import dbDefault from './'
 
 // Add methods for running queries directly on the tablet

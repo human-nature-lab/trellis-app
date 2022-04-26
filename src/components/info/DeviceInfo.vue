@@ -10,7 +10,7 @@
   import DeviceService from '../../services/device'
   import DatabaseService from '../../services/database'
   import InfoBlock from './InfoBlock.vue'
-  import config from 'config'
+  import config from '../../config'
 
   declare const VERSION: string
 

@@ -10,15 +10,15 @@ import { i18n } from './i18n'
 import './mixins/GlobalMixin'
 import 'typeface-roboto/index.css'
 import Debug from './components/Debug.vue'
-import WebApp from './WebApp.vue'
 import router from './router'
 
-import config from 'config'
+import config from './config'
 import ConfigService from './services/config'
 import vuetify from './plugins/vuetify'
 import { APP_ENV } from './static/constants'
 import './logging'
 import './filters/toFixed.filter'
+import WebApp from './WebApp.vue'
 // import './checkWebviewVersion'
 
 async function init () {

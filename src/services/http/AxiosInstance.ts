@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import config from 'config'
+import config from '../../config'
 import RouteWhitelist from '../../router/RouteWhitelist'
 import storage from '../StorageService'
 import router, { routeQueue, routerReady } from '../../router'
