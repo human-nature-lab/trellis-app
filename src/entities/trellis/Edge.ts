@@ -7,9 +7,11 @@ import Respondent from './Respondent'
 export default class Edge extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   sourceRespondentId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   targetRespondentId: string
 
   @Relationship(type => Respondent)
@@ -21,5 +23,4 @@ export default class Edge extends TimestampedSoftDelete {
   @ManyToOne(type => Respondent, respondent => respondent.sourceEdges)
   @JoinColumn()
   sourceRespondent: Respondent
-
 }

@@ -7,16 +7,22 @@ import BaseEntity from '../base/BaseEntity'
 export default class PreloadAction extends BaseEntity implements SnakeSerializable {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   actionType: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   payload: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   respondentId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   questionId: string
-  @Column() @Serializable @AsDate
+
+  @Column({ type: 'datetime' }) @Serializable @AsDate
   createdAt: Date
-  @Column() @Serializable @AsDate
+
+  @Column({ type: 'datetime' }) @Serializable @AsDate
   deletedAt: Date
 }

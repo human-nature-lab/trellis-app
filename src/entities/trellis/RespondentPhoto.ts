@@ -7,17 +7,20 @@ import Photo from './Photo'
 export default class RespondentPhoto extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   respondentId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   photoId: string
+
   @Column({ type: 'tinyint' }) @Serializable
   sortOrder: number
+
   @Column({ type: 'text', nullable: true }) @Serializable
   notes: string
 
   @OneToOne(type => Photo)
   @JoinColumn()
   photo: Photo
-
 }

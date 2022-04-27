@@ -6,13 +6,16 @@ import Question from './Question'
 
 @Entity()
 export default class QuestionParameter extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   questionId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   parameterId: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   val: string
 
   @Relationship(type => Parameter)
@@ -22,5 +25,4 @@ export default class QuestionParameter extends SparseTimestampedSoftDelete {
 
   @ManyToOne(type => Question, question => question.questionParameters)
   question: Question
-
 }

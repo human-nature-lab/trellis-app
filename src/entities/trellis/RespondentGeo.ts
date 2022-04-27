@@ -8,28 +8,33 @@ import Respondent from './Respondent'
 export default class RespondentGeo extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   geoId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   respondentId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   previousRespondentGeoId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   notes: string
+
   @Column({ type: Boolean }) @Serializable
   isCurrent: boolean
 
   @ManyToOne(type => Respondent, respondent => respondent.geos)
   respondent: Respondent
 
-  @Relationship(type =>Geo)
+  @Relationship(type => Geo)
   @OneToOne(type => Geo)
   @JoinColumn()
   geo: Geo
 
   history?: RespondentGeo[]
 
-  fromSnakeJSON(json: any) {
+  fromSnakeJSON (json: any) {
     // I hate that this is necessary, but the json comes in two different forms
     if (json.pivot) {
       super.fromSnakeJSON(json.pivot)
@@ -42,5 +47,5 @@ export default class RespondentGeo extends TimestampedSoftDelete {
     }
     this.isCurrent = !!this.isCurrent
     return this
- }
+  }
 }

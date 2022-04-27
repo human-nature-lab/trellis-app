@@ -11,15 +11,20 @@ import { Moment } from 'moment'
 export default class Survey extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   respondentId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   formId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   studyId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   lastQuestionId: string
-  @Column({ type: 'datetime', nullable: true, transformer: MomentTransformer}) @Serializable
+
+  @Column({ type: 'datetime', nullable: true, transformer: MomentTransformer }) @Serializable
   completedAt: Moment
 
   @Relationship(type => Form)
@@ -34,5 +39,4 @@ export default class Survey extends TimestampedSoftDelete {
   @Relationship(type => Interview)
   @OneToMany(type => Interview, interview => interview.survey)
   interviews?: Interview[]
-
 }

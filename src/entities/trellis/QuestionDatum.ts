@@ -23,25 +23,34 @@ export interface QuestionDatumRecyclerData {
 
 @Entity()
 export default class QuestionDatum extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryColumn() @Serializable
+  @PrimaryColumn('uuid') @Serializable
   public id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public questionId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public surveyId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public followUpDatumId: string
-  @Column() @Serializable
+
+  @Column('integer') @Serializable
   public sectionRepetition: number
-  @Column({name: 'answered_at', type: 'datetime', nullable: true, transformer: MomentTransformer}) @Serializable @AsDate
+
+  @Column({ name: 'answered_at', type: 'datetime', nullable: true, transformer: MomentTransformer }) @Serializable @AsDate
   public answeredAt: Moment
-  @Column({name: 'skipped_at', type: 'datetime', nullable: true, transformer: MomentTransformer}) @Serializable @AsDate
+
+  @Column({ name: 'skipped_at', type: 'datetime', nullable: true, transformer: MomentTransformer }) @Serializable @AsDate
   public skippedAt: Moment
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   public dkRf: boolean
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   public dkRfVal: string
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   public noOne: boolean
   // @Column() @Serializable
   // public interviewId: string
@@ -56,11 +65,11 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
    * @returns {this}
    */
   fromRecycler (data: QuestionDatumRecyclerData) {
-    for (let key in data) {
+    for (const key in data) {
       this[key] = data[key]
     }
-    if (this['interviewId']) {
-      delete this['interviewId']
+    if (this.interviewId) {
+      delete this.interviewId
     }
     this.createdAt = now()
     this.updatedAt = now()
@@ -86,5 +95,4 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
     q.deletedAt = this.deletedAt
     return q
   }
-
 }

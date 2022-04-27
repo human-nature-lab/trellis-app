@@ -5,11 +5,13 @@ import Skip from './Skip'
 
 @Entity()
 export default class FormSkip extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   formId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   skipId: string
 
   @Relationship(type => Skip)

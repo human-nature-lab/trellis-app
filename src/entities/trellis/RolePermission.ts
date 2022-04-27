@@ -5,13 +5,16 @@ import Permission from './Permission'
 
 @Entity()
 export default class RolePermission extends TimestampedSoftDelete {
-  @PrimaryColumn() @Serializable
+  @PrimaryColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   roleId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   permissionId: string
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   value: boolean
 
   @Relationship(type => Permission)

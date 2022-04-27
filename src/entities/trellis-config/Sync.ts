@@ -3,25 +3,25 @@ import { Serializable } from '../decorators/WebOrmDecorators'
 
 @Entity('sync')
 export default class Sync {
-  @PrimaryColumn({ name: 'id' }) @Serializable
+  @PrimaryColumn({ name: 'id', type: 'text' }) @Serializable
   id: string
 
-  @Column({ name: 'type' }) @Serializable
+  @Column({ name: 'type', type: 'text' }) @Serializable
   type: string
 
-  @Column({ name: 'status' }) @Serializable
+  @Column({ name: 'status', type: 'text' }) @Serializable
   status: string
 
-  @Column({ name: 'device_id' }) @Serializable
+  @Column({ name: 'device_id', type: 'text' }) @Serializable
   deviceId: string
 
-  @Column({ name: 'snapshot_id', nullable: true }) @Serializable
+  @Column({ name: 'snapshot_id', nullable: true, type: 'text' }) @Serializable
   snapshotId: string
 
   @Column({ name: 'snapshot_created_at', type: 'datetime', nullable: true }) @Serializable
   snapshotCreatedAt: Date
 
-  @Column({ name: 'file_name' }) @Serializable
+  @Column({ name: 'file_name', type: 'text' }) @Serializable
   fileName: string
 
   @Column({ name: 'created_at', type: 'datetime' }) @Serializable
@@ -30,14 +30,3 @@ export default class Sync {
   @Column({ name: 'completed_at', type: 'datetime', nullable: true }) @Serializable
   completedAt: Date
 }
-
-/* TODO:
-relations: {
-  messages: {
-    target: 'Message',
-      type: 'many-to-many',
-      joinTable: true,
-      cascade: true
-  }
-}
-*/

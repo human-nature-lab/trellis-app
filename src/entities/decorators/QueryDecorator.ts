@@ -43,7 +43,7 @@ function cached (cb: Function): Function {
 export function LazyQuery (type: any, queryCallback: QueryCallback<typeof type>, opts: AsyncQueryOptions = defaultOptions) {
   return function (target: any, propertyKey: string): any {
     async function defaultGetter (this: typeof type) {
-      const DatabaseService = require('../../services/database').default
+      const DatabaseService = (await import('../../services/database')).default
       if (type instanceof Function) {
         type = type()
       }

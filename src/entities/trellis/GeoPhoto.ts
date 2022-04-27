@@ -7,12 +7,16 @@ import Photo from './Photo'
 export default class GeoPhoto extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   geoId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   photoId: string
+
   @Column({ type: 'tinyint' }) @Serializable
   sortOrder: number
+
   @Column({ type: 'text' }) @Serializable
   notes: string
 

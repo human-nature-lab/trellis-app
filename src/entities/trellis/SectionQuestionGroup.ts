@@ -5,13 +5,13 @@ import QuestionGroup from './QuestionGroup'
 
 @Entity()
 export default class SectionQuestionGroup extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column({ select: false }) @Serializable
+  @Column({ select: false, type: 'uuid' }) @Serializable
   sectionId: string
 
-  @Column({ select: false }) @Serializable
+  @Column({ select: false, type: 'uuid' }) @Serializable
   questionGroupId: string
 
   @Column({ type: 'integer' }) @Serializable

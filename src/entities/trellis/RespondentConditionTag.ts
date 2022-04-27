@@ -13,16 +13,18 @@ export interface RespondentConditionTagRecylerData {
 
 @Entity()
 export default class RespondentConditionTag extends TimestampedSoftDelete {
-  @PrimaryColumn() @Serializable
+  @PrimaryColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   respondentId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   conditionTagId: string
 
   @Relationship({
     constructor: () => ConditionTag,
-    jsonKey: 'condition_tag'
+    jsonKey: 'condition_tag',
   })
   @OneToOne(type => ConditionTag, { eager: true })
   @JoinColumn({ name: 'condition_tag_id' })
@@ -35,12 +37,13 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
   get conditionId () {
     return this.conditionTagId
   }
+
   set conditionId (id) {
     this.conditionTagId = id
   }
 
   fromRecycler (data: RespondentConditionTagRecylerData) {
-    for (let key in data) {
+    for (const key in data) {
       if (data[key] !== undefined) {
         this[key] = data[key]
       }
@@ -60,5 +63,4 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
     r.updatedAt = this.updatedAt
     return r
   }
-
 }

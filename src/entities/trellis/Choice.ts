@@ -6,11 +6,13 @@ import Question from './Question'
 
 @Entity()
 export default class Choice extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   choiceTranslationId: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   val: string
 
   @Relationship(type => Translation)

@@ -7,12 +7,15 @@ import Question from './Question'
 
 @Entity()
 export default class QuestionChoice extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   questionId: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   choiceId: string
+
   @Column({ type: 'integer' }) @Serializable
   sortOrder: number
 
@@ -31,7 +34,7 @@ export default class QuestionChoice extends SparseTimestampedSoftDelete {
     } else {
       super.fromSnakeJSON(json)
       mapFromSnakeJSON(this, json, {
-        choice: Choice
+        choice: Choice,
       })
     }
     return this

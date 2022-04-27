@@ -4,8 +4,9 @@ import BaseEntity from '../base/BaseEntity'
 
 @Entity()
 export default class FormType extends BaseEntity {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
 }

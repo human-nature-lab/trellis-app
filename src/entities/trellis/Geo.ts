@@ -9,17 +9,23 @@ import Photo from './Photo'
 export default class Geo extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   geoTypeId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   parentId: string
+
   @Column({ type: 'double', nullable: true }) @Serializable
   latitude: number
+
   @Column({ type: 'double', nullable: true }) @Serializable
   longitude: number
+
   @Column({ type: 'double', nullable: true }) @Serializable
   altitude: number
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   nameTranslationId: string
 
   @Relationship(type => GeoType)
@@ -36,5 +42,4 @@ export default class Geo extends TimestampedSoftDelete {
   @ManyToMany(type => Photo, photo => photo.geos)
   @JoinTable({ name: 'geo_photo' })
   photos: Photo[]
-
 }

@@ -5,13 +5,16 @@ import User from './User'
 
 @Entity()
 export default class Device extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   deviceId: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   key!: string
 
   @Relationship(type => User)
