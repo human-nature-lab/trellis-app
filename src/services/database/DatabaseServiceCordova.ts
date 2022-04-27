@@ -7,7 +7,6 @@ import FileService from '../file'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 import config from '../../config'
 import { monekypatch } from './monekypatch'
-import { requireAllModules } from '../../classes/requireAll'
 import { delay } from '../../classes/delay'
 monekypatch()
 
@@ -16,7 +15,7 @@ const trellisConfigConnection = {
   database: 'trellis-config',
   name: 'trellis-config',
   location: 'default',
-  entities: requireAllModules(require.context('../../entities/trellis-config', true, /\.[tj]s$/)),
+  entities: import.meta.globEager('../../entities/trellis-config/*.ts'),
   logging: (config.database && config.database.logging !== null) ? config.database.logging : ['error'],
   synchronize: true
 }
@@ -26,7 +25,7 @@ const trellisConnection = {
   database: 'trellis',
   name: 'trellis',
   location: 'default',
-  entities: requireAllModules(require.context('../../entities/trellis', true, /\.[tj]s$/)),
+  entities: import.meta.globEager('../../entities/trellis/*.ts'),
   namingStrategy: new SnakeCaseNamingStrategy(),
   // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
