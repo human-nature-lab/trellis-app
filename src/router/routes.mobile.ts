@@ -15,28 +15,28 @@ export default sharedRoutes.concat([{
   path: '/',
   name: 'Home',
   component: Sync,
-  beforeEnter: guardQueue([ServerConfigGuard, DeviceKeyGuard])
+  beforeEnter: guardQueue([LoginGuard, ServerConfigGuard, DeviceKeyGuard]),
 }, {
   path: '/sync',
   name: 'Sync',
   component: Sync,
-  beforeEnter: guardQueue([ServerConfigGuard, DeviceKeyGuard])
+  beforeEnter: guardQueue([ServerConfigGuard, DeviceKeyGuard]),
 }, {
   path: '/logs',
   name: 'Logs',
-  component: Logs
+  component: Logs,
 }, {
   path: '/storage',
   name: 'Storage',
-  component: Storage
+  component: Storage,
 }, {
   path: '/register-device',
   name: 'RegisterDevice',
   component: RegisterDevice,
-  beforeEnter: guardQueue([ServerConfigGuard, AlreadyHaveDeviceKeyGuard])
+  beforeEnter: guardQueue([ServerConfigGuard, AlreadyHaveDeviceKeyGuard]),
 }, {
   path: '/configure-server',
   name: 'ConfigureServer',
   component: ConfigureServer,
-  beforeEnter: guardQueue([AlreadyConfiguredServerGuard])
+  beforeEnter: guardQueue([AlreadyConfiguredServerGuard]),
 }])

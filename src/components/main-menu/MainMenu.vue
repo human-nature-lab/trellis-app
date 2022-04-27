@@ -300,7 +300,7 @@ export default {
       }, {
         title: this.$t('general'),
         items: [{
-          to: { name: 'Documentation' },
+          to: { path: '/documentation/' },
           icon: 'mdi-help-circle',
           title: this.$t('documentation'),
         }, {

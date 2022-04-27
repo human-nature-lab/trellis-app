@@ -15,6 +15,8 @@ import PhotoService from '../services/photo'
 
 Vue.use(Router)
 
+console.log('routes', routes)
+
 export const router = new Router({
   routes,
   mode: 'hash',
@@ -40,7 +42,7 @@ if (singleton.offline) {
 }
 
 // Always require we're logged in
-router.beforeEach(guardQueue([LoginGuard]))
+// router.beforeEach(guardQueue([LoginGuard]))
 
 router.beforeEach((to, from, next) => {
   // Don't let photo requests prevent navigation from happening by cancelling outstanding requests
@@ -60,6 +62,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to) => {
   singleton.loading.active = false
+  console.log('to', to)
   logger.log({
     component: 'router/index.js@afterEach',
     message: `after navigating to: ${to.fullPath}`,

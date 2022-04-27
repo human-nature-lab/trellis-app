@@ -4,6 +4,7 @@ import StudyGuard from './guards/StudyGuard'
 import PermissionGuard from './guards/PermissionGuard'
 import sharedRoutes from './shared.routes'
 import { TrellisPermission } from '../static/permissions.base'
+import LoginGuard from './guards/LoginGuard'
 
 const Forms = () => import(/* webpackChunkName: "forms" */'../views/Forms.vue')
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview.vue')
@@ -29,70 +30,72 @@ export default sharedRoutes.concat([{
   name: 'Home',
   default: true,
   component: StudyDashboard,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
 }, {
   path: '/sync-admin',
   name: 'SyncAdmin',
-  component: SyncAdmin
+  component: SyncAdmin,
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
 }, {
   path: '/form/:formId/preview',
   name: 'InterviewPreview',
   component: Interview,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
 }, {
   path: '/user',
   name: 'Users',
   component: Users,
-  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.VIEW_USERS)])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_USERS)])
 }, {
   path: '/reports',
   name: 'Reports',
   component: Reports,
-  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.VIEW_REPORTS), StudyGuard])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_REPORTS), StudyGuard])
 }, {
   path: '/import-data',
   name: 'DataImport',
   component: DataImport,
-  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.IMPORT_RESPONDENTS), StudyGuard]),
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.IMPORT_RESPONDENTS), StudyGuard]),
 }, {
   path: '/form/:formId/old-builder',
   name: 'OldFormBuilder',
   component: OldFormBuilder,
-  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
 }, {
   path: '/form/:formId/builder',
   name: 'FormBuilder',
   component: FormBuilder,
-  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
 }, {
   path: '/form/:formId/print',
   name: 'FormPrint',
   component: FormPrint,
-  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard])
 }, {
   path: '/forms',
   name: 'Forms',
   component: Forms,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
 }, {
   path: '/devices',
   name: 'Devices',
   component: Devices,
-  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.VIEW_DEVICES)])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_DEVICES)])
 }, {
   path: '/studies',
   name: 'Studies',
   component: Studies,
-  beforeEnter: guardQueue([PermissionGuard(TrellisPermission.VIEW_STUDIES)])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_STUDIES)])
 }, {
   path: '/geo-types',
   name: 'GeoTypes',
   component: GeoTypes,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
 }, {
   path: '/server-config',
   name: 'ServerConfig',
-  component: ServerConfig
+  component: ServerConfig,
+  beforeEnter: guardQueue([LoginGuard]),
 }, {
   path: '/demo-signup',
   name: 'DemoSignUp',
@@ -104,5 +107,6 @@ export default sharedRoutes.concat([{
 }, {
   path: '/permissions',
   name: 'Permissions',
-  component: Permissions
+  component: Permissions,
+  beforeEnter: guardQueue([LoginGuard]),
 }])

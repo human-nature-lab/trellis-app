@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="respondent-search">
-    <v-row no-gutter>
+    <v-row no-gutters>
       <v-text-field
         :placeholder="$t('search')"
         v-model="query"
