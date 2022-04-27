@@ -1,5 +1,5 @@
 import DeviceService from '../device'
-import { createConnection, Entity, EntityTarget, getConnection, QueryRunner } from 'typeorm'
+import { createConnection, Entity, EntityTarget, EntitySchema, getConnection, QueryRunner } from 'typeorm'
 import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'
 import Sync from '../../entities/trellis-config/Sync'
@@ -8,24 +8,36 @@ import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 import config from '../../config'
 import { monekypatch } from './monekypatch'
 import { delay } from '../../classes/delay'
+import { Mutex } from 'async-mutex'
 monekypatch()
 
+const trellisConfigEntities = []
+const trellisConfigImports = import.meta.globEager('../../entities/trellis/*.ts')
+for (const name in trellisConfigImports) {
+  trellisConfigEntities.push(trellisConfigImports[name].default)
+}
 const trellisConfigConnection = {
   type: 'cordova',
   database: 'trellis-config',
   name: 'trellis-config',
   location: 'default',
-  entities: import.meta.globEager('../../entities/trellis-config/*.ts'),
+  entities: trellisConfigEntities,
   logging: (config.database && config.database.logging !== null) ? config.database.logging : ['error'],
   synchronize: true
 }
+console.log(trellisConfigConnection)
 
+const trellisEntities = []
+const trellisImports = import.meta.globEager('../../entities/trellis/*.ts')
+for (const name in trellisImports) {
+  trellisEntities.push(trellisImports[name].default)
+}
 const trellisConnection = {
   type: 'cordova',
   database: 'trellis',
   name: 'trellis',
   location: 'default',
-  entities: import.meta.globEager('../../entities/trellis/*.ts'),
+  entities: trellisEntities,
   namingStrategy: new SnakeCaseNamingStrategy(),
   // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
@@ -40,23 +52,32 @@ interface SnapshotProgress {
 type SnapshotProgressCallback = (progress: SnapshotProgress) => any
 
 export default class DatabaseServiceCordova {
-  private databaseCreated: Promise<void>
-  private configDatabaseCreated: Promise<void>
+  private configMutex = new Mutex()
+  private defaultMutex = new Mutex()
   constructor () {
-    this.databaseCreated = this.createDatabase()
-    this.configDatabaseCreated = this.createConfigDatabase()
+    this.createDatabase()
+    this.createConfigDatabase()
   }
 
-  createDatabase () {
-    return DeviceService.isDeviceReady()
-      .then(() => createConnection(trellisConnection))
-      .then((connection) => connection.createQueryRunner())
-      .then((queryRunner) => this.createUpdatedRecordsTable(queryRunner, { message: null }))
+  async createDatabase () {
+    const release = await this.defaultMutex.acquire()
+    try {
+      await DeviceService.isDeviceReady()
+      const connection = await createConnection(trellisConnection)
+      const queryRunner = connection.createQueryRunner()
+      await this.createUpdatedRecordsTable(queryRunner, { message: null })
+    } finally {
+      release()
+    }
   }
 
   async getDatabase () {
-    await this.databaseCreated
-    return getConnection('trellis')
+    const release = await this.defaultMutex.acquire()
+    try {
+      return await getConnection('trellis')
+    } finally {
+      release()
+    }
   }
 
   async tableExists (table: string) {
@@ -86,16 +107,25 @@ export default class DatabaseServiceCordova {
     return conn.getRepository<T>(entity)
   }
 
-  createConfigDatabase () {
-    return DeviceService.isDeviceReady()
-      .then(() => createConnection(trellisConfigConnection))
+  async createConfigDatabase () {
+    const release = await this.configMutex.acquire()
+    try {
+      await DeviceService.isDeviceReady()
+      await createConnection(trellisConfigConnection)
+    } finally {
+      release()
+    }
   }
 
   async getConfigDatabase () {
     console.log('getConfigDatabase')
-    await this.configDatabaseCreated
-    console.log('config database created')
-    return getConnection('trellis-config')
+    const release = await this.configMutex.acquire()
+    try {
+      console.log('config database created')
+      return getConnection('trellis-config')
+    } finally {
+      release()
+    }
   }
 
   async getConfigRepository (entity: typeof Entity) {

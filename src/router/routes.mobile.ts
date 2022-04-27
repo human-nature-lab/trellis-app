@@ -4,6 +4,7 @@ import ServerConfigGuard from './guards/ServerConfigGuard'
 import DeviceKeyGuard from './guards/DeviceKeyGuard'
 import { guardQueue } from './GuardQueue'
 import sharedRoutes from './shared.routes'
+import LoginGuard from './guards/LoginGuard'
 
 const Sync = () => import(/* webpackChunkName: "sync" */'../views/Sync.vue')
 const Logs = () => import(/* webpackChunkName: "logs" */'../views/Logs.vue')
