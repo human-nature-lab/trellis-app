@@ -210,7 +210,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
 
       // Insert 2nd
       for (let addedQuestionDatum of diff.data.questionDatum.added) {
-        let questionDatumExists = await manager.findOne(QuestionDatum, {id: addedQuestionDatum.id})
+        let questionDatumExists = await manager.findOne(QuestionDatum, { where: { id: addedQuestionDatum.id } })
         if (questionDatumExists instanceof QuestionDatum) {
           // Just undelete it
           await manager.update(QuestionDatum, { id: addedQuestionDatum.id }, { deletedAt: null })
@@ -235,7 +235,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
       }
 
       for (let addedDatum of diff.data.datum.added) {
-        let datumExists = await manager.findOne(Datum, {id: addedDatum.id})
+        let datumExists = await manager.findOne(Datum, { where: { id: addedDatum.id } })
         if (datumExists instanceof Datum) {
           // Just undelete it
           await manager.update(Datum, {id: addedDatum.id}, {deletedAt: null})

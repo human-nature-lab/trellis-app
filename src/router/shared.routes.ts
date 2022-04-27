@@ -23,7 +23,7 @@ const RespondentsSearch = () => import(/* webpackChunkName: "respondent-search" 
 const RespondentForms = () => import(/* webpackChunkName: "respondent-forms" */'../components/respondent/RespondentForms.vue')
 const RespondentInfo = () => import(/* webpackChunkName: "respondent-info" */'../components/respondent/RespondentInfo.vue')
 const DocsRoute = () => import(/* webpackChunkName: "documentation" */'../components/documentation/DocsRoute.vue')
-const Changelog = () => import(/* webpackChunkName: "changelog" */'../components/Changelog.vue')
+const Changelog = () => import(/* webpackChunkName: "changelog" */'../components/changelog/Changelog.vue')
 const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'../components/geo/GeoInfo.vue')
 
 const docsRoutes = Object.keys(docs.content).map(path => ({

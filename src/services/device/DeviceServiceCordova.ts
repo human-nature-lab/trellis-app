@@ -29,7 +29,9 @@ export class DeviceServiceCordova implements DeviceServiceInterface {
     const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Config)
     const entry = await repo.findOne({
-      name: deviceKeyKey
+      where: {
+        name: deviceKeyKey,
+      },
     })
     if (entry) {
       this.deviceKey = entry.val

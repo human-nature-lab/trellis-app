@@ -5,6 +5,9 @@ import { createVuePlugin } from 'vite-plugin-vue2'
 import markdown from './src/vite-plugins/markdown'
 import handlebars from './src/vite-plugins/handlebars'
 import cordova from './src/vite-plugins/cordova'
+// import babel from 'vite-plugin-babel'
+import vitePluginRequire from 'vite-plugin-require'
+// import requireTransform from 'vite-plugin-require-transform';
 // import { esbuildPluginTsc } from 'esbuild-plugin-tsc'
 // import { viteCommonjs, esbuildCommonjs } from '@originjs/vite-plugin-commonjs'
 
@@ -24,18 +27,29 @@ export default defineConfig(({ command, mode }) => {
     // logLevel: 'warn',
     // esbuild: false,
     plugins: [
+      // babel(),
       // viteCommonjs({ include}),
       // esbuildPluginTsc({ force: true }),
+      // requireTransform({
+      //   include: /.*typeorm.*/,
+      // }),
       createVuePlugin({
-        target: 'es5',
+        target: 'es6',
         include: [/\.vue$/, /\.md$/],
       }),
-      markdown(),
+      markdown({
+        marked: {
+          baseUrl: '/#/documentation/',
+        },
+      }),
       handlebars({
         context: require(isProd ? './config/config-xml.prod' : './config/config-xml.dev'),
         entryFile: path.join(__dirname, 'src/config.xml.hbs'),
       }),
       cordova(),
+      vitePluginRequire({
+        fileRegex: /\.(tsx?|jsx?)$/,
+      }),
     ],
     define: {
       'process.env': process.env,
@@ -59,13 +73,14 @@ export default defineConfig(({ command, mode }) => {
           // dynamicImportVars(),
         ],
       },
-      // commonjsOptions: {
-      //   strictRequires: 'auto',
+      commonjsOptions: {
+        // strictRequires: true,
+        transformMixedEsModules: true,
       //   // dynamicRequirePaths: [
       //   //   'node_modules/typeorm/*.js',
       //   // ],
       //   // include: ['typeorm'],
-      // },
+      },
     },
     optimizeDeps: {
       exclude: ['test'],

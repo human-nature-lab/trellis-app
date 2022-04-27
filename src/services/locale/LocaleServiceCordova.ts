@@ -9,7 +9,7 @@ export class LocaleServiceCordova extends LocaleServiceAbstract {
   async getLocaleById (localeId: string): Promise<Locale> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Locale)
-    return repository.findOne({ id: localeId, deletedAt: null })
+    return repository.findOne({ where: { id: localeId, deletedAt: null } })
   }
 
   async getStudyLocales (studyId: string): Promise<Locale[]> {

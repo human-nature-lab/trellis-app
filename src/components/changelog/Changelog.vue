@@ -34,14 +34,8 @@
 </template>
 
 <script>
-import global from '../static/singleton'
-const changelog = import.meta.glob('../../../docs/**/*.md')
-
-for (const key in changelog) {
-  const newKey = key.replace('../../../changelog/', '')
-  changelog[newKey] = changelog[key]
-  delete changelog[key]
-}
+import global from '../../static/singleton'
+import { changelog } from './logs'
 
 export default {
   name: 'Changelog',

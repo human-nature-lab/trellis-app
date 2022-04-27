@@ -19,9 +19,7 @@ export default function markdown (opts?: MarkdownOpts) {
   opts = merge({
     rootPath: path.join(__dirname, '../../docs'),
     type: 'vue',
-    marked: {
-      baseUrl: '/#/documentation/',
-    },
+    marked: {},
   } as MarkdownOpts, opts)
   if (opts.include && !opts.include.length) {
     throw new Error('must include at least one include statement or omit the include option')

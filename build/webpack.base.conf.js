@@ -4,10 +4,8 @@ const config = require('../config')
 const webpack = require('webpack')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const VuetifyLoaderPlugin = require('vuetify-loader/lib/plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 // var SentryPlugin = require('@sentry/webpack-plugin')
@@ -73,7 +71,8 @@ const cssLoaders = [isProd
 const plugins = [
   new CleanWebpackPlugin(),
   new webpack.DefinePlugin({
-    'process.env': JSON.stringify(process.env),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    'process.env.APP_ENV': JSON.stringify(process.env.APP_ENV),
     VERSION: JSON.stringify(require('../package').version),
   }),
   new VueLoaderPlugin(),
@@ -92,19 +91,8 @@ const plugins = [
     ignore: ['.*'],
   }]),
   new VuetifyLoaderPlugin(),
-  new HtmlWebpackPlugin({
-    filename: 'index.html',
-    template: 'index.webpack.html',
-    inject: true,
-    minify: {
-      removeComments: true,
-      collapseWhitespace: false,
-      removeAttributeQuotes: false,
-    },
-    chunksSortMode: 'none',
-  }),
   new MiniCssExtractPlugin({
-    filename: '[name].[contenthash].css',
+    filename: 'css/[name].[contenthash].css',
   }),
   // new ForkTsCheckerWebpackPlugin({
   //   typescript: {
@@ -126,7 +114,7 @@ const plugins = [
 //   }))
 // }
 
-const devtool = sourceMap && (isProd ? 'hidden-source-map' : 'eval')
+const devtool = sourceMap && 'eval'
 module.exports = {
   target: 'web',
   mode: isProd ? 'production' : 'development',
