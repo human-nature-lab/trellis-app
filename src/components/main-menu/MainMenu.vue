@@ -72,7 +72,8 @@
 </template>
 
 <script>
-import config from 'config'
+import Vue from 'vue'
+import config from '../../config'
 import menuBus from './MenuBus'
 import LoginService from '../../services/login'
 import { routeQueue } from '../../router'
@@ -85,10 +86,9 @@ import TrellisModal from '../TrellisModal.vue'
 import IsAdminMixin from '../../mixins/IsAdminMixin'
 import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
 import GeoLocationService from '../../services/geolocation'
-import Vue from 'vue'
 import PermissionMixin from '../../mixins/PermissionMixin'
 import { TrellisPermission } from '../../static/permissions.base'
-import StudyService from '../../services/study/StudyService'
+import StudyService from '../../services/study'
 
 export default {
   mixins: [IsAdminMixin, IsLoggedInMixin, PermissionMixin],
@@ -291,14 +291,16 @@ export default {
           title: this.$t('track_location'),
           iconColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green' : 'yellow') : null,
           switchColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green' : 'yellow') : null,
-          icon: this.global.watchGPS ? (this.global.gpsFixed ? 'mdi-crosshairs-gps' : 'mdi-crosshairs') : 'mdi-crosshairs-question',
+          icon: this.global.watchGPS
+            ? (this.global.gpsFixed ? 'mdi-crosshairs-gps' : 'mdi-crosshairs')
+            : 'mdi-crosshairs-question',
           switchValue: this.global.watchGPS,
           showIf: this.isCordovaBuild,
         }],
       }, {
         title: this.$t('general'),
         items: [{
-          to: { name: 'Documentation' },
+          to: { path: '/documentation/' },
           icon: 'mdi-help-circle',
           title: this.$t('documentation'),
         }, {

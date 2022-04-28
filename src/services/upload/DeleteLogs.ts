@@ -1,5 +1,5 @@
 import Log from '../../entities/trellis-config/Log'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import { Connection } from 'typeorm'
 
 export default async function DeleteLogs () {

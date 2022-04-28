@@ -1,5 +1,5 @@
 import Config from '../../entities/trellis/Config'
-import config from 'config'
+import config from '../../config'
 import { safeParse, setDot } from '../JSONUtil'
 
 export default abstract class ConfigServiceAbstract {

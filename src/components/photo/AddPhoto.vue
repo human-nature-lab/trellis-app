@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import PhotoService from '../../services/photo/PhotoService'
+  import PhotoService from '../../services/photo'
   export default {
     name: 'AddPhoto',
     data () {

@@ -6,11 +6,13 @@ import Study from './Study'
 
 @Entity()
 export default class UserStudy extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   userId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   studyId: string
 
   @ManyToOne(type => User, user => user.studies)

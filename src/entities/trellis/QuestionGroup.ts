@@ -8,7 +8,7 @@ import Section from './Section'
 
 @Entity()
 export default class QuestionGroup extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
   @Relationship(type => Question)
@@ -27,5 +27,4 @@ export default class QuestionGroup extends SparseTimestampedSoftDelete {
   // Inverse relationships only
   @ManyToMany(type => Section, section => section.questionGroups)
   section: Section
-
 }

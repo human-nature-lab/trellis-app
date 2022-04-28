@@ -16,34 +16,39 @@ export interface SectionConditionTagRecylerData {
 }
 
 @Entity()
-export default class SectionConditionTag extends TimestampedSoftDelete implements SnakeSerializable{
-  @PrimaryColumn() @Serializable
+export default class SectionConditionTag extends TimestampedSoftDelete implements SnakeSerializable {
+  @PrimaryColumn('uuid') @Serializable
   id: string;
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   sectionId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   conditionId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   surveyId: string
+
   @Column({ type: 'integer' }) @Serializable
   repetition: number
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   followUpDatumId: string
 
-  //Future
+  // Future
   // @Column() @Serializable
   // interviewId: string
 
   @Relationship({
     constructor: () => ConditionTag,
-    jsonKey: 'condition'
+    jsonKey: 'condition',
   })
   @OneToOne(type => ConditionTag, { eager: true })
   @JoinColumn({ name: 'condition_id' })
   conditionTag: ConditionTag
 
   fromRecycler (data: SectionConditionTagRecylerData) {
-    for (let key in data) {
+    for (const key in data) {
       if (data[key] !== undefined) {
         this[key] = data[key]
       }
@@ -55,7 +60,7 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
   }
 
   copy () {
-    let s = new SectionConditionTag()
+    const s = new SectionConditionTag()
     s.id = this.id
     s.sectionId = this.sectionId
     s.conditionId = this.conditionId
@@ -67,5 +72,4 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
     s.deletedAt = this.deletedAt
     return s
   }
-
 }

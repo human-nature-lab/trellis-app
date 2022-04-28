@@ -4,7 +4,7 @@ import Datum from '../../../../entities/trellis/Datum'
 import InterviewManager from '../../classes/InterviewManager'
 import { ActionHandler } from './ActionManager'
 import Action from '../../../../entities/trellis/Action'
-import { defaultLoggingService } from '../../../../services/logging/LoggingService'
+import { defaultLoggingService } from '../../../../services/logging'
 import { ActionPayload } from './ActionPayload'
 
 interface DatumFindFunc {

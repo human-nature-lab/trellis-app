@@ -9,7 +9,7 @@
       </v-alert>
       <v-card>
         <v-toolbar flat>
-          <v-toolbar-title>
+          <v-toolbar-title v-if="respondent">
             {{ $t('respondent_forms', [respondent.name]) }}
           </v-toolbar-title>
           <v-spacer />
@@ -30,14 +30,22 @@
                     mdi-check
                   </v-icon>
                 </v-list-item-action>
-                <v-list-item-title>{{ $t('show_all') }}</v-list-item-title>
+                <v-list-item-title>{{ $t('show_skipped') }}</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click="showUnpublished = !showUnpublished">
+                <v-list-item-action>
+                  <v-icon v-if="showUnpublished">
+                    mdi-check
+                  </v-icon>
+                </v-list-item-action>
+                <v-list-item-title>{{ $t('show_unpublished') }}</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
         </v-toolbar>
         <forms-view
           v-if="forms"
-          :forms="forms"
+          :forms="respondentForms"
           :respondent="respondent"
           :show-hidden="showHidden"
           :show-unpublished="showUnpublished"
@@ -66,8 +74,8 @@ import DocsLinkMixin from '../../mixins/DocsLinkMixin'
 import FormsView from './FormsView.vue'
 import RoutePreloadMixin from '../../mixins/RoutePreloadMixin'
 import SurveyService from '../../services/survey'
-import FormService from '../../services/form/FormService'
-import RespondentService from '../../services/respondent/RespondentService'
+import FormService from '../../services/form'
+import RespondentService from '../../services/respondent'
 import global from '../../static/singleton'
 import Vue from 'vue'
 import Survey from '../../entities/trellis/Survey'
@@ -117,6 +125,8 @@ async function load (to): Promise<object> {
   }
 }
 
+const skipService = new SkipService()
+
 export default Vue.extend({
   name: 'RespondentForms',
   mixins: [
@@ -126,8 +136,8 @@ export default Vue.extend({
   data () {
     return {
       global,
-      forms: [] as DisplayForm[],
-      censusForms: [] as DisplayForm[],
+      surveys: [] as Survey[],
+      forms: [] as StudyForm[],
       respondent: null as Respondent,
       conditionTags: [] as RespondentConditionTag[],
       showHidden: false,
@@ -140,48 +150,64 @@ export default Vue.extend({
     FormsView,
   },
   methods: {
-    async startInterview(interview: Interview) {
+    async startInterview (interview: Interview) {
       routeQueue.replaceAndReturnToCurrent({
         name: 'Interview',
-        params: { studyId: this.global['study'].id, interviewId: interview.id },
-      });
+        params: { studyId: this.global.study.id, interviewId: interview.id },
+      })
     },
-    hydrate(data: RespondentFormsData) {
+    hydrate (data: RespondentFormsData) {
       // Join any surveys that have been created with the possible forms
       data.forms.sort((a, b) => {
-        return a.sortOrder - b.sortOrder;
-      });
-      const censusForms = data.forms.filter(f => f.censusTypeId)
-      console.log(data, censusForms)
-      const forms: DisplayForm[] = data.forms.map((studyForm: StudyForm) => {
-        let formSurveys = data.surveys.filter(
-          (survey: Survey) => survey.formId === studyForm.currentVersionId
-        );
+        return a.sortOrder - b.sortOrder
+      })
+      skipService.clear()
+      for (const f of data.forms) {
+        if (f.form.skips && f.form.skips.length) {
+          skipService.register(f.form.skips)
+        }
+      }
+      this.conditionTags = data.conditionTags
+      this.surveys = data.surveys
+      this.forms = data.forms
+      this.respondent = data.respondent
+    },
+  },
+  computed: {
+    displayForms (): DisplayForm[] {
+      return this.forms.map((studyForm: StudyForm) => {
+        const formSurveys = this.surveys.filter(
+          (survey: Survey) => survey.formId === studyForm.currentVersionId,
+        )
         const conditionTags: Set<string> = new Set(
-          data.conditionTags.map((c: RespondentConditionTag) => {
-            return c.conditionTag.name;
-          })
-        );
-        const isSkipped = SkipService.shouldSkip(
+          this.conditionTags.map((c: RespondentConditionTag) => {
+            return c.conditionTag.name
+          }),
+        )
+        const isSkipped = skipService.shouldSkip(
           studyForm.form.skips,
-          conditionTags
-        );
+          conditionTags,
+        )
+        const showForm = !isSkipped || this.showHidden
         return {
           id: studyForm.currentVersionId,
           nameTranslation: studyForm.form.nameTranslation,
           surveys: formSurveys,
           isPublished: studyForm.form.isPublished,
-          isSkipped: isSkipped,
+          isSkipped: !showForm,
           censusTypeId: studyForm.censusTypeId,
           isComplete: false,
           isStarted: formSurveys.length > 0,
           nComplete: 0,
           version: studyForm.form.version,
-        } as DisplayForm;
-      });
-      this.respondent = data.respondent;
-      this.censusForms = forms.filter((f) => f.censusTypeId);
-      this.forms = forms.filter((f) => !f.censusTypeId);
+        } as DisplayForm
+      })
+    },
+    censusForms (): DisplayForm[] {
+      return this.displayForms.filter(f => f.censusTypeId)
+    },
+    respondentForms (): DisplayForm[] {
+      return this.displayForms.filter(f => !f.censusTypeId)
     },
   },
 })

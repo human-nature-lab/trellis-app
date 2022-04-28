@@ -7,7 +7,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import PhotoService from '../../services/photo/PhotoService'
+  import PhotoService from '../../services/photo'
   import formatBytesFilter from '../../filters/format-bytes.filter'
   import InfoBlock from './InfoBlock.vue'
 

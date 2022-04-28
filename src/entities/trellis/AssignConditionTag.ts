@@ -6,20 +6,23 @@ import Question from './Question'
 
 @Entity()
 export default class AssignConditionTag extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   conditionTagId: string
+
   @Column({ type: 'text' }) @Serializable
   logic: string
-  @Column({nullable: true}) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   scope: string
 
   @Relationship({
     constructor: () => ConditionTag,
-    jsonKey: 'condition'
+    jsonKey: 'condition',
   })
-  @OneToOne(type => ConditionTag, {eager: true})
+  @OneToOne(type => ConditionTag, { eager: true })
   @JoinColumn()
   conditionTag: ConditionTag
 

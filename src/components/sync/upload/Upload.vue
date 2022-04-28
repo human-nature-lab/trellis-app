@@ -125,10 +125,10 @@
   import UploadImages from './substeps/UploadImages.vue'
   import { BUTTON_STATUS } from '../../../static/constants'
   import SyncService from '../../../services/SyncService'
-  import DeviceService from '../../../services/device/DeviceService'
-  import FileService from '../../../services/file/FileService'
+  import DeviceService from '../../../services/device'
+  import FileService from '../../../services/file'
   import Log from '../../../entities/trellis-config/Log'
-  import LoggingService, { defaultLoggingService } from '../../../services/logging/LoggingService'
+  import LoggingService, { defaultLoggingService } from '../../../services/logging'
 
   export default {
     name: 'upload',

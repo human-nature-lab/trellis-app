@@ -5,14 +5,15 @@ import Skip from './Skip'
 
 @Entity()
 export default class QuestionGroupSkip extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   questionGroupId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   skipId: string
 
   @Relationship(type => Skip)
   skip: Skip
-
 }

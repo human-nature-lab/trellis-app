@@ -1,4 +1,10 @@
-declare module "*.vue" {
+declare module '*.vue' {
   import Vue from 'vue'
-  export default Vue;
+  export default Vue
+}
+
+declare module '*.md' {
+  import { ComponentOptions } from 'vue'
+  const Component: ComponentOptions
+  export default Component
 }

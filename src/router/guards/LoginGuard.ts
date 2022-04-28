@@ -1,8 +1,8 @@
 import { Route } from 'vue-router'
 import User from '../../entities/trellis/User'
-import UserService from '../../services/user/UserService'
+import UserService from '../../services/user'
 import LoginService from '../../services/login'
-import config from 'config'
+import config from '../../config'
 import RouteWhitelist from '../RouteWhitelist'
 
 

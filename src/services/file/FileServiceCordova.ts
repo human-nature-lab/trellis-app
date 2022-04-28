@@ -1,4 +1,4 @@
-import DeviceService from '../device/DeviceService'
+import DeviceService from '../device'
 import md5 from 'js-md5'
 import { merge } from 'lodash'
 import CancellablePromise from '../../classes/CancellablePromise'

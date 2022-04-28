@@ -20,7 +20,7 @@
           @click="global.menuDrawer.open = !global.menuDrawer.open" />
         <v-toolbar-title class="logo">
           <router-link :to="{name: 'Home'}" class="deep-orange--text">
-            <img src="/img/trellis-logo.png?url" alt="trellis" />
+            <img src="./assets/trellis-logo.png?url" alt="trellis" />
           </router-link>
         </v-toolbar-title>
         <v-toolbar-title v-if="global.study" class="study">
@@ -116,6 +116,7 @@
 </template>
 
 <script lang="ts">
+  import './services/device'
   import MainMenu from './components/main-menu/MainMenu.vue'
   import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
@@ -127,12 +128,12 @@
   import singleton from './static/singleton'
   // Do not remove!
   import SingletonService from './services/SingletonService'
-  import { defaultLoggingService } from './services/logging/LoggingService'
+  import { defaultLoggingService } from './services/logging'
   import GeoLocationService from './services/geolocation'
   import SnackbarQueue from './components/SnackbarQueue.vue'
   import DocsSidebar from './components/documentation/DocsSidebar.vue'
-  import UserService from './services/user/UserService'
-  import config from 'config'
+  import UserService from './services/user'
+  import config from './config'
   import IsLoggedInMixin from './mixins/IsLoggedInMixin'
   import Banner from './components/Banner.vue'
   import PermissionMixin from './mixins/PermissionMixin'

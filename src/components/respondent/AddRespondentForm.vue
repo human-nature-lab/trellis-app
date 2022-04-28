@@ -85,7 +85,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentService from '../../services/respondent'
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import PhotoAlbum from '../photo/PhotoAlbum.vue'

@@ -4,10 +4,12 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class PhotoTag extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   photoId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   tagId: string
 }

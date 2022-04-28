@@ -1,7 +1,7 @@
 import './globals'
 import {expect} from 'chai'
-import StudyServiceWeb from '../../src/services/study/StudyServiceWeb'
-import StudyServiceCordova from '../../src/services/study/StudyServiceCordova'
+import { StudyServiceWeb } from '../../src/services/study/StudyServiceWeb'
+import { StudyServiceCordova } from '../../src/services/study/StudyServiceCordova'
 import {studyId, userId} from "../testing-ids";
 import {deepCompareEntities} from "./helpers";
 

@@ -62,7 +62,7 @@
 <script>
   import AlertService from '../services/AlertService'
   import SyncStatus from '../components/sync/SyncStatus.vue'
-  import DatabaseService from '../services/database/DatabaseService'
+  import DatabaseService from '../services/database'
   import Download from '../components/sync/download/Download.vue'
   import Upload from '../components/sync/upload/Upload.vue'
   import ServerIpConfig from './ServerIPConfig.vue'

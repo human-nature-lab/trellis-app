@@ -4,19 +4,25 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class GeoType extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   parentId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   studyId: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   canUserAdd: boolean
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   canUserAddChild: boolean
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   canContainRespondent: boolean
 
   fromSnakeJSON (json) {

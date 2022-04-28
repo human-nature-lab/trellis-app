@@ -1,14 +1,15 @@
 import StudyLocale from '../../entities/trellis/StudyLocale'
 import LocaleServiceAbstract from './LocaleServiceAbstract'
 import Locale from '../../entities/trellis/Locale'
-import StudyService from '../study/StudyService'
-import DatabaseService from '../database/DatabaseService'
+import StudyService from '../study'
+import DatabaseService from '../database'
 
-class LocaleServiceCordova extends LocaleServiceAbstract {
+export class LocaleServiceCordova extends LocaleServiceAbstract {
+  
   async getLocaleById (localeId: string): Promise<Locale> {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(Locale)
-    return repository.findOne({ id: localeId, deletedAt: null })
+    return repository.findOne({ where: { id: localeId, deletedAt: null } })
   }
 
   async getStudyLocales (studyId: string): Promise<Locale[]> {
@@ -30,4 +31,3 @@ class LocaleServiceCordova extends LocaleServiceAbstract {
   }
 }
 
-export default new LocaleServiceCordova()

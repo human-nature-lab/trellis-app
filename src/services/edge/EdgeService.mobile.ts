@@ -1,6 +1,6 @@
 import EdgeServiceInterface, { SourceTarget } from './EdgeServiceInterface'
 import Edge from '../../entities/trellis/Edge'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import { In } from 'typeorm'
 
 export default class EdgeServiceCordova implements EdgeServiceInterface {

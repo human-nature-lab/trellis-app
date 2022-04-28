@@ -5,10 +5,10 @@
 </template>
 
 <script>
-    import DatabaseService from '../../../../services/database/DatabaseService'
+    import DatabaseService from '../../../../services/database'
     import {COMPARE_DOWNLOAD_RESULTS as RESULTS} from '../../../../static/constants'
     import SyncSubStep from '../../SyncSubStep.vue'
-    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     import DateService from '../../../../services/DateService'
     export default {
       name: 'compare-download',

@@ -9,6 +9,8 @@ import Geo from '../components/geo/Geo.vue'
 import SurveyComplete from '../components/interview/SurveyComplete.vue'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage.vue'
 import WebLogin from '../views/WebLogin.vue'
+import docs from '../components/documentation/docs'
+import LoginGuard from './guards/LoginGuard'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview.vue')
 const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../views/ServiceTesting.vue')
@@ -21,85 +23,97 @@ const RespondentsSearch = () => import(/* webpackChunkName: "respondent-search" 
 const RespondentForms = () => import(/* webpackChunkName: "respondent-forms" */'../components/respondent/RespondentForms.vue')
 const RespondentInfo = () => import(/* webpackChunkName: "respondent-info" */'../components/respondent/RespondentInfo.vue')
 const DocsRoute = () => import(/* webpackChunkName: "documentation" */'../components/documentation/DocsRoute.vue')
-const Changelog = () => import(/* webpackChunkName: "changelog" */'../components/Changelog.vue')
+const Changelog = () => import(/* webpackChunkName: "changelog" */'../components/changelog/Changelog.vue')
 const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'../components/geo/GeoInfo.vue')
+
+console.log(docs)
+const docsRoutes = Object.keys(docs.content).map(path => ({
+  path: path === 'Home.md' ? '' : encodeURI(path),
+  name: path,
+  default: path === 'Home.md',
+  component: docs.content[path],
+}))
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',
   name: 'Interview',
   component: Interview,
-  beforeEnter: guardQueue([StudyGuard, CompletedSurveyGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, CompletedSurveyGuard]),
 }, {
   path: '/study/:studyId/respondent/:respondentId/forms',
   name: 'RespondentForms',
   component: RespondentForms,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/search/respondents',
   name: 'RespondentsSearch',
   component: RespondentsSearch,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/locale',
   name: 'LocaleSelector',
   component: LocaleSelectorPage,
-  beforeEnter: guardQueue([StudyGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard]),
 }, {
   path: '/search/locations',
   name: 'GeoSearch',
   component: Geo,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/search/locations/map/:geoId',
   name: 'GeoSearchWithMap',
   component: GeoSearchWithMap,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/geo/:geoId',
   name: 'Geo',
   component: GeoInfo,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/study/:studyId/respondent/:respondentId',
   name: 'Respondent',
   component: RespondentInfo,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/study/:studyId/census/:censusTypeId',
   name: 'StartCensusForm',
   component: CensusFormLoaderPage,
-  beforeEnter: guardQueue([StudyGuard, LocaleGuard, CensusFormGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard, CensusFormGuard]),
 }, {
   path: '/login',
   name: 'Login',
   component: WebLogin,
-  beforeEnter: guardQueue([AlreadyLoggedInGuard])
+  beforeEnter: guardQueue([AlreadyLoggedInGuard]),
 }, {
   path: '/study',
   name: 'StudySelector',
-  component: StudySelectorPage
+  component: StudySelectorPage,
+  beforeEnter: guardQueue([LoginGuard]),
 }, {
   path: '/test/services',
   name: 'ServiceTesting',
-  component: ServiceTesting
+  component: ServiceTesting,
 }, {
   path: '/survey/:surveyId/completed',
   name: 'SurveyComplete',
-  component: SurveyComplete
+  component: SurveyComplete,
+  beforeEnter: guardQueue([LoginGuard]),
 }, {
   path: '/location-history',
   name: 'LocationHistory',
-  component: LocationHistory
+  component: LocationHistory,
+  beforeEnter: guardQueue([LoginGuard]),
 }, {
   path: '/info',
   name: 'Info',
-  component: TrellisInfo
+  component: TrellisInfo,
 }, {
-  path: '/documentation/:filePath?',
+  path: '/documentation/',
   name: 'Documentation',
-  component: DocsRoute
+  component: DocsRoute,
+  children: docsRoutes,
 }, {
   path: '/changelog',
   name: 'Changelog',
-  component: Changelog
+  component: Changelog,
 }] as RouteConfig[]

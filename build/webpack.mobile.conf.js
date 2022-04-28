@@ -3,6 +3,7 @@ const express = require('express')
 const webpackMerge = require('webpack-merge')
 const config = require('./webpack.base.conf')
 const HandlebarsPlugin = require('handlebars-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 function mobileOnly (req, res, next) {
   if (req.hostname.includes('localhost')) {
@@ -13,12 +14,12 @@ function mobileOnly (req, res, next) {
 
 const isProd = process.env.NODE_ENV === 'production'
 console.log('isProd', isProd, process.env.NODE_ENV, process.env.APP_ENV)
-module.exports = webpackMerge(config, {
+module.exports = webpackMerge({
   resolve: {
     extensions: [
       '.mobile.ts',
       '.mobile.js',
-    ]
+    ],
   },
   devServer: {
     before (app, server, compiler) {
@@ -44,6 +45,17 @@ module.exports = webpackMerge(config, {
       data: require(isProd ? '../config/config-xml.prod' : '../config/config-xml.dev'),
       entry: path.join(__dirname, '../src/config.xml.hbs'),
       output: path.join(__dirname, '../www/config.xml')
-    })
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: 'index.webpack.html',
+      inject: true,
+      minify: {
+        removeComments: true,
+        collapseWhitespace: false,
+        removeAttributeQuotes: false,
+      },
+      chunksSortMode: 'none',
+    }),
   ]
-})
+}, config)

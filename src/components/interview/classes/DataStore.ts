@@ -18,7 +18,7 @@ import InterviewDataInterface, {
 import ConditionTag from '../../../entities/trellis/ConditionTag'
 import Action from '../../../entities/trellis/Action'
 import { cloneDeep } from 'lodash'
-import InterviewService from '../../../services/interview/InterviewService'
+import InterviewService from '../../../services/interview'
 import { Mutex, MutexInterface } from 'async-mutex'
 import EdgeService from '../../../services/edge'
 import Edge from '../../../entities/trellis/Edge'

@@ -4,10 +4,12 @@ import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
 @Entity()
 export default class SectionSkip extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   sectionId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   skipId: string
 }

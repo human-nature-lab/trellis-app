@@ -2,7 +2,7 @@ import StudyLocale from '../../entities/trellis/StudyLocale'
 import SingletonService from '../SingletonService'
 import Locale from '../../entities/trellis/Locale'
 import Study from '../../entities/trellis/Study'
-import StudyService from '../study/StudyService'
+import StudyService from '../study'
 
 export default abstract class LocaleServiceAbstract {
 

@@ -1,36 +1,41 @@
-import DeviceService from '../device/DeviceService'
-import { createConnection, Entity, EntityTarget, getConnection, QueryRunner } from 'typeorm'
+import DeviceService from '../device'
+import { Entity, QueryRunner, EntityTarget, createConnection, getConnection } from 'typeorm'
 import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'
 import Sync from '../../entities/trellis-config/Sync'
-import FileService from '../file/FileService'
+import FileService from '../file'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
-import config from 'config'
+import config from '../../config'
 import { monekypatch } from './monekypatch'
-import { requireAllModules } from '../../classes/requireAll'
 import { delay } from '../../classes/delay'
-monekypatch()
+import { Mutex } from 'async-mutex'
+import { trellisConfigEntities, trellisEntities } from './entities'
 
-const trellisConfigConnection = {
+monekypatch()
+enum DB {
+  CONFIG = 'trellis-config',
+  TRELLIS = 'trellis'
+}
+const trellisConfigOptions = {
   type: 'cordova',
-  database: 'trellis-config',
-  name: 'trellis-config',
+  database: DB.CONFIG,
+  name: DB.CONFIG,
   location: 'default',
-  entities: requireAllModules(require.context('../../entities/trellis-config', true, /\.[tj]s$/)),
+  entities: trellisConfigEntities,
   logging: (config.database && config.database.logging !== null) ? config.database.logging : ['error'],
   synchronize: true
 }
 
-const trellisConnection = {
+const trellisOptions = {
   type: 'cordova',
-  database: 'trellis',
-  name: 'trellis',
+  database: DB.TRELLIS,
+  name: DB.TRELLIS,
   location: 'default',
-  entities: requireAllModules(require.context('../../entities/trellis', true, /\.[tj]s$/)),
+  entities: trellisEntities,
   namingStrategy: new SnakeCaseNamingStrategy(),
   // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
-  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['warning', 'error']
+  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['query', 'warning', 'error']
 }
 
 interface SnapshotProgress {
@@ -41,23 +46,38 @@ interface SnapshotProgress {
 type SnapshotProgressCallback = (progress: SnapshotProgress) => any
 
 export default class DatabaseServiceCordova {
-  private databaseCreated: Promise<void>
-  private configDatabaseCreated: Promise<void>
+  private configMutex = new Mutex()
+  private defaultMutex = new Mutex()
   constructor () {
-    this.databaseCreated = this.createDatabase()
-    this.configDatabaseCreated = this.createConfigDatabase()
+    this.createDatabase()
+    this.createConfigDatabase()
   }
 
-  createDatabase () {
-    return DeviceService.isDeviceReady()
-      .then(() => createConnection(trellisConnection))
-      .then((connection) => connection.createQueryRunner())
-      .then((queryRunner) => this.createUpdatedRecordsTable(queryRunner, { message: null }))
+  async createDatabase () {
+    const release = await this.defaultMutex.acquire()
+    try {
+      await DeviceService.isDeviceReady()
+      const connection = await createConnection(trellisOptions)
+      const queryRunner = connection.createQueryRunner()
+      await this.createUpdatedRecordsTable(queryRunner, { message: null })
+    } finally {
+      release()
+    }
   }
 
   async getDatabase () {
-    await this.databaseCreated
-    return getConnection('trellis')
+    const release = await this.defaultMutex.acquire()
+    try {
+      return getConnection(DB.TRELLIS)
+    } finally {
+      release()
+    }
+  }
+
+  async tableExists (table: string) {
+    const conn = await this.getDatabase()
+    const res = await conn.query(`select name from sqlite_master where type="table" and name="${table}"`)
+    return res && res.length && res[0].name.toLowerCase() === table
   }
 
   async closeDatabase (timeout = 2000): Promise<boolean> {
@@ -81,14 +101,25 @@ export default class DatabaseServiceCordova {
     return conn.getRepository<T>(entity)
   }
 
-  createConfigDatabase () {
-    return DeviceService.isDeviceReady()
-      .then(() => createConnection(trellisConfigConnection))
+  async createConfigDatabase () {
+    const release = await this.configMutex.acquire()
+    try {
+      await DeviceService.isDeviceReady()
+      await createConnection(trellisConfigOptions)
+    } finally {
+      release()
+    }
   }
 
   async getConfigDatabase () {
-    await this.configDatabaseCreated
-    return getConnection('trellis-config')
+    console.log('getConfigDatabase')
+    const release = await this.configMutex.acquire()
+    try {
+      console.log('config database created')
+      return getConnection(DB.CONFIG)
+    } finally {
+      release()
+    }
   }
 
   async getConfigRepository (entity: typeof Entity) {
@@ -240,8 +271,8 @@ export default class DatabaseServiceCordova {
   async getServerIPAddress (): Promise<string> {
     const connection = await this.getConfigDatabase()
     const repository = await connection.getRepository(Config)
-    const config = await repository.findOne({name: 'serverIP'})
-    return (config === undefined) ? undefined : config.val
+    const config = await repository.findOne({ where: { name: 'serverIP' } })
+    return !config ? undefined : config.val
   }
 
   async setServerIPAddress (combinedAddress: string): Promise<void> {

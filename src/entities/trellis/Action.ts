@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import { AsDate, Serializable } from '../decorators/WebOrmDecorators'
 import BaseEntity from '../base/BaseEntity'
-import { ActionPayload } from '../../components/interview/services/actions/ActionPayload'
+import type { ActionPayload } from '../../components/interview/services/actions/ActionPayload'
 import { ValueTransformer } from 'typeorm/decorator/options/ValueTransformer'
 import { Moment } from 'moment'
 import MomentTransformer from '../base/MomentTransformer'
@@ -11,6 +11,7 @@ export class PayloadTransformer implements ValueTransformer {
   to (actionPayload: ActionPayload) {
     return JSON.stringify(actionPayload)
   }
+
   from (payloadString: string) {
     return JSON.parse(payloadString) as PayloadTransformer
   }
@@ -20,37 +21,49 @@ export class PayloadTransformer implements ValueTransformer {
 export default class Action extends BaseEntity implements SnakeSerializable {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ type: 'datetime', transformer: MomentTransformer}) @Serializable @AsDate
+
+  @Column({ type: 'datetime', transformer: MomentTransformer }) @Serializable @AsDate
   createdAt: Moment
-  @Column({ type: 'datetime', transformer: MomentTransformer}) @Serializable @AsDate
+
+  @Column({ type: 'datetime', transformer: MomentTransformer }) @Serializable @AsDate
   deletedAt: Moment
+
   // @Column() @Serializable
   // surveyId: string
-  @Column() @Serializable
+  @Column('uuid') @Serializable
   questionId: string
-  @Column({ type: 'text' , transformer: new PayloadTransformer()}) @Serializable
+
+  @Column({ type: 'text', transformer: new PayloadTransformer() }) @Serializable
   payload: ActionPayload
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   actionType: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   interviewId: string
+
   @Column({ type: 'integer' }) @Serializable
   sectionFollowUpRepetition: number
+
   @Column({ type: 'integer' }) @Serializable
   sectionRepetition: number
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   preloadActionId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   followUpActionId: string
+
   @Column({ type: 'integer' }) @Serializable
   randomSortOrder: number
+
   @Column({ type: 'integer' }) @Serializable
   sortOrder: number
 
   toSnakeJSON () {
-    let d = super.toSnakeJSON()
-    if (typeof d['payload'] !== 'string') {
-      d['payload'] = JSON.stringify(d['payload'])
+    const d = super.toSnakeJSON()
+    if (typeof d.payload !== 'string') {
+      d.payload = JSON.stringify(d.payload)
     }
     return d
   }
@@ -62,5 +75,4 @@ export default class Action extends BaseEntity implements SnakeSerializable {
     }
     return this
   }
-
 }

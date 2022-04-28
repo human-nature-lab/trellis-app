@@ -5,23 +5,31 @@ import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
 @Entity()
 export default class FormSection extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   formId: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   sectionId: string
+
   @Column({ type: 'integer' }) @Serializable
   sortOrder: number
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   isRepeatable: boolean
-  @Column() @Serializable
+
+  @Column('integer') @Serializable
   maxRepetitions: number
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   repeatPromptTranslationId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   followUpQuestionId: string
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   randomizeFollowUp: boolean
 
   @ManyToOne(type => Section, section => section.formSections)

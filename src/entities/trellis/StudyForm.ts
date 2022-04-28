@@ -5,24 +5,30 @@ import Form from './Form'
 
 @Entity()
 export default class StudyForm extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   studyId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   formMasterId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   currentVersionId: string
-  @Column() @Serializable
+
+  @Column('integer') @Serializable
   sortOrder: number
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   formTypeId: number
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   censusTypeId: string
 
   @Relationship(type => Form)
   @OneToOne(type => Form, { eager: true })
-  @JoinColumn({ name : 'current_version_id' })
+  @JoinColumn({ name: 'current_version_id' })
   form: Form
 
   fromSnakeJSON (json: any) {
@@ -38,5 +44,5 @@ export default class StudyForm extends TimestampedSoftDelete {
     }
     this.sortOrder = +this.sortOrder // Convert to a number
     return this
- }
+  }
 }

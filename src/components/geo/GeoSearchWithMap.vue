@@ -58,7 +58,7 @@
   import 'leaflet'
   import DocsLinkMixin from '../../mixins/DocsLinkMixin'
   import DocsFiles from '../documentation/DocsFiles'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import GeoSearch from './GeoSearch.vue'
   import TranslationService from '../../services/TranslationService'
   import global from '../../static/singleton'
@@ -66,25 +66,30 @@
   import forceDirectedLayout from 'ngraph.forcelayout'
   import GeoEditPanel from './GeoEditPanel.vue'
   import Permission from '../Permission.vue'
-  import StudyService from '../../services/study/StudyService'
-  import config from 'config'
+  import StudyService from '../../services/study'
+  import config from '../../config'
+  import greenDot from '../../../static/img/map_icons/green_dot.png'
+  import pixel from '../../../static/img/map_icons/1px.png'
+  import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+  import markerIcon from 'leaflet/dist/images/marker-icon.png'
+  import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 
   const targetMapWidth = 600
 
   const defaultIcon = L.icon({
-    iconUrl: require('../../../static/img/map_icons/green_dot.png'),
+    iconUrl: greenDot,
     iconSize: [10, 10],
     iconAnchor: [4, 4],
     popupAnchor: [4, 4],
-    labelAnchor: [1, 0]
+    labelAnchor: [1, 0],
   })
 
   const hiddenIcon = L.icon({
-    iconUrl: require('../../../static/img/map_icons/1px.png'),
+    iconUrl: pixel,
     iconSize: [1, 1],
     iconAnchor: [0, 0],
     popupAnchor: [0, 0],
-    labelAnchor: [0, 0]
+    labelAnchor: [0, 0],
   })
 
   const ITERATIONS = 100
@@ -163,9 +168,9 @@
         this.trellisMap = L.map('leafletMap').setView([0.0, 0.0], 1)
         delete L.Icon.Default.prototype._getIconUrl
         L.Icon.Default.mergeOptions({
-          iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-          iconUrl: require('leaflet/dist/images/marker-icon.png'),
-          shadowUrl: require('leaflet/dist/images/marker-shadow.png')
+          iconRetinaUrl: markerIcon2x,
+          iconUrl: markerIcon,
+          shadowUrl: markerShadow
         })
         L.tileLayer(config.mapTileLayer.url, {
           attribution: config.mapTileLayer.attribution,

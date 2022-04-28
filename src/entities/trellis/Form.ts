@@ -9,15 +9,19 @@ import Question from './Question'
 
 @Entity()
 export default class Form extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   formMasterId: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   nameTranslationId: string
-  @Column({type: 'integer'}) @Serializable
+
+  @Column({ type: 'integer' }) @Serializable
   version: number
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   isPublished: boolean
 
   @Relationship(type => Section)
@@ -31,7 +35,7 @@ export default class Form extends TimestampedSoftDelete {
   skips: Skip[]
 
   @Relationship(type => Translation)
-  @OneToOne(type => Translation, {eager: true})
+  @OneToOne(type => Translation, { eager: true })
   @JoinColumn()
   nameTranslation: Translation
 
@@ -42,11 +46,11 @@ export default class Form extends TimestampedSoftDelete {
   // Inverse relationships
   @OneToOne(type => Form)
   form: Form
-  
+
   @Relationship(type => Form)
   versions: Form[]
 
-  fromSnakeJSON(json: any) {
+  fromSnakeJSON (json: any) {
     super.fromSnakeJSON(json)
     if (this.versions) {
       this.versions.sort((a, b) => b.version - a.version)
@@ -56,7 +60,7 @@ export default class Form extends TimestampedSoftDelete {
     this.isPublished = !!+this.isPublished
     return this
   }
-  
+
   sort () {
     this.sections.sort((a, b) => {
       return a.formSections[0].sortOrder - b.formSections[0].sortOrder

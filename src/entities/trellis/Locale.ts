@@ -5,13 +5,16 @@ import Study from './Study'
 
 @Entity()
 export default class Locale extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   languageTag: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   languageName: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   languageNative: string
 
   // Inverse

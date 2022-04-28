@@ -7,15 +7,20 @@ import Respondent from './Respondent'
 export default class RespondentName extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
+
   @Column({ type: Boolean }) @Serializable
   isDisplayName: boolean
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   respondentId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   localeId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   previousRespondentNameId: string
 
   @ManyToOne(type => Respondent, respondent => respondent.names)

@@ -3,9 +3,9 @@ import RolePermission from '../../entities/trellis/RolePermission'
 import User from '../../entities/trellis/User'
 import { TrellisPermission } from '../../static/permissions.base'
 import PermissionServiceAbstract from './PermissionServiceAbstract'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 
-export default class PermissionServiceCordova extends PermissionServiceAbstract {
+export class PermissionServiceCordova extends PermissionServiceAbstract {
 
   protected async fetchUserPermissions (user: User): Promise<string[]> {
     const repo = await DatabaseService.getRepository(RolePermission)

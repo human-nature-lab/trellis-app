@@ -73,7 +73,7 @@
   import MoveRespondentGeoForm from './MoveRespondentGeoForm.vue'
   import { checkForCensusForm } from '../CensusFormChecker.vue'
 
-  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentService from '../../services/respondent'
   import CensusTypes from '../../static/census.types'
   import Respondent from '../../entities/trellis/Respondent'
   import RespondentGeo from '../../entities/trellis/RespondentGeo'

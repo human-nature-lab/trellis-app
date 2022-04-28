@@ -14,7 +14,7 @@
 <script lang="ts">
   import Vue from 'vue'
   import global from '../../static/singleton'
-  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentService from '../../services/respondent'
   import TrellisFileUpload from './TrellisFileUpload.vue'
 
   export default Vue.extend({

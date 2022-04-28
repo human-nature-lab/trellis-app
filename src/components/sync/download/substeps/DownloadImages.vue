@@ -13,12 +13,12 @@
 </template>
 
 <script>
-    import FileService from '../../../../services/file/FileService'
+    import FileService from '../../../../services/file'
     import SyncService from '../../../../services/SyncService'
     import axios from 'axios'
     import SyncSubStep from '../../SyncSubStep.vue'
     import { i18n } from '../../../../i18n'
-    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     export default {
       name: 'download-images',
       data () {

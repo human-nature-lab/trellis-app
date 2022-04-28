@@ -1,5 +1,5 @@
 import { RedirectOption, Route, RouteConfig } from 'vue-router'
-import InterviewService from '../../services/interview/InterviewService'
+import InterviewService from '../../services/interview'
 import { isUndefined } from '../../services/util'
 import { GuardConfig } from '../GuardQueue'
 

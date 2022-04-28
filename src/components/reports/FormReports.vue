@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-  import FormService from '../../services/form/FormService'
+  import FormService from '../../services/form'
   import Form from '../../entities/trellis/Form'
   import TranslateMixin from '../../mixins/TranslateMixin'
   import global from '../../static/singleton'

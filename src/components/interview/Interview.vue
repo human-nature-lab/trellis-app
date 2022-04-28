@@ -160,7 +160,7 @@ import global from '../../static/singleton'
 import AT from '../../static/action.types'
 
 import { sharedInterview, clearSharedInterview } from './classes/InterviewManager'
-import InterviewService from '../../services/interview/InterviewService'
+import InterviewService from '../../services/interview'
 import actionBus from './services/actions/ActionBus'
 
 import { allParametersAreValidWithError } from './services/ValidatorService'

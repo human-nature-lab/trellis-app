@@ -24,7 +24,7 @@
 
 <script>
   import GeoType from '../../entities/trellis/GeoType'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import global from '../../static/singleton'
 
   export default {

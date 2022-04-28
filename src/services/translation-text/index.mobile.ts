@@ -1,4 +1,4 @@
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import TranslationText from '../../entities/trellis/TranslationText'
 import TranslationTextServiceInterface from './TranslationTextServiceInterface'
 import { IsNull } from 'typeorm'

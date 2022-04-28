@@ -38,7 +38,7 @@
 <script lang="ts">
 import Locale from '../../entities/trellis/Locale'
 import Vue, { PropOptions } from 'vue'
-import LocaleService from '../../services/locale/LocaleService'
+import LocaleService from '../../services/locale'
 
 export default Vue.extend({
   name: 'LocaleSelectorMenu',

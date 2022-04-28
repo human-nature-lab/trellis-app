@@ -13,10 +13,12 @@ export enum ParameterType {
 
 @Entity()
 export default class Parameter extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   type: string
 }

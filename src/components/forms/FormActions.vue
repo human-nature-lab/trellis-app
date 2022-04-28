@@ -36,6 +36,16 @@
         </v-list-item>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
+        <v-list-item @click="$emit('update:isPublished', !form.isPublished)" :disabled="isTestStudy">
+          <v-list-item-content v-if="form.isPublished">
+            {{ $t('disable_form') }}
+          </v-list-item-content>
+          <v-list-item-content v-else>
+            {{ $t('enable_form') }}
+          </v-list-item-content>
+        </v-list-item>
+      </Permission>
+      <Permission :requires="TrellisPermission.EDIT_FORM">
         <v-list-item @click="$emit('revert', form)" :disabled="isTestStudy">
           <v-list-item-content>
             {{ $t('revert_version') }}

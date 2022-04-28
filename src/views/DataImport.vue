@@ -1,5 +1,5 @@
 <template>
-  <v-col>
+  <v-col class="w-full w-max-normal">
     <v-row>
       <h4 class="text-h4">
         {{ $t('data_import') }}

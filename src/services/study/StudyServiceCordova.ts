@@ -1,12 +1,12 @@
 import StudyServiceAbstract from './StudyServiceAbstract'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import Study from '../../entities/trellis/Study'
-import UserService from '../user/UserService'
+import UserService from '../user'
 import UserStudy from '../../entities/trellis/UserStudy'
 import User from '../../entities/trellis/User'
 import { IsNull, Not } from 'typeorm'
 
-class StudyServiceCordova extends StudyServiceAbstract {
+export class StudyServiceCordova extends StudyServiceAbstract {
   async getStudy (studyId: string): Promise<Study> {
     const repo = await DatabaseService.getRepository(Study)
     return repo.findOne({
@@ -87,5 +87,3 @@ class StudyServiceCordova extends StudyServiceAbstract {
     throw new Error('Not implemented')
   }
 }
-
-export default StudyServiceCordova

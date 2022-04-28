@@ -1,7 +1,7 @@
 import { Mutex } from 'async-mutex'
 import Vue from 'vue'
 import Router from 'vue-router'
-import { defaultLoggingService as logger } from '../services/logging/LoggingService'
+import { defaultLoggingService as logger } from '../services/logging'
 import singleton from '../static/singleton'
 import SyncGuard from './guards/SyncGuard'
 import LoginGuard from './guards/LoginGuard'
@@ -11,9 +11,11 @@ import routes from './routes'
 import { RouteQueue } from './RouteQueue'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
 import { AddSnack } from '../components/SnackbarQueue.vue'
-import PhotoService from '../services/photo/PhotoService'
+import PhotoService from '../services/photo'
 
 Vue.use(Router)
+
+console.log('routes', routes)
 
 export const router = new Router({
   routes,
@@ -40,7 +42,7 @@ if (singleton.offline) {
 }
 
 // Always require we're logged in
-router.beforeEach(guardQueue([LoginGuard]))
+// router.beforeEach(guardQueue([LoginGuard]))
 
 router.beforeEach((to, from, next) => {
   // Don't let photo requests prevent navigation from happening by cancelling outstanding requests
@@ -60,6 +62,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to) => {
   singleton.loading.active = false
+  console.log('to', to)
   logger.log({
     component: 'router/index.js@afterEach',
     message: `after navigating to: ${to.fullPath}`,

@@ -1,9 +1,9 @@
 import { syncInstance } from '../http/AxiosInstance'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import Log from '../../entities/trellis-config/Log'
 import { IsNull } from 'typeorm'
 import { merge } from 'lodash'
-import DeviceService from '../device/DeviceService'
+import DeviceService from '../device'
 
 
 interface LogUploadOptions {

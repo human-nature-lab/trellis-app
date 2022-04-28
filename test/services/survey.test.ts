@@ -1,5 +1,5 @@
-import SurveyServiceWeb from '../../src/services/survey/SurveyServiceWeb'
-import SurveyServiceCordova from '../../src/services/survey/SurveyServiceCordova'
+import { SurveyServiceWeb } from '../../src/services/survey/SurveyServiceWeb'
+import { SurveyServiceCordova } from '../../src/services/survey/SurveyServiceCordova'
 import Survey from "../../src/entities/trellis/Survey";
 import './globals'
 

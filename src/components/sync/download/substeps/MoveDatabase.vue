@@ -12,8 +12,8 @@
 <script lang="ts">
   import Vue, { PropOptions } from 'vue'
   import SyncSubStep from '../../SyncSubStep.vue'
-  import FileService from '../../../../services/file/FileService'
-  import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+  import FileService from '../../../../services/file'
+  import LoggingService, { defaultLoggingService } from '../../../../services/logging'
 
   export default Vue.extend({
     name: 'MoveDatabase',

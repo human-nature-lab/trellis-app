@@ -5,9 +5,10 @@ import Skip from './Skip'
 
 @Entity()
 export default class ConditionTag extends SparseTimestampedSoftDelete {
-  @PrimaryColumn() @Serializable
+  @PrimaryColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
 
   @ManyToMany(type => Skip, skip => skip.conditionTags)

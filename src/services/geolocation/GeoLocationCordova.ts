@@ -1,4 +1,4 @@
-import DeviceService from '../device/DeviceService'
+import DeviceService from '../device'
 import GeoLocationAbstract from './GeoLocationAbstract'
 
 export default class GeoLocationCordova extends GeoLocationAbstract {

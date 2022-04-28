@@ -25,7 +25,7 @@
   import { Mutex } from "async-mutex";
   import Locale from "../entities/trellis/Locale";
   import TranslationText from "../entities/trellis/TranslationText";
-  import LocaleService from "../services/locale/LocaleService";
+  import LocaleService from "../services/locale";
   import SingletonService from "../services/SingletonService";
   import TranslationTextService from "../services/translation-text";
   import ClickToEdit from "./ClickToEdit.vue";

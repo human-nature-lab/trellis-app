@@ -7,7 +7,7 @@ import {
   OneToMany,
   JoinTable,
   ManyToMany,
-  JoinColumn
+  JoinColumn,
 } from 'typeorm'
 import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
@@ -21,21 +21,26 @@ import QuestionGroup from './QuestionGroup'
 
 @Entity()
 export default class Question extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   questionTypeId: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   questionTranslationId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   questionGroupId: string
+
   @Column({ type: 'tinyint' }) @Serializable
   sortOrder: number
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   varName: string
 
   @Relationship(type => QuestionType)
-  @ManyToOne(type => QuestionType, qt => qt.questions, {eager: true})
+  @ManyToOne(type => QuestionType, qt => qt.questions, { eager: true })
   questionType: QuestionType
 
   @Relationship(type => Translation)
@@ -60,12 +65,12 @@ export default class Question extends SparseTimestampedSoftDelete {
   @ManyToOne(type => QuestionGroup, qg => qg.questions)
   questionGroup: QuestionGroup
 
-  datum?: QuestionDatum           // Assigned and used by InterviewManager only
-  parameters?: object             // Assigned and used by InterviewManager only
+  datum?: QuestionDatum // Assigned and used by InterviewManager only
+  parameters?: object // Assigned and used by InterviewManager only
 
-  fromSnakeJSON(json: any) {
+  fromSnakeJSON (json: any) {
     super.fromSnakeJSON(json)
     this.sortOrder = +this.sortOrder
     return this
- }
+  }
 }

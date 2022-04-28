@@ -81,7 +81,7 @@ import RespondentsSearch from '../../respondent/RespondentsSearch.vue'
 import ModalTitle from '../../ModalTitle.vue'
 import EdgeService from '../../../services/edge'
 import parameterTypes from '../../../static/parameter.types'
-import GeoService from '../../../services/geo/GeoService'
+import GeoService from '../../../services/geo'
 import { uniq } from 'lodash'
 
 export default {

@@ -107,7 +107,7 @@
   import GeoListTile from './GeoListTile.vue'
   import Cart from '../Cart.vue'
   import { debounce } from 'lodash'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
   import { routeQueue } from '../../router'

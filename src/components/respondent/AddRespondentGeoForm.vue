@@ -47,7 +47,7 @@
   import ModalTitle from '../ModalTitle.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
 
-  import RespondentService from '../../services/respondent/RespondentService'
+  import RespondentService from '../../services/respondent'
   import RespondentGeo from '../../entities/trellis/RespondentGeo'
   export default Vue.extend({
     components: {GeoSearch, ModalTitle, AsyncTranslationText},

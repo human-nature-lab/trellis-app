@@ -1,7 +1,7 @@
 import LoggingServiceAbstract from './LoggingServiceAbstract'
 import Log from '../../entities/trellis-config/Log'
 
-class LoggingServiceWeb extends LoggingServiceAbstract {
+export class LoggingServiceWeb extends LoggingServiceAbstract {
 
   async log (_request) {
     // TODO: Implement the web version
@@ -24,5 +24,3 @@ class LoggingServiceWeb extends LoggingServiceAbstract {
   }
 
 }
-
-export default LoggingServiceWeb
