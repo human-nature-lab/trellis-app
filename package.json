@@ -25,6 +25,7 @@
     "check:translations": "node check-translations.js",
     "web": "npm run compile && webpack --config=build/webpack.web.conf.js",
     "mobile": "npm run build:vite",
+    "format": "npx eslint --fix \"src/**\"",
     "build:webpack:android": "npm run compile & webpack --config=build/webpack.mobile.conf.js && cordova run android",
     "release:webpack:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run build:webpack:android",
     "start": "npm run compile && webpack-dev-server --config=build/webpack.mobile.conf.js",

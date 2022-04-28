@@ -37,6 +37,7 @@ module.exports = {
   // add your custom rules here
   rules: {
     // allow paren-less arrow functions
+    'linebreak-style': ['warn', 'unix'],
     'arrow-parens': 0,
     'max-len': ['warn', { code: 120, comments: 120 }],
     'lines-between-class-members': ['warn', 'always', { exceptAfterSingleLine: true }],
