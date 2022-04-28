@@ -6,6 +6,10 @@ import SaferEvalService from './SaferEvalService'
 export default class SkipService {
   evalService = new SaferEvalService()
 
+  clear () {
+    this.evalService.clear()
+  }
+
   register (skips: Skip[]) {
     for (const skip of skips) {
       if (skip.customLogic) {
