@@ -1,5 +1,4 @@
 const path = require('path')
-const fs = require('fs')
 const express = require('express')
 const webpackMerge = require('webpack-merge')
 const config = require('./webpack.base.conf')
