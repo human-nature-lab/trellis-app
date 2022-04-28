@@ -26,6 +26,7 @@ const DocsRoute = () => import(/* webpackChunkName: "documentation" */'../compon
 const Changelog = () => import(/* webpackChunkName: "changelog" */'../components/changelog/Changelog.vue')
 const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'../components/geo/GeoInfo.vue')
 
+console.log(docs)
 const docsRoutes = Object.keys(docs.content).map(path => ({
   path: path === 'Home.md' ? '' : encodeURI(path),
   name: path,

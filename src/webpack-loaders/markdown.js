@@ -65,9 +65,10 @@ async function transform (opts, source) {
     await configure(opts)
   }
   toImport.clear()
-  currentFile = this.request
+  const parts = this.request.split('!')
+  currentFile = parts[parts.length - 1].split('?')[0]
   let html = marked.parse(source)
-  html = html.replaceAll('`', '\\`')
+  html = html.replaceAll('`', '\'')
   const imports = Array.from(toImport).map(v => `import '${v}'`).join('\n')
   const name = path.basename(currentFile).replace('.md', '')
   if (opts.compileVue) {
@@ -85,10 +86,11 @@ async function transform (opts, source) {
       render: ${r.render},
     }`
   }
-  let res = `<template functional><div>${html}</div></template>\n`
+  let res = `<template><div>${html}</div></template>\n`
   if (imports !== '') {
-    res += `<script>\n${imports}\n export default { name: '${name}' }\n</script>`
+    res += `<script>\n${imports}\n export default { name : '${name}' }</script>\n`
   }
+  res += '<style></style>'
   return res
 }
 

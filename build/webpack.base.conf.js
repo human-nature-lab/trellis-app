@@ -207,10 +207,6 @@ module.exports = {
   },
   module: {
     rules: [
-      // {
-      //   test: /\.md$/,
-      //   loader: 'raw-loader',
-      // },
       {
         test: /changelog.*\.md$/,
         use: [{
@@ -220,26 +216,27 @@ module.exports = {
           options: {
             rootPath: path.resolve(__dirname, '../changelog'),
             marked: {
-              baseUrl: '/#/changelog',
+              baseUrl: '/#/changelog/',
             },
           },
         }],
       },
       {
         test: /docs.*\.md$/,
-        use: [{
-          loader: path.resolve(__dirname, '../src/webpack-loaders/log'),
-        }, {
-          loader: 'vue-loader',
-        }, {
-          loader: path.resolve(__dirname, '../src/webpack-loaders/markdown'),
-          options: {
-            rootPath: path.resolve(__dirname, '../docs'),
-            marked: {
-              baseUrl: '/#/documentation',
+        use: [
+          {
+            loader: 'vue-loader',
+          },
+          {
+            loader: path.resolve(__dirname, '../src/webpack-loaders/markdown'),
+            options: {
+              rootPath: path.resolve(__dirname, '../docs'),
+              marked: {
+                baseUrl: '/#/documentation/',
+              },
             },
           },
-        }],
+        ],
       },
       {
         test: /\.csv$/,

@@ -2,11 +2,8 @@
   <v-flex class="ma-4">
     <v-layout>
       <v-container>
-        <v-layout>
-          <Markdown
-            :file-name="selectedFile"
-            :markdown="markdown"
-          />
+        <v-layout class="w-full">
+          <component class="w-full" :is="markdown" />
         </v-layout>
       </v-container>
     </v-layout>
