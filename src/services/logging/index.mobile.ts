@@ -1,5 +1,5 @@
 import { LoggingServiceCordova } from './LoggingServiceCordova'
 
-export default new LoggingServiceCordova()
+export default LoggingServiceCordova
 
 export const defaultLoggingService = new LoggingServiceCordova()

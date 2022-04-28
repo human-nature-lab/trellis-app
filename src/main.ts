@@ -31,7 +31,7 @@ async function init () {
   if (config.appEnv === APP_ENV.CORDOVA) {
     Vue.use(VueCordova)
   }
-  Vue.component('debug', Debug)
+  Vue.component('Debug', Debug)
 
   new Vue({
     el: '#app',
@@ -40,17 +40,17 @@ async function init () {
     vuetify,
     template: '<WebApp />',
     components: {
-      WebApp
+      WebApp,
     },
     // @ts-ignore
     head: {
       meta: [
         {
           name: 'viewport',
-          content: 'width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'
-        }
-      ]
-    }
+          content: 'width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover',
+        },
+      ],
+    },
   })
 }
 

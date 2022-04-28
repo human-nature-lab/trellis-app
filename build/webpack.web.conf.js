@@ -2,12 +2,12 @@ const webpackMerge = require('webpack-merge')
 const config = require('./webpack.base.conf')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-module.exports = webpackMerge(config, {
+module.exports = webpackMerge({
   resolve: {
     extensions: [
       '.web.ts',
       '.web.js',
-    ].concat(config.extensions),
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -21,5 +21,5 @@ module.exports = webpackMerge(config, {
       },
       chunksSortMode: 'none',
     }),
-    ]
-})
+  ],
+}, config)

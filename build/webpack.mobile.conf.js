@@ -48,7 +48,7 @@ module.exports = webpackMerge({
       output: path.join(__dirname, '../www/config.xml')
     }),
     new HtmlWebpackPlugin({
-      filename: 'index.cordova.html',
+      filename: 'index.html',
       template: 'index.webpack.html',
       inject: true,
       minify: {

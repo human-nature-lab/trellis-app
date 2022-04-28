@@ -76,7 +76,7 @@ const plugins = [
     VERSION: JSON.stringify(require('../package').version),
   }),
   new VueLoaderPlugin(),
-  new webpack.NormalModuleReplacementPlugin(/typeorm$/, function (result) {
+  new webpack.NormalModuleReplacementPlugin(/^typeorm/, function (result) {
     result.request = result.request.replace(/typeorm/, 'typeorm/browser')
   }),
   new BundleAnalyzerPlugin({
@@ -92,8 +92,9 @@ const plugins = [
   }]),
   new VuetifyLoaderPlugin(),
   new MiniCssExtractPlugin({
-    filename: 'css/[name].[contenthash].css',
+    filename: '[name].[contenthash].css',
   }),
+
   // new ForkTsCheckerWebpackPlugin({
   //   typescript: {
   //     extensions: {
@@ -206,9 +207,39 @@ module.exports = {
   },
   module: {
     rules: [
+      // {
+      //   test: /\.md$/,
+      //   loader: 'raw-loader',
+      // },
       {
-        test: /\.md$/,
-        loader: 'raw-loader',
+        test: /changelog.*\.md$/,
+        use: [{
+          loader: 'vue-loader',
+        }, {
+          loader: path.resolve(__dirname, '../src/webpack-loaders/markdown'),
+          options: {
+            rootPath: path.resolve(__dirname, '../changelog'),
+            marked: {
+              baseUrl: '/#/changelog',
+            },
+          },
+        }],
+      },
+      {
+        test: /docs.*\.md$/,
+        use: [{
+          loader: path.resolve(__dirname, '../src/webpack-loaders/log'),
+        }, {
+          loader: 'vue-loader',
+        }, {
+          loader: path.resolve(__dirname, '../src/webpack-loaders/markdown'),
+          options: {
+            rootPath: path.resolve(__dirname, '../docs'),
+            marked: {
+              baseUrl: '/#/documentation',
+            },
+          },
+        }],
       },
       {
         test: /\.csv$/,
@@ -237,11 +268,6 @@ module.exports = {
       {
         test: /\.vue$/,
         use: [{
-          loader: 'cache-loader',
-          options: {
-            cacheDirectory: resolveCache('vue-loader'),
-          },
-        }, {
           loader: 'vue-loader',
           options: {
             compilerOptions: {
