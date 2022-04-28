@@ -6,7 +6,7 @@ import {
   OneToMany,
   JoinTable,
   OneToOne,
-  JoinColumn
+  JoinColumn,
 } from 'typeorm'
 import { Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import Translation from './Translation'
@@ -17,10 +17,10 @@ import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
 @Entity()
 export default class Section extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column() @Serializable
+  @Column('uuid') @Serializable
   nameTranslationId: string
 
   @Relationship(type => Translation)

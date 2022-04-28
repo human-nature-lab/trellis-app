@@ -49,16 +49,15 @@
 </template>
 
 <script>
-  import GeoService from '../../../services/geo/GeoService'
-  import GeoSearch from '../../geo/GeoSearch'
-  import GeoBreadcrumbs from '../../geo/GeoBreadcrumbs'
-  import GeoListTile from '../../geo/GeoListTile'
+  import GeoService from '../../../services/geo'
+  import GeoSearch from '../../geo/GeoSearch.vue'
+  import GeoBreadcrumbs from '../../geo/GeoBreadcrumbs.vue'
+  import GeoListTile from '../../geo/GeoListTile.vue'
   import TranslationService from '../../../services/TranslationService'
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
-  import PT from '../../../static/parameter.types'
   import global from '../../../static/singleton'
-  import ModalTitle from '../../ModalTitle'
+  import ModalTitle from '../../ModalTitle.vue'
   import GeoTypeParameterMixin from '../mixins/GeoTypeParameterMixin'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   export default {

@@ -2,11 +2,11 @@ import * as Sentry from '@sentry/browser'
 import Emitter from '../classes/Emitter'
 import singleton from '../static/singleton'
 import storage from './StorageService'
-import i18n from '../i18n/index'
+import { loadLanguageAsync } from '../i18n/index'
 import moment from 'moment'
-import DeviceService from './device/DeviceService'
-import DatabaseService from './database/DatabaseService'
-import config from 'config'
+import DeviceService from './device'
+import DatabaseService from './database'
+import config from '../config'
 import { APP_ENV } from '../static/constants'
 import theme from '../static/theme'
 
@@ -68,8 +68,10 @@ class SingletonService extends Emitter {
   }
 
   setCurrentLocale (locale) {
-    moment.locale(locale.languageTag)
-    i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
+    const tag = locale.languageTag
+    moment.locale(tag)
+    loadLanguageAsync(tag)
+    // i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
     singleton.locale = locale
     storage.set(StorageKey.locale, locale.id)
     this.dispatch('locale', locale)

@@ -18,9 +18,9 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import StudyService from '../services/study/StudyService'
-  import LocaleService from '../services/locale/LocaleService'
-  import SingletonService from '../services/SingletonService'
+  import StudyService from '../services/study'
+  import LocaleService from '../services/locale'
+  
   export default Vue.extend({
     name: 'locale-selector',
     data () {

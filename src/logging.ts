@@ -1,15 +1,14 @@
 import * as Sentry from '@sentry/browser'
 import Locale from './entities/trellis/Locale'
 import Vue from 'vue'
-import config from 'config'
+import config from './config'
 import Study from './entities/trellis/Study'
-import DeviceService from './services/device/DeviceService'
+import DeviceService from './services/device'
 import SentryOfflineTransport from './services/logging/SentryOfflineTransport'
 import { BrowserOptions } from '@sentry/browser/esm'
-import StudyService from './services/study/StudyService'
 import { APP_ENV } from './static/constants'
 import SingletonService from './services/SingletonService'
-import DatabaseService from './services/database/DatabaseService'
+import DatabaseService from './services/database'
 declare const VERSION: string
 
 async function asyncSetup () {

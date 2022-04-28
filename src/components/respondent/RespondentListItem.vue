@@ -11,7 +11,7 @@
 </template>
 
 <script>
-  import Photo from '../photo/Photo'
+  import Photo from '../photo/Photo.vue'
   export default {
     name: 'respondent-list-item',
     props: {

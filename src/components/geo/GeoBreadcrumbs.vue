@@ -24,8 +24,8 @@
 </template>
 
 <script>
-  import AsyncTranslationText from '../AsyncTranslationText'
-  import GeoService from '../../services/geo/GeoService'
+  import AsyncTranslationText from '../AsyncTranslationText.vue'
+  import GeoService from '../../services/geo'
   import singleton from '../../static/singleton'
   export default {
     name: 'geo-breadcrumbs',

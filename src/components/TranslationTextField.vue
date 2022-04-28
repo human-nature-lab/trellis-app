@@ -25,10 +25,10 @@
   import { Mutex } from "async-mutex";
   import Locale from "../entities/trellis/Locale";
   import TranslationText from "../entities/trellis/TranslationText";
-  import LocaleService from "../services/locale/LocaleService";
+  import LocaleService from "../services/locale";
   import SingletonService from "../services/SingletonService";
-  import TranslationTextService from "../services/translation-text/TranslationTextService";
-  import ClickToEdit from "./ClickToEdit";
+  import TranslationTextService from "../services/translation-text";
+  import ClickToEdit from "./ClickToEdit.vue";
   import singleton, { Singleton } from "../static/singleton";
   import Vue from "vue";
 
@@ -138,9 +138,7 @@
               );
             } else if (tt.translatedText !== mTt.translatedText) {
               // Update an existing translation text
-              this.memCopy.translationText[
-                i
-              ] = await TranslationTextService.updateTranslatedTextById(
+              this.memCopy.translationText[i] = await TranslationTextService.updateTranslatedTextById(
                 mTt.id,
                 mTt.translatedText
               );

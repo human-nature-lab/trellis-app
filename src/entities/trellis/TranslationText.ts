@@ -8,10 +8,13 @@ import Translation from './Translation'
 export default class TranslationText extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   translationId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   localeId: string
+
   @Column('text') @Serializable
   translatedText: string
 
@@ -21,5 +24,4 @@ export default class TranslationText extends SparseTimestampedSoftDelete {
 
   @ManyToOne(type => Translation, translation => translation.translationText)
   translation: Translation
-
 }

@@ -7,18 +7,22 @@ import Study from './Study'
 
 @Entity()
 export default class User extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   username: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   password: string
 
-  @Column({ nullable: true }) @Serializable
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   roleId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   selectedStudyId: string
 
   @Relationship(type => Role)

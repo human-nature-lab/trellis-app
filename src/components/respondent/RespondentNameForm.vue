@@ -49,9 +49,9 @@
 </template>
 
 <script>
-  import ModalTitle from '../ModalTitle'
-  import LocaleService from '../../services/locale/LocaleService'
-  import RespondentService from '../../services/respondent/RespondentService'
+  import ModalTitle from '../ModalTitle.vue'
+  import LocaleService from '../../services/locale'
+  import RespondentService from '../../services/respondent'
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
   import singleton from '../../static/singleton'

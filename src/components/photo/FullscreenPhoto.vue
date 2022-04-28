@@ -17,8 +17,8 @@
 </template>
 
 <script>
-  import ModalTitle from '../ModalTitle'
-  import Photo from './Photo'
+  import ModalTitle from '../ModalTitle.vue'
+  import Photo from './Photo.vue'
   export default {
     components: {Photo, ModalTitle},
     props: {

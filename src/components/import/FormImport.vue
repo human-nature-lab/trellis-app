@@ -24,7 +24,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import FormService from '../../services/form/FormService'
+  import FormService from '../../services/form'
   import global from '../../static/singleton'
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
   import FileUpload from 'vue-upload-component'

@@ -30,10 +30,19 @@ enum SortMethod {
   RANDOM
 }
 
+export function locationsAreEqual (a: InterviewLocation, b: InterviewLocation) {
+  return a && b &&
+    a.page === b.page &&
+    a.section === b.section &&
+    a.sectionFollowUpRepetition === b.sectionFollowUpRepetition &&
+    a.sectionRepetition === b.sectionRepetition
+}
+
 export default class InterviewAlligator {
+  public updatePagesCalled = 0
+  public skipped: InterviewLocation[]
   private index = 0
   private pages: InterviewLocation[]
-  public skipped: InterviewLocation[]
   private form: Form
   private data: DataStore
   private sectionIndex: Map<string, Section> = new Map()
@@ -41,10 +50,9 @@ export default class InterviewAlligator {
   private sectionToNumIndex: Map<string, number> = new Map()
   private pageToNumIndex: Map<string, number> = new Map()
   private varNameToQuestionIndex: Map<string, Question> = new Map()
-
-  private hasDataChanges: boolean = true
-
-  public updatePagesCalled: number = 0
+  private skipService = new SkipService()
+  private hasDataChanges = true
+  private skipCache = new Map()
 
   constructor (private manager: InterviewManager) {
     this.form = manager.blueprint
@@ -83,6 +91,7 @@ export default class InterviewAlligator {
       this.sectionToNumIndex.set(section.id, s)
       for (let p = 0; p < section.questionGroups.length; p++) {
         const page = section.questionGroups[p]
+        this.skipService.register(page.skips)
         this.pageIndex.set(page.id, page)
         this.pageToNumIndex.set(page.id, p)
         for (const question of page.questions) {
@@ -100,7 +109,7 @@ export default class InterviewAlligator {
       section: this.sectionToNumIndex.get(sectionId),
       sectionRepetition,
       sectionFollowUpDatumId: followUpDatumId,
-      sectionFollowUpRepetition
+      sectionFollowUpRepetition,
     } as InterviewLocation
     if (this.shouldSkipPage(loc)) {
       // console.log('skipping', JSON.stringify(loc), JSON.stringify(this.data.conditionTags), Array.from(this.getConditionTagSet(loc.sectionRepetition, loc.sectionFollowUpDatumId)))
@@ -121,9 +130,9 @@ export default class InterviewAlligator {
       const isSame = l.page === loc.page &&
         l.section === loc.section &&
         l.sectionRepetition === loc.sectionRepetition
-      return loc.sectionFollowUpRepetition ?
-        isSame && loc.sectionFollowUpDatumId === l.sectionFollowUpDatumId :
-        isSame && loc.sectionFollowUpRepetition === l.sectionFollowUpRepetition
+      return loc.sectionFollowUpRepetition
+        ? isSame && loc.sectionFollowUpDatumId === l.sectionFollowUpDatumId
+        : isSame && loc.sectionFollowUpRepetition === l.sectionFollowUpRepetition
     }) > -1
   }
 
@@ -138,7 +147,7 @@ export default class InterviewAlligator {
       return []
     }
     // TODO: This assumes that the follow up question is not inside another follow up section
-    let qd = questionData.find((qd: QuestionDatum) => {
+    const qd = questionData.find((qd: QuestionDatum) => {
       return qd.questionId === followUpQuestionId
     })
     if (!qd) {
@@ -148,16 +157,17 @@ export default class InterviewAlligator {
   }
 
   private updatePages () {
+    this.skipCache.clear()
     this.updatePagesCalled++
-    const initLocation: InterviewLocation = this.loc ? JSON.parse(JSON.stringify(this.loc)) : {
-      page: 0,
-      section: 0,
-      sectionRepetition: 0,
-      sectionFollowUpRepetition: 0
-    }
+    const initLocation: InterviewLocation = this.loc
+      ? JSON.parse(JSON.stringify(this.loc))
+      : {
+          page: 0,
+          section: 0,
+          sectionRepetition: 0,
+          sectionFollowUpRepetition: 0,
+        }
     let actuallyUpdated = 0
-    const prevPages = this.pages.length
-    const expectedUpdate = this.pages.length - this.index
     this.pages.splice(this.index)
     for (let s = initLocation.section; s < this.form.sections.length; s++) {
       const section = this.form.sections[s]
@@ -166,7 +176,6 @@ export default class InterviewAlligator {
       if (section.followUpQuestionId) {
         const sortMethod: SortMethod = section.formSections[0].randomizeFollowUp ? SortMethod.RANDOM : SortMethod.NATURAL
         let data: Datum[] = this.getFollowUpQuestionDatum(section.followUpQuestionId)
-        // debugger
         // console.log('follow up data', data.length)
         // if (!data.length) {
         //   // Marking skipped repeated section
@@ -191,7 +200,7 @@ export default class InterviewAlligator {
         for (let d = initFollowUpRepetition; d < data.length; d++) {
           const datum = data[d]
           const isSameRepetitionAsInitial = isInitialSection && d === initLocation.sectionFollowUpRepetition
-          const initPage =  isSameRepetitionAsInitial ? initLocation.page : 0
+          const initPage = isSameRepetitionAsInitial ? initLocation.page : 0
           for (let p = initPage; p < section.questionGroups.length; p++) {
             const page = section.questionGroups[p]
             this.addLocation(page.id, section.id, datum.id, d, 0)
@@ -224,7 +233,7 @@ export default class InterviewAlligator {
   private shouldSkipPage (loc: InterviewLocation): boolean {
     const conditionTagNames = this.getConditionTagSet(loc.sectionRepetition, loc.sectionFollowUpDatumId)
     const page = this.pageIndex.get(loc.pageId)
-    return SkipService.shouldSkip(page.skips, conditionTagNames)
+    return this.skipService.shouldSkip(page.skips, conditionTagNames, this.manager, loc, this.skipCache)
   }
 
   public seekTo (loc: InterviewLocation): boolean {
@@ -252,7 +261,7 @@ export default class InterviewAlligator {
   public getActionQuestionDatum (action: Action): QuestionDatum|null {
     if (!action.questionId) throw new Error('invalid question')
     const questionData = this.data.getQuestionDataByQuestionId(action.questionId)
-    for (let qDatum of questionData) {
+    for (const qDatum of questionData) {
       if (qDatum.followUpDatumId) {
         // TODO: Lookup questionDatum by datum eventOrder
         const datum = this.data.getDatumById(qDatum.followUpDatumId)
@@ -288,7 +297,7 @@ export default class InterviewAlligator {
               questionTypeId: question.questionTypeId,
               sectionRepetition: loc.sectionRepetition,
               sectionFollowUpDatumId: loc.sectionFollowUpDatumId,
-              sectionFollowUpRepetition: loc.sectionFollowUpRepetition
+              sectionFollowUpRepetition: loc.sectionFollowUpRepetition,
             }
           }
         }

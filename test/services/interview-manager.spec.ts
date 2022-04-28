@@ -17,9 +17,9 @@ import {
   respondentId2
 } from "../testing-ids";
 import SurveyService from "../../src/services/survey/index";
-import InterviewService from "../../src/services/interview/InterviewService";
-import FormService from "../../src/services/form/FormService";
-import RespondentService from "../../src/services/respondent/RespondentService";
+import InterviewService from "../../src/services/interview";
+import FormService from "../../src/services/form";
+import RespondentService from "../../src/services/respondent";
 import AT from '../../src/static/action.types'
 import QT from '../../src/static/question.types'
 
@@ -200,7 +200,7 @@ function getCurrentQuestions (manager: InterviewManager): Question[] {
   return manager.getPageQuestions(manager.location.section, manager.location.sectionRepetition, manager.location.sectionFollowUpDatumId, manager.location.page)
 }
 
-async function setupInterviewManager (formId: string, rId?: string, sId?: string, customActions?: Action[]) {
+export async function setupInterviewManager (formId: string, rId?: string, sId?: string, customActions?: Action[]) {
   const interview = await createNewSurvey(formId, rId, sId)
   const res = await InterviewLoader.loadInterview(interview.id)
   let {form, actions, data, respondentFills, baseRespondentConditionTags} = res

@@ -27,7 +27,8 @@ export class FormServiceWeb implements FormServiceInterface {
     return http().get(uriTemplate('form/{form}', [formId]))
       .then(res => {
         if (res.data.form) {
-          return new Form().fromSnakeJSON(res.data.form)
+          const form = new Form().fromSnakeJSON(res.data.form)
+          return form
         } else {
           console.error(res)
           throw Error('Unable to retrieve form')
@@ -55,7 +56,10 @@ export class FormServiceWeb implements FormServiceInterface {
   async exportForm (formId: string) {
     const res = await adminInst.get(uriTemplate('form/{form}', [formId]))
     const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'text/json' })
-    saveAs(blob, `form-${formId}.json`)
+    const t = res.data.form.name_translation
+    const name = t && t.translation_text && t.translation_text.length && t.translation_text[0].translated_text
+    const version = res.data.form.version
+    saveAs(blob, `trellis-form-${name}-v${version}.json`)
   }
 
   async importForm (studyId: string, formName: string, formType: number, file: File): Promise<Form> {

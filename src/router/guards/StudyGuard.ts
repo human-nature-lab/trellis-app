@@ -1,6 +1,6 @@
 import { Route } from 'vue-router'
 import SingletonService from '../../services/SingletonService'
-import StudyService from '../../services/study/StudyService'
+import StudyService from '../../services/study'
 import StorageService from '../../services/StorageService'
 import { GuardConfig } from '../GuardQueue'
 

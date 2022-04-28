@@ -1,4 +1,4 @@
-import DatabaseService from '../../services/database/DatabaseService'
+import DatabaseService from '../../services/database'
 import { isUndefined } from '../../services/util'
 import { GuardConfig } from '../GuardQueue'
 

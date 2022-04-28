@@ -1,13 +1,13 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import config from 'config'
+import config from '../../config'
 import RouteWhitelist from '../../router/RouteWhitelist'
 import storage from '../StorageService'
 import router, { routeQueue, routerReady } from '../../router'
 import singleton from '../../static/singleton'
-import DatabaseService from '../database/DatabaseService'
-import DeviceService from '../device/DeviceService'
+import DatabaseService from '../database'
+import DeviceService from '../device'
 import { makeBasicAuthHeader } from '../util'
-import { requestCredentials } from '../../components/login/LoginModal'
+import { requestCredentials } from '../../components/login/LoginModal.vue'
 import { ExpiringValue } from '../../classes/ExpiringValue'
 
 export interface Token {
@@ -145,3 +145,9 @@ export const adminInst = axios.create({
 
 adminInst.interceptors.request.use(requestInterceptor)
 adminInst.interceptors.response.use(responseInterceptor, responseError)
+
+export const builderInst = axios.create({
+  baseURL: config.apiRoot + "/builder",
+})
+builderInst.interceptors.request.use(requestInterceptor)
+builderInst.interceptors.response.use(responseInterceptor, responseError)

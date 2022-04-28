@@ -56,7 +56,7 @@
   import Geo from '../../entities/trellis/Geo'
   import Photo from '../photo/Photo.vue'
   import TranslationService from '../../services/TranslationService'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import global from '../../static/singleton'
   import TranslationTextField from '../TranslationTextField.vue'
   import GeoTypeSelector from './GeoTypeSelector.vue'

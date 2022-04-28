@@ -13,7 +13,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoService from '../../services/geo'
   import global from '../../static/singleton'
   import TrellisFileUpload from './TrellisFileUpload.vue'
 

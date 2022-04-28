@@ -2,7 +2,7 @@ import './globals'
 import {expect} from 'chai'
 import Form from '../../src/entities/trellis/Form'
 
-import ConditionAssignmentService from '../../src/services/ConditionAssignmentService'
+import ConditionAssignmentService from '../../src/services/SaferEvalService'
 import { FormBuilder } from '../FormBuilder'
 import { SectionTemplate } from '../FormBuilderTypes'
 import { InterviewController } from '../InterviewController'
@@ -70,8 +70,8 @@ export default function () {
       expect(cassTime).to.be.lessThan(evalTime, 'Wow... This managed to be slower somehow O.o')
     })
 
-    describe('api', () => {
-      const form = require('../forms/condition-assignment-api-form-builder.json')
+    describe('api', async () => {
+      const form = await import('../forms/condition-assignment-api-form-builder.json')
       // const builder = FormBuilder.fromTemplate(require('../forms/condition-assignment-api').default)
       // debugger
       const builder = new FormBuilder(new Form().fromSnakeJSON(form))

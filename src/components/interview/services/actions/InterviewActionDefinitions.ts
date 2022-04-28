@@ -17,6 +17,7 @@ import Action from '../../../../entities/trellis/Action'
 
 // Options
 const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
+const removeDataOnDkRf = false  // indicates if selecting dk_rf will remove the responses to the question
 
 // Definitions
 /**
@@ -79,9 +80,9 @@ actionManager.add(AT.dk_rf, function (interview, action, questionDatum) {
     }
   }
   // Uncomment this if we want to remove datum associated with this question
-  // if (questionDatum.data && questionDatum.data.length) {
-  //   interview.deleteAllQuestionDatumData(questionDatum)
-  // }
+  if (removeDataOnDkRf && questionDatum.data && questionDatum.data.length) {
+    interview.data.removeAllDatum(questionDatum)
+  }
 })
 actionManager.add(AT.dk_rf_val, function (interview, action: Action, questionDatum) {
   if (questionDatum) {
@@ -120,7 +121,6 @@ actionManager.add(AT.respondent_move, addDatum)
 actionManager.add(AT.respondent_add_geo, addDatum)
 actionManager.add(AT.respondent_remove_geo, addDatum)
 actionManager.add(AT.other_respondent_added, function () {
-  debugger
   addOrUpdateSingleDatum.apply(null, arguments)
 })
 

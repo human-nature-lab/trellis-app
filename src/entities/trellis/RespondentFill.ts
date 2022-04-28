@@ -4,12 +4,15 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class RespondentFill extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   respondentId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   name: string
-  @Column({ type: 'text' }) @Serializable
+
+  @Column('text') @Serializable
   val: string
 }

@@ -36,7 +36,7 @@
   import Vue from 'vue'
   import GeoType from '../../entities/trellis/GeoType'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import CRUDMenu from '../CRUDMenu'
+  import CRUDMenu from '../CRUDMenu.vue'
   export default Vue.extend({
     name: 'GeoTypeRow',
     mixins: [PermissionMixin],

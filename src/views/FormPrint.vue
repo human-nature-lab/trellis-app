@@ -72,7 +72,7 @@
   import Form from '../entities/trellis/Form'
   import TranslateMixin from '../mixins/TranslateMixin'
   import singleton from '../static/singleton'
-  import FormService from '../services/form/FormService'
+  import FormService from '../services/form'
   import LocaleSelector from '../components/LocaleSelector.vue'
   import TrellisModal from '../components/TrellisModal.vue'
   import DisplaySkipRow from '../components/skips/DisplaySkipRow.vue'

@@ -10,22 +10,24 @@
         @click="onClick"
         :photo="photo" />
       <v-card-actions class="respondent-name">
-        <v-layout row wrap>
-          <v-flex @click="onClick">
+        <v-row no-gutters class="align-center">
+          <v-col cols="12" sm="auto" @click="onClick">
             {{name}}
-          </v-flex>
+          </v-col>
           <v-spacer />
-          <v-btn
-            :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}"
-            icon>
-            <v-icon :large="$vuetify.breakpoint.smAndDown">mdi-form-select</v-icon>
-          </v-btn>
-          <v-btn
-            @click="showFullscreen = true"
-            icon>
-            <v-icon :large="$vuetify.breakpoint.smAndDown">mdi-fullscreen</v-icon>
-          </v-btn>
-        </v-layout>
+          <v-col cols="12" sm="auto">
+            <v-btn
+              :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}"
+              icon>
+              <v-icon :large="$vuetify.breakpoint.smAndDown">mdi-form-select</v-icon>
+            </v-btn>
+            <v-btn
+              @click="showFullscreen = true"
+              icon>
+              <v-icon :large="$vuetify.breakpoint.smAndDown">mdi-fullscreen</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-card-actions>
       <v-card-text
         v-if="labels && labels.length">
@@ -46,10 +48,8 @@
 </template>
 
 <script lang="ts">
-  // @ts-ignore
-  import Photo from '../photo/Photo'
-  // @ts-ignore
-  import FullscreenPhoto from '../photo/FullscreenPhoto'
+  import Photo from '../photo/Photo.vue'
+  import FullscreenPhoto from '../photo/FullscreenPhoto.vue'
   import Respondent from '../../entities/trellis/Respondent'
   import Vue from 'vue'
   import global from '../../static/singleton'

@@ -1,6 +1,6 @@
 import formTypes from '../../static/form.types'
 import FormServiceInterface from './FormServiceInterface'
-import DatabaseService from '../database/DatabaseService'
+import DatabaseService from '../database'
 import StudyForm from '../../entities/trellis/StudyForm'
 import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'

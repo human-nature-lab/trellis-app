@@ -82,5 +82,3 @@ export class UserServiceWeb extends UserServiceAbstract {
   }
 
 }
-
-export default UserServiceWeb

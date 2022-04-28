@@ -9,19 +9,26 @@ import MomentTransformer from '../base/MomentTransformer'
 export class Interview extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   surveyId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   userId: string
+
   @Column({ type: 'datetime', transformer: MomentTransformer }) @Serializable @AsDate
   startTime: Date
+
   @Column({ type: 'datetime', nullable: true, transformer: MomentTransformer }) @Serializable @AsDate
   endTime: Date
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   latitude: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   longitude: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   altitude: string
   // @Column({ nullable: true }) @Serializable
   // previousInterviewId: string
@@ -36,7 +43,6 @@ export class Interview extends TimestampedSoftDelete {
   @OneToOne(type => User)
   @JoinColumn()
   user: User
-
 }
 
 export default Interview

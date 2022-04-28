@@ -8,7 +8,7 @@ import PT from '../../src/static/parameter.types'
 import uuidv4 from 'uuid/v4'
 export default function () {
 
-  function makeQuestion (questionType: string, questionParameters: [string | number, any][], values: (string | number)[], dkRf: boolean = null, dkRfVal?: string): Question {
+  function makeQuestion(questionType: string, questionParameters: [string | number, any][], values: (string | number)[], dkRf: boolean = null, dkRfVal?: string): Question {
     const id = uuidv4()
     const q = new Question().fromSnakeJSON({
       id,
@@ -96,13 +96,13 @@ export default function () {
       it('should handle required correctly', function () {
         let q = makeQuestion(QT.multiple_choice, [[PT.is_required, false]], [])
         expect(validateParametersNew(q, q.questionParameters, q.datum)).to.be.true
-        let q = makeQuestion(QT.multiple_choice, [], [])
+        q = makeQuestion(QT.multiple_choice, [], [])
         expect(validateParametersNew(q, q.questionParameters, q.datum)).to.not.be.true
       })
       it('should have read_only override other parameters', function () {
-        const q = makeQuestion(QT.multiple_select, [[PT.read_only, true], [PT.is_required, true]], [])
+        let q = makeQuestion(QT.multiple_select, [[PT.read_only, true], [PT.is_required, true]], [])
         expect(validateParametersNew(q, q.questionParameters, q.datum)).to.be.true
-        const q = makeQuestion(QT.geo, [[PT.read_only, true], [PT.is_required, false], [PT.min_geos, 10]], [])
+        q = makeQuestion(QT.geo, [[PT.read_only, true], [PT.is_required, false], [PT.min_geos, 10]], [])
         expect(validateParametersNew(q, q.questionParameters, q.datum)).to.be.true
       })
       it(`should have Don't know and Refused responses override other parameters`, function () {

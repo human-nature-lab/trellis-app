@@ -11,7 +11,7 @@
 </template>
 
 <script>
-  import RespondentGeos from '../../respondent/RespondentGeos'
+  import RespondentGeos from '../../respondent/RespondentGeos.vue'
   import AT from '../../../static/action.types'
   import ActionMixin from '../mixins/ActionMixin'
   import global from '../../../static/singleton'

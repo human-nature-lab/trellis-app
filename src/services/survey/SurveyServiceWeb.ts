@@ -1,7 +1,7 @@
 import http from '../http/AxiosInstance'
 import SurveyServiceInterface from './SurveyServiceInterface'
 import Survey from '../../entities/trellis/Survey'
-export default class SurveyServiceWeb implements SurveyServiceInterface {
+export class SurveyServiceWeb implements SurveyServiceInterface {
 
   async getSurveyById (surveyId: string): Promise<Survey> {
     surveyId = encodeURIComponent(surveyId)

@@ -141,16 +141,16 @@
 </template>
 
 <script>
-  import StudyService from '../../services/study/StudyService'
-  import GeoService from '../../services/geo/GeoService'
+  import StudyService from '../../services/study'
+  import GeoService from '../../services/geo'
   import CensusFormService from '../../services/census/index'
   import censusTypes from '../../static/census.types'
-  import PhotoAlbum from '../photo/PhotoAlbum'
+  import PhotoAlbum from '../photo/PhotoAlbum.vue'
   import TranslationTextField from '../TranslationTextField.vue'
   import GeoTypeSelector from './GeoTypeSelector.vue'
   import { routeQueue } from '../../router'
-  import { getCurrentPosition } from '../LocationFinder'
-  import isNumber from 'lodash/isNumber'
+  import { getCurrentPosition } from '../LocationFinder.vue'
+  import { isNumber } from 'lodash'
   import global from '../../static/singleton'
 
   export default {

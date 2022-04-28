@@ -27,7 +27,7 @@
 </template>
 
 <script>
-  import ModalTitle from '../ModalTitle'
+  import ModalTitle from '../ModalTitle.vue'
   import ConditionTagService from '../../services/condition-tag'
   export default {
     components: {ModalTitle},

@@ -81,9 +81,9 @@
               <v-list-item-title>
                 {{ $t('displaying_first_results',[defaultSearchResultsLimit]) }}
               </v-list-item-title>
-              <v-list-item-sub-title>
+              <v-list-item-title>
                 {{ $t('use_search_field_results') }}
-              </v-list-item-sub-title>
+              </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -104,10 +104,10 @@
 </template>
 
 <script>
-  import GeoListTile from './GeoListTile'
-  import Cart from '../Cart'
-  import debounce from 'lodash/debounce'
-  import GeoService from '../../services/geo/GeoService'
+  import GeoListTile from './GeoListTile.vue'
+  import Cart from '../Cart.vue'
+  import { debounce } from 'lodash'
+  import GeoService from '../../services/geo'
   import TranslationService from '../../services/TranslationService'
   import singleton from '../../static/singleton'
   import { routeQueue } from '../../router'

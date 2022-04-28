@@ -2,8 +2,8 @@ import './globals'
 import {expect} from 'chai'
 
 import User from '../../src/entities/trellis/User'
-import UserServiceCordova from '../../src/services/user/UserServiceCordova'
-import UserServiceWeb from '../../src/services/user/UserServiceWeb'
+import { UserServiceCordova } from '../../src/services/user/UserServiceCordova'
+import { UserServiceWeb } from '../../src/services/user/UserServiceWeb'
 
 export default function () {
   let userCordova = new UserServiceCordova()

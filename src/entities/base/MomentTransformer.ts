@@ -1,13 +1,13 @@
 import { ValueTransformer } from 'typeorm/decorator/options/ValueTransformer'
-import moment, { isDate, isMoment, Moment } from 'moment'
+import moment, { Moment } from 'moment'
 import { FindOperator } from 'typeorm'
 
 export class MomentTransformer implements ValueTransformer {
   to (date: Moment | any) {
     if (date == null) return date
-    else if (isMoment(date)) {
+    else if (moment.isMoment(date)) {
       return date.toDate()
-    } else if (isDate(date)) {
+    } else if (moment.isDate(date)) {
       return date
     } else if (date instanceof FindOperator) {
       return date
@@ -16,6 +16,7 @@ export class MomentTransformer implements ValueTransformer {
       return date
     }
   }
+
   from (date: Date) {
     if (date === null || date === undefined) {
       return null
@@ -23,6 +24,5 @@ export class MomentTransformer implements ValueTransformer {
     return moment(date)
   }
 }
-
 
 export default new MomentTransformer()

@@ -171,7 +171,7 @@
   import PapaParse from 'papaparse'
   import { saveAs } from 'file-saver'
   import { QueryPersistMixin } from '../../mixins/QueryPersistMixin'
-  import debounce from 'lodash/debounce'
+  import { debounce } from 'lodash'
   import Geo from '../../entities/trellis/Geo'
 
   export default Vue.extend({

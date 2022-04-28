@@ -13,7 +13,7 @@
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import PT from '../../../static/parameter.types'
-  import Choice from './Choice'
+  import Choice from './Choice.vue'
   export default {
     components: {Choice},
     props: {

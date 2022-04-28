@@ -4,10 +4,12 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 
 @Entity()
 export default class StudyLocale extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   studyId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   localeId: string
 }

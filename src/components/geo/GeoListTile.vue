@@ -34,7 +34,7 @@
 <script>
   import TranslationMixin from '../../mixins/TranslationMixin'
   import { routeQueue } from '../../router'
-  import Photo from '../photo/Photo'
+  import Photo from '../photo/Photo.vue'
   import Geo from '../../entities/trellis/Geo'
   export default {
     name: 'geo-list-tile',

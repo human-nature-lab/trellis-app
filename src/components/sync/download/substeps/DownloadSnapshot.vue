@@ -12,11 +12,11 @@
 </template>
 
 <script>
-    import FileService from '../../../../services/file/FileService'
-    import DeviceService from '../../../../services/device/DeviceService'
-    import DatabaseService from '../../../../services/database/DatabaseService'
+    import FileService from '../../../../services/file'
+    import DeviceService from '../../../../services/device'
+    import DatabaseService from '../../../../services/database'
     import SyncSubStep from '../../SyncSubStep.vue'
-    import LoggingService, { defaultLoggingService } from '../../../../services/logging/LoggingService'
+    import LoggingService, { defaultLoggingService } from '../../../../services/logging'
     import { getSyncAuthentication } from '../../../../services/http/AxiosInstance'
     export default {
       name: 'download-snapshot',

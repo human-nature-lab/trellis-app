@@ -1,9 +1,9 @@
 <template>
   <v-card class="question" :question-id="question.id">
-    <v-card-title class="primary question-title white--text flex justify-end">
-      <v-flex sm6 class="text-right">
+    <v-card-title class="primary question-title white--text flex justify-end py-0">
+      <v-col cols="12" class="text-right">
         {{question.varName}} : {{question.questionType.name}}
-      </v-flex>
+      </v-col>
     </v-card-title>
     <v-alert color="error" v-show="validationError" transition="slide-y-transition">
       {{validationError}}
@@ -20,7 +20,7 @@
         :is="currentQuestionComponent"
         :question="question"
         :location="location"
-        :disabled="disabled"
+        :disabled="disabled || hasDkRf"
         :respondent="interview.survey.respondent"></div>
     </v-card-text>
     <v-card-actions v-if="question.type.name !== 'intro'">
@@ -35,7 +35,7 @@
 <script lang="ts">
   // This parent component servers the purpose of handling general functionality that is used across all questions.
   // For example, question title and message fills will be applied here. The question header text will be applied here
-  import Vue, { PropOptions } from 'Vue'
+  import Vue, { PropOptions } from 'vue'
   import DontKnowRefused from './DontKnowRefused.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
   import TranslationMixin from '../../mixins/TranslationMixin'
@@ -166,6 +166,9 @@
         if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return true
         const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.show_timer_controls)
         return questionParameter ? !!questionParameter.val : true
+      },
+      hasDkRf (): boolean {
+        return this.question.dkRf !== null && this.question.dkRf !== undefined
       }
     }
   }

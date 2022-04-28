@@ -1,5 +1,4 @@
 import Emitter from '../../../classes/Emitter'
-import Question from '../../../entities/trellis/Question'
 import { now } from '../../../services/DateService'
 import QuestionDatumRecycler from '../services/recyclers/QuestionDatumRecycler'
 import DatumRecycler from '../services/recyclers/DatumRecycler'
@@ -14,13 +13,15 @@ import SectionConditionTag from '../../../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../../../entities/trellis/SurveyConditionTag'
 import InterviewDataInterface, {
   ConditionTagInterface,
-  ConditionTagScope
+  ConditionTagScope,
 } from '../../../services/interview/InterviewDataInterface'
 import ConditionTag from '../../../entities/trellis/ConditionTag'
 import Action from '../../../entities/trellis/Action'
-import cloneDeep from 'lodash/cloneDeep'
-import InterviewService from '../../../services/interview/InterviewService'
+import { cloneDeep } from 'lodash'
+import InterviewService from '../../../services/interview'
 import { Mutex, MutexInterface } from 'async-mutex'
+import EdgeService from '../../../services/edge'
+import Edge from '../../../entities/trellis/Edge'
 
 export interface FindFunction<T> {
   (o: T, i?: number, a?: T[]): boolean
@@ -33,24 +34,27 @@ export interface FilterFunction<T> {
 const conditionTagScopes = [ConditionTagScope.RESPONDENT, ConditionTagScope.SURVEY, ConditionTagScope.SECTION]
 
 export default class DataStore extends Emitter {
-  private baseRespondentConditionTags: any[] = []
   public data: QuestionDatum[] = []
   public conditionTags: ConditionTagInterface = {
     [ConditionTagScope.RESPONDENT]: [],
     [ConditionTagScope.SECTION]: [],
-    [ConditionTagScope.SURVEY]: []
+    [ConditionTagScope.SURVEY]: [],
   }
-  private datumIdMap: Map<string, Datum> = new Map()
-  private questionDatumIdMap: Map<string, QuestionDatum> = new Map()
-  private questionDatumQuestionIdIndex: Map<string, QuestionDatum[]> = new Map()
-  private actionIdMap: Map<string, Datum> = new Map()
-  private followUpDatumIdMap: Map<string, Datum> = new Map()
+
+  public edges: Map<string, Edge> = EdgeService.cache
+  private extraEdgeIds = []
+  private baseRespondentConditionTags = []
+  private datumIdMap = new Map<string, Datum>()
+  private questionDatumIdMap = new Map<string, QuestionDatum>()
+  private questionDatumQuestionIdIndex = new Map<string, QuestionDatum[]>()
+  private actionIdMap = new Map<string, Datum>()
+  private followUpDatumIdMap= new Map<string, Datum>()
   private conditionTagStore: ConditionTagStore = cts
   private previousState!: InterviewDataInterface
   private mutex = new Mutex()
   private releaseMutex!: MutexInterface.Releaser
 
-  constructor (throttleRate = 10000) {
+  constructor () {
     super()
     this.reset()
     DatumRecycler.clear()
@@ -63,9 +67,25 @@ export default class DataStore extends Emitter {
   /**
    * Intitialize the datastore. Emits an initialState event to any subscribers
    */
-  initialize () {
+  async initialize () {
+    await this.preloadEdges()
     this.previousState = this.getState()
     this.emit('initialState', this.data)
+  }
+
+  async preloadEdges () {
+    const ids: string[] = []
+    for (const qd of this.data) {
+      for (const d of qd.data) {
+        if (d.edgeId) {
+          ids.push(d.edgeId)
+        }
+      }
+    }
+    ids.push(...this.extraEdgeIds)
+    if (ids.length) {
+      return EdgeService.getEdges(ids)
+    }
   }
 
   /**
@@ -88,7 +108,7 @@ export default class DataStore extends Emitter {
   private getState (): InterviewDataInterface {
     return cloneDeep({
       data: this.data,
-      conditionTags: this.conditionTags
+      conditionTags: this.conditionTags,
     })
   }
 
@@ -114,12 +134,19 @@ export default class DataStore extends Emitter {
    * @param data
    * @MOVE_TO_SERVICE_LAYER
    */
-  loadData (data: QuestionDatum[]) {
+  loadData (data: QuestionDatum[], actions?: Action[]) {
+    if (actions) {
+      for (const a of actions) {
+        if (a.payload.edge_id) {
+          this.extraEdgeIds.push(a.payload.edge_id)
+        }
+      }
+    }
     data = data.map(c => c.copy())
-    let datum = []
-    let questionDatum = []
+    const datum = []
+    const questionDatum = []
     for (let d of data) {
-      for (let dat of d.data) {
+      for (const dat of d.data) {
         this.datumIdMap.set(dat.id, dat)
         datum.push(dat)
       }
@@ -138,15 +165,15 @@ export default class DataStore extends Emitter {
    * @param {RespondentConditionTag[]} baseRespondentConditionTags - respondent condition tags that were not assigned by this form and should not be removed
    * @MOVE_TO_SERVICE_LAYER
    */
-  loadConditionTags (tags: any, baseRespondentConditionTags?: RespondentConditionTag[]) {
+  loadConditionTags (tags: ConditionTagInterface, baseRespondentConditionTags?: RespondentConditionTag[]) {
     if (baseRespondentConditionTags) {
       this.baseRespondentConditionTags = baseRespondentConditionTags
     } else if (tags && tags.respondent) {
       this.baseRespondentConditionTags = tags.respondent
     }
-    for (let type of conditionTagScopes) {
+    for (const type of conditionTagScopes) {
       if (this.conditionTags[type] && tags[type]) {
-        for (let tag of tags[type]) {
+        for (const tag of tags[type]) {
           this.addTag(type, tag)
         }
       }
@@ -174,7 +201,7 @@ export default class DataStore extends Emitter {
     this.emitChange()
   }
 
-  getDatumById (datumId: string): Datum|null {
+  getDatumById (datumId: string): Datum | null {
     for (let j = 0; j < this.data.length; j++) {
       for (let i = 0; i < this.data[j].data.length; i++) {
         if (this.data[j].data[i].id === datumId) {
@@ -191,7 +218,7 @@ export default class DataStore extends Emitter {
    */
   public getFollowUpActionId (questionId: string, sectionFollowUpDatumId: string, sectionRepetition: number): string {
     const questionData: QuestionDatum[] = this.questionDatumQuestionIdIndex.get(questionId)
-    let questionDatum = questionData.find(qd => qd.followUpDatumId === sectionFollowUpDatumId &&
+    const questionDatum = questionData.find(qd => qd.followUpDatumId === sectionFollowUpDatumId &&
       qd.sectionRepetition === sectionRepetition)
     if (!questionDatum) throw Error('Question datum id must be valid')
     const datum = this.datumIdMap.get(questionDatum.followUpDatumId)
@@ -202,7 +229,7 @@ export default class DataStore extends Emitter {
   public emitChange () {
     this.emit('change', {
       data: this.data,
-      conditionTags: this.conditionTags
+      conditionTags: this.conditionTags,
     })
   }
 
@@ -242,7 +269,7 @@ export default class DataStore extends Emitter {
     }
     // Update the sort order for remaining datum
     for (let i = datumIndex; i < questionDatum.data.length; i++) {
-      questionDatum.data[i].sortOrder = i;
+      questionDatum.data[i].sortOrder = i
     }
     this.emitChange()
     return removedData
@@ -285,7 +312,6 @@ export default class DataStore extends Emitter {
    * @param {ConditionTag} conditionTag
    */
   addTag (type: ConditionTagScope, tag: RespondentConditionTag | SectionConditionTag | SurveyConditionTag, conditionTag?: ConditionTag): void {
-    // @ts-ignore
     this.conditionTags[type].push(tag)
     if (tag.conditionTag) {
       this.conditionTagStore.add(tag.conditionTag)
@@ -304,7 +330,7 @@ export default class DataStore extends Emitter {
    * @param args
    * @returns {QuestionDatum | null}
    */
-  getSingleQuestionDatumByLocation (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string, ...args): QuestionDatum|undefined {
+  getSingleQuestionDatumByLocation (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string): QuestionDatum | undefined {
     return this.questionDatumQuestionIdIndex.get(questionId).find(qD =>
       qD.sectionRepetition === sectionRepetition &&
       qD.followUpDatumId === sectionFollowUpDatumId)
@@ -340,13 +366,13 @@ export default class DataStore extends Emitter {
    */
   public getAllConditionTagsForLocation (sectionRepetition: number, sectionFollowUpDatumId: string): ConditionTag[] {
     const tags = []
-    for (let rct of this.conditionTags.respondent) {
+    for (const rct of this.conditionTags.respondent) {
       tags.push(this.conditionTagStore.getTagById(rct.conditionTagId))
     }
-    for (let sct of this.conditionTags.survey) {
+    for (const sct of this.conditionTags.survey) {
       tags.push(this.conditionTagStore.getTagById(sct.conditionId))
     }
-    for (let sct of this.conditionTags.section) {
+    for (const sct of this.conditionTags.section) {
       if (sct.repetition === sectionRepetition &&
         sct.followUpDatumId === sectionFollowUpDatumId) {
         tags.push(this.conditionTagStore.getTagById(sct.conditionId))
@@ -384,10 +410,10 @@ export default class DataStore extends Emitter {
    * @returns {Array}
    */
   getQuestionDataByIds (questionIds: string[], sectionRepetition: number, sectionFollowUpDatumId: string): QuestionDatum[] {
-    let data = []
-    for (let id of questionIds) {
+    const data = []
+    for (const id of questionIds) {
       if (this.questionDatumQuestionIdIndex.has(id)) {
-        let qd = this.questionDatumQuestionIdIndex.get(id).find(qd => {
+        const qd = this.questionDatumQuestionIdIndex.get(id).find(qd => {
           return qd.sectionRepetition === sectionRepetition && qd.followUpDatumId === sectionFollowUpDatumId
         })
         if (qd) {
@@ -408,7 +434,8 @@ export default class DataStore extends Emitter {
   locationHasQuestionDatum (questionId: string, sectionRepetition: number, sectionFollowUpDatumId: string) {
     return this.data.findIndex(qD => {
       return this._locationMatchesQuestionDatum(qD, sectionRepetition, sectionFollowUpDatumId) &&
-        qD.questionId === questionId}
+        qD.questionId === questionId
+    },
     ) !== -1
   }
 
@@ -429,23 +456,25 @@ export default class DataStore extends Emitter {
    */
   hasConditionTag (name: string, sectionRepetition: number, followUpDatumId: string): boolean {
     for (const tag of this.conditionTags[ConditionTagScope.RESPONDENT]) {
-      if (tag.conditionTag && tag.conditionTag.name === name) {
+      const conditionTagName = this.conditionTagStore.getNameFromId(tag.conditionId)
+      if (conditionTagName === name) {
         return true
       }
     }
     for (const tag of this.conditionTags[ConditionTagScope.SURVEY]) {
-      if (tag.conditionTag && tag.conditionTag.name === name) {
+      const conditionTagName = this.conditionTagStore.getNameFromId(tag.conditionId)
+      if (conditionTagName === name) {
         return true
       }
     }
     for (const tag of this.conditionTags[ConditionTagScope.SECTION]) {
-      if (tag.repetition === sectionRepetition && tag.followUpDatumId === followUpDatumId) {
+      const conditionTagName = this.conditionTagStore.getNameFromId(tag.conditionId)
+      if (tag.repetition === sectionRepetition && tag.followUpDatumId === followUpDatumId && conditionTagName === name) {
         return true
       }
     }
     return false
   }
-
 }
 
 /**

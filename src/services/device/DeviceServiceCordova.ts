@@ -9,7 +9,7 @@ declare const cordova
 
 const deviceKeyKey = 'device-key'
 
-export default class DeviceServiceCordova implements DeviceServiceInterface {
+export class DeviceServiceCordova implements DeviceServiceInterface {
   private isReady: boolean = false
   private platform: string
   private uuid: string
@@ -26,10 +26,12 @@ export default class DeviceServiceCordova implements DeviceServiceInterface {
       return this.deviceKey
     }
     await this.isDeviceReady()
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Config)
     const entry = await repo.findOne({
-      name: deviceKeyKey
+      where: {
+        name: deviceKeyKey,
+      },
     })
     if (entry) {
       this.deviceKey = entry.val
@@ -123,7 +125,7 @@ export default class DeviceServiceCordova implements DeviceServiceInterface {
 
   async setDeviceKey (device: Device): Promise<void> {
     await this.isDeviceReady()
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Config)
     const entry = new Config()
     entry.name = deviceKeyKey
@@ -133,7 +135,7 @@ export default class DeviceServiceCordova implements DeviceServiceInterface {
   }
 
   async removeDeviceKey (): Promise<void> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Config)
     const entry = new Config()
     entry.name = deviceKeyKey

@@ -1,4 +1,4 @@
-import FormService from '@/services/form/FormService'
+import FormService from '@/services/form'
 
 describe(`FormService`, () => {
   it('service should be defined', () => {

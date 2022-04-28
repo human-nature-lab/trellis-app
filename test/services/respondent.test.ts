@@ -1,7 +1,7 @@
 import './globals'
 import {expect} from 'chai'
-import RespondentServiceCordova from "../../src/services/respondent/RespondentServiceCordova";
-import RespondentServiceWeb from "../../src/services/respondent/RespondentServiceWeb";
+import { RespondentServiceCordova } from "../../src/services/respondent/RespondentServiceCordova";
+import { RespondentServiceWeb } from "../../src/services/respondent/RespondentServiceWeb";
 import {geoId, respondentId} from "../testing-ids";
 import {deepCompareEntities} from "./helpers";
 import RespondentFill from "../../src/entities/trellis/RespondentFill";

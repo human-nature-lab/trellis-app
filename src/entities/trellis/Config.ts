@@ -4,12 +4,15 @@ import { Serializable } from '../decorators/WebOrmDecorators'
 
 @Entity()
 export default class Config extends BaseEntity {
-  @PrimaryColumn() @Serializable
+  @PrimaryColumn('uuid') @Serializable
   key: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   value: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   type: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   defaultValue: string
 }

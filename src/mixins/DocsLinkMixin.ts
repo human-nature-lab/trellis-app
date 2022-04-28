@@ -1,4 +1,4 @@
-import config from 'config'
+import config from '../config'
 import global from '../static/singleton'
 import bus, {DocsEventTypes} from '../components/documentation/DocsEventBus'
 

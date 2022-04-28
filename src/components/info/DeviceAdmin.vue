@@ -19,7 +19,7 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import DeviceService from '../../services/device/DeviceService'
+  import DeviceService from '../../services/device'
   import TrellisLoadingCircle from '../TrellisLoadingCircle.vue'
 
   export default Vue.extend({

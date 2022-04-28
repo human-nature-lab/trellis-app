@@ -1,37 +1,43 @@
-// @ts-ignore
-import translations from './translations.csv'
 import VueI18n from 'vue-i18n'
 import Vue from 'vue'
+import en from './en.json'
 Vue.use(VueI18n)
 
-let locales = translations.shift().filter(t => t !== 'key' && t !== 'comment')
+const langMap = {
+  en: () => import('./en.json'),
+  es: () => import('./es.json'),
+}
 
-// Transform the translations into the required format for the vue-index plugin
-/**
- * {
- *    en: {
- *      title: 'Trellis'
- *    },
- *    es: {
- *      title: 'Trellis'
- *    }
- * }
- */
-let messages = locales.reduce((agg, l) => {
-  agg[l] = {}
-  return agg
-}, {})
-messages = translations.reduce((trans, t) => {
-  for (let i = 0; i < locales.length; i++) {
-    if (t[i + 1]) {
-      trans[locales[i]][t[0]] = t[i + 1]
-    }
-  }
-  return trans
-}, messages)
-
-export default new VueI18n({
+export const i18n = new VueI18n({
   locale: 'en',
   fallbackLocale: 'en',
-  messages
+  messages: {
+    en,
+  }
 })
+
+const loadedLanguages = ['en']
+
+function setI18nLanguage(lang) {
+  i18n.locale = lang
+  // axios.defaults.headers.common['Accept-Language'] = lang
+  document.querySelector('html').setAttribute('lang', lang)
+  return lang
+}
+
+export function loadLanguageAsync(lang: string) {
+  // If the language was already loaded or the same language
+  if (loadedLanguages.includes(lang) || i18n.locale === lang) {
+    return Promise.resolve(setI18nLanguage(lang))
+  }
+
+  if (lang in langMap) {
+    return langMap[lang]().then(messages => {
+      i18n.setLocaleMessage(lang, messages.default)
+      loadedLanguages.push(lang)
+      return setI18nLanguage(lang)
+    })
+  } else {
+    throw new Error('unsupported language ' + lang)
+  }
+}

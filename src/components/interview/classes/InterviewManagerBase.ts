@@ -8,9 +8,9 @@ import Question from '../../../entities/trellis/Question'
 import QuestionDatum from '../../../entities/trellis/QuestionDatum'
 import Page from '../../../entities/trellis/QuestionGroup'
 import Section from '../../../entities/trellis/Section'
-import ConditionAssignmentService from '../../../services/ConditionAssignmentService'
+import SaferEvalService from '../../../services/SaferEvalService'
 import { ConditionTagScope } from '../../../services/interview/InterviewDataInterface'
-import { defaultLoggingService as logger } from '../../../services/logging/LoggingService'
+import { defaultLoggingService as logger } from '../../../services/logging'
 import QT from '../../../static/question.types'
 import InterviewAlligator, { InterviewLocation } from '../services/InterviewAlligator'
 import FormConditionTagRecycler from '../services/recyclers/FormConditionTagRecycler'
@@ -32,7 +32,7 @@ export default class InterviewManagerBase extends Emitter {
 
   // Indexes and data stores
   protected respondentFills: RespondentFillStore = new RespondentFillStore()
-  protected conditionAssigner: ConditionAssignmentService = new ConditionAssignmentService()
+  protected conditionAssigner = new SaferEvalService()
   protected varNameIndex: Map<string, string> = new Map()
   protected questionIdToSectionIndex: Map<string, Section> = new Map()
   protected questionIdToPageIndex: Map<string, Page> = new Map()
@@ -81,6 +81,9 @@ export default class InterviewManagerBase extends Emitter {
         })
         for (let question of page.questions) {
           question.varName = question.varName.trim()
+          if (this.varNameIndex.has(question.varName)) {
+            throw new Error(`The var_name "${question.varName}" occurs more than once in this form. Make sure all variables are unique.`)
+          }
           this.varNameIndex.set(question.varName, question.id)
           this.questionIndex.set(question.id, question)
           if (question.choices) {

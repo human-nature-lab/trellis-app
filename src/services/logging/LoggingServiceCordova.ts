@@ -1,12 +1,12 @@
 import AlertService from '../../services/AlertService'
 import LoggingServiceAbstract from './LoggingServiceAbstract'
 import Log from '../../entities/trellis-config/Log'
-import throttle from 'lodash/throttle'
+import { throttle } from 'lodash'
 import { LoggingLevel, LogRequest } from './LoggingTypes'
 import { IsNull, Not } from 'typeorm'
 import { Mutex, MutexInterface } from 'async-mutex'
 
-class LoggingServiceCordova extends LoggingServiceAbstract {
+export class LoggingServiceCordova extends LoggingServiceAbstract {
 
   private queue: Log[] = []
   private save: Function
@@ -40,7 +40,7 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
     }
     console.info(`writing ${saving.length} logs to disk`)
     let succeeded = false
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     try {
       const connection = await DatabaseService.getConfigDatabase()
       await connection.manager.save(saving)
@@ -80,7 +80,7 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async getLogPage (page: number, limit: number, sortBy?: string, descending?: boolean): Promise<Log[]> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     let order = sortBy ? {
       [sortBy]: descending ? 'DESC' : 'ASC'
@@ -93,13 +93,13 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async getLogCount (): Promise<number> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.count()
   }
 
   public async getUploadedCount (): Promise<number> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.count({
       uploadedAt: Not(IsNull())
@@ -107,11 +107,10 @@ class LoggingServiceCordova extends LoggingServiceAbstract {
   }
 
   public async deleteUploaded (): Promise<void> {
-    const DatabaseService = (await import('../database/DatabaseService')).default
+    const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Log)
     return repo.delete()
   }
 
 }
 
-export default LoggingServiceCordova

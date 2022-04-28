@@ -5,18 +5,23 @@ import Section from './Section'
 import Skip from './Skip'
 import Translation from './Translation'
 import StudyForm from './StudyForm'
+import Question from './Question'
 
 @Entity()
 export default class Form extends TimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   formMasterId: string
-  @Column({ select: false }) @Serializable
+
+  @Column({ select: false, type: 'uuid' }) @Serializable
   nameTranslationId: string
-  @Column({type: 'integer'}) @Serializable
+
+  @Column({ type: 'integer' }) @Serializable
   version: number
-  @Column() @Serializable
+
+  @Column('boolean') @Serializable
   isPublished: boolean
 
   @Relationship(type => Section)
@@ -30,7 +35,7 @@ export default class Form extends TimestampedSoftDelete {
   skips: Skip[]
 
   @Relationship(type => Translation)
-  @OneToOne(type => Translation, {eager: true})
+  @OneToOne(type => Translation, { eager: true })
   @JoinColumn()
   nameTranslation: Translation
 
@@ -41,11 +46,11 @@ export default class Form extends TimestampedSoftDelete {
   // Inverse relationships
   @OneToOne(type => Form)
   form: Form
-  
+
   @Relationship(type => Form)
   versions: Form[]
 
-  fromSnakeJSON(json: any) {
+  fromSnakeJSON (json: any) {
     super.fromSnakeJSON(json)
     if (this.versions) {
       this.versions.sort((a, b) => b.version - a.version)
@@ -54,5 +59,37 @@ export default class Form extends TimestampedSoftDelete {
     // and all of them are interpreted correctly by this statement
     this.isPublished = !!+this.isPublished
     return this
+  }
+
+  sort () {
+    this.sections.sort((a, b) => {
+      return a.formSections[0].sortOrder - b.formSections[0].sortOrder
+    })
+    for (const section of this.sections) {
+      section.questionGroups.sort((a, b) => {
+        return a.sectionQuestionGroup.questionGroupOrder - b.sectionQuestionGroup.questionGroupOrder
+      })
+      for (const page of section.questionGroups) {
+        page.questions.sort((a, b) => a.sortOrder - b.sortOrder)
+        page.skips.sort((a, b) => a.precedence - b.precedence)
+        for (const question of page.questions) {
+          if (question.choices) {
+            question.choices.sort((a, b) => a.sortOrder - b.sortOrder)
+          }
+        }
+      }
+    }
+  }
+
+  varNameQuestionMap () {
+    const m = new Map<string, Question>()
+    for (const section of this.sections) {
+      for (const page of section.pages) {
+        for (const question of page.questions) {
+          m.set(question.varName, question)
+        }
+      }
+    }
+    return m
   }
 }

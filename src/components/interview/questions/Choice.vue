@@ -31,8 +31,8 @@
 <script>
   import AT from '../../../static/action.types'
   import ActionMixin from '../mixins/ActionMixin'
-  import ChoiceText from './ChoiceText'
-  import RadioCheckbox from './RadioCheckbox'
+  import ChoiceText from './ChoiceText.vue'
+  import RadioCheckbox from './RadioCheckbox.vue'
 
   export default {
     name: 'choice',

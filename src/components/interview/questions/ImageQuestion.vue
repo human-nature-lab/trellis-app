@@ -9,9 +9,9 @@
 </template>
 
 <script>
-  import PhotoAlbum from '../../photo/PhotoAlbum'
+  import PhotoAlbum from '../../photo/PhotoAlbum.vue'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
-  import PhotoService from '../../../services/photo/PhotoService'
+  import PhotoService from '../../../services/photo'
   import ActionMixin from '../mixins/ActionMixin'
   import AT from '../../../static/action.types'
 

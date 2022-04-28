@@ -1,5 +1,5 @@
-import FileService from '../file/FileService'
-import DatabaseService from '../database/DatabaseService'
+import FileService from '../file'
+import DatabaseService from '../database'
 import Photo from '../../entities/trellis/Photo'
 import uuid from 'uuid/v4'
 import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'
@@ -10,7 +10,7 @@ declare global {
   interface Window {ImageResizer: any}
 }
 
-export default class PhotoServiceCordova extends PhotoServiceAbstract {
+export class PhotoServiceCordova extends PhotoServiceAbstract {
 
   async getPhotosByIds (photoIds: string[]): Promise<Photo[]> {
     if (!photoIds.length) return []
@@ -68,7 +68,6 @@ export default class PhotoServiceCordova extends PhotoServiceAbstract {
   resize (uri: string, quality: number): Promise<string> {
     return new Promise((resolve, reject) => {
       window.ImageResizer.resize({uri, quality}, resolve, err => {
-        debugger
         reject('Failed to resize the image ' + JSON.stringify(err))
       })
     })

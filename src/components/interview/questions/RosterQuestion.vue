@@ -156,7 +156,7 @@
 
 <script>
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
-  import RosterService from '../../../services/roster/RosterService'
+  import RosterService from '../../../services/roster'
   import ActionMixin from '../mixins/ActionMixin'
   import BarcodeMixin from '../mixins/BarcodeMixin'
   import AT from '../../../static/action.types'

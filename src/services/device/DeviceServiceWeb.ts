@@ -4,7 +4,7 @@ import { uriTemplate } from '../http/WebUtils'
 import DeviceServiceInterface from './DeviceServiceInterface'
 import Device from '../../entities/trellis/Device'
 
-export default class DeviceServiceWeb implements DeviceServiceInterface {
+export class DeviceServiceWeb implements DeviceServiceInterface {
   async getUUID (): Promise<string> {
     return null
   }

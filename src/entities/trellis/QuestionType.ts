@@ -5,9 +5,10 @@ import Question from './Question'
 
 @Entity()
 export default class QuestionType extends SparseTimestampedSoftDelete {
-  @PrimaryGeneratedColumn() @Serializable
+  @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
 
   @OneToMany(type => Question, q => q.questionType)

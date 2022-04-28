@@ -16,11 +16,13 @@ interface SurveyConditionTagRecyclerData {
 
 @Entity()
 export default class SurveyConditionTag extends TimestampedSoftDelete implements SnakeSerializable {
-  @PrimaryColumn() @Serializable
+  @PrimaryColumn('uuid') @Serializable
   id: string;
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   surveyId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   conditionId: string
   // Future
   // @Column() @Serializable
@@ -28,7 +30,7 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
 
   @Relationship({
     constructor: () => ConditionTag,
-    jsonKey: 'condition'
+    jsonKey: 'condition',
   })
   @OneToOne(type => ConditionTag, { eager: true })
   @JoinColumn({ name: 'condition_id' })
@@ -40,7 +42,7 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
    * @returns {this}
    */
   fromRecycler (data: SurveyConditionTagRecyclerData) {
-    for (let key in data) {
+    for (const key in data) {
       if (data[key] !== undefined) {
         this[key] = data[key]
       }
@@ -55,7 +57,7 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
   }
 
   copy () {
-    let s = new SurveyConditionTag()
+    const s = new SurveyConditionTag()
     s.id = this.id
     s.surveyId = this.surveyId
     s.conditionId = this.conditionId
@@ -64,5 +66,4 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
     s.deletedAt = this.deletedAt
     return s
   }
-
 }

@@ -1,6 +1,6 @@
-import DatabaseService from '../database/DatabaseService'
-import config from 'config'
-import DeviceService from '../device/DeviceService'
+import DatabaseService from '../database'
+import config from '../../config'
+import DeviceService from '../device'
 
 declare const FileTransfer
 

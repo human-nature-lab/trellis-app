@@ -12,22 +12,27 @@ import { LazyQuery } from '../decorators/QueryDecorator'
 import Survey from './Survey'
 import Edge from './Edge'
 
-
 @Entity()
 export default class Respondent extends TimestampedSoftDelete implements SnakeSerializable {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   assignedId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   geoId: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   notes: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'text' }) @Serializable
   geoNotes: string
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   name: string
-  @Column({ nullable: true }) @Serializable
+
+  @Column({ nullable: true, type: 'uuid' }) @Serializable
   associatedRespondentId: string
 
   @Relationship(type => RespondentGeo)
@@ -44,10 +49,10 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   photos: Photo[]
 
   @Relationship({ generator: rctGenerator, async: true })
-  @LazyQuery(RespondentConditionTag, (repo, respondent) => {
+  @LazyQuery(type => RespondentConditionTag, (repo, respondent) => {
     return repo.find({
       respondentId: respondent.id,
-      deletedAt: null
+      deletedAt: null,
     })
   }, { cached: false })
   respondentConditionTags: Promise<RespondentConditionTag[]>
@@ -58,20 +63,19 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
 
   @OneToMany(type => Edge, edge => edge.sourceRespondent)
   sourceEdges: Edge[]
+
   @OneToMany(type => Edge, edge => edge.targetRespondent)
   targetEdges: Edge[]
-
-
 }
 
 function geoGenerator (geo) {
-  let g = new RespondentGeo().fromSnakeJSON(geo.pivot)
+  const g = new RespondentGeo().fromSnakeJSON(geo.pivot)
   g.geo = new Geo().fromSnakeJSON(geo)
   return g
 }
 
 function rctGenerator (tag) {
-  let rc = new RespondentConditionTag().fromSnakeJSON(tag.pivot)
+  const rc = new RespondentConditionTag().fromSnakeJSON(tag.pivot)
   rc.conditionTag = new ConditionTag().fromSnakeJSON(tag)
   return rc
 }

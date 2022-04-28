@@ -4,12 +4,12 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Respondent from './Respondent'
 import Geo from './Geo'
 
-@Entity("photo")
+@Entity('photo')
 export default class Photo extends TimestampedSoftDelete {
-  @PrimaryColumn() @Serializable
+  @PrimaryColumn('uuid') @Serializable
   id: string;
 
-  @Column() @Serializable
+  @Column('text') @Serializable
   fileName: string;
 
   @ManyToMany(type => Respondent, respondent => respondent.photos)

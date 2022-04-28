@@ -1,29 +1,21 @@
 import { Mutex } from 'async-mutex'
 import Vue from 'vue'
-import Router, { RouteConfig } from 'vue-router'
-import { defaultLoggingService as logger } from '../services/logging/LoggingService'
+import Router from 'vue-router'
+import { defaultLoggingService as logger } from '../services/logging'
 import singleton from '../static/singleton'
 import SyncGuard from './guards/SyncGuard'
 import LoginGuard from './guards/LoginGuard'
 import { guardQueue } from './GuardQueue'
 
-import appRoutes from './app.routes'
+import routes from './routes'
 import { RouteQueue } from './RouteQueue'
-import webRoutes from './web.routes'
-import sharedRoutes from './shared.routes'
 import { LoggingLevel } from '../services/logging/LoggingTypes'
-// @ts-ignore
-import { AddSnack } from '../components/SnackbarQueue'
-import PhotoService from '../services/photo/PhotoService'
-
-let routes = sharedRoutes
-if (singleton.offline) {
-  routes = routes.concat(appRoutes)
-} else {
-  routes = routes.concat(webRoutes)
-}
+import { AddSnack } from '../components/SnackbarQueue.vue'
+import PhotoService from '../services/photo'
 
 Vue.use(Router)
+
+console.log('routes', routes)
 
 export const router = new Router({
   routes,
@@ -50,7 +42,7 @@ if (singleton.offline) {
 }
 
 // Always require we're logged in
-router.beforeEach(guardQueue([LoginGuard]))
+// router.beforeEach(guardQueue([LoginGuard]))
 
 router.beforeEach((to, from, next) => {
   // Don't let photo requests prevent navigation from happening by cancelling outstanding requests
@@ -70,6 +62,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to) => {
   singleton.loading.active = false
+  console.log('to', to)
   logger.log({
     component: 'router/index.js@afterEach',
     message: `after navigating to: ${to.fullPath}`,
@@ -86,6 +79,7 @@ router.onReady(() => {
 })
 
 router.onError(err => {
+  console.error(err)
   err.severity = LoggingLevel.error
   err.component = err.component ? err.component : 'router/index.js@onError'
   logger.log(err)
@@ -122,7 +116,7 @@ export function routerReady () {
       isReady = true
       clearInterval(intervalId)
       resolve(false)
-    }, 5000)
+    }, 1000)
     check()
   })
 }

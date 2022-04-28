@@ -1,7 +1,12 @@
-import requireAll from '../../classes/requireAll'
+const docs = import.meta.glob('../../../docs/**/*.md')
 
-const docs = requireAll(require.context('../../../docs/', true, /\.md$/))
+for (const key in docs) {
+  const newKey = key.replace('../../../docs/', '')
+  docs[newKey] = docs[key]
+  delete docs[key]
+}
+
 export default {
   names: Object.keys(docs),
-  content: docs
+  content: docs,
 }

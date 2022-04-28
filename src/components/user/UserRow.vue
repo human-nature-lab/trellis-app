@@ -30,11 +30,11 @@
   import Vue from 'vue'
   import User from '../../entities/trellis/User'
   import PermissionMixin from '../../mixins/PermissionMixin'
-  import StudyService from '../../services/study/StudyService'
-  import UserService from '../../services/user/UserService'
+  import StudyService from '../../services/study'
+  import UserService from '../../services/user'
   import global from '../../static/singleton'
   import IsAdminMixin from '../../mixins/IsAdminMixin'
-  import CRUDMenu from '../CRUDMenu'
+  import CRUDMenu from '../CRUDMenu.vue'
 
   export default Vue.extend({
     name: 'UserRow',

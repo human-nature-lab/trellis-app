@@ -9,7 +9,7 @@ import Photo from '../../entities/trellis/Photo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
 import { uriTemplate } from '../http/WebUtils'
-export default class RespondentServiceWeb implements RespondentServiceInterface {
+export class RespondentServiceWeb implements RespondentServiceInterface {
 
   async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     throw new Error("Can't add respondent photo yet") // TODO: Respondent photo web

@@ -26,38 +26,54 @@ export interface DatumRecyclerData {
 
 @Entity()
 export default class Datum extends TimestampedSoftDelete implements SnakeSerializable {
-  @Column() @Serializable
+  @Column('uuid') @Serializable
   public choiceId: string;
-  @Column() @Serializable
-  public datumTypeId: string = '0';
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
+  public datumTypeId = '0';
+
+  @Column('uuid') @Serializable
   public edgeId: string;
-  @Column({type: 'integer'}) @Serializable
+
+  @Column({ type: 'integer' }) @Serializable
   public eventOrder: number;
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public geoId: string;
-  @PrimaryColumn() @Serializable
+
+  @PrimaryColumn('uuid') @Serializable
   public id: string;
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   public name: string;
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public photoId: string;
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public questionDatumId: string;
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public respondentGeoId: string
-  @Column() @Serializable
-  public  respondentNameId: string
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
+  public respondentNameId: string
+
+  @Column('uuid') @Serializable
   public rosterId: string;
-  @Column({type: 'integer'}) @Serializable
+
+  @Column({ type: 'integer' }) @Serializable
   public sortOrder: number;
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public surveyId: string;
-  @Column() @Serializable
+
+  @Column('text') @Serializable
   public val: string;
-  @Column() @Serializable
+
+  @Column('uuid') @Serializable
   public actionId: string
+
   @Column({ type: 'integer' }) @Serializable
   public randomSortOrder: number
 
@@ -69,10 +85,10 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
    * @param {DatumRecyclerData} data
    * @returns {this}
    */
-  fromRecycler (data: DatumRecyclerData){
+  fromRecycler (data: DatumRecyclerData) {
     this.id = uuidv4()
     this.createdAt = now()
-    for (let key in data) {
+    for (const key in data) {
       if (data[key] !== undefined) {
         this[key] = data[key]
       }
@@ -81,7 +97,7 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   }
 
   copy () {
-    let d = new Datum()
+    const d = new Datum()
     d.actionId = this.actionId
     d.choiceId = this.choiceId
     d.datumTypeId = this.datumTypeId
