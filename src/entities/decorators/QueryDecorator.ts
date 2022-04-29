@@ -41,11 +41,13 @@ function cached (cb: Function): Function {
 }
 
 export function LazyQuery (type: any, queryCallback: QueryCallback<typeof type>, opts: AsyncQueryOptions = defaultOptions) {
+  let alreadyEvaluatedGenerator = false
   return function (target: any, propertyKey: string): any {
     async function defaultGetter (this: typeof type) {
       const DatabaseService = (await import('../../services/database')).default
-      if (type instanceof Function) {
+      if (!alreadyEvaluatedGenerator && type instanceof Function) {
         type = type()
+        alreadyEvaluatedGenerator = true
       }
       const repo = await DatabaseService.getRepository(type)
       console.log('Running async query for', type, propertyKey)
