@@ -69,7 +69,7 @@ jobs:
         continue-on-error: true
         run: |
           npm run mobile
-          cordova prepare
+          npx cordova prepare
           npm run release:webpack:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       

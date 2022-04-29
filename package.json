@@ -17,7 +17,6 @@
     "build:web": "cross-env NODE_ENV=production npm run web",
     "build:dev:android": "npm run build:vite && cordova run android",
     "build:dev:web": "npm run build:vite",
-    "prepare": "npx cordova prepare",
     "release:vite": "npm run compile && vite build --mode production",
     "release:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run release:vite && cordova build android",
     "release:run:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run release:vite && cordova run android",
