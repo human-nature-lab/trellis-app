@@ -111,6 +111,17 @@ jobs:
 #           asset_path: ./trellis-dev.apk
 #           asset_name: trellis-dev.apk
 #           asset_content_type: application/octet-stream
+
+      - name: Upload web bundle
+        id: upload-web-bundle
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./trellis-web.zip
+          asset_name: trellis-web.zip
+          asset_content_type: application/zip
         
       - name: Upload debug APK
         id: upload-debug-apk
@@ -123,13 +134,4 @@ jobs:
           asset_name: trellis-debug.apk
           asset_content_type: application/octet-stream
       
-      - name: Upload web bundle
-        id: upload-web-bundle
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./trellis-web.zip
-          asset_name: trellis-web.zip
-          asset_content_type: application/zip
+
