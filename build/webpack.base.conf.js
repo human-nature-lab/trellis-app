@@ -40,6 +40,9 @@ function urlLoader (dirName) {
 }
 
 const isProd = process.env.NODE_ENV === 'production'
+const liveReload = !isProd
+// const isProd = false
+// const liveReload = false
 const sourceMap = true
 const useSentry = isProd && fs.existsSync('.sentryclirc')
 console.log('building', isProd ? 'prod' : 'dev', useSentry ? 'with sentry' : 'without sentry')
@@ -76,7 +79,7 @@ const plugins = [
     VERSION: JSON.stringify(require('../package').version),
   }),
   new VueLoaderPlugin(),
-  new webpack.NormalModuleReplacementPlugin(/^typeorm/, function (result) {
+  new webpack.NormalModuleReplacementPlugin(/typeorm$/, function (result) {
     result.request = result.request.replace(/typeorm/, 'typeorm/browser')
   }),
   new BundleAnalyzerPlugin({
@@ -94,7 +97,6 @@ const plugins = [
   new MiniCssExtractPlugin({
     filename: '[name].[contenthash].css',
   }),
-
   // new ForkTsCheckerWebpackPlugin({
   //   typescript: {
   //     extensions: {
@@ -115,7 +117,7 @@ const plugins = [
 //   }))
 // }
 
-const devtool = sourceMap && 'eval'
+const devtool = sourceMap && 'eval-source-map'
 module.exports = {
   target: 'web',
   mode: isProd ? 'production' : 'development',
@@ -132,7 +134,7 @@ module.exports = {
   output: {
     path: config.build.assetsRoot,
     filename: 'js/[name].js',
-    publicPath: isProd
+    publicPath: !liveReload
       ? config.build.assetsPublicPath
       : config.dev.assetsPublicPath,
     chunkFilename: 'js/[id].[hash:8].js',

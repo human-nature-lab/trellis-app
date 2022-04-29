@@ -1,5 +1,5 @@
 import { uniqueId } from 'lodash'
-import Form from '../../src/entities/trellis/form'
+import Form from '../../src/entities/trellis/Form'
 import Question from '../../src/entities/trellis/Question'
 import QuestionGroup from '../../src/entities/trellis/QuestionGroup'
 import Section from '../../src/entities/trellis/Section'

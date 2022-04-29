@@ -1,7 +1,7 @@
 // import './timeoutTracker'
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
-import 'reflect-metadata'
+// import 'reflect-metadata'
 import './assets/main.sass'
 
 import Vue from 'vue'

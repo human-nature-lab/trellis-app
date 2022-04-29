@@ -1,5 +1,6 @@
 
+import './monekypatch'
 import DatabaseServiceCordova from './DatabaseServiceCordova'
-// import './debug'
+import './debug'
 
 export default new DatabaseServiceCordova()

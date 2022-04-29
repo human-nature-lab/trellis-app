@@ -7,12 +7,12 @@ import { GuardConfig } from '../GuardQueue'
 export default {
   name: 'StudyGuard',
   async condition (to: Route) {
-    let studyId = StorageService.get('current-study')
+    const studyId = StorageService.get('current-study')
     if (!studyId) {
       return false
     }
     try {
-      let study = await StudyService.getStudy(studyId)
+      const study = await StudyService.getStudy(studyId)
       if (study) {
         SingletonService.setCurrentStudy(study)
       }
@@ -21,7 +21,9 @@ export default {
       StorageService.delete('current-study')
     }
     try {
-      let study = to.params.studyId ? await StudyService.getStudy(to.params.studyId) : await StudyService.getCurrentStudy()
+      const study = to.params.studyId
+        ? await StudyService.getStudy(to.params.studyId)
+        : await StudyService.getCurrentStudy()
       if (study) {
         SingletonService.setCurrentStudy(study)
       }
@@ -32,5 +34,5 @@ export default {
   },
   redirect () {
     return { name: 'StudySelector' }
-  }
+  },
 } as GuardConfig

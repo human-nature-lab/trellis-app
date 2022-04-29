@@ -32,7 +32,7 @@ export class SurveyServiceCordova implements SurveyServiceInterface {
 
   async getRespondentSurveys (studyId: string, respondentId: string): Promise<Survey[]> {
     const repo = await DatabaseService.getRepository(Survey)
-    let surveys = await repo.find({
+    const surveys = await repo.find({
       where: {
         deletedAt: IsNull(),
         respondentId: respondentId,
