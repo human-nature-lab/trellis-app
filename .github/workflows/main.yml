@@ -68,9 +68,9 @@ jobs:
       - name: Build debug APK
         continue-on-error: true
         run: |
-          npm run mobile
+          npm run webpack:android
           npx cordova prepare
-          npm run webpack:release:android
+          npx cordova build android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
       # - name: SSH Debug
