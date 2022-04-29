@@ -9,10 +9,10 @@ export default class RespondentGeo extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   geoId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   respondentId: string
 
   @Column({ nullable: true, type: 'uuid' }) @Serializable

@@ -6,12 +6,10 @@ import Sync from '../../entities/trellis-config/Sync'
 import FileService from '../file'
 import SnakeCaseNamingStrategy from './SnakeCaseNamingStrategy'
 import config from '../../config'
-import { monekypatch } from './monekypatch'
 import { delay } from '../../classes/delay'
 import { Mutex } from 'async-mutex'
 import { trellisConfigEntities, trellisEntities } from './entities'
 
-monekypatch()
 enum DB {
   CONFIG = 'trellis-config',
   TRELLIS = 'trellis'
@@ -37,6 +35,8 @@ const trellisOptions = {
   // logging: true // verbose logging
   logging: (config.database && config.database.logging !== null) ? config.database.logging : ['query', 'warning', 'error']
 }
+
+console.log('database configs', trellisConfigOptions, trellisOptions)
 
 interface SnapshotProgress {
   inserted: number
@@ -112,10 +112,8 @@ export default class DatabaseServiceCordova {
   }
 
   async getConfigDatabase () {
-    console.log('getConfigDatabase')
     const release = await this.configMutex.acquire()
     try {
-      console.log('config database created')
       return getConnection(DB.CONFIG)
     } finally {
       release()

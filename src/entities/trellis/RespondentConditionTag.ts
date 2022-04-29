@@ -16,10 +16,10 @@ export default class RespondentConditionTag extends TimestampedSoftDelete {
   @PrimaryColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   respondentId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   conditionTagId: string
 
   @Relationship({

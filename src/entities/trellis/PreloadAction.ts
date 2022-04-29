@@ -14,10 +14,10 @@ export default class PreloadAction extends BaseEntity implements SnakeSerializab
   @Column('text') @Serializable
   payload: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   respondentId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   questionId: string
 
   @Column({ type: 'datetime' }) @Serializable @AsDate

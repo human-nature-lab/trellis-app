@@ -39,14 +39,12 @@
     <v-btn
       v-if="showNoOne"
       :disabled="isQuestionDisabled || hasAddedRelationships"
-      :class="{primary: isNoOneSelected}"
+      :class="{ primary: isNoOneSelected }"
       @click="updateNoOne()"
     >
       {{ $t('no_one') }}
     </v-btn>
-    <v-dialog
-      v-model="respondentSearchDialog"
-    >
+    <v-dialog v-model="respondentSearchDialog">
       <ModalTitle
         :title="$t('respondent_search')"
         @close="respondentSearchDialog = false"
@@ -156,7 +154,8 @@ export default {
     edgeIds () {
       return this.question.datum.data.map(d => d.edgeId)
     },
-    edges: function () {
+    edges () {
+      console.log('RelationshipQuesiton.edges')
       const toLoad = []
       const edges = this.edgeIds.map(id => {
         if (this.loadedEdges[id]) {
@@ -191,8 +190,7 @@ export default {
     },
   },
   methods: {
-    showRespondentSearch () {
-      let promise = new Promise(resolve => resolve())
+    async showRespondentSearch () {
       if (this.geoTypeParameterValue && !this.baseAncestorIds.length && this.respondent.geos.length) {
         const p = []
         const geoTypeCompareVal = this.geoTypeParameterValue.replace(/\s/g, '').toLowerCase()
@@ -208,26 +206,22 @@ export default {
             }))
           }
         }
-        promise = Promise.all(p)
+        await Promise.all(p)
       }
-      promise.then(() => {
-        // Remove duplicate IDs
-        this.baseAncestorIds = uniq(this.baseAncestorIds)
-        this.respondentSearchDialog = true
-      })
+      this.baseAncestorIds = uniq(this.baseAncestorIds)
+      this.respondentSearchDialog = true
     },
-    loadEdges: function (edgeIds) {
+    async loadEdges (edgeIds) {
       if (!edgeIds.length) return
-      EdgeService.getEdges(edgeIds)
-        .then(edges => {
-          for (const edge of edges) {
-            this.$set(this.loadedEdges, edge.id, edge)
-          }
-        })
-        .catch(err => {
-          console.error(err)
-          this.error = err
-        })
+      try {
+        const edges = await EdgeService.getEdges(edgeIds)
+        for (const edge of edges) {
+          this.$set(this.loadedEdges, edge.id, edge)
+        }
+      } catch (err) {
+        this.logError(err)
+        this.error = err
+      }
     },
     add: function (edgeId) {
       this.action(ActionTypes.add_edge, {
@@ -255,12 +249,14 @@ export default {
       }])
       this.add(edges[0].id)
     },
-    onSelected: function (added, removed) {
+    async onSelected (added, removed) {
       this.isSavingEdges = true
-      EdgeService.createEdges(added.map(id => ({
+      const edgeBlueprints = added.map(id => ({
         source_respondent_id: this.respondent.id,
         target_respondent_id: id,
-      }))).then(edges => {
+      }))
+      try {
+        const edges = await EdgeService.createEdges(edgeBlueprints)
         for (const edge of edges) {
           this.$set(this.loadedEdges, edge.id, edge)
         }
@@ -271,13 +267,13 @@ export default {
           const edge = this.edges.find(edge => edge.targetRespondentId === respondentId)
           this.remove(edge.id)
         }
-      }).catch(err => {
-        console.error(err)
+      } catch (err) {
+        this.logError(err)
         this.error = err
-      }).then(() => {
+      } finally {
         this.isSavingEdges = false
         this.respondentSearchDialog = false
-      })
+      }
     },
   },
   created: function () {

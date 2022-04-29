@@ -26,13 +26,13 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   @PrimaryColumn('uuid') @Serializable
   public id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public questionId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public surveyId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public followUpDatumId: string
 
   @Column('integer') @Serializable

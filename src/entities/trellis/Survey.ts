@@ -12,13 +12,13 @@ export default class Survey extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   respondentId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   formId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   studyId: string
 
   @Column({ nullable: true, type: 'uuid' }) @Serializable

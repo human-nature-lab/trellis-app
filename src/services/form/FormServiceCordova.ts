@@ -4,18 +4,19 @@ import DatabaseService from '../database'
 import StudyForm from '../../entities/trellis/StudyForm'
 import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'
-import { In, IsNull } from 'typeorm'
+import { In, IsNull, Not } from 'typeorm'
 import { removeSoftDeleted } from '../database/SoftDeleteHelper'
 
 export default class FormServiceCordova implements FormServiceInterface {
 
   async getStudyForms (studyId: string): Promise<StudyForm[]> {
     const repo = await DatabaseService.getRepository(StudyForm)
-    let studyForms = await repo.find({
+    const studyForms = await repo.find({
       where: {
         studyId: studyId,
-        deletedAt: IsNull()
-      }
+        deletedAt: IsNull(),
+        currentVersionId: Not(IsNull()),
+      },
     })
     removeSoftDeleted(studyForms)
     return studyForms

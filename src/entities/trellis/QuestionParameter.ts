@@ -9,10 +9,10 @@ export default class QuestionParameter extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   questionId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   parameterId: string
 
   @Column('text') @Serializable

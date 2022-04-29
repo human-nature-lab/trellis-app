@@ -8,10 +8,10 @@ export default class QuestionGroupSkip extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   questionGroupId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   skipId: string
 
   @Relationship(type => Skip)

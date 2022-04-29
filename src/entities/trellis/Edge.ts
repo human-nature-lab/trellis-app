@@ -8,10 +8,10 @@ export default class Edge extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   sourceRespondentId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   targetRespondentId: string
 
   @Relationship(type => Respondent)

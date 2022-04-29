@@ -33,10 +33,7 @@ export default class EdgeServiceWeb implements EdgeServiceInterface {
       }
     }
     const res = await http().post('edges', { edges: edges })
-    const resEdges = res.data.edges.map(e => new Edge().fromSnakeJSON(e))
-    for (const edge of resEdges) {
-      this.cache.set(edge.id, edge)
-    }
-    return resEdges
+    const ids = res.data.edges.map(e => e.id)
+    return this.getEdges(ids)
   }
 }

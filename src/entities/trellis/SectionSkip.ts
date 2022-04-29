@@ -7,9 +7,9 @@ export default class SectionSkip extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   sectionId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   skipId: string
 }

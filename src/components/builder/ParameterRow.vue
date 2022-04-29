@@ -33,8 +33,8 @@
           :disabled="disabled"
           v-model="value.val"
           @change="onChange"
-          :questionChoices="choices"
-          itemValue="val"
+          :question-choices="choices"
+          item-value="val"
           hide-details
           :locale="locale"
         />
@@ -47,8 +47,16 @@
           @change="onChange"
         />
       </v-col>
-      <v-col cols="1" class="px-0 text-right">
-        <DotsMenu v-if="!disabled" removable @remove="$emit('delete')" :loading="working" />
+      <v-col
+        cols="1"
+        class="px-0 text-right"
+      >
+        <DotsMenu
+          v-if="!disabled"
+          removable
+          @remove="$emit('delete')"
+          :loading="working"
+        />
       </v-col>
     </v-row>
   </v-col>
@@ -57,14 +65,14 @@
 <script lang="ts">
 import Parameter, { ParameterType } from '../../entities/trellis/Parameter'
 import Vue, { PropType } from 'vue'
-import type QuestionParameter from '../../entities/trellis/QuestionParameter'
+import QuestionParameter from '../../entities/trellis/QuestionParameter'
 import MenuSelect from './MenuSelect.vue'
-import type ConditionTag from '../../entities/trellis/ConditionTag'
-import type Choice from '../../entities/trellis/Choice'
-import type GeoType from '../../entities/trellis/GeoType'
+import ConditionTag from '../../entities/trellis/ConditionTag'
+import Choice from '../../entities/trellis/Choice'
+import GeoType from '../../entities/trellis/GeoType'
 import builder from '../../services/builder'
 import ChoiceSelector from './ChoiceSelector.vue'
-import type Locale from '../../entities/trellis/Locale'
+import Locale from '../../entities/trellis/Locale'
 import DotsMenu from './DotsMenu.vue'
 
 export default Vue.extend({
@@ -79,20 +87,20 @@ export default Vue.extend({
     geoTypes: Array as PropType<GeoType[]>,
     disabled: Boolean,
   },
-  data() {
+  data () {
     return {
-      working: false
+      working: false,
     }
   },
   methods: {
-    async onChange() {
+    async onChange () {
       if (this.working) return
       this.working = true
       try {
         const updated = await builder.createOrUpdateParameter({
           id: this.value.id,
           question_id: this.value.questionId,
-          name: this.parameter?.name,
+          name: this.parameter ? this.parameter.name : '',
           val: this.value.val,
         })
         this.$emit('input', updated)
@@ -105,31 +113,27 @@ export default Vue.extend({
     },
   },
   computed: {
-    parameter(): Parameter {
+    parameter (): Parameter {
       return this.parameters.find(p => p.id === this.value.parameterId)
     },
-    isText(): boolean {
+    isText (): boolean {
       return this.parameter.type === ParameterType.String
     },
-    isNumber(): boolean {
+    isNumber (): boolean {
       return this.parameter.type === ParameterType.Number
     },
-    isChoice(): boolean {
+    isChoice (): boolean {
       return this.parameter.type === ParameterType.Choice
     },
-    isBoolean(): boolean {
+    isBoolean (): boolean {
       return this.parameter.type === ParameterType.Boolean
     },
-    isGeoType(): boolean {
+    isGeoType (): boolean {
       return this.parameter.type === ParameterType.GeoType
     },
-    isConditionTag(): boolean {
+    isConditionTag (): boolean {
       return this.parameter.type === ParameterType.ConditionTag
-    }
-  }
+    },
+  },
 })
 </script>
-
-<style lang="sass">
-
-</style>

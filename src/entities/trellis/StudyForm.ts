@@ -8,19 +8,19 @@ export default class StudyForm extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   studyId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   formMasterId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   currentVersionId: string
 
   @Column('integer') @Serializable
   sortOrder: number
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   formTypeId: number
 
   @Column({ nullable: true, type: 'uuid' }) @Serializable

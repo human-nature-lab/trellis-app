@@ -20,19 +20,19 @@ export default class SectionConditionTag extends TimestampedSoftDelete implement
   @PrimaryColumn('uuid') @Serializable
   id: string;
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   sectionId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   conditionId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   surveyId: string
 
   @Column({ type: 'integer' }) @Serializable
   repetition: number
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   followUpDatumId: string
 
   // Future

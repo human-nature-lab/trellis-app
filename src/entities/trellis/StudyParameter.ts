@@ -7,10 +7,10 @@ export default class StudyParameter extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   studyId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   parameterId: string
 
   @Column('text') @Serializable

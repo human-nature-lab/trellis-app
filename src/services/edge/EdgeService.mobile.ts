@@ -32,7 +32,7 @@ export default class EdgeServiceCordova implements EdgeServiceInterface {
     for (const e of edges) {
       this.cache.set(e.id, e)
     }
-    return res
+    return res.concat(edges)
   }
 
   async createEdges (edgeDefs: SourceTarget[]): Promise<Edge[]> {

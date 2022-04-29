@@ -19,10 +19,10 @@ export default class SurveyConditionTag extends TimestampedSoftDelete implements
   @PrimaryColumn('uuid') @Serializable
   id: string;
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   surveyId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   conditionId: string
   // Future
   // @Column() @Serializable

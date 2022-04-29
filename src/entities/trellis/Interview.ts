@@ -10,7 +10,7 @@ export class Interview extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   surveyId: string
 
   @Column({ nullable: true, type: 'uuid' }) @Serializable

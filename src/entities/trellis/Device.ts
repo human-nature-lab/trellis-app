@@ -8,7 +8,7 @@ export default class Device extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   deviceId: string
 
   @Column('text') @Serializable

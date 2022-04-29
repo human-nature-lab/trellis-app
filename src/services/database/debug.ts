@@ -1,12 +1,12 @@
 import config from '../../config'
-import dbDefault from './'
 
 // Add methods for running queries directly on the tablet
 if (config.debug) {
   const runQuery = async function (query: string, parameters?: string[], db?: string) {
+    const dbService = (await import('./')).default
     db = db || 'trellis'
     try {
-      return (await (db === 'trellis' ? dbDefault.getDatabase() : dbDefault.getConfigDatabase())).query(query, parameters)
+      return (await (db === 'trellis' ? dbService.getDatabase() : dbService.getConfigDatabase())).query(query, parameters)
     } catch (err) {
       console.dir(err)
     }
@@ -29,6 +29,4 @@ if (config.debug) {
     console.log(`${r.length} rows`)
     return r
   }
-  // @ts-ignore
-  window.dbDefault = dbDefault
 }
