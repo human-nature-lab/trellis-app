@@ -25,8 +25,10 @@
     "web": "npm run compile && webpack --config=build/webpack.web.conf.js",
     "mobile": "npm run build:vite",
     "format": "npx eslint --fix \"src/**\"",
-    "build:webpack:android": "npm run compile & webpack --config=build/webpack.mobile.conf.js && cordova run android",
-    "release:webpack:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run build:webpack:android",
+    "webpack:android": "npm run compile & webpack --config=build/webpack.mobile.conf.js",
+    "webpack:run:android": "npm run webpack:android && cordova run android",
+    "webpack:build:android": "npm run webpack:android && cordova build android",
+    "webpack:release:android": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run webpack:build:android",
     "start": "npm run compile && webpack-dev-server --config=build/webpack.mobile.conf.js",
     "start:web": "npm run compile && webpack-dev-server --config=build/webpack.web.conf.js"
   },

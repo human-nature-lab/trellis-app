@@ -70,7 +70,7 @@ jobs:
         run: |
           npm run mobile
           npx cordova prepare
-          npm run release:webpack:android
+          npm run webpack:release:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
       # - name: SSH Debug
