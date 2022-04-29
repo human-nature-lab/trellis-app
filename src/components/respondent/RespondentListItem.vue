@@ -1,7 +1,7 @@
 <template>
   <v-layout row class="respondent-list-item">
     <v-flex class="respondent-photo">
-      <Photo :photo="respondent.photos[0]" allow-fullscreen></Photo>
+      <Photo :photo="respondent.photos[0]"></Photo>
     </v-flex>
     <v-spacer></v-spacer>
     <v-flex class="respondent-name" justify-end align-content-end>

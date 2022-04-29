@@ -22,8 +22,8 @@
 <script lang="ts">
 import QuestionChoice from '../../entities/trellis/QuestionChoice'
 import Vue, { PropType } from 'vue'
-import hoice from '../../entities/trellis/Choice'
-import ocale from '../../entities/trellis/Locale'
+import Choice from '../../entities/trellis/Choice'
+import Locale from '../../entities/trellis/Locale'
 import Translation from './Translation.vue'
 
 export default Vue.extend({
