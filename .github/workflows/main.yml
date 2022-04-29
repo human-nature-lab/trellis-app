@@ -69,8 +69,8 @@ jobs:
         continue-on-error: true
         run: |
           npm run webpack:android
-          npx cordova prepare
-          npx cordova build android
+          cordova prepare
+          cordova build android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
       # - name: SSH Debug
