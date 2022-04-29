@@ -10,10 +10,10 @@ export default class Geo extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   geoTypeId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   parentId: string
 
   @Column({ type: 'double', nullable: true }) @Serializable
@@ -25,7 +25,7 @@ export default class Geo extends TimestampedSoftDelete {
   @Column({ type: 'double', nullable: true }) @Serializable
   altitude: number
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   nameTranslationId: string
 
   @Relationship(type => GeoType)

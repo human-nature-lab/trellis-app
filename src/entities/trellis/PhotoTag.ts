@@ -7,9 +7,9 @@ export default class PhotoTag extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   photoId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   tagId: string
 }

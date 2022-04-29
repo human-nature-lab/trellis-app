@@ -26,19 +26,19 @@ export interface DatumRecyclerData {
 
 @Entity()
 export default class Datum extends TimestampedSoftDelete implements SnakeSerializable {
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public choiceId: string;
 
-  @Column('uuid') @Serializable
+  @Column('varchar') @Serializable
   public datumTypeId = '0';
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public edgeId: string;
 
   @Column({ type: 'integer' }) @Serializable
   public eventOrder: number;
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public geoId: string;
 
   @PrimaryColumn('uuid') @Serializable
@@ -47,31 +47,31 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   @Column('text') @Serializable
   public name: string;
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public photoId: string;
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public questionDatumId: string;
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public respondentGeoId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public respondentNameId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public rosterId: string;
 
   @Column({ type: 'integer' }) @Serializable
   public sortOrder: number;
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public surveyId: string;
 
   @Column('text') @Serializable
   public val: string;
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   public actionId: string
 
   @Column({ type: 'integer' }) @Serializable

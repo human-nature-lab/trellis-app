@@ -8,10 +8,10 @@ export default class GeoPhoto extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   geoId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   photoId: string
 
   @Column({ type: 'tinyint' }) @Serializable

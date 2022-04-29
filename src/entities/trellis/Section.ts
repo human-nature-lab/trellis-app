@@ -20,7 +20,7 @@ export default class Section extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   nameTranslationId: string
 
   @Relationship(type => Translation)

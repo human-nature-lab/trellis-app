@@ -8,10 +8,10 @@ export default class FormSkip extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   formId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   skipId: string
 
   @Relationship(type => Skip)

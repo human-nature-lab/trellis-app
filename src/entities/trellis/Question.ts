@@ -24,13 +24,13 @@ export default class Question extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   questionTypeId: string
 
   @Column({ select: false, type: 'uuid' }) @Serializable
   questionTranslationId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   questionGroupId: string
 
   @Column({ type: 'tinyint' }) @Serializable

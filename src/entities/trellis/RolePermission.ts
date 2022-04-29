@@ -8,10 +8,10 @@ export default class RolePermission extends TimestampedSoftDelete {
   @PrimaryColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   roleId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   permissionId: string
 
   @Column('boolean') @Serializable

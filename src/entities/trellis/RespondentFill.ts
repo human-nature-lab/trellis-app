@@ -7,10 +7,10 @@ export default class RespondentFill extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   respondentId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   name: string
 
   @Column('text') @Serializable

@@ -14,10 +14,10 @@ export default class Study extends TimestampedSoftDelete {
   @Column({ type: 'tinyint' }) @Serializable
   photoQuality: number
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   defaultLocaleId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   testStudyId: string
 
   @Relationship(type => Locale)

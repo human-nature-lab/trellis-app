@@ -10,7 +10,7 @@ export default class GeoType extends TimestampedSoftDelete {
   @Column({ nullable: true, type: 'uuid' }) @Serializable
   parentId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   studyId: string
 
   @Column('text') @Serializable

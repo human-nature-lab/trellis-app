@@ -9,7 +9,7 @@ export default class AssignConditionTag extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   conditionTagId: string
 
   @Column({ type: 'text' }) @Serializable

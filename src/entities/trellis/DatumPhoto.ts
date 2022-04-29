@@ -8,10 +8,10 @@ export default class DatumPhoto extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   datumId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   photoId: string
 
   @Column({ type: 'tinyint' }) @Serializable

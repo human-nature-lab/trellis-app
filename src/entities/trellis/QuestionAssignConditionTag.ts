@@ -7,9 +7,9 @@ export default class QuestionAssignConditionTag extends SparseTimestampedSoftDel
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   questionId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   assignConditionTagId: string
 }

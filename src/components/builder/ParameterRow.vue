@@ -57,14 +57,14 @@
 <script lang="ts">
 import Parameter, { ParameterType } from '../../entities/trellis/Parameter'
 import Vue, { PropType } from 'vue'
-import type QuestionParameter from '../../entities/trellis/QuestionParameter'
+import QuestionParameter from '../../entities/trellis/QuestionParameter'
 import MenuSelect from './MenuSelect.vue'
-import type ConditionTag from '../../entities/trellis/ConditionTag'
-import type Choice from '../../entities/trellis/Choice'
-import type GeoType from '../../entities/trellis/GeoType'
+import ConditionTag from '../../entities/trellis/ConditionTag'
+import Choice from '../../entities/trellis/Choice'
+import GeoType from '../../entities/trellis/GeoType'
 import builder from '../../services/builder'
 import ChoiceSelector from './ChoiceSelector.vue'
-import type Locale from '../../entities/trellis/Locale'
+import Locale from '../../entities/trellis/Locale'
 import DotsMenu from './DotsMenu.vue'
 
 export default Vue.extend({

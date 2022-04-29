@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import { AsDate, Serializable } from '../decorators/WebOrmDecorators'
 import BaseEntity from '../base/BaseEntity'
-import type { ActionPayload } from '../../components/interview/services/actions/ActionPayload'
+import { ActionPayload } from '../../components/interview/services/actions/ActionPayload'
 import { ValueTransformer } from 'typeorm/decorator/options/ValueTransformer'
 import { Moment } from 'moment'
 import MomentTransformer from '../base/MomentTransformer'
@@ -30,7 +30,7 @@ export default class Action extends BaseEntity implements SnakeSerializable {
 
   // @Column() @Serializable
   // surveyId: string
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   questionId: string
 
   @Column({ type: 'text', transformer: new PayloadTransformer() }) @Serializable
@@ -39,7 +39,7 @@ export default class Action extends BaseEntity implements SnakeSerializable {
   @Column('text') @Serializable
   actionType: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   interviewId: string
 
   @Column({ type: 'integer' }) @Serializable
@@ -48,7 +48,7 @@ export default class Action extends BaseEntity implements SnakeSerializable {
   @Column({ type: 'integer' }) @Serializable
   sectionRepetition: number
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   preloadActionId: string
 
   @Column({ nullable: true, type: 'uuid' }) @Serializable

@@ -9,7 +9,7 @@ export default class Choice extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   choiceTranslationId: string
 
   @Column('text') @Serializable

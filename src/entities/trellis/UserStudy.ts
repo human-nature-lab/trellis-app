@@ -9,10 +9,10 @@ export default class UserStudy extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   userId: string
 
-  @Column('uuid') @Serializable
+  @Column() @Serializable
   studyId: string
 
   @ManyToOne(type => User, user => user.studies)
