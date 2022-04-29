@@ -29,7 +29,6 @@ export default class EdgeServiceCordova implements EdgeServiceInterface {
         'targetRespondent.photos',
       ],
     })
-    console.log('getEdges', edges)
     for (const e of edges) {
       this.cache.set(e.id, e)
     }

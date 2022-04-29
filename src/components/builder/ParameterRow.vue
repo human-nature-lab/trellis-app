@@ -33,8 +33,8 @@
           :disabled="disabled"
           v-model="value.val"
           @change="onChange"
-          :questionChoices="choices"
-          itemValue="val"
+          :question-choices="choices"
+          item-value="val"
           hide-details
           :locale="locale"
         />
@@ -47,8 +47,16 @@
           @change="onChange"
         />
       </v-col>
-      <v-col cols="1" class="px-0 text-right">
-        <DotsMenu v-if="!disabled" removable @remove="$emit('delete')" :loading="working" />
+      <v-col
+        cols="1"
+        class="px-0 text-right"
+      >
+        <DotsMenu
+          v-if="!disabled"
+          removable
+          @remove="$emit('delete')"
+          :loading="working"
+        />
       </v-col>
     </v-row>
   </v-col>
@@ -79,20 +87,20 @@ export default Vue.extend({
     geoTypes: Array as PropType<GeoType[]>,
     disabled: Boolean,
   },
-  data() {
+  data () {
     return {
-      working: false
+      working: false,
     }
   },
   methods: {
-    async onChange() {
+    async onChange () {
       if (this.working) return
       this.working = true
       try {
         const updated = await builder.createOrUpdateParameter({
           id: this.value.id,
           question_id: this.value.questionId,
-          name: this.parameter?.name,
+          name: this.parameter ? this.parameter.name : '',
           val: this.value.val,
         })
         this.$emit('input', updated)
@@ -105,31 +113,27 @@ export default Vue.extend({
     },
   },
   computed: {
-    parameter(): Parameter {
+    parameter (): Parameter {
       return this.parameters.find(p => p.id === this.value.parameterId)
     },
-    isText(): boolean {
+    isText (): boolean {
       return this.parameter.type === ParameterType.String
     },
-    isNumber(): boolean {
+    isNumber (): boolean {
       return this.parameter.type === ParameterType.Number
     },
-    isChoice(): boolean {
+    isChoice (): boolean {
       return this.parameter.type === ParameterType.Choice
     },
-    isBoolean(): boolean {
+    isBoolean (): boolean {
       return this.parameter.type === ParameterType.Boolean
     },
-    isGeoType(): boolean {
+    isGeoType (): boolean {
       return this.parameter.type === ParameterType.GeoType
     },
-    isConditionTag(): boolean {
+    isConditionTag (): boolean {
       return this.parameter.type === ParameterType.ConditionTag
-    }
-  }
+    },
+  },
 })
 </script>
-
-<style lang="sass">
-
-</style>
