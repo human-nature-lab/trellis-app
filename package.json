@@ -107,7 +107,6 @@
     "chai": "^4.1.2",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^4.5.2",
-    "cordova": "^10.0.0",
     "cordova-android": "^9.0.0",
     "cordova-plugin-camera": "^5.0.1",
     "cordova-plugin-device": "^2.0.3",
