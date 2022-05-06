@@ -70,7 +70,6 @@ jobs:
         run: |
           npm run webpack:android
           cordova prepare
-          cordova platform add android
           npm run webpack:release:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
