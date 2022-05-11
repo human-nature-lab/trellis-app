@@ -65,6 +65,7 @@
           :key="question.id"
           v-model="value.questions[index]"
           @remove="removeQuestion(question)"
+          @duplicate="duplicateQuestion(question)"
         />
       </template>
     </SortableList>
@@ -130,6 +131,20 @@ export default Vue.extend({
           this.value.questions.splice(index, 1)
           this.$emit('input', this.value)
         }
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.working = false
+      }
+    },
+    async duplicateQuestion (question: QuestionModel) {
+      if (this.working) return
+      try {
+        this.working = true
+        const q = await builderService.duplicateQuestion(this.value.id, question)
+        const qs = this.value.questions
+        qs.push(q)
+        this.$emit('input', this.value)
       } catch (err) {
         this.logError(err)
       } finally {

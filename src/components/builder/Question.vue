@@ -8,6 +8,7 @@
       :allow-choices="isChoiceType"
       @change="updateQuestion"
       @remove="$emit('remove')"
+      @duplicate="$emit('duplicate')"
       :loading="working"
     />
     <v-col class="question-content">

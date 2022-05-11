@@ -5,7 +5,7 @@
         <MenuSelect
           v-model="value.parameterId"
           :items="parameters"
-          :disabled="disabled"
+          :disabled="disabled || working"
           @change="onChange"
           item-text="name"
           item-value="id"
@@ -23,14 +23,14 @@
         />
         <v-simple-checkbox
           v-else-if="isBoolean"
-          :disabled="disabled"
-          v-model="value.val"
-          @change="onChange"
+          :disabled="disabled || working"
+          :value="value.val"
+          @input="updateVal"
           color="primary"
         />
         <ChoiceSelector
           v-else-if="isChoice"
-          :disabled="disabled"
+          :disabled="disabled || working"
           v-model="value.val"
           @change="onChange"
           :question-choices="choices"
@@ -110,6 +110,13 @@ export default Vue.extend({
       } finally {
         this.working = false
       }
+    },
+    updateVal (val: any) {
+      console.log('updating val', val)
+      const v = this.value
+      v.val = val
+      this.$emit('input', v)
+      this.onChange()
     },
   },
   computed: {
