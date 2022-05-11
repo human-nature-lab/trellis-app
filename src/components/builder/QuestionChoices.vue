@@ -43,7 +43,7 @@
           :locale="locale"
           :disabled="disabled"
           :loading="workingIndex === index"
-          @remove="remove(choice)"
+          @remove="remove(value[index])"
         />
       </template>
     </SortableList>

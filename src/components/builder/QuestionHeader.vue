@@ -65,6 +65,12 @@
           :on-title="$t('hide_choices')"
           :off-title="$t('show_choices')"
         />
+        <v-list-item
+          :disabled="builder.locked"
+          @click="$emit('duplicate')"
+        >
+          {{ $t('duplicate') }}
+        </v-list-item>
       </DotsMenu>
     </v-row>
     <v-progress-linear

@@ -56,6 +56,11 @@ class FormBuilderService {
     return new Question().fromSnakeJSON(res.data.question)
   }
 
+  async duplicateQuestion (pageId: string, question: Question) {
+    const res = await builderInst.post(uriTemplate('/group/{group}/question/{question}/duplicate', [pageId, question.id]), question.toSnakeJSON({ includeRelationships: true }))
+    return new Question().fromSnakeJSON(res.data.question)
+  }
+
   async updateQuestion (question: Question) {
     const res = await builderInst.put(uriTemplate('/question/{question}', [question.id]), question.toSnakeJSON())
     return new Question().fromSnakeJSON(res.data)
