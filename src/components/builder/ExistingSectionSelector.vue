@@ -75,12 +75,14 @@ export default Vue.extend({
     sections () {
       const sections: FS[] = []
       for (const sf of this.studyForms) {
-        for (const s of sf.form.sections) {
-          sections.push({
-            sectionId: s.id,
-            sectionTranslation: s.nameTranslation,
-            formTranslation: sf.form.nameTranslation,
-          })
+        if (sf.form) {
+          for (const s of sf.form.sections) {
+            sections.push({
+              sectionId: s.id,
+              sectionTranslation: s.nameTranslation,
+              formTranslation: sf.form.nameTranslation,
+            })
+          }
         }
       }
       return sections
