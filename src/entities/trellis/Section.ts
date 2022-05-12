@@ -45,8 +45,27 @@ export default class Section extends SparseTimestampedSoftDelete {
   maxRepetitions?: number
   isRepeatable?: boolean
   followUpQuestionId?: string
+  linkedFormSections?: FormSection[] = []
 
   get pages () {
     return this.questionGroups
+  }
+
+  fromSnakeJSON (json: any) {
+    super.fromSnakeJSON(json)
+    if (this.formSections && this.formSections.length > 1 && json.pivot) {
+      const mySections = []
+      const otherSections = []
+      for (const s of this.formSections) {
+        if (s.id === json.pivot.id) {
+          mySections.push(s)
+        } else {
+          otherSections.push(s)
+        }
+      }
+      this.formSections = mySections
+      this.linkedFormSections = otherSections
+    }
+    return this
   }
 }

@@ -608,3 +608,5 @@ disable_form,Disable form,,
 enable_form,Enable form,,
 photo,Photo,,
 duplicate,Duplicate,,Create a duplicate copy of something
+linked_to_forms_n,No linked forms | Linked to {n} forms | Linked to {n} forms,,
+add_existing_section,Add existing section,,

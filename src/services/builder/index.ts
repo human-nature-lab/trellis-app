@@ -12,6 +12,7 @@ import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'
 import Skip from '../../entities/trellis/Skip'
 import FormSection from '../../entities/trellis/FormSection'
+import StudyForm from '../../entities/trellis/StudyForm'
 
 class FormBuilderService {
   async getQuestionTypes (): Promise<QuestionType[]> {
@@ -42,13 +43,23 @@ class FormBuilderService {
     return new Section().fromSnakeJSON(res.data.section)
   }
 
+  async getStudyFormSections (studyId: string) {
+    const res = await builderInst.get(uriTemplate('/study/{study}/sections', [studyId]))
+    return res.data.study_forms.map(sf => new StudyForm().fromSnakeJSON(sf))
+  }
+
+  async linkSection (formId: string, sectionId: string) {
+    const res = await builderInst.post(uriTemplate('/form/{form}/section/{section}', [formId, sectionId]))
+    return new FormSection().fromSnakeJSON(res.data.form_section)
+  }
+
   async updateFormSection (section: FormSection) {
     const res = await builderInst.put(uriTemplate('/form_section/{section}', [section.id]), section.toSnakeJSON())
     return new FormSection().fromSnakeJSON(res.data.section.form_sections[0])
   }
 
-  async removeSection (sectionId: string) {
-    await builderInst.delete(uriTemplate('section/{section}', [sectionId]))
+  async removeSection (formSectionId: string) {
+    await builderInst.delete(uriTemplate('section/{section}', [formSectionId]))
   }
 
   async createQuestion (pageId: string, question: { translated_text: string, var_name: string, question_type_id: string, locale_id }) {

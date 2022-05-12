@@ -22,6 +22,7 @@
           :form-id="builder.form.id"
           @addSection="addSection"
           @refresh="load"
+          @addExistingSection="showSectionSelector = true"
         />
       </v-row>
       <v-progress-linear
@@ -38,7 +39,7 @@
       >
         <template #item="{ index, item: section }">
           <Section
-            :key="section.id"
+            :key="section.formSections[0].id"
             v-model="builder.form.sections[index]"
             @remove="removeSection(section)"
           />
@@ -46,6 +47,12 @@
       </SortableList>
       <v-col v-if="builder.form" />
     </v-col>
+    <TrellisModal
+      v-model="showSectionSelector"
+      :title="$t('sections')"
+    >
+      <ExistingSectionSelector @select="addExistingSection" />
+    </TrellisModal>
   </v-col>
 </template>
 
@@ -69,13 +76,16 @@ import GeoType from '../entities/trellis/GeoType'
 import GeoTypeService from '../services/geotype'
 import SortableList, { Added, Moved } from '../components/builder/SortableList.vue'
 import FormSection from '../entities/trellis/FormSection'
+import TrellisModal from '../components/TrellisModal.vue'
+import ExistingSectionSelector from '../components/builder/ExistingSectionSelector.vue'
 
 export default {
   name: 'FormBuilder',
-  components: { Section, Translation, BuilderMenu, SortableList },
+  components: { Section, Translation, BuilderMenu, SortableList, TrellisModal, ExistingSectionSelector },
   data () {
     return {
       isLoading: true,
+      showSectionSelector: false,
       builder: {
         form: null as Form,
         locale: singleton.locale ? singleton.locale.copy() : null,
@@ -127,8 +137,20 @@ export default {
       this.isLoading = true
       try {
         const section = await builderService.createSection(this.$route.params.formId, { sort_order: this.builder.form.sections.length })
-        console.log(JSON.stringify(section))
         this.builder.form.sections.push(section)
+      } catch (err) {
+        this.logError(err)
+      } finally {
+        this.isLoading = false
+      }
+    },
+    async addExistingSection (sectionId: string) {
+      if (this.isLoading) return
+      this.isLoading = true
+      try {
+        this.showSectionSelector = false
+        await builderService.linkSection(this.builder.form.id, sectionId)
+        await this.load()
       } catch (err) {
         this.logError(err)
       } finally {
@@ -138,7 +160,7 @@ export default {
     async removeSection (section: SectionModel) {
       this.isLoading = true
       try {
-        await builderService.removeSection(section.id)
+        await builderService.removeSection(section.formSections[0].id)
         const index = this.builder.form.sections.indexOf(section)
         if (index > -1) {
           this.builder.form.sections.splice(index, 1)
