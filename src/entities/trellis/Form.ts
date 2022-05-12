@@ -56,25 +56,6 @@ export default class Form extends TimestampedSoftDelete {
       this.versions.sort((a, b) => b.version - a.version)
     }
 
-    // Separate form_sections for this form from other forms
-    // if (this.sections) {
-    //   for (const s of this.sections) {
-    //     if (s.formSections && s.formSections.length > 1) {
-    //       const sectionsForThisForm = []
-    //       const otherSections = []
-    //       for (const fs of s.formSections) {
-    //         if (fs.formId === this.id) {
-    //           sectionsForThisForm.push(fs)
-    //         } else {
-    //           otherSections.push(fs)
-    //         }
-    //       }
-    //       s.formSections = sectionsForThisForm
-    //       s.linkedFormSections = otherSections
-    //     }
-    //   }
-    // }
-
     // Simple way to convert into an integer and then to a boolean. Possible values for this are '1', '0', 1, 0, true,
     // false and all of them are interpreted correctly by this statement
     this.isPublished = !!+this.isPublished
