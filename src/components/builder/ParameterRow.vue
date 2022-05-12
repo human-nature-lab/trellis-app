@@ -24,8 +24,8 @@
         <v-simple-checkbox
           v-else-if="isBoolean"
           :disabled="disabled || working"
-          :value="value.val"
-          @input="updateVal"
+          :value="boolVal"
+          @input="updateBoolVal"
           color="primary"
         />
         <ChoiceSelector
@@ -111,10 +111,10 @@ export default Vue.extend({
         this.working = false
       }
     },
-    updateVal (val: any) {
+    updateBoolVal (val: boolean) {
       console.log('updating val', val)
       const v = this.value
-      v.val = val
+      v.val = val ? 1 : 0
       this.$emit('input', v)
       this.onChange()
     },
@@ -140,6 +140,9 @@ export default Vue.extend({
     },
     isConditionTag (): boolean {
       return this.parameter.type === ParameterType.ConditionTag
+    },
+    boolVal (): boolean {
+      return !!+this.value.val
     },
   },
 })

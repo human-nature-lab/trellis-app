@@ -69,7 +69,12 @@
           :disabled="builder.locked"
           @click="$emit('duplicate')"
         >
-          {{ $t('duplicate') }}
+          <v-list-item-icon>
+            <v-icon>mdi-content-duplicate</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            {{ $t('duplicate') }}
+          </v-list-item-content>
         </v-list-item>
       </DotsMenu>
     </v-row>

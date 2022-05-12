@@ -28,6 +28,9 @@
       >
         {{ $tc('n_questions', questionCount) }}
       </BuilderChip>
+      <BuilderChip :visible="!!section.linkedFormSections.length">
+        {{ $tc('linked_to_forms_n', section.linkedFormSections.length) }}
+      </BuilderChip>
       <MenuSelect
         :disabled="builder.locked"
         nullable
@@ -39,7 +42,7 @@
         item-text="varName"
       >
         <template #selected="{ item: questionId }">
-        {{ questionId ? $t('follow_up_to', [questionId in questions ? questions[questionId].varName : $t('unknown_question')]) : $t('no_follow_up') }}
+          {{ questionId ? $t('follow_up_to', [questionId in questions ? questions[questionId].varName : $t('unknown_question')]) : $t('no_follow_up') }}
         </template>
       </MenuSelect>
       <v-slide-x-transition>
@@ -84,15 +87,13 @@ import Translation from './Translation.vue'
 import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
 import { builder } from '../../symbols/builder'
 import DotsMenu from './DotsMenu.vue'
-import ToggleItem from './ToggleItem.vue'
 import MenuSelect from './MenuSelect.vue'
-import ExpandSection from './ExpandSection.vue'
 import BuilderChip from './BuilderChip.vue'
 
 export default Vue.extend({
   name: 'SectionHeader',
   mixins: [FormQuestionsMixin],
-  components: { Translation, DotsMenu, ToggleItem, MenuSelect, ExpandSection, BuilderChip },
+  components: { Translation, DotsMenu, MenuSelect, BuilderChip },
   inject: { builder },
   props: {
     section: Object as PropOptions<Section>,
@@ -107,13 +108,13 @@ export default Vue.extend({
       }, {
         text: 'Ordered',
         value: false,
-      }]
+      }],
     }
   },
   methods: {
     setVisible (val: boolean) {
       this.$emit('update:visible', val)
-    }
+    },
   },
   computed: {
     followUpId (): string {
@@ -134,8 +135,8 @@ export default Vue.extend({
         count += this.section.pages[i].questions.length
       }
       return count
-    }
-  }
+    },
+  },
 })
 </script>
 

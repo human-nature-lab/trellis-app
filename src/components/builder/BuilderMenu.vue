@@ -35,6 +35,19 @@
         {{ $t('add_section') }}
       </v-list-item>
       <v-list-item
+        :disabled="locked"
+        @click="$emit('addExistingSection')"
+      >
+        <v-list-item-action>
+          <v-icon>
+            mdi-vector-link
+          </v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          {{ $t('add_existing_section') }}
+        </v-list-item-content>
+      </v-list-item>
+      <v-list-item
         :to="{ name: 'InterviewPreview', params: { formId: formId } }"
         target="_blank"
       >
@@ -73,6 +86,7 @@
         <v-list-item-content>{{ $t('refresh') }}</v-list-item-content>
       </v-list-item>
     </v-list>
+
   </DotsMenu>
 </template>
 
@@ -84,11 +98,14 @@ import LocaleSelectorMenu from '../locale/LocaleSelectorMenu.vue'
 import DotsMenu from './DotsMenu.vue'
 import expandAll from '../../events/builder/expandAll'
 import FormService from '../../services/form'
+import TrellisModal from '../TrellisModal.vue'
+import ExistingSectionSelector from './ExistingSectionSelector.vue'
+import Section from '../../entities/trellis/Section'
 
 export default Vue.extend({
   name: 'BuilderMenu',
   inject: { study },
-  components: { LocaleSelectorMenu, DotsMenu },
+  components: { LocaleSelectorMenu, DotsMenu, TrellisModal, ExistingSectionSelector },
   props: {
     locked: Boolean,
     locale: Object as PropType<Locale>,
@@ -98,6 +115,7 @@ export default Vue.extend({
     return {
       openLocales: false,
       expandAll: false,
+      showSectionSelector: false,
     }
   },
   methods: {
