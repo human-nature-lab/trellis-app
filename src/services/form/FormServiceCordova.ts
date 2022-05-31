@@ -31,7 +31,7 @@ export default class FormServiceCordova implements FormServiceInterface {
     const connection = await DatabaseService.getDatabase()
     const formRepository = await connection.getRepository(Form)
 
-    const form = await formRepository.findOne({
+    const form: Form = await formRepository.findOne({
       where: {
         id: id
       },
@@ -40,6 +40,7 @@ export default class FormServiceCordova implements FormServiceInterface {
 
     const questionGroupMap = {}
     const questionGroupIds = []
+    form.sections = form.sections.filter(s => s.formSections.length && !s.formSections[0].deletedAt)
     form.sections.forEach((section) => {
       section.questionGroups.forEach((questionGroup) => {
         questionGroup.questions = []
@@ -62,6 +63,7 @@ export default class FormServiceCordova implements FormServiceInterface {
     })
 
     console.log('finished form', form)
+    console.log(JSON.stringify(form.toSnakeJSON({ includeRelationships: true })))
 
     removeSoftDeleted(form)
     console.log('form removed soft deleted')
