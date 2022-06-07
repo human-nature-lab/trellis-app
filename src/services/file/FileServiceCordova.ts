@@ -48,30 +48,49 @@ class FileServiceCordova {
     })
   }
 
-  writeFile (directory: string, file: File, fileName: string, fileSize: number, storageType = 'PERSISTENT', create = true, exclusive = false) {
-    let requestFileSystemOptions = {
-      'storageType': (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
-      'requestedBytes': fileSize
+  async writeFile (directory: string, file: File, fileName: string, fileSize: number, storageType = 'PERSISTENT') {
+    const requestFileSystemOptions = {
+      storageType: (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
+      requestedBytes: fileSize,
     }
-    return this.requestFileSystem(requestFileSystemOptions)
-      .then((fileSystem) => this.getDirectoryEntry(fileSystem, directory))
-      .then((directoryEntry: DirectoryEntry) => this.getFileEntry(directoryEntry, fileName))
-      .then((fileEntry: FileEntry) => new Promise((resolve, reject) => {
-        fileEntry.createWriter(
-          function (fileWriter) {
-            fileWriter.onwriteend = function () {
-              resolve(fileEntry)
-            }
-            fileWriter.onerror = function (error) {
-              reject(error)
-            }
-            fileWriter.write(file)
-          },
-          function (error) {
+    const fileSystem = await this.requestFileSystem(requestFileSystemOptions)
+    const directoryEntry = await this.getDirectoryEntry(fileSystem, directory)
+    const fileEntry = await this.getFileEntry(directoryEntry, fileName)
+    return this.writeFileToEntry(fileEntry, file)
+  }
+
+  async writeFileToEntry (entry: FileEntry, file: File): Promise<FileEntry> {
+    return new Promise((resolve, reject) => {
+      entry.createWriter(
+        function (fileWriter) {
+          fileWriter.onwriteend = function () {
+            resolve(entry)
+          }
+          fileWriter.onerror = function (error) {
             reject(error)
-          })
-      })
-    )
+          }
+          fileWriter.write(file)
+        },
+        function (error) {
+          reject(error)
+        })
+    })
+  }
+
+  async resolveLocalFileSystemByURL (url: string): Promise<Entry> {
+    return new Promise((resolve, reject) => {
+      window.resolveLocalFileSystemURL(url, resolve, reject)
+    })
+  }
+
+  async getFileFromDir (dir: DirectoryEntry, path: string, opts?: Flags): Promise<FileEntry> {
+    return new Promise((resolve, reject) => dir.getFile(path, opts, resolve, reject))
+  }
+
+  async writePhoto (file: File, fileName: string) {
+    const dir = await this.getPhotosDir()
+    const entry = await this.getFileFromDir(dir, fileName, { create: true, exclusive: true })
+    return this.writeFileToEntry(entry, file)
   }
 
   /**
@@ -196,19 +215,38 @@ class FileServiceCordova {
     return this.getDirectoryEntry(fs, FULL_RES_DIR)
   }
 
-  async getPhotosDir (): Promise<DirectoryEntry> {
-    const fs = await this.requestFileSystem()
-    return this.getDirectoryEntry(fs, PHOTOS_DIR)
+  async mkdir (root: DirectoryEntry, path: string): Promise<DirectoryEntry> {
+    return new Promise((resolve, reject) => {
+      root.getDirectory(path, { create: true }, resolve, reject)
+    })
   }
 
-  listPhotos () {
-    return this.getPhotosDir()
-      .then((directoryEntry: DirectoryEntry) => {
-        return new Promise((resolve, reject) => {
-          let reader: DirectoryReader = directoryEntry.createReader()
-          reader.readEntries(resolve, reject)
-        })
-      })
+  async mkdirp (root: DirectoryEntry, path: string): Promise<DirectoryEntry> {
+    const parts = path.split('/')
+    for (const p of parts) {
+      root = await this.mkdir(root, p)
+    }
+    return root
+  }
+
+  async getPhotosDir (): Promise<DirectoryEntry> {
+    try {
+      const root = await this.resolveLocalFileSystemByURL(cordova.file.externalRootDirectory) as DirectoryEntry
+      const dir = await this.mkdirp(root, 'trellis/photos')
+      console.log(dir.fullPath)
+      return dir
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  async listPhotos () {
+    const directoryEntry = await this.getPhotosDir()
+    console.log('directoryEntry', directoryEntry)
+    return new Promise((resolve, reject) => {
+      const reader = directoryEntry.createReader()
+      reader.readEntries(resolve, reject)
+    })
   }
 
   async getPhoto (fileName): Promise<FileEntry> {

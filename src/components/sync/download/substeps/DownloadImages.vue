@@ -91,9 +91,8 @@
               this.sources.set(fileName, source)
               SyncService.downloadImage(source, fileName)
                 .then((response) => {
-                  let photo = response.data
-                  let fileSize = Number(response.headers['content-length'])
-                  return FileService.writeFile('photos', photo, fileName, fileSize)
+                  const photo = response.data
+                  return FileService.writePhoto(photo, fileName)
                 })
                 .then(() => {
                   this.progressIndeterminate = false
