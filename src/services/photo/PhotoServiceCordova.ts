@@ -81,7 +81,7 @@ export class PhotoServiceCordova extends PhotoServiceAbstract {
       navigator.camera.getPicture((filePath) => {
         const photo = new Photo()
         photo.id = uuid()
-        FileService.getPhotosDir().then(fullResDir => {
+        FileService.getPhotosDir(true).then(fullResDir => {
           return FileService.move(filePath, fullResDir.nativeURL, `${photo.id}.jpg`)
         })/*.then((fullResEntry: FileEntry) => {
           return FileService.getPhotosDir().then(photosDir => {
@@ -113,11 +113,11 @@ export class PhotoServiceCordova extends PhotoServiceAbstract {
   }
 
   async getPhotoFileCount (): Promise<number> {
-    return FileService.countDirectoryFiles(await FileService.getPhotosDir())
+    return FileService.countDirectoryFiles(await FileService.getPhotosDir(true))
   }
 
   getPhotosSize (): CancellablePromise<number> {
-    return FileService.getPhotosDir().then(dir => {
+    return FileService.getPhotosDir(true).then(dir => {
       return FileService.getDirectorySize(dir, true)
     })
   }

@@ -72,7 +72,7 @@
         try {
           this.working = true
           this.progressIndeterminate = false
-          const photosDir = await FileService.getPhotosDir()
+          const photosDir = await FileService.getPhotosDir(true)
           await FileService.entriesForEach(photosDir, (file, i) => {
             if (this.imageList.indexOf(file.name) > -1) {
               this.fileList.push(file)

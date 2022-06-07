@@ -5,7 +5,7 @@ import CancellablePromise from '../../classes/CancellablePromise'
 declare var md5chksum, FileTransfer, cordova
 /* global md5chksum, FileTransfer */
 
-const PHOTOS_DIR = 'photos'
+const PHOTOS_DIR = 'trellis/photos'
 const FULL_RES_DIR = 'full-resolution-photos'
 
 enum StorageType {
@@ -87,10 +87,14 @@ class FileServiceCordova {
     return new Promise((resolve, reject) => dir.getFile(path, opts, resolve, reject))
   }
 
+  async writeFileInDir (dir: DirectoryEntry, file: File, fileName: string) {
+    const entry = await this.getFileFromDir(dir, fileName, { create: true })
+    return this.writeFileToEntry(entry, file)
+  }
+
   async writePhoto (file: File, fileName: string) {
     const dir = await this.getPhotosDir()
-    const entry = await this.getFileFromDir(dir, fileName, { create: true, exclusive: true })
-    return this.writeFileToEntry(entry, file)
+    return this.writeFileInDir(dir, file, fileName)
   }
 
   /**
@@ -229,20 +233,22 @@ class FileServiceCordova {
     return root
   }
 
-  async getPhotosDir (): Promise<DirectoryEntry> {
+  async getPhotosDir (mkdir = false): Promise<DirectoryEntry> {
     try {
       const root = await this.resolveLocalFileSystemByURL(cordova.file.externalRootDirectory) as DirectoryEntry
-      const dir = await this.mkdirp(root, 'trellis/photos')
-      console.log(dir.fullPath)
-      return dir
+      if (mkdir) {
+        return this.mkdirp(root, PHOTOS_DIR)
+      }
+      return new Promise((resolve, reject) => {
+        root.getDirectory(PHOTOS_DIR, {}, resolve, reject)
+      })
     } catch (err) {
       console.error(err)
     }
   }
 
   async listPhotos () {
-    const directoryEntry = await this.getPhotosDir()
-    console.log('directoryEntry', directoryEntry)
+    const directoryEntry = await this.getPhotosDir(true)
     return new Promise((resolve, reject) => {
       const reader = directoryEntry.createReader()
       reader.readEntries(resolve, reject)

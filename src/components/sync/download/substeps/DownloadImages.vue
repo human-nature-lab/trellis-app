@@ -58,11 +58,12 @@
         }
       },
       methods: {
-        downloadImages: function () {
+        async downloadImages () {
           if (this.imagesToDownload.length === 0) {
             this.downloading = false
             this.onDone()
           } else {
+            const photosDir = await FileService.getPhotosDir(true)
             this.downloading = true
             this.isCancelling = false
             this.sources = new Map()
@@ -92,7 +93,8 @@
               SyncService.downloadImage(source, fileName)
                 .then((response) => {
                   const photo = response.data
-                  return FileService.writePhoto(photo, fileName)
+                  return FileService.writeFileInDir(photosDir, photo, fileName)
+                  // return FileService.writePhoto(photo, fileName)
                 })
                 .then(() => {
                   this.progressIndeterminate = false
