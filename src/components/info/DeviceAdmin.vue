@@ -5,7 +5,10 @@
         <v-layout class="display-1 mb-2">
           {{ $t('admin') }}
         </v-layout>
-        <v-row no-gutters class="justify-space-between">
+        <v-row
+          no-gutters
+          class="justify-space-between"
+        >
           <v-btn
             color="error"
             :disabled="isWorking"
@@ -17,8 +20,18 @@
             />
             <span v-else>{{ $t('unregister_device') }}</span>
           </v-btn>
-          <v-btn color="error" :disabled="isWorking" @click="deleteUploads">
-            {{ $t('delete_uploads') }}
+          <v-btn
+            color="error"
+            :disabled="isWorking"
+            @click="deleteUploads"
+          >
+            <TrellisLoadingCircle
+              v-if="isWorking"
+              size="25px"
+            />
+            <span v-else>
+              {{ $t('delete_uploads') }}
+            </span>
           </v-btn>
         </v-row>
       </v-container>

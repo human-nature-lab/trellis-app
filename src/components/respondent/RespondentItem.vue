@@ -7,7 +7,7 @@
       :class="{selected: selected === true, respondent: true, 'ma-1': true}">
       <Photo
         class="respondent-photo"
-        @click="onClick"
+        @click.capture.stop.prevent="onClick"
         :photo="photo" />
       <v-card-actions class="respondent-name">
         <v-row no-gutters class="align-center">

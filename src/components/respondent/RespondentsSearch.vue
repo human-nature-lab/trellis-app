@@ -6,6 +6,9 @@
         v-model="query"
         :loading="isLoading"
         @input="onQueryChange"
+        autocomplete="off"
+        spellcheck="false"
+        clearable
       />
       <v-btn
         v-if="canSelect"
