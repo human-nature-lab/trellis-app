@@ -88,7 +88,7 @@ class FileServiceCordova {
   }
 
   async writeFileInDir (dir: DirectoryEntry, file: File, fileName: string) {
-    const entry = await this.getFileFromDir(dir, fileName, { create: true })
+    const entry = await this.getFileFromDir(dir, fileName, { create: true, exclusive: false })
     return this.writeFileToEntry(entry, file)
   }
 
