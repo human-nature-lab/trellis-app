@@ -47,7 +47,7 @@
               </v-chip>
             </v-card-title>
             <v-col v-if="opts.pageSkips && page.skips.length">
-              <DisplaySkipRow  v-for="skip in page.skips" :key="skip.id" :skip="skip" subject="page" :conditionTags="conditionTags" />
+              <SkipRow  v-for="skip in page.skips" :key="skip.id" :value="skip" :conditionTags="conditionTags" disabled />
             </v-col>
             <Question 
               v-for="question in page.questions"
@@ -75,7 +75,7 @@
   import FormService from '../services/form'
   import LocaleSelector from '../components/LocaleSelector.vue'
   import TrellisModal from '../components/TrellisModal.vue'
-  import DisplaySkipRow from '../components/skips/DisplaySkipRow.vue'
+  import SkipRow from '../components/builder/SkipRow.vue'
   import ConditionTag from '../entities/trellis/ConditionTag'
   import ConditionTagService from '../services/condition-tag'
   import QuestionEntity from '../entities/trellis/Question'
@@ -83,7 +83,7 @@
 
   export default Vue.extend({
     name: 'FormPrint',
-    components: { LocaleSelector, TrellisModal, DisplaySkipRow, Question },
+    components: { LocaleSelector, TrellisModal, SkipRow, Question },
     mixins: [TranslateMixin],
     data () {
       return {
@@ -197,6 +197,9 @@
     white-space: -pre-wrap      /* Opera 4-6 */
     white-space: -o-pre-wrap    /* Opera 7 */
     word-wrap: break-word       /* Internet Explorer 5.5+ */
+  .section
+    page-break-before: auto
+    page-break-inside: avoid
   .section-content
     position: relative
     .section-indicator
@@ -209,4 +212,8 @@
       border-left: 1px solid grey
       border-top: 1px solid grey
       border-bottom: 1px solid grey
+  .page
+    page-break-before: auto
+    page-break-inside: avoid
+
 </style>
