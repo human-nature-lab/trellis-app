@@ -50,6 +50,7 @@ export default Vue.extend({
             blur: e => { this.$emit('blur', e) },
             click: e => { this.$emit('click', e) },
           }),
+          EditorView.lineWrapping,
           compartments.dark.of(EditorView.darkTheme.of(this.global.darkTheme)),
         ],
       }),
