@@ -205,9 +205,13 @@ export default Vue.extend({
       }
     },
     async printToDoc () {
-      const doc = await DocService.formToDocx(this.form, this.global.locale, this.opts)
-      const name = this.translate(this.form.nameTranslation, this.global.locale)
-      saveAs(doc, `${name} v${this.form.version}.docx`)
+      try {
+        const doc = await DocService.formToDocx(this.form, this.global.locale, this.opts)
+        const name = this.translate(this.form.nameTranslation, this.global.locale)
+        saveAs(doc, `${name} v${this.form.version}.docx`)
+      } catch (err) {
+        this.logError(err)
+      }
     },
   },
   computed: {

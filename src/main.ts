@@ -22,7 +22,7 @@ import './filters/toFixed.filter'
 import WebApp from './WebApp.vue'
 // import './checkWebviewVersion'
 
-async function init () {
+export async function makeVue (props?: object) {
   // Wait for the configuration to load before doing anything else
   await ConfigService.load()
 
@@ -33,16 +33,13 @@ async function init () {
   }
   Vue.component('Debug', Debug)
 
-  new Vue({
-    el: '#app',
+  return new Vue(Object.assign({
     router,
     i18n,
     vuetify,
-    template: '<WebApp />',
     components: {
       WebApp,
     },
-    // @ts-ignore
     head: {
       meta: [
         {
@@ -51,7 +48,9 @@ async function init () {
         },
       ],
     },
-  })
+  }, props))
 }
 
-init()
+makeVue({ template: '<WebApp />' }).then(app => {
+  app.$mount('#app')
+})

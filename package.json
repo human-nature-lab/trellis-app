@@ -51,6 +51,7 @@
     "cordova-plugin-simple-image-resizer": "git+https://github.com/protonet/cordova-plugin-image-resizer.git",
     "core-js": "^3.8.3",
     "docx": "^7.3.0",
+    "dom-to-image": "^2.6.0",
     "file-saver": "^2.0.0",
     "highlight.js": "^11.5.1",
     "js-md5": "^0.7.3",

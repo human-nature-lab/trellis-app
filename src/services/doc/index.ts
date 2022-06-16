@@ -1,7 +1,14 @@
-import { Document, Paragraph, HeadingLevel, Packer, TextRun, TabStopType, TabStopPosition } from 'docx'
+import { Document, Paragraph, HeadingLevel, Packer, TextRun, TabStopType, TabStopPosition, ImageRun } from 'docx'
 import Locale from '../../entities/trellis/Locale'
 import Form from '../../entities/trellis/Form'
 import TranslationService from '../TranslationService'
+import domtoimage from 'dom-to-image'
+import InterviewManager, { clearSharedInterview, sharedInterview } from '../../components/interview/classes/InterviewManager'
+import QuestionText from '../../components/interview/QuestionText.vue'
+import Question from '../../entities/trellis/Question'
+import { makeVue } from '../../main'
+import Interview from '../../entities/trellis/Interview'
+import Respondent from '../../entities/trellis/Respondent'
 
 type DocxOpts = {
   choices: boolean
@@ -25,6 +32,30 @@ export class DocService {
       children.push(new TextRun({ text: line, break: 1, font: 'Consolas', size: '10pt' }))
     }
     return children
+  }
+
+  static async renderQuestionTemplate (form: Form, question: Question) {
+    const node = document.createElement('div')
+    const manager = sharedInterview(new Interview(), form)
+    try {
+      await manager.initialize()
+      const v = await makeVue({
+        components: { QuestionText },
+        template: '<QuestionText :subject="subject" :question="question" :location="location" />',
+        data: {
+          question: question,
+          location: manager.location,
+          subject: new Respondent().fromSnakeJSON({ id: '1', name: 'Test Respondent' }),
+        },
+      })
+      v.$mount(node)
+      const res: Uint8Array = await domtoimage.toPixelData(node)
+      console.log(question.varName, res)
+      v.$destroy()
+      return res
+    } finally {
+      clearSharedInterview()
+    }
   }
 
   static async formToDocx (form: Form, locale: Locale, opts: Partial<DocxOpts> = defaultOpts) {
@@ -97,9 +128,27 @@ export class DocService {
             ],
           }))
           // Question content
-          children.push(new Paragraph({
-            text: TranslationService.getAny(question.questionTranslation, locale),
-          }))
+          const questionContent = TranslationService.getAny(question.questionTranslation, locale)
+          if (questionContent.trim().startsWith('<')) {
+            // Question with code in it
+            const image = await DocService.renderQuestionTemplate(form, question)
+            children.push(new Paragraph({
+              children: [
+                new ImageRun({
+                  data: [image],
+                  transformation: {
+                    width: 100,
+                    height: 100,
+                  },
+                }),
+              ],
+            }))
+          } else {
+            // Just standard question text
+            children.push(new Paragraph({
+              text: questionContent,
+            }))
+          }
           if (opts.choices && question.choices && question.choices.length) {
             for (const choice of question.choices) {
               children.push(new Paragraph({
