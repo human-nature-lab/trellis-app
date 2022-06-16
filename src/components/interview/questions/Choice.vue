@@ -1,20 +1,31 @@
 <template>
   <v-row class="checkbox-group">
     <v-checkbox
+      class="checkbox"
       v-if="question.type.name==='multiple_select'"
       :disabled="disabled"
       v-model="choice.isSelected"
       :class="choiceClasses(choice)"
-      @change="onChange(choice)">
-      <ChoiceText :translation="choice.choiceTranslation" :location="location" slot="label"/>
+      @change="onChange(choice)"
+    >
+      <ChoiceText
+        :translation="choice.choiceTranslation"
+        :location="location"
+        slot="label"
+      />
     </v-checkbox>
     <radio-checkbox
       v-else
       :disabled="disabled"
       v-model="choice.isSelected"
       :class="choiceClasses(choice)"
-      @change="onChange(choice)">
-      <ChoiceText :translation="choice.choiceTranslation" :location="location" slot="label"/>
+      @change="onChange(choice)"
+    >
+      <ChoiceText
+        :translation="choice.choiceTranslation"
+        :location="location"
+        slot="label"
+      />
     </radio-checkbox>
     <v-text-field
       solo
@@ -24,74 +35,80 @@
       v-if="choice.isSelected && choice.isOther"
       :value="choice.otherText"
       :autofocus="!choice.otherText || !choice.otherText.length"
-      @input="onOtherChange"/>
+      @input="onOtherChange"
+    />
   </v-row>
 </template>
 
 <script>
-  import AT from '../../../static/action.types'
-  import ActionMixin from '../mixins/ActionMixin'
-  import ChoiceText from './ChoiceText.vue'
-  import RadioCheckbox from './RadioCheckbox.vue'
+import AT from '../../../static/action.types'
+import ActionMixin from '../mixins/ActionMixin'
+import ChoiceText from './ChoiceText.vue'
+import RadioCheckbox from './RadioCheckbox.vue'
 
-  export default {
-    name: 'choice',
-    props: {
-      choice: Object,
-      question: Object,
-      location: Object,
-      disabled: Boolean
-    },
-    methods: {
-      onChange (displayChoice) {
-        const choice = displayChoice.choice
-        if (displayChoice.isSelected) {
-          this.action(AT.select_choice, {
-            choice_id: choice.id,
-            val: choice.val,
-            name: choice.val
-          })
-        } else {
-          this.action(AT.deselect_choice, {
-            choice_id: choice.id,
-            val: choice.val,
-            name: choice.val
-          })
-        }
-      },
-      onOtherChange (otherVal) {
-        console.log('other change', otherVal)
-        this.debouncedAction(AT.other_choice_text, {
-          choice_id: this.choice.id,
-          val: otherVal,
-          name: otherVal
+export default {
+  name: 'Choice',
+  props: {
+    choice: Object,
+    question: Object,
+    location: Object,
+    disabled: Boolean,
+  },
+  methods: {
+    onChange (displayChoice) {
+      const choice = displayChoice.choice
+      if (displayChoice.isSelected) {
+        this.action(AT.select_choice, {
+          choice_id: choice.id,
+          val: choice.val,
+          name: choice.val,
         })
-      },
-      choiceClasses (choice) {
-        return { other: choice.isOther && choice.isSelected }
+      } else {
+        this.action(AT.deselect_choice, {
+          choice_id: choice.id,
+          val: choice.val,
+          name: choice.val,
+        })
       }
     },
-    mixins: [ActionMixin],
-    components: {
-      ChoiceText,
-      RadioCheckbox
-    }
-  }
+    onOtherChange (otherVal) {
+      console.log('other change', otherVal)
+      this.debouncedAction(AT.other_choice_text, {
+        choice_id: this.choice.id,
+        val: otherVal,
+        name: otherVal,
+      })
+    },
+    choiceClasses (choice) {
+      return { other: choice.isOther && choice.isSelected }
+    },
+  },
+  mixins: [ActionMixin],
+  components: {
+    ChoiceText,
+    RadioCheckbox,
+  },
+}
 </script>
 
 <style lang="sass">
-    .input-group
-      label
-        position: static
-        height: auto
-        white-space: normal
-        display: block
-        line-height: 20px
-      &.other
-        .input-group__details
-          display: none
-    .checkbox-group
-      .input-group--text-field
-        margin-top: 0
-        margin-bottom: 10px
+.input-group
+  label
+    position: static
+    height: auto
+    white-space: normal
+    display: block
+    line-height: 20px
+  &.other
+    .input-group__details
+      display: none
+.checkbox-group
+  .input-group--text-field
+    margin-top: 0
+    margin-bottom: 10px
+  .checkbox
+    margin-top: 0
+    .v-messages
+      height: 0
+      min-height: 0
 </style>
