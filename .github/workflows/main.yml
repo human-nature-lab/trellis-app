@@ -28,7 +28,8 @@ jobs:
           node-version: '16'
       
       # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
-      - uses: c-hive/gha-npm-cache@v1
+      # - uses: c-hive/gha-npm-cache@v1
+      - run: npm install
       - run: npm ci
 
       - name: Copy config files
@@ -51,6 +52,7 @@ jobs:
         run: |
           $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
           $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
+          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
       
       - run: npm i -g @ionic/cli@6
       
