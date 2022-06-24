@@ -52,6 +52,7 @@ jobs:
         run: |
           $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
           $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
+          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
       
       - run: npm i -g @ionic/cli@6
       
