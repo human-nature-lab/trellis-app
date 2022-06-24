@@ -68,7 +68,7 @@
     "regenerator-runtime": "^0.13.7",
     "typecache": "^0.3.2",
     "typeface-roboto": "0.0.54",
-    "typeorm": "^0.2.7",
+    "typeorm": "^0.2.25",
     "unplugin-vue-components": "^0.17.18",
     "uuid": "^3.3.2",
     "vue": "^2.6.14",
