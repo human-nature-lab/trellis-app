@@ -40,6 +40,7 @@ export default class FormServiceCordova implements FormServiceInterface {
 
     const questionGroupMap = {}
     const questionGroupIds = []
+    form.sections.forEach(s => s.filterFormSections(form.id))
     form.sections = form.sections.filter(s => s.formSections.length && !s.formSections[0].deletedAt)
     form.sections.forEach((section) => {
       section.questionGroups.forEach((questionGroup) => {
@@ -61,6 +62,8 @@ export default class FormServiceCordova implements FormServiceInterface {
       const questionGroup = questionGroupMap[question.questionGroupId]
       questionGroup.questions.push(question)
     })
+
+    form.sort()
 
     console.log('finished form', form)
     console.log(JSON.stringify(form.toSnakeJSON({ includeRelationships: true })))

@@ -8,7 +8,7 @@ export default class FormSection extends SparseTimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column({ select: false, type: 'uuid' }) @Serializable
+  @Column({ select: true, type: 'uuid' }) @Serializable
   formId: string
 
   @Column({ select: false, type: 'uuid' }) @Serializable

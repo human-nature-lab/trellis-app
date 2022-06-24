@@ -51,6 +51,22 @@ export default class Section extends SparseTimestampedSoftDelete {
     return this.questionGroups
   }
 
+  filterFormSections (formId: string) {
+    const mySections = []
+    const otherSections = []
+    for (const s of this.formSections) {
+      if (s.formId === formId) {
+        mySections.push(s)
+      } else {
+        otherSections.push(s)
+      }
+    }
+    this.formSections = mySections
+    if (otherSections.length) {
+      this.linkedFormSections = otherSections
+    }
+  }
+
   fromSnakeJSON (json: any) {
     super.fromSnakeJSON(json)
     if (this.formSections && this.formSections.length > 1 && json.pivot) {
