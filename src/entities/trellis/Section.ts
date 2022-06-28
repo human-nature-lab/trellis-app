@@ -55,10 +55,12 @@ export default class Section extends SparseTimestampedSoftDelete {
     const mySections = []
     const otherSections = []
     for (const s of this.formSections) {
-      if (s.formId === formId) {
-        mySections.push(s)
-      } else {
-        otherSections.push(s)
+      if (!s.deletedAt) {
+        if (s.formId === formId) {
+          mySections.push(s)
+        } else {
+          otherSections.push(s)
+        }
       }
     }
     this.formSections = mySections

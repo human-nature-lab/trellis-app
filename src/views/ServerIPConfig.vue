@@ -58,6 +58,7 @@
         if (!this.$refs.form.validate()) return
         try {
           this.loading = true
+          this.ipAddress = this.ipAddress.trim()
           let combinedAddress = constructCombinedAddress(this.ipAddress)
           const http = await heartbeatInstance(combinedAddress)
           await http.get(`heartbeat`)
