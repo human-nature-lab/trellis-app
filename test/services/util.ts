@@ -3,8 +3,10 @@ import Form from '../../src/entities/trellis/Form'
 import Question from '../../src/entities/trellis/Question'
 import QuestionGroup from '../../src/entities/trellis/QuestionGroup'
 import Section from '../../src/entities/trellis/Section'
+import Skip from '../../src/entities/trellis/Skip'
 import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
 import Datum from '../../src/entities/trellis/Datum'
+import questionTypes from '../../src/static/question.types'
 
 type BasicForm = {
   sections: {
@@ -26,8 +28,12 @@ type BasicForm = {
 export function createForm (def: BasicForm): Form {
   const form = new Form()
   form.sections = []
-  for (let i = 0; i < def.sections.length; i ++) {
-    const section = def.sections[i]
+  let sections = def.sections
+  if (!Array.isArray(sections)) {
+    sections = [sections]
+  }
+  for (let i = 0; i < sections.length; i++) {
+    const section = sections[i]
     const s = new Section().fromSnakeJSON(section)
     if (!s.id) {
       s.id = uniqueId()
@@ -63,8 +69,8 @@ export function createForm (def: BasicForm): Form {
         if (!q.assignConditionTags) {
           q.assignConditionTags = []
         }
-        if (!q.parameters) {
-          q.parameters = []
+        if (!q.questionParameters) {
+          q.questionParameters = []
         }
         p.questions.push(q)
       }
@@ -74,7 +80,6 @@ export function createForm (def: BasicForm): Form {
   }
   return form
 }
-
 
 type BasicQuestionDatum = {
   varName: string
@@ -103,4 +108,22 @@ export function createFormData (form: Form, data: BasicQuestionDatum[]): Questio
     res.push(qd)
   }
   return res
+}
+
+export function createChoiceQuestion (varName: string, choices: string[], multi = false) {
+  return [{
+    var_name: varName,
+    question_type_id: multi ? questionTypes.multiple_select : questionTypes.multiple_choice,
+    choices: choices.map((val, i) => {
+      const id = uniqueId()
+      return {
+        choice_id: id,
+        sort_order: i,
+        choice: {
+          id,
+          val,
+        },
+      }
+    }),
+  }]
 }

@@ -186,6 +186,10 @@ export default class InterviewManager extends InterviewManagerBase {
       console.error(action)
       throw new Error('Only next and previous action types are allowed to not be associated with a question datum id')
     }
+    if (action.questionId && (!questionDatum || !questionBlueprint)) {
+      console.error('invalid action', action)
+      debugger
+    }
     return actionManager.do(action, this, questionDatum, questionBlueprint, actionWasInitiatedByAHuman)
   }
 

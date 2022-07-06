@@ -97,6 +97,7 @@ export default {
   data: () => ({
     global,
     showPasswordModal: false,
+    checkpoint: 0,
   }),
   methods: {
     refresh () {
@@ -177,6 +178,10 @@ export default {
     },
     openLocaleSelector () {
       routeQueue.pushAndReturnToCurrent({ name: 'LocaleSelector' })
+    },
+    logCheckpoint () {
+      console.log('TRELLIS CHECKPOINT:', this.checkpoint)
+      this.checkpoint++
     },
   },
   computed: {
@@ -327,6 +332,10 @@ export default {
           icon: 'mdi-wrench',
           title: this.$t('server_config'),
           showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_CONFIG),
+        }, {
+          click: this.logCheckpoint,
+          icon: 'mdi-flag',
+          title: 'Log Checkpoint',
         }, {
           to: { name: 'Permissions' },
           icon: 'mdi-lock',

@@ -9,21 +9,21 @@ import Form from '../../src/entities/trellis/Form'
 import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
 import Datum from '../../src/entities/trellis/Datum'
 
-function anyAllString(val: boolean): string {
+function anyAllString (val: boolean): string {
   return val ? 'all' : 'any'
 }
 
-function showHideString(val: boolean): string {
+function showHideString (val: boolean): string {
   return val ? 'show' : 'hide'
 }
 
-function shouldHide(skips: Skip[], conditions: Set<string>, interview?: InterviewManager): void {
+function shouldHide (skips: Skip[], conditions: Set<string>, interview?: InterviewManager): void {
   const service = new SkipService()
   service.register(skips)
   expect(service.shouldSkip(skips, conditions, interview)).to.equal(true, 'This page should hide')
 }
 
-function shouldShow(skips: Skip[], conditions: Set<string>, interview?: InterviewManager): void {
+function shouldShow (skips: Skip[], conditions: Set<string>, interview?: InterviewManager): void {
   const service = new SkipService()
   service.register(skips)
   expect(service.shouldSkip(skips, conditions, interview)).to.equal(false, 'This page should show')
@@ -36,14 +36,14 @@ interface SkipHelper extends Skip {
   all(): this
 }
 
-function makeSkip(conditions: string[]): SkipHelper {
-  let skip = new Skip().fromSnakeJSON({
+function makeSkip (conditions: string[]): SkipHelper {
+  const skip = new Skip().fromSnakeJSON({
     show_hide: true,
     any_all: true,
     conditions: conditions.map(c => ({
       id: c,
-      condition_tag_name: c
-    }))
+      condition_tag_name: c,
+    })),
   })
 
   // @ts-ignore
@@ -70,7 +70,7 @@ function makeSkip(conditions: string[]): SkipHelper {
   return skip as SkipHelper
 }
 
-function customSkip(logic: string): Skip {
+function customSkip (logic: string): Skip {
   return new Skip().fromSnakeJSON({
     id: uniqueId(),
     custom_logic: logic,
@@ -150,35 +150,35 @@ export default function () {
         it('should show at the first positive show result', () => {
           shouldShow([
             makeSkip(['one']).show().all(),
-            makeSkip(['two']).show().any()
+            makeSkip(['two']).show().any(),
           ], new Set(['two']))
           shouldShow([
             makeSkip(['one']).hide().any(),
             makeSkip(['two']).show().any(),
-            makeSkip(['three']).show().any()
+            makeSkip(['three']).show().any(),
           ], new Set(['two']))
           shouldShow([
             makeSkip(['two']).show().any(),
-            makeSkip(['three']).show().any()
+            makeSkip(['three']).show().any(),
           ], new Set(['two']))
           shouldShow([
             makeSkip(['two', 'three']).show().all(),
-            makeSkip(['two', 'four']).show().all()
+            makeSkip(['two', 'four']).show().all(),
           ], new Set(['two', 'four', 'five']))
         })
         it('should hide at the first positive hide result', () => {
           shouldHide([
             makeSkip(['one']).hide().all(),
-            makeSkip(['two']).hide().any()
+            makeSkip(['two']).hide().any(),
           ], new Set(['two']))
           shouldHide([
             makeSkip(['one']).show().any(),
             makeSkip(['two']).hide().any(),
-            makeSkip(['three']).hide().any()
+            makeSkip(['three']).hide().any(),
           ], new Set(['two']))
           shouldHide([
             makeSkip(['two']).hide().any(),
-            makeSkip(['three']).hide().any()
+            makeSkip(['three']).hide().any(),
           ], new Set(['two']))
         })
       })
@@ -199,12 +199,12 @@ export default function () {
               var_name: 'hello',
             }, {
               var_name: 'foo',
-            }]
-          }]
-        }]
+            }],
+          }],
+        }],
       })
-      const data = createFormData(form, [{ 
-        varName: 'hello', 
+      const data = createFormData(form, [{
+        varName: 'hello',
         data: [{ val: 'world' }],
       }, {
         varName: 'foo',
@@ -217,7 +217,7 @@ export default function () {
         console.log('vars.hello', vars.hello);
         return vars.hello === 'world';
       }`)], new Set(), manager)
-      shouldHide([customSkip(`function ({ vars }) { return vars.foo === 'nobar'; }`)], new Set(), manager)
+      shouldHide([customSkip('function ({ vars }) { return vars.foo === \'nobar\'; }')], new Set(), manager)
     })
   })
 }

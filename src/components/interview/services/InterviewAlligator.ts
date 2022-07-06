@@ -53,6 +53,7 @@ export default class InterviewAlligator {
   private skipService = new SkipService()
   private hasDataChanges = true
   private skipCache = new Map()
+  private lastPageHash = 0
 
   constructor (private manager: InterviewManager) {
     this.form = manager.blueprint
@@ -176,21 +177,6 @@ export default class InterviewAlligator {
       if (section.followUpQuestionId) {
         const sortMethod: SortMethod = section.formSections[0].randomizeFollowUp ? SortMethod.RANDOM : SortMethod.NATURAL
         let data: Datum[] = this.getFollowUpQuestionDatum(section.followUpQuestionId)
-        // console.log('follow up data', data.length)
-        // if (!data.length) {
-        //   // Marking skipped repeated section
-        //   for (let page of section.questionGroups) {
-        //     this.skipped.push({
-        //       pageId: page.id,
-        //       page: this.pageToNumIndex.get(page.id),
-        //       sectionId: section.id,
-        //       section: this.sectionToNumIndex.get(section.id),
-        //       sectionRepetition: 0,
-        //       sectionFollowUpDatumId: null,
-        //       sectionFollowUpRepetition: 0
-        //     } as InterviewLocation)
-        //   }
-        // }
         const initFollowUpRepetition = isInitialSection ? initLocation.sectionFollowUpRepetition : 0
         data = data.slice() // Make new array that we can sort
         // TODO: Sort based on sort method
@@ -216,7 +202,20 @@ export default class InterviewAlligator {
         }
       }
     }
-    // console.log(`updated ${actuallyUpdated} pages. expected to update ~${expectedUpdate} / ${prevPages}`)
+
+    // Keep calling updatePages until it reaches a stable state
+    let hash = 0
+    for (const p of this.pages) {
+      const v = (p.section + 1) * (p.sectionRepetition + 1) * (1 + p.page) +
+        (p.section + 1) * (p.sectionRepetition + 1) +
+        (p.page + 1) * (p.section + 1) +
+        (p.sectionRepetition + 1) + (p.page + 1)
+      hash += v
+    }
+    if (hash !== this.lastPageHash) {
+      this.lastPageHash = hash
+      this.updatePages()
+    }
     this.hasDataChanges = false
   }
 

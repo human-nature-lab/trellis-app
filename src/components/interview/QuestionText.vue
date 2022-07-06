@@ -185,14 +185,15 @@ export default Vue.extend({
           this.isLoading = true
           this.question.questionTranslation.translationText = await TranslationTextService.getTranslatedTextByTranslationId(trans.id)
         }
+        this.translation = this.question.questionTranslation
+        if (this.isLoading) {
+          this.updateFills()
+        }
       } catch (err) {
-        this.log(err)
+        this.logError(err)
+      } finally {
+        this.isLoading = false
       }
-      this.translation = this.question.questionTranslation
-      if (this.isLoading) {
-        this.updateFills()
-      }
-      this.isLoading = false
     },
     async updateFills () {
       if (!this.useOldFills) return
