@@ -51,7 +51,7 @@ export default class InterviewAlligator {
   private pageToNumIndex: Map<string, number> = new Map()
   private varNameToQuestionIndex: Map<string, Question> = new Map()
   private skipService = new SkipService()
-  private hasDataChanges = true
+  public hasDataChanges = true
   private skipCache = new Map()
   private lastPageHash = 0
 
@@ -118,6 +118,22 @@ export default class InterviewAlligator {
     } else {
       this.pages.push(loc)
     }
+  }
+
+  // Here we are using a simple algorithm with an avalanche effect to compute the "hash" number. Small changes yield
+  // large differences and the "hash" for each interview state has a high probability of being unique
+  private getCurrentHash (): number {
+    let val = 16807 % 2147483647
+    function hashVal (add: number) {
+      val = (val + add) * 16807 % 2147483647
+    }
+    for (const page of this.pages) {
+      hashVal(page.page + 1)
+      hashVal(page.section + 1)
+      hashVal(page.sectionRepetition + 1)
+      hashVal(page.sectionFollowUpRepetition + 1)
+    }
+    return val
   }
 
   /**
@@ -204,15 +220,10 @@ export default class InterviewAlligator {
     }
 
     // Keep calling updatePages until it reaches a stable state
-    let hash = 0
-    for (const p of this.pages) {
-      const v = (p.section + 1) * (p.sectionRepetition + 1) * (1 + p.page) +
-        (p.section + 1) * (p.sectionRepetition + 1) +
-        (p.page + 1) * (p.section + 1) +
-        (p.sectionRepetition + 1) + (p.page + 1)
-      hash += v
-    }
+    const hash = this.getCurrentHash()
+    console.log('hash', hash, this.pages.length, actuallyUpdated)
     if (hash !== this.lastPageHash) {
+      console.log('recomputing')
       this.lastPageHash = hash
       this.updatePages()
     }

@@ -251,7 +251,7 @@ export default class InterviewManager extends InterviewManagerBase {
       // We aren't at the end of the survey and we made changes. Replay the all actions to rebuild the state before moving forward.
       this.resetHighWaterMark()
       this.replayToCurrent()
-      this.stepForward(false)
+      this.stepForward()
     } else if (this.isAtHighWaterMark && this.hasAddedActions) {
       // We are at the end of the survey and we made changes. Play all valid actions ahead of this point in the survey and then move back to the correct page.
       if (this.stepForward()) {
@@ -263,7 +263,7 @@ export default class InterviewManager extends InterviewManagerBase {
       this.lastActionHasChanged = false
     } else {
       // No actions have been added so we just move to the next page
-      this.stepForward(false)
+      this.stepForward()
     }
     await this.save()
     this.hasAddedActions = false
@@ -287,6 +287,7 @@ export default class InterviewManager extends InterviewManagerBase {
       this.atEnd()
       return false
     }
+    this.navigator.hasDataChanges = dataHasChanged
     this.navigator.next()
     if (dataHasChanged) {
       this.onPageEnter()
