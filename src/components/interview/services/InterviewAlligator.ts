@@ -221,9 +221,7 @@ export default class InterviewAlligator {
 
     // Keep calling updatePages until it reaches a stable state
     const hash = this.getCurrentHash()
-    console.log('hash', hash, this.pages.length, actuallyUpdated)
     if (hash !== this.lastPageHash) {
-      console.log('recomputing')
       this.lastPageHash = hash
       this.updatePages()
     }
