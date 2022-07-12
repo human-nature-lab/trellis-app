@@ -287,6 +287,7 @@ export default class InterviewManager extends InterviewManagerBase {
       this.atEnd()
       return false
     }
+    this.navigator.hasDataChanges = true
     this.navigator.next()
     if (dataHasChanged) {
       this.onPageEnter()
