@@ -1,10 +1,5 @@
 #### [Home](Home.md)
-#### Getting started
-- [Introduction](getting-started/Introduction.md)
-- [Setting up a study](getting-started/Setup-study.md)
-- [Create a form](getting-started/Create-form.md)
-- [Preview a form](getting-started/Preview-form.md)
-- [Administer a form](getting-started/Administer-form.md)
+#### [Getting started](getting-started.md)
 
 #### Form builder
 - [Introduction](form-builder/Introduction.md)

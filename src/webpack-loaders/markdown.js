@@ -32,6 +32,14 @@ function configure (opts) {
   }
 
   const renderer = {
+    heading (text, level) {
+      const escapedText = text.toLowerCase().replace(/[^\w]+/g, '-')
+      const padding = 14 - 2 * level
+      return `
+              <h${level} class="pt-${padding}" id="${escapedText}">
+                ${text}
+              </h${level}>`
+    },
     link (href, title, text) {
       const isExternal = href.startsWith('http')
       if (!isExternal) {
