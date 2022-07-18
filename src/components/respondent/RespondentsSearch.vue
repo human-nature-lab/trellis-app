@@ -29,7 +29,7 @@
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn v-on="on" v-bind="attrs" icon @click="clearFilters">
-                  <v-icon>mdi-clear</v-icon>
+                  <v-icon>mdi-close</v-icon>
                 </v-btn>
               </template>
               <span>{{ $t("clear") }}</span>
