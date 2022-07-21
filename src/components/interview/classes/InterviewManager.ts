@@ -289,9 +289,7 @@ export default class InterviewManager extends InterviewManagerBase {
     }
     this.navigator.hasDataChanges = true
     this.navigator.next()
-    if (dataHasChanged) {
-      this.onPageEnter()
-    }
+    this.onPageEnter()
     this.updateHighWaterMark()
     return true
   }
