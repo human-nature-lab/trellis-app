@@ -6,6 +6,7 @@ import Form from '../../entities/trellis/Form'
 import Question from '../../entities/trellis/Question'
 import { In, IsNull, Not } from 'typeorm'
 import { removeSoftDeleted } from '../database/SoftDeleteHelper'
+import Section from '../../entities/trellis/Section'
 
 export default class FormServiceCordova implements FormServiceInterface {
 
@@ -33,10 +34,19 @@ export default class FormServiceCordova implements FormServiceInterface {
 
     const form: Form = await formRepository.findOne({
       where: {
-        id: id
+        id: id,
       },
-      relations: ['sections']
     })
+
+    const q = 'select section_id from form_section where form_id = ? and deleted_at is null'
+    const sectionIds = (await connection.query(q, [id])).map(s => s.section_id)
+    form.sections = []
+    const sectionRepository = await connection.getRepository(Section)
+
+    for (const sId of sectionIds) {
+      const section = await sectionRepository.findOne({ id: sId })
+      form.sections.push(section)
+    }
 
     const questionGroupMap = {}
     const questionGroupIds = []
@@ -54,8 +64,8 @@ export default class FormServiceCordova implements FormServiceInterface {
     const questions = await questionRepository.find({
       where: {
         questionGroupId: In(questionGroupIds),
-        deletedAt: IsNull()
-      }
+        deletedAt: IsNull(),
+      },
     })
 
     questions.forEach((question) => {
