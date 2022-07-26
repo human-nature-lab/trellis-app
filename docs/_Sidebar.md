@@ -44,7 +44,8 @@
 ### General
 - [Server Configuration](admin/ServerConfiguration.md)
 - [Permissions](admin/Permissions.md)
-- [Studies](Studies)
+- [Studies](Studies.md)
+- [Skips](Skips.md)
 - [Devices](devices/Devices.md)
   - [Registering devices](devices/RegisterDevice.md)
 - [Logs](admin/Logs.md)

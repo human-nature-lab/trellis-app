@@ -56,7 +56,22 @@ function configure (opts) {
       }
     },
     table (header, body) {
-      return `<table class="table">${header}${body}</table>`
+      return `<div class="v-data-table">
+        <div class="v-data-table__wrapper">
+          <table class="table">
+            <thead>${header}</thead>
+            <tbody>${body}</tbody>
+          </table>
+        </div>
+      </div>`
+    },
+    tablecell (content, flags) {
+      // flags: { header: boolean, align: 'left' | 'right' }
+      if (flags.header) {
+        return `<th class="text-left">${content}</th>`
+      } else {
+        return `<td>${content}</td>`
+      }
     },
     code (src) {
       const highlighted = hljs.highlightAuto(src)

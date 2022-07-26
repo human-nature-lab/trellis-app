@@ -12,14 +12,12 @@ clicking the "-" icon in the upper-right corner.
 
 ## Page skips
 
-A page of questions may be conditionally shown or hidden based on conditions that were previously assigned based on 
-responses to previous questions. The steps for adding a page skip are:
+A page of questions may be conditionally shown or hidden based on conditions that were previously
+assigned based on responses to previous questions. The steps for adding a page skip are:
 
 1.  Click the "Add Skip" button on the page you want to conditionally show.
-2.  Select "Hide" or "Show" to choose whether you want the page to be conditionally hidden or shown.
-3.  Select "any" or "all" to choose whether the Hide/Show action should be applied only if all of the selected 
-    conditions are present or if any one of the conditions exists.
-4.  Type one or more conditions in the tag field, available conditions will be autocompleted.
+2.  Add the [skip logic](../Skips.md) using custom JavaScript or Hide/Show logic.
+
 
 For more information, go to the section on [condition assignment](Conditions.md).
  

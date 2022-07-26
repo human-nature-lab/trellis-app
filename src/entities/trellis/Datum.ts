@@ -74,6 +74,8 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
   @Column() @Serializable
   public actionId: string
 
+  // Every datum has a random number between assigned to it for use when randomizing follow up sections.
+  // This number is in the range (0, Number.MAX_SAFE_INTEGER - 1]
   @Column({ type: 'integer' }) @Serializable
   public randomSortOrder: number
 
