@@ -67,6 +67,10 @@ jobs:
 #           npm run build:dev:android
 #           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-dev.apk
       
+      - name: Fix hooks permissions
+        run: |
+          chmod +x -R hooks/*.sh
+
       - name: Build debug APK
         # continue-on-error: true
         run: |
