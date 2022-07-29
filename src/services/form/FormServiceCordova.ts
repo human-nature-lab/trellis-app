@@ -12,7 +12,7 @@ export default class FormServiceCordova implements FormServiceInterface {
 
   async getStudyForms (studyId: string): Promise<StudyForm[]> {
     const repo = await DatabaseService.getRepository(StudyForm)
-    const studyForms = await repo.find({
+    const studyForms: StudyForm[] = await repo.find({
       where: {
         studyId: studyId,
         deletedAt: IsNull(),
@@ -20,6 +20,11 @@ export default class FormServiceCordova implements FormServiceInterface {
       },
     })
     removeSoftDeleted(studyForms)
+    for (const fs of studyForms) {
+      if (fs.form) {
+        fs.form.sort()
+      }
+    }
     return studyForms
   }
 
