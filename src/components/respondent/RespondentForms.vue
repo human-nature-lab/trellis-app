@@ -13,6 +13,15 @@
             {{ $t('respondent_forms', [respondent.name]) }}
           </v-toolbar-title>
           <v-spacer />
+          <v-btn
+            v-if="respondent"
+            exact
+            icon
+            text
+            :to="{ name: 'Respondent', params: { studyId: global.study.id, respondentId: respondent.id } }"
+          >
+            <v-icon>mdi-information-outline</v-icon>
+          </v-btn>
           <v-menu offset-y>
             <template #activator="{ on, attrs }">
               <v-btn

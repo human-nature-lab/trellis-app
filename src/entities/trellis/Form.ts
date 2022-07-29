@@ -63,19 +63,26 @@ export default class Form extends TimestampedSoftDelete {
   }
 
   sort () {
-    this.sections.sort((a, b) => {
-      return a.formSections[0].sortOrder - b.formSections[0].sortOrder
-    })
-    for (const section of this.sections) {
-      section.questionGroups.sort((a, b) => {
-        return a.sectionQuestionGroup.questionGroupOrder - b.sectionQuestionGroup.questionGroupOrder
+    if (this.skips) {
+      this.skips.sort((a, b) => {
+        return a.precedence - b.precedence
       })
-      for (const page of section.questionGroups) {
-        page.questions.sort((a, b) => a.sortOrder - b.sortOrder)
-        page.skips.sort((a, b) => a.precedence - b.precedence)
-        for (const question of page.questions) {
-          if (question.choices) {
-            question.choices.sort((a, b) => a.sortOrder - b.sortOrder)
+    }
+    if (this.sections) {
+      this.sections.sort((a, b) => {
+        return a.formSections[0].sortOrder - b.formSections[0].sortOrder
+      })
+      for (const section of this.sections) {
+        section.questionGroups.sort((a, b) => {
+          return a.sectionQuestionGroup.questionGroupOrder - b.sectionQuestionGroup.questionGroupOrder
+        })
+        for (const page of section.questionGroups) {
+          page.questions.sort((a, b) => a.sortOrder - b.sortOrder)
+          page.skips.sort((a, b) => a.precedence - b.precedence)
+          for (const question of page.questions) {
+            if (question.choices) {
+              question.choices.sort((a, b) => a.sortOrder - b.sortOrder)
+            }
           }
         }
       }
