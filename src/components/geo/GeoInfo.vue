@@ -62,32 +62,30 @@
         @delete-photo="onDeletePhoto"
         @update-photos="onUpdatePhotos"
       />
-       <div v-if="hasPermission([TrellisPermission.REMOVE_GEO])">
-        <v-toolbar flat>
-          <v-toolbar-title>
-            {{ $t('admin') }}
-          </v-toolbar-title>
-        </v-toolbar>
-        <v-col>
-          <v-row
-            no-gutters
-            class="justify-space-between"
-          >
-            <Permission :requires="TrellisPermission.REMOVE_GEO">
-              <v-btn
-                @click="removeGeo"
-                color="error"
-              >
-                {{ $t('delete') }}
-              </v-btn>
-            </Permission>
-            <GeoHooks
-              v-if="isWeb && geo"
-              :geo-id="geo.id"
-            />
-          </v-row>
-        </v-col>
-      </div>
+      <v-toolbar flat>
+        <v-toolbar-title>
+          {{ $t('admin') }}
+        </v-toolbar-title>
+      </v-toolbar>
+      <v-col>
+        <v-row
+          no-gutters
+          class="justify-space-between"
+        >
+          <Permission :requires="TrellisPermission.REMOVE_GEO">
+            <v-btn
+              @click="removeGeo"
+              color="error"
+            >
+              {{ $t('delete') }}
+            </v-btn>
+          </Permission>
+          <GeoHooks
+            v-if="isWeb && geo"
+            :geo-id="geo.id"
+          />
+        </v-row>
+      </v-col>
     </v-card>
     <TrellisModal
       v-model="showGeoTypeDialog"

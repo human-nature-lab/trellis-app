@@ -74,7 +74,7 @@
         >
           <v-btn
             color="success"
-            :disabled="running"
+            :disabled="running || !hasPermission(TrellisPermission.ADD_SNAPSHOT)"
             :loading="running"
             @click="runHook(activeDef)"
           >
@@ -93,11 +93,13 @@ import { Hook } from '../../types/Hook'
 import { HookService } from '../../services/hook'
 import TrellisModal from '../TrellisModal.vue'
 import { relativeTime } from '../../filters/relativeTime'
+import PermissionMixin from '../../mixins/PermissionMixin'
 
 export default Vue.extend({
   name: 'GeoHooks',
   components: { TrellisModal },
   filters: { relativeTime },
+  mixins: [PermissionMixin],
   props: {
     geoId: String,
   },
