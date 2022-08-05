@@ -610,3 +610,8 @@ photo,Photo,,
 duplicate,Duplicate,,Create a duplicate copy of something
 linked_to_forms_n,No linked forms | Linked to {n} forms | Linked to {n} forms,,
 add_existing_section,Add existing section,,
+confirm_run_hook,Are you sure you want to run this hook? This action cannot be undone.,,
+show_result,Show Result,,
+hook_never_run,This hook has never been run,,
+hooks,Hooks,,
+run_hook,Run Hook,,

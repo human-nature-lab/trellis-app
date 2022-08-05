@@ -10,7 +10,7 @@
           v-on="on"
           v-bind="attrs"
         >
-          Hooks
+          {{ $t('hooks') }}
           <v-icon>mdi-chevron-down</v-icon>
         </v-btn>
       </template>
@@ -20,13 +20,16 @@
           :key="id"
           @click="activeDef = def"
         >
-          {{ def.name }}
+          <v-list-item-icon>
+            <v-icon v-text="def.icon || 'mdi-run'" />
+          </v-list-item-icon>
+          <v-list-item-content>{{ def.name }}</v-list-item-content>
         </v-list-item>
       </v-list>
     </v-menu>
     <TrellisModal
       :value="!!activeDef"
-      :title="activeDef ? `Hook: ${activeDef.name}` : ''"
+      :title="activeDef ? `${activeDef.name}` : ''"
       @input="activeDef = null; activeResult = null;"
     >
       <v-col v-if="activeDef">
@@ -36,9 +39,9 @@
         <v-simple-table v-if="activeDef.instances.length">
           <thead>
             <tr>
-              <th>Id</th>
-              <th>Instance Id</th>
-              <th>Date</th>
+              <th>{{ $t('id') }}</th>
+              <th>{{ $t('instance_id') }}</th>
+              <th>{{ $t('started_at') }}</th>
               <th />
             </tr>
           </thead>
@@ -54,14 +57,14 @@
               </td>
               <td>
                 <v-btn @click="activeResult = inst">
-                  Show Result
+                  {{ $t('show_result') }}
                 </v-btn>
               </td>
             </tr>
           </tbody>
         </v-simple-table>
         <p v-else>
-          This hook has never been executed
+          {{ $t('hook_never_run') }}
         </p>
         <v-slide-y-transition>
           <v-col v-if="activeResult">
@@ -78,7 +81,7 @@
             :loading="running"
             @click="runHook(activeDef)"
           >
-            Run
+            {{ $t('run_hook') }}
             <v-icon>mdi-play</v-icon>
           </v-btn>
         </v-row>
@@ -88,12 +91,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue, { PropType } from 'vue'
 import { Hook } from '../../types/Hook'
 import { HookService } from '../../services/hook'
 import TrellisModal from '../TrellisModal.vue'
 import { relativeTime } from '../../filters/relativeTime'
 import PermissionMixin from '../../mixins/PermissionMixin'
+import Geo from '../../entities/trellis/Geo'
 
 export default Vue.extend({
   name: 'GeoHooks',
@@ -101,7 +105,7 @@ export default Vue.extend({
   filters: { relativeTime },
   mixins: [PermissionMixin],
   props: {
-    geoId: String,
+    geo: Object as PropType<Geo>,
   },
   data () {
     return {
@@ -114,9 +118,9 @@ export default Vue.extend({
     }
   },
   watch: {
-    geoId: {
-      handler (newId: string, oldId: string) {
-        if (newId !== oldId) {
+    geo: {
+      handler (newGeo: Geo, oldGeo: Geo) {
+        if (!oldGeo || newGeo.id !== oldGeo.id) {
           this.load()
         }
       },
@@ -127,7 +131,13 @@ export default Vue.extend({
     async load () {
       try {
         this.loading = true
-        this.hooks = await HookService.geoHooks(this.geoId)
+        this.hooks = await HookService.geoHooks(this.geo.id)
+        for (const id in this.hooks) {
+          const hook = this.hooks[id]
+          if (hook.geoTypeId && hook.geoTypeId !== this.geo.geoTypeId) {
+            delete this.hooks[id]
+          }
+        }
         this.hasHooks = !!Object.keys(this.hooks).length
       } catch (err) {
         this.logError(err)
@@ -136,9 +146,12 @@ export default Vue.extend({
       }
     },
     async runHook (def: Hook) {
+      if (!confirm(this.$t('confirm_run_hook'))) {
+        return
+      }
       try {
         this.running = true
-        await HookService.runGeoHook(this.geoId, def.id)
+        await HookService.runGeoHook(this.geo.id, def.id)
         this.alert('success', this.$t('success'))
         await this.load()
         this.activeDef = this.hooks[this.activeDef.id]

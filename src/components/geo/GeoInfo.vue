@@ -82,7 +82,7 @@
           </Permission>
           <GeoHooks
             v-if="isWeb && geo"
-            :geo-id="geo.id"
+            :geo="geo"
           />
         </v-row>
       </v-col>
