@@ -134,6 +134,12 @@ export default Vue.extend({
         this.hooks = await HookService.geoHooks(this.geo.id)
         for (const id in this.hooks) {
           const hook = this.hooks[id]
+          hook.instances = hook.instances.map(i => {
+            if (i.result) {
+              i.result = JSON.parse(i.result)
+            }
+            return i
+          })
           if (hook.geoTypeId && hook.geoTypeId !== this.geo.geoTypeId) {
             delete this.hooks[id]
           }
