@@ -1,7 +1,7 @@
 const colors = {
-  primary: '#E64A19',
+  primary: '#cc4115',
   secondary: '#FFCCBC',
-  accent: '#93C0A4'
+  accent: '#93C0A4',
   // accent: '#607D8B'
   // error: '#DD2C00',
   // warning: '#F2C078',
@@ -12,6 +12,6 @@ export default {
   dark: false,
   themes: {
     light: colors,
-    dark: colors
-  }
+    dark: colors,
+  },
 }
