@@ -8,7 +8,9 @@ export class HookService {
   }
 
   static async runGeoHook (geoId: string, hookId: string) {
-    const res = await adminInst.post(uriTemplate('/hooks/geo/{geoid}/{hookid}', [geoId, hookId]))
+    const res = await adminInst.post(uriTemplate('/hooks/geo/{geoid}/{hookid}', [geoId, hookId]), null, {
+      timeout: 0,
+    })
     return res.data
   }
 }

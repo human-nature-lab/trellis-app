@@ -76,8 +76,8 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
         select id from interview where survey_id = (select survey_id from interview where id = :interviewId)
       )
     )`, {
-        interviewId
-      })
+        interviewId,
+      }).andWhere('preload_action.deleted_at is null')
     let preloadActions = await q.getMany()
     const insertActions = preloadActions.map((p, i) => {
       let a = new Action()
