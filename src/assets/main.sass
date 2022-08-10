@@ -30,9 +30,20 @@
     min-height: 100vh
 
 @media print
+  html, body, .v-application, .main-wrapper
+    height: auto !important
+  html, body
+    overflow: visible
   .main-wrapper
     overflow: visible !important
-    height: auto !important
+    min-height: 100% !important
+    nav
+      display: none
+    header.v-app-bar
+      display: none
+    #trellis-main
+      margin: 0 !important
+      min-height: 100vh !important
 
 .pointer
   cursor: pointer

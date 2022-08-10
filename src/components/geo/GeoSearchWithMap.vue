@@ -1,41 +1,43 @@
 <template>
-  <v-col class="fill-height content">
-    <v-toolbar>
+  <v-col class="geo-search-with-map d-flex flex-column flex-grow-1">
+    <v-toolbar class="flex-grow-0 w-full">
       <v-btn icon v-if="parentGeo !== null" @click.stop="upOneLevelDone">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
       <v-toolbar-title>{{ parentGeoName }}</v-toolbar-title>
     </v-toolbar>
-    <v-container
-      ref="mapContainer"
-      id="leafletMap"
-      style="position: relative;">
-      <v-progress-linear id="loading-progress" v-if="isLoading" indeterminate />
-      <v-btn
-        class="floating-button"
-        @click.stop="printMap"
-        :dark="global.darkTheme"
-        fab
-        absolute
-        bottom
-        left>
-        <v-icon style="height:auto;">mdi-printer</v-icon>
-      </v-btn>
-      <Permission :requires="TrellisPermission.ADD_GEO">
+    <v-col class="flex-grow-1 pa-0">
+      <v-col
+        ref="mapContainer"
+        id="leafletMap">
+        <v-progress-linear id="loading-progress" v-if="isLoading" indeterminate />
         <v-btn
-          v-if="selectedGeo === null && parentGeo !== null && parentGeo.geoType.canUserAddChild"
-          class="deep-orange floating-button"
-          @click.stop="addNewGeo"
+          class="floating-button"
+          @click.stop="printMap"
+          :dark="global.darkTheme"
           fab
-          dark
           absolute
           bottom
-          right>
-          <v-icon style="height:auto;">mdi-plus</v-icon>
+          left>
+          <v-icon style="height:auto;">mdi-printer</v-icon>
         </v-btn>
-      </Permission>
-    </v-container>
-    <v-col class="flow-grow-0">
+        <Permission :requires="TrellisPermission.ADD_GEO">
+          <v-btn
+            v-if="selectedGeo === null && parentGeo !== null && parentGeo.geoType.canUserAddChild"
+            class="deep-orange floating-button"
+            @click.stop="addNewGeo"
+            fab
+            dark
+            absolute
+            bottom
+            right>
+            <v-icon style="height:auto;">mdi-plus</v-icon>
+          </v-btn>
+        </Permission>
+      </v-col>
+    </v-col>
+    
+    <div class="flow-grow-0">
       <Permission :requires="TrellisPermission.EDIT_GEO">
         <GeoEditPanel
           v-on:select-geo-done="selectGeoDone"
@@ -48,8 +50,7 @@
           :selected-geo="selectedGeo"
           :leaflet-map="trellisMap" />
       </Permission>
-    </v-col>
-
+    </div>
   </v-col>
 </template>
 
@@ -447,22 +448,14 @@
   @import "../../../node_modules/leaflet/dist/leaflet.css"
 
   @media print
-    .floating-button
-      display: none
-    .v-main
-      overflow: hidden
-  
-  .print-mode
-    .v-main
-      width: 90%
-      margin: auto
-      padding: 0 0 !important
-      position: absolute
-      right: 0
-      top: 0
-      left: 0
-      width: 8in
-      height: 10.5in
+    .geo-search-with-map
+      .floating-button
+        display: none
+      .col
+        padding: 0
+      .container.fill-height
+        height: 100% !important
+        min-height: 100vh
 
   .snack
     z-index: 3000 !important
@@ -470,8 +463,8 @@
     z-index: 3000 !important
     margin-bottom: 50px
   #leafletMap
+    z-index: 0
     height: 100%
-    // height: 400px /* Temporary height, replaced by actual container height via javascript */
     width: 100%
   .trellis-popup
     margin: 2px 2px

@@ -244,14 +244,14 @@ export default Vue.extend({
     // .scroll-container
     //   overflow: auto !important
     //   height: 100%
-    .v-application--wrap
-      min-height: inherit !important
-    .v-main
-      padding: 0 !important
-      padding-top: 5px !important
-      margin: 0 !important
-      height: auto !important
-      overflow: visible !important
+    // .v-application--wrap
+    //   min-height: inherit !important
+    // .v-main
+    //   padding: 0 !important
+    //   padding-top: 5px !important
+    //   margin: 0 !important
+    //   height: auto !important
+    //   overflow: visible !important
   .code
     max-width: 100%
     white-space: pre-wrap       /* Since CSS 2.1 */

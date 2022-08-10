@@ -85,32 +85,30 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-      <v-main id="trellis-main" class="scroll-container">
+      <v-main id="trellis-main" class="scroll-container d-flex flex-column">
         <v-dialog :value="alerts && alerts.length > 0" persistent>
           <v-card>
             <v-card-text>
-              <trellis-alert :current-log="alerts[alerts.length - 1]"></trellis-alert>
+              <TrellisAlert :current-log="alerts[alerts.length - 1]" />
             </v-card-text>
             <v-card-actions>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-btn @click="dismissAlert()">Dismiss</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container fluid fill-height class="pa-0 align-start" v-if="!maintenanceMode">
-          <router-view class="route-container fade-in" />
+        <v-container fluid class="flex-grow-1 fill-height pa-0" v-if="!maintenanceMode">
+          <router-view class="route-container fill-height fade-in align-start" />
         </v-container>
-        <v-container fluid fill-height class="align-start" v-else>
+        <v-container fluid class="fill-height align-start" v-else>
           <Maintenance v-model="maintenanceMode" />
         </v-container>
       </v-main>
-
       <LocationFinder />
       <CensusFormChecker />
       <SnackbarQueue />
       <DocsSidebar />
       <LoginModal />
-
     </v-app>
   </div>
 </template>
@@ -256,56 +254,25 @@
 </script>
 
 <style lang="sass">
-  // .container
-  //   &.fill-height
-  //     align-items: start
   html, body
     overflow: auto !important
-    // overflow: auto !important
-    /*padding-top: constant(safe-area-inset-top)*/
-    /*padding-top: env(safe-area-inset-top)*/
-  // .route-loading
-  //   position: absolute
-  //   margin: 0
-  //   margin-top: 2px
-  // .navigation-drawer
-  //   z-index: 1600
-  //   padding: 0
-  // .dialog
-  //   z-index: 1600
-  // .overlay
-  //   z-index: 1500
-  // .app-container
-  //   /*margin-top: 50px*/
-  //   /*margin-bottom: 50px*/
-  // .app-container-demo
-  //   padding-top: 56px
-  // .main-menu
-  //   margin-top: 0 !important
-  // .main-menu-demo
-  //   margin-top: 56px !important
-  // .demo-banner
-  //   z-index: 1600
-  //   position: fixed
-  //   width: 100%
-  //   height: 55px
-  //   margin-top: 0
-  //   font-weight: bold
-  //   font-size: 20px
-  // @media only screen and (max-width: 900px)
-  //   .demo-banner
-  //     font-size: 15px
-  // @media only screen and (max-width: 700px)
-  //   .demo-banner
-  //     font-size: 11px
-  // .list--dense
-  //   padding-top: 0
+
+  .route-container > *
+    width: 100%
   .logo
     height: 55%
     img
       max-width: 100%
       max-height: 100%
-  
+
+  #trellis-main
+    margin-top: 64px !important
+    padding: 0 !important
+    height: calc(100% - 64px)
+
+  .v-main__wrap
+    height: 100%
+
   .main-wrapper
     display: flex
     flex-direction: column
@@ -320,9 +287,7 @@
   .scroll-container
     overflow: auto
     flex: 1 1 auto !important
-    // margin-bottom: 64px
-  // .study
-  //   margin-left: 0
+
   .fade-in
     animation: fade-in .3s ease-in-out 0s 1
   @keyframes fade-in
@@ -335,7 +300,6 @@
     *:not(.stepper__wrapper)
       transition-property: none !important
       transition-duration: 0s !important
-      /*transform: none !important*/
       animation: none !important
   .page-footer
     background-color: #808080 !important
