@@ -2,7 +2,7 @@ import EdgeServiceInterface, { SourceTarget } from './EdgeServiceInterface'
 import Edge from '../../entities/trellis/Edge'
 import DatabaseService from '../database'
 import { In } from 'typeorm'
-
+import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
 export default class EdgeServiceCordova implements EdgeServiceInterface {
   public cache = new Map<string, Edge>()
 
@@ -25,14 +25,58 @@ export default class EdgeServiceCordova implements EdgeServiceInterface {
         'targetRespondent',
         'sourceRespondent.names',
         'targetRespondent.names',
-        'sourceRespondent.photos',
-        'targetRespondent.photos',
       ],
     })
+    await this.setEdgePhotos(edges)
     for (const e of edges) {
       this.cache.set(e.id, e)
     }
     return res.concat(edges)
+  }
+
+  async setEdgePhotos (edges: Edge[]) {
+    const photoRepo = await DatabaseService.getRepository(RespondentPhoto)
+    const respondentIds = []
+    const sourceMap = new Map<string, Edge[]>()
+    const targetMap = new Map<string, Edge[]>()
+    for (const e of edges) {
+      e.sourceRespondent.photos = []
+      e.targetRespondent.photos = []
+      if (!sourceMap.has(e.sourceRespondentId)) {
+        sourceMap.set(e.sourceRespondentId, [e])
+      } else {
+        sourceMap.get(e.sourceRespondentId).push(e)
+      }
+      if (!targetMap.has(e.targetRespondentId)) {
+        targetMap.set(e.targetRespondentId, [e])
+      } else {
+        targetMap.get(e.targetRespondentId).push(e)
+      }
+      respondentIds.push(e.sourceRespondentId, e.targetRespondentId)
+    }
+    const resPhotos = await photoRepo.find({
+      where: {
+        respondentId: In(respondentIds),
+      },
+      relations: [
+        'photo',
+      ],
+      order: {
+        sortOrder: 'ASC',
+      },
+    })
+    for (const p of resPhotos) {
+      if (sourceMap.has(p.respondentId)) {
+        for (const e of sourceMap.get(p.respondentId)) {
+          e.sourceRespondent.photos.push(p.photo)
+        }
+      }
+      if (targetMap.has(p.respondentId)) {
+        for (const e of targetMap.get(p.respondentId)) {
+          e.targetRespondent.photos.push(p.photo)
+        }
+      }
+    }
   }
 
   async createEdges (edgeDefs: SourceTarget[]): Promise<Edge[]> {
