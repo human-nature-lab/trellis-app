@@ -13,9 +13,9 @@
       :key="edge.id"
       v-for="edge in edges"
     >
-      <v-avatar v-if="!edge.isLoading">
+      <v-avatar v-if="respondent && !edge.isLoading && edge.sourceRespondentId !== respondent.id">
         <Photo
-          :photo="edge.targetRespondent.photos.length ? edge.targetRespondent.photos[0] : null"
+          :photo="edge.sourceRespondent.photos.length ? edge.sourceRespondent.photos[0] : null"
           :show-alt="false"
           immediate
           width="20"
@@ -26,6 +26,19 @@
         <v-progress-circular
           indeterminate
           color="primary"
+        />
+      </v-avatar>
+      <span v-if="!edge.isLoading && respondent && respondent.id !== edge.sourceRespondentId">
+        {{ edge.sourceRespondent.name }}
+        <v-icon>mdi-arrow-right</v-icon>
+      </span>
+      <v-avatar v-if="!edge.isLoading">
+        <Photo
+          :photo="edge.targetRespondent.photos.length ? edge.targetRespondent.photos[0] : null"
+          :show-alt="false"
+          immediate
+          width="20"
+          height="20"
         />
       </v-avatar>
       {{ edge.isLoading ? 'Loading...' : edge.targetRespondent.name }}
