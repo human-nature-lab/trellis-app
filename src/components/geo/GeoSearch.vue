@@ -104,14 +104,13 @@
 </template>
 
 <script>
-  import GeoListTile from './GeoListTile.vue'
-  import Cart from '../Cart.vue'
   import { debounce } from 'lodash'
-  import GeoService from '../../services/geo'
-  import TranslationService from '../../services/TranslationService'
-  import singleton from '../../static/singleton'
-  import { routeQueue } from '../../router'
-  import global from '../../static/singleton'
+  import GeoListTile from '@/components/geo/GeoListTile.vue'
+  import Cart from '@/components/Cart.vue'
+  import GeoService from '@/services/geo'
+  import TranslationService from '@/services/TranslationService'
+  import { routeQueue } from '@/router'
+  import singleton from '@/static/singleton'
 
   export default {
     name: 'geo-search',
@@ -187,8 +186,8 @@
       },
       orderedResults () {
         function compare(a, b) {
-          const aTransText = a.nameTranslation.translationText.find((tt) => tt.localeId === global.locale.id)
-          const bTransText = b.nameTranslation.translationText.find((tt) => tt.localeId === global.locale.id)
+          const aTransText = a.nameTranslation.translationText.find((tt) => tt.localeId === singleton.locale.id)
+          const bTransText = b.nameTranslation.translationText.find((tt) => tt.localeId === singleton.locale.id)
           const aName = aTransText ? aTransText.translatedText : (a.nameTranslation.translationText.length ? a.nameTranslation.translationText[0].translatedText : '')
           const bName = bTransText ? bTransText.translatedText : (b.nameTranslation.translationText.length ? b.nameTranslation.translationText[0].translatedText : '')
           // TODO: je104 comes before je004, would need to split into numeric and non-numeric and sort separately

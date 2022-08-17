@@ -101,7 +101,7 @@
 
 <script>
   import ModalTitle from '../ModalTitle.vue'
-  import GeoSearch from '../geo/GeoSearch.vue'
+  import GeoSearch from '@/components/geo/GeoSearch.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
   import RespondentService from '../../services/respondent'
   import GeoBreadcrumbs from '../geo/GeoBreadcrumbs.vue'

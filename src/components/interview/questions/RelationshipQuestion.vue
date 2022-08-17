@@ -84,16 +84,16 @@
 </template>
 
 <script>
-import ActionTypes from '../../../static/action.types'
+import { uniq } from 'lodash'
+import ActionTypes from '@/static/action.types'
 import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
 import ActionMixin from '../mixins/ActionMixin'
 import Photo from '../../photo/Photo.vue'
-import RespondentsSearch from '../../respondent/RespondentsSearch.vue'
+import RespondentsSearch from '@/views/respondent/RespondentsSearch.vue'
 import ModalTitle from '../../ModalTitle.vue'
-import EdgeService from '../../../services/edge'
-import parameterTypes from '../../../static/parameter.types'
-import GeoService from '../../../services/geo'
-import { uniq } from 'lodash'
+import EdgeService from '@/services/edge'
+import parameterTypes from '@/static/parameter.types'
+import GeoService from '@/services/geo'
 
 export default {
   name: 'RelationshipQuestion',

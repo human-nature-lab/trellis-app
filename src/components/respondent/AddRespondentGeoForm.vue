@@ -43,7 +43,7 @@
 <script lang="ts">
   import Vue from 'vue'
 
-  import GeoSearch from '../geo/GeoSearch.vue'
+  import GeoSearch from '@/components/geo/GeoSearch.vue'
   import ModalTitle from '../ModalTitle.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
 
