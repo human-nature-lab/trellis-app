@@ -42,7 +42,7 @@
             <span>{{$t('change_study')}}</span>
           </v-tooltip>
         </v-toolbar-title>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-tooltip left>
           <template v-slot:activator="{ on, attrs }">
             <v-btn 
@@ -97,8 +97,8 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container fluid class="flex-grow-1 fill-height pa-0" v-if="!maintenanceMode">
-          <router-view class="route-container fill-height fade-in align-start" />
+        <v-container fluid class="flex-grow-1 fill-height pa-0 align-start" v-if="!maintenanceMode">
+          <router-view class="route-container fill-height fade-in align-start align-content-start" />
         </v-container>
         <v-container fluid class="fill-height align-start" v-else>
           <Maintenance v-model="maintenanceMode" />

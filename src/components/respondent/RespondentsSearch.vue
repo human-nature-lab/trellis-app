@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="respondent-search">
+  <v-container fluid class="respondent-search align-content-start">
     <v-row no-gutters>
       <v-text-field
         :placeholder="$t('search')"
@@ -21,7 +21,7 @@
         <v-icon v-else>mdi-chevron-down</v-icon>
       </v-btn>
     </v-row>
-    <v-scale-transition>
+    <v-slide-y-transition>
       <v-col v-if="filtersIsOpen">
         <v-col>
           <v-row>
@@ -45,7 +45,7 @@
           </v-row>
         </v-col>
       </v-col>
-    </v-scale-transition>
+    </v-slide-y-transition>
     <v-row>
       <v-divider v-if="filters.geos && filters.geos.length" />
     </v-row>
