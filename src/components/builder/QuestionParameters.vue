@@ -43,20 +43,20 @@
 </template>
 
 <script lang="ts">
-import builder from '../../services/builder'
-import MenuSelect from './MenuSelect.vue'
-import ParameterRow from './ParameterRow.vue'
-import QuestionParameter from '../../entities/trellis/QuestionParameter'
-import Choice from '../../entities/trellis/Choice'
-import ConditionTag from '../../entities/trellis/ConditionTag'
-import GeoType from '../../entities/trellis/GeoType'
-import Locale from '../../entities/trellis/Locale'
-import Parameter from '../../entities/trellis/Parameter'
-import QPType from '../../entities/trellis/QuestionParameter'
 import Vue, { PropType } from 'vue'
+import builder from '@/services/builder'
+import MenuSelect from '@/components/util/MenuSelect.vue'
+import ParameterRow from './ParameterRow.vue'
+import QuestionParameter from '@/entities/trellis/QuestionParameter'
+import Choice from '@/entities/trellis/Choice'
+import ConditionTag from '@/entities/trellis/ConditionTag'
+import GeoType from '@/entities/trellis/GeoType'
+import Locale from '@/entities/trellis/Locale'
+import Parameter from '@/entities/trellis/Parameter'
+import QPType from '@/entities/trellis/QuestionParameter'
 
 export default Vue.extend({
-  name: "QuestionParameters",
+  name: 'QuestionParameters',
   props: {
     disabled: Boolean,
     value: Array as PropType<QPType[]>,

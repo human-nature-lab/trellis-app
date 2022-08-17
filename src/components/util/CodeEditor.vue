@@ -12,7 +12,7 @@ import { EditorState, Compartment } from '@codemirror/state'
 import { javascript } from '@codemirror/lang-javascript'
 import { html } from '@codemirror/lang-html'
 import { ViewUpdate } from '@codemirror/view'
-import global from '../static/singleton'
+import global from '@/static/singleton'
 
 type Compartments = {
   readonly: Compartment

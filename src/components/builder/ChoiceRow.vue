@@ -43,11 +43,11 @@
 
 <script lang="ts">
 import Vue, { PropType } from 'vue'
-import Locale from '../../entities/trellis/Locale'
-import QuestionChoice from '../../entities/trellis/QuestionChoice'
-import TranslationEntity from '../../entities/trellis/Translation'
-import builder from '../../services/builder'
-import DotsMenu from './DotsMenu.vue'
+import Locale from '@/entities/trellis/Locale'
+import QuestionChoice from '@/entities/trellis/QuestionChoice'
+import TranslationEntity from '@/entities/trellis/Translation'
+import builder from '@/services/builder'
+import DotsMenu from '@/components/util/DotsMenu.vue'
 import Translation from './Translation.vue'
 
 export default Vue.extend({

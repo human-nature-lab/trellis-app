@@ -81,13 +81,13 @@
 </template>
 
 <script lang="ts">
-import Section from '../../entities/trellis/Section'
+import Section from '@/entities/trellis/Section'
 import Vue, { PropOptions } from 'vue'
 import Translation from './Translation.vue'
-import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
-import { builder } from '../../symbols/builder'
-import DotsMenu from './DotsMenu.vue'
-import MenuSelect from './MenuSelect.vue'
+import FormQuestionsMixin from '@/mixins/FormQuestionsMixin'
+import { builder } from '@/symbols/builder'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import MenuSelect from '@/components/util/MenuSelect.vue'
 import BuilderChip from './BuilderChip.vue'
 
 export default Vue.extend({

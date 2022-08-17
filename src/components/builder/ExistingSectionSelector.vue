@@ -32,12 +32,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import Translation from './Translation.vue'
-import FormSection from '../../entities/trellis/FormSection'
-import builderService from '../../services/builder'
-import { builder } from '../../symbols/builder'
-import { study } from '../../symbols/main'
-import StudyForm from '../../entities/trellis/StudyForm'
-import TranslationModel from 'src/entities/trellis/Translation'
+import builderService from '@/services/builder'
+import { builder } from '@/symbols/builder'
+import { study } from '@/symbols/main'
+import StudyForm from '@/entities/trellis/StudyForm'
+import TranslationModel from '@/entities/trellis/Translation'
 
 type FS = {
   sectionId: string

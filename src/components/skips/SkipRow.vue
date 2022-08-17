@@ -1,198 +1,180 @@
 <template>
-  <div>
-    <v-container fluid>
-      <v-row no-gutters>
-        <span>
-          <v-select
-            dense
-            :disabled="disabled"
-            v-model="memSkip.showHide"
-            :items="skipTypes"
-            style="max-width: 8em" />
-        </span>
-        <span class="py-2 px-4">
-          the {{subject}} if {{scope}} has
-        </span>
-        <span>
-          <v-select
-            dense
-            :disabled="disabled"
-            v-model="memSkip.anyAll"
-            :items="logicTypes"
-            style="max-width: 8em"
-            single-line
-          />
-        </span>
-        <span class="py-2 px-4">conditions</span>
-        <v-autocomplete
-            dense
-            deletable-chips
-            chips
-            small-chips
-            multiple
-            :loading="isLoading"
-            :disabled="disabled || isLoading"
-            v-show="!isLoading"
-            :items="existingConditionTagNames"
-            append-icon="mdi-plus"
-            @click:append="showCreateConditionTag"
-            :value="selectedConditionTags"
-            @input="updateConditionTags" />
-      </v-row>
-    </v-container>
-    <TrellisModal title="New condition tag" v-model="showConditionTag">
-      <v-text-field
-        label="Condition tag"
-        v-model="conditionTagName"
-        append-icon="mdi-plus"
-        @click:append="addConditionTag"
+  <v-row
+    no-gutters
+    class="align-center"
+  >
+    <v-col
+      v-if="!disabled"
+      cols="1"
+    >
+      <DotsMenu
+        removable
+        @remove="$emit('remove')"
+        :loading="loading"
+        right
+        class-name="skip-drag-handle"
+      >
+        <ToggleItem
+          v-if="allowCustom"
+          :value="!!value.customLogic"
+          @input="toggleCustomLogic"
+          :on-title="$t('hide_custom_logic')"
+          :off-title="$t('show_custom_logic')"
+        />
+      </DotsMenu>
+    </v-col>
+    <v-col
+      v-if="!value.customLogic"
+      md="auto"
+      cols="11"
+      class="px-1"
+    >
+      <MenuSelect
+        v-model="value.showHide"
+        :items="showOpts"
+        :disabled="disabled || loading"
+        @change="updateShowHide"
+        color="primary lighten-3"
       />
-    </TrellisModal>
-  </div>
+      <span class="mx-1">the {{ subject }} if there are</span>
+      <MenuSelect
+        v-model="value.anyAll"
+        :items="anyOpts"
+        :disabled="disabled || loading"
+        @change="updateAnyAll"
+        color="primary lighten-3"
+      />
+      <span class="mx-1">of the conditions</span>
+      <span v-if="disabled">
+        <v-chip
+          color="primary lighten-3"
+          v-for="condition in selectedConditionTags"
+          :key="condition"
+          label
+        >{{ condition }}</v-chip>
+      </span>
+    </v-col>
+    <v-col
+      v-if="!disabled && !value.customLogic"
+      cols="auto"
+      class="flex-grow-1"
+    >
+      <v-autocomplete
+        :value="selectedConditionTags"
+        @change="updateConditionTags"
+        :items="conditionTagNames"
+        :disabled="loading"
+        multiple
+        dense
+        hide-details
+        chips
+        color="primary lighten-3"
+      />
+    </v-col>
+    <v-col v-if="value.customLogic">
+      <CodeEditor
+        v-model="value.customLogic"
+        @change="updateCustomLogic"
+        :readonly="disabled"
+      />
+    </v-col>
+  </v-row>
 </template>
 
 <script lang="ts">
-  import Vue from "vue";
-  import Skip from "../../entities/trellis/Skip";
-  import ConditionTag from "../../entities/trellis/ConditionTag";
-  import TrellisLoadingCircle from "../TrellisLoadingCircle.vue";
-  import TrellisModal from "../TrellisModal.vue";
-  import { debounce } from "lodash";
-  import SkipConditionTag from "../../entities/trellis/SkipConditionTag";
-  import CompareService from "../../services/CompareService";
+import Vue, { PropType } from 'vue'
+import { debounce } from 'lodash'
+import Skip from '@/entities/trellis/Skip'
+import titleCase from '@/filters/TitleCase'
+import MenuSelect from '@/components/util/MenuSelect.vue'
+import ConditionTag from '@/entities/trellis/ConditionTag'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import ToggleItem from '@/components/util/ToggleItem.vue'
+import EditText from '@/components/util/EditText.vue'
+import CodeEditor from '@/components/util/CodeEditor.vue'
 
-  export default Vue.extend({
-    name: "SkipRow",
-    components: { TrellisLoadingCircle, TrellisModal },
-    props: {
-      skip: Object as () => Skip,
-      conditionTags: Array as () => ConditionTag[],
-      scope: {
-        type: String,
-        default: "respondent",
-      },
-      subject: {
-        type: String,
-        required: true,
-      },
-      disabled: {
-        type: Boolean,
-        default: false,
-      },
+const defaultLogic = 'function showIf({ vars, tags, data }) {\n  return true;\n}'
+
+export default Vue.extend({
+  name: 'SkipRow',
+  components: { MenuSelect, DotsMenu, ToggleItem, EditText, CodeEditor },
+  filters: { titleCase },
+  props: {
+    value: Object as PropType<Skip>,
+    disabled: Boolean,
+    allowCustom: Boolean,
+    loading: Boolean,
+    subject: String as PropType<'page' | 'section' | 'form'>,
+    conditionTags: Array as PropType<ConditionTag[]>,
+  },
+  data () {
+    return {
+      emitChangeDebounced: debounce((value: Skip) => {
+        this.$emit('change', value)
+      }, 500),
+    }
+  },
+  computed: {
+    selectedConditionTags (): string[] {
+      const r = this.value.conditionTags.map((sct) => sct.conditionTagName)
+      r.sort()
+      return r
     },
-    data() {
-      return {
-        memSkip: this.skip.copy(),
-        isDirty: false,
-        showConditionTag: false,
-        conditionTagName: null,
-        skipTypes: [
-          {
-            text: "Show",
-            value: true,
-          },
-          {
-            text: "Hide",
-            value: false,
-          },
-        ],
-        logicTypes: [
-          {
-            text: "any",
-            value: false,
-          },
-          {
-            text: "all",
-            value: true,
-          },
-        ],
-        saveThrottled: null,
-      };
+    conditionTagNames (): string[] {
+      const r = this.conditionTags.map(c => c.name)
+      r.sort()
+      return r
     },
-    created() {
-      this.saveThrottled = debounce(() => {
-        console.log("emitting finalSave event");
-        this.$emit("save", this.memSkip);
-      }, 2000);
+    showOpts (): object[] {
+      return [{
+        text: this.$t('show'),
+        value: true,
+      }, {
+        text: this.$t('hide'),
+        value: false,
+      }]
     },
-    watch: {
-      skip(newSkip) {
-        console.log("Updating skip", newSkip);
-        this.merge(newSkip);
-        this.isDirty = false;
-      },
-      memSkip: {
-        handler(newSkip): void {
-          if (
-            !CompareService.entitiesAreEqual(newSkip, this.skip) &&
-            newSkip.conditionTags.length
-          ) {
-            console.log("mem copy is different from previous");
-            this.isDirty = true;
-            this.saveThrottled(newSkip);
-          } else {
-            this.isDirty = false;
-          }
-        },
-        deep: true,
-      },
+    anyOpts (): object {
+      return [{
+        text: this.$t('any'),
+        value: false,
+      }, {
+        text: this.$t('all'),
+        value: true,
+      }]
     },
-    computed: {
-      selectedConditionTags(): string[] {
-        return this.memSkip.conditionTags.map((sct) => sct.conditionTagName);
-      },
-      isLoading(): boolean {
-        return this.conditionTags === null
-      },
-      existingConditionTagNames(): string[] {
-        return this.conditionTags
-          .map((ct) => ct.name)
-          .concat(this.selectedConditionTags);
-      },
+  },
+  methods: {
+    updateConditionTags (newConds: string[]) {
+      this.$emit('changeConditions', this.value, newConds)
     },
-    methods: {
-      merge(newSkip: Skip) {
-        this.memSkip = newSkip.copy();
-      },
-      showCreateConditionTag() {
-        this.showConditionTag = true;
-        this.conditionTagName = "";
-      },
-      updateConditionTags(tags: string[]) {
-        console.log("updating condition tags");
-        if (tags.length > this.memSkip.conditionTags.length) {
-          // Adding condition tags
-          for (let name of tags) {
-            if (this.selectedConditionTags.indexOf(name) === -1) {
-              this.memSkip.conditionTags.push(
-                new SkipConditionTag().fromSnakeJSON({
-                  condition_tag_name: name,
-                })
-              );
-            }
-          }
-        } else {
-          // Removing condition tags
-          for (let i = 0; i < this.memSkip.conditionTags.length; i++) {
-            const tag = this.memSkip.conditionTags[i];
-            if (tags.indexOf(tag.conditionTagName) === -1) {
-              this.memSkip.conditionTags.splice(i, 1);
-              i++;
-            }
-          }
+    updateShowHide (val: boolean) {
+      this.value.showHide = val
+      this.$emit('change', this.value)
+    },
+    updateAnyAll (val: boolean) {
+      this.value.anyAll = val
+      this.$emit('change', this.value)
+    },
+    toggleCustomLogic (show: boolean) {
+      if (show) {
+        this.value.customLogic = defaultLogic
+        this.$emit('change', this.value)
+      } else {
+        if (confirm(this.$t('delete_custom_logic_confirm'))) {
+          this.value.customLogic = null
+          this.$emit('change', this.value)
         }
-      },
-      addConditionTag() {
-        this.memSkip.conditionTags.push(
-          new SkipConditionTag().fromSnakeJSON({
-            condition_tag_name: this.conditionTagName,
-          })
-        );
-        this.showConditionTag = false;
-      },
-      remove() {
-        this.$emit("remove");
-      },
+      }
     },
-  });
+    updateCustomLogic (newVal: string) {
+      this.value.customLogic = newVal
+      this.emitChangeDebounced(this.value)
+    },
+  },
+})
 </script>
+
+<style lang="sass">
+
+</style>

@@ -80,7 +80,7 @@
     <TrellisModal v-model="showFormSkips" :title="$t('skips')">
       <FormSkips
         @close="showFormSkips = false"
-        :form="formSkipsForm" />
+        v-model="formSkipsForm" />
     </TrellisModal>
   </v-container>
 </template>

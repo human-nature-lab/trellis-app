@@ -75,17 +75,17 @@
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
 import Question from './Question.vue'
-import QuestionGroup from '../../entities/trellis/QuestionGroup'
-import QuestionModel from '../../entities/trellis/Question'
+import QuestionGroup from '@/entities/trellis/QuestionGroup'
+import QuestionModel from '@/entities/trellis/Question'
 import TCard from '../styles/TCard.vue'
-import { builder } from '../../symbols/builder'
-import DotsMenu from './DotsMenu.vue'
-import builderService from '../../services/builder'
+import { builder } from '@/symbols/builder'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import builderService from '@/services/builder'
 import PageSkips from './PageSkips.vue'
-import ToggleItem from './ToggleItem.vue'
+import ToggleItem from '@/components/util/ToggleItem.vue'
 import ExpandSection from './ExpandSection.vue'
-import SortableList, { Added, Moved } from './SortableList.vue'
-import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
+import SortableList, { Added, Moved } from '@/components/util/SortableList.vue'
+import FormQuestionsMixin from '@/mixins/FormQuestionsMixin'
 
 export default Vue.extend({
   name: 'Page',

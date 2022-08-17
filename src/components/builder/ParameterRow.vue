@@ -63,17 +63,17 @@
 </template>
 
 <script lang="ts">
-import Parameter, { ParameterType } from '../../entities/trellis/Parameter'
 import Vue, { PropType } from 'vue'
-import QuestionParameter from '../../entities/trellis/QuestionParameter'
-import MenuSelect from './MenuSelect.vue'
-import ConditionTag from '../../entities/trellis/ConditionTag'
-import Choice from '../../entities/trellis/Choice'
-import GeoType from '../../entities/trellis/GeoType'
-import builder from '../../services/builder'
+import Parameter, { ParameterType } from '@/entities/trellis/Parameter'
+import QuestionParameter from '@/entities/trellis/QuestionParameter'
+import MenuSelect from '@/components/util/MenuSelect.vue'
+import ConditionTag from '@/entities/trellis/ConditionTag'
+import Choice from '@/entities/trellis/Choice'
+import GeoType from '@/entities/trellis/GeoType'
+import builder from '@/services/builder'
 import ChoiceSelector from './ChoiceSelector.vue'
-import Locale from '../../entities/trellis/Locale'
-import DotsMenu from './DotsMenu.vue'
+import Locale from '@/entities/trellis/Locale'
+import DotsMenu from '@/components/util/DotsMenu.vue'
 
 export default Vue.extend({
   name: 'ParameterRow',

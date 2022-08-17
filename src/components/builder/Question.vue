@@ -67,16 +67,16 @@
 
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
-import Question from '../../entities/trellis/Question'
-import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
+import Question from '@/entities/trellis/Question'
+import FormQuestionsMixin from '@/mixins/FormQuestionsMixin'
 import Translation from './Translation.vue'
 import QuestionHeader from './QuestionHeader.vue'
 import QuestionParameters from './QuestionParameters.vue'
-import { builder } from '../../symbols/builder'
+import { builder } from '@/symbols/builder'
 import QuestionChoices from './QuestionChoices.vue'
-import questionTypes from '../../static/question.types'
+import questionTypes from '@/static/question.types'
 import QuestionConditions from './QuestionConditions.vue'
-import builderService from '../../services/builder'
+import builderService from '@/services/builder'
 import ExpandSection from './ExpandSection.vue'
 
 export default Vue.extend({

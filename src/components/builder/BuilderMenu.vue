@@ -91,16 +91,15 @@
 </template>
 
 <script lang="ts">
-import { study } from '../../symbols/main'
 import Vue, { PropType } from 'vue'
-import Locale from '../../entities/trellis/Locale'
-import LocaleSelectorMenu from '../locale/LocaleSelectorMenu.vue'
-import DotsMenu from './DotsMenu.vue'
-import expandAll from '../../events/builder/expandAll'
-import FormService from '../../services/form'
-import TrellisModal from '../TrellisModal.vue'
+import { study } from '@/symbols/main'
+import Locale from '@/entities/trellis/Locale'
+import LocaleSelectorMenu from '@/components/locale/LocaleSelectorMenu.vue'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import expandAll from '@/events/builder/expandAll'
+import FormService from '@/services/form'
+import TrellisModal from '@/components/TrellisModal.vue'
 import ExistingSectionSelector from './ExistingSectionSelector.vue'
-import Section from '../../entities/trellis/Section'
 
 export default Vue.extend({
   name: 'BuilderMenu',

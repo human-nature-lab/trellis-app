@@ -88,13 +88,13 @@
 </template>
 
 <script lang="ts">
-import Question from '../../entities/trellis/Question'
 import Vue, { PropType } from 'vue'
-import EditText from './EditText.vue'
-import MenuSelect from './MenuSelect.vue'
-import { builder } from '../../symbols/builder'
-import DotsMenu from './DotsMenu.vue'
-import ToggleItem from './ToggleItem.vue'
+import Question from '@/entities/trellis/Question'
+import EditText from '@/components/util/EditText.vue'
+import MenuSelect from '@/components/util/MenuSelect.vue'
+import { builder } from '@/symbols/builder'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import ToggleItem from '@/components/util/ToggleItem.vue'
 import BuilderChip from './BuilderChip.vue'
 
 export default Vue.extend({

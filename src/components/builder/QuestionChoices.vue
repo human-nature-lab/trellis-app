@@ -52,11 +52,11 @@
 
 <script lang="ts">
 import Vue, { PropType } from 'vue'
-import Locale from '../../entities/trellis/Locale'
-import QuestionChoice from '../../entities/trellis/QuestionChoice'
-import builder from '../../services/builder'
+import Locale from '@/entities/trellis/Locale'
+import QuestionChoice from '@/entities/trellis/QuestionChoice'
+import builder from '@/services/builder'
 import ChoiceRow from './ChoiceRow.vue'
-import SortableList, { Added, Moved } from './SortableList.vue'
+import SortableList, { Moved } from '@/components/util/SortableList.vue'
 
 export default Vue.extend({
   props: {

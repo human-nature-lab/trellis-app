@@ -91,11 +91,11 @@
 </template>
 
 <script lang="ts">
-import { builder } from '../../symbols/builder'
 import Vue from 'vue'
+import { builder } from '@/symbols/builder'
 import AutoTextField from './AutoTextField.vue'
-import { i18n } from '../../i18n'
-import CodeEditor from '../CodeEditor.vue'
+import { i18n } from '@/i18n'
+import CodeEditor from './CodeEditor.vue'
 
 export default Vue.extend({
   name: 'EditText',
