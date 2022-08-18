@@ -65,7 +65,7 @@
   import DatabaseService from '@/services/database'
   import Download from '@/components/sync/download/Download.vue'
   import Upload from '@/components/sync/upload/Upload.vue'
-  import ServerIpConfig from '@views/setup/ServerIPConfig.vue'
+  import ServerIpConfig from '@/views/setup/ServerIPConfig.vue'
   import DocsLinkMixin from '@/mixins/DocsLinkMixin'
   import DocsFiles from '@/components/documentation/DocsFiles'
   import TrellisModal from '@/components/TrellisModal.vue'

@@ -6,11 +6,11 @@ import { guardQueue } from './GuardQueue'
 import sharedRoutes from './shared.routes'
 import LoginGuard from './guards/LoginGuard'
 
-const Sync = () => import(/* webpackChunkName: "sync" */'../views/Sync.vue')
-const Logs = () => import(/* webpackChunkName: "logs" */'../views/Logs.vue')
-const Storage = () => import(/* webpackChunkName: "storage" */'../views/Storage.vue')
-const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'../views/RegisterDevice.vue')
-const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'../views/ServerIPConfig.vue')
+const Sync = () => import(/* webpackChunkName: "sync" */'@/views/sync/Sync.vue')
+const Logs = () => import(/* webpackChunkName: "logs" */'@/views/info/Logs.vue')
+const Storage = () => import(/* webpackChunkName: "storage" */'@/views/info/Storage.vue')
+const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'@/views/setup/RegisterDevice.vue')
+const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'@/views/setup/ServerIPConfig.vue')
 
 export default sharedRoutes.concat([{
   path: '/',
