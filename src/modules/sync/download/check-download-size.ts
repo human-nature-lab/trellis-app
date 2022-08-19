@@ -1,37 +1,29 @@
 import formatBytesFilter from '@/filters/format-bytes.filter'
 import { i18n } from '@/i18n'
-import { Step, Controller } from '../'
+import { Controller } from '../'
 import SyncService from '@/services/SyncService'
 import DeviceService from '@/services/device'
-import axios from 'axios'
+import Snapshot from '@/entities/trellis/Snapshot'
 
-type input = { snapshotId: string }
-
-export class CheckDownloadSize implements Step<input, void> {
-  public name = 'Check Download Size'
-
-  async run (data: input, ctrl: Controller, log: typeof console) {
-    const source = axios.CancelToken.source()
-    const [freeDiskSpace, snapshotFileSize] = await Promise.all([
-      DeviceService.getFreeDiskSpace(),
-      SyncService.getSnapshotFileSize(source, data.snapshotId),
-    ])
-    if (snapshotFileSize > freeDiskSpace) {
-      log.warn(i18n.t('snapshot_requires_space', [
-        formatBytesFilter(snapshotFileSize),
-        formatBytesFilter(freeDiskSpace),
-      ]))
-    } else if ((snapshotFileSize * 5) > freeDiskSpace) {
-      const proceed = await ctrl.confirm(i18n.t('extracted_snapshot_requires_space', [
-        formatBytesFilter(snapshotFileSize * 5),
-        formatBytesFilter(freeDiskSpace),
-      ]), 'warn')
-      if (!proceed) {
-        throw new Error('not enough space on device')
-      }
-    }
-    return {
-      message: i18n.t('success'),
+export async function checkDownloadSize (data: { snapshot: Snapshot }, ctrl: Controller) {
+  console.log(data)
+  const [freeDiskSpace, snapshotFileSize] = await Promise.all([
+    DeviceService.getFreeDiskSpace(),
+    SyncService.getSnapshotFileSize(ctrl.source, data.snapshot.id),
+  ])
+  if (snapshotFileSize > freeDiskSpace) {
+    ctrl.log.warn(i18n.t('snapshot_requires_space', [
+      formatBytesFilter(snapshotFileSize),
+      formatBytesFilter(freeDiskSpace),
+    ]))
+  } else if ((snapshotFileSize * 5) > freeDiskSpace) {
+    const proceed = await ctrl.confirm(i18n.t('extracted_snapshot_requires_space', [
+      formatBytesFilter(snapshotFileSize * 5),
+      formatBytesFilter(freeDiskSpace),
+    ]), 'warn')
+    if (!proceed) {
+      throw new Error('not enough space on device')
     }
   }
+  return data
 }

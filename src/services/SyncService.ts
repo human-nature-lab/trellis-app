@@ -7,6 +7,8 @@ import { AxiosRequestConfig, CancelTokenSource } from 'axios'
 import { Connection } from 'typeorm'
 import LoginService from './login'
 import SingletonService from './SingletonService'
+import { parse, parseISO } from 'date-fns'
+import Snapshot from '@/entities/trellis/Snapshot'
 
 /**
  * Max number of rows to write to upload file at a time.
@@ -37,6 +39,12 @@ class SyncService {
     return resp.data
   }
 
+  async getServerTime (deviceId: string) {
+    const http = await syncInstance()
+    const res = await http.get(`device/${deviceId}/server-time`)
+    return parseISO(res.data.time)
+  }
+
   async authenticate (source: CancelTokenSource, deviceId: string) {
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
@@ -45,13 +53,13 @@ class SyncService {
     return resp.data
   }
 
-  async getLatestSnapshot (source: CancelTokenSource) {
+  async getLatestSnapshot (source?: CancelTokenSource): Promise<Snapshot> {
     const deviceId = await DeviceService.getUUID()
     let options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const http = await syncInstance()
     const resp = await http.get(`device/${deviceId}/syncv2/snapshot`, options)
-    return resp.data
+    return new Snapshot().fromSnakeJSON(resp.data)
   }
 
   async listUploads () {

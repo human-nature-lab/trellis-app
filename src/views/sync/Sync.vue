@@ -15,12 +15,7 @@
               @upload-done="uploadDone"
               @upload-cancelled="uploadCancelled">
             </upload>
-            <download
-              v-if="downloading || downloadingPhotos"
-              :init-download-step="downloadStep"
-              @download-done="downloadDone"
-              @download-cancelled="downloadCancelled">
-            </download>
+            <DownloadSnapshot v-if="downloading" @onDone="downloadDone" />
           </v-flex>
         </v-row>
         <v-row
@@ -64,6 +59,7 @@
   import SyncStatus from '@/components/sync/SyncStatus.vue'
   import DatabaseService from '@/services/database'
   import Download from '@/components/sync/download/Download.vue'
+  import DownloadSnapshot from '@/components/sync/DownloadSnapshot.vue'
   import Upload from '@/components/sync/upload/Upload.vue'
   import ServerIpConfig from '@/views/setup/ServerIPConfig.vue'
   import DocsLinkMixin from '@/mixins/DocsLinkMixin'
@@ -78,6 +74,7 @@
       Upload,
       SyncStatus,
       TrellisModal,
+      DownloadSnapshot,
     },
     mixins: [DocsLinkMixin(DocsFiles.sync.introduction)],
     data () {

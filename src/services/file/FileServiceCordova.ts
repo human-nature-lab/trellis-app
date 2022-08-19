@@ -2,6 +2,7 @@ import DeviceService from '../device'
 import md5 from 'js-md5'
 import { merge } from 'lodash'
 import CancellablePromise from '../../classes/CancellablePromise'
+import { CancelPromise } from '@/types/CancelPromise'
 declare var md5chksum, FileTransfer, cordova
 /* global md5chksum, FileTransfer */
 
@@ -240,14 +241,14 @@ class FileServiceCordova {
     })
   }
 
-  download (uri, fileEntry, onDownloadProgress, authHeader?: string) {
-    const promise = new Promise((resolve, reject) => {
+  download (uri, fileEntry, onDownloadProgress, authHeader?: string): CancelPromise<void> {
+    let promise: CancelPromise<void>
+    promise = new Promise((resolve, reject) => {
       DeviceService.getDeviceKey()
         .then(deviceKey => {
           try {
             const fileTransfer = new FileTransfer()
-            // @ts-ignore
-            promise.cancelDownload = fileTransfer.abort.bind(fileTransfer)
+            promise.cancel = fileTransfer.abort.bind(fileTransfer)
             fileTransfer.onprogress = onDownloadProgress
             const fileURL = fileEntry.toURL()
             const headers = {
