@@ -5,6 +5,7 @@ import uuid from 'uuid/v4'
 import PhotoServiceAbstract, {CancelFunction} from './PhotoServiceAbstract'
 import { In, IsNull } from 'typeorm'
 import CancellablePromise from '../../classes/CancellablePromise'
+import { Camera } from '@/cordova/camera'
 
 declare global {
   interface Window {ImageResizer: any}
@@ -73,36 +74,22 @@ export class PhotoServiceCordova extends PhotoServiceAbstract {
     })
   }
 
-  takePhoto (): Promise<Photo> {
-    return new Promise((resolve, reject) => {
-      if (!navigator || !navigator.camera) {
-        return reject(new Error('Camera api not found'))
-      }
-      navigator.camera.getPicture((filePath) => {
-        const photo = new Photo()
-        photo.id = uuid()
-        FileService.getPhotosDir().then(fullResDir => {
-          return FileService.move(filePath, fullResDir.nativeURL, `${photo.id}.jpg`)
-        })/*.then((fullResEntry: FileEntry) => {
-          return FileService.getPhotosDir().then(photosDir => {
-            // TODO: Compress and copy the file into the respondent-photos
-            return this.resize(fullResEntry.nativeURL, 50).then(resizedFileName => {
-              return FileService.move(resizedFileName, photosDir.nativeURL, `${photo.id}.jpg`)
-            })
-          })
-        })*/.then(photoEntry => {
-          photo.fileName = photoEntry.name
-          return DatabaseService.getRepository(Photo)
-        }).then(repo => repo.save(photo))
-        .then(() => {
-          resolve(photo)
-        }).catch(err => {
-          reject(err)
-        })
-      }, reject, {
-        quality: 100
-      })
+  async takePhoto (): Promise<Photo> {
+    console.debug('taking photo')
+    const filePath = await Camera.getPicture({
+      quality: 100,
     })
+    console.debug('took photo', filePath)
+    const photo = new Photo()
+    photo.id = uuid()
+    const fullResDir = await FileService.getPhotosDir()
+    console.debug('photosDir', fullResDir)
+    const photoEntry = await FileService.move(filePath, fullResDir.nativeURL, `${photo.id}.jpg`)
+    console.debug('photoEntry', photoEntry)
+    photo.fileName = photoEntry.name
+    const repo = await DatabaseService.getRepository(Photo)
+    console.debug('saving photo', photo)
+    return repo.save(photo)
   }
 
   async getPhotoCount (): Promise<number> {
