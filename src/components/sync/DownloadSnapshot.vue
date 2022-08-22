@@ -61,8 +61,6 @@ import SyncStepper, { DisplayStep } from './SyncStepper.vue'
 import { Pipeline } from '@/modules/sync/pipe'
 import { delay } from '@/classes/delay'
 import { Snapshot } from '@/modules/sync/types'
-import { group } from 'console'
-import { start } from 'repl'
 import SyncService from '@/services/SyncService'
 import DeviceService from '@/services/device'
 import Sync from '@/entities/trellis-config/Sync'
@@ -152,7 +150,7 @@ export default Vue.extend({
         this.group++
         this.pipeData.sync = sync
         this.pipeData = await this.runPipe(this.pipeData, replacingPipe, this.displayGroups[2])
-        await delay(2000)
+        await delay(1000)
         this.$emit('onDone', sync)
       } catch (err) {
         await SyncService.registerCancelledSync(sync)

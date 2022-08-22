@@ -17,6 +17,7 @@ export class Pipeline<In, Out, CtrlType, SegType> {
   public beforeEach = new AsyncHook()
   public afterEach = new AsyncHook()
   public onError = new AsyncHook()
+  public afterAll = new AsyncHook()
 
   public clearHooks () {
     this.beforeEach.clear()
