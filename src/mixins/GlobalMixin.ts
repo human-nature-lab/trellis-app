@@ -17,7 +17,7 @@ export default Vue.mixin({
   },
   methods: {
     log(log: any): Promise<Log> {
-      if (log && !log.component) {
+      if (typeof log === 'object' && log && !log.component) {
         log.component = this.$options.name
       }
       return defaultLoggingService.log(log)

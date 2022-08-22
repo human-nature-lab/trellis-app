@@ -28,8 +28,8 @@
           const photo = await PhotoService.takePhoto()
           this.$emit('photo', photo)
         } catch (err) {
-          this.log(err)
           console.error(err)
+          this.log(err)
         } finally {
           this.isAddingPhoto = false
         }

@@ -2,7 +2,7 @@ export class Camera {
   static getPicture (opts?: CameraOptions) {
     return new Promise((resolve, reject) => {
       if (!navigator || !navigator.camera) {
-        return reject(new Error('Camera api not found'))
+        return reject(new Error('Camera API not found'))
       }
       navigator.camera.getPicture(resolve, reject, opts)
     })
