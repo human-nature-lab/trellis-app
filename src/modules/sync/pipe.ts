@@ -1,6 +1,10 @@
-import { AsyncHook } from '@/classes/Hook'
+import { AsyncHook, AsyncResultHook } from '@/classes/Hook'
 
-type Exec<In, Out, CtrlType> = (input: In, ctrlData?: CtrlType) => Out | Promise<Out>
+type PipelineHooks<R extends any[]> = {
+  afterAll: AsyncResultHook<[Error | undefined, ...R], Error | void>
+}
+
+type Exec<In, Out, CtrlType> = (ctrl: PipelineHooks<[In]>, input: In, ctrlData?: CtrlType) => Out | Promise<Out>
 
 export class Segment<In, Out, CtrlType, SegType> {
   next?: Segment<Out, any, CtrlType, SegType>
@@ -17,31 +21,42 @@ export class Pipeline<In, Out, CtrlType, SegType> {
   public beforeEach = new AsyncHook()
   public afterEach = new AsyncHook()
   public onError = new AsyncHook()
-  public afterAll = new AsyncHook()
+  public afterAll = new AsyncResultHook<[Error, ...R], Error | void>()
 
   public clearHooks () {
     this.beforeEach.clear()
     this.afterEach.clear()
     this.onError.clear()
+    this.afterAll.clear()
   }
 
   async run<T> (input: In, data: CtrlType) {
+    const hooks = {
+      afterAll: this.afterAll.clone(),
+    }
     let s = this.first
     let i = 0
     let output: T
-    while (s) {
-      await this.beforeEach.emit(input, i)
-      try {
-        output = await s.execute(input, data)
-        await this.afterEach.emit(input, output, i)
-        input = output
-      } catch (err) {
-        await this.onError.emit(err, i)
-        throw err
+    let err: Error
+    try {
+      while (s) {
+        await this.beforeEach.emit(input, i)
+        try {
+          output = await s.execute(hooks, input, data)
+          await this.afterEach.emit(input, output, i)
+          input = output
+        } catch (err2) {
+          await this.onError.emit(err, i)
+          err = err2
+          throw err2
+        }
+        s = s.next
+        i++
       }
-      s = s.next
-      i++
+    } finally {
+      await hooks.afterAll.emit(err, output)
     }
+    
     return output
   }
 

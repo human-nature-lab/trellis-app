@@ -1,12 +1,11 @@
 import formatBytesFilter from '@/filters/format-bytes.filter'
 import { i18n } from '@/i18n'
-import { Controller } from '../'
 import SyncService from '@/services/SyncService'
 import DeviceService from '@/services/device'
 import Snapshot from '@/entities/trellis/Snapshot'
+import { UIController } from '../uiController'
 
-export async function checkDownloadSize (data: { snapshot: Snapshot }, ctrl: Controller) {
-  console.log(data)
+export async function checkDownloadSize (ctrl: UIController, data: { snapshot: Snapshot }) {
   const [freeDiskSpace, snapshotFileSize] = await Promise.all([
     DeviceService.getFreeDiskSpace(),
     SyncService.getSnapshotFileSize(ctrl.source, data.snapshot.id),
