@@ -22,7 +22,7 @@ export function runImageDownload (ctrl: VueController) {
     ctrl.setStep(g1s2)
     await authenticateDevice(ctrl)
     ctrl.setStep(g1s3)
-    // await compareTime()
+    await compareTime()
 
     ctrl.setGroup(g2)
     try {

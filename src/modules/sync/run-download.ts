@@ -51,7 +51,7 @@ export function runDownload (ctrl: VueController): () => Promise<void> {
     ctrl.setStep(g1s2)
     const a = await authenticateDevice(ctrl)
     ctrl.setStep(g1s3)
-    // await compareTime()
+    await compareTime()
     ctrl.setStep(g1s4)
     const b = await checkLatestSnapshot(ctrl)
     ctrl.setStep(g1s5)
