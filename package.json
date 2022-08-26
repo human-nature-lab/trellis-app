@@ -25,6 +25,7 @@
     "web": "npm run compile && webpack --config=build/webpack.web.conf.js",
     "mobile": "npm run build:vite",
     "format": "npx eslint --fix \"src/**\"",
+    "devtools": "vue-devtools",
     "webpack:android": "npm run compile & webpack --config=build/webpack.mobile.conf.js",
     "webpack:run:android": "npm run webpack:android && cordova run android",
     "webpack:build:android": "npm run webpack:android && cordova build android --verbose",
@@ -48,6 +49,7 @@
     "cordova-android": "^9.1.0",
     "cordova-android-support-gradle-release": "^3.0.1",
     "cordova-plugin-file": "6.0.1",
+    "cordova-plugin-insomnia": "^4.3.0",
     "cordova-plugin-simple-image-resizer": "git+https://github.com/protonet/cordova-plugin-image-resizer.git",
     "core-js": "^3.8.3",
     "date-fns": "^2.29.1",
@@ -102,6 +104,7 @@
     "@typescript-eslint/eslint-plugin": "^5.19.0",
     "@typescript-eslint/parser": "^5.19.0",
     "@vue/cli-plugin-babel": "^4.5.11",
+    "@vue/devtools": "^6.2.1",
     "autoprefixer": "^7.1.2",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.2.2",
@@ -196,7 +199,8 @@
       "cordova-plugin-zeep": {},
       "phonegap-plugin-barcodescanner": {
         "ANDROID_SUPPORT_V4_VERSION": "27.+"
-      }
+      },
+      "cordova-plugin-insomnia": {}
     },
     "platforms": [
       "android"

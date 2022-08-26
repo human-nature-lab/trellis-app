@@ -94,19 +94,25 @@ class SyncService {
     return resp.data
   }
 
-  async getImageFileList (source: CancelTokenSource, fileNames: string[]): Promise<string[]> {
-    let options = {} as AxiosRequestConfig
+  async getImageFileList (source: CancelTokenSource, fileNames: string[]) {
+    type Res = {
+      'total_size': number
+      'photos_requested': number
+      'is_estimate': number
+      'photos_found': number
+    }
+    const options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const deviceId = await DeviceService.getUUID()
     const http = await syncInstance()
     const resp = await http.post(`device/${deviceId}/image_size`, fileNames, options)
-    return resp.data
+    return resp.data as Res
   }
 
   async downloadImage (source: CancelTokenSource, fileName: string): Promise<any> {
-    let options = {
+    const options = {
       timeout: 0,
-      responseType: 'blob'
+      responseType: 'blob',
     } as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const deviceId = await DeviceService.getUUID()

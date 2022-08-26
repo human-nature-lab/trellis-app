@@ -37,7 +37,7 @@ export function removeToken () {
 function requestInterceptor (request) {
   const token = storage.get(TOKEN_KEY)
   if (token && token.hash) {
-    request.headers['Authorization'] = `bearer ${token.hash}`
+    request.headers.Authorization = `bearer ${token.hash}`
   }
   return request
 }
@@ -72,7 +72,7 @@ export default function defaultInstance (): AxiosInstance {
       timeout: 120000,
     }
     if (config.xKey) {
-      axConf.headers = {'X-Key': config.xKey}
+      axConf.headers = { 'X-Key': config.xKey }
     }
     defaultInst = axios.create(axConf)
 
@@ -89,7 +89,7 @@ export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance
     timeout: 0,
   }
   if (config.xKey) {
-    axConf.headers = {'X-Key': config.xKey}
+    axConf.headers = { 'X-Key': config.xKey }
   }
   return axios.create(axConf)
 }
@@ -101,13 +101,13 @@ export async function syncInstance (): Promise<AxiosInstance> {
     const apiRoot = await DatabaseService.getServerIPAddress()
     syncInst = axios.create({
       baseURL: apiRoot + '/sync',
-      timeout: 0
+      timeout: 0,
     })
     syncInst.interceptors.request.use(async function (config) {
       config.headers['X-Key'] = await DeviceService.getDeviceKey()
       const authHeader = syncAuthHeader.get()
       if (authHeader) {
-        config.headers['Authorization'] = authHeader
+        config.headers.Authorization = authHeader
       }
       return config
     })
@@ -116,7 +116,7 @@ export async function syncInstance (): Promise<AxiosInstance> {
       if (err.response && err.response.status === 401) {
         const config = err.config as AxiosRequestConfig
         const creds = await requestCredentials()
-        config.headers['Authorization'] = makeBasicAuthHeader(creds.username, creds.password)
+        config.headers.Authorization = makeBasicAuthHeader(creds.username, creds.password)
         setSyncCredentials(creds.username, creds.password)
         return syncInst(config)
       } else {
@@ -147,7 +147,7 @@ adminInst.interceptors.request.use(requestInterceptor)
 adminInst.interceptors.response.use(responseInterceptor, responseError)
 
 export const builderInst = axios.create({
-  baseURL: config.apiRoot + "/builder",
+  baseURL: config.apiRoot + '/builder',
 })
 builderInst.interceptors.request.use(requestInterceptor)
 builderInst.interceptors.response.use(responseInterceptor, responseError)

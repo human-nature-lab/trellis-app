@@ -1,43 +1,30 @@
 <template>
-
+  <SyncStepper
+    :start="start"
+    v-on="$listeners"
+  />
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
+import Vue from 'vue'
+import { delay } from '@/classes/delay'
+import { VueController } from '@/modules/sync/controller'
+import { runImageDownload } from '@/modules/sync/download-images'
+import SyncStepper from './SyncStepper.vue'
 
-  export default Vue.extend({
-    name: 'DownloadImages',
-    methods: {
-      async runPipe<T, R> (input: T, pipe: Pipeline<T, R, Controller, DisplayStep>, displayGroup) {
-      pipe.clearHooks()
-      pipe.beforeEach.add((_, i) => {
-        this.ctrl.onCancel.clear()
-        this.activeStep = i
-        const dStep = displayGroup.steps[i]
-        dStep.status = 'running'
-      })
-      pipe.afterEach.add((input, output, i) => {
-        this.progress.indeterminate = true
-        this.progress.value = 1
-        this.progress.total = 1
-        const dStep = displayGroup.steps[i]
-        console.log('res', input, output, dStep.name)
-        dStep.status = 'success'
-      })
-      pipe.onError.add((err, i) => {
-        const dStep = displayGroup.steps[i]
-        dStep.status = 'error'
-        dStep.message = {
-          value: err.message,
-        }
-        this.running = false
-      })
-      return pipe.run(input, this.ctrl)
+export default Vue.extend({
+  name: 'DownloadImages',
+  components: { SyncStepper },
+  methods: {
+    async start (ctrl: VueController) {
+      const run = await runImageDownload(ctrl)
+      await delay(1000)
+      return run()
     },
-    }
-  })
+  },
+})
 </script>
 
 <style lang="sass">
-  
+
 </style>

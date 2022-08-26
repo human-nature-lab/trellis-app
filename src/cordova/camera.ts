@@ -1,4 +1,4 @@
-export class Camera {
+export class camera {
   static getPicture (opts?: CameraOptions) {
     return new Promise((resolve, reject) => {
       if (!navigator || !navigator.camera) {

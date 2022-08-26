@@ -3,8 +3,6 @@ import md5 from 'js-md5'
 import { merge } from 'lodash'
 import CancellablePromise from '../../classes/CancellablePromise'
 import { CancelPromise } from '@/types/CancelPromise'
-declare var md5chksum, FileTransfer, cordova
-/* global md5chksum, FileTransfer */
 
 const PHOTOS_DIR = 'photos'
 const FULL_RES_DIR = 'full-resolution-photos'
@@ -218,7 +216,7 @@ class FileServiceCordova {
   }
 
   emptyDirectory (directoryEntry) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       directoryEntry
         .createReader()
         .readEntries((entries) => {
@@ -241,29 +239,30 @@ class FileServiceCordova {
     })
   }
 
-  download (uri, fileEntry, onDownloadProgress, authHeader?: string): CancelPromise<void> {
+  download (uri, fileEntry, onDownloadProgress, authHeader?: string): CancelPromise<FileEntry> {
     let promise: CancelPromise<void>
+    let fileTransfer: FileTransfer
     promise = new Promise((resolve, reject) => {
       DeviceService.getDeviceKey()
         .then(deviceKey => {
           try {
-            const fileTransfer = new FileTransfer()
-            promise.cancel = fileTransfer.abort.bind(fileTransfer)
+            fileTransfer = new FileTransfer()
             fileTransfer.onprogress = onDownloadProgress
             const fileURL = fileEntry.toURL()
-            const headers = {
+            const headers: Record<string, string> = {
               'X-Key': deviceKey
             }
             if (authHeader) {
-              headers['Authorization'] = authHeader
+              headers.Authorization = authHeader
             }
             fileTransfer.download(uri, fileURL,
-              (success) => {
+              () => {
                 resolve(fileEntry)
               },
-              (err) => {
+              err => {
+                console.log('fileTransfer err', err)
                 if (err.hasOwnProperty('code') && err.code === 4) {
-                  let errorObject = {
+                  const errorObject = {
                     message: 'Operation cancelled by user.'
                   }
                   merge(errorObject, err)
@@ -278,6 +277,12 @@ class FileServiceCordova {
           }
         })
     })
+    promise.cancel = function () {
+      console.log('cancelling download')
+      if (fileTransfer) {
+        fileTransfer.abort()
+      }
+    }
     return promise
   }
 
