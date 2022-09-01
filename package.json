@@ -67,6 +67,7 @@
     "ngraph.graph": "0.0.14",
     "nop-typeorm": "^0.1.1",
     "papaparse": "^5.3.1",
+    "path-browserify": "^1.0.1",
     "reflect-metadata": "^0.1.12",
     "regenerator-runtime": "^0.13.7",
     "typecache": "^0.3.2",

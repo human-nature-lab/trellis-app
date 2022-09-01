@@ -48,14 +48,15 @@ class FileServiceCordova {
   }
 
   writeFile (directory: string, file: File, fileName: string, fileSize: number, storageType = 'PERSISTENT', create = true, exclusive = false) {
-    let requestFileSystemOptions = {
-      'storageType': (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
-      'requestedBytes': fileSize
+    const requestFileSystemOptions = {
+      storageType: (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
+      requestedBytes: fileSize,
     }
     return this.requestFileSystem(requestFileSystemOptions)
       .then((fileSystem) => this.getDirectoryEntry(fileSystem, directory))
       .then((directoryEntry: DirectoryEntry) => this.getFileEntry(directoryEntry, fileName))
       .then((fileEntry: FileEntry) => new Promise((resolve, reject) => {
+        console.log('fileEntry', fileEntry.toURL())
         fileEntry.createWriter(
           function (fileWriter) {
             fileWriter.onwriteend = function () {

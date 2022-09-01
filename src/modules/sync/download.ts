@@ -1,4 +1,5 @@
 import { throttle } from 'lodash'
+import path from 'path'
 import formatBytesFilter from '@/filters/format-bytes.filter'
 import { i18n } from '@/i18n'
 import DeviceService from '@/services/device'
@@ -12,6 +13,7 @@ import { CancelPromise } from '@/types/CancelPromise'
 import { delay } from '@/classes/delay'
 import ZipService from '@/services/zip'
 import Sync from '@/entities/trellis-config/Sync'
+import { filetransfer } from '@/cordova/filetransfer'
 
 export async function checkDownloadSize (ctrl: StepController, data: { snapshot: Snapshot }) {
   const [freeDiskSpace, snapshotFileSize] = await Promise.all([
@@ -112,8 +114,9 @@ export async function configureDatabase (ctrl: StepController) {
 export async function downloadSnapshot (ctrl: StepController, { snapshot }: { snapshot: Snapshot }) {
   ctrl.setProgress(0, 1)
   const fileName = snapshot.id + '.sql.zip'
-  const [deviceId, apiRoot, fileSystem, syncAuth] = await Promise.all([
+  const [deviceId, deviceKey, apiRoot, fileSystem, syncAuth] = await Promise.all([
     DeviceService.getUUID(),
+    DeviceService.getDeviceKey(),
     DatabaseService.getServerIPAddress(),
     FileService.requestFileSystem(),
     getSyncAuthentication(),
@@ -122,9 +125,17 @@ export async function downloadSnapshot (ctrl: StepController, { snapshot }: { sn
   const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'snapshots')
   const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
   ctrl.log.info('starting download')
-  const p: CancelPromise<void> = FileService.download(uri, fileEntry, throttle((progressEvent) => {
+  const p = filetransfer.download(uri, path.join(directoryEntry.toURL(), fileName), false, {
+    headers: {
+      'X-Key': deviceKey,
+      Authorization: syncAuth,
+    },
+  }, throttle((progressEvent) => {
     ctrl.setProgress(progressEvent.loaded, progressEvent.total)
-  }, 1000), syncAuth)
+  }, 1000))
+  // const p: CancelPromise<void> = FileService.download(uri, fileEntry, throttle((progressEvent) => {
+  //   ctrl.setProgress(progressEvent.loaded, progressEvent.total)
+  // }, 1000), syncAuth)
   ctrl.onCancel.add(p.cancel)
   await p
   ctrl.log.info('download complete')

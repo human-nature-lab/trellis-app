@@ -1,8 +1,9 @@
+import { file } from '@/cordova/file'
 import { insomnia } from '@/cordova/insomnia'
 import { i18n } from '@/i18n'
 import { authenticateDevice, checkConnection, compareTime } from './common'
 import { VueController } from './controller'
-import { checkDiskSpace, downloadImages, missingImages } from './images'
+import { checkDiskSpace, downloadImages, getLocalMissingImages } from './images'
 
 export function runImageDownload (ctrl: VueController) {
   const g1 = ctrl.addGroup(i18n.t('connecting'))
@@ -28,7 +29,7 @@ export function runImageDownload (ctrl: VueController) {
     try {
       await insomnia.keepAwake()
       ctrl.setStep(g2s1)
-      const images = await missingImages()
+      const images = await getLocalMissingImages(ctrl)
       ctrl.setStep(g2s2)
       await checkDiskSpace(ctrl, images)
       ctrl.setStep(g2s3)

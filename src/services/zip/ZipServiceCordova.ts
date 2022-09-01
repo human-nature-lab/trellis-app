@@ -3,14 +3,13 @@
 import FileService from '../file'
 
 class ZipServiceCordova {
-
   unzipFile (fileEntry: FileEntry, progressCallback: () => any) {
     return new Promise((resolve, reject) => {
       FileService.requestFileSystem()
         .then((fileSystem) => FileService.getDirectoryEntry(fileSystem, 'snapshots'))
         .then((directoryEntry) => {
-          let dirUrl = directoryEntry.toURL()
-          let fileUrl = fileEntry.toURL()
+          const dirUrl = directoryEntry.toURL()
+          const fileUrl = fileEntry.toURL()
           // @ts-ignore
           zip.unzip(fileUrl, dirUrl, function (result) {
             if (result === -1) {
@@ -34,14 +33,15 @@ class ZipServiceCordova {
   }
 
   zipFile (fromDirectoryEntry: DirectoryEntry, toDirectoryEntry: DirectoryEntry, toFileName: string): Promise<void> {
-    console.log('zipFile')
-    return new Promise((resolve, reject) => {
-      let fromUrl = fromDirectoryEntry.toURL()
-      let toUrl = toDirectoryEntry.toURL() + '/' + toFileName
-      console.log('fromUrl', fromUrl)
-      console.log('toUrl', toUrl)
+    const fromUrl = fromDirectoryEntry.toURL()
+    const toUrl = toDirectoryEntry.toURL() + '/' + toFileName
+    return this.zip(fromUrl, toUrl)
+  }
+
+  zip (fromURL: string, toURL: string) {
+    return new Promise<void>((resolve, reject) => {
       // @ts-ignore
-      Zeep.zip({from: fromUrl, to: toUrl},
+      Zeep.zip({ from: fromURL, to: toURL },
         function () {
           console.log('zipFile done')
           resolve()

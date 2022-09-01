@@ -95,7 +95,7 @@ export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance
 }
 
 const minuteMs = 60 * 1000
-const syncAuthHeader = new ExpiringValue(30 * minuteMs)
+const syncAuthHeader = new ExpiringValue<string>(30 * minuteMs)
 export async function syncInstance (): Promise<AxiosInstance> {
   if (syncInst === undefined) {
     const apiRoot = await DatabaseService.getServerIPAddress()
@@ -131,12 +131,17 @@ export async function setSyncCredentials (username: string, password: string) {
   syncAuthHeader.set(makeBasicAuthHeader(username, password))
 }
 
-export async function resetSyncCredentials () {
+export function resetSyncCredentials () {
   syncAuthHeader.clear()
 }
 
-export async function getSyncAuthentication () {
+export function getSyncAuthentication () {
   return syncAuthHeader.get()
+}
+
+export async function requestSyncAuthentication () {
+  const creds = await requestCredentials()
+  return makeBasicAuthHeader(creds.username, creds.password)
 }
 
 export const adminInst = axios.create({

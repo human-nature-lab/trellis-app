@@ -11,17 +11,17 @@
 import Vue from 'vue'
 import SyncStepper from './SyncStepper.vue'
 import { VueController } from '@/modules/sync/controller'
-import { runDownload } from '@/modules/sync/run-download'
+import { runUpload } from '@/modules/sync/run-upload'
 
 export default Vue.extend({
-  name: 'DownloadSnapshot',
-  components: { SyncStepper },
+  name: 'UploadSnapshot',
   props: {
     onlyPhotos: Boolean,
   },
+  components: { SyncStepper },
   methods: {
     async start (ctrl: VueController) {
-      const run = runDownload(ctrl, this.onlyPhotos)
+      const run = runUpload(ctrl, this.onlyPhotos)
       return run()
     },
   },

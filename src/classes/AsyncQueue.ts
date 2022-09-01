@@ -1,14 +1,13 @@
-import { delay } from './delay'
 import { Hook } from './Hook'
 
-export class DownloadQueue<T, R = void> {
+export class AsyncQueue<T, R = void> {
   public pending: T[] = []
   public total = 0
   public results: R[] = []
-  public onDownload = new Hook()
+  public onExec = new Hook()
   private isCancelled = false
 
-  constructor (private download: (item: T) => Promise<R>, public numSimultaneous = 8) { }
+  constructor (private exec: (item: T) => Promise<R>, public numSimultaneous = 8) { }
 
   async add (...args: T[]) {
     this.total += args.length
@@ -32,11 +31,11 @@ export class DownloadQueue<T, R = void> {
   private async runThread () {
     let item = this.pending.pop()
     while (item && !this.isCancelled) {
-      const res = await this.download(item)
+      const res = await this.exec(item)
       if (res) {
         this.results.push(res)
       }
-      this.onDownload.emit()
+      this.onExec.emit()
       item = this.pending.pop()
     }
   }

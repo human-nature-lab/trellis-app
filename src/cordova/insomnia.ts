@@ -16,4 +16,15 @@ export class insomnia {
       })
     }
   }
+
+  static async withScreenOn<T> (cb: () => T) {
+    let res: T
+    try {
+      await this.keepAwake()
+      res = await cb()
+    } finally {
+      await this.allowSleep()
+    }
+    return res
+  }
 }

@@ -53,12 +53,12 @@
               >
                 mdi-alert
               </v-icon>
-              <v-progress-circular
+              <v-icon
                 v-else-if="stepIndex === activeStep"
-                :size="26"
-                :width="2"
-                indeterminate
-              />
+                class="anim-rotate"
+              >
+                mdi-cog
+              </v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title>{{ step.title }}</v-list-item-title>
@@ -67,9 +67,17 @@
               </div>
               <v-alert
                 v-if="stepIndex === activeStep && message"
+                outlined
                 :type="message.color"
               >
                 {{ message.msg }}
+              </v-alert>
+              <v-alert
+                v-else-if="stepIndex === activeStep && error"
+                outlined
+                type="error"
+              >
+                {{ error }}
               </v-alert>
               <v-row
                 v-if="progress && progress.total && !error && stepIndex === activeStep"
@@ -109,18 +117,27 @@
           :disabled="!startedOnce"
           @click="cancel"
         >
-          {{ $t('cancel') }}
+          {{ running ? $t('cancel') : $t('stop') }}
         </v-btn>
       </v-row>
     </slot>
+    <ConfirmationDialog ref="confirmation">
+      <v-alert
+        outlined
+        :type="confirmationType"
+      >
+        {{ confirmationMessage }}
+      </v-alert>
+    </ConfirmationDialog>
   </v-stepper>
 </template>
 
 <script lang="ts">
+import Vue, { PropType } from 'vue'
 import { delay } from '@/classes/delay'
 import { Controller } from '@/modules/sync'
 import { Stringable } from '@/modules/sync/controller'
-import Vue, { PropType } from 'vue'
+import ConfirmationDialog from './ConfirmationDialog.vue'
 
 export type DisplayStep = {
   title: Stringable
@@ -150,6 +167,7 @@ type Progress = {
 
 export default Vue.extend({
   name: 'SyncStepper',
+  components: { ConfirmationDialog },
   props: {
     start: Function as PropType<(ctrl: Controller) => Promise<void>>,
   },
@@ -159,19 +177,27 @@ export default Vue.extend({
       startedOnce: false,
       cancelled: false,
       group: 0,
-      error: null as Error,
+      error: null as string,
       message: null as Message,
       activeStep: -1,
       progress: null as Progress,
       randId: 1,
+      isDone: true,
       randGroupId: 1,
       groups: [] as Group[],
       ctrl: null as Controller,
+      confirmationType: 'warn',
+      confirmationMessage: '' as Stringable,
     }
   },
   created () {
     this.setup()
     this._start()
+  },
+  beforeDestroy () {
+    if (!this.isDone) {
+      this.cancel()
+    }
   },
   methods: {
     setup () {
@@ -196,11 +222,12 @@ export default Vue.extend({
       try {
         await this.start(this.ctrl)
       } catch (err) {
-        this.error = err
-        this.groups[this.group - 1].steps[this.activeStep].message = {
-          value: err.message,
-          color: 'error',
-        }
+        console.error(err)
+        this.error = '' + err
+        // this.groups[this.group - 1].steps[this.activeStep].message = {
+        //   value: err.message,
+        //   color: 'error',
+        // }
       } finally {
         this.running = false
       }
@@ -208,6 +235,7 @@ export default Vue.extend({
     async done () {
       this.activeStep = this.groups[this.group - 1].steps.length + 1
       await delay(4000)
+      this.isDone = true
       this.$emit('done')
     },
     addGroup (title: Stringable): number {
@@ -237,7 +265,10 @@ export default Vue.extend({
       this.message = { msg, color }
     },
     async confirm (msg: Stringable, color = 'warning') {
-      return confirm(msg.toString())
+      this.confirmationMessage = msg
+      this.confirmationType = color
+      const el = (this.$refs.confirmation as unknown) as { confirm (): Promise<boolean> }
+      return el.confirm()
     },
     async cancel () {
       this.cancelled = true
@@ -257,6 +288,15 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
+  .anim-rotate
+    animation: rotate linear infinite 1s
 
+@keyframes rotate
+  0%
+    transform: rotate(0deg)
+  50%
+    transform: rotate(180deg)
+  100%
+    transform: rotate(360deg)
 </style>

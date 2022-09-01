@@ -1,78 +1,84 @@
 <template>
-  <v-container
-    fill-height
-    justify-start
-  >
-    <v-col>
-      <v-container>
-        <v-row>
-          <v-flex class="xs12">
-            <sync-status
-              v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
-              :local-latest-snapshot="localLatestSnapshot"
-              :updated-records-count="updatedRecordsCount"
-            />
-            <upload
-              v-if="uploading || uploadingPhotos"
-              :init-upload-step="uploadStep"
-              @upload-done="uploadDone"
-              @upload-cancelled="uploadCancelled"
-            />
-            <DownloadSnapshot
-              v-if="downloading"
-              @done="downloadDone"
-              @cancel="downloadCanceled"
-            />
-            <DownloadImages
-              v-if="downloadingPhotos"
-              @done="photoDownloadDone"
-              @cancel="downloadCanceled"
-            />
-          </v-flex>
-        </v-row>
+  <v-col>
+    <sync-status
+      v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
+      :local-latest-snapshot="localLatestSnapshot"
+      :updated-records-count="updatedRecordsCount"
+    />
+    <UploadSnapshot
+      v-if="uploading || uploadingPhotos"
+      :only-photos="onlyPhotos"
+      @done="uploadDone"
+      @cancel="uploadCanceled"
+    />
+    <DownloadSnapshot
+      v-if="downloading || downloadingPhotos"
+      :only-photos="onlyPhotos"
+      @done="downloadDone"
+      @cancel="downloadCanceled"
+    />
+    <v-row
+      no-gutters
+      class="pa-4"
+      v-if="!needsServerConfig"
+    >
+      <v-col>
+        <h4 class="py-2 text-center">
+          {{ $t('sync') }}
+        </h4>
+        <v-spacer />
         <v-row
-          v-if="!needsServerConfig"
-          class="sync-footer"
+          no-gutters
+          class="justify-space-around"
         >
-          <v-col cols="auto">
-            <v-btn
-              :disabled="!enableUpload"
-              :loading="uploading"
-              @click="onUpload"
-            >
-              <v-icon>mdi-cloud-upload</v-icon>
-            </v-btn>
-            <v-btn
-              @click="onUploadPhotos"
-              :loading="uploadingPhotos"
-              :disabled="!enablePhotoDownload"
-            >
-              <v-icon>mdi-collections</v-icon>
-              <v-icon>mdi-arrow-up</v-icon>
-            </v-btn>
-          </v-col>
-          <v-spacer />
-          <v-col cols="auto">
-            <v-btn
-              @click="onDownload"
-              :loading="downloading"
-              :disabled="!enableDownload"
-            >
-              <v-icon>mdi-cloud-download</v-icon>
-            </v-btn>
-            <v-btn
-              @click="onDownloadPhotos"
-              :loading="downloadingPhotos"
-              :disabled="!enablePhotoDownload"
-            >
-              <v-icon>mdi-collections</v-icon>
-              <v-icon>mdi-arrow-down</v-icon>
-            </v-btn>
-          </v-col>
+          <v-btn
+            @click="onDownload"
+            :loading="downloading"
+            :disabled="!enableDownload"
+          >
+            <v-icon>
+              mdi-cloud-download
+            </v-icon>
+          </v-btn>
+          <v-btn
+            :disabled="!enableUpload"
+            :loading="uploading"
+            @click="onUpload"
+          >
+            <v-icon>
+              mdi-cloud-upload
+            </v-icon>
+          </v-btn>
         </v-row>
-      </v-container>
-    </v-col>
-  </v-container>
+      </v-col>
+      <v-spacer />
+      <v-col>
+        <h4 class="py-2 text-center">
+          {{ $t('photos') }}
+        </h4>
+        <v-spacer />
+        <v-row
+          no-gutters
+          class="justify-space-around"
+        >
+          <v-btn
+            @click="onDownloadPhotos"
+            :loading="downloadingPhotos"
+            :disabled="!enablePhotoDownload"
+          >
+            <v-icon>mdi-arrow-down</v-icon>
+          </v-btn>
+          <v-btn
+            @click="onUploadPhotos"
+            :loading="uploadingPhotos"
+            :disabled="!enablePhotoDownload"
+          >
+            <v-icon>mdi-arrow-up</v-icon>
+          </v-btn>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-col>
 </template>
 
 <script>
@@ -80,28 +86,25 @@ import AlertService from '@/services/AlertService'
 import SyncStatus from '@/components/sync/SyncStatus.vue'
 import DatabaseService from '@/services/database'
 import DownloadSnapshot from '@/components/sync/DownloadSnapshot.vue'
-import DownloadImages from '@/components/sync/DownloadImages.vue'
-import Upload from '@/components/sync/upload/Upload.vue'
+import UploadSnapshot from '@/components/sync/UploadSnapshot.vue'
 import DocsLinkMixin from '@/mixins/DocsLinkMixin'
 import DocsFiles from '@/components/documentation/DocsFiles'
 
 export default {
   name: 'SyncView',
   components: {
-    Upload,
+    UploadSnapshot,
     SyncStatus,
     DownloadSnapshot,
-    DownloadImages,
   },
   mixins: [DocsLinkMixin(DocsFiles.sync.introduction)],
   data () {
     return {
       loading: true,
-      downloadStep: 1,
-      uploadStep: 1,
       uploading: false,
       downloading: false,
       downloadingPhotos: false,
+      onlyPhotos: false,
       uploadingPhotos: false,
       serverIPAddress: null,
       serverLatestSnapshot: null,
@@ -129,36 +132,33 @@ export default {
       this.serverIPAddress = await DatabaseService.getServerIPAddress()
     },
     onDownload () {
-      this.downloadStep = 1
       this.downloading = true
+      this.onlyPhotos = false
     },
     onUpload () {
-      this.uploadStep = 1
       this.uploading = true
+      this.onlyPhotos = false
     },
     onUploadPhotos () {
-      this.uploadStep = 3
       this.uploadingPhotos = true
+      this.onlyPhotos = true
     },
     onDownloadPhotos () {
       this.downloadingPhotos = true
+      this.onlyPhotos = true
     },
     downloadCanceled () {
       this.downloading = false
       this.downloadingPhotos = false
-      this.uploadingPhotos = false
       // Re-init in case download was successful
       this.initComponent()
     },
     downloadDone () {
       this.downloading = false
-      this.downloadingPhotos = true
-    },
-    photoDownloadDone () {
       this.downloadingPhotos = false
       this.initComponent()
     },
-    uploadCancelled () {
+    uploadCanceled () {
       this.uploading = false
       this.uploadingPhotos = false
       // Re-init in case upload was successful
