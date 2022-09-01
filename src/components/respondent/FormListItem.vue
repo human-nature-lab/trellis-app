@@ -96,7 +96,7 @@
                   </span>
                 </td>
                 <td>
-                  <table class="table">
+                  <table class="table no-wrap">
                     <tr>
                       <th>{{ $t('surveyor') }}</th>
                       <th>{{ $t('version') }}</th>
@@ -117,7 +117,7 @@
                           v-if="interview.startTime"
                           :title="interview.startTime.local().format('llll')"
                         >
-                          {{ interview.startTime.local().fromNow() }}
+                          {{ interview.startTime.local().format('LL') }}
                         </span>
                       </td>
                       <td>
@@ -313,6 +313,8 @@ export default Vue.extend({
         border-bottom: 1px solid grey
     width: 100%
     td, th
+      padding-left: 4px
+      padding-right: 4px
       text-align: right
       &:first-child
         text-align: left
@@ -337,5 +339,8 @@ export default Vue.extend({
   .centered
     display: inline-flex
     align-items: center
+
+  .no-wrap
+    white-space: nowrap
 
 </style>

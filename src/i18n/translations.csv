@@ -622,4 +622,4 @@ comparing_server_time,Comparing server time to tablet,Comparando la hora del ser
 restart,Restart,Reiniciar,
 server_rejected_images,The server rejected {0} images,El servidor rechazó {0} imagenes,
 outdated_survey,This survey is outdated and cannot be resumed,Esta encuesta es obsoleta y no puede ser reiniciada,
-duration,duration,Duración,
+duration,Duration,Duración,
