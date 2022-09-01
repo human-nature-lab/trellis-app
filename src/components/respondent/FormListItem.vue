@@ -23,18 +23,10 @@
           >
             {{ status.icon }}
           </v-icon>
-          <v-tooltip>
-            <span>
-              {{ form.isStarted ? $t('not_started') : $t('in_progress') }}
-            </span>
-          </v-tooltip>
         </v-col>
         <AsyncTranslationText
           :translation="form.nameTranslation"
         />
-        <span class="version">
-          (v{{ form.version }})
-        </span>
         <v-spacer />
         <v-chip
           v-if="status.msg"
@@ -44,6 +36,9 @@
         >
           {{ status.msg }}
         </v-chip>
+        <div class="version d-flex align-center">
+          (v{{ form.version }})
+        </div>
         <v-col class="icon-container">
           <v-btn
             :disabled="!form.surveys.length"
