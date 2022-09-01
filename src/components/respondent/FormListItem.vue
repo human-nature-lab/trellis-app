@@ -8,76 +8,43 @@
       class="w-full"
       :class="{'open': isOpen}"
     >
-      <v-row class="fill-width">
-        <v-flex
-          class="centered icon-container clickable"
+      <v-row
+        no-gutters
+        class="clickable align-content-center fill-width"
+        @click="$emit('click')"
+      >
+        <v-col
+          class="icon-container clickable flex-grow-0 mr-4"
           @click="tryCreatingSurvey"
         >
-          <v-tooltip
-            right
-            v-if="form.isComplete"
+          <v-icon
+            @click.stop="tryCreatingSurvey"
+            :color="status.color"
           >
-            <template #activator="{ on, attrs }">
-              <v-icon
-                v-on="on"
-                v-bind="attrs"
-                color="green darken-2"
-              >
-                mdi-check-circle
-              </v-icon>
-            </template>
+            {{ status.icon }}
+          </v-icon>
+          <v-tooltip>
             <span>
-              {{ $t('completed') }}
+              {{ form.isStarted ? $t('not_started') : $t('in_progress') }}
             </span>
           </v-tooltip>
-          <v-tooltip
-            right
-            v-else-if="form.isStarted"
-          >
-            <template #activator="{ on, attrs }">
-              <v-icon
-                v-on="on"
-                v-bind="attrs"
-                color="orange darken-2"
-              >
-                mdi-clock-outline
-              </v-icon>
-            </template>
-            <span>
-              {{ $t('in_progress') }}
-            </span>
-          </v-tooltip>
-          <v-tooltip
-            right
-            v-else
-          >
-            <template #activator="{ on, attrs }">
-              <v-icon
-                @click.stop="tryCreatingSurvey"
-                v-on="on"
-                v-bind="attrs"
-              >
-                mdi-play-circle-outline
-              </v-icon>
-            </template>
-            <span>
-              {{ $t('not_started') }}
-            </span>
-          </v-tooltip>
-        </v-flex>
-        <v-flex
-          class="centered clickable"
-          @click="$emit('click')"
-        >
-          <AsyncTranslationText
-            :translation="form.nameTranslation"
-          />
-          <span class="version">
-            (v{{ form.version }})
-          </span>
-        </v-flex>
+        </v-col>
+        <AsyncTranslationText
+          :translation="form.nameTranslation"
+        />
+        <span class="version">
+          (v{{ form.version }})
+        </span>
         <v-spacer />
-        <v-flex class="icon-container">
+        <v-chip
+          v-if="status.msg"
+          outlined
+          label
+          :color="status.color"
+        >
+          {{ status.msg }}
+        </v-chip>
+        <v-col class="icon-container">
           <v-btn
             :disabled="!form.surveys.length"
             icon
@@ -90,14 +57,14 @@
               mdi-chevron-up
             </v-icon>
           </v-btn>
-        </v-flex>
+        </v-col>
       </v-row>
       <v-row
         class="ml-12"
         v-if="isOpen"
       >
         <v-flex>
-          <table class="table">
+          <v-simple-table>
             <thead>
               <tr>
                 <th>{{ $t('interview_status') }}</th>
@@ -112,6 +79,7 @@
                 :data-survey-id="survey.id"
                 :key="survey.id"
                 @click="tryStartingSurvey(survey)"
+                class="clickable"
               >
                 <td>
                   <span
@@ -131,23 +99,39 @@
                   <table class="table">
                     <tr>
                       <th>{{ $t('surveyor') }}</th>
+                      <th>{{ $t('version') }}</th>
                       <th>{{ $t('start_time') }}</th>
-                      <th>{{ $t('end_time') }}</th>
+                      <th>{{ $t('duration') }}</th>
                     </tr>
                     <tr
                       v-for="interview in survey.interviews"
                       :data-interview-id="interview.id"
                       :key="interview.id"
                     >
-                      <td>{{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span></td>
-                      <td>{{ interview.startTime && interview.startTime.local().format('llll') }}</td>
-                      <td>{{ interview.endTime && interview.endTime.local().format('llll') }}</td>
+                      <td>
+                        {{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span>
+                      </td>
+                      <td>{{ survey.form.version }}</td>
+                      <td>
+                        <span
+                          v-if="interview.startTime"
+                          :title="interview.startTime.local().format('llll')"
+                        >
+                          {{ interview.startTime.local().fromNow() }}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          v-if="interview.startTime && interview.endTime">
+                          {{ dateDiff(interview.startTime, interview.endTime) }}
+                        </span>
+                      </td>
                     </tr>
                   </table>
                 </td>
               </tr>
             </tbody>
-          </table>
+          </v-simple-table>
         </v-flex>
       </v-row>
     </v-col>
@@ -157,12 +141,28 @@
 <script lang="ts">
 import AsyncTranslationText from '../AsyncTranslationText.vue'
 
-import Vue from 'vue'
-import global from '../../static/singleton'
-import SurveyService from '../../services/survey'
-import InterviewService from '../../services/interview'
+import Vue, { PropOptions } from 'vue'
+import global from '@/static/singleton'
+import SurveyService from '@/services/survey'
+import InterviewService from '@/services/interview'
 import { getCurrentPosition } from '../LocationFinder.vue'
-import singleton from '../../static/singleton'
+import singleton from '@/static/singleton'
+import Survey from '@/entities/trellis/Survey'
+import Translation from '@/entities/trellis/Translation'
+import moment, { Moment } from 'moment'
+
+export type DisplayForm = {
+  isComplete?: boolean
+  isStarted?: boolean
+  nComplete?: number
+  id: string
+  nameTranslation: Translation
+  surveys: Survey[]
+  isPublished: boolean
+  isSkipped: boolean
+  censusTypeId: string
+  version: number
+}
 
 export default Vue.extend({
   name: 'FormListItem',
@@ -174,7 +174,7 @@ export default Vue.extend({
     form: {
       type: Object,
       required: true,
-    },
+    } as PropOptions<DisplayForm>,
     allowMultipleSurveys: {
       type: Boolean,
       required: true,
@@ -201,6 +201,26 @@ export default Vue.extend({
     nSurveys (): number {
       return this.form.surveys.length
     },
+    status (): { msg: string, icon: string, color: string } {
+      if (this.form.isComplete) {
+        return {
+          msg: this.$t('completed').toString(),
+          icon: 'mdi-check-circle',
+          color: 'green darken-2',
+        }
+      } else if (this.form.isStarted) {
+        return {
+          msg: this.$t('in_progress').toString(),
+          icon: 'mdi-play-circle-outline',
+          color: 'orange darken-2',
+        }
+      }
+      return {
+        msg: '',
+        icon: 'mdi-play-circle-outline',
+        color: '',
+      }
+    },
   },
   methods: {
     getName (user) {
@@ -209,13 +229,18 @@ export default Vue.extend({
     getUsername (user) {
       return user ? user.username : ''
     },
+    dateDiff (startTime: Moment, endTime: Moment): string {
+      return moment.duration(endTime.diff(startTime)).humanize()
+    },
     async tryCreatingSurvey () {
+      const currentVersionSurveys = this.form.surveys.filter(s => s.formId === this.form.id)
       if (!this.canCreateSurveys) {
         // Do nothing
-        alert(this.$t('cant_start_form'))
-      } else if (this.form.surveys.length !== 0 && !this.allowMultipleSurveys) {
-        alert(this.$t('cant_create_survey'))
-      } else if (this.form.surveys.length === 0 || confirm(this.$t('create_another_survey'))) {
+        this.alert('error', this.$t('cant_start_form'), { timeout: 0 })
+      } else if (currentVersionSurveys.length !== 0 && !this.allowMultipleSurveys) {
+        this.alert('error', this.$t('cant_create_survey'), { timeout: 0 })
+      } else if (currentVersionSurveys.length === 0 || confirm(this.$t('create_another_survey').toString())) {
+        this.alert('success', this.$t('starting_survey'))
         singleton.loading.indeterminate = true
         singleton.loading.active = true
         singleton.loading.fullscreen = true
@@ -237,10 +262,12 @@ export default Vue.extend({
         // this.global.loading.active = false
       }
     },
-    async tryStartingSurvey (survey) {
+    async tryStartingSurvey (survey: Survey) {
       let coords, interview
       if (survey.completedAt) {
-        alert(this.$t('cant_resume_survey'))
+        this.alert('error', this.$t('cant_resume_survey'))
+      } else if (survey.formId !== this.form.id) {
+        this.alert('error', this.$t('outdated_survey'))
       } else {
         try {
           coords = await InterviewService.getLatestInterviewPosition(survey.respondentId, this.previousInterviewCoordinatesTolerance)

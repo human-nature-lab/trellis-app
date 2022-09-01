@@ -36,9 +36,9 @@ export class SurveyServiceCordova implements SurveyServiceInterface {
       where: {
         deletedAt: IsNull(),
         respondentId: respondentId,
-        studyId: studyId
+        studyId: studyId,
       },
-      relations: ['interviews', 'interviews.user']
+      relations: ['interviews', 'interviews.user', 'form'],
     })
 
     return surveys

@@ -1,5 +1,5 @@
 <template>
-  <v-flex sm12>
+  <v-col>
     <FormListItem
       v-for="form in cForms"
       :key="form.id"
@@ -10,13 +10,12 @@
       @update="$emit('update')"
       @newInterview="$emit('newInterview', $event)"
     />
-  </v-flex>
+  </v-col>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import FormListItem from './FormListItem.vue'
-import { DisplayForm } from './RespondentForms.vue'
+import FormListItem, { DisplayForm } from './FormListItem.vue'
 import singleton from '../../static/singleton'
 
 export default Vue.extend({
@@ -71,7 +70,7 @@ export default Vue.extend({
   },
   computed: {
     cForms (): DisplayForm[] {
-      return this.forms.filter(form => this.showForm(form)).map((form: DisplayForm, i) => {
+      return this.forms.filter(form => this.showForm(form)).map((form: DisplayForm) => {
         form.nComplete = form.surveys.reduce((c, s) => (s.completedAt ? c + 1 : c), 0)
         form.isComplete = (form.surveys.length && !!form.surveys[0].completedAt) || false
         form.isStarted = (form.surveys.length && !form.surveys[0].completedAt) || false
