@@ -241,7 +241,7 @@ export default Vue.extend({
       } else if (currentVersionSurveys.length !== 0 && !this.allowMultipleSurveys) {
         this.alert('error', this.$t('cant_make_multiple_surveys'), { timeout: 0 })
       } else if (currentVersionSurveys.length === 0 || confirm(this.$t('create_another_survey').toString())) {
-        this.alert('success', this.$t('starting_survey'))
+        this.alert('success', this.$t('creating_survey'))
         singleton.loading.indeterminate = true
         singleton.loading.active = true
         singleton.loading.fullscreen = true
