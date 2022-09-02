@@ -10,7 +10,7 @@
     >
       <v-row
         no-gutters
-        class="clickable align-content-center fill-width"
+        class="align-content-center fill-width"
         @click="$emit('click')"
       >
         <v-col
@@ -232,8 +232,14 @@ export default Vue.extend({
       if (!this.canCreateSurveys) {
         // Do nothing
         this.alert('error', this.$t('cant_start_form'), { timeout: 0 })
+      } else if (currentVersionSurveys.length === 1 && !currentVersionSurveys[0].completedAt) {
+        this.alert('success', this.$t('resuming_survey'))
+        singleton.loading.indeterminate = true
+        singleton.loading.active = true
+        singleton.loading.fullscreen = true
+        return this.tryStartingSurvey(currentVersionSurveys[0])
       } else if (currentVersionSurveys.length !== 0 && !this.allowMultipleSurveys) {
-        this.alert('error', this.$t('cant_create_survey'), { timeout: 0 })
+        this.alert('error', this.$t('cant_make_multiple_surveys'), { timeout: 0 })
       } else if (currentVersionSurveys.length === 0 || confirm(this.$t('create_another_survey').toString())) {
         this.alert('success', this.$t('starting_survey'))
         singleton.loading.indeterminate = true
