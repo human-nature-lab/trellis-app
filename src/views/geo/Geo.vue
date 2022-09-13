@@ -1,33 +1,16 @@
 <template>
-  <v-container fill-height>
-    <v-layout>
-      <v-col>
-        <geo-search
-          :show-add-location-button="!adding && canUserAddChild"
-          @add="addLocation"
-          v-on:parent-geo-id-changed="onParentGeoChanged"
-        ></geo-search>
-      </v-col>
-    </v-layout>
-    <!-- <v-fab-transition>
-      <v-btn
-        v-show="!adding && canUserAddChild"
-        class="deep-orange"
-        @click="addLocation"
-        fab
-        dark
-        fixed
-        bottom
-        right>
-        <v-icon style="height:auto;">mdi-plus</v-icon>
-      </v-btn>
-    </v-fab-transition>-->
+  <v-container fill-height class="pa-0">
+    <geo-search
+      :show-add-location-button="!adding && canUserAddChild"
+      @add="addLocation"
+      @parent-geo-id-changed="onParentGeoChanged"
+    />
     <add-geo-form
       v-if="adding"
       @close="addLocationClose"
       :adding="adding"
-      :parentGeoId="parentGeoId"
-    ></add-geo-form>
+      :parent-geo-id="parentGeoId"
+    />
   </v-container>
 </template>
 
@@ -43,14 +26,14 @@ import { routeQueue } from '@/router'
 export default {
   name: 'Geo',
   mixins: [DocsLinkMixin(DocsFiles.locations.search)],
-  data() {
+  data () {
     return {
       parentGeoId: null,
       adding: false,
-      canUserAddChild: false
+      canUserAddChild: false,
     }
   },
-  created() {
+  created () {
     if (this.$route.query.filters) {
       this.parentGeoId = JSON.parse(this.$route.query.filters).parent
       this.setCanUserAddChild()
@@ -58,37 +41,37 @@ export default {
   },
   components: {
     GeoSearch,
-    AddGeoForm
+    AddGeoForm,
   },
   methods: {
-    addLocationClose(addedLocation) {
+    addLocationClose (addedLocation) {
       this.adding = false
       if (addedLocation instanceof Geo) {
         routeQueue.push({
           name: 'Geo',
           params: {
-            geoId: addedLocation.id
-          }
+            geoId: addedLocation.id,
+          },
         })
       }
     },
-    addLocation() {
+    addLocation () {
       this.adding = true
     },
-    onParentGeoChanged(parentGeoId) {
+    onParentGeoChanged (parentGeoId) {
       this.parentGeoId = parentGeoId
       this.setCanUserAddChild()
     },
-    async setCanUserAddChild() {
+    async setCanUserAddChild () {
       try {
-        let parentGeo = await GeoService.getGeoById(this.parentGeoId)
+        const parentGeo = await GeoService.getGeoById(this.parentGeoId)
         this.canUserAddChild = (parentGeo && parentGeo.hasOwnProperty('geoType')) ? parentGeo.geoType.canUserAddChild : false
       } catch (err) {
         if (this.isNotAuthError(err)) {
           this.logError(err)
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>
