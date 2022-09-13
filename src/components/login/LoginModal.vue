@@ -17,7 +17,7 @@ import config from '../../config'
 
 let component: typeof Vue
 
-type Creds = { username, password }
+type Creds = { username: string, password: string }
 
 export function requestCredentials (): Promise<Creds> {
   return new Promise((resolve, reject) => {

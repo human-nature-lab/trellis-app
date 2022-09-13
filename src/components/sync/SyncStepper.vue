@@ -224,10 +224,6 @@ export default Vue.extend({
       } catch (err) {
         console.error(err)
         this.error = '' + err
-        // this.groups[this.group - 1].steps[this.activeStep].message = {
-        //   value: err.message,
-        //   color: 'error',
-        // }
       } finally {
         this.running = false
       }
