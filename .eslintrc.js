@@ -22,6 +22,7 @@ module.exports = {
   plugins: [
     'import',
     'html',
+    '@typescript-eslint',
   ],
   globals: {
     device: true,
@@ -47,6 +48,8 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'no-useless-constructor': 'off',
     '@typescript-eslint/no-useless-constructor': ['error'],
+    'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': ['error', { typedefs: false }],
     // typescript compiler has checks built into it
     'no-undef': 0,
     'comma-dangle': ['error', {

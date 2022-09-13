@@ -20,7 +20,7 @@
   import { routeQueue } from '@/router'
 
   export default {
-    name: 'LocaleSelector',
+    name: 'LocaleSelectorPage',
     methods: {
       done () {
         routeQueue.goToNext()

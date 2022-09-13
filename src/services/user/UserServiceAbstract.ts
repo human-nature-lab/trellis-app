@@ -50,7 +50,7 @@ export abstract class UserServiceAbstract {
    * Remove current user
    */
   removeCurrentUser(): void {
-    delete(this._user)
+    delete this._user
     SingletonService.set('user', null)
     PermissionService.resetUserPermissions()
   }
