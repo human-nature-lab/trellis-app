@@ -1,13 +1,17 @@
 <template>
   <v-container fluid>
-    <v-row class="cart">
-      <v-col sm="10">
-        <v-row wrap class="pa-6 items align-center">
+    <v-row class="align-center">
+      <v-col>
+        <v-row
+          wrap
+          class="pa-6 items align-center"
+        >
           <div
             class="mr-1"
             v-for="item in items"
-            :key="item.id">
-            <slot v-bind:item="item">
+            :key="item.id"
+          >
+            <slot :item="item">
               <div class="cart-item elevation-1">
                 {{ item }}
               </div>
@@ -15,27 +19,27 @@
           </div>
         </v-row>
       </v-col>
-      <v-col sm="2">
-        <v-btn
-          @click="$emit('done')"
-          class="primary--text">
-          {{ $t('done') }}
-        </v-btn>
-      </v-col>
+      <v-spacer />
+      <v-btn
+        @click="$emit('done')"
+        class="primary--text"
+      >
+        {{ $t('done') }}
+      </v-btn>
     </v-row>
   </v-container>
 </template>
 
 <script>
-  export default {
-    name: 'cart',
-    props: {
-      items: {
-        type: Array,
-        required: true
-      }
-    }
-  }
+export default {
+  name: 'Cart',
+  props: {
+    items: {
+      type: Array,
+      required: true,
+    },
+  },
+}
 </script>
 
 <style lang="sass" scoped>

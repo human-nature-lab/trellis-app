@@ -140,8 +140,8 @@
                       :key="interview.id"
                     >
                       <td>{{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span></td>
-                      <td>{{ interview.startTime && interview.startTime.local().format('llll') }}</td>
-                      <td>{{ interview.endTime && interview.endTime.local().format('llll') }}</td>
+                      <td>{{ interview.startTime && interview.startTime | dateFormat }}</td>
+                      <td>{{ interview.endTime && interview.endTime | dateFormat }}</td>
                     </tr>
                   </table>
                 </td>
@@ -163,9 +163,11 @@ import SurveyService from '../../services/survey'
 import InterviewService from '../../services/interview'
 import { getCurrentPosition } from '../LocationFinder.vue'
 import singleton from '../../static/singleton'
+import { dateFormat } from '@/filters/date'
 
 export default Vue.extend({
   name: 'FormListItem',
+  filters: { dateFormat },
   props: {
     respondent: {
       type: Object,

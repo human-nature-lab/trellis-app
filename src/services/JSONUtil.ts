@@ -1,7 +1,7 @@
 import { AssignerFunction, RelationshipOpts } from '../entities/decorators/WebOrmDecorators'
 import { copyDate } from './DateService'
-import moment from 'moment'
 import { isUndefined } from './util'
+import { isDate } from 'date-fns'
 
 /**
  * Convert a camel case string into snake case
@@ -166,7 +166,7 @@ export function deepCopy (obj: any, copySelf: boolean = false): any {
     return obj
   } else if (Array.isArray(obj)) {
     return obj.map(o => deepCopy(o, true))
-  } else if (moment.isMoment(obj) || moment.isDate(obj)) {
+  } else if (isDate(obj)) {
     return copyDate(obj)
   } else if (typeof obj === 'object') {
     if (obj.copy && copySelf) {

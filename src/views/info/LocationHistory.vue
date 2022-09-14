@@ -4,7 +4,7 @@
       <v-flex>
         <h1>Location History</h1>
       </v-flex>
-      <v-spacer></v-spacer>
+      <v-spacer />
       <v-flex>
         <v-progress-circular v-if="isWatching" indeterminate/>
         <v-btn v-else @click="tryWatch">Retry</v-btn>
@@ -14,7 +14,7 @@
       :pagination.sync="pagination"
       :headers="headers"
       :items="items">
-      <template v-slot:item="{ item }">
+      <template :item="{ item }">
         <tr>
           <td 
             v-for="h in headers"

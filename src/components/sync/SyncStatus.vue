@@ -25,8 +25,8 @@
 
 <script>
   /* TODO: Consider adding information about the last upload here. */
-  import DateService from '../../services/DateService'
   import DocsLinkBadge from '../documentation/DocsLinkBadge.vue'
+  import { dateFormat } from '@/filters/date'
   export default {
     components: {DocsLinkBadge},
     name: 'sync-status',
@@ -39,12 +39,12 @@
       }
     },
     computed: {
-      wasSnapshotDownloaded: function () {
+      wasSnapshotDownloaded () {
         return !!this.localLatestSnapshot
       },
-      snapshotDownloadedAt: function () {
+      snapshotDownloadedAt () {
         if (this.localLatestSnapshot && this.localLatestSnapshot.hasOwnProperty('snapshotCreatedAt')) {
-          return DateService.parseDate(this.localLatestSnapshot.snapshotCreatedAt).local().format('llll')
+          return dateFormat(this.localLatestSnapshot.snapshotCreatedAt, 'Pp')
         } else {
           return ''
         }

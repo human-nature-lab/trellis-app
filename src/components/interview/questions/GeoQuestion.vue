@@ -30,21 +30,14 @@
         </v-btn>
       </v-card>
       <!--we need the geo-search-dialog class for geo search to work correctly in the dialog-->
-      <v-dialog
-        content-class="geo-search-dialog"
-        v-model="geoSearchDialog">
-        <modal-title
-          :title="$t('location_search')"
-          @close="geoSearchDialog=false">
-        </modal-title>
+      <trellis-modal v-model="geoSearchDialog" :title="$t('location_search')">
         <geo-search
           :showCart="true"
           :isSelectable="isGeoSelectable"
           :selectedGeos="selectedGeos"
           :shouldUpdateRoute="false"
-          @doneSelecting="onDoneSelecting">
-        </geo-search>
-      </v-dialog>
+          @doneSelecting="onDoneSelecting" />
+      </trellis-modal>
     </v-flex>
 </template>
 
@@ -60,6 +53,7 @@
   import ModalTitle from '../../ModalTitle.vue'
   import GeoTypeParameterMixin from '../mixins/GeoTypeParameterMixin'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+import TrellisModal from '@/components/TrellisModal.vue'
   export default {
     name: 'geo-question',
     mixins: [ActionMixin, GeoTypeParameterMixin, QuestionDisabledMixin],
@@ -67,8 +61,9 @@
       GeoSearch,
       GeoListTile,
       ModalTitle,
-      GeoBreadcrumbs
-    },
+      GeoBreadcrumbs,
+      TrellisModal,
+   },
     props: {
       question: {
         type: Object,

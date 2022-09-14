@@ -3,7 +3,7 @@ import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import InterviewDataInterface from './InterviewDataInterface'
 import DiffService from '../DiffService'
-import * as moment from 'moment'
+import { dateFormat } from '../DateService'
 
 export default abstract class InterviewServiceAbstract {
 
@@ -92,7 +92,7 @@ export default abstract class InterviewServiceAbstract {
    * @param tolerance
    */
   protected getDateFromTolerance (tolerance: number): string {
-    const now = moment().utc()
-    return now.subtract(tolerance, 'ms').format('YYYY-MM-DD HH:mm:ss')
+    const now = Date.now() - tolerance
+    return dateFormat(new Date(now))
   }
 }

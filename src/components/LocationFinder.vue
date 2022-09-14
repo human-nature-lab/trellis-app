@@ -97,7 +97,6 @@
 </template>
 
 <script>
-  import * as moment from 'moment'
   import GeoLocationService from '../services/geolocation/index'
   import { FakePosition } from '../services/geolocation/GeoLocationAbstract'
 
@@ -206,13 +205,13 @@
         try {
           const pos = await GeoLocationService.getLocationTolerance(tol)
           this.lastKnownCoordinates = pos.coords
-          this.lastKnownTime = moment(pos.timestamp)
+          this.lastKnownTime = new Date(pos.timestamp)
           return pos
         } catch (err) {
-          if (err && err.message && err.message.toLowerCase().startsWith("only secure origins are allowed")) {
+          if (err && err.message && err.message.toLowerCase().startsWith('only secure origins are allowed')) {
             // necessary for dev over http
             this.lastKnownCoordinates = FakePosition.coords
-            this.lastKnownTime = moment(FakePosition.timestamp)
+            this.lastKnownTime = new Date(pos.timestamp)
             return FakePosition
           }
           throw err

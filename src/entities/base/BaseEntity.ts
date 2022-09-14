@@ -9,14 +9,14 @@ interface toSnakeJSONOpts {
 }
 
 export default class BaseEntity implements SnakeSerializable {
-
   /**
    * Just parse all of the dates defined in the model's __dates__ array
    */
   protected parseDates () {
-    for (let key of getColumnMeta(this).dates) {
+    for (const key of getColumnMeta(this).dates) {
       if (key in this && this[key]) {
-        this[key] = parseDate(this[key]) // This returns a moment object which will automatically be serialized correctly
+        // This returns a Date object which will be serialized correctly when put back into the database
+        this[key] = parseDate(this[key])
       }
     }
     return this
@@ -28,16 +28,16 @@ export default class BaseEntity implements SnakeSerializable {
    * @returns {this}
    */
   protected mapRelationships (json: any) {
-    let relationships = getColumnMeta(this).relationships
-    for (let o of relationships) {
-      let [key, assigner] = o
+    const relationships = getColumnMeta(this).relationships
+    for (const o of relationships) {
+      const [key, assigner] = o
       assigner(this, json)
     }
     return this
   }
 
   protected mapColumns (json: any) {
-    for (let key of getColumnMeta(this).names) {
+    for (const key of getColumnMeta(this).names) {
       this[key] = json[key]
     }
     return this
@@ -73,7 +73,7 @@ export default class BaseEntity implements SnakeSerializable {
       console.log('expected to be object', this, json)
       return json
     }
-    let colMeta = getColumnMeta(this)
+    const colMeta = getColumnMeta(this)
     for (let i = 0; i < colMeta.names.length; i++) {
       if (colMeta.snake[i] in json) {
         this[colMeta.names[i]] = json[colMeta.snake[i]]
@@ -87,7 +87,7 @@ export default class BaseEntity implements SnakeSerializable {
   /**
    * Map all camel case column names to the equivalent snake case name and return a plain object
    */
-  toSnakeJSON (opts: toSnakeJSONOpts = {includeRelationships: false}): object {
+  toSnakeJSON (opts: toSnakeJSONOpts = { includeRelationships: false }): object {
     const colMeta = getColumnMeta(this)
     const r = {}
     for (let i = 0; i < colMeta.names.length; i++) {
@@ -96,7 +96,7 @@ export default class BaseEntity implements SnakeSerializable {
       r[snakeKey] = this[key]
     }
     if (opts.includeRelationships) {
-      for (let o of colMeta.relationships) {
+      for (const o of colMeta.relationships) {
         const [key, _] = o
         const snakeKey = camelToSnake(key)
         if (this[key] == null) {
@@ -119,26 +119,4 @@ export default class BaseEntity implements SnakeSerializable {
   copy () {
     return deepCopy(this)
   }
-  // copy () {
-  //   const colMeta = getColumnMeta(this)
-  //   // @ts-ignore
-  //   const clone = new this.constructor()
-  //   for (let key of colMeta.names) {
-  //     if (this.hasOwnProperty(key)) {
-  //       if (Array.isArray(this[key])) {
-  //         clone[key] = this[key].map(o => o.copy())
-  //       } else if (moment.isMoment(this[key]) || moment.isDate(this[key])) {
-  //         clone[key] = moment(this[key])
-  //       } else if (typeof this[key] === 'object') {
-  //         if ('copy' in this[key]) {
-  //           clone[key] = this[key].copy()
-  //         } else {
-  //           clone[key] = deepCopy(this[key])
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return clone
-  // }
-
 }

@@ -3,12 +3,12 @@ import Emitter from '../classes/Emitter'
 import singleton from '../static/singleton'
 import storage from './StorageService'
 import { loadLanguageAsync } from '../i18n/index'
-import moment from 'moment'
 import DeviceService from './device'
 import DatabaseService from './database'
 import config from '../config'
 import { APP_ENV } from '../static/constants'
 import theme from '../static/theme'
+import { setLocale } from './DateService'
 
 enum StorageKey {
   theme = 'dark-theme',
@@ -69,7 +69,7 @@ class SingletonService extends Emitter {
 
   setCurrentLocale (locale) {
     const tag = locale.languageTag
-    moment.locale(tag)
+    setLocale(tag)
     loadLanguageAsync(tag)
     // i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
     singleton.locale = locale

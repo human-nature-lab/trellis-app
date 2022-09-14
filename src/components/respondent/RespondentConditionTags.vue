@@ -29,7 +29,7 @@
       <template v-slot:item="{ item }">
         <tr>
           <td>{{ item.conditionTag.name }}</td>
-          <td class="text-xs-right">{{ item.createdAt.format('l') }}</td>
+          <td class="text-xs-right">{{ item.createdAt | dateFormat }}</td>
           <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG">
             <td>
               <v-btn
@@ -54,18 +54,19 @@
 </template>
 
 <script lang="ts">
+  import Vue from 'vue'
   import Permission from '../Permission.vue'
   import RespondentConditionTagForm from './RespondentConditionTagForm.vue'
-  import Vue from 'vue'
-
-  import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
-  import ConditionTagService from '../../services/condition-tag'
+  import RespondentConditionTag from '@/entities/trellis/RespondentConditionTag'
+  import ConditionTagService from '@/services/condition-tag'
+  import { dateFormat } from '@/filters/date'
 
   export default Vue.extend({
     components: {
       Permission,
-      RespondentConditionTagForm
+      RespondentConditionTagForm,
     },
+    filters: { dateFormat },
     data () {
       return {
         showForm: false,

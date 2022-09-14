@@ -1,6 +1,6 @@
 <template>
   <div
-    class="scroll-container d-flex flex-column"
+    :class="'scroll-container d-flex flex-column ' + containerClass"
   >
     <div
       class="header pa-0"
@@ -10,7 +10,7 @@
     </div>
     <div
       ref="scroller"
-      class="scrollable pa-0"
+      class="scrollable pa-0 flex-grow-1"
     >
       <slot />
     </div>
@@ -26,7 +26,11 @@ export default Vue.extend({
     elevation: {
       type: Number,
       default: 4,
-    }
+    },
+    containerClass: {
+      type: String,
+      default: '',
+    },
   },
   data () {
     return {
@@ -43,12 +47,18 @@ export default Vue.extend({
       this.isScrolled = el.scrollTop > 0
     },
   },
+  computed: {
+    attrs () {
+      return 
+    }
+  }
 })
 </script>
 
 <style lang="sass" scoped>
   .scroll-container
     height: 100%
+    max-height: 100%
     width: 100%
     overflow: hidden
     position: relative
@@ -60,5 +70,5 @@ export default Vue.extend({
     .scrollable
       z-index: 0
       position: relative
-      overflow-y: scroll
+      overflow-y: auto
 </style>

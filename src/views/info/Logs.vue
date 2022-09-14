@@ -1,14 +1,15 @@
 <template>
   <v-container fluid>
     <v-toolbar flat>
-      <v-toolbar-title>{{$t('logs')}}</v-toolbar-title>
+      <v-toolbar-title>{{ $t('logs') }}</v-toolbar-title>
       <v-spacer />
       <v-menu offset-y v-if="isCordova">
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn
             v-on="on"
             v-bind="attrs"
-            icon> 
+            icon
+          >
             <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
         </template>
@@ -36,22 +37,24 @@
       :loading="isLoading"
       :headers="headers"
       :items="logs"
-      :total-items="total"
-      :pagination.sync="pagination"
-      @update:pagination="updatePage">
-      <template v-slot:item="{ item }" >
+      :server-items-length="total"
+      :items-per-page.sync="pagination.itemsPerPage"
+      @pagination="updatePage"
+      :page.sync="pagination.page"
+    >
+      <template #item="{ item }">
         <tr @click="showFull(item)">
           <td>
-            {{item.createdAt.local().fromNow()}}
+            {{ item.createdAt | relativeTime }}
           </td>
           <td :class="`text--${item.severity} ${item.severity}`">
-            {{item.severity}}
+            {{ item.severity }}
           </td>
           <td>
-            {{item.message}}
+            {{ item.message }}
           </td>
           <td>
-            {{item.component}}
+            {{ item.component }}
           </td>
           <td>
             <v-icon v-if="item.uploadedAt" color="green">mdi-check</v-icon>
@@ -59,27 +62,30 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog
-      v-if="isFullOpen"
-      v-model="isFullOpen">
-      <ModalTitle :title="`${fullLog.severity}: ${fullLog.createdAt}`" @close="isFullOpen = false"/>
-      <v-card flat>
-        <v-container
-          fluid
-          color="white">
-          <v-layout column>
-            <v-flex
-              v-for="prop in ['message', 'fullMessage', 'component', 'syncId', 'interviewId', 'deviceId', 'userId', 'version', 'offline', 'uploadedAt']"
-              :key="prop">
-              <v-layout>
-                <v-flex class="subheader">{{prop}}</v-flex>
-                <v-flex>{{fullLog[prop]}}</v-flex>
-              </v-layout>
-            </v-flex>
-          </v-layout>
-        </v-container>
-      </v-card>
-    </v-dialog>
+    <TrellisModal
+      v-model="isFullOpen"
+      :title="fullLog ? `${fullLog.severity}: ${fullLog.createdAt}` : ''"
+    >
+      <v-container
+        v-if="isFullOpen"
+        fluid
+        color="white"
+      >
+        <v-col>
+          <v-col
+            v-for="prop in ['message', 'fullMessage', 'component', 'syncId', 'interviewId', 'deviceId', 'userId', 'version', 'offline', 'uploadedAt']"
+            :key="prop"
+          >
+            <v-row>
+              <v-col class="text-h6">
+                {{ prop }}
+              </v-col>
+              <v-col>{{ fullLog[prop] }}</v-col>
+            </v-row>
+          </v-col>
+        </v-col>
+      </v-container>
+    </TrellisModal>
     <v-dialog v-model="upload.isOpen" :persistent="upload.isActive">
       <v-card>
         <v-container>
@@ -108,13 +114,16 @@
   import DocsLinkMixin from '@/mixins/DocsLinkMixin'
   import { defaultLoggingService } from '@/services/logging'
   import Log from '@/entities/trellis-config/Log'
+  import TrellisModal from '@/components/TrellisModal.vue'
   import ModalTitle from '@/components/ModalTitle.vue'
   import uploadLogs from '@/services/upload/UploadLogs'
   import DeleteLogs from '@/services/upload/DeleteLogs'
+import { relativeTime } from '@/filters/date'
 
   export default Vue.extend({
     name: 'Logs',
-    components: { ModalTitle },
+    components: { TrellisModal, ModalTitle },
+    filters: { relativeTime },
     mixins: [DocsLinkMixin('./admin/Logs.md')],
     data () {
       return {
@@ -137,7 +146,7 @@
         pagination: {
           descending: true,
           page: 1,
-          rowsPerPage: 100,
+          itemsPerPage: 10,
           sortBy: 'createdAt'
         },
         total: 10,
@@ -163,6 +172,7 @@
       }
     },
     mounted () {
+      this.loadPage()
       this.updateTotal()
     },
     methods: {
@@ -174,13 +184,15 @@
         this.total = await defaultLoggingService.getLogCount()
       },
       updatePage (pagination) {
+        console.log('pagination', pagination)
         this.pagination = pagination
         this.loadPage()
       },
       async loadPage () {
         this.isLoading = true
-        this.logs = await defaultLoggingService.getLogPage(this.pagination.page - 1, this.pagination.rowsPerPage, this.pagination.sortBy, this.pagination.descending)
+        this.logs = await defaultLoggingService.getLogPage(this.pagination.page - 1, this.pagination.itemsPerPage, this.pagination.sortBy, this.pagination.descending)
         this.isLoading = false
+        console.log('logs', this.logs)
       },
       async uploadLogs () {
         try {
