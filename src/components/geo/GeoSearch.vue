@@ -5,15 +5,6 @@
         no-gutters
         class="align-center px-4"
       >
-        <v-btn
-          text
-          icon
-          :disabled="!canMoveUp || isSearching"
-          @click="moveUpOneLevel"
-          class="mr-2"
-        >
-          <v-icon>mdi-arrow-left-bold</v-icon>
-        </v-btn>
         <v-text-field
           clearable
           v-model="query"
@@ -23,6 +14,20 @@
         />
       </v-row>
       <v-col class="geo-breadcrumbs pt-0">
+        <v-btn
+          text
+          icon
+          @click="goToTop"
+          :disabled="isSearching"
+          :class="{ current: !ancestors.length }"
+        >
+          <v-icon>mdi-home</v-icon>
+        </v-btn>
+        <v-icon
+          :disabled="isSearching"
+        >
+          mdi-arrow-right
+        </v-icon>
         <template v-for="(geo, index) in ancestors">
           <v-btn
             :key="geo.id"
@@ -201,9 +206,6 @@ export default {
     filters () {
       return Object.assign({}, this.baseFilters, this.userFilters)
     },
-    canMoveUp () {
-      return this.lastParentIds.length > 1
-    },
     orderedResults () {
       function compare (a, b) {
         const aTransText = a.nameTranslation.translationText.find((tt) => tt.localeId === singleton.locale.id)
@@ -225,6 +227,13 @@ export default {
     },
   },
   methods: {
+    goToTop () {
+      if (!this.lastParentIds.length) return
+      this.lastParentIds = []
+      this.userFilters.parent = null
+      this.query = ''
+      this.search()
+    },
     geoIsSelectable (geo) {
       return typeof this.isSelectable === 'boolean' ? this.isSelectable : this.isSelectable(geo)
     },
@@ -260,13 +269,6 @@ export default {
         name: this.$route.name,
         params: this.$route.params,
         query: q,
-      })
-    },
-    moveUpOneLevel () {
-      this.userFilters.parent = this.lastParentIds[this.lastParentIds.length - 2]
-      this.query = null
-      this.search().then(() => {
-        this.lastParentIds.pop()
       })
     },
     async onGeoClick (geo) {

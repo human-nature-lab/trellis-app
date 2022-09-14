@@ -2,7 +2,7 @@ import { parse, differenceInDays, format, addDays } from 'date-fns'
 
 type Data = { labels: string[], data: number[] }
 
-export function homogenizeDates (data: Data, min?: string, max?: string, dateFormat = 'YYYY-MM-DD'): Data {
+export function homogenizeDates (data: Data, min?: string, max?: string, dateFormat = 'yyyy-MM-dd'): Data {
   if (!data.labels.length) return data
 
   let dateCursor = parse(min || data.labels[0], dateFormat, new Date())
