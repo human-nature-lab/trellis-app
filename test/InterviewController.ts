@@ -2,7 +2,6 @@ import InterviewManager from '../src/components/interview/classes/InterviewManag
 import { ActionPayload } from '../src/components/interview/services/actions/DatumOperations'
 import Action from '../src/entities/trellis/Action'
 import Form from '../src/entities/trellis/Form'
-import moment from 'moment'
 import Interview from '../src/entities/trellis/Interview'
 import QuestionDatum from '../src/entities/trellis/QuestionDatum'
 import RespondentConditionTag from '../src/entities/trellis/RespondentConditionTag'
@@ -10,6 +9,7 @@ import RespondentFill from '../src/entities/trellis/RespondentFill'
 import { ConditionTagInterface } from '../src/services/interview/InterviewDataInterface'
 import AT from '../src/static/action.types'
 import { expect } from 'chai'
+import { addSeconds } from 'date-fns'
 
 interface SimpleLocation {
   section?: number
@@ -68,7 +68,7 @@ export class InterviewController {
     action.actionType = actionType
     action.payload = payload
     action.questionId = questionId
-    action.createdAt = moment().add(this.n, 'seconds')
+    action.createdAt = addSeconds(new Date(), this.n)
     this.n++
     return action
   }
@@ -76,7 +76,7 @@ export class InterviewController {
   simpleAction (actionType: string): Action {
     const action = new Action()
     action.actionType = actionType
-    action.createdAt = moment().add(this.n, 'seconds')
+    action.createdAt = addSeconds(new Date(), this.n)
     this.n++
     return action
   }
