@@ -626,7 +626,7 @@ outdated_survey,This survey is outdated and cannot be resumed,Esta encuesta es o
 duration,Duration,Duración,
 creating_survey,Creating survey,Creando encuesta,
 resuming_survey,Resuming survey,Reanudando encuesta,
-reopen_survey,Reopen survey,,
+reopen_survey,Reopen survey,Reabrir encuesta,
 year,{n}y,{n}y,
 week,{n}w,{n}w,
 day,{n}d,{n}d,
