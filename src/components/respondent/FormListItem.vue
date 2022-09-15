@@ -19,6 +19,7 @@
         >
           <v-icon
             @click.stop="tryCreatingSurvey"
+            :disabled="disabled"
             :color="status.color"
           >
             {{ status.icon }}
@@ -74,7 +75,7 @@
                 :data-survey-id="survey.id"
                 :key="survey.id"
                 @click="tryStartingSurvey(survey)"
-                class="clickable"
+                :class="{ clickable: !disabled }"
               >
                 <td>
                   <span
@@ -117,13 +118,29 @@
                       </td>
                       <td>
                         <span
-                          v-if="interview.startTime && interview.endTime">
+                          v-if="interview.startTime && interview.endTime"
+                        >
                           {{ dateDiff(interview.startTime, interview.endTime) }}
                         </span>
                       </td>
                     </tr>
                   </table>
                 </td>
+                <Permission
+                  web-only
+                  :allowed-roles="['admin']"
+                >
+                  <td>
+                    <DotsMenu>
+                      <v-list-item
+                        @click="uncompleteSurvey(survey)"
+                        :disabled="disabled || !survey.completedAt"
+                      >
+                        {{ $t('reopen_survey') }}
+                      </v-list-item>
+                    </DotsMenu>
+                  </td>
+                </Permission>
               </tr>
             </tbody>
           </v-simple-table>
@@ -137,14 +154,17 @@
 import AsyncTranslationText from '../AsyncTranslationText.vue'
 
 import Vue, { PropOptions } from 'vue'
-import global from '@/static/singleton'
-import SurveyService from '@/services/survey'
-import InterviewService from '@/services/interview'
+import global from '../../static/singleton'
+import SurveyService from '../../services/survey'
+import InterviewService from '../../services/interview'
 import { getCurrentPosition } from '../LocationFinder.vue'
-import singleton from '@/static/singleton'
-import Survey from '@/entities/trellis/Survey'
-import Translation from '@/entities/trellis/Translation'
-import moment, { Moment } from 'moment'
+import singleton from '../../static/singleton'
+import Survey from '../../entities/trellis/Survey'
+import Translation from '../../entities/trellis/Translation'
+import { Moment } from 'moment'
+import DotsMenu from '../builder/DotsMenu.vue'
+import Permission from '../Permission.vue'
+import { humanizeDateDiff } from '../../filters/humanizeDateDiff'
 
 export type DisplayForm = {
   isComplete?: boolean
@@ -162,6 +182,7 @@ export type DisplayForm = {
 export default Vue.extend({
   name: 'FormListItem',
   props: {
+    disabled: Boolean,
     respondent: {
       type: Object,
       required: true,
@@ -225,9 +246,14 @@ export default Vue.extend({
       return user ? user.username : ''
     },
     dateDiff (startTime: Moment, endTime: Moment): string {
-      return moment.duration(endTime.diff(startTime)).humanize()
+      return humanizeDateDiff(startTime.toDate(), endTime.toDate())
+    },
+    async uncompleteSurvey (survey: Survey) {
+      const s = await SurveyService.uncomplete(survey.id)
+      this.$emit('survey', s)
     },
     async tryCreatingSurvey () {
+      if (this.disabled) return
       const currentVersionSurveys = this.form.surveys.filter(s => s.formId === this.form.id)
       if (!this.canCreateSurveys) {
         // Do nothing
@@ -264,6 +290,7 @@ export default Vue.extend({
       }
     },
     async tryStartingSurvey (survey: Survey) {
+      if (this.disabled) return
       let coords, interview
       if (survey.completedAt) {
         this.alert('error', this.$t('cant_resume_survey'))
@@ -296,6 +323,8 @@ export default Vue.extend({
   },
   components: {
     AsyncTranslationText,
+    DotsMenu,
+    Permission,
   },
 })
 </script>

@@ -51,6 +51,9 @@
       <FormsView
         v-if="forms"
         :forms="respondentForms"
+        :loading="loading"
+        :disabled="loading"
+        @update:forms="rehydrate"
         :respondent="respondent"
         :show-hidden="showHidden"
         :show-unpublished="showUnpublished"
@@ -64,7 +67,10 @@
       </v-toolbar>
       <forms-view
         v-if="censusForms"
+        :loading="loading"
+        :disabled="loading"
         :forms="censusForms"
+        @update:forms="rehydrate"
         :respondent="respondent"
         :can-create-surveys="true"
         @newInterview="startInterview"
@@ -135,6 +141,7 @@ export default Vue.extend({
       showUnpublished: false,
       skipService: new SkipService(),
       error: '',
+      loading: false,
     }
   },
   components: {
@@ -146,6 +153,10 @@ export default Vue.extend({
         name: 'Interview',
         params: { studyId: this.global.study.id, interviewId: interview.id },
       })
+    },
+    async rehydrate () {
+      this.loading = true
+      this.hydrate(await load(this.$route))
     },
     hydrate (data: RespondentFormsData) {
       // Join any surveys that have been created with the possible forms
@@ -162,6 +173,7 @@ export default Vue.extend({
       this.surveys = data.surveys
       this.forms = data.forms
       this.respondent = data.respondent
+      this.loading = false
     },
   },
   computed: {
