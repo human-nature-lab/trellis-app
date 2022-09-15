@@ -1,13 +1,18 @@
 <template>
   <v-col>
+    <v-progress-linear
+      v-if="loading"
+      indeterminate
+    />
     <FormListItem
       v-for="form in cForms"
       :key="form.id"
       :form="form"
+      :disabled="disabled"
       :respondent="respondent"
       :allow-multiple-surveys="allowMultipleSurveys"
       :can-create-surveys="canCreateSurveys"
-      @update="$emit('update')"
+      @survey="survey => updateSurvey(form, survey)"
       @newInterview="$emit('newInterview', $event)"
     />
   </v-col>
@@ -17,10 +22,14 @@
 import Vue from 'vue'
 import FormListItem, { DisplayForm } from './FormListItem.vue'
 import singleton from '../../static/singleton'
+import Form from '../../entities/trellis/Form'
+import Survey from '../../entities/trellis/Survey'
 
 export default Vue.extend({
   name: 'FormsView',
   props: {
+    disabled: Boolean,
+    loading: Boolean,
     respondent: {
       type: Object,
       required: true,
@@ -52,7 +61,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    showForm (form): boolean {
+    showForm (form: Form): boolean {
       const isTestStudy = this.global.study.testStudyId === null
       if (isTestStudy) {
         return true
@@ -66,6 +75,11 @@ export default Vue.extend({
       } else {
         return false
       }
+    },
+    updateSurvey (form: DisplayForm, survey: Survey) {
+      const index = form.surveys.findIndex(s => s.id === survey.id)
+      form.surveys.splice(index, 1, survey)
+      this.$emit('update:forms', this.forms)
     },
   },
   computed: {

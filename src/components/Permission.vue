@@ -33,24 +33,22 @@ export default Vue.extend({
     isVisible: {
       cache: false,
       get (): boolean {
-        let isCorrectPlatform = true
-        if (this.webOnly || this.mobileOnly) {
-          isCorrectPlatform = (this.webOnly !== false && this.isWeb) || (this.mobileOnly !== false && this.isCordova)
-        }
-        const isUserLoaded = this.global && !!this.global.user
-        const hasPermissions = this.requires != null ? this.hasPermission(this.requires) : false
+        const isCorrectPlatform = (this.webOnly !== false && this.isWeb) ||
+          (this.mobileOnly !== false && this.isCordova)
         if (!isCorrectPlatform) {
           return false
-        } else if (isCorrectPlatform && this.onlyHasPlatform) {
+        }
+        const isUserLoaded = this.global && !!this.global.user
+        if (isCorrectPlatform && this.onlyHasPlatform) {
           return true
         } else if (!isUserLoaded) {
           return false
         } else if (this.requires != null) {
-          return hasPermissions
+          return this.hasPermission(this.requires)
         } else if (this.allowedRoles.length) {
-          return this.userInAllowedList()
+          return this.userInAllowedList
         } else if (this.blockedRoles.length) {
-          return !this.userInBlockedList()
+          return !this.userInBlockedList
         } else {
           return true
         }
@@ -67,12 +65,12 @@ export default Vue.extend({
     },
     userInAllowedList (): boolean {
       if (!this.allowedRoles.length) return false
-      const role = this.global.user.role.toLowerCase()
+      const role = this.global.user.roleId.toLowerCase()
       return this.isInList(this.allowedLower, role)
     },
     userInBlockedList (): boolean {
       if (!this.blockedRoles.length) return false
-      const role = this.global.user.role.toLowerCase()
+      const role = this.global.user.roleId.toLowerCase()
       return this.isInList(this.blockedLower, role)
     },
   },
