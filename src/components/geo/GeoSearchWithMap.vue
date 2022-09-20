@@ -1,12 +1,13 @@
 <template>
-  <v-col class="fill-height content">
-    <v-toolbar>
+  <v-col class="fill-height content d-flex flex-column">
+    <v-toolbar class="flex-grow-0">
       <v-btn icon v-if="parentGeo !== null" @click.stop="upOneLevelDone">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
       <v-toolbar-title>{{ parentGeoName }}</v-toolbar-title>
     </v-toolbar>
-    <v-container
+    <v-col
+      class="flex-grow-1"
       ref="mapContainer"
       id="leafletMap"
       style="position: relative;">
@@ -34,9 +35,9 @@
           <v-icon style="height:auto;">mdi-plus</v-icon>
         </v-btn>
       </Permission>
-    </v-container>
-    <v-col class="flow-grow-0">
-      <Permission :requires="TrellisPermission.EDIT_GEO">
+    </v-col>
+    <Permission :requires="TrellisPermission.EDIT_GEO">
+      <v-col class="flow-grow-0 edit-panel" v-if="selectedGeo">
         <GeoEditPanel
           v-on:select-geo-done="selectGeoDone"
           v-on:up-one-level-done="upOneLevelDone"
@@ -46,10 +47,10 @@
           v-on:position-geo-done="positionGeoDone"
           v-on:editing-cancelled="editingCancelled"
           :selected-geo="selectedGeo"
-          :leaflet-map="trellisMap" />
-      </Permission>
-    </v-col>
-
+          :leaflet-map="trellisMap" 
+        />
+      </v-col>
+    </Permission>
   </v-col>
 </template>
 
@@ -482,4 +483,7 @@
     position: absolute
     top: -15px
     z-index: 1000
+  
+  .edit-panel
+    max-height: 200px
 </style>
