@@ -33,8 +33,10 @@ export default Vue.extend({
     isVisible: {
       cache: false,
       get (): boolean {
-        const isCorrectPlatform = (this.webOnly !== false && this.isWeb) ||
-          (this.mobileOnly !== false && this.isCordova)
+        let isCorrectPlatform = true
+        if (this.webOnly || this.mobileOnly) {
+          isCorrectPlatform = (this.webOnly !== false && this.isWeb) || (this.mobileOnly !== false && this.isCordova)
+        }
         if (!isCorrectPlatform) {
           return false
         }
