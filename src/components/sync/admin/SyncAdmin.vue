@@ -192,10 +192,7 @@
             return u
           })
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to fetch uploads')
-          }
+          this.handleError(err, 'Unable to fetch uploads')
         } finally {
           this.uploadsLoading = false
         }
@@ -205,10 +202,7 @@
         try {
           this.snapshots = await SyncAdminService.listSnapshots()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to fetch snapshots')
-          }
+          this.handleError(err, 'Unable to fetch snapshots')
         } finally {
           this.snapshotsLoading = false
         }
@@ -219,10 +213,7 @@
           await SyncAdminService.processUploads(this.selectedUploads.map(u => u.id))
           this.getUploads()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to process uploads')
-          }
+          this.handleError(err, 'Unable to process uploads')
         } finally {
           this.uploadsProcessing = false
         }
@@ -230,15 +221,23 @@
       generateSnapshot: async function () {
         this.generatingSnapshot = true
         try {
-          await SyncAdminService.generateSnapshot()
+          const res = await SyncAdminService.generateSnapshot()
+          this.alert('success', res.data.msg)
           this.getSnapshots()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to generate a snapshot')
-          }
+          this.handleError(err, 'Unable to generate a snapshot')
         } finally {
           this.generatingSnapshot = false
+        }
+      },
+      handleError (err, defaultMessage) {
+        if (this.isNotAuthError(err)) {
+          this.log(err)
+          let msg = defaultMessage
+          if (err && err.response && typeof err.response.data === 'object' && err.response.data.msg) {
+            msg = err.response.data.msg
+          }
+          this.alert('error', msg)
         }
       }
     }
