@@ -234,8 +234,12 @@
         if (this.isNotAuthError(err)) {
           this.log(err)
           let msg = defaultMessage
-          if (err && err.response && typeof err.response.data === 'object' && err.response.data.msg) {
-            msg = err.response.data.msg
+          if (err && err.response && typeof err.response.data === 'object') {
+            if (err.response.data.msg) {
+              msg = err.response.data.msg
+            } else if (err.response.data.translation) {
+              msg = this.$t(err.response.data.translation)
+            }
           }
           this.alert('error', msg)
         }
