@@ -222,7 +222,7 @@
         this.generatingSnapshot = true
         try {
           const res = await SyncAdminService.generateSnapshot()
-          this.alert('success', res.data.msg)
+          this.alertRes('success', res.data, 'Successfully created snapshot')
           this.getSnapshots()
         } catch (err) {
           this.handleError(err, 'Unable to generate a snapshot')
@@ -230,18 +230,25 @@
           this.generatingSnapshot = false
         }
       },
+      alertRes (kind, data, defaultMessage) {
+        let msg = defaultMessage
+        if (data && typeof data === 'object') {
+          if (data.msg) {
+            msg = data.msg
+          } else if (data.translation) {
+            msg = '' + this.$t(data.translation)
+          }
+        }
+        this.alert(kind, msg)
+      },
       handleError (err, defaultMessage) {
         if (this.isNotAuthError(err)) {
           this.log(err)
-          let msg = defaultMessage
-          if (err && err.response && typeof err.response.data === 'object') {
-            if (err.response.data.msg) {
-              msg = err.response.data.msg
-            } else if (err.response.data.translation) {
-              msg = this.$t(err.response.data.translation)
-            }
+          if (err && err.response) {
+            this.alertRes('error', err.response.data, defaultMessage)
+          } else {
+            this.alert('error', defaultMessage)
           }
-          this.alert('error', msg)
         }
       }
     }
