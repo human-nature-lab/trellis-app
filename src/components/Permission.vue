@@ -66,7 +66,7 @@ export default Vue.extend({
       return this.blockedRoles.map(r => r.toLowerCase())
     },
     userInAllowedList (): boolean {
-      if (!this.allowedRoles.length) return false
+      if (!this.allowedRoles.length || !this.global) return false
       const role = this.global.user.roleId.toLowerCase()
       return this.isInList(this.allowedLower, role)
     },

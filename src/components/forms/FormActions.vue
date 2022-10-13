@@ -43,6 +43,9 @@
           <v-list-item-content v-else>
             {{ $t('enable_form') }}
           </v-list-item-content>
+          <v-list-item-action>
+            <v-switch v-model="form.isPublished" :disabled="isTestStudy" color="success" />
+          </v-list-item-action>
         </v-list-item>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
@@ -50,6 +53,16 @@
           <v-list-item-content>
             {{ $t('revert_version') }}
           </v-list-item-content>
+        </v-list-item>
+      </Permission>
+      <Permission v-if="!isTestStudy" :requires="TrellisPermission.EDIT_FORM">
+        <v-list-item @click.stop.capture="toggleAllowMultipleResponses">
+          <v-list-item-content>
+            {{ $t('allow_multiple_responses') }}
+          </v-list-item-content>
+          <v-list-item-action>
+            <v-switch v-model="allowMultipleResponses" color="success" />
+          </v-list-item-action>
         </v-list-item>
       </Permission>
       <v-list-item
@@ -89,6 +102,7 @@
   import StudyForm from '../../entities/trellis/StudyForm'
   import PermissionMixin from '../../mixins/PermissionMixin'
   import Permission from '../Permission.vue'
+  import FormService from '../../services/form'
 
   export default Vue.extend({
     name: 'FormActions',
@@ -115,5 +129,23 @@
         isOpen: false,
       }
     },
+    methods: {
+      async toggleAllowMultipleResponses () {
+        const sf = this.studyForm.copy()
+        sf.allowMultipleResponses = !sf.allowMultipleResponses
+        this.$emit('update:studyForm', sf)
+        await FormService.updateStudyForm(sf.studyId, sf)
+      }
+    },
+    computed: {
+      allowMultipleResponses (): boolean {
+        return this.studyForm.allowMultipleResponses
+      }
+    }
   })
 </script>
+
+<style lang="sass" scoped>
+  .list__tile__title
+    line-height: 30px
+</style>

@@ -19,6 +19,7 @@
         @export="exportForm"
         @publish="onPublish"
         @update:isPublished="onToggleEnabled"
+        @update:studyForm="$emit('update:studyForm', $event)"
         @revert="showVersionModal = true"
         @toggleFormSkips="$emit('toggleFormSkips', $event)"
       />
@@ -106,7 +107,7 @@ export default Vue.extend({
       showMenu: false,
       showVersionModal: false,
       isOpen: false,
-      memForm: this.form.copy(),
+      memForm: {} as Form,
       saveThrottled: debounce(async () => {
         this.$emit('save', this.memForm)
       }, 2000),
@@ -125,8 +126,13 @@ export default Vue.extend({
     },
   },
   watch: {
-    form (newForm: Form) {
-      this.memForm = newForm.copy()
+    form: {
+      handler (newForm: Form) {
+        if (newForm) {
+          this.memForm = newForm.copy()
+        }
+      },
+      immediate: true,
     },
   },
   computed: {

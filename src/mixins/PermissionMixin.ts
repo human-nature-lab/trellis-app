@@ -15,6 +15,12 @@ export default Vue.extend({
     }
   },
   async created () {
+    const unwatch = this.$watch('global.user', () => {
+      if (this.global && this.global.user) {
+        setTimeout(() => unwatch())
+        PermissionService.loadIfNotLoaded(this.global.user)
+      }
+    }, { immediate: true })
     if (this.global && !this.global.user) {
       try {
         const user = await UserService.loadCurrentUser()
@@ -23,7 +29,6 @@ export default Vue.extend({
         }
       } catch (err) {}
     }
-    await PermissionService.loadIfNotLoaded(this.global.user)
   },
   methods: {
     hasPermission (permissions: TrellisPermission|TrellisPermission[]): boolean {

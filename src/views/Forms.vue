@@ -256,7 +256,7 @@
         const index = this.studyForms.findIndex(sf => sf.id === studyForm.id)
         if (index > -1) {
           studyForm.form = this.studyForms[index].form
-          this.studyForms[index] = studyForm
+          this.$set(this.studyForms, index, studyForm)
         }
       },
       async loadForms() {

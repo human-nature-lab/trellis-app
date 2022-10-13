@@ -26,6 +26,12 @@ export default class StudyForm extends TimestampedSoftDelete {
   @Column({ nullable: true, type: 'uuid' }) @Serializable
   censusTypeId: string
 
+  @Column() @Serializable
+  allowMultipleResponses: boolean
+
+  @Column() @Serializable
+  allowPublicResponses: boolean
+
   @Relationship(type => Form)
   @OneToOne(type => Form, { eager: true })
   @JoinColumn({ name: 'current_version_id' })
@@ -42,6 +48,8 @@ export default class StudyForm extends TimestampedSoftDelete {
       super.fromSnakeJSON(json)
       this.formTypeId = +this.formTypeId
     }
+    this.allowMultipleResponses = !!this.allowMultipleResponses
+    this.allowPublicResponses = !!this.allowPublicResponses
     this.sortOrder = +this.sortOrder // Convert to a number
     return this
   }

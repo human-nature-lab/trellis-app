@@ -57,7 +57,7 @@
         :respondent="respondent"
         :show-hidden="showHidden"
         :show-unpublished="showUnpublished"
-        :allow-multiple-surveys="false"
+        :allow-multiple-surveys="true"
         @newInterview="startInterview"
       />
     </v-card>
@@ -197,6 +197,7 @@ export default Vue.extend({
           nameTranslation: studyForm.form.nameTranslation,
           surveys: formSurveys,
           isPublished: studyForm.form.isPublished,
+          allowMultipleResponses: studyForm.allowMultipleResponses,
           isSkipped: !showForm,
           censusTypeId: studyForm.censusTypeId,
           isComplete: false,

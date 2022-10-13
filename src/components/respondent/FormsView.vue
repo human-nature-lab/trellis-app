@@ -10,7 +10,6 @@
       :form="form"
       :disabled="disabled"
       :respondent="respondent"
-      :allow-multiple-surveys="allowMultipleSurveys"
       :can-create-surveys="canCreateSurveys"
       @survey="survey => updateSurvey(form, survey)"
       @newInterview="$emit('newInterview', $event)"
@@ -43,10 +42,6 @@ export default Vue.extend({
       default: false,
     },
     showUnpublished: {
-      type: Boolean,
-      default: false,
-    },
-    allowMultipleSurveys: {
       type: Boolean,
       default: false,
     },

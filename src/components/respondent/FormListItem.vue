@@ -172,6 +172,7 @@ export type DisplayForm = {
   nComplete?: number
   id: string
   nameTranslation: Translation
+  allowMultipleResponses: boolean
   surveys: Survey[]
   isPublished: boolean
   isSkipped: boolean
@@ -191,10 +192,6 @@ export default Vue.extend({
       type: Object,
       required: true,
     } as PropOptions<DisplayForm>,
-    allowMultipleSurveys: {
-      type: Boolean,
-      required: true,
-    },
     canCreateSurveys: {
       type: Boolean,
       required: true,
@@ -264,7 +261,7 @@ export default Vue.extend({
         singleton.loading.active = true
         singleton.loading.fullscreen = true
         return this.tryStartingSurvey(currentVersionSurveys[0])
-      } else if (currentVersionSurveys.length !== 0 && !this.allowMultipleSurveys) {
+      } else if (currentVersionSurveys.length !== 0 && !this.form.allowMultipleResponses) {
         this.alert('error', this.$t('cant_make_multiple_surveys'), { timeout: 0 })
       } else if (currentVersionSurveys.length === 0 || confirm(this.$t('create_another_survey').toString())) {
         this.alert('success', this.$t('creating_survey'))

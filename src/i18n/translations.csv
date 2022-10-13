@@ -640,3 +640,5 @@ uploads_running,Uploads are already being processed,Las carga estan siendo proce
 snapshot_created,Snapshot was created successfully,La captura fue creada correctamente,
 uploads_process_failure,Failed to process uploads,No se pudieron procesar las cargas,
 snapshot_failure,Failed to create snapshot,No se pudo crear la captura,
+allow_multiple_responses,Allow multiple responses,,
+cant_make_multiple_surveys,Can't have multiple responses to this form,,
