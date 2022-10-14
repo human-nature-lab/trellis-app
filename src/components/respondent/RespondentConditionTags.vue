@@ -24,6 +24,7 @@
     <v-data-table
       class="mb-4"
       hide-default-footer
+      :items-per-page="-1"
       :headers="conditionTagHeaders"
       :items="conditionTags">
       <template v-slot:item="{ item }">

@@ -22,6 +22,7 @@
       class="mb-4"
       :headers="locationHeaders"
       :items="locations"
+      :items-per-page="-1"
       hide-default-footer>
       <template v-slot:item="props">
         <RespondentGeoRow

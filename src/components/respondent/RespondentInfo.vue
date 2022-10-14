@@ -118,6 +118,12 @@
         try {
           this.respondent = respondent
           this.respondentConditionTags = await respondent.respondentConditionTags
+          this.respondentConditionTags.sort((a, b) => {
+            if (!a.conditionTag || !b.conditionTag) {
+              return 0
+            }
+            return a.conditionTag.name.localeCompare(b.conditionTag.name)
+          })
           this.respondentPhotos = await RespondentService.getRespondentPhotos(respondent.id)
           this.respondentPhotosLoading = false
         } catch (err) {
