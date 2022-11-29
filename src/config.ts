@@ -9,5 +9,5 @@ export default c as {
     offline: boolean
   }
   debug?: boolean
-  compareTime?: boolean
+  checkServerTime?: boolean
 }

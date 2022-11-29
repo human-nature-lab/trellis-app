@@ -22,7 +22,7 @@ export async function checkConnection (ctrl: StepController) {
 }
 
 export async function compareTime () {
-  if (config.compareTime) {
+  if (config.checkServerTime) {
     const deviceId = await DeviceService.getUUID()
     const serverTime = await SyncService.getServerTime(deviceId)
     const now = new Date()
