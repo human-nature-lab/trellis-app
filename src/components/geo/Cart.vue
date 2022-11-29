@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row class="cart">
       <v-col sm="10">
-        <v-row wrap class="pa-6 items">
+        <v-row wrap class="pa-6 items align-center">
           <div
             class="mr-1"
             v-for="item in items"
@@ -22,8 +22,6 @@
           {{ $t('done') }}
         </v-btn>
       </v-col>
-      <v-spacer />
-
     </v-row>
   </v-container>
 </template>
@@ -41,8 +39,6 @@
 </script>
 
 <style lang="sass" scoped>
-.cart
-  background: white
   /*max-height: 150px*/
 .cart-item
   height: 100px
