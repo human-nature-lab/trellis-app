@@ -67,14 +67,16 @@ export default class EdgeServiceCordova implements EdgeServiceInterface {
       },
     })
     for (const p of resPhotos) {
-      if (sourceMap.has(p.respondentId)) {
-        for (const e of sourceMap.get(p.respondentId)) {
-          e.sourceRespondent.photos.push(p.photo)
+      if (!p.photo.deletedAt) {
+        if (sourceMap.has(p.respondentId)) {
+          for (const e of sourceMap.get(p.respondentId)) {
+            e.sourceRespondent.photos.push(p.photo)
+          }
         }
-      }
-      if (targetMap.has(p.respondentId)) {
-        for (const e of targetMap.get(p.respondentId)) {
-          e.targetRespondent.photos.push(p.photo)
+        if (targetMap.has(p.respondentId)) {
+          for (const e of targetMap.get(p.respondentId)) {
+            e.targetRespondent.photos.push(p.photo)
+          }
         }
       }
     }
