@@ -6,7 +6,7 @@
     <v-card>
       <v-toolbar flat>
         <v-toolbar-title v-if="respondent">
-          {{ $t('respondent_forms', [respondent.name]) }}
+          {{ $t('respondent_forms', [respondentName]) }}
         </v-toolbar-title>
         <v-spacer />
         <v-btn
@@ -208,6 +208,13 @@ export default Vue.extend({
     },
     censusForms (): DisplayForm[] {
       return this.displayForms.filter(f => f.censusTypeId)
+    },
+    respondentName (): string {
+      return (this.respondent &&
+        this.respondent.names &&
+        this.respondent.names.length &&
+        this.respondent.names.find(n => n.isDisplayName).name) ||
+        this.respondent.name
     },
     respondentForms (): DisplayForm[] {
       return this.displayForms.filter(f => !f.censusTypeId)
