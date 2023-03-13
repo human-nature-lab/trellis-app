@@ -38,8 +38,13 @@
               :respondent="respondent"></respondent-names>
             <respondent-fill
               :respondent="respondent"></respondent-fill>
+            <Permission web-only>
+              <RespondentEdges
+                v-if="respondent && global.study"
+                :respondent-id="respondent.id"
+                :study-id="global.study.id" />
+            </Permission>
             <v-flex v-if="hasPermission([TrellisPermission.REMOVE_RESPONDENT])">
-
               <v-toolbar flat>
                 <v-toolbar-title>{{$t('admin')}}</v-toolbar-title>
               </v-toolbar>
@@ -69,6 +74,7 @@
   import PhotoAlbum from '../photo/PhotoAlbum.vue'
   import RespondentConditionTags from './RespondentConditionTags.vue'
   import RespondentFill from './RespondentFill.vue'
+  import RespondentEdges from './RespondentEdges.vue'
 
   import RouteMixinFactory from '../../mixins/RoutePreloadMixin'
   import RespondentService from '../../services/respondent'
@@ -183,7 +189,8 @@
       RespondentConditionTags,
       Permission,
       RespondentGeos,
-      PhotoAlbum
+      PhotoAlbum,
+      RespondentEdges,
     }
   })
 </script>

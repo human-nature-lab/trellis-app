@@ -63,6 +63,7 @@
   import ConditionTagService from '../../services/condition-tag'
 
   export default Vue.extend({
+    name: 'RespondentConditionTags',
     components: {
       Permission,
       RespondentConditionTagForm
@@ -101,10 +102,6 @@
         default: [] as RespondentConditionTag[]
       }
     },
-    created () {
-      // TODO: Load respondent condition tags if they aren't passed in
-    },
-    name: 'RespondentConditionTags',
     methods: {
       doneAddingRespondentConditionTag (tag: RespondentConditionTag): void {
         this.conditionTags.push(tag)

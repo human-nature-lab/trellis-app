@@ -1,6 +1,6 @@
-import Pagination, {RandomPagination, RandomPaginationResult} from '../../types/Pagination'
-import http, {adminInst} from '../http/AxiosInstance'
-import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
+import { RandomPagination, RandomPaginationResult } from '../../types/Pagination'
+import http, { adminInst } from '../http/AxiosInstance'
+import RespondentServiceInterface, { SearchFilter, EdgeDatum } from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
@@ -164,6 +164,11 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
         'Content-Type': 'multipart/form-data'
       }
     })
+  }
+
+  async listEdges (respondentId: string) {
+    const res = await adminInst.get(uriTemplate('respondent/{respondentId}/edges', [respondentId]))
+    return res.data as EdgeDatum[]
   }
 
 }
