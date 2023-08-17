@@ -217,6 +217,11 @@ export default {
           to: { name: 'Sync' },
           icon: 'mdi-sync',
           title: this.$t('sync'),
+        }, {
+          showIf: this.isCordovaBuild,
+          to: { name: 'NearbyCommunications' },
+          icon: 'mdi-wifi',
+          title: this.$t('nearby_communications'),
         }],
       }, {
         title: this.$t('admin'),
