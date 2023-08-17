@@ -72,7 +72,6 @@ const cssLoaders = [isProd
 }]
 
 const plugins = [
-  new CleanWebpackPlugin(),
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     'process.env.APP_ENV': JSON.stringify(process.env.APP_ENV),
@@ -108,6 +107,10 @@ const plugins = [
   //   }
   // })
 ]
+
+if (isProd) {
+  plugins.splice(0, 0, new CleanWebpackPlugin())
+}
 
 // if (useSentry) {
 //   plugins.push(new SentryPlugin({
