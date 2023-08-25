@@ -38,5 +38,8 @@
     "www/lib/typeorm",
     "platforms",
     "hooks"
-  ]
+  ],
+  "vueCompilerOptions": {
+    "target": 2.7
+  }
 }
