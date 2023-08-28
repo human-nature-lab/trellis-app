@@ -16,5 +16,6 @@ export default {
   year_month: 'd840f8cb-b68b-432a-9a47-2b0b5dc65377',
   year_month_day: 'efbafb7c-62ca-4ed9-92df-7d171e855650',
   year_month_day_time: 'effab4ce-df07-459d-a2a4-25be77bcca1b',
-  respondent_geo: 'db1192c9-a850-4427-ad67-388f6325fd23'
+  respondent_geo: 'db1192c9-a850-4427-ad67-388f6325fd23',
+  distribution: 'd9a2de9f-411a-11ee-81c8-0242ac120003',
 }

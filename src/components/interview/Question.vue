@@ -23,7 +23,7 @@
         :disabled="disabled || hasDkRf"
         :respondent="interview.survey.respondent"></div>
     </v-card-text>
-    <v-card-actions v-if="question.type.name !== 'intro'">
+    <v-card-actions v-if="question.type.name !== 'intro' && showDkRf">
       <DontKnowRefused
         :disabled="disabled"
         :question="question" />
@@ -55,6 +55,7 @@
   import TextQuestion from './questions/TextQuestion.vue'
   import TextAreaQuestion from './questions/TextAreaQuestion.vue'
   import TimeQuestion from './questions/TimeQuestion.vue'
+  import DistributionQuestion from './questions/distribution/DistributionQuestion.vue'
   import QuestionTimer from './QuestionTimer.vue'
   import QuestionText from './QuestionText.vue'
   import Question from '../../entities/trellis/Question'
@@ -78,7 +79,8 @@
     [questionTypes.text]: TextQuestion,
     [questionTypes.text_area]: TextAreaQuestion,
     [questionTypes.time]: TimeQuestion,
-    [questionTypes.image]: ImageQuestion
+    [questionTypes.image]: ImageQuestion,
+    [questionTypes.distribution]: DistributionQuestion,
   }
 
   export default {
@@ -100,6 +102,7 @@
       RespondentGeoQuestion,
       TextQuestion,
       TimeQuestion,
+      DistributionQuestion,
       QuestionText,
     },
     props: {
@@ -166,6 +169,18 @@
         if (!this.question || !this.question.questionParameters || !this.question.questionParameters.length) return true
         const questionParameter = this.question.questionParameters.find(qp => qp.parameterId == ParameterType.show_timer_controls)
         return questionParameter ? !!questionParameter.val : true
+      },
+      showDkRf (): boolean {
+        let count = 0
+        for (const qp of this.question.questionParameters) {
+          const i = parseInt(qp.parameterId, 10)
+          if (i === ParameterType.show_dk || i === ParameterType.show_rf) {
+            if (!!+qp.val) {
+              count++
+            }
+          }
+        }
+        return count === 2
       },
       hasDkRf (): boolean {
         return this.question.dkRf !== null && this.question.dkRf !== undefined
