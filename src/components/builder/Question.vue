@@ -22,45 +22,60 @@
         textarea
       />
       <ExpandSection
-        v-if="isChoiceType"
-        v-model="showChoices"
+        v-if="isDistributionType"
+        v-model="isDistributionType"
         global
       >
-        <QuestionChoices
-          :question-id="value.id"
-          :disabled="builder.locked"
-          v-model="value.choices"
-          :locale="builder.locale"
-        />
+        <v-col>
+          <DistributionQuestionBuilder
+            :locked="builder.locked"
+            :value="value"
+            @input="$emit('input', $event)"
+          />
+        </v-col>
       </ExpandSection>
-      <ExpandSection
-        v-model="showParameters"
-        global
-      >
-        <QuestionParameters
-          v-if="showParameters"
-          :disabled="builder.locked"
-          v-model="value.questionParameters"
-          :parameters="builder.parameters"
-          :condition-tags="builder.conditionTags"
-          :locale="builder.locale"
-          :geo-types="builder.geoTypes"
-          :question-id="value.id"
-          :choices="value.choices"
-        />
-      </ExpandSection>
-      <ExpandSection
-        v-model="showConditions"
-        global
-      >
-        <QuestionConditions
-          v-if="showConditions"
-          :question-id="value.id"
-          :condition-tags="builder.conditionTags"
-          :disabled="builder.locked"
-          v-model="value.assignConditionTags"
-        />
-      </ExpandSection>
+      <v-col>
+        <ExpandSection
+          v-if="isChoiceType"
+          v-model="showChoices"
+          global
+        >
+          <QuestionChoices
+            :question-id="value.id"
+            :disabled="builder.locked"
+            v-model="value.choices"
+            :locale="builder.locale"
+          />
+        </ExpandSection>
+        <ExpandSection
+          v-model="showParameters"
+          global
+        >
+          <QuestionParameters
+            v-if="showParameters"
+            :disabled="builder.locked"
+            v-model="value.questionParameters"
+            :parameters="builder.parameters"
+            :condition-tags="builder.conditionTags"
+            :locale="builder.locale"
+            :geo-types="builder.geoTypes"
+            :question-id="value.id"
+            :choices="value.choices"
+          />
+        </ExpandSection>
+        <ExpandSection
+          v-model="showConditions"
+          global
+        >
+          <QuestionConditions
+            v-if="showConditions"
+            :question-id="value.id"
+            :condition-tags="builder.conditionTags"
+            :disabled="builder.locked"
+            v-model="value.assignConditionTags"
+          />
+        </ExpandSection>
+      </v-col>
     </v-col>
   </v-col>
 </template>
@@ -78,12 +93,21 @@ import questionTypes from '../../static/question.types'
 import QuestionConditions from './QuestionConditions.vue'
 import builderService from '../../services/builder'
 import ExpandSection from './ExpandSection.vue'
+import DistributionQuestionBuilder from './question-builders/DistributionQuestionBuilder.vue'
 
 export default Vue.extend({
   name: 'Question',
   inject: { builder },
   mixins: [FormQuestionsMixin],
-  components: { Translation, QuestionHeader, QuestionParameters, QuestionChoices, QuestionConditions, ExpandSection },
+  components: {
+    Translation,
+    QuestionHeader,
+    QuestionParameters,
+    QuestionChoices,
+    QuestionConditions,
+    ExpandSection,
+    DistributionQuestionBuilder,
+  },
   props: {
     value: Object as PropOptions<Question>,
   },
@@ -97,6 +121,7 @@ export default Vue.extend({
   },
   methods: {
     async updateQuestion () {
+      console.log('Question.vue@updateQuestion')
       if (this.working) return
       this.working = true
       this.showChoices = this.isChoiceType
@@ -112,6 +137,9 @@ export default Vue.extend({
   computed: {
     isChoiceType (): boolean {
       return this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select
+    },
+    isDistributionType (): boolean {
+      return this.value.questionTypeId === questionTypes.distribution
     },
   },
 })
