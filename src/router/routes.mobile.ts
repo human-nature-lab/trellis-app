@@ -11,6 +11,7 @@ const Logs = () => import(/* webpackChunkName: "logs" */'../views/Logs.vue')
 const Storage = () => import(/* webpackChunkName: "storage" */'../views/Storage.vue')
 const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'../views/RegisterDevice.vue')
 const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'../views/ServerIPConfig.vue')
+const HistoryView = () => import(/* webpackChunkName: "history" */'../views/HistoryView.vue')
 const NearbyCommunications = () => import(
   /* webpackChunkName: "nearby-comms" */'../views/nearby-comms/NearbyCommunications.vue'
 )
@@ -62,4 +63,8 @@ export default sharedRoutes.concat([{
   path: '/nearby-comms/client',
   name: 'NearbyClient',
   component: NearbyClient,
+}, {
+  path: '/history',
+  name: 'HistoryView',
+  component: HistoryView,
 }])

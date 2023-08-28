@@ -2,16 +2,7 @@ import * as VueRouter from 'vue-router'
 import { copyWhitelist } from '../services/JSONUtil'
 import StorageService from '../services/StorageService'
 import { routerReady } from './index'
-
-export type QueuableRoute = {
-  name?: string
-  path?: string
-  query?: {
-    [key: string]: any
-    q?: string[]
-  }
-  params?: {[key: string]: any}
-}
+import { QueuableRoute, pushHistory } from './history'
 
 const CURRENT_ROUTE_PROPS = ['name', 'path', 'params', 'query']
 
@@ -44,6 +35,7 @@ export class RouteQueue {
 
   private afterEach = (to: VueRouter.Route, from: VueRouter.Route) => {
     this.setCurrentRoute(to)
+    pushHistory(to)
   }
 
   private saveQueue () {

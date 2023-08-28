@@ -119,6 +119,13 @@
         isAddingPhoto: false
       }
     },
+    head () {
+      return {
+        title: {
+          inner: `${this.name} info`,
+        }
+      }
+    },
     methods: {
       async hydrate (respondent: Respondent) {
         try {
