@@ -20,7 +20,6 @@ if (existingHistoryStr) {
   }
 }
 export const history = ref<HistoryItem[]>(initialHistory)
-// TODO: limit to a certain length
 
 export function pushHistory (route: QueuableRoute, title?: string) {
   if (route.name === 'HistoryView') {
@@ -36,6 +35,9 @@ export function pushHistory (route: QueuableRoute, title?: string) {
       timestamp: Date.now(),
       title,
     })
+    if (history.value.length > 500) {
+      history.value.shift()
+    }
     try {
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history.value))
     } catch (e) {
