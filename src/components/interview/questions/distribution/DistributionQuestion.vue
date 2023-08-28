@@ -24,19 +24,31 @@ const rightPercent = computed(() => {
   return (value.value / config.value.quantity)
 })
 
-function updateValue (v: number) {
-  console.log('updateValue', v)
+function storeValue (v: number) {
   debouncedAction(props.question.id, AT.set_val, {
     name: props.question.varName,
     val: v + '',
   })
 }
 
+function updateValue (v: number) {
+  console.log('updateValue', v)
+  if (!config.value.useSubmit) {
+    storeValue(v)
+  }
+}
+
+const locked = ref(false)
+function submit () {
+  storeValue(value.value)
+  locked.value = true
+}
+
 </script>
 
 <template>
-  <v-container>
-    <v-row class="no-gutters justify-space-between mx-6">
+  <v-col class="pa-0">
+    <v-row class="no-gutters justify-space-between mx-2">
       <CurrencyBin
         :closed="false"
         :currency="config.currency"
@@ -50,15 +62,28 @@ function updateValue (v: number) {
         :value="rightPercent * config.quantity"
       />
     </v-row>
-    <v-col>
+    <v-col class="ma-0 pa-0">
       <v-slider
+        class="mt-4"
         v-model="value"
+        :disabled="locked"
         @change="updateValue"
         :max="config.quantity"
         :step="config.stepSize"
       />
     </v-col>
-  </v-container>
+    <v-row
+      v-if="config.useSubmit"
+      class="no-gutters justify-center"
+    >
+      <v-btn
+        @click="submit"
+        :disabled="locked"
+      >
+        {{ $t('submit') }}
+      </v-btn>
+    </v-row>
+  </v-col>
 </template>
 
 <style lang="sass">

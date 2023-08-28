@@ -9,6 +9,7 @@ import { numberTransformer } from '../../../lib/number-transformer'
 export type Config = {
   type: 'currency'
   currency: 'hnl' | 'usd'
+  useSubmit: boolean
   quantity: number
   stepSize: number
   startingPercentage: number
@@ -23,6 +24,7 @@ const props = defineProps<{
 const { config, loading, error } = jsonQuestionParameter<Config>(props.value, {
   quantity: 10,
   stepSize: 1,
+  useSubmit: false,
   startingPercentage: 0.50,
   type: 'currency',
   currency: 'hnl',
@@ -94,7 +96,6 @@ const startingPercentage = numberTransformer(config, 'startingPercentage')
     <v-row class="no-gutters">
       <v-col
         class="px-1"
-        cols="6"
       >
         Left
         <v-select
@@ -110,7 +111,6 @@ const startingPercentage = numberTransformer(config, 'startingPercentage')
       </v-col>
       <v-col
         class="px-1"
-        cols="6"
       >
         Right
         <v-select
@@ -123,6 +123,13 @@ const startingPercentage = numberTransformer(config, 'startingPercentage')
           :src="bins[config.bins[1]].displayImageSrc"
           :alt="`photo of a distribution bin with name '${config.bins[1]}'`"
         >
+      </v-col>
+      <v-col class="px-1">
+        <v-switch
+          v-model="config.useSubmit"
+          :readonly="props.locked"
+          :label="$t('distribution_use_submit')"
+        />
       </v-col>
     </v-row>
   </v-container>

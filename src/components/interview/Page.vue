@@ -1,7 +1,7 @@
 <template>
   <v-container
     fluid
-    class="page"
+    class="page ma-0 pa-0 mb-16"
   >
     <v-expansion-panels>
       <debug name="Location">
@@ -192,7 +192,7 @@ export default {
 
 $btn-height: 60px
 .page
-  margin-bottom: 20px
+  margin-bottom: 80px
   .page-footer
     background-color: white
     box-shadow: 0 0px 10px rgba(0, 0, 0, .3)

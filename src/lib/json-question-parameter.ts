@@ -1,7 +1,8 @@
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import builder from '../services/builder'
 import Question from '../entities/trellis/question'
 import { debounce } from 'lodash'
+import PT from '../static/parameter.types'
 
 type QuestionParameterSnake = {
   id?: string
@@ -14,8 +15,18 @@ export function jsonQuestionParameter<T extends object> (
   question: Question,
   defaultValue: T = {},
 ) {
-  const initialValue = question.questionParameters.length
-    ? JSON.parse(question.questionParameters[0].val)
+
+  const index = computed(() => {
+    const index = question.questionParameters.findIndex(p => +p.parameterId === PT.json)
+    return index
+  })
+
+  const qParameter = computed(() => {
+    return index.value > -1 ? question.questionParameters[index.value] : null
+  })
+
+  const initialValue = qParameter.value
+    ? JSON.parse(qParameter.value.val)
     : defaultValue
   const config = ref<T>(initialValue)
   const loading = ref(false)
@@ -24,12 +35,12 @@ export function jsonQuestionParameter<T extends object> (
     loading.value = true
     try {
       const parameter: QuestionParameterSnake = Object.assign(
-        question.questionParameters.length ? question.questionParameters[0] : {},
+        qParameter.value || {},
         { name: 'json', question_id: question.id, val: JSON.stringify(newConfig) },
       )
       const res = await builder.createOrUpdateParameter(parameter)
-      question.questionParameters = [res]
-      prevQuestionParams = question.questionParameters
+      question.questionParameters[index.value] = res
+      prevQuestionParam = res
     } catch (err) {
       error.value = err
     } finally {
@@ -44,11 +55,11 @@ export function jsonQuestionParameter<T extends object> (
     debouncedUpdate(config.value)
   }, { deep: true })
 
-  let prevQuestionParams = question.questionParameters
-  watch(() => question.questionParameters, newParams => {
+  let prevQuestionParam = qParameter.value
+  watch(() => qParameter.value, newParam => {
     console.log('questionParameters changed')
-    if (newParams && newParams !== prevQuestionParams && newParams.length) {
-      config.value = JSON.parse(newParams[0].val)
+    if (newParam && newParam !== prevQuestionParam) {
+      config.value = JSON.parse(newParam.val)
     }
   })
   return { config, loading, update, error }

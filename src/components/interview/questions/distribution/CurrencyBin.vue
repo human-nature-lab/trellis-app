@@ -28,7 +28,7 @@ const dy = -4
 
 const bills = computed(() => {
   const res = []
-  let yOffset = props.bin.padding && props.bin.padding.top ? props.bin.padding.top : 0
+  let yOffset = (props.bin.padding && props.bin.padding.top ? props.bin.padding.top : 0) + 100
   let xOffset = (props.bin.padding && props.bin.padding.left ? props.bin.padding.left : 0) + 18
   for (let j = 0; j < change.value.length; j++) {
     const denomination = change.value[j]
@@ -121,8 +121,6 @@ const bills = computed(() => {
       height: 100%
     .foreground
       z-index: 10
-    .currency
-      top: 100px
     .bill
       position: absolute
       top: 0
