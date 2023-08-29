@@ -1,5 +1,10 @@
 import { parse, formatDistanceToNow } from 'date-fns'
 
 export function relativeTime (val: string) {
-  return formatDistanceToNow(parse(val + '+0000', 'yyyy-MM-dd kk:mm:ssxx', new Date()), { addSuffix: true })
+  val += '+0000'
+  const d = parse(val, 'yyyy-MM-dd HH:mm:ssxxxx', new Date())
+  if (isNaN(d.getTime())) {
+    throw new Error('invalid date: ' + val)
+  }
+  return formatDistanceToNow(d, { addSuffix: true })
 }

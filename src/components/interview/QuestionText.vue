@@ -35,7 +35,17 @@ import TranslationTextService from '../../services/translation-text'
 import TranslationService from '../../services/TranslationService'
 import { isEqual } from 'lodash'
 
-const vueKeywords = new Set(['_isVue', 'state', 'render', 'data', 'computed', 'props', '__ob__'])
+const vueKeywords = new Set([
+  '_isVue',
+  'state',
+  'render',
+  'data',
+  'computed',
+  'props',
+  '__ob__',
+  '__v_skip',
+  '__v_isRef',
+])
 
 function DataHandler (location: () => InterviewLocation): ProxyHandler<Record<string | symbol, Datum[]>> {
   let prevLocation: InterviewLocation

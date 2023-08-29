@@ -40,4 +40,6 @@ export default interface SurveyServiceInterface {
    * @param {String} surveyId
    */
   complete (surveyId: string): Promise<Survey>
+
+  uncomplete (surveyId: string): Promise<Survey>
 }

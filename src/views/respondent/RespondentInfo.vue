@@ -38,8 +38,13 @@
               :respondent="respondent"></respondent-names>
             <respondent-fill
               :respondent="respondent"></respondent-fill>
+            <Permission web-only>
+              <RespondentEdges
+                v-if="respondent && global.study"
+                :respondent-id="respondent.id"
+                :study-id="global.study.id" />
+            </Permission>
             <v-flex v-if="hasPermission([TrellisPermission.REMOVE_RESPONDENT])">
-
               <v-toolbar flat>
                 <v-toolbar-title>{{$t('admin')}}</v-toolbar-title>
               </v-toolbar>
@@ -70,6 +75,7 @@
   import PhotoAlbum from '@/components/photo/PhotoAlbum.vue'
   import RespondentConditionTags from '@/components/respondent/RespondentConditionTags.vue'
   import RespondentFill from '@/components/respondent/RespondentFill.vue'
+  import RespondentEdges from '@/components/respondent/RespondentEdges.vue'
 
   import RouteMixinFactory from '@/mixins/RoutePreloadMixin'
   import RespondentService from '@/services/respondent'
@@ -113,11 +119,24 @@
         isAddingPhoto: false
       }
     },
+    head () {
+      return {
+        title: {
+          inner: `${this.name} info`,
+        }
+      }
+    },
     methods: {
       async hydrate (respondent: Respondent) {
         try {
           this.respondent = respondent
           this.respondentConditionTags = await respondent.respondentConditionTags
+          this.respondentConditionTags.sort((a, b) => {
+            if (!a.conditionTag || !b.conditionTag) {
+              return 0
+            }
+            return a.conditionTag.name.localeCompare(b.conditionTag.name)
+          })
           this.respondentPhotos = await RespondentService.getRespondentPhotos(respondent.id)
           this.respondentPhotosLoading = false
         } catch (err) {
@@ -177,7 +196,8 @@
       RespondentConditionTags,
       Permission,
       RespondentGeos,
-      PhotoAlbum
+      PhotoAlbum,
+      RespondentEdges,
     }
   })
 </script>

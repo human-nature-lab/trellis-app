@@ -11,6 +11,16 @@ const Logs = () => import(/* webpackChunkName: "logs" */'@/views/info/Logs.vue')
 const Storage = () => import(/* webpackChunkName: "storage" */'@/views/info/Storage.vue')
 const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'@/views/setup/RegisterDevice.vue')
 const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'@/views/setup/ServerIPConfig.vue')
+const HistoryView = () => import(/* webpackChunkName: "history" */'@/views/HistoryView.vue')
+const NearbyCommunications = () => import(
+  /* webpackChunkName: "nearby-comms" */'@/views/nearby-comms/NearbyCommunications.vue'
+)
+const NearbyServer = () => import(
+  /* webpackChunkName: "nearby-comms" */'@/views/nearby-comms/NearbyServer.vue'
+)
+const NearbyClient = () => import(
+  /* webpackChunkName: "nearby-comms" */'@/views/nearby-comms/NearbyClient.vue'
+)
 
 export default sharedRoutes.concat([{
   path: '/',
@@ -40,4 +50,21 @@ export default sharedRoutes.concat([{
   name: 'ConfigureServer',
   component: ConfigureServer,
   beforeEnter: guardQueue([AlreadyConfiguredServerGuard]),
+}, {
+  path: '/nearby-comms',
+  name: 'NearbyCommunications',
+  component: NearbyCommunications,
+  // beforeEnter: guardQueue([AlreadyConfiguredServerGuard])
+}, {
+  path: '/nearby-comms/server',
+  name: 'NearbyServer',
+  component: NearbyServer,
+}, {
+  path: '/nearby-comms/client',
+  name: 'NearbyClient',
+  component: NearbyClient,
+}, {
+  path: '/history',
+  name: 'HistoryView',
+  component: HistoryView,
 }])

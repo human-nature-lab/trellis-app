@@ -192,10 +192,7 @@
             return u
           })
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to fetch uploads')
-          }
+          this.handleError(err, 'Unable to fetch uploads')
         } finally {
           this.uploadsLoading = false
         }
@@ -205,10 +202,7 @@
         try {
           this.snapshots = await SyncAdminService.listSnapshots()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to fetch snapshots')
-          }
+          this.handleError(err, 'Unable to fetch snapshots')
         } finally {
           this.snapshotsLoading = false
         }
@@ -219,10 +213,7 @@
           await SyncAdminService.processUploads(this.selectedUploads.map(u => u.id))
           this.getUploads()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to process uploads')
-          }
+          this.handleError(err, 'Unable to process uploads')
         } finally {
           this.uploadsProcessing = false
         }
@@ -230,15 +221,34 @@
       generateSnapshot: async function () {
         this.generatingSnapshot = true
         try {
-          await SyncAdminService.generateSnapshot()
+          const res = await SyncAdminService.generateSnapshot()
+          this.alertRes('success', res.data, 'Successfully created snapshot')
           this.getSnapshots()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to generate a snapshot')
-          }
+          this.handleError(err, 'Unable to generate a snapshot')
         } finally {
           this.generatingSnapshot = false
+        }
+      },
+      alertRes (kind, data, defaultMessage) {
+        let msg = defaultMessage
+        if (data && typeof data === 'object') {
+          if (data.msg) {
+            msg = data.msg
+          } else if (data.translation) {
+            msg = '' + this.$t(data.translation)
+          }
+        }
+        this.alert(kind, msg)
+      },
+      handleError (err, defaultMessage) {
+        if (this.isNotAuthError(err)) {
+          this.log(err)
+          if (err && err.response) {
+            this.alertRes('error', err.response.data, defaultMessage)
+          } else {
+            this.alert('error', defaultMessage)
+          }
         }
       }
     }

@@ -475,4 +475,7 @@
     position: absolute
     top: -15px
     z-index: 1000
+  
+  .edit-panel
+    max-height: 200px
 </style>

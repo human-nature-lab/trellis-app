@@ -15,6 +15,14 @@ export interface SearchFilter {
   randomize?: boolean          // Indicates that the respondents results should be randomized TODO: Web
 }
 
+export interface EdgeDatum {
+  id: string
+  source_respondent_id: string
+  target_respondent_id: string
+  var_name: string
+}
+
+
 export default interface RespondentServiceInterface {
 
   /**
@@ -178,4 +186,6 @@ export default interface RespondentServiceInterface {
    */
   importRespondentGeos (file: File, studyId: string): Promise<any>
 
+
+  listEdges (respondentId: string): Promise<EdgeDatum[]>
 }

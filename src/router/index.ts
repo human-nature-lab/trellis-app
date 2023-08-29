@@ -62,7 +62,6 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to) => {
   singleton.loading.active = false
-  console.log('to', to)
   logger.log({
     component: 'router/index.js@afterEach',
     message: `after navigating to: ${to.fullPath}`,

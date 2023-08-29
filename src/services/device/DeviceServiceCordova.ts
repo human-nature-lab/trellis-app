@@ -1,6 +1,6 @@
 import Config from '../../entities/trellis-config/Config'
 import Pagination from '../../types/Pagination'
-import { resetSyncCredentials, setSyncCredentials, syncInstance } from '../http/AxiosInstance'
+import { resetSyncCredentials, syncInstance } from '../http/AxiosInstance'
 import DeviceServiceInterface from './DeviceServiceInterface'
 import Device from '../../entities/trellis/Device'
 
@@ -10,7 +10,7 @@ declare const cordova
 const deviceKeyKey = 'device-key'
 
 export class DeviceServiceCordova implements DeviceServiceInterface {
-  private isReady: boolean = false
+  private isReady = false
   private platform: string
   private uuid: string
   private deviceKey!: string

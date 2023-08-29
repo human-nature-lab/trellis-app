@@ -25,7 +25,8 @@ enum ParameterType  {
   min_date = 24,
   max_date = 25,
   min_time = 26,
-  max_time = 27
+  max_time = 27,
+  json = 28,
 }
 
 export default ParameterType

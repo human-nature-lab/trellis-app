@@ -103,7 +103,7 @@ class FormBuilderService {
     await builderInst.put(uriTemplate('question/choice/{id}', [qc.id]), qc.toSnakeJSON())
   }
 
-  async createOrUpdateParameter (param: { id: string, question_id: string, name: string, val: string }) {
+  async createOrUpdateParameter (param: { id?: string, question_id: string, name: string, val: string }) {
     const res = await builderInst.post(uriTemplate('question/{question_id}/parameter', [param.question_id]), param)
     return new QuestionParameter().fromSnakeJSON(res.data.parameter)
   }

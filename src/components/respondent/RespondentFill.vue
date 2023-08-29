@@ -11,6 +11,7 @@
       class="mb-4"
       :headers="fillHeaders"
       :items="respondentFills"
+      :items-per-page="-1"
       hide-default-footer>
       <template v-slot:item="{ item }">
         <tr>

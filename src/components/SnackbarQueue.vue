@@ -31,7 +31,7 @@
   import { merge } from 'lodash'
   import Vue, {Component} from 'vue'
 
-  interface SnackConfig {
+  export interface SnackConfig {
     slot?: Component
     msg?: string
     timeout?: number
