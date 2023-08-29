@@ -162,7 +162,7 @@ import singleton from '../../static/singleton'
 import Survey from '../../entities/trellis/Survey'
 import Translation from '../../entities/trellis/Translation'
 import { Moment } from 'moment'
-import DotsMenu from '../builder/DotsMenu.vue'
+import DotsMenu from '../util/DotsMenu.vue'
 import Permission from '../Permission.vue'
 import { humanizeDateDiff } from '../../filters/humanizeDateDiff'
 

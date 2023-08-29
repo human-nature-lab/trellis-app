@@ -194,16 +194,14 @@ let interviewData // used to store the preloaded data for the interview
 export default {
   name: 'Interview',
   head: {
-    title: function () {
-      const d = {
-        inner: 'Interview',
-      }
+    title () {
+      let inner = 'Interview'
       if (this.type === 'preview') {
-        d.inner = 'Form preview: ' + interviewState.blueprint.id
+        inner = 'Form preview: ' + interviewState.blueprint.id
       } else if (this.interview.survey) {
-        d.inner = `Interview with ${this.interview.survey.respondent.name}`
+        inner = `Interview with ${this.interview.survey.respondent.name}`
       }
-      return d
+      return { inner }
     },
   },
   data () {

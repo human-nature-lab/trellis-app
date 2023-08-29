@@ -119,6 +119,8 @@
   import UploadError from '@/components/sync/admin/UploadError.vue'
   import DocsLinkMixin from '@/mixins/DocsLinkMixin'
   import DocsFiles from '@/components/documentation/DocsFiles'
+  import { updateTitle } from '@/router/history'
+
   export default {
     name: 'sync-admin',
     mixins: [DocsLinkMixin(DocsFiles.sync.admin)],
@@ -163,6 +165,9 @@
           value: 'file_name'
         }]
       }
+    },
+    setup () {
+      updateTitle({ key: 'sync_admin' })
     },
     created () {
       this.getUploads()

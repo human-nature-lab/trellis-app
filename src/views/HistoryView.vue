@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { history, removeHistoryItem, clearHistory } from '../router/history'
+import HistoryTitle from '@/components/history/HistoryTitle.vue'
 
 const viewIcons = {
   'mdi-account-group': ['Respondent', 'RespondentsSearch', 'RespondentForms'], // respondents
@@ -22,7 +23,6 @@ const dateGroups = computed(() => {
     const item = history.value[i]
     const date = new Date(item.timestamp)
     const group = groups.find(g => g.date === date.toLocaleDateString())
-    item.title = item.title.replace('| Trellis', '')
     if (group) {
       group.items.push({ index: i, ...item })
     } else {
@@ -42,7 +42,7 @@ const openPanels = ref(0)
 <template>
   <v-container>
     <v-col>
-      <v-row>
+      <v-row class="no-gutters">
         <h2>{{ $t('history') }}</h2>
         <v-spacer />
         <v-btn @click="clearHistory">
@@ -72,9 +72,7 @@ const openPanels = ref(0)
                 </v-icon>
               </v-list-item-avatar>
               <v-list-item-title>
-                <span class="mx-2">{{ new Date(item.timestamp).toLocaleTimeString() }}</span>
-                -
-                <span class="mx-2">{{ item.title }} ({{ item.route.name }})</span>
+                <HistoryTitle :route="item" />
               </v-list-item-title>
               <v-list-item-action>
                 <v-btn

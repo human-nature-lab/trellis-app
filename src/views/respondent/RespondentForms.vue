@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue, { getCurrentInstance } from 'vue'
 import DocsLinkMixin from '@/mixins/DocsLinkMixin'
 import FormsView from '@/components/respondent/FormsView.vue'
 import RoutePreloadMixin from '@/mixins/RoutePreloadMixin'
@@ -95,7 +95,8 @@ import SkipService from '@/services/SkipService'
 import RespondentConditionTag from '@/entities/trellis/RespondentConditionTag'
 import { routeQueue } from '@/router'
 import Interview from '@/entities/trellis/Interview'
-import { DisplayForm } from '@/components/forms/FormListItem.vue'
+import { DisplayForm } from '@/components/respondent/FormListItem.vue'
+import { computedTitle } from '@/router/history'
 
 interface RespondentFormsData {
   respondent: Respondent
@@ -143,6 +144,14 @@ export default Vue.extend({
       error: '',
       loading: false,
     }
+  },
+  created () {
+    computedTitle(() => {
+      if (this.respondent) {
+        return { key: 'respondent_forms', args: [this.respondentName] }
+      }
+      return { key: 'respondent_forms_static' }
+    })
   },
   components: {
     FormsView,
@@ -210,11 +219,13 @@ export default Vue.extend({
       return this.displayForms.filter(f => f.censusTypeId)
     },
     respondentName (): string {
-      return (this.respondent &&
-        this.respondent.names &&
-        this.respondent.names.length &&
-        this.respondent.names.find(n => n.isDisplayName).name) ||
-        this.respondent.name
+      if (this.respondent && this.respondent.names && this.respondent.names.length) {
+        const displayName = this.respondent.names.find(n => n.isDisplayName)
+        if (displayName) {
+          return displayName.name
+        }
+      }
+      return this.respondent ? this.respondent.name : 'Unknown'
     },
     respondentForms (): DisplayForm[] {
       return this.displayForms.filter(f => !f.censusTypeId)

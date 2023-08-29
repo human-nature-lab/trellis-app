@@ -89,6 +89,7 @@ import DownloadSnapshot from '@/components/sync/DownloadSnapshot.vue'
 import UploadSnapshot from '@/components/sync/UploadSnapshot.vue'
 import DocsLinkMixin from '@/mixins/DocsLinkMixin'
 import DocsFiles from '@/components/documentation/DocsFiles'
+import { updateTitle } from '@/router/history'
 
 export default {
   name: 'SyncView',
@@ -111,6 +112,9 @@ export default {
       localLatestSnapshot: null,
       updatedRecordsCount: null,
     }
+  },
+  setup () {
+    updateTitle({ key: 'sync' })
   },
   created () {
     this.initComponent()

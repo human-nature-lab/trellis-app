@@ -74,6 +74,7 @@
   import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
   import markerIcon from 'leaflet/dist/images/marker-icon.png'
   import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+  import { computedTitle } from '@/router/history'
 
   const targetMapWidth = 600
 
@@ -127,6 +128,12 @@
       }
     },
     async created () {
+      computedTitle(() => {
+        if (this.parentGeoName) {
+          return { key: 'location_search_map_in', args: [this.parentGeoName] }
+        }
+        return { key: 'location_search_map' }
+      })
       try {
         this.isLoading = true
         let curGeo = this.$router.currentRoute.params.geoId ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null

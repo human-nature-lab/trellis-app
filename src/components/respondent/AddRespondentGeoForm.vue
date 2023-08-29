@@ -30,12 +30,14 @@
     </v-card>
     <v-dialog v-model="showGeoSearch">
       <ModalTitle :title="$t('location_search')" @close="showGeoSearch=false" />
-      <GeoSearch
-        :showCart="true"
-        :limit="1"
-        :isSelectable="geoSelectionFilter"
-        :should-update-route="false"
-        @doneSelecting="geoSelected" />
+      <v-card>
+        <GeoSearch
+          :showCart="true"
+          :limit="1"
+          :isSelectable="geoSelectionFilter"
+          :should-update-route="false"
+          @doneSelecting="geoSelected" />
+      </v-card>
     </v-dialog>
   </v-dialog>
 </template>

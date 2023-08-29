@@ -130,6 +130,7 @@ import router, { routeQueue } from '@/router'
 import Geo from '@/entities/trellis/Geo'
 import { SearchFilter } from '@/services/respondent/RespondentServiceInterface'
 import DocsFiles from '@/components/documentation/DocsFiles'
+import { computedTitle } from '@/router/history'
 
 export default Vue.extend({
   name: 'GeoInfo',
@@ -159,6 +160,14 @@ export default Vue.extend({
       showGeoTypeDialog: false,
       showEditName: false,
     }
+  },
+  created () {
+    computedTitle(() => {
+      if (this.translated) {
+        return { key: 'geo_info_for', args: [this.translated] }
+      }
+      return { key: 'geo_info' }
+    })
   },
   methods: {
     hydrate: async function (geo: Geo) {
