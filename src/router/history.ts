@@ -1,6 +1,5 @@
 import { ref } from 'vue'
-import { QueuableRoute, sanitizeRoute } from './sanitizeRoute'
-import { Route } from 'vue-router'
+import { QueuableRoute, routesAreSame, sanitizeRoute } from './util'
 
 export type HistoryItem = {
   route: QueuableRoute
@@ -21,22 +20,25 @@ if (existingHistoryStr) {
 }
 export const history = ref<HistoryItem[]>(initialHistory)
 
+let prevTimestamp = 0
 export function pushHistory (route: QueuableRoute, title?: string) {
-  if (route.name === 'HistoryView') {
+  const timestamp = Date.now()
+  if (route.name === 'HistoryView' || (timestamp - prevTimestamp) < 500) {
     return
   }
+  prevTimestamp = timestamp
   setTimeout(() => {
     if (!title) {
       title = document.title
     }
     route = sanitizeRoute(route)
-    history.value.push({
+    history.value.unshift({
       route,
-      timestamp: Date.now(),
+      timestamp,
       title,
     })
     if (history.value.length > 500) {
-      history.value.shift()
+      history.value.pop()
     }
     try {
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history.value))
@@ -44,4 +46,14 @@ export function pushHistory (route: QueuableRoute, title?: string) {
       console.error('Failed to save history to localStorage', e)
     }
   })
+}
+
+export function clearHistory () {
+  history.value = []
+  localStorage.removeItem(HISTORY_KEY)
+}
+
+export function removeHistoryItem (index: number) {
+  history.value.splice(index, 1)
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.value))
 }

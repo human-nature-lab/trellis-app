@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { history } from '../router/history'
+import { history, removeHistoryItem, clearHistory } from '../router/history'
 
 const viewIcons = {
   'mdi-account-group': ['Respondent', 'RespondentsSearch', 'RespondentForms'], // respondents
@@ -18,16 +18,17 @@ for (const icon in viewIcons) {
 
 const dateGroups = computed(() => {
   const groups = []
-  for (const item of history.value) {
+  for (let i = 0; i < history.value.length; i++) {
+    const item = history.value[i]
     const date = new Date(item.timestamp)
     const group = groups.find(g => g.date === date.toLocaleDateString())
     item.title = item.title.replace('| Trellis', '')
     if (group) {
-      group.items.push(item)
+      group.items.push({ index: i, ...item })
     } else {
       groups.push({
         date: date.toLocaleDateString(),
-        items: [item],
+        items: [{ index: i, ...item }],
       })
     }
   }
@@ -40,7 +41,15 @@ const openPanels = ref(0)
 
 <template>
   <v-container>
-    <h2>{{ $t('history') }}</h2>
+    <v-col>
+      <v-row>
+        <h2>{{ $t('history') }}</h2>
+        <v-spacer />
+        <v-btn @click="clearHistory">
+          {{ $t('clear') }}
+        </v-btn>
+      </v-row>
+    </v-col>
     <v-expansion-panels v-model="openPanels">
       <v-expansion-panel
         v-for="group in dateGroups"
@@ -54,15 +63,28 @@ const openPanels = ref(0)
               :key="item.route.path + index"
               :to="{ name: item.route.name, params: item.route.params }"
             >
-              <v-icon v-if="iconMap[item.route.name]">
-                {{ iconMap[item.route.name] }}
-              </v-icon>
-              <v-icon v-else>
-                mdi-delta
-              </v-icon>
-              <span class="mx-2">{{ new Date(item.timestamp).toLocaleTimeString() }}</span>
-               - 
-              <span class="mx-2">{{ item.title }} ({{ item.route.name }})</span>
+              <v-list-item-avatar>
+                <v-icon v-if="iconMap[item.route.name]">
+                  {{ iconMap[item.route.name] }}
+                </v-icon>
+                <v-icon v-else>
+                  mdi-delta
+                </v-icon>
+              </v-list-item-avatar>
+              <v-list-item-title>
+                <span class="mx-2">{{ new Date(item.timestamp).toLocaleTimeString() }}</span>
+                -
+                <span class="mx-2">{{ item.title }} ({{ item.route.name }})</span>
+              </v-list-item-title>
+              <v-list-item-action>
+                <v-btn
+                  @click.prevent="removeHistoryItem(item.index)"
+                  text
+                  color="error"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </v-list-item-action>
             </v-list-item>
           </v-list>
         </v-expansion-panel-content>
