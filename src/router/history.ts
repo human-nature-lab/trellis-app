@@ -38,11 +38,15 @@ export const history = ref<HistoryItem[]>(initialHistory)
 
 let prevTimestamp = 0
 export function pushHistory (route: QueuableRoute, title?: string) {
+  console.log('pushHistory', route, title)
   if (config.appEnv !== APP_ENV.CORDOVA) {
     return
   }
   const timestamp = Date.now()
   if ((timestamp - prevTimestamp) < 500 || ignoredRoutes.includes(route.name)) {
+    return
+  } else if (route.name === 'Interview' && history.value[0].route.name === 'Interview') {
+    console.log('Skipping interview history update')
     return
   }
   prevTimestamp = timestamp
@@ -72,25 +76,31 @@ export async function evalTitle (title: Title) {
     return i18n.t(title.key, title.params) as string
   } else {
     // TODO: this should be translated
+    
     return title.translationId
   }
 }
 
-export async function updateTitle (newTitle: Title) {
-  if (config.appEnv !== APP_ENV.CORDOVA) {
+export async function updateTitle (routeName: string, newTitle: Title) {
+  if (config.appEnv !== APP_ENV.CORDOVA || !newTitle) {
     return
   }
   const route = history.value[0]
+  if (route.route.name !== routeName) {
+    return
+  }
   if (route) {
     route.title = newTitle
   }
   document.title = await evalTitle(newTitle)
-  console.log('Updated title to', newTitle)
+  console.log('Updated history title to', newTitle)
 }
 
-export function computedTitle (fn: () => Title) {
+export function computedTitle (routeName: string, fn: () => Title) {
   const title = computed(fn)
-  watch(() => title.value, updateTitle, { immediate: true })
+  watch(() => title.value, v => {
+    updateTitle(routeName, v)
+  }, { immediate: true })
 }
 
 export function clearHistory () {

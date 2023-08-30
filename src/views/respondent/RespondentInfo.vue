@@ -95,7 +95,7 @@ import RespondentFill from '@/components/respondent/RespondentFill.vue'
 import RespondentEdges from '@/components/respondent/RespondentEdges.vue'
 import RespondentService from '@/services/respondent'
 import Respondent from '@/entities/trellis/Respondent'
-import { ref, reactive, computed } from 'vue'
+import { ref, computed } from 'vue'
 import global from '@/static/singleton'
 import { computedTitle } from '@/router/history'
 import { useRoute } from 'vue-router/composables'
@@ -135,8 +135,8 @@ const name = computed(() => {
 })
 
 setDocsLink('./respondents/RespondentInfo.md')
-computedTitle(() => {
-  if (respondent.value && name.value) {
+computedTitle('Respondent', () => {
+  if (name.value) {
     return { key: 'respondent_info_named', args: [name.value] }
   }
   return { key: 'respondent_info' }

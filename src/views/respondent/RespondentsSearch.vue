@@ -306,7 +306,7 @@ export default {
     },
   },
   setup () {
-    updateTitle({ key: 'respondent_search' })
+    updateTitle('RespondentsSearch', { key: 'respondent_search' })
   },
   data () {
     return {

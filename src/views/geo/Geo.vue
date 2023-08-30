@@ -40,7 +40,7 @@ export default {
     }
   },
   created () {
-    computedTitle(() => {
+    computedTitle('GeoSearch', () => {
       if (this.parentGeoName) {
         return { key: 'location_search_in', args: [this.parentGeoName] }
       }
@@ -75,6 +75,10 @@ export default {
       this.setCanUserAddChild()
     },
     async setCanUserAddChild () {
+      if (!this.parentGeoId) {
+        this.canUserAddChild = false
+        return
+      }
       try {
         this.parentGeo = await GeoService.getGeoById(this.parentGeoId)
         console.log('loaded parent geo', this.parentGeo)
@@ -92,7 +96,6 @@ export default {
         return null
       }
       const translation = TranslationService.getAny(this.parentGeo.nameTranslation)
-      debugger
       return (translation) || '[No translation]'
     },
   },

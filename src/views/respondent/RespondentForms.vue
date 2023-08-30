@@ -146,7 +146,7 @@ export default Vue.extend({
     }
   },
   created () {
-    computedTitle(() => {
+    computedTitle('RespondentForms', () => {
       if (this.respondent) {
         return { key: 'respondent_forms', args: [this.respondentName] }
       }

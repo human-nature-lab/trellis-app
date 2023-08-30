@@ -169,6 +169,10 @@ import { routeQueue } from '@/router'
 import InterviewLoader from '@/components/interview/services/InterviewLoader'
 import SurveyService from '@/services/survey'
 import { locationsAreEqual } from '@/components/interview/services/InterviewAlligator'
+import { computedTitle } from '@/router/history'
+import Form from '@/entities/trellis/Form'
+import TranslationService from '@/services/TranslationService'
+import Respondent from '@/entities/trellis/Respondent'
 
 function load (to) {
   return new Promise(async (resolve, reject) => {
@@ -193,17 +197,6 @@ let interviewState
 let interviewData // used to store the preloaded data for the interview
 export default {
   name: 'Interview',
-  head: {
-    title () {
-      let inner = 'Interview'
-      if (this.type === 'preview') {
-        inner = 'Form preview: ' + interviewState.blueprint.id
-      } else if (this.interview.survey) {
-        inner = `Interview with ${this.interview.survey.respondent.name}`
-      }
-      return { inner }
-    },
-  },
   data () {
     return {
       global,
@@ -222,7 +215,7 @@ export default {
       interviewActions: {},
       interviewConditionTags: {},
       interview: {},
-      form: null,
+      form: null as Form,
       location: {
         section: 0,
         page: 0,
@@ -243,9 +236,19 @@ export default {
       questions: [],
       loadingStep: 0,
       section: null,
+      respondent: null as Respondent,
     }
   },
   created () {
+    computedTitle('Interview', () => {
+      if (this.type === 'preview') {
+        return { key: 'preview_form', args: [this.formName] }
+      }
+      if (this.respondentName) {
+        return { key: 'survey_with', args: [this.respondentName] }
+      }
+      return { key: 'survey' }
+    })
     actionBus.on('action', this.actionHandler)
     menuBus.$on('showConditionTags', this.showConditionTags)
     window.onbeforeunload = this.prematureExit
@@ -286,7 +289,7 @@ export default {
       this.initializeInterview(data)
     },
     async initializeInterview (d) {
-      const { actions, form, baseRespondentConditionTags, conditionTags, data, interview, respondentFills } = d
+      const { actions, form, baseRespondentConditionTags, conditionTags, data, interview, respondentFills, respondent } = d
       clearSharedInterview()
       this.dialog.end = false
       this.dialog.beginning = false
@@ -309,6 +312,7 @@ export default {
       this.interviewConditionTags = interviewState.data.conditionTags
       this.interviewActions = interviewState.actions.store
       this.interview = interview
+      this.respondent = respondent
       this.conditionAssignmentErrors = interviewState.conditionAssignmentErrors
       this.form = form
       interviewState.on('atEnd', this.showEndDialog, this)
@@ -350,7 +354,7 @@ export default {
 
       if (!sameLocation) {
       // The reference to this.location needs to be here so that we have a dependency on this.location
-        let questions = interviewState.getPageQuestions(
+        const questions = interviewState.getPageQuestions(
           this.location.section,
           this.location.sectionRepetition,
           this.location.sectionFollowUpDatumId,
@@ -462,6 +466,16 @@ export default {
     },
     currentRepetition (): number {
       return this.section.isRepeatable ? this.location.sectionRepetition : this.location.sectionFollowUpRepetition
+    },
+    formName (): string {
+      return this.form && this.form.nameTranslation
+        ? TranslationService.getAny(this.form.nameTranslation, this.global.locale)
+        : ''
+    },
+    respondentName (): string {
+      const res = this.respondent ? this.respondent.name : ''
+      console.log('computed respondent name', res)
+      return res
     },
   },
   components: {
