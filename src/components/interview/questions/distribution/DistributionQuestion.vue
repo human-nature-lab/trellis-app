@@ -7,6 +7,7 @@ import CurrencyBin from './CurrencyBin.vue'
 import { bins } from '../../../../lib/distribution/bin'
 import AT from '../../../../static/action.types'
 import { debouncedAction } from '../../lib/action'
+import { exitFullscreen, isFullscreen, toggleFullscreen } from '@/helpers/fullscreen.helper'
 
 const props = defineProps<{
   question: Question
@@ -38,54 +39,76 @@ function updateValue (v: number) {
   }
 }
 
+const elem = ref<HTMLElement>()
 const locked = ref(false)
+
 function submit () {
   storeValue(value.value)
   locked.value = true
+  if (isFullscreen.value) {
+    setTimeout(() => {
+      exitFullscreen()
+    }, 2000)
+  }
 }
 
 </script>
 
 <template>
-  <v-col class="pa-0">
-    <v-row class="no-gutters justify-space-between mx-2">
-      <CurrencyBin
-        :closed="false"
-        :currency="config.currency"
-        :bin="bins[config.bins[0]]"
-        :value="(1 - rightPercent) * config.quantity"
-      />
-      <CurrencyBin
-        :closed="false"
-        :currency="config.currency"
-        :bin="bins[config.bins[1]]"
-        :value="rightPercent * config.quantity"
-      />
-    </v-row>
-    <v-col class="ma-0 pa-0">
-      <v-slider
-        class="mt-4"
-        v-model="value"
-        :disabled="locked"
-        @change="updateValue"
-        :max="config.quantity"
-        :step="config.stepSize"
-      />
-    </v-col>
-    <v-row
-      v-if="config.useSubmit"
-      class="no-gutters justify-center"
+  <div
+    ref="elem"
+    :class="{'fullscreen-container': isFullscreen}"
+  >
+    <v-col
+      class="distribution-question"
+      :class="{'fullscreen-question': isFullscreen}"
     >
-      <v-btn
-        @click="submit"
-        :disabled="locked"
+      <v-row class="no-gutters justify-space-between mx-2">
+        <CurrencyBin
+          :closed="locked"
+          :currency="config.currency"
+          :bin="bins[config.bins[0]]"
+          :value="(1 - rightPercent) * config.quantity"
+        />
+        <CurrencyBin
+          :closed="locked"
+          :currency="config.currency"
+          :bin="bins[config.bins[1]]"
+          :value="rightPercent * config.quantity"
+        />
+      </v-row>
+      <v-col class="ma-0 pa-0">
+        <v-slider
+          class="mt-4"
+          v-model="value"
+          :disabled="locked"
+          @change="updateValue"
+          :max="config.quantity"
+          :step="config.stepSize"
+        />
+      </v-col>
+      <v-row
+        v-if="config.useSubmit"
+        class="no-gutters justify-center"
       >
-        {{ $t('submit') }}
-      </v-btn>
-    </v-row>
-  </v-col>
+        <v-btn
+          @click="submit"
+          :disabled="locked"
+        >
+          {{ $t('submit') }}
+        </v-btn>
+        <v-btn
+          v-if="!isFullscreen"
+          @click="toggleFullscreen(elem)"
+        >
+          fullscreen
+        </v-btn>
+      </v-row>
+    </v-col>
+  </div>
 </template>
 
 <style lang="sass">
-
+  .distribution-question
+    padding: 0
 </style>

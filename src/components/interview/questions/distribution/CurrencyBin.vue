@@ -48,20 +48,20 @@ const bills = computed(() => {
 </script>
 
 <template>
-  <v-col cols="6">
+  <v-col>
     <h2 class="text-center mb-4">
       {{ Math.round(value) }}
     </h2>
     <div
       v-if="closed"
-      class="bin-container"
+      class="bin-container mx-auto"
     >
       <div
         class="background"
       >
         <img :src="bin.closed.backSrc">
       </div>
-      <div class="currency">
+      <!-- <div class="currency">
         <img
           v-for="(bill, index) in bills"
           :key="index"
@@ -69,7 +69,7 @@ const bills = computed(() => {
           :style="{ transform: `translate(${bill.xOffset}%, ${bill.yOffset}%) rotateZ(-85deg)`}"
           :src="bill.src"
         >
-      </div>
+      </div> -->
       <div
         class="foreground"
         v-if="bin.closed.frontSrc"
@@ -79,7 +79,7 @@ const bills = computed(() => {
     </div>
     <div
       v-else
-      class="bin-container"
+      class="bin-container mx-auto"
     >
       <div
         class="background"
@@ -109,6 +109,7 @@ const bills = computed(() => {
   .bin-container
     position: relative
     width: 100%
+    max-width: 300px
     z-index: 0
     img
       max-width: 100%
