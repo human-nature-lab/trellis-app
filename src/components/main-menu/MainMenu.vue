@@ -219,11 +219,6 @@ export default {
           title: this.$t('sync'),
         }, {
           showIf: this.isCordovaBuild,
-          to: { name: 'NearbyCommunications' },
-          icon: 'mdi-wifi',
-          title: this.$t('nearby_communications'),
-        }, {
-          showIf: this.isCordovaBuild,
           to: { name: 'HistoryView' },
           icon: 'mdi-history',
           title: this.$t('history'),
