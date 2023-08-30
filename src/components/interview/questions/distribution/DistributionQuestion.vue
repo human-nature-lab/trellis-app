@@ -98,7 +98,7 @@ function submit () {
           {{ $t('submit') }}
         </v-btn>
         <v-btn
-          v-if="!isFullscreen"
+          v-if="!isFullscreen && !locked"
           @click="toggleFullscreen(elem)"
         >
           fullscreen
