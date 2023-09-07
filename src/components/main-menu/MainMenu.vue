@@ -68,27 +68,41 @@
         @done="showPasswordModal = false"
       />
     </TrellisModal>
+    <TrellisModal
+      v-model="showExtraModules"
+      :title="$t('extra_modules')"
+    >
+      <v-list>
+        <v-list-item
+          v-for="item in enabledModules"
+          :key="item.key"
+        >
+          {{ item.name }}
+        </v-list-item>
+      </v-list>
+    </TrellisModal>
   </v-flex>
 </template>
 
 <script>
 import Vue from 'vue'
-import config from '../../config'
+import config from '@/config'
 import menuBus from './MenuBus'
-import LoginService from '../../services/login'
-import { routeQueue } from '../../router'
-import SingletonService from '../../services/SingletonService'
-import storage from '../../services/StorageService'
-import global from '../../static/singleton'
-import { APP_ENV } from '../../static/constants'
+import LoginService from '@/services/login'
+import { routeQueue } from '@/router'
+import SingletonService from '@/services/SingletonService'
+import storage from '@/services/StorageService'
+import global from '@/static/singleton'
+import { APP_ENV } from '@/static/constants'
 import UserPassword from '../user/UserPassword.vue'
 import TrellisModal from '../TrellisModal.vue'
-import IsAdminMixin from '../../mixins/IsAdminMixin'
-import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
-import GeoLocationService from '../../services/geolocation'
-import PermissionMixin from '../../mixins/PermissionMixin'
-import { TrellisPermission } from '../../static/permissions.base'
-import StudyService from '../../services/study'
+import IsAdminMixin from '@/mixins/IsAdminMixin'
+import IsLoggedInMixin from '@/mixins/IsLoggedInMixin'
+import GeoLocationService from '@/services/geolocation'
+import PermissionMixin from '@/mixins/PermissionMixin'
+import { TrellisPermission } from '@/static/permissions.base'
+import StudyService from '@/services/study'
+import { extraModules } from '@/modules'
 
 export default {
   mixins: [IsAdminMixin, IsLoggedInMixin, PermissionMixin],
@@ -96,7 +110,10 @@ export default {
   name: 'MainMenu',
   data: () => ({
     global,
+    config,
+    extraModules,
     showPasswordModal: false,
+    showExtraModules: false,
     checkpoint: 0,
   }),
   methods: {
@@ -186,18 +203,25 @@ export default {
   },
   computed: {
     isDebug () {
-      return config.debug
+      return this.config.debug
     },
     isTestMode () {
       return !!this.global.study && !this.global.study.testStudy
     },
     isCordovaBuild () {
-      return config.appEnv === APP_ENV.CORDOVA
+      return this.config.appEnv === APP_ENV.CORDOVA
     },
     isInterview () {
       return this.$route.name === 'Interview' || this.$route.name === 'InterviewPreview'
     },
+    extraModulesEnabled () {
+      return this.isCordovaBuild && this.enabledModules.length > 0
+    },
+    enabledModules () {
+      return Object.keys(this.extraModules).filter(m => m.enabled)
+    },
     sections () {
+      const that = this
       return [{
         items: [{
           title: this.$t('respondents'),
@@ -217,6 +241,14 @@ export default {
           to: { name: 'Sync' },
           icon: 'mdi-sync',
           title: this.$t('sync'),
+        }, {
+          showIf: this.extraModulesEnabled,
+          icon: 'mdi-wifi',
+          click () {
+            // console.log('TODO: ')
+            that.showExtraModules = true
+          },
+          title: this.$t('extra_modules'),
         }, {
           showIf: this.isCordovaBuild,
           to: { name: 'HistoryView' },

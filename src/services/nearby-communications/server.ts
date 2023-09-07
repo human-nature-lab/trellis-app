@@ -87,10 +87,13 @@ export class Server {
     }
   }
 
-  async send (msg: string) {
+  send (msg: string) {
+    const payloads = []
     for (const id in this.connections) {
       const connection = this.connections[id]
-      await NearbyCommunications.sendPayload(connection.endpointId, msg)
+      payloads.push(NearbyCommunications.sendPayload(connection.endpointId, msg))
     }
+    this.messages.emit(null, msg)
+    return Promise.all(payloads)
   }
 }

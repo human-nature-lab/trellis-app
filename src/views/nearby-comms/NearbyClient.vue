@@ -1,3 +1,63 @@
+<script setup lang="ts" >
+import { ref, onBeforeUnmount, computed } from 'vue'
+import config from '@/config'
+import { useRoute } from 'vue-router/composables'
+import NearbyCommunications, { Connection } from '@/services/nearby-communications'
+
+const route = useRoute()
+const { studyId, formId } = route.params
+const status = ref('disconnected')
+const messages = ref<string[]>([])
+
+const serviceId = computed(() => {
+  return `${config.apiRoot}_${studyId}_${formId}`
+})
+
+async function connect () {
+  status.value = 'starting'
+  try {
+    await NearbyCommunications.startDiscovery('star', serviceId.value)
+    status.value = 'discovering'
+  } catch (err) {
+    status.value = 'error'
+    console.error(err)
+  }
+}
+async function onConnection (connection: Connection) {
+  status.value = 'connected'
+  console.log('Connected to', connection)
+}
+async function onConnectionFound (connection: Connection) {
+  // TODO: validate the server somehow
+  await NearbyCommunications.acceptConnection(connection.endpointId)
+}
+async function disconnect () {
+  status.value = 'disconnecting'
+  try {
+    await NearbyCommunications.stopDiscovery()
+    status.value = 'disconnected'
+  } catch (err) {
+    status.value = 'error'
+    console.error(err)
+  }
+}
+function onPayloadReceived (msg: string) {
+  messages.value.push(msg)
+}
+
+NearbyCommunications.hooks.onConnection.add(onConnection)
+NearbyCommunications.hooks.onConnectionFound.add(onConnectionFound)
+NearbyCommunications.hooks.onPayloadReceived.add(onPayloadReceived)
+connect()
+
+onBeforeUnmount(() => {
+  NearbyCommunications.hooks.onConnection.remove(onConnection)
+  NearbyCommunications.hooks.onConnectionFound.remove(onConnectionFound)
+  NearbyCommunications.hooks.onPayloadReceived.remove(onPayloadReceived)
+})
+
+</script>
+
 <template>
   <v-container>
     <h1>Client</h1>
@@ -25,67 +85,6 @@
     </v-list>
   </v-container>
 </template>
-
-<script lang="ts">
-import NearbyCommunications, { Connection } from '../../services/nearby-communications'
-import Vue from 'vue'
-
-export default Vue.extend({
-  name: 'NearbyClient',
-  data () {
-    return {
-      serviceId: 'trellis',
-      status: 'disconnected',
-      messages: [] as string[],
-    }
-  },
-  created () {
-    NearbyCommunications.hooks.onConnection.add(this.onConnection)
-    NearbyCommunications.hooks.onConnectionFound.add(this.onConnectionFound)
-    NearbyCommunications.hooks.onPayloadReceived.add(this.onPayloadReceived)
-    this.connect()
-  },
-  async beforeDestroy () {
-    NearbyCommunications.hooks.onConnection.remove(this.onConnection)
-    NearbyCommunications.hooks.onConnectionFound.remove(this.onConnectionFound)
-    NearbyCommunications.hooks.onPayloadReceived.remove(this.onPayloadReceived)
-    await this.disconnect()
-  },
-  methods: {
-    async connect () {
-      this.status = 'starting'
-      try {
-        await NearbyCommunications.startDiscovery('star', this.serviceId)
-        this.status = 'discovering'
-      } catch (err) {
-        this.status = 'error'
-        console.error(err)
-      }
-    },
-    async onConnection (connection: Connection) {
-      this.status = 'connected'
-      console.log('Connected to', connection)
-    },
-    async onConnectionFound (connection: Connection) {
-      // TODO: validate the server somehow
-      await NearbyCommunications.acceptConnection(connection.endpointId)
-    },
-    async disconnect () {
-      this.status = 'disconnecting'
-      try {
-        await NearbyCommunications.stopDiscovery()
-        this.status = 'disconnected'
-      } catch (err) {
-        this.status = 'error'
-        console.error(err)
-      }
-    },
-    onPayloadReceived (msg: string) {
-      this.messages.push(msg)
-    },
-  },
-})
-</script>
 
 <style lang="sass">
 

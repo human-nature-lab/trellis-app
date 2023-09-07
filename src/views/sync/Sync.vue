@@ -1,5 +1,5 @@
 <template>
-  <v-col>
+  <v-col class="fill-height">
     <sync-status
       v-if="!needsServerConfig && !downloading && !uploading && !downloadingPhotos && !uploadingPhotos"
       :local-latest-snapshot="localLatestSnapshot"
@@ -78,6 +78,9 @@
         </v-row>
       </v-col>
     </v-row>
+    <v-col class="bottom fixed text-center">
+      {{ $t('syncing_with_api', [config.apiRoot]) }}
+    </v-col>
   </v-col>
 </template>
 
@@ -90,6 +93,7 @@ import UploadSnapshot from '@/components/sync/UploadSnapshot.vue'
 import DocsLinkMixin from '@/mixins/DocsLinkMixin'
 import DocsFiles from '@/components/documentation/DocsFiles'
 import { updateTitle } from '@/router/history'
+import config from '@/config'
 
 export default {
   name: 'SyncView',
@@ -101,6 +105,7 @@ export default {
   mixins: [DocsLinkMixin(DocsFiles.sync.introduction)],
   data () {
     return {
+      config,
       loading: true,
       uploading: false,
       downloading: false,

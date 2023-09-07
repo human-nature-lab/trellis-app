@@ -6,7 +6,6 @@
     :value="value"
     @input="$emit('input', $event)"
     class="d-flex flex-column"
-    content-class="h-full"
   >
     <ScrollContainer :elevation="2">
       <template #header>
