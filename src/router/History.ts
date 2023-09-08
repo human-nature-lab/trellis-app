@@ -34,7 +34,6 @@ export class History {
 
   push (route: MinimalRoute) {
     this.items.push(route)
-    this.storage.
   }
 
   unshift () {
