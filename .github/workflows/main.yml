@@ -38,23 +38,23 @@ jobs:
           cp static/config.default.js static/config.js
           cp config/config-xml.dev.default.js config/config-xml.dev.js
       
-      - name: Build web bundle
-        id: web_bundle
-        run: |
-          npm run build:web
-          zip -r trellis-web.zip www/
+      # - name: Build web bundle
+      #   id: web_bundle
+      #   run: |
+      #     npm run build:web
+      #     zip -r trellis-web.zip www/
       
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
           java-version: '8'
       
-      - name: Uninstall corrupt sdk build-tools
-        run: |
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.1'
+      # - name: Uninstall corrupt sdk build-tools
+      #   run: |
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.1'
       
       - run: npm i -g @ionic/cli@6
       
