@@ -73,6 +73,10 @@ jobs:
         run: |
           chmod +x -R hooks/*.sh
 
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+
       - name: Build debug APK
         # continue-on-error: true
         run: |
