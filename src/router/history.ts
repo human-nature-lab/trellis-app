@@ -1,114 +1,50 @@
-import { computed, ref, watch } from 'vue'
-import { QueuableRoute, sanitizeRoute } from './util'
-import { i18n } from '@/i18n'
-import config from '../config'
-import { APP_ENV } from '../static/constants'
+import { LinkedList } from '@/core/LinkedList'
+import { LocalStorage, NamespaceStorage } from '@/core/storage'
+import { Mutex } from 'async-mutex'
 
-export type Title = string | { key: string, params?: any[] } | { translationId: string }
-const ignoredRoutes = [
-  'HistoryView',
-  'Sync',
-  'SyncAdmin',
-  'Login',
-  'Home',
-  'StudySelector',
-  'LocaleSelector',
-  'Information',
-  'Documentation',
-]
-
-export type HistoryItem = {
-  route: QueuableRoute
-  timestamp: number
-  title?: Title
+type MinimalRoute = {
+  title?: string
+  path: string
+  query?: Record<string, any>
+  params?: Record<string, any>
 }
 
-const HISTORY_KEY = 'history'
+export class History {
+  public items = new LinkedList<MinimalRoute>()
+  private storage = new NamespaceStorage('history', new LocalStorage())
+  private isInitialized = false
+  private mut = new Mutex()
 
-const existingHistoryStr = localStorage.getItem(HISTORY_KEY)
-let initialHistory: HistoryItem[] = []
-if (existingHistoryStr) {
-  try {
-    initialHistory = JSON.parse(existingHistoryStr)
-  } catch (e) {
-    console.error('Failed to parse history from localStorage', existingHistoryStr)
+  constructor () {
+    this.init()
   }
-}
-export const history = ref<HistoryItem[]>(initialHistory)
 
-let prevTimestamp = 0
-export function pushHistory (route: QueuableRoute, title?: string) {
-  console.log('pushHistory', route, title)
-  if (config.appEnv !== APP_ENV.CORDOVA) {
-    return
+  private init () {
+    return this.mut.runExclusive(async () => {
+      if (this.isInitialized) {
+        return
+      }
+      const items = await this.storage.items<MinimalRoute>()
+      for (const item of items) {
+        this.items.push(item)
+      }
+      this.isInitialized = true
+    })
   }
-  const timestamp = Date.now()
-  if ((timestamp - prevTimestamp) < 500 || ignoredRoutes.includes(route.name)) {
-    return
-  } else if (route.name === 'Interview' && history.value[0].route.name === 'Interview') {
-    console.log('Skipping interview history update')
-    return
-  }
-  prevTimestamp = timestamp
-  if (!title) {
-    title = route.name
-  }
-  route = sanitizeRoute(route)
-  history.value.unshift({
-    route,
-    timestamp,
-    title,
-  })
-  if (history.value.length > 500) {
-    history.value.pop()
-  }
-  try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(history.value))
-  } catch (e) {
-    console.error('Failed to save history to localStorage', e)
-  }
-}
 
-export async function evalTitle (title: Title) {
-  if (typeof title === 'string') {
-    return title
-  } else if ('key' in title) {
-    return i18n.t(title.key, title.params) as string
-  } else {
-    // TODO: this should be translated
-    
-    return title.translationId
+  push (route: MinimalRoute) {
+    this.items.push(route)
   }
-}
 
-export async function updateTitle (routeName: string, newTitle: Title) {
-  if (config.appEnv !== APP_ENV.CORDOVA || !newTitle) {
-    return
+  unshift () {
+
   }
-  const route = history.value[0]
-  if (route.route.name !== routeName) {
-    return
+
+  clear () {
+
   }
-  if (route) {
-    route.title = newTitle
+
+  replace () {
+
   }
-  document.title = await evalTitle(newTitle)
-  console.log('Updated history title to', newTitle)
-}
-
-export function computedTitle (routeName: string, fn: () => Title) {
-  const title = computed(fn)
-  watch(() => title.value, v => {
-    updateTitle(routeName, v)
-  }, { immediate: true })
-}
-
-export function clearHistory () {
-  history.value = []
-  localStorage.removeItem(HISTORY_KEY)
-}
-
-export function removeHistoryItem (index: number) {
-  history.value.splice(index, 1)
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.value))
 }
