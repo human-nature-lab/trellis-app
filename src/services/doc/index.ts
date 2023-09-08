@@ -61,7 +61,7 @@ export class DocService {
                   }),
                   new TextRun(' the page if '),
                   new TextRun({
-                    text: skip.anyAll ? 'any' : 'all',
+                    text: skip.anyAll ? 'all' : 'any',
                     bold: true,
                   }),
                   new TextRun(' of these conditions are assigned: '),
