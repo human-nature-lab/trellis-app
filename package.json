@@ -149,6 +149,7 @@
     "postcss": "^8.2.10",
     "postcss-loader": "^4.2.0",
     "raw-loader": "^0.5.1",
+    "react-native-sqlite-storage": "file:./shims/react-native-sqlite-storage",
     "sass": "^1.32.2",
     "sass-loader": "^10.1.1",
     "sinon": "^2.1.0",

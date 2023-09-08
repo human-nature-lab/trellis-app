@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: '16'
       
-      - run: rm -rf node_modules/.cache
+      # - run: rm -rf node_modules/.cache
       # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
       # - uses: c-hive/gha-npm-cache@v1
       - run: npm install
@@ -47,21 +47,21 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
-          java-version: '8'
+          java-version: '11'
       
-      - name: Uninstall corrupt sdk build-tools
-        run: |
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.1'
+      # - name: Uninstall corrupt sdk build-tools
+      #   run: |
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.1'
       
       - run: npm i -g @ionic/cli@6
       
       - uses: human-nature-lab/setup-ionic@v1
         with:
           install-java: false
-          cordova-version: 9
+          cordova-version: 11
       
 #       - name: Build dev APK
 #         run: |
@@ -73,11 +73,15 @@ jobs:
         run: |
           chmod +x -R hooks/*.sh
 
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+
       - name: Build debug APK
         # continue-on-error: true
         run: |
           npm run webpack:android
-          cordova prepare
+          sh cordova-setup.sh
           npm run webpack:release:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
