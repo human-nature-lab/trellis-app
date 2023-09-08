@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
 import Question from '../../../entities/trellis/Question'
 import { jsonQuestionParameter } from '../../../lib/json-question-parameter'
 import { bins } from '../../../lib/distribution/bin'
-import Translation from '../Translation.vue'
 import { numberTransformer } from '../../../lib/number-transformer'
 
 export type Config = {

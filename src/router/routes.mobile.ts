@@ -5,6 +5,8 @@ import DeviceKeyGuard from './guards/DeviceKeyGuard'
 import { guardQueue } from './GuardQueue'
 import sharedRoutes from './shared.routes'
 import LoginGuard from './guards/LoginGuard'
+import StudyGuard from './guards/StudyGuard'
+import { extraRoutes } from '@/modules'
 
 const Sync = () => import(/* webpackChunkName: "sync" */'@/views/sync/Sync.vue')
 const Logs = () => import(/* webpackChunkName: "logs" */'@/views/info/Logs.vue')
@@ -12,15 +14,6 @@ const Storage = () => import(/* webpackChunkName: "storage" */'@/views/info/Stor
 const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'@/views/setup/RegisterDevice.vue')
 const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'@/views/setup/ServerIPConfig.vue')
 const HistoryView = () => import(/* webpackChunkName: "history" */'@/views/HistoryView.vue')
-const NearbyCommunications = () => import(
-  /* webpackChunkName: "nearby-comms" */'@/views/nearby-comms/NearbyCommunications.vue'
-)
-const NearbyServer = () => import(
-  /* webpackChunkName: "nearby-comms" */'@/views/nearby-comms/NearbyServer.vue'
-)
-const NearbyClient = () => import(
-  /* webpackChunkName: "nearby-comms" */'@/views/nearby-comms/NearbyClient.vue'
-)
 
 export default sharedRoutes.concat([{
   path: '/',
@@ -51,20 +44,11 @@ export default sharedRoutes.concat([{
   component: ConfigureServer,
   beforeEnter: guardQueue([AlreadyConfiguredServerGuard]),
 }, {
-  path: '/nearby-comms',
-  name: 'NearbyCommunications',
-  component: NearbyCommunications,
-  // beforeEnter: guardQueue([AlreadyConfiguredServerGuard])
-}, {
-  path: '/nearby-comms/server',
-  name: 'NearbyServer',
-  component: NearbyServer,
-}, {
-  path: '/nearby-comms/client',
-  name: 'NearbyClient',
-  component: NearbyClient,
-}, {
   path: '/history',
   name: 'HistoryView',
   component: HistoryView,
-}])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard]),
+}]).concat(extraRoutes.map(r => ({
+  ...r,
+  beforeEnter: guardQueue([LoginGuard, StudyGuard]),
+})))

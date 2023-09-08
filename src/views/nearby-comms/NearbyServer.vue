@@ -1,9 +1,70 @@
+<script setup lang="ts">
+import { computed, onBeforeUnmount, ref } from 'vue'
+import config from '@/config'
+import device from '@/services/device'
+import { Server } from '../../services/nearby-communications/server'
+import { useRoute } from 'vue-router/composables'
+
+const route = useRoute()
+const { studyId, formId } = route.params
+const deviceName = ref('')
+let server: Server
+const working = ref(false)
+const devices = ref([])
+const connections = ref([])
+const endpoints = ref([])
+
+const serviceId = computed(() => {
+  return `${config.apiRoot}_${studyId}_${formId}`
+})
+
+function onPayloadReceived (...args: any[]) {
+  console.log('payload received', args)
+}
+
+async function start () {
+  console.log('starting server')
+  working.value = true
+  try {
+    deviceName.value = await device.getDeviceKey()
+    server = new Server(deviceName.value, serviceId)
+    server.messages.add(onPayloadReceived)
+    await server.start()
+  } catch (err) {
+    console.error(err)
+  } finally {
+    working.value = false
+  }
+}
+async function stop () {
+  working.value = true
+  try {
+    server.messages.remove(onPayloadReceived)
+    if (server) {
+      await server.stop()
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    working.value = false
+  }
+}
+
+onBeforeUnmount(async () => {
+  await stop()
+})
+
+start()
+
+</script>
+
 <template>
   <v-container>
     <h1>Server</h1>
     <div>
       {{ deviceName }}
     </div>
+    <div>{{ serviceId }}</div>
     <h3>Status: {{ server && server.state }}</h3>
     <v-row class="no-gutters">
       <v-btn
@@ -19,13 +80,15 @@
         Stop
       </v-btn>
     </v-row>
-    <h3 v-if="server">Connections {{ Object.keys(server.connections).length }} ({{ Object.keys(server.pending).length }})</h3>
+    <h3 v-if="server">
+      Connections {{ Object.keys(server.connections).length }} ({{ Object.keys(server.pending).length }})
+    </h3>
     <v-list v-if="server">
       <v-list-item
         v-for="connection in server.pending"
         :key="connection.endpointId"
       >
-       Pending {{ connection }}
+        Pending {{ connection }}
       </v-list-item>
     </v-list>
     <v-list v-if="server">
@@ -56,63 +119,6 @@
     </v-list>
   </v-container>
 </template>
-
-<script lang="ts">
-import Vue from 'vue'
-import device from '@/services/device'
-import { Server } from '../../services/nearby-communications/server'
-
-export default Vue.extend({
-  name: 'NearbyServer',
-  data () {
-    return {
-      server: null as Server | null,
-      serviceId: 'trellis',
-      working: false,
-      deviceName: '',
-      devices: [],
-      connections: [],
-      endpoints: [],
-    }
-  },
-  async created () {
-    this.deviceName = await device.getDeviceKey()
-    await this.start()
-  },
-  async beforeDestroy () {
-    await this.stop()
-  },
-  methods: {
-    async start () {
-      console.log('starting server')
-      this.working = true
-      try {
-        this.server = new Server(this.deviceName, this.serviceId)
-        this.server.messages.add(this.onPayloadReceived)
-        await this.server.start()
-      } catch (err) {
-        console.error(err)
-      } finally {
-        this.working = false
-      }
-    },
-    async stop () {
-      this.working = true
-      try {
-        this.server.messages.remove(this.onPayloadReceived)
-        await this.server.stop()
-      } catch (err) {
-        console.error(err)
-      } finally {
-        this.working = false
-      }
-    },
-    onPayloadReceived (...args: any[]) {
-      console.log('payload received', args)
-    },
-  },
-})
-</script>
 
 <style lang="sass">
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineProps, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import Question from '../../../../entities/trellis/Question'
 import { jsonQuestionParameter } from '../../../../lib/json-question-parameter'
 import { Config } from '../../../builder/question-builders/DistributionQuestionBuilder.vue'

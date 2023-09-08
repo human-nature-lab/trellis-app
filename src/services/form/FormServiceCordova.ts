@@ -25,11 +25,12 @@ export default class FormServiceCordova implements FormServiceInterface {
         fs.form.sort()
       }
     }
+    studyForms.sort((a, b) => a.sortOrder - b.sortOrder)
     return studyForms
   }
 
-  async getAllStudyForms (studyId: string): Promise<StudyForm[]> {
-    throw Error('Not implemented')
+  getAllStudyForms (studyId: string): Promise<StudyForm[]> {
+    return this.getStudyForms(studyId)
   }
 
   async getForm (id: string, bareBones: boolean = false): Promise<Form> {
