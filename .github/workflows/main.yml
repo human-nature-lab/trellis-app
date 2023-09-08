@@ -61,7 +61,7 @@ jobs:
       - uses: human-nature-lab/setup-ionic@v1
         with:
           install-java: false
-          cordova-version: 9
+          cordova-version: 11
       
 #       - name: Build dev APK
 #         run: |
