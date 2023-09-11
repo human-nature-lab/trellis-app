@@ -11,12 +11,24 @@
             text
             :loading="generatingSnapshot"
             :disabled="generatingSnapshot"
-            @click="generateSnapshot">
+            @click="generateSnapshot(false)">
             {{ $t('generate_snapshot') }}
           </v-btn>
           <v-btn icon @click="getSnapshots" :disabled="snapshotsLoading">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
+          <v-menu offset-y left>
+            <template #activator="{ on, attrs }">
+              <v-btn icon v-on="on" v-bind="attrs">
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item @click="generateSnapshot(true)">
+                {{ $t('force_generate_snapshot') }}
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </v-card-title>
         <v-card-text>
           <v-data-table
@@ -223,10 +235,10 @@
           this.uploadsProcessing = false
         }
       },
-      generateSnapshot: async function () {
+      generateSnapshot: async function (force = false) {
         this.generatingSnapshot = true
         try {
-          const res = await SyncAdminService.generateSnapshot()
+          const res = await SyncAdminService.generateSnapshot(force)
           this.alertRes('success', res.data, 'Successfully created snapshot')
           this.getSnapshots()
         } catch (err) {

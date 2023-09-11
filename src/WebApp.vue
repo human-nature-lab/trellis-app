@@ -7,7 +7,8 @@
       :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
       <v-navigation-drawer
         v-model="global.menuDrawer.open"
-        app>
+        app
+      >
         <MainMenu />
       </v-navigation-drawer>
       <v-app-bar
