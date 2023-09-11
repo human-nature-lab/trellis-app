@@ -46,6 +46,7 @@
       v-for="section in form.sections"
       :key="section.id"
       class="section mt-2"
+      cols="12"
     >
       <v-row
         v-if="opts.sectionHeaders"
