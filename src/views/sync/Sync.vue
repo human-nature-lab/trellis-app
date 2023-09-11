@@ -79,7 +79,7 @@
       </v-col>
     </v-row>
     <v-col class="bottom fixed text-center">
-      {{ $t('syncing_with_api', [config.apiRoot]) }}
+      {{ $t('syncing_with_api', [serverIPAddress]) }}
     </v-col>
   </v-col>
 </template>

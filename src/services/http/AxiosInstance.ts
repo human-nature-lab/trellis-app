@@ -9,6 +9,7 @@ import DeviceService from '../device'
 import { makeBasicAuthHeader } from '../util'
 import { requestCredentials } from '../../components/login/LoginModal.vue'
 import { ExpiringValue } from '../../classes/ExpiringValue'
+import { Mutex } from 'async-mutex'
 
 export interface Token {
   hash: string
@@ -139,9 +140,17 @@ export function getSyncAuthentication () {
   return syncAuthHeader.get()
 }
 
-export async function requestSyncAuthentication () {
-  const creds = await requestCredentials()
-  return makeBasicAuthHeader(creds.username, creds.password)
+const authMutex = new Mutex()
+export function requestSyncAuthentication () {
+  return authMutex.runExclusive(async () => {
+    let header = syncAuthHeader.get()
+    if (!header) {
+      const creds = await requestCredentials()
+      header = makeBasicAuthHeader(creds.username, creds.password)
+      syncAuthHeader.set(header)
+    }
+    return header
+  })
 }
 
 export const adminInst = axios.create({
