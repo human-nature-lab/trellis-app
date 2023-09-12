@@ -219,7 +219,8 @@ export function getDot (obj: object, key: string) {
  * @param key
  * @param val
  */
-export function setDot (obj: object, key: string, val: any) {
+export function setDot (obj: object, key: string, val: any, setter?: (obj: object, key: string, val: any) => void) {
+  console.log('setDot', obj, key, val)
   const parts = key.split('.')
   let ref = obj
   let i
@@ -229,7 +230,11 @@ export function setDot (obj: object, key: string, val: any) {
       if (key in ref) {
         ref = ref[key]
       } else {
-        ref[key] = {}
+        if (setter) {
+          setter(ref, key, {}) 
+        } else {
+          ref[key] = {}
+        }
         ref = ref[key]
       }
     } else {
@@ -237,7 +242,11 @@ export function setDot (obj: object, key: string, val: any) {
     }
   }
   if (typeof ref === 'object') {
-    ref[parts[i]] = val
+    if (setter) {
+      setter(ref, parts[i], val)
+    } else {
+      ref[parts[i]] = val
+    }
   }
 }
 

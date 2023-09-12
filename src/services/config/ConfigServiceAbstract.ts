@@ -1,5 +1,6 @@
-import Config from '../../entities/trellis/Config'
-import config from '../../config'
+import Vue from 'vue'
+import Config from '@/entities/trellis/Config'
+import config from '@/config'
 import { safeParse, setDot } from '../JSONUtil'
 
 export default abstract class ConfigServiceAbstract {
@@ -12,7 +13,7 @@ export default abstract class ConfigServiceAbstract {
       const pairs: Config[] = await this.getAll()
       for (const pair of pairs) {
         const val = this.castValue(pair.type, pair.value)
-        setDot(config, pair.key, val)
+        setDot(config, pair.key, val, Vue.set)
       }
     } catch (err) {
       console.error(err)

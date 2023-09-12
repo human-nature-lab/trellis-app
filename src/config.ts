@@ -1,7 +1,6 @@
-//@ts-ignore
-const c = window.config
-console.log('config', c)
-export default c as {
+import { reactive, watch } from "vue"
+
+type Config = {
   apiRoot: string
   appEnv: string
   appMode: 'PROD' | 'DEV'
@@ -42,3 +41,11 @@ export default c as {
     password: string
   }
 }
+
+const config = reactive((window.config! || {}) as Config)
+console.log('config', JSON.stringify(config, null, 2))
+watch(config, () => {
+  console.log('config changed', JSON.stringify(config))
+  return null
+})
+export default config
