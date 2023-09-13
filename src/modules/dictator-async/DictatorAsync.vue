@@ -1,16 +1,36 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import config from '@/config'
 import FormSelector from '@/components/forms/FormSelector.vue'
 import singleton from '@/static/singleton'
+import DictatorClient from './DictatorClient.vue'
+import DictatorServer from './DictatorServer.vue'
+import FormService from '@/services/form'
+import PT from '@/static/parameter.types'
+
 const formId = ref<string>()
 const serviceId = computed(() => {
   return `${config.apiRoot}_${singleton.study.id}_${formId.value}_dictator_async`
 })
 const role = ref<'server' | 'client'>()
-const formsWithDictator = ref<string[]>([])
 
-const canRunDictator = ref(false) // TODO: check if the selected form has any dictator questions
+const canRunDictator = ref(false)
+const working = ref(false)
+watch(() => formId.value, async () => {
+  if (formId.value) {
+    working.value = true
+    try {
+      canRunDictator.value = await FormService.formHasQuestionsWithParameters(formId.value, [PT.dictator_decision, PT.dictator_receiver])
+    } finally {
+      working.value = false
+    }
+  }
+}, { immediate: true })
+
+const canSelectRole = computed(() => {
+  return !working.value && formId.value && canRunDictator.value
+})
+
 </script>
 
 <template>
@@ -19,11 +39,12 @@ const canRunDictator = ref(false) // TODO: check if the selected form has any di
       v-model="formId"
       :study-id="singleton.study.id"
     />
-    <v-row>
+    <v-row v-if="!role">
       <v-col>
         <v-btn
           @click="role = 'server'"
-          :disabled="!formId"
+          :loading="working"
+          :disabled="!canSelectRole"
         >
           {{ $t('start_server') }}
         </v-btn>
@@ -31,11 +52,16 @@ const canRunDictator = ref(false) // TODO: check if the selected form has any di
       <v-col>
         <v-btn
           @click="role = 'client'"
-          :disabled="!formId"
+          :loading="working"
+          :disabled="!canSelectRole"
         >
           {{ $t('join_server') }}
         </v-btn>
       </v-col>
     </v-row>
+    <v-col>
+      <DictatorClient v-if="role === 'client'" />
+      <DictatorServer v-else-if="role === 'server'" />
+    </v-col>
   </v-container>
 </template>

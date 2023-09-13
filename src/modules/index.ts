@@ -1,6 +1,9 @@
-import { computed } from 'vue'
 import config from '@/config'
 import { i18n } from '@/i18n'
+import { guardQueue } from '@/router/GuardQueue'
+import LocaleGuard from '@/router/guards/LocaleGuard'
+import LoginGuard from '@/router/guards/LoginGuard'
+import StudyGuard from '@/router/guards/StudyGuard'
 const DictatorAsync = () => import(/* webpackChunkName: "dictator-async" */'./dictator-async/DictatorAsync.vue')
 
 console.log('config', JSON.stringify(config, null, 2))
@@ -11,9 +14,10 @@ export const extraModules = {
     enabled: () => !!(config.extraModules && config.extraModules.dictatorAsync),
     to: { name: 'DictatorAsync' },
     routes: [{
-      path: '/nearby-comms/dictator-async',
+      path: '/extra-modules/dictator-async',
       name: 'DictatorAsync',
       component: DictatorAsync,
+      beforeEntry: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
     }],
   },
 }

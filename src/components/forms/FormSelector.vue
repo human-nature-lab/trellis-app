@@ -3,11 +3,13 @@ import { ref, watch, computed } from 'vue'
 import FormService from '@/services/form'
 import StudyForm from '@/entities/trellis/StudyForm'
 import AsyncTranslationText from '../AsyncTranslationText.vue'
+import global from '@/static/singleton'
+
 const props = defineProps<{
   value: string // formId
   studyId: string
   onlyPublished?: boolean
-  formFilter?: (form: StudyForm) => boolean
+  formFilter?:(form: StudyForm) => boolean
 }>()
 const loading = ref(false)
 const forms = ref<StudyForm[]>([])

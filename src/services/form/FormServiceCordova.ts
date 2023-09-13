@@ -7,6 +7,8 @@ import Question from '../../entities/trellis/Question'
 import { In, IsNull, Not } from 'typeorm'
 import { removeSoftDeleted } from '../database/SoftDeleteHelper'
 import Section from '../../entities/trellis/Section'
+import PT from '@/static/parameter.types'
+import { namedQuery } from '../database/named'
 
 export default class FormServiceCordova implements FormServiceInterface {
 
@@ -88,6 +90,31 @@ export default class FormServiceCordova implements FormServiceInterface {
     console.log('form removed soft deleted')
 
     return form
+  }
+
+  async formHasQuestionsWithParameters (formId: string, parameterIds: string[]): Promise<boolean> {
+    const connection = await DatabaseService.getDatabase()
+    const q = `select count(*) as c from question q
+      where q.question_group_id in (
+        select question_group_id from section_question_group sqg
+        where sqg.section_id in (
+          select section_id from form_section fs
+          where fs.form_id = :formId 
+          and fs.deleted_at is null
+        ) and sqg.deleted_at is null
+      ) 
+      and q.deleted_at is null
+      and q.id in (
+        select question_id from question_parameter qp
+        where qp.parameter_id in (:parameterIds)
+        and qp.deleted_at is null
+      )
+    `
+    const { query, params } = namedQuery(q, { parameterIds: parameterIds.map(pId => '' + pId), formId })
+    console.log('transformed query', query, params)
+    const res = await connection.query(query, params)
+    console.log('result', res)
+    return res[0].c === parameterIds.length
   }
 
   createForm (studyId: string, formType: formTypes): Promise<StudyForm> {

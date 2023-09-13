@@ -19,6 +19,7 @@ export default sharedRoutes.concat([{
   path: '/',
   name: 'Home',
   component: Sync,
+  default: true,
   beforeEnter: guardQueue([LoginGuard, ServerConfigGuard, DeviceKeyGuard]),
 }, {
   path: '/sync',
