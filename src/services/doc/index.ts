@@ -1,13 +1,18 @@
-import { Document, Paragraph, HeadingLevel, Packer, TextRun, TabStopType, TabStopPosition } from 'docx'
+import { Document, Paragraph, HeadingLevel, Packer, TextRun, TabStopType, TabStopPosition, LevelFormat, AlignmentType } from 'docx'
 import Locale from '../../entities/trellis/Locale'
 import Form from '../../entities/trellis/Form'
 import TranslationService from '../TranslationService'
+import { i18n } from '@/i18n'
 
-type DocxOpts = {
+export type DocxOpts = {
   choices: boolean
   parameters: boolean
-  pageSkips: boolean
   assignments: boolean
+  pageTitles: boolean
+  pageHeaders: boolean
+  pageSkips: boolean
+  questionNumbers: boolean
+  sectionHeaders: boolean
 }
 
 const defaultOpts: DocxOpts = {
@@ -15,6 +20,10 @@ const defaultOpts: DocxOpts = {
   parameters: true,
   pageSkips: true,
   assignments: true,
+  pageTitles: true,
+  pageHeaders: true,
+  questionNumbers: true,
+  sectionHeaders: true,
 }
 
 export class DocService {
@@ -40,12 +49,22 @@ export class DocService {
         }))
         hasCreatedTitle = true
       }
-      children.push(new Paragraph({
-        text: 'Section: ' + TranslationService.getAny(section.nameTranslation, locale),
-        heading: HeadingLevel.HEADING_2,
-      }))
-      for (const page of section.pages) {
-        children.push(new Paragraph({ text: ' ', heading: HeadingLevel.HEADING_3 }))
+      if (opts.sectionHeaders) {
+        children.push(new Paragraph({
+          text: 'Section: ' + TranslationService.getAny(section.nameTranslation, locale),
+          heading: HeadingLevel.HEADING_2,
+        }))
+      }
+      for (let i = 0; i < section.pages.length; i++) {
+        const page = section.pages[i]
+        if (opts.pageTitles) {
+          children.push(new Paragraph({
+            text: i18n.t('page_n', [i]) + '',
+            heading: HeadingLevel.HEADING_3,
+          }))
+        } else if (opts.pageHeaders) {
+          children.push(new Paragraph({ text: ' ', heading: HeadingLevel.HEADING_3 }))
+        }
         if (opts.pageSkips && page.skips) {
           for (const skip of page.skips) {
             if (skip.customLogic) {
@@ -102,9 +121,15 @@ export class DocService {
           }))
           if (opts.choices && question.choices && question.choices.length) {
             for (const choice of question.choices) {
+              const name = TranslationService.getAny(choice.choice.choiceTranslation, locale)
+              const val = choice.choice.val
+              const text = `${val}) ${name}`
               children.push(new Paragraph({
-                text: TranslationService.getAny(choice.choice.choiceTranslation, locale),
-                bullet: { level: 0 },
+                text,
+                numbering: {
+                  reference: 'choice-vals',
+                  level: 0,
+                },
               }))
             }
           }
@@ -135,6 +160,26 @@ export class DocService {
     const questionSpaceBefore = 20 * 72 * 0.2
     const pageSpaceBefore = questionSpaceBefore * 2
     const doc = new Document({
+      numbering: {
+        config: [
+          {
+            reference: 'choice-vals',
+            levels: [
+              {
+                level: 0,
+                format: LevelFormat.NONE,
+                text: '%1',
+                alignment: AlignmentType.START,
+                style: {
+                  paragraph: {
+                    indent: { left: 300 },
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
       styles: {
         default: {
           heading2: {
