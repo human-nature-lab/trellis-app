@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { getCurrentInstance } from 'vue'
+import Vue from 'vue'
 import DocsLinkMixin from '@/mixins/DocsLinkMixin'
 import FormsView from '@/components/respondent/FormsView.vue'
 import RoutePreloadMixin from '@/mixins/RoutePreloadMixin'
