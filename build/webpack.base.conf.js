@@ -75,6 +75,7 @@ const plugins = [
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     'process.env.APP_ENV': JSON.stringify(process.env.APP_ENV),
+    DEV: !isProd,
     VERSION: JSON.stringify(require('../package').version),
   }),
   new VueLoaderPlugin(),
