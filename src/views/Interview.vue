@@ -173,6 +173,7 @@ import { computedTitle } from '@/router/history'
 import Form from '@/entities/trellis/Form'
 import TranslationService from '@/services/TranslationService'
 import Respondent from '@/entities/trellis/Respondent'
+import { onBeforeUnload } from '@/helpers/window.helper'
 
 function load (to) {
   return new Promise(async (resolve, reject) => {
@@ -251,11 +252,10 @@ export default {
     })
     actionBus.on('action', this.actionHandler)
     menuBus.$on('showConditionTags', this.showConditionTags)
-    window.onbeforeunload = this.prematureExit
+    onBeforeUnload(this.prematureExit.bind(this))
     this.hydrate(interviewData)
   },
   beforeDestroy: function () {
-    window.onbeforeunload = null
     menuBus.$off('showConditionTags', this.showConditionTags)
     actionBus.off('action', this.actionHandler)
   },

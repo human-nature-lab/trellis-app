@@ -28,7 +28,7 @@ const showExtraModal = ref(false)
 const checkpoint = ref(0)
 
 const isDebug = computed(() => {
-  return config.debug
+  return config.debug || DEV
 })
 const isTestMode = computed(() => {
   return !!global.study && !global.study.testStudy

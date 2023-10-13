@@ -3,12 +3,12 @@ import { ref, watch, computed } from 'vue'
 import FormService from '@/services/form'
 import StudyForm from '@/entities/trellis/StudyForm'
 import AsyncTranslationText from '../AsyncTranslationText.vue'
-import global from '@/static/singleton'
 
 const props = defineProps<{
   value: string // formId
   studyId: string
   onlyPublished?: boolean
+  disabled?: boolean
   formFilter?:(form: StudyForm) => boolean
 }>()
 const loading = ref(false)
@@ -44,6 +44,7 @@ const displayForms = computed(() => {
       :loading="loading"
       :items="displayForms"
       :value="value"
+      :disabled="disabled"
       @input="$emit('input', $event)"
       :label="$t('forms')"
     >

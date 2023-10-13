@@ -89,7 +89,6 @@ export default Vue.extend({
           precedence: this.value.skips.length + 1,
         })
         const res = await SkipService.createFormSkip(this.value.id, tSkip)
-        debugger
         const f = this.value.copy()
         f.skips.push(res)
         this.$emit('input', f)
