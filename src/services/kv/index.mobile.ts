@@ -1,6 +1,6 @@
 import KV from '@/entities/trellis/KV'
 import DatabaseService from '../database/'
-import { Connection, Repository, SaveOptions } from 'typeorm'
+import { AbstractRepository, Connection, Repository, SaveOptions, TreeRepository } from 'typeorm'
 
 export class KVStore {
   async get (namespace: string, key: string) {
@@ -36,6 +36,16 @@ export class KVStore {
     return res
   }
 
+  async all (namespace: string) {
+    const repo: TreeRepository<KV> = await DatabaseService.getRepository(KV)
+    const res = await repo.find({
+      where: {
+        namespace,
+      },
+    })
+    return res
+  }
+
   async clearNamespace (namespace: string) {
     const repo = await DatabaseService.getRepository(KV)
     const res = await repo.delete({
@@ -62,6 +72,10 @@ export class NamespaceStore {
 
   async clear () {
     return this.kvStore.clearNamespace(this.namespace)
+  }
+
+  async all () {
+    return this.kvStore.all(this.namespace)
   }
 }
 

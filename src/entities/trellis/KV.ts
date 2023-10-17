@@ -1,10 +1,11 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
+import uuid from 'uuid/v4'
 
 @Entity()
 export default class KV extends TimestampedSoftDelete {
-  @PrimaryColumn()
-  id: number
+  @PrimaryColumn({ type: 'uuid', default: () => uuid() })
+  id: string
 
   @Column({ type: 'varchar', default: 'default' })
   namespace: string

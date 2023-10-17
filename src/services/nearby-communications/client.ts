@@ -2,8 +2,9 @@ import { Hook } from '@/lib/Hook'
 import nearbyCommunications, { Connection, Strategy } from '.'
 import { ClientToServer, ServerToClient } from './server'
 
+type State = 'disconnected' | 'connecting' | 'discovering' | 'connected' | 'disconnecting' | 'failure'
 export class Client {
-  public state = 'disconnected'
+  public state: State = 'disconnected'
   public onConnection = new Hook()
 
   private conn: Connection

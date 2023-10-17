@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
+import StatusChip from './StatusChip.vue'
 import { Actor, CandidatesRequest, CandidatesResponse, CompleteTxRequest, DBActor, Device, Message, PairRequest } from './common'
 import { Client } from '@/services/nearby-communications/client'
 import DatabaseService from '@/services/database'
@@ -60,21 +61,12 @@ onBeforeUnload(disconnect)
   <v-col class="pa-0 ma-0">
     <v-row class="no-gutters">
       <h1>Client</h1>
+      <StatusChip :status="client.state" />
+      <v-spacer />
       <v-btn @click="$emit('stop')">
         Disconnect
       </v-btn>
-      <v-spacer />
-      <span>{{ client.state }}</span>
     </v-row>
-    <!-- <v-alert
-      v-if="error"
-      color="error"
-    >
-      {{ error }}
-    </v-alert> -->
-    <v-col>
-      ({{ props.serviceId }}) ({{ props.deviceId }})
-    </v-col>
   </v-col>
 </template>
 

@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import NearbyCommunications, { Connection } from '@/services/nearby-communications'
-import { ref, onBeforeUnmount, set, del, onBeforeMount, computed } from 'vue'
-import { Message, CandidatesRequest, CandidatesResponse, Device, Decision, Actor, Pair, DBActor } from './common'
+import { ref, onBeforeUnmount, onBeforeMount, computed, watch } from 'vue'
+import TrellisModal from '@/components/TrellisModal.vue'
+import PreviousReports from './PreviousReports.vue'
+import ReportTable from './ReportTable.vue'
+import StatusChip from './StatusChip.vue'
+import { Message, CandidatesRequest, CandidatesResponse, Device, Decision, Actor, Pair, DBActor, DeviceDecision } from './common'
 import { Server, ServerSocket } from '@/services/nearby-communications/server'
 import { onBeforeUnload } from '@/helpers/window.helper'
 import { reactiveSet } from '@/lib/reactive-set'
 import { shuffle } from 'lodash'
+import { useReports, Report } from './useReports'
 
 const props = defineProps<{
   serviceId: string
@@ -30,7 +34,22 @@ const localConn = ref<Conn>({
   actor: new DBActor(),
 })
 
+const { reports, loading: reportsLoading, pushReport, error: reportsErr } = useReports(props.formId, props.deviceId)
+
+watch(() => reports.value, () => {
+  console.log('reports', reports.value)
+}, { immediate: true })
+
 const connections = ref<Record<string, Conn>>({})
+const deviceActors = computed(() => {
+  const actorMap: Record<string, Actor> = { local: localConn.value.actor }
+  for (const conn of Object.values(connections.value)) {
+    if (conn.device) {
+      actorMap[conn.device.deviceId] = conn.actor
+    }
+  }
+  return actorMap
+})
 
 class SocketActor implements Actor {
   constructor (private socket: ServerSocket) {}
@@ -55,12 +74,12 @@ class SocketActor implements Actor {
   }
 }
 
-type SocketDecision = Decision & ({ socketId: string } | { isLocal: boolean })
 const allDecisions = computed(() => {
-  const decisions = [] as SocketDecision[]
+  const decisions = [] as DeviceDecision[]
   for (const decision of localConn.value.decisions) {
     decisions.push({
       ...decision,
+      deviceId: 'local',
       isLocal: true,
     })
   }
@@ -69,7 +88,7 @@ const allDecisions = computed(() => {
     for (const decision of conn.decisions) {
       decisions.push({
         ...decision,
-        socketId,
+        deviceId: conn.device.deviceId,
       })
     }
   }
@@ -129,27 +148,169 @@ function toggleSelectedRespondent (respondentId: string) {
   }
 }
 
+const report = ref<Report>(null)
+const showReport = ref(false)
+const working = ref(false)
+const execErr = ref()
+
 async function generateRing () {
-  const respondentDecisions = new Map<string, SocketDecision>()
+  execErr.value = null
+  const respondentDecisions = new Map<string, DeviceDecision>()
   for (const decision of allDecisions.value) {
-    respondentDecisions.set(decision.respondentId, decision)
+    if (selectedRespondents.has(decision.respondentId)) {
+      respondentDecisions.set(decision.respondentId, decision)
+    }
   }
   const respIds = shuffle(Array.from(respondentDecisions.keys()))
   const pairs = respIds.map((respId, i) => {
     const nextRespId = respIds[(i + 1) % respIds.length]
-    const deciderDesc = respondentDecisions.get(respId)
-    const receiverDesc = respondentDecisions.get(nextRespId)
+    const decider = respondentDecisions.get(respId)
+    const receiver = respondentDecisions.get(nextRespId)
     return {
-      deciderSocketId: deciderDesc.socketId,
-      deciderId: respId,
-      deciderResult: deciderDesc.value + receiverDesc.value,
-      receiverSocketId: receiverDesc.socketId,
-      receiverId: nextRespId,
-      receiverSurveyId: deciderDesc.surveyId,
+      decider,
+      receiver,
     }
   })
+
+  report.value = {
+    devices: Object.keys(deviceActors.value),
+    rows: [],
+  }
+  for (const pair of pairs) {
+    const kept = pair.receiver.max - pair.receiver.value
+    const given = pair.decider.value
+    report.value.rows.push({
+      respondentId: pair.receiver.respondentId,
+      pair,
+      kept,
+      given,
+      total: kept + given,
+    })
+  }
+  showReport.value = true
   console.log('pairs', pairs)
+  console.log('report', report)
 }
+
+function reportDevicesHaveChanged (report: Report) {
+  return report.devices.join(':') !== Object.keys(deviceActors.value).join(':')
+}
+
+function compareWithPreviousReports (report: Report) {
+  const reportRespondents = report.rows.map(row => row.respondentId)
+  reportRespondents.sort()
+  for (const r of reports.value) {
+    const rRespondents = r.report.rows.map(row => row.respondentId)
+    rRespondents.sort()
+    if (rRespondents.join(':') === reportRespondents.join(':')) {
+      throw new Error('Report with the same respondents already exists')
+    }
+    for (const id of rRespondents) {
+      if (reportRespondents.includes(id)) {
+        throw new Error(`A respondent was in a previous report: ${id}`)
+      }
+    }
+  }
+}
+
+async function synchronize () {
+  compareWithPreviousReports(report.value)
+
+  if (report.value.rows.length === 0) {
+    throw new Error('No report to synchronize')
+  }
+  if (reportDevicesHaveChanged(report.value)) {
+    throw new Error('Devices have changed since report was created')
+  }
+
+  // store the report in the database
+  await pushReport(report.value)
+
+  const pairs = report.value.rows.map(row => row.pair)
+  const pairGroups = new Map<string, Pair[]>()
+  for (const pair of pairs) {
+    if (!pairGroups.has(pair.decider.deviceId)) {
+      pairGroups.set(pair.decider.deviceId, [])
+    }
+    pairGroups.get(pair.decider.deviceId).push(pair)
+  }
+
+  console.log('pairGroups', pairGroups)
+
+  if (reportDevicesHaveChanged(report.value)) {
+    throw new Error('Devices changed after saving report')
+  }
+  const actors = []
+  const promises = []
+  try {
+    for (const [deviceId, group] of pairGroups) {
+      const actor = deviceActors.value[deviceId]
+      if (!actor) {
+        throw new Error('No actor found for device: ' + deviceId)
+      }
+      actors.push(actor)
+      promises.push(actor.startSave(group))
+    }
+  } catch (err) {
+    await Promise.all(actors.map(a => a.rollbackSave()))
+    throw err
+  }
+
+  try {
+    await Promise.all(promises)
+  } catch (err) {
+    await Promise.all(actors.map(a => a.rollbackSave()))
+    throw err
+  }
+
+  if (reportDevicesHaveChanged(report.value)) {
+    throw new Error('Devices changed after starting save')
+  }
+  // await Promise.all(actors.map(a => a.rollbackSave()))
+
+  try {
+    await Promise.all(actors.map(a => a.completeSave()))
+    showReport.value = false
+  } catch (err) {
+    await Promise.all(actors.map(a => a.rollbackSave()))
+    throw err
+  }
+}
+
+async function exec (fn: () => any) {
+  working.value = true
+  try {
+    await fn()
+  } catch (err) {
+    execErr.value = err
+  } finally {
+    working.value = false
+  }
+}
+
+const err = computed(() => {
+  return execErr.value || reportsErr.value
+})
+
+const allSelected = computed(() => {
+  return selectedRespondents.size === allDecisions.value.length
+})
+
+const someSelected = computed(() => {
+  return selectedRespondents.size > 0 && !allSelected.value
+})
+
+function toggleSelectAll () {
+  if (allSelected.value) {
+    selectedRespondents.clear()
+  } else {
+    for (const decision of allDecisions.value) {
+      selectedRespondents.add(decision.respondentId)
+    }
+  }
+}
+
+const showPrevReports = ref(false)
 
 </script>
 
@@ -157,22 +318,41 @@ async function generateRing () {
   <v-col>
     <v-row class="no-gutters">
       <h1>Server</h1>
+      <StatusChip :status="server.state" />
+      <v-spacer />
+      <v-btn @click="showPrevReports = true">
+        Reports
+      </v-btn>
       <v-btn @click="$emit('stop')">
         Disconnect
       </v-btn>
-      <v-spacer />
-      <span>{{ server.state }}</span>
     </v-row>
-    <v-col>
-      ({{ props.serviceId }}) ({{ props.deviceId }})
-    </v-col>
+    <v-alert
+      v-if="err"
+      color="error"
+    >
+      {{ err }}
+    </v-alert>
     <v-row class="no-gutters">
-      <v-btn @click="generateRing">
+      <v-btn
+        @click="generateRing"
+        :disabled="selectedRespondents.size < 2"
+      >
         Generate ring
       </v-btn>
     </v-row>
     <v-list>
-      <h3>Decisions ({{ allDecisions.length }})</h3>
+      <v-list-item class="no-gutters">
+        <v-simple-checkbox
+          :value="allSelected"
+          :indeterminate="someSelected"
+          @click="toggleSelectAll"
+        />
+        <h3>
+          Decisions ({{ allDecisions.length }})
+        </h3>
+      </v-list-item>
+
       <v-list-item
         v-for="decision in allDecisions"
         :key="decision.surveyId"
@@ -191,6 +371,37 @@ async function generateRing () {
         {{ conn.device.deviceName }} ({{ conn.device.deviceId }})
       </v-list-item>
     </v-list>
+    <TrellisModal
+      v-model="showReport"
+      :title="$t('report')"
+    >
+      <ReportTable
+        v-if="report"
+        :report="report"
+      />
+      <v-row class="no-gutters">
+        <v-spacer />
+        <v-btn
+          @click="exec(synchronize)"
+          :disabled="working || !!err"
+          :loading="working"
+        >
+          {{ $t('save') }}
+        </v-btn>
+        <v-btn
+          @click="showReport = false"
+          :disabled="working"
+        >
+          {{ $t('cancel') }}
+        </v-btn>
+      </v-row>
+    </TrellisModal>
+    <TrellisModal
+      v-model="showPrevReports"
+      :title="$t('previous_reports')"
+    >
+      <PreviousReports :reports="reports" />
+    </TrellisModal>
   </v-col>
 </template>
 

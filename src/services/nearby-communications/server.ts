@@ -13,7 +13,7 @@ export type ClientToServer<T> = ServerToClient<T> & {
 }
 export class ServerSocket {
   events = {} as Record<string, Hook>
-  state = 'disconnected'
+  state: 'disconnected' | 'connected' = 'disconnected'
   onDisconnect = new Hook()
   latestPing = Date.now()
   activeTimers = new Set<number>()
@@ -87,14 +87,14 @@ export class Server {
   private endpointConnectionMap = new Map<string, Connection>()
   private authSocketMap = new Map<string, ServerSocket>()
   private unsubscribers = [] as (() => void)[]
-  state = 'disconnected'
+  state: 'stopped' | 'starting' | 'started' | 'stopping' = 'stopped'
   onConnection = new Hook<[ServerSocket]>()
   connAcceptor: (conn: Connection) => boolean = () => true
 
   constructor (public deviceName: string, public serviceId: string, public strategy: Strategy) {}
 
   async connect () {
-    if (this.state === 'disconnected') {
+    if (this.state === 'stopped') {
       this.state = 'starting'
       try {
         this.addHooks()
@@ -102,7 +102,7 @@ export class Server {
         this.state = 'started'
       } catch (err) {
         this.removeHooks()
-        this.state = 'disconnected'
+        this.state = 'stopped'
         throw err
       }
     } else {
@@ -111,7 +111,7 @@ export class Server {
   }
 
   async disconnect () {
-    this.state = 'disconnecting'
+    this.state = 'stopping'
     try {
       for (const socket of this.authSocketMap.values()) {
         await socket.disconnect()
@@ -120,7 +120,7 @@ export class Server {
       this.authSocketMap.clear()
       this.endpointConnectionMap.clear()
       this.removeHooks()
-      this.state = 'disconnected'
+      this.state = 'stopped'
       this.endpointConnectionMap.clear()
       this.authSocketMap.clear()
     } catch (err) {
