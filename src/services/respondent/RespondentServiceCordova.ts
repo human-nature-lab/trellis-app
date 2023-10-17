@@ -435,4 +435,8 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
     throw new Error('Not implemented')
   }
 
+  async listEdges (respondentId: string) {
+    throw new Error('Not implemented')
+  }
+
 }

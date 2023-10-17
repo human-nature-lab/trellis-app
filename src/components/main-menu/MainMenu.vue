@@ -1,3 +1,319 @@
+<script setup lang="ts">
+import Vue, { computed, ref } from 'vue'
+import config from '@/config'
+import menuBus from './MenuBus'
+import LoginService from '@/services/login'
+import { routeQueue } from '@/router'
+import SingletonService from '@/services/SingletonService'
+import storage from '@/services/StorageService'
+import global from '@/static/singleton'
+import { APP_ENV } from '@/static/constants'
+import UserPassword from '../user/UserPassword.vue'
+import TrellisModal from '../TrellisModal.vue'
+import GeoLocationService from '@/services/geolocation'
+import { TrellisPermission } from '@/static/permissions.base'
+import StudyService from '@/services/study'
+import { extraModules } from '@/modules'
+import { log, alert } from '@/helpers/log.helper'
+import { useRoute } from 'vue-router/composables'
+import { i18n } from '@/i18n'
+import { userHasPermission } from '@/helpers/user.helper'
+import { isLoggedIn, isWeb } from '@/helpers/singleton.helper'
+import { useVuetify } from '@/plugins/vuetify'
+
+const vuetify = useVuetify()
+const route = useRoute()
+const showPasswordModal = ref(false)
+const showExtraModal = ref(false)
+const checkpoint = ref(0)
+
+const isDebug = computed(() => {
+  return config.debug || DEV
+})
+const isTestMode = computed(() => {
+  return !!global.study && !global.study.testStudy
+})
+const isCordovaBuild = computed(() => {
+  return config.appEnv === APP_ENV.CORDOVA
+})
+const isInterview = computed(() => {
+  return route.name === 'Interview' || route.name === 'InterviewPreview'
+})
+const enabledModules = computed(() => {
+  console.log('extraModules changed', extraModules)
+  return Object.values(extraModules).filter(m => m.enabled())
+})
+const extraModulesEnabled = computed(() => {
+  return isCordovaBuild.value && enabledModules.value.length > 0
+})
+
+function copyCurrentLocation () {
+  try {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      log({
+        severity: 'info',
+        message: 'information',
+      })
+      log({
+        severity: 'debug',
+        message: 'debugging',
+      })
+      alert('success', 'Text copied to clipboard!', { color: 'info', top: true })
+    }).catch(err => {
+      log(err)
+      alert('error', `Unable to copy to clipboard. ${window.location.href}`, { timeout: 0 })
+    })
+  } catch (err) {
+    log(err)
+    alert('error', `Unable to copy to clipboard. ${window.location.href}`, { timeout: 0 })
+  }
+}
+
+function refresh () {
+  window.location.reload()
+}
+async function logout () {
+  await LoginService.logout()
+  routeQueue.redirect({ name: 'Login' })
+}
+function toggleDarkTheme () {
+  const isDark = SingletonService.get('darkTheme')
+  vuetify.theme.dark = !isDark
+  SingletonService.setDarkTheme(!isDark)
+}
+
+let rippleDirective
+function toggleBatterySaver () {
+  global.cpuOptimized = !global.cpuOptimized
+  if (global.cpuOptimized) {
+    rippleDirective = Vue.directive('ripple')
+    Vue.directive('ripple', {})
+  } else {
+    Vue.directive('ripple', rippleDirective)
+  }
+}
+function toggleGPSWatch () {
+  global.watchGPS = !global.watchGPS
+  if (global.watchGPS) {
+    GeoLocationService.watchPosition()
+  } else {
+    GeoLocationService.clearWatch()
+  }
+}
+function toggleOffline () {
+  const offline = !SingletonService.get('offline')
+  storage.clear()
+  SingletonService.setOnlineOffline(offline)
+  setTimeout(() => refresh(), 50)
+}
+async function toggleTestMode () {
+  if (isTestMode.value) {
+    const study = await StudyService.getProdStudyFromTest(global.study.id)
+    if (study) {
+      SingletonService.setCurrentStudy(study)
+    }
+  } else {
+    SingletonService.setCurrentStudy(global.study.testStudy)
+  }
+  setTimeout(() => refresh(), 50)
+}
+function changePassword () {
+  showPasswordModal.value = true
+}
+function openStudySelector () {
+  routeQueue.pushAndReturnToCurrent({ name: 'StudySelector' })
+}
+function openLocaleSelector () {
+  routeQueue.pushAndReturnToCurrent({ name: 'LocaleSelector' })
+}
+function logCheckpoint () {
+  console.log('TRELLIS CHECKPOINT:', checkpoint.value)
+  checkpoint.value++
+}
+
+function emit (event, ...args) {
+  menuBus.$emit(event, ...args)
+}
+
+const sections = computed(() => {
+  return [{
+    items: [{
+      title: i18n.t('respondents'),
+      icon: 'mdi-account-group',
+      to: { name: 'RespondentsSearch' },
+    }, {
+      title: i18n.t('locations'),
+      icon: 'mdi-map-marker',
+      to: { name: 'GeoSearch' },
+    }, {
+      showIf: !global.offline,
+      to: { name: 'SyncAdmin' },
+      icon: 'mdi-sync',
+      title: i18n.t('sync'),
+    }, {
+      showIf: global.offline,
+      to: { name: 'Sync' },
+      icon: 'mdi-sync',
+      title: i18n.t('sync'),
+    }, {
+      showIf: extraModulesEnabled.value,
+      icon: 'mdi-wifi',
+      click () {
+        console.log('TODO: ')
+        showExtraModal.value = true
+      },
+      title: i18n.t('extra_modules'),
+    }, {
+      showIf: isCordovaBuild.value,
+      to: { name: 'HistoryView' },
+      icon: 'mdi-history',
+      title: i18n.t('history'),
+    }],
+  }, {
+    title: i18n.t('admin'),
+    showIf: isWeb.value,
+    items: [{
+      to: { name: 'Home' },
+      icon: 'mdi-chart-line',
+      title: i18n.t('dashboard'),
+    }, {
+      to: { name: 'Users' },
+      icon: 'mdi-account-box-multiple',
+      title: i18n.t('users'),
+      showIf: userHasPermission(TrellisPermission.VIEW_USERS),
+    }, {
+      to: { name: 'Forms' },
+      icon: 'mdi-form-select',
+      title: i18n.t('forms'),
+    }, {
+      to: { name: 'Reports' },
+      icon: 'mdi-content-save',
+      title: i18n.t('reports'),
+      showIf: userHasPermission(TrellisPermission.VIEW_REPORTS),
+    }, {
+      to: { name: 'DataImport' },
+      icon: 'mdi-upload',
+      title: i18n.t('data_import'),
+      showIf: userHasPermission(TrellisPermission.IMPORT_RESPONDENTS),
+    }, {
+      to: { name: 'Devices' },
+      icon: 'mdi-cellphone-link',
+      title: i18n.t('devices'),
+      showIf: userHasPermission(TrellisPermission.VIEW_DEVICES),
+    }, {
+      to: { name: 'Studies' },
+      icon: 'mdi-book-open-blank-variant',
+      title: i18n.t('studies'),
+      showIf: userHasPermission(TrellisPermission.VIEW_STUDIES),
+    }, {
+      to: { name: 'GeoTypes' },
+      icon: 'mdi-map-plus',
+      title: i18n.t('geo_types'),
+    }],
+  }, {
+    title: 'settings',
+    items: [{
+      click: openStudySelector,
+      icon: 'mdi-clipboard-text',
+      title: i18n.t('change_study'),
+    }, {
+      click: openLocaleSelector,
+      title: i18n.t('change_locale'),
+      icon: 'mdi-web',
+    }, {
+      showIf: !!global.study,
+      click: toggleTestMode,
+      icon: isTestMode.value ? 'mdi-test-tube' : 'mdi-test-tube-empty',
+      title: i18n.t('test_mode'),
+      switchColor: 'yellow',
+      iconColor: null,
+      switchValue: isTestMode.value,
+    }, {
+      click: toggleDarkTheme,
+      icon: 'mdi-theme-light-dark',
+      title: i18n.t('toggle_dark'),
+      switchColor: 'green',
+      iconColor: null,
+      switchValue: global.darkTheme,
+    }, {
+      click: toggleBatterySaver,
+      title: i18n.t('battery_saver'),
+      icon: 'mdi-battery-alert',
+      switchColor: 'green',
+      switchValue: global.cpuOptimized,
+      showIf: isCordovaBuild.value,
+    }, {
+      click: toggleGPSWatch,
+      title: i18n.t('track_location'),
+      iconColor: global.watchGPS ? (global.gpsFixed ? 'green' : 'yellow') : null,
+      switchColor: global.watchGPS ? (global.gpsFixed ? 'green' : 'yellow') : null,
+      icon: global.watchGPS
+        ? (global.gpsFixed ? 'mdi-crosshairs-gps' : 'mdi-crosshairs')
+        : 'mdi-crosshairs-question',
+      switchValue: global.watchGPS,
+      showIf: isCordovaBuild.value,
+    }],
+  }, {
+    title: i18n.t('general'),
+    items: [{
+      to: { path: '/documentation/' },
+      icon: 'mdi-help-circle',
+      title: i18n.t('documentation'),
+    }, {
+      to: { name: 'Info' },
+      icon: 'mdi-information',
+      title: i18n.t('information'),
+    }, {
+      showIf: isInterview.value,
+      click: () => emit('showConditionTags'),
+      icon: 'mdi-tag',
+      title: i18n.t('condition_tags'),
+    }, {
+      showIf: isLoggedIn.value,
+      click: logout,
+      icon: 'mdi-exit-to-app',
+      title: i18n.t('logout'),
+    }, {
+      showIf: isLoggedIn.value,
+      click: changePassword,
+      icon: 'mdi-backup-restore',
+      title: i18n.t('change_password'),
+    }, {
+      to: { name: 'ServerConfig' },
+      icon: 'mdi-wrench',
+      title: i18n.t('server_config'),
+      showIf: isWeb.value && userHasPermission(TrellisPermission.VIEW_CONFIG),
+    }, {
+      click: logCheckpoint,
+      icon: 'mdi-flag',
+      title: 'Log Checkpoint',
+    }, {
+      to: { name: 'Permissions' },
+      icon: 'mdi-lock',
+      title: i18n.t('permissions'),
+      showIf: isWeb.value && userHasPermission(TrellisPermission.VIEW_PERMISSIONS),
+    }, {
+      click: refresh,
+      icon: 'mdi-refresh',
+      title: i18n.t('refresh_app'),
+    }, {
+      showIf: isDebug.value,
+      to: { name: 'ServiceTesting' },
+      icon: 'mdi-check-all',
+      title: 'Service Testing',
+    }],
+  }]
+})
+
+const visibleSections = computed(() => sections.value
+  .filter(s => s.showIf !== false || !s.items.length)
+  .map(s => {
+    s.items = s.items.filter(i => i.showIf !== false)
+    return s
+  }))
+
+</script>
+
 <template>
   <v-flex>
     <v-list dense>
@@ -17,10 +333,7 @@
           {{ $t('logged_in_as', [global.user.username]) }}
         </v-flex>
       </v-toolbar>
-      <template
-        v-for="section in sections"
-        v-if="section.showIf !== false"
-      >
+      <template v-for="section in visibleSections">
         <v-divider :key="section.title + 'divider'" />
         <v-list
           dense
@@ -34,7 +347,6 @@
           <v-list-item
             v-for="item in section.items"
             :key="item.title"
-            v-if="item.showIf !== false"
             @click="(e) => item.click && item.click(e)"
             exact
             v-bind="{to: item.to ? item.to : null}"
@@ -68,294 +380,22 @@
         @done="showPasswordModal = false"
       />
     </TrellisModal>
+    <TrellisModal
+      v-model="showExtraModal"
+      :title="$t('extra_modules')"
+    >
+      <v-list>
+        <v-list-item
+          v-for="item in enabledModules"
+          :key="item.label"
+          :to="item.to"
+        >
+          {{ item.label }}
+        </v-list-item>
+      </v-list>
+    </TrellisModal>
   </v-flex>
 </template>
-
-<script>
-import Vue from 'vue'
-import config from '../../config'
-import menuBus from './MenuBus'
-import LoginService from '../../services/login'
-import { routeQueue } from '../../router'
-import SingletonService from '../../services/SingletonService'
-import storage from '../../services/StorageService'
-import global from '../../static/singleton'
-import { APP_ENV } from '../../static/constants'
-import UserPassword from '../user/UserPassword.vue'
-import TrellisModal from '../TrellisModal.vue'
-import IsAdminMixin from '../../mixins/IsAdminMixin'
-import IsLoggedInMixin from '../../mixins/IsLoggedInMixin'
-import GeoLocationService from '../../services/geolocation'
-import PermissionMixin from '../../mixins/PermissionMixin'
-import { TrellisPermission } from '../../static/permissions.base'
-import StudyService from '../../services/study'
-
-export default {
-  mixins: [IsAdminMixin, IsLoggedInMixin, PermissionMixin],
-  components: { UserPassword, TrellisModal },
-  name: 'MainMenu',
-  data: () => ({
-    global,
-    showPasswordModal: false,
-    checkpoint: 0,
-  }),
-  methods: {
-    refresh () {
-      window.location.reload(true)
-    },
-    emit (eventName, ...args) {
-      menuBus.$emit(eventName, ...args)
-    },
-    copyCurrentLocation () {
-      try {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-          this.log({
-            severity: 'info',
-            message: 'information',
-          })
-          this.log({
-            severity: 'debug',
-            message: 'debugging',
-          })
-          this.alert('success', 'Text copied to clipboard!', { color: 'info', top: true })
-        }).catch(err => {
-          this.log(err)
-          this.alert('error', `Unable to copy to clipboard. ${window.location.href}`, { timeout: 0 })
-        })
-      } catch (err) {
-        this.log(err)
-        this.alert('error', `Unable to copy to clipboard. ${window.location.href}`, { timeout: 0 })
-      }
-    },
-    async logout () {
-      await LoginService.logout()
-      routeQueue.redirect({ name: 'Login' })
-    },
-    toggleDarkTheme () {
-      const isDark = SingletonService.get('darkTheme')
-      this.$vuetify.theme.dark = !isDark
-      SingletonService.setDarkTheme(!isDark)
-    },
-    toggleBatterySaver () {
-      this.global.cpuOptimized = !this.global.cpuOptimized
-      if (this.global.cpuOptimized) {
-        this.rippleDirective = Vue.directive('ripple')
-        Vue.directive('ripple', {})
-      } else {
-        Vue.directive('ripple', this.rippleDirective)
-      }
-    },
-    toggleGPSWatch () {
-      this.global.watchGPS = !this.global.watchGPS
-      if (this.global.watchGPS) {
-        GeoLocationService.watchPosition()
-      } else {
-        GeoLocationService.clearWatch()
-      }
-    },
-    toggleOffline () {
-      const offline = !SingletonService.get('offline')
-      storage.clear()
-      SingletonService.setOnlineOffline(offline)
-      setTimeout(() => this.refresh(), 50)
-    },
-    async toggleTestMode () {
-      if (this.isTestMode) {
-        const study = await StudyService.getProdStudyFromTest(this.global.study.id)
-        if (study) {
-          SingletonService.setCurrentStudy(study)
-        }
-      } else {
-        SingletonService.setCurrentStudy(this.global.study.testStudy)
-      }
-      setTimeout(() => this.refresh(), 50)
-    },
-    changePassword () {
-      this.showPasswordModal = true
-    },
-    openStudySelector () {
-      routeQueue.pushAndReturnToCurrent({ name: 'StudySelector' })
-    },
-    openLocaleSelector () {
-      routeQueue.pushAndReturnToCurrent({ name: 'LocaleSelector' })
-    },
-    logCheckpoint () {
-      console.log('TRELLIS CHECKPOINT:', this.checkpoint)
-      this.checkpoint++
-    },
-  },
-  computed: {
-    isDebug () {
-      return config.debug
-    },
-    isTestMode () {
-      return !!this.global.study && !this.global.study.testStudy
-    },
-    isCordovaBuild () {
-      return config.appEnv === APP_ENV.CORDOVA
-    },
-    isInterview () {
-      return this.$route.name === 'Interview' || this.$route.name === 'InterviewPreview'
-    },
-    sections () {
-      return [{
-        items: [{
-          title: this.$t('respondents'),
-          icon: 'mdi-account-group',
-          to: { name: 'RespondentsSearch' },
-        }, {
-          title: this.$t('locations'),
-          icon: 'mdi-map-marker',
-          to: { name: 'GeoSearch' },
-        }, {
-          showIf: !this.global.offline,
-          to: { name: 'SyncAdmin' },
-          icon: 'mdi-sync',
-          title: this.$t('sync'),
-        }, {
-          showIf: this.global.offline,
-          to: { name: 'Sync' },
-          icon: 'mdi-sync',
-          title: this.$t('sync'),
-        }],
-      }, {
-        title: this.$t('admin'),
-        showIf: this.isWeb,
-        items: [{
-          to: { name: 'Home' },
-          icon: 'mdi-chart-line',
-          title: this.$t('dashboard'),
-        }, {
-          to: { name: 'Users' },
-          icon: 'mdi-account-box-multiple',
-          title: this.$t('users'),
-          showIf: this.hasPermission(TrellisPermission.VIEW_USERS),
-        }, {
-          to: { name: 'Forms' },
-          icon: 'mdi-form-select',
-          title: this.$t('forms'),
-        }, {
-          to: { name: 'Reports' },
-          icon: 'mdi-content-save',
-          title: this.$t('reports'),
-          showIf: this.hasPermission(TrellisPermission.VIEW_REPORTS),
-        }, {
-          to: { name: 'DataImport' },
-          icon: 'mdi-upload',
-          title: this.$t('data_import'),
-          showIf: this.hasPermission(TrellisPermission.IMPORT_RESPONDENTS),
-        }, {
-          to: { name: 'Devices' },
-          icon: 'mdi-cellphone-link',
-          title: this.$t('devices'),
-          showIf: this.hasPermission(TrellisPermission.VIEW_DEVICES),
-        }, {
-          to: { name: 'Studies' },
-          icon: 'mdi-book-open-blank-variant',
-          title: this.$t('studies'),
-          showIf: this.hasPermission(TrellisPermission.VIEW_STUDIES),
-        }, {
-          to: { name: 'GeoTypes' },
-          icon: 'mdi-map-plus',
-          title: this.$t('geo_types'),
-        }],
-      }, {
-        title: 'settings',
-        items: [{
-          click: this.openStudySelector,
-          icon: 'mdi-clipboard-text',
-          title: this.$t('change_study'),
-        }, {
-          click: this.openLocaleSelector,
-          title: this.$t('change_locale'),
-          icon: 'mdi-web',
-        }, {
-          showIf: !!this.global.study,
-          click: this.toggleTestMode,
-          icon: this.isTestMode ? 'mdi-test-tube' : 'mdi-test-tube-empty',
-          title: this.$t('test_mode'),
-          switchColor: 'yellow',
-          iconColor: null,
-          switchValue: this.isTestMode,
-        }, {
-          click: this.toggleDarkTheme,
-          icon: 'mdi-theme-light-dark',
-          title: this.$t('toggle_dark'),
-          switchColor: 'green',
-          iconColor: null,
-          switchValue: this.global.darkTheme,
-        }, {
-          click: this.toggleBatterySaver,
-          title: this.$t('battery_saver'),
-          icon: 'mdi-battery-alert',
-          switchColor: 'green',
-          switchValue: this.global.cpuOptimized,
-          showIf: this.isCordovaBuild,
-        }, {
-          click: this.toggleGPSWatch,
-          title: this.$t('track_location'),
-          iconColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green' : 'yellow') : null,
-          switchColor: this.global.watchGPS ? (this.global.gpsFixed ? 'green' : 'yellow') : null,
-          icon: this.global.watchGPS
-            ? (this.global.gpsFixed ? 'mdi-crosshairs-gps' : 'mdi-crosshairs')
-            : 'mdi-crosshairs-question',
-          switchValue: this.global.watchGPS,
-          showIf: this.isCordovaBuild,
-        }],
-      }, {
-        title: this.$t('general'),
-        items: [{
-          to: { path: '/documentation/' },
-          icon: 'mdi-help-circle',
-          title: this.$t('documentation'),
-        }, {
-          to: { name: 'Info' },
-          icon: 'mdi-information',
-          title: this.$t('information'),
-        }, {
-          showIf: this.isInterview,
-          click: () => this.emit('showConditionTags'),
-          icon: 'mdi-tag',
-          title: this.$t('condition_tags'),
-        }, {
-          showIf: this.isLoggedIn,
-          click: this.logout,
-          icon: 'mdi-exit-to-app',
-          title: this.$t('logout'),
-        }, {
-          showIf: this.isLoggedIn,
-          click: this.changePassword,
-          icon: 'mdi-backup-restore',
-          title: this.$t('change_password'),
-        }, {
-          to: { name: 'ServerConfig' },
-          icon: 'mdi-wrench',
-          title: this.$t('server_config'),
-          showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_CONFIG),
-        }, {
-          click: this.logCheckpoint,
-          icon: 'mdi-flag',
-          title: 'Log Checkpoint',
-        }, {
-          to: { name: 'Permissions' },
-          icon: 'mdi-lock',
-          title: this.$t('permissions'),
-          showIf: this.isWeb && this.hasPermission(TrellisPermission.VIEW_PERMISSIONS),
-        }, {
-          click: this.refresh,
-          icon: 'mdi-refresh',
-          title: this.$t('refresh_app'),
-        }, {
-          showIf: this.isDebug,
-          to: { name: 'ServiceTesting' },
-          icon: 'mdi-check-all',
-          title: 'Service Testing',
-        }],
-      }]
-    },
-  },
-}
-</script>
 
 <style scoped>
   .list__tile__title {

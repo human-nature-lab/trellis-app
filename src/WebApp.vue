@@ -7,7 +7,8 @@
       :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
       <v-navigation-drawer
         v-model="global.menuDrawer.open"
-        app>
+        app
+      >
         <MainMenu />
       </v-navigation-drawer>
       <v-app-bar
@@ -25,7 +26,7 @@
         </v-toolbar-title>
         <v-toolbar-title v-if="global.study" class="study">
           <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-btn 
                 class="subheading"
                 v-on="on"
@@ -44,7 +45,7 @@
         </v-toolbar-title>
         <v-spacer />
         <v-tooltip left>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn 
               class="subheading"
               icon
@@ -57,14 +58,14 @@
           <span>{{$t('change_locale')}}</span>
         </v-tooltip>
         <v-tooltip
-          v-if="global.secondaryDrawer.isEnabled"
+          v-if="secondaryDrawerIcon"
           left>
-          <template v-slot:activator="{on, attrs}">
+          <template #activator="{on, attrs}">
             <v-icon
               v-on="on"
               v-bind="attrs"
-              @click.stop="global.secondaryDrawer.onClick">
-              {{global.secondaryDrawer.icon || 'mdi-magnify'}}
+              @click.stop="secondaryDrawerOnClick">
+              {{ secondaryDrawerIcon }}
             </v-icon>
           </template>
           <span>{{$t('view_current_documentation')}}</span>
@@ -137,6 +138,7 @@
   import PermissionMixin from './mixins/PermissionMixin'
   import Maintenance from './components/Maintenance.vue'
   import maintenanceService from './services/maintenance'
+  import { secondaryDrawerIcon, secondaryDrawerOnClick } from '@/helpers/drawer.helper'
 
   export default {
     name: 'WebApp',
@@ -150,7 +152,9 @@
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
         alerts: AlertService.alerts,
         cpuOptimized: true,
-        serverMode: config.serverMode
+        serverMode: config.serverMode,
+        secondaryDrawerIcon,
+        secondaryDrawerOnClick,
       }
     },
     async created () {

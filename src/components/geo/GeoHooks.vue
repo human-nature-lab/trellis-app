@@ -146,6 +146,7 @@ export default Vue.extend({
         }
         this.hasHooks = !!Object.keys(this.hooks).length
       } catch (err) {
+        this.alert('error', err, { timeout: 0 })
         this.logError(err)
       } finally {
         this.loading = false

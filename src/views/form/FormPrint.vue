@@ -46,6 +46,7 @@
       v-for="section in form.sections"
       :key="section.id"
       class="section mt-2"
+      cols="12"
     >
       <v-row
         v-if="opts.sectionHeaders"
@@ -112,7 +113,7 @@
               :show-numbers="opts.questionNumbers"
               :show-choices="opts.choices"
               :show-parameters="opts.parameters"
-              :show-conditions="opts.conditions"
+              :show-conditions="opts.assignments"
               class="mb-2"
             />
           </v-card>
@@ -135,7 +136,7 @@ import ConditionTag from '@/entities/trellis/ConditionTag'
 import ConditionTagService from '@/services/condition-tag'
 import QuestionEntity from '@/entities/trellis/Question'
 import Question from '@/components/print/Question.vue'
-import { DocService } from '@/services/doc'
+import { DocService, DocxOpts } from '@/services/doc'
 import { saveAs } from 'file-saver'
 
 export default Vue.extend({
@@ -152,14 +153,14 @@ export default Vue.extend({
       opts: {
         choices: true,
         parameters: true,
-        conditions: true,
+        assignments: true,
         pageTitles: true,
         pageHeaders: true,
         pageSkips: true,
         questionNumbers: true,
         sectionHeaders: true,
         sectionIndicators: true,
-      },
+      } as DocxOpts,
     }
   },
   created () {

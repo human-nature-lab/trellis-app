@@ -1,5 +1,8 @@
 <template>
-  <v-container fill-height class="pa-0">
+  <v-container
+    fill-height
+    class="pa-0"
+  >
     <geo-search
       :show-add-location-button="!adding && canUserAddChild"
       @add="addLocation"
@@ -22,6 +25,8 @@ import GeoService from '@/services/geo'
 import DocsFiles from '@/components/documentation/DocsFiles'
 import DocsLinkMixin from '@/mixins/DocsLinkMixin'
 import { routeQueue } from '@/router'
+import { computedTitle } from '@/router/history'
+import TranslationService from '@/services/TranslationService'
 
 export default {
   name: 'Geo',
@@ -29,11 +34,18 @@ export default {
   data () {
     return {
       parentGeoId: null,
+      parentGeo: null,
       adding: false,
       canUserAddChild: false,
     }
   },
   created () {
+    computedTitle('GeoSearch', () => {
+      if (this.parentGeoName) {
+        return { key: 'location_search_in', args: [this.parentGeoName] }
+      }
+      return { key: 'location_search' }
+    })
     if (this.$route.query.filters) {
       this.parentGeoId = JSON.parse(this.$route.query.filters).parent
       this.setCanUserAddChild()
@@ -63,14 +75,28 @@ export default {
       this.setCanUserAddChild()
     },
     async setCanUserAddChild () {
+      if (!this.parentGeoId) {
+        this.canUserAddChild = false
+        return
+      }
       try {
-        const parentGeo = await GeoService.getGeoById(this.parentGeoId)
-        this.canUserAddChild = (parentGeo && parentGeo.hasOwnProperty('geoType')) ? parentGeo.geoType.canUserAddChild : false
+        this.parentGeo = await GeoService.getGeoById(this.parentGeoId)
+        console.log('loaded parent geo', this.parentGeo)
+        this.canUserAddChild = (this.parentGeo && this.parentGeo.hasOwnProperty('geoType')) ? this.parentGeo.geoType.canUserAddChild : false
       } catch (err) {
         if (this.isNotAuthError(err)) {
           this.logError(err)
         }
       }
+    },
+  },
+  computed: {
+    parentGeoName () {
+      if (!this.parentGeo) {
+        return null
+      }
+      const translation = TranslationService.getAny(this.parentGeo.nameTranslation)
+      return (translation) || '[No translation]'
     },
   },
 }

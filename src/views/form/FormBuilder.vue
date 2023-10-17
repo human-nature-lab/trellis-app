@@ -138,6 +138,7 @@ export default {
       try {
         const section = await builderService.createSection(this.$route.params.formId, { sort_order: this.builder.form.sections.length })
         this.builder.form.sections.push(section)
+        Vue.set(this.builder.form, 'sections', this.builder.form.sections)
       } catch (err) {
         this.logError(err)
       } finally {

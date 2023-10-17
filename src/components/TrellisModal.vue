@@ -5,7 +5,7 @@
     v-on="$listeners"
     :value="value"
     @input="$emit('input', $event)"
-    scrollable
+    class="d-flex flex-column"
   >
     <ScrollContainer
       :elevation="2"

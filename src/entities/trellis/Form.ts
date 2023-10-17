@@ -12,7 +12,7 @@ export default class Form extends TimestampedSoftDelete {
   @PrimaryGeneratedColumn('uuid') @Serializable
   id: string
 
-  @Column({ select: false, type: 'uuid' }) @Serializable
+  @Column({ type: 'uuid' }) @Serializable
   formMasterId: string
 
   @Column({ select: false, type: 'uuid' }) @Serializable

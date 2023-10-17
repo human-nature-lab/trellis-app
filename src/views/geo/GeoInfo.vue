@@ -16,10 +16,18 @@
           </v-btn>
         </Permission>
         <v-btn
-          @click.stop="showGeoMap"
+          v-if="geo"
+          :to="geoMapSearchRoute(geo.id)"
           icon
         >
           <v-icon>mdi-map</v-icon>
+        </v-btn>
+        <v-btn
+          v-if="geo"
+          :to="geoSearchRoute(geo.id)"
+          icon
+        >
+          <v-icon>mdi-magnify</v-icon>
         </v-btn>
         <v-btn @click="viewRespondents">
           {{ $t('respondents') }}
@@ -130,6 +138,8 @@ import router, { routeQueue } from '@/router'
 import Geo from '@/entities/trellis/Geo'
 import { SearchFilter } from '@/services/respondent/RespondentServiceInterface'
 import DocsFiles from '@/components/documentation/DocsFiles'
+import { computedTitle } from '@/router/history'
+import { geoSearchRoute, geoMapSearchRoute } from '@/router/util'
 
 export default Vue.extend({
   name: 'GeoInfo',
@@ -160,7 +170,17 @@ export default Vue.extend({
       showEditName: false,
     }
   },
+  created () {
+    computedTitle('Geo', () => {
+      if (this.translated) {
+        return { key: 'geo_info_for', args: [this.translated] }
+      }
+      return { key: 'geo_info' }
+    })
+  },
   methods: {
+    geoSearchRoute,
+    geoMapSearchRoute,
     hydrate: async function (geo: Geo) {
       if (!geo) {
         return this.logError(new Error('Unable to load location'))
@@ -237,14 +257,6 @@ export default Vue.extend({
         this.log(err)
         this.alert('error', this.$t('failed_resource_delete', [this.geo.id]), { timeout: 0 })
       }
-    },
-    showGeoMap () {
-      routeQueue.redirect({
-        name: 'GeoSearchWithMap',
-        params: {
-          geoId: this.geo.id,
-        },
-      })
     },
   },
 })

@@ -1,7 +1,7 @@
 import EdgeServiceInterface, { SourceTarget } from './EdgeServiceInterface'
 import Edge from '../../entities/trellis/Edge'
 import DatabaseService from '../database'
-import { In } from 'typeorm'
+import { In, IsNull } from 'typeorm'
 import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
 export default class EdgeServiceCordova implements EdgeServiceInterface {
   public cache = new Map<string, Edge>()
@@ -57,6 +57,7 @@ export default class EdgeServiceCordova implements EdgeServiceInterface {
     const resPhotos = await photoRepo.find({
       where: {
         respondentId: In(respondentIds),
+        deletedAt: IsNull(),
       },
       relations: [
         'photo',
@@ -66,14 +67,16 @@ export default class EdgeServiceCordova implements EdgeServiceInterface {
       },
     })
     for (const p of resPhotos) {
-      if (sourceMap.has(p.respondentId)) {
-        for (const e of sourceMap.get(p.respondentId)) {
-          e.sourceRespondent.photos.push(p.photo)
+      if (!p.photo.deletedAt) {
+        if (sourceMap.has(p.respondentId)) {
+          for (const e of sourceMap.get(p.respondentId)) {
+            e.sourceRespondent.photos.push(p.photo)
+          }
         }
-      }
-      if (targetMap.has(p.respondentId)) {
-        for (const e of targetMap.get(p.respondentId)) {
-          e.targetRespondent.photos.push(p.photo)
+        if (targetMap.has(p.respondentId)) {
+          for (const e of targetMap.get(p.respondentId)) {
+            e.targetRespondent.photos.push(p.photo)
+          }
         }
       }
     }

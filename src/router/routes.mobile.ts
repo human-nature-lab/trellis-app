@@ -5,17 +5,21 @@ import DeviceKeyGuard from './guards/DeviceKeyGuard'
 import { guardQueue } from './GuardQueue'
 import sharedRoutes from './shared.routes'
 import LoginGuard from './guards/LoginGuard'
+import StudyGuard from './guards/StudyGuard'
+import { extraRoutes } from '@/modules'
 
 const Sync = () => import(/* webpackChunkName: "sync" */'@/views/sync/Sync.vue')
 const Logs = () => import(/* webpackChunkName: "logs" */'@/views/info/Logs.vue')
 const Storage = () => import(/* webpackChunkName: "storage" */'@/views/info/Storage.vue')
 const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'@/views/setup/RegisterDevice.vue')
 const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'@/views/setup/ServerIPConfig.vue')
+const HistoryView = () => import(/* webpackChunkName: "history" */'@/views/HistoryView.vue')
 
 export default sharedRoutes.concat([{
   path: '/',
   name: 'Home',
   component: Sync,
+  default: true,
   beforeEnter: guardQueue([LoginGuard, ServerConfigGuard, DeviceKeyGuard]),
 }, {
   path: '/sync',
@@ -40,4 +44,12 @@ export default sharedRoutes.concat([{
   name: 'ConfigureServer',
   component: ConfigureServer,
   beforeEnter: guardQueue([AlreadyConfiguredServerGuard]),
-}])
+}, {
+  path: '/history',
+  name: 'HistoryView',
+  component: HistoryView,
+  beforeEnter: guardQueue([LoginGuard, StudyGuard]),
+}]).concat(extraRoutes.map(r => ({
+  ...r,
+  beforeEnter: guardQueue([LoginGuard, StudyGuard]),
+})))

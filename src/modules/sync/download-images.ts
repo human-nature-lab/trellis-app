@@ -1,4 +1,3 @@
-import { file } from '@/cordova/file'
 import { insomnia } from '@/cordova/insomnia'
 import { i18n } from '@/i18n'
 import { authenticateDevice, checkConnection, compareTime } from './common'

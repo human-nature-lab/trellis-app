@@ -2,48 +2,41 @@
   <TrellisModal
     :value="value"
     @input="close"
-    :title="$t('add_location')"
-  >
-    <v-card-text>
-      <v-layout>
-        <v-flex>
-          Location
-          <v-chip v-if="selectedGeo">
-            <AsyncTranslationText :translation="selectedGeo.nameTranslation" />
-          </v-chip>
-        </v-flex>
-        <v-spacer />
-        <v-btn @click="showGeoSearch=true">
-          {{ selectedGeo ? $t('select_location') : $t('add_location') }}
-        </v-btn>
-      </v-layout>
-      <v-layout>
-        <v-checkbox
-          v-model="isCurrent"
-          :label="$t('current_geo_location')"
-        />
-        <v-spacer />
-        <v-btn
-          @click="done"
-          :disabled="!selectedGeo"
-        >
-          {{ $t('save') }}
-        </v-btn>
-      </v-layout>
-    </v-card-text>
-    <TrellisModal
-      v-model="showGeoSearch"
-      :title="$t('location_search')"
-    >
-      <GeoSearch
-        :show-cart="true"
-        :limit="1"
-        :is-selectable="geoSelectionFilter"
-        :should-update-route="false"
-        @doneSelecting="geoSelected"
-      />
+    :title="$t('add_location')">
+    <v-card>
+      <v-card-text>
+          <v-layout>
+            <v-flex>
+              Location
+              <v-chip v-if="selectedGeo">
+                <AsyncTranslationText :translation="selectedGeo.nameTranslation" />
+              </v-chip>
+            </v-flex>
+            <v-spacer />
+            <v-btn @click="showGeoSearch=true">
+              {{selectedGeo ? $t('select_location') : $t('add_location')}}
+            </v-btn>
+          </v-layout>
+          <v-layout>
+            <v-checkbox v-model="isCurrent" :label="$t('current_geo_location')" />
+            <v-spacer></v-spacer>
+            <v-btn @click="done" :disabled="!selectedGeo">
+              {{$t('save')}}
+            </v-btn>
+          </v-layout>
+      </v-card-text>
+    </v-card>
+    <TrellisModal v-model="showGeoSearch" :title="$t('location_search')">
+      <v-card>
+        <GeoSearch
+          :showCart="true"
+          :limit="1"
+          :isSelectable="geoSelectionFilter"
+          :should-update-route="false"
+          @doneSelecting="geoSelected" />
+      </v-card>
     </TrellisModal>
-  </TrellisModal>
+  </v-dialog>
 </template>
 
 <script lang="ts">

@@ -3,6 +3,7 @@ import DeviceService from '@/services/device'
 import { StepController } from '../controller'
 import DatabaseService from '@/services/database'
 import { i18n } from '@/i18n'
+import config from '@/config'
 
 export async function authenticateDevice (ctrl: StepController) {
   const deviceId = await DeviceService.getUUID()
@@ -21,10 +22,12 @@ export async function checkConnection (ctrl: StepController) {
 }
 
 export async function compareTime () {
-  const deviceId = await DeviceService.getUUID()
-  const serverTime = await SyncService.getServerTime(deviceId)
-  const now = new Date()
-  if (Math.abs(now.getTime() - serverTime.getTime()) > 5 * 60 * 1000) {
-    throw new Error('server time does not match device time')
+  if (config.checkServerTime) {
+    const deviceId = await DeviceService.getUUID()
+    const serverTime = await SyncService.getServerTime(deviceId)
+    const now = new Date()
+    if (Math.abs(now.getTime() - serverTime.getTime()) > 5 * 60 * 1000) {
+      throw new Error('server time does not match device time')
+    }
   }
 }

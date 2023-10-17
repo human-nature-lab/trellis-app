@@ -2,21 +2,12 @@ import * as VueRouter from 'vue-router'
 import { copyWhitelist } from '../services/JSONUtil'
 import StorageService from '../services/StorageService'
 import { routerReady } from './index'
-
-export type QueuableRoute = {
-  name?: string
-  path?: string
-  query?: {
-    [key: string]: any
-    q?: string[]
-  }
-  params?: {[key: string]: any}
-}
+import { pushHistory } from './history'
+import { QueuableRoute, routesAreSame } from './util'
 
 const CURRENT_ROUTE_PROPS = ['name', 'path', 'params', 'query']
 
 export class RouteQueue {
-
   private storageKey = 'route-queue'
   private queue: QueuableRoute[]
   public currentRoute: QueuableRoute
@@ -44,6 +35,7 @@ export class RouteQueue {
 
   private afterEach = (to: VueRouter.Route, from: VueRouter.Route) => {
     this.setCurrentRoute(to)
+    pushHistory(to)
   }
 
   private saveQueue () {
@@ -51,19 +43,11 @@ export class RouteQueue {
   }
 
   private isAlreadyQueued (route: QueuableRoute): boolean {
-    return this.queue.findIndex(r => this.routesAreSame(route, r)) > -1
+    return this.queue.findIndex(r => routesAreSame(route, r)) > -1
   }
 
   private isCurrentRoute (route: QueuableRoute): boolean {
-    return this.router.currentRoute && this.routesAreSame(this.router.currentRoute, route)
-  }
-
-  private routesAreSame (routeA: QueuableRoute, routeB: QueuableRoute): boolean {
-    if (routeA === routeB) return true
-    if (!routeA || !routeB) return false
-    if (routeA.name !== routeB.name) return false
-    if (routeA.path !== routeB.path) return false
-    return true
+    return this.router.currentRoute && routesAreSame(this.router.currentRoute, route)
   }
 
   private setCurrentRoute (route: QueuableRoute) {
@@ -101,7 +85,7 @@ export class RouteQueue {
   }
 
   replaceAndReturnToCurrent (route: QueuableRoute) {
-    if (!this.routesAreSame(this.currentRoute, route)) {
+    if (!routesAreSame(this.currentRoute, route)) {
       const current = copyWhitelist(this.router.currentRoute, CURRENT_ROUTE_PROPS)
       this.unshift(current)
       return this.replace(route)
@@ -154,5 +138,4 @@ export class RouteQueue {
   toString () {
     return this.queue
   }
-
 }

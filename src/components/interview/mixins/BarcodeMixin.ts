@@ -7,7 +7,7 @@ export default {
       return this.isCordova && this.question && !!this.question.questionParameters.find(qp => parseInt(qp.parameterId, 10) === PT.allow_barcode)
     },
     barcodeIcon () {
-      return this.showBarcodeScanner ? 'scanner' : undefined
+      return this.showBarcodeScanner ? 'mdi-barcode' : undefined
     },
   },
   methods: {

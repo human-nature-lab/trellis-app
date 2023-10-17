@@ -194,6 +194,7 @@ import DocsLinkMixin from '@/mixins/DocsLinkMixin'
 import DocsFiles from '@/components/documentation/DocsFiles'
 import TrellisModal from '@/components/TrellisModal.vue'
 import ScrollContainer from '@/components/styles/ScrollContainer.vue'
+import { updateTitle } from '@/router/history'
 
 function hasAnyFilter (filters) {
   for (const key in filters) {
@@ -304,10 +305,8 @@ export default {
       required: false,
     },
   },
-  head: {
-    title: {
-      inner: 'Respondent search',
-    },
+  setup () {
+    updateTitle('RespondentsSearch', { key: 'respondent_search' })
   },
   data () {
     return {

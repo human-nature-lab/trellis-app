@@ -6,6 +6,10 @@
       "file": "C:/Users/wi27/Documents/code/trellis-docker/trellis-app/src/components/forms/FormListTile.vue"
     },
     {
+      "key": "data.translation",
+      "file": "C:/Users/wi27/Documents/code/trellis-docker/trellis-app/src/components/sync/admin/SyncAdmin.vue"
+    },
+    {
       "key": "i",
       "file": "C:/Users/wi27/Documents/code/trellis-docker/trellis-app/src/views/DataImport.vue"
     }

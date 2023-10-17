@@ -1,4 +1,5 @@
-import TranslationText from '../../entities/trellis/TranslationText'
+import Translation from '@/entities/trellis/Translation'
+import TranslationText from '@/entities/trellis/TranslationText'
 
 export default interface TranslationTextServiceInterface {
 
@@ -23,4 +24,7 @@ export default interface TranslationTextServiceInterface {
    * @returns {PromiseLike<TranslationText[]>}
    */
   getTranslatedTextByTranslationId (translationId: string): PromiseLike<TranslationText[]>
+
+
+  getTranslationById (translationId: string): PromiseLike<Translation>
 }

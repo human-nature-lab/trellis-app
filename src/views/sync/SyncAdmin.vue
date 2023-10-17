@@ -11,12 +11,24 @@
             text
             :loading="generatingSnapshot"
             :disabled="generatingSnapshot"
-            @click="generateSnapshot">
+            @click="generateSnapshot(false)">
             {{ $t('generate_snapshot') }}
           </v-btn>
           <v-btn icon @click="getSnapshots" :disabled="snapshotsLoading">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
+          <v-menu offset-y left>
+            <template #activator="{ on, attrs }">
+              <v-btn icon v-on="on" v-bind="attrs">
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
+            <v-list>
+              <v-list-item @click="generateSnapshot(true)">
+                {{ $t('force_generate_snapshot') }}
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </v-card-title>
         <v-card-text>
           <v-data-table
@@ -119,6 +131,8 @@
   import UploadError from '@/components/sync/admin/UploadError.vue'
   import DocsLinkMixin from '@/mixins/DocsLinkMixin'
   import DocsFiles from '@/components/documentation/DocsFiles'
+  import { updateTitle } from '@/router/history'
+
   export default {
     name: 'sync-admin',
     mixins: [DocsLinkMixin(DocsFiles.sync.admin)],
@@ -164,6 +178,9 @@
         }]
       }
     },
+    setup () {
+      updateTitle({ key: 'sync_admin' })
+    },
     created () {
       this.getUploads()
       this.getSnapshots()
@@ -192,10 +209,7 @@
             return u
           })
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to fetch uploads')
-          }
+          this.handleError(err, 'Unable to fetch uploads')
         } finally {
           this.uploadsLoading = false
         }
@@ -205,10 +219,7 @@
         try {
           this.snapshots = await SyncAdminService.listSnapshots()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to fetch snapshots')
-          }
+          this.handleError(err, 'Unable to fetch snapshots')
         } finally {
           this.snapshotsLoading = false
         }
@@ -219,26 +230,42 @@
           await SyncAdminService.processUploads(this.selectedUploads.map(u => u.id))
           this.getUploads()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to process uploads')
-          }
+          this.handleError(err, 'Unable to process uploads')
         } finally {
           this.uploadsProcessing = false
         }
       },
-      generateSnapshot: async function () {
+      generateSnapshot: async function (force = false) {
         this.generatingSnapshot = true
         try {
-          await SyncAdminService.generateSnapshot()
+          const res = await SyncAdminService.generateSnapshot(force)
+          this.alertRes('success', res.data, 'Successfully created snapshot')
           this.getSnapshots()
         } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.log(err)
-            this.alert('error', 'Unable to generate a snapshot')
-          }
+          this.handleError(err, 'Unable to generate a snapshot')
         } finally {
           this.generatingSnapshot = false
+        }
+      },
+      alertRes (kind, data, defaultMessage) {
+        let msg = defaultMessage
+        if (data && typeof data === 'object') {
+          if (data.msg) {
+            msg = data.msg
+          } else if (data.translation) {
+            msg = '' + this.$t(data.translation)
+          }
+        }
+        this.alert(kind, msg)
+      },
+      handleError (err, defaultMessage) {
+        if (this.isNotAuthError(err)) {
+          this.log(err)
+          if (err && err.response) {
+            this.alertRes('error', err.response.data, defaultMessage)
+          } else {
+            this.alert('error', defaultMessage)
+          }
         }
       }
     }

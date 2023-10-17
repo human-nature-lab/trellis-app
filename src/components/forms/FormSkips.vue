@@ -76,7 +76,7 @@ export default Vue.extend({
         done()
       }
     },
-    async create (skip: Partial<Skip>, conditionTags?: string[], done: (err?: Error) => void) {
+    async create (skip: Partial<Skip>, conditionTags?: string[], done?: (err?: Error) => void) {
       console.log('create', skip, conditionTags)
       try {
         if (conditionTags) {
@@ -84,14 +84,20 @@ export default Vue.extend({
             new SkipConditionTag().fromSnakeJSON({ condition_tag_name: t }),
           )
         }
-        const res = await SkipService.createFormSkip(this.value.id, skip)
+        const tSkip = new Skip()
+        Object.assign(tSkip, skip, {
+          precedence: this.value.skips.length + 1,
+        })
+        const res = await SkipService.createFormSkip(this.value.id, tSkip)
         const f = this.value.copy()
         f.skips.push(res)
         this.$emit('input', f)
       } catch (err) {
         this.logError(err)
       } finally {
-        done()
+        if (done) {
+          done()
+        }
       }
     },
     async remove (skip: Skip, done: (err?: Error) => void) {

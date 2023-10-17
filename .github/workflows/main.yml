@@ -16,7 +16,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: '16'
       
+      # - run: rm -rf node_modules/.cache
       # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
       # - uses: c-hive/gha-npm-cache@v1
       - run: npm install
@@ -46,20 +47,21 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
-          java-version: '8'
+          java-version: '11'
       
-      - name: Uninstall corrupt sdk build-tools
-        run: |
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
+      # - name: Uninstall corrupt sdk build-tools
+      #   run: |
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.1'
       
       - run: npm i -g @ionic/cli@6
       
       - uses: human-nature-lab/setup-ionic@v1
         with:
           install-java: false
-          cordova-version: 9
+          cordova-version: 11
       
 #       - name: Build dev APK
 #         run: |
@@ -71,11 +73,15 @@ jobs:
         run: |
           chmod +x -R hooks/*.sh
 
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+
       - name: Build debug APK
         # continue-on-error: true
         run: |
           npm run webpack:android
-          cordova prepare
+          sh cordova-setup.sh
           npm run webpack:release:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
@@ -137,7 +143,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: ./trellis-debug.apk
-          asset_name: trellis-debug.apk
+          asset_name: ${{ env.RELEASE_TITLE}}.apk
           asset_content_type: application/octet-stream
       
 

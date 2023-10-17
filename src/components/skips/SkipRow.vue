@@ -116,7 +116,7 @@ export default Vue.extend({
   },
   computed: {
     selectedConditionTags (): string[] {
-      const r = this.value.conditionTags.map((sct) => sct.conditionTagName)
+      const r = (this.value.conditionTags || []).map((sct) => sct.conditionTagName)
       r.sort()
       return r
     },

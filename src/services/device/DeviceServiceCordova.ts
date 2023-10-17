@@ -1,16 +1,14 @@
 import Config from '../../entities/trellis-config/Config'
 import Pagination from '../../types/Pagination'
-import { resetSyncCredentials, setSyncCredentials, syncInstance } from '../http/AxiosInstance'
+import { resetSyncCredentials, syncInstance } from '../http/AxiosInstance'
 import DeviceServiceInterface from './DeviceServiceInterface'
 import Device from '../../entities/trellis/Device'
 
-declare const device
-declare const cordova
-
 const deviceKeyKey = 'device-key'
+const deviceNameKey = 'device-name'
 
 export class DeviceServiceCordova implements DeviceServiceInterface {
-  private isReady: boolean = false
+  private isReady = false
   private platform: string
   private uuid: string
   private deviceKey!: string
@@ -35,6 +33,22 @@ export class DeviceServiceCordova implements DeviceServiceInterface {
     })
     if (entry) {
       this.deviceKey = entry.val
+      return entry.val
+    } else {
+      return null
+    }
+  }
+
+  async getDeviceName (): Promise<string> {
+    await this.isDeviceReady()
+    const DatabaseService = (await import('../database')).default
+    const repo = await DatabaseService.getConfigRepository(Config)
+    const entry = await repo.findOne({
+      where: {
+        name: deviceNameKey,
+      },
+    })
+    if (entry) {
       return entry.val
     } else {
       return null
@@ -110,11 +124,11 @@ export class DeviceServiceCordova implements DeviceServiceInterface {
   }
 
   async createDevice (device: Device): Promise<Device> {
-    let r = null
+    let r: Device
     try {
       const http = await syncInstance()
       const res = await http.post('device', {
-        device: device.toSnakeJSON()
+        device: device.toSnakeJSON(),
       })
       r = new Device().fromSnakeJSON(res.data.device)
     } finally {
@@ -127,10 +141,14 @@ export class DeviceServiceCordova implements DeviceServiceInterface {
     await this.isDeviceReady()
     const DatabaseService = (await import('../database')).default
     const repo = await DatabaseService.getConfigRepository(Config)
-    const entry = new Config()
-    entry.name = deviceKeyKey
-    entry.val = device.key
-    await repo.save(entry)
+    const keyEntry = new Config()
+    keyEntry.name = deviceKeyKey
+    keyEntry.val = device.key
+    await repo.save(keyEntry)
+    const nameEntry = new Config()
+    nameEntry.name = deviceNameKey
+    nameEntry.val = device.name
+    await repo.save(nameEntry)
     this.deviceKey = device.key
   }
 

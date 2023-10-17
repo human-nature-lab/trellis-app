@@ -24,6 +24,7 @@
       class="mb-4"
       :headers="nameHeaders"
       :items="respondent.names"
+      :items-per-page="-1"
       hide-default-footer>
       <template v-slot:item="props">
         <tr>

@@ -1,10 +1,23 @@
 <template>
   <v-col class="geo-search-with-map d-flex flex-column flex-grow-1">
     <v-toolbar class="flex-grow-0 w-full">
-      <v-btn icon v-if="parentGeo !== null" @click.stop="upOneLevelDone">
+      <v-btn
+        v-if="parentGeo !== null"
+        icon
+        @click.stop="upOneLevelDone"
+      >
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
       <v-toolbar-title>{{ parentGeoName }}</v-toolbar-title>
+      <v-spacer />
+      <v-btn
+        v-if="parentGeo"
+        :to="geoSearchRoute(parentGeo.id)"
+        icon
+        text
+      >
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-col class="flex-grow-1 pa-0">
       <v-col
@@ -74,6 +87,8 @@
   import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
   import markerIcon from 'leaflet/dist/images/marker-icon.png'
   import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+  import { computedTitle } from '@/router/history'
+  import { geoSearchRoute } from '@/router/util'
 
   const targetMapWidth = 600
 
@@ -127,6 +142,12 @@
       }
     },
     async created () {
+      computedTitle('GeoSearchWithMap', () => {
+        if (this.parentGeoName) {
+          return { key: 'location_search_map_in', args: [this.parentGeoName] }
+        }
+        return { key: 'location_search_map' }
+      })
       try {
         this.isLoading = true
         let curGeo = this.$router.currentRoute.params.geoId ? await GeoService.getGeoById(this.$router.currentRoute.params.geoId) : null
@@ -145,6 +166,7 @@
       this.trellisMap.off('zoomend resize')
     },
     methods: {
+      geoSearchRoute,
       async selectGeo (geo) {
         const geoId = (geo && geo.id) ? geo.id : null
         try {
@@ -475,4 +497,7 @@
     position: absolute
     top: -15px
     z-index: 1000
+  
+  .edit-panel
+    max-height: 200px
 </style>
