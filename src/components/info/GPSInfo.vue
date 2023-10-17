@@ -9,8 +9,8 @@
   import Vue from 'vue'
   import InfoBlock from './InfoBlock.vue'
   import GeoLocationService from '../../services/geolocation'
-  import * as moment from 'moment'
   import { VChip } from 'vuetify/lib'
+import { formatDistanceToNow } from 'date-fns'
 
   export default Vue.extend({
     name: "GPSInfo",
@@ -54,10 +54,10 @@
         this.statusData.classes = isWorking ? ['green', 'green--text'] : ['red', 'red--text']
         const lastUpdatedPosition = await GeoLocationService.getLatestPosition()
         if (lastUpdatedPosition) {
-          const lastUpdated = moment(lastUpdatedPosition.timestamp + 4000)
+          const lastUpdated = new Date(lastUpdatedPosition.timestamp + 4000)
           const tol = 5 * 60 * 1000
           const withinTol = Date.now() - lastUpdatedPosition.timestamp < tol
-          this.updateData.label = lastUpdated.fromNow()
+          this.updateData.label = formatDistanceToNow(lastUpdated)
           this.updateData.classes = withinTol ? ['green', 'green--text'] : ['red', 'red--text']
         } else {
           this.updateData.label = this.$t('none')

@@ -1,11 +1,9 @@
 <template>
-  <v-dialog
+  <TrellisModal
     :value="value"
-    @input="close">
+    @input="close"
+    :title="$t('add_location')">
     <v-card>
-      <ModalTitle
-        :title="$t('add_location')"
-        @close="close" />
       <v-card-text>
           <v-layout>
             <v-flex>
@@ -28,8 +26,7 @@
           </v-layout>
       </v-card-text>
     </v-card>
-    <v-dialog v-model="showGeoSearch">
-      <ModalTitle :title="$t('location_search')" @close="showGeoSearch=false" />
+    <TrellisModal v-model="showGeoSearch" :title="$t('location_search')">
       <v-card>
         <GeoSearch
           :showCart="true"
@@ -38,66 +35,66 @@
           :should-update-route="false"
           @doneSelecting="geoSelected" />
       </v-card>
-    </v-dialog>
+    </TrellisModal>
   </v-dialog>
 </template>
 
 <script lang="ts">
-  import Vue from 'vue'
+import Vue from 'vue'
 
-  import GeoSearch from '@/components/geo/GeoSearch.vue'
-  import ModalTitle from '../ModalTitle.vue'
-  import AsyncTranslationText from '../AsyncTranslationText.vue'
+import GeoSearch from '@/components/geo/GeoSearch.vue'
+import TrellisModal from '../TrellisModal.vue'
+import AsyncTranslationText from '../AsyncTranslationText.vue'
 
-  import RespondentService from '../../services/respondent'
-  import RespondentGeo from '../../entities/trellis/RespondentGeo'
-  export default Vue.extend({
-    components: {GeoSearch, ModalTitle, AsyncTranslationText},
-    name: 'AddRespondentGeoForm',
-    data () {
-      return {
-        isCurrent: true,
-        showGeoSearch: false,
-        selectedGeo: null
-      }
-    },
-    props: {
-      value: {
-        type: Boolean,
-        required: true
-      },
-      respondent: {
-        type: Object,
-        required: true
-      },
-      geoSelectionFilter: {
-        default: true
-      }
-    },
-    methods: {
-      geoSelected (geos) {
-        this.selectedGeo = geos[0]
-        console.log(this.selectedGeo)
-        this.showGeoSearch = false
-      },
-      async done () {
-        try {
-          if (this.respondent && this.selectedGeo) {
-            const rGeo: RespondentGeo = await RespondentService.addRespondentGeo(this.respondent.id, this.selectedGeo.id, this.isCurrent)
-            this.$emit('added', rGeo)
-            this.close()
-          }
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err)
-          }
-        }
-      },
-      close () {
-        this.$emit('input', false)
-        this.selectedGeo = null
-        this.isCurrent = false
-      }
+import RespondentService from '../../services/respondent'
+import RespondentGeo from '../../entities/trellis/RespondentGeo'
+export default Vue.extend({
+  components: { GeoSearch, TrellisModal, AsyncTranslationText },
+  name: 'AddRespondentGeoForm',
+  data () {
+    return {
+      isCurrent: true,
+      showGeoSearch: false,
+      selectedGeo: null,
     }
-  })
+  },
+  props: {
+    value: {
+      type: Boolean,
+      required: true,
+    },
+    respondent: {
+      type: Object,
+      required: true,
+    },
+    geoSelectionFilter: {
+      default: true,
+    },
+  },
+  methods: {
+    geoSelected (geos) {
+      this.selectedGeo = geos[0]
+      console.log(this.selectedGeo)
+      this.showGeoSearch = false
+    },
+    async done () {
+      try {
+        if (this.respondent && this.selectedGeo) {
+          const rGeo: RespondentGeo = await RespondentService.addRespondentGeo(this.respondent.id, this.selectedGeo.id, this.isCurrent)
+          this.$emit('added', rGeo)
+          this.close()
+        }
+      } catch (err) {
+        if (this.isNotAuthError(err)) {
+          this.logError(err)
+        }
+      }
+    },
+    close () {
+      this.$emit('input', false)
+      this.selectedGeo = null
+      this.isCurrent = false
+    },
+  },
+})
 </script>

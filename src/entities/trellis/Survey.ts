@@ -4,8 +4,6 @@ import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
 import Respondent from './Respondent'
 import Form from './Form'
 import Interview from './Interview'
-import MomentTransformer from '../base/MomentTransformer'
-import { Moment } from 'moment'
 
 @Entity()
 export default class Survey extends TimestampedSoftDelete {
@@ -24,8 +22,8 @@ export default class Survey extends TimestampedSoftDelete {
   @Column({ nullable: true, type: 'uuid' }) @Serializable
   lastQuestionId: string
 
-  @Column({ type: 'datetime', nullable: true, transformer: MomentTransformer }) @Serializable
-  completedAt: Moment
+  @Column({ type: 'datetime', nullable: true }) @Serializable
+  completedAt: Date
 
   @Relationship(type => Form)
   @OneToOne(type => Form)

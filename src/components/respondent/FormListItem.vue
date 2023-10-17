@@ -104,25 +104,9 @@
                       :data-interview-id="interview.id"
                       :key="interview.id"
                     >
-                      <td>
-                        {{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span>
-                      </td>
-                      <td>{{ survey.form.version }}</td>
-                      <td>
-                        <span
-                          v-if="interview.startTime"
-                          :title="interview.startTime.local().format('llll')"
-                        >
-                          {{ interview.startTime.local().format('LL') }}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          v-if="interview.startTime && interview.endTime"
-                        >
-                          {{ dateDiff(interview.startTime, interview.endTime) }}
-                        </span>
-                      </td>
+                      <td>{{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span></td>
+                      <td>{{ interview.startTime && interview.startTime | dateFormat }}</td>
+                      <td>{{ interview.endTime && interview.endTime | dateFormat }}</td>
                     </tr>
                   </table>
                 </td>
@@ -159,6 +143,7 @@ import SurveyService from '../../services/survey'
 import InterviewService from '../../services/interview'
 import { getCurrentPosition } from '../LocationFinder.vue'
 import singleton from '../../static/singleton'
+import { dateFormat } from '@/filters/date'
 import Survey from '../../entities/trellis/Survey'
 import Translation from '../../entities/trellis/Translation'
 import { Moment } from 'moment'
@@ -181,6 +166,7 @@ export type DisplayForm = {
 
 export default Vue.extend({
   name: 'FormListItem',
+  filters: { dateFormat },
   props: {
     disabled: Boolean,
     respondent: {

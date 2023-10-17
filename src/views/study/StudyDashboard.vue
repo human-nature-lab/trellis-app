@@ -72,24 +72,26 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import moment from 'moment'
   import global from '@/static/singleton'
   import SparkLoader from '@/components/dashboard/SparkLoader.vue'
   import StudyCounts from '@/components/dashboard/StudyCounts.vue'
   import DashboardForms from '@/components/dashboard/DashboardForms.vue'
   import { QueryPersistMixin } from '@/mixins/QueryPersistMixin'
+import { format, subYears } from 'date-fns'
 
   export default Vue.extend({
     name: 'StudyDashboard',
     mixins: [QueryPersistMixin],
     components: { SparkLoader, DashboardForms, StudyCounts },
     data () {
-      const today = moment()
-      return {  
+      return {
         global,
         showDates: false,
-        dates: [today.clone().subtract(1, 'year').format('YYYY-MM-DD'), today.format('YYYY-MM-DD')],
-        persistKeys: ['dates']
+        dates: [
+          format(subYears(new Date(), 1), 'yyyy-MM-dd'),
+          format(new Date(), 'yyyy-MM-dd'),
+        ],
+        persistKeys: ['dates'],
       }
     },
     created () {

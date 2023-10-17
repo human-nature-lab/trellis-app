@@ -56,8 +56,8 @@ export async function compareDownload (ctrl: StepController, data: { snapshot: S
   if (!localDownload) {
     return data
   }
-  const isOlder = localDownload.createdAt.getTime() > data.snapshot.createdAt.toDate().getTime()
-  const isSame = localDownload.createdAt.getTime() === data.snapshot.createdAt.toDate().getTime()
+  const isOlder = localDownload.createdAt.getTime() > data.snapshot.createdAt.getTime()
+  const isSame = localDownload.createdAt.getTime() === data.snapshot.createdAt.getTime()
   if (isOlder) {
     const msg = i18n.t('older_snapshot', [data.snapshot.createdAt, localDownload.createdAt])
     const proceed = await ctrl.confirm(msg)
@@ -166,7 +166,7 @@ export async function moveDatabase () {
 }
 
 export async function registerDownload ({ sync, snapshot }: { sync: Sync, snapshot: Snapshot }) {
-  sync.snapshotCreatedAt = snapshot.createdAt.toDate()
+  sync.snapshotCreatedAt = snapshot.createdAt
   await SyncService.registerSuccessfulSync(sync)
 }
 

@@ -32,10 +32,7 @@ export interface AssignerFunction {
 
 
 /**
- * Register this column as a date so that it can be transformed to and from a Moment date object
- * @param target
- * @param {string} propertyKey
- * @constructor
+ * Register this column as a date so that it can be transformed to and from a Date
  */
 export function AsDate (target: any, propertyKey: string) {
   let columnMeta = getOrCreateMeta(target)

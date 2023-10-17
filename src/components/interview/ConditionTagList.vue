@@ -17,10 +17,10 @@
           {{ $t('no_condition_tags') }}
         </td>
       </tr>
-      <tr v-for="condition in allConditions">
+      <tr v-for="condition in allConditions" :key="condition.id">
         <td>{{condition.name}}</td>
         <td>{{condition.type}}</td>
-        <td>{{condition.createdAt.fromNow()}}</td>
+        <td>{{condition.createdAt | relativeTime }}</td>
       </tr>
     </table>
   </v-flex>
@@ -28,9 +28,11 @@
 
 <script>
   import conditionTagStore from './classes/ConditionTagStore'
+  import { relativeTime } from '@/filters/date'
   const conditionKeys = ['respondent', 'survey', 'section']
   export default {
     name: 'condition-tag-list',
+    filters: { relativeTime },
     props: {
       conditions: {
         validator: function (v) {

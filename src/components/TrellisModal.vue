@@ -7,7 +7,10 @@
     @input="$emit('input', $event)"
     class="d-flex flex-column"
   >
-    <ScrollContainer :elevation="2">
+    <ScrollContainer
+      :elevation="2"
+      container-class="white"
+    >
       <template #header>
         <slot name="title">
           <ModalTitle
@@ -16,7 +19,7 @@
           />
         </slot>
       </template>
-      <v-card tile>
+      <v-card class="h-full">
         <v-container fluid>
           <slot />
         </v-container>
@@ -55,7 +58,7 @@ export default Vue.extend({
 </script>
 
 <style lang="sass">
-  .h-full
-    max-height: 100%
-    overflow: hidden
+  .trellis-dialog-content
+    position: relative
+    // overflow: hidden !important
 </style>
