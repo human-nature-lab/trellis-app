@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { i18n } from '@/i18n'
 import { computed } from 'vue'
 
 type Status = 'started' | 'starting' | 'connected' | 'connecting' |
@@ -19,11 +20,31 @@ const color = computed(() => {
     return 'error'
   }
 })
+
+const statusMap = {
+  connected: i18n.t('connected'),
+  running: i18n.t('running'),
+  started: i18n.t('started'),
+  connecting: i18n.t('connecting'),
+  disconnected: i18n.t('disconnected'),
+  disconnecting: i18n.t('disconnecting'),
+  stopping: i18n.t('stopping'),
+  starting: i18n.t('starting'),
+  discovering: i18n.t('discovering'),
+  finished: i18n.t('finished'),
+  stopped: i18n.t('stopped'),
+  error: i18n.t('error'),
+  failure: i18n.t('failure'),
+}
+
+const translated = computed(() => {
+  return statusMap[props.status]
+})
 </script>
 
 <template>
   <v-chip :color="color">
-    {{ status }}
+    {{ translated }}
   </v-chip>
 </template>
 

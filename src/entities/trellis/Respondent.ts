@@ -66,6 +66,11 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
 
   @OneToMany(type => Edge, edge => edge.targetRespondent)
   targetEdges: Edge[]
+
+  getName () {
+    const displayName = this.names.find(name => name.isDisplayName)
+    return displayName ? displayName.name : this.name
+  }
 }
 
 function geoGenerator (geo) {

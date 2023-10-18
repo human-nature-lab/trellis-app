@@ -317,14 +317,14 @@ const showPrevReports = ref(false)
 <template>
   <v-col>
     <v-row class="no-gutters">
-      <h1>Server</h1>
+      <h1>{{ $t('leader') }}</h1>
       <StatusChip :status="server.state" />
       <v-spacer />
       <v-btn @click="showPrevReports = true">
-        Reports
+        {{ $t('reports') }}
       </v-btn>
       <v-btn @click="$emit('stop')">
-        Disconnect
+        {{ $t('stop') }}
       </v-btn>
     </v-row>
     <v-alert
@@ -338,7 +338,7 @@ const showPrevReports = ref(false)
         @click="generateRing"
         :disabled="selectedRespondents.size < 2"
       >
-        Generate ring
+        {{ $t('generate_ring') }}
       </v-btn>
     </v-row>
     <v-list>
@@ -349,7 +349,7 @@ const showPrevReports = ref(false)
           @click="toggleSelectAll"
         />
         <h3>
-          Decisions ({{ allDecisions.length }})
+          {{ $t('decisions_n', [allDecisions.length]) }}
         </h3>
       </v-list-item>
 
@@ -359,11 +359,13 @@ const showPrevReports = ref(false)
         @click="toggleSelectedRespondent(decision.respondentId)"
       >
         <v-checkbox :value="selectedRespondents.has(decision.respondentId)" />
-        {{ decision.respondentId }} is giving L{{ decision.value }}
+        {{ decision.respondentId }}
       </v-list-item>
     </v-list>
     <v-list>
-      <h4>Connections ({{ Object.keys(connections).length }})</h4>
+      <h4>
+        {{ $t('connections_n', [Object.keys(connections).length]) }}
+      </h4>
       <v-list-item
         v-for="conn, key in connections"
         :key="key"

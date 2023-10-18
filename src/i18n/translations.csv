@@ -670,5 +670,32 @@ survey,Survey,,
 survey_with,Survey with {0},,
 extra_modules,Extra modules,,
 history,History,,
-syncing_with_api,Syncing with {0},,
+syncing_with_api,Syncing with {0},,ex: syncing with https://api.trellisprod.net
 force_generate_snapshot,Force snapshot,,
+dialog,Dialog,,
+dictator_async,Dictator pairing,,
+start_leader,Start leader,,
+follow_leader,Follow leader,,
+follower,Follower,,
+leader,Leader,,
+disconnect,Disconnect,,
+generate_ring,Generate ring,,
+decisions_n,Decisions ({0}),,# of pending decisions like: Decisions (12)
+connections_n,Connections ({0}),,# of active connections like: Connections (3)
+report,Report,,
+previous_reports,Previous reports,,
+report_title,Report from {0},,Report from 2023-10-10
+kept,Kept,,Header for Lempiras kept
+received,Received,,Header for Lempiras received
+total,Total,,Header for total payoff
+connected,Connected,,Status indicator
+running,Running,,Status indicator
+started,Started,,Status indicator
+disconnected,Disconnected,,Status indicator
+disconnecting,Disconnecting,,Status indicator
+stopping,Stopping,,Status indicator
+starting,Starting,,Status indicator
+discovering,Discovering,,Status indicator
+finished,Finished,,Status indicator
+stopped,Stopped,,Status indicator
+failure,Failure,,Status indicator

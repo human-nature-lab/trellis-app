@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
 import StatusChip from './StatusChip.vue'
-import { Actor, CandidatesRequest, CandidatesResponse, CompleteTxRequest, DBActor, Device, Message, PairRequest } from './common'
+import { CandidatesRequest, CandidatesResponse, DBActor, Device, Message, PairRequest } from './common'
 import { Client } from '@/services/nearby-communications/client'
-import DatabaseService from '@/services/database'
-import DatabaseServiceCordova from '@/services/database/DatabaseServiceCordova'
-import Question from '@/entities/trellis/Question'
-import PT from '@/static/parameter.types'
 import { onBeforeUnload } from '@/helpers/window.helper'
 
-const dbSvc = DatabaseService as DatabaseServiceCordova
 const props = defineProps<{
   serviceId: string
   deviceId: string
@@ -37,7 +32,7 @@ onBeforeMount(async () => {
   client.value.handle(Message.StartPairs, async (req: PairRequest) => {
     return actor.startSave(req.pairs)
   })
-  client.value.handle(Message.CompleteTx, async (req: CompleteTxRequest) => {
+  client.value.handle(Message.CompleteTx, async () => {
     return actor.completeSave()
   })
   client.value.handle(Message.RollbackTx, async () => {
@@ -60,11 +55,11 @@ onBeforeUnload(disconnect)
 <template>
   <v-col class="pa-0 ma-0">
     <v-row class="no-gutters">
-      <h1>Client</h1>
+      <h1>{{ $t('follower') }}</h1>
       <StatusChip :status="client.state" />
       <v-spacer />
       <v-btn @click="$emit('stop')">
-        Disconnect
+        {{ $t('disconnect') }}
       </v-btn>
     </v-row>
   </v-col>

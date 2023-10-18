@@ -2,8 +2,8 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import FormSelector from '@/components/forms/FormSelector.vue'
 import singleton from '@/static/singleton'
-import DictatorClient from './DictatorClient.vue'
-import DictatorServer from './DictatorServer.vue'
+import DictatorFollower from './DictatorFollower.vue'
+import DictatorLeader from './DictatorLeader.vue'
 import FormService from '@/services/form'
 import PT from '@/static/parameter.types'
 import { useDeviceId, useDeviceName, useServerAddress } from '@/helpers/device.helper'
@@ -16,7 +16,7 @@ const serviceId = computed(() => {
 })
 const { deviceId, loading: loadingDevice, error: deviceError } = useDeviceId()
 const { name, loading: loadingName, error: nameError } = useDeviceName()
-const role = ref<'server' | 'client'>()
+const role = ref<'leader' | 'follower'>()
 
 const canRunDictator = ref(false)
 const working = ref(false)
@@ -67,33 +67,33 @@ function stop () {
     <v-row v-if="!role">
       <v-col>
         <v-btn
-          @click="role = 'server'"
+          @click="role = 'leader'"
           :loading="!isReady"
           :disabled="!canSelectRole"
         >
-          {{ $t('start_server') }}
+          {{ $t('start_leader') }}
         </v-btn>
       </v-col>
       <v-col>
         <v-btn
-          @click="role = 'client'"
+          @click="role = 'follower'"
           :loading="!isReady"
           :disabled="!canSelectRole"
         >
-          {{ $t('join_server') }}
+          {{ $t('follow_leader') }}
         </v-btn>
       </v-col>
     </v-row>
     <v-col>
-      <DictatorClient
-        v-if="role === 'client'"
+      <DictatorFollower
+        v-if="role === 'follower'"
         :service-id="serviceId"
         :device-id="deviceId"
         :device-name="name"
         @stop="stop"
       />
-      <DictatorServer
-        v-else-if="role === 'server'"
+      <DictatorLeader
+        v-else-if="role === 'leader'"
         :service-id="serviceId"
         :device-id="deviceId"
         :form-id="formId"
