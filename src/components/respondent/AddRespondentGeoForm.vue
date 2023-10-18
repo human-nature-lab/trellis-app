@@ -36,7 +36,7 @@
           @doneSelecting="geoSelected" />
       </v-card>
     </TrellisModal>
-  </v-dialog>
+  </TrellisModal>
 </template>
 
 <script lang="ts">
