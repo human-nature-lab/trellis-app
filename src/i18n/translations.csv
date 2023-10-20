@@ -648,54 +648,54 @@ incoming,Incoming,Entrante,
 outgoing,Outgoing,Saliente,
 var_name,Variable,Variable,
 edges,Edges,Enlace,
-distribution_quantity,Quantity,,
-distribution_step_size,Step size,,
-currency,Currency,,
-distribution_starting_percentage,Initial percentage,,
-distribution_bin_type,Bin type,,
-distribution_use_submit,Show submit,,
-submit,Submit,,
-operation_cancelled,Operation cancelled,,
-sections,Sections,,
-section,Section,,
-form,Form,,
-location_search_map,Map location search,,
-location_search_map_in,Map locations in {0},,
-respondent_forms_static,Respondent forms,,
-location_search_in,Location search in {0},,
-geo_info,Location info,,
-geo_info_for,{0} location info,,
-respondent_info_named,{0}'s info,,
-survey,Survey,,
-survey_with,Survey with {0},,
-extra_modules,Extra modules,,
-history,History,,
-syncing_with_api,Syncing with {0},,ex: syncing with https://api.trellisprod.net
-force_generate_snapshot,Force snapshot,,
-dialog,Dialog,,
-dictator_async,Dictator pairing,,
-start_leader,Start leader,,
-follow_leader,Follow leader,,
-follower,Follower,,
-leader,Leader,,
-disconnect,Disconnect,,
-generate_ring,Generate ring,,
-decisions_n,Decisions ({0}),,# of pending decisions like: Decisions (12)
-connections_n,Connections ({0}),,# of active connections like: Connections (3)
-report,Report,,
-previous_reports,Previous reports,,
-report_title,Report from {0},,Report from 2023-10-10
-kept,Kept,,Header for Lempiras kept
-received,Received,,Header for Lempiras received
-total,Total,,Header for total payoff
-connected,Connected,,Status indicator
-running,Running,,Status indicator
-started,Started,,Status indicator
-disconnected,Disconnected,,Status indicator
-disconnecting,Disconnecting,,Status indicator
-stopping,Stopping,,Status indicator
-starting,Starting,,Status indicator
-discovering,Discovering,,Status indicator
-finished,Finished,,Status indicator
-stopped,Stopped,,Status indicator
-failure,Failure,,Status indicator
+distribution_quantity,Quantity,Cantidad,
+distribution_step_size,Step size,Cantidad de Incremento,
+currency,Currency,Divisa,
+distribution_starting_percentage,Initial percentage,Porcentaje Inicial,
+distribution_bin_type,Bin type,Tipo de Contenedor,
+distribution_use_submit,Show submit,Mostrar enviar,
+submit,Submit,Enviar,
+operation_cancelled,Operation cancelled,Operacion Cancelada,
+sections,Sections,Secciones,
+section,Section,Seccion,
+form,Form,Formulario,
+location_search_map,Map location search,Busqueda de ubicacion en el mapa,
+location_search_map_in,Map locations in {0},Ubicacion del mapa en {0},
+respondent_forms_static,Respondent forms,Formulario de Encuestado,
+location_search_in,Location search in {0},Busqueda de ubicacion en {0},
+geo_info,Location info,Informacion de ubicacion,
+geo_info_for,{0} location info,Informacion de ubicacion de {0},
+respondent_info_named,{0}'s info,Información de {0},
+survey,Survey,Encuesta,
+survey_with,Survey with {0},Encuesta con {0},
+extra_modules,Extra modules,Modulos extra,
+history,History,Historial,
+syncing_with_api,Syncing with {0},Sincronizando con {0},ex: syncing with https://api.trellisprod.net
+force_generate_snapshot,Force snapshot,Forzar captura,
+dialog,Dialog,Dialogo,
+dictator_async,Dictator pairing,Emparejamiento de dictador,
+start_leader,Start leader,Iniciar Lider,
+follow_leader,Follow leader,Seguir Lider,
+follower,Follower,Seguidor,
+leader,Leader,Lider,
+disconnect,Disconnect,Desconectar,
+generate_ring,Generate ring,Generar *,
+decisions_n,Decisions ({0}),Decisiones ({0}),# of pending decisions like: Decisions (12)
+connections_n,Connections ({0}),Conexiones ({0}),# of active connections like: Connections (3)
+report,Report,Reporte,
+previous_reports,Previous reports,Reporte anterior,
+report_title,Report from {0},Reporte de {0},Report from 2023-10-10
+kept,Kept,Conservado,Header for Lempiras kept
+received,Received,Recibido,Header for Lempiras received
+total,Total,Total,Header for total payoff
+connected,Connected,Conectado,Status indicator
+running,Running,Ejecutando,Status indicator
+started,Started,Iniciado,Status indicator
+disconnected,Disconnected,Desconectado,Status indicator
+disconnecting,Disconnecting,Desconectando,Status indicator
+stopping,Stopping,Deteniendo,Status indicator
+starting,Starting,Iniciando,Status indicator
+discovering,Discovering,Buscando,Status indicator
+finished,Finished,Finalizado,Status indicator
+stopped,Stopped,Detenido,Status indicator
+failure,Failure,Falla,Status indicator
