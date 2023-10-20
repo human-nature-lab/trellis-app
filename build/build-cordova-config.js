@@ -8,6 +8,7 @@ console.log('data', data)
 const entry = path.join(__dirname, '../src/config.xml.hbs')
 const output = path.join(__dirname, '../www/config.xml')
 
+data.ALLOW_CLEARTEXT_TRAFFIC = data.DEV || !!process.env.ALLOW_CLEARTEXT_TRAFFIC
 const template = handlebars.compile(fs.readFileSync(entry, 'utf8'))
 
 fs.writeFileSync(output, template(data), 'utf8')

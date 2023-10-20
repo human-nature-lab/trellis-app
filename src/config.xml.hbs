@@ -59,13 +59,11 @@
     <!-- TODO iOS splash screens -->
   {{!-- </platform> --}}
  
+  {{#if ALLOW_CLEARTEXT_TRAFFIC}}
   <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-      {{#if DEV}}
-        <application android:usesCleartextTraffic="true" />
-      {{/if}}
-      {{#if ALLOW_CLEARTEXT_TRAFFIC}}
-        <application android:usesCleartextTraffic="true" />
-      {{/if}}
+      <application android:usesCleartextTraffic="true" />
   </edit-config>
+  {{/if}} 
+
   <engine name="android" spec="^11.0.0" />
 </widget>
