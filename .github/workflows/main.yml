@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: '16'
       
-      # - run: rm -rf node_modules/.cache
+      - run: rm -rf node_modules
       # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
       # - uses: c-hive/gha-npm-cache@v1
       - run: npm install
@@ -89,7 +89,7 @@ jobs:
         run: |
           cordova clean
           npm run setup:cordova:proxy
-          cordova build android --verbose
+          cordova build android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-proxy.apk
       # - name: SSH Debug
       #   if: ${{ failure() }}
