@@ -80,11 +80,16 @@ jobs:
       - name: Build debug APK
         # continue-on-error: true
         run: |
-          npm run webpack:android
+          npm run setup:cordova
           sh cordova-setup.sh
           npm run webpack:release:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
+      - name: Build proxy APK
+        run: |
+          npm run setup:cordova:proxy
+          cordova build android --verbose
+          mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-proxy.apk
       # - name: SSH Debug
       #   if: ${{ failure() }}
       #   run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
@@ -146,4 +151,14 @@ jobs:
           asset_name: ${{ env.RELEASE_TITLE}}.apk
           asset_content_type: application/octet-stream
       
+      - name: Upload debug proxy APK
+        id: upload-debug-proxy-apk
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./trellis-proxy.apk
+          asset_name: ${{ env.RELEASE_TITLE}}.apk
+          asset_content_type: application/octet-stream
 
