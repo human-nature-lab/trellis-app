@@ -7,10 +7,10 @@
     </v-toolbar>
     <v-progress-linear v-if="loading" :indeterminate="true"></v-progress-linear>
     <transition-group v-if="this.photos.length > 0" name="photo-cards" tag="div" class="layout row wrap">
-      <v-flex
-        xs6 sm6 md4 lg3 xl2
+      <v-col
+        xs="6" sm="4" md="3" lg="2" xl="2"
         v-for="photo in orderedPhotos"
-        class="photo-flex"
+        class="photo-flex ma-0 pa-0"
         :key="photo.id">
         <v-card class="photo-vcard">
           <photo
@@ -24,9 +24,9 @@
               <v-icon v-if="photo.pivot.sortOrder === 0" medium>mdi-star</v-icon>
               <v-icon v-else medium>mdi-star-outline</v-icon>
             </v-btn>
-            <v-spacer></v-spacer>
+            <v-spacer />
             <v-menu bottom left>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn v-on="on" v-bind="attrs" icon>
                   <v-icon medium>mdi-dots-vertical</v-icon>
                 </v-btn>
@@ -46,7 +46,7 @@
             </v-menu>
           </v-card-actions>
         </v-card>
-      </v-flex>
+      </v-col>
     </transition-group>
     <v-flex v-if="photos.length === 0">{{$t('no_photos')}}</v-flex>
     <fullscreen-photo v-if="fullPhoto !== null" title="" :photo="fullPhoto" v-model="isFullOpen"></fullscreen-photo>
@@ -58,10 +58,10 @@
           </v-toolbar-title>
         </v-toolbar>
         <v-card-text>
-          <v-text-field multi-line auto-grow textarea v-model="editingPhoto.pivot.notes"></v-text-field>
+          <v-text-field multi-line auto-grow textarea v-model="editingPhoto.pivot.notes" />
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <v-spacer />
           <v-btn text @click.native="editPhoto(null)">{{ $t('cancel') }}</v-btn>
           <v-btn text @click.native="updatePhotos(editingPhoto)">{{ $t('save') }}</v-btn>
         </v-card-actions>
@@ -81,7 +81,7 @@
     components: {
       Photo,
       AddPhoto,
-      FullscreenPhoto
+      FullscreenPhoto,
     },
     data () {
       this._srcCache = {}
@@ -93,7 +93,7 @@
         editingPhoto: null,
         isFullOpen: false,
         showDialog: false,
-        global: global
+        global,
       }
     },
     name: 'PhotoAlbum',
@@ -135,6 +135,7 @@
     },
     computed: {
       orderedPhotos: function () {
+        console.log('orderedPhotos', this.photos)
         return orderBy(this.photos, 'pivot.sortOrder')
       }
     },

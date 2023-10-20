@@ -10,6 +10,7 @@ import { onBeforeUnload } from '@/helpers/window.helper'
 import { reactiveSet } from '@/lib/reactive-set'
 import { shuffle } from 'lodash'
 import { useReports, Report } from './useReports'
+import { watchRespondents } from '@/helpers/respondent.helper'
 
 const props = defineProps<{
   serviceId: string
@@ -95,6 +96,10 @@ const allDecisions = computed(() => {
   return decisions
 })
 
+const { respondents, loading, error: respondentsErr } = watchRespondents(() =>
+  allDecisions.value.map(d => d.respondentId),
+)
+
 async function onConnection (socket: ServerSocket) {
   console.log('onConnection', socket.connection)
   socket.onDisconnect.add(() => {
@@ -176,7 +181,8 @@ async function generateRing () {
     devices: Object.keys(deviceActors.value),
     rows: [],
   }
-  for (const pair of pairs) {
+  const shuffledPairs = shuffle(pairs)
+  for (const pair of shuffledPairs) {
     const kept = pair.receiver.max - pair.receiver.value
     const given = pair.decider.value
     report.value.rows.push({
@@ -188,7 +194,7 @@ async function generateRing () {
     })
   }
   showReport.value = true
-  console.log('pairs', pairs)
+  console.log('pairs', shuffledPairs)
   console.log('report', report)
 }
 
@@ -289,7 +295,7 @@ async function exec (fn: () => any) {
 }
 
 const err = computed(() => {
-  return execErr.value || reportsErr.value
+  return execErr.value || reportsErr.value || respondentsErr.value
 })
 
 const allSelected = computed(() => {
@@ -341,38 +347,45 @@ const showPrevReports = ref(false)
         {{ $t('generate_ring') }}
       </v-btn>
     </v-row>
-    <v-list>
-      <v-list-item class="no-gutters">
-        <v-simple-checkbox
-          :value="allSelected"
-          :indeterminate="someSelected"
-          @click="toggleSelectAll"
-        />
-        <h3>
-          {{ $t('decisions_n', [allDecisions.length]) }}
-        </h3>
-      </v-list-item>
+    <v-card class="my-2">
+      <v-list dense>
+        <v-list-item class="no-gutters">
+          <v-simple-checkbox
+            :value="allSelected"
+            :indeterminate="someSelected"
+            @click="toggleSelectAll"
+          />
+          <h3>
+            {{ $t('decisions_n', [allDecisions.length]) }}
+          </h3>
+        </v-list-item>
 
-      <v-list-item
-        v-for="decision in allDecisions"
-        :key="decision.surveyId"
-        @click="toggleSelectedRespondent(decision.respondentId)"
-      >
-        <v-checkbox :value="selectedRespondents.has(decision.respondentId)" />
-        {{ decision.respondentId }}
-      </v-list-item>
-    </v-list>
-    <v-list>
-      <h4>
-        {{ $t('connections_n', [Object.keys(connections).length]) }}
-      </h4>
-      <v-list-item
-        v-for="conn, key in connections"
-        :key="key"
-      >
-        {{ conn.device.deviceName }} ({{ conn.device.deviceId }})
-      </v-list-item>
-    </v-list>
+        <v-list-item
+          v-for="decision in allDecisions"
+          :key="decision.surveyId"
+          @click="toggleSelectedRespondent(decision.respondentId)"
+        >
+          <v-checkbox :value="selectedRespondents.has(decision.respondentId)" />
+          {{ respondents[decision.respondentId] ? respondents[decision.respondentId].getName() : $t('loading') }}
+        </v-list-item>
+      </v-list>
+    </v-card>
+    <v-card class="my-2">
+      <v-list dense>
+        <v-list-item>
+          <h3>
+            {{ $t('connections_n', [Object.keys(connections).length]) }}
+          </h3>
+        </v-list-item>
+        <v-list-item
+          v-for="conn, key in connections"
+          :key="key"
+        >
+          {{ conn.device.deviceName }} ({{ conn.device.deviceId }})
+        </v-list-item>
+      </v-list>
+    </v-card>
+
     <TrellisModal
       v-model="showReport"
       :title="$t('report')"

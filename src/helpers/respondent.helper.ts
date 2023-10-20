@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { WatchSource, ref, watch } from 'vue'
 import RespondentService from '@/services/respondent'
 import Respondent from '@/entities/trellis/Respondent'
 import { RespondentServiceCordova } from '@/services/respondent/RespondentServiceCordova'
@@ -39,4 +39,33 @@ export function useRespondents (ids: string[]) {
   }
   reload()
   return { respondents, error, loading, reload }
+}
+
+export function watchRespondents (source: WatchSource<string[]>) {
+  const respondents = ref<Record<string, Respondent>>({})
+  const error = ref<Error | null>(null)
+  const loading = ref(false)
+
+  let pending = []
+  async function loadPending (respondentIds: string[]) {
+    const newRespondentIds = respondentIds.filter(id => !respondents.value[id] && !pending.includes(id))
+    if (newRespondentIds.length === 0) return
+    pending.push(...newRespondentIds)
+    loading.value = true
+    try {
+      const newRespondents = await Promise.all(newRespondentIds.map(id => rs.getRespondentById(id)))
+      for (const r of newRespondents) {
+        respondents.value[r.id] = r
+      }
+      respondents.value = { ...respondents.value }
+      pending = pending.filter(id => !newRespondentIds.includes(id))
+    } catch (err) {
+      error.value = err
+    } finally {
+      loading.value = false
+    }
+  }
+  watch(source, loadPending, { immediate: true })
+
+  return { respondents, error, loading }
 }
