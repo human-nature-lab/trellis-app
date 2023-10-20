@@ -12,7 +12,7 @@
     "vite": "npm run compile && vite --host 0.0.0.0",
     "compile": "node compile-translations.js",
     "setup:cordova": "node ./build/build-cordova-config.js",
-    "setup:cordova:proxy": "cross-env ALLOW_CLEARTEXT_TRAFFIC=1 npm run setup:cordova",
+    "setup:cordova:proxy": "cross-env ALLOW_CLEARTEXT_TRAFFIC=1 APP_ENV=CORDOVA NODE_ENV=production npm run setup:cordova",
     "preview:vite": "npm run compile && vite preview",
     "build:vite": "npm run compile && vite build --mode development",
     "build:mobile": "cross-env APP_ENV=CORDOVA NODE_ENV=production npm run mobile",

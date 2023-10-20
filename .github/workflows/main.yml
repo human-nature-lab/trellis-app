@@ -87,6 +87,7 @@ jobs:
       
       - name: Build proxy APK
         run: |
+          cordova clean
           npm run setup:cordova:proxy
           cordova build android --verbose
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-proxy.apk
