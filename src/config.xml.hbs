@@ -42,6 +42,11 @@
     <preference name="android-targetSdkVersion" value="31" />
     <preference name="AndroidLaunchMode" value="singleTask"/>
     <hook type="before_build" src="hooks/android_before_build.sh" />
+     
+    <resource-file src="config/android/app/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
+    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+      <application android:networkSecurityConfig="@xml/network_security_config" />
+    </edit-config>
   </platform>
   {{!-- <platform name="ios">
     <allow-intent href="itms:*" />

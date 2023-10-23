@@ -107,6 +107,9 @@ export function runDownload (ctrl: VueController, onlyPhotos = false) {
           console.log('cancelled sync')
           console.error(err)
           await SyncService.registerCancelledSync(sync)
+          if (err.exception) {
+            throw err.exception
+          }
           throw err
         }
       }

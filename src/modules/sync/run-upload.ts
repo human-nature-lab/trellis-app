@@ -82,6 +82,9 @@ export function runUpload (ctrl: VueController, onlyImageUpload: boolean) {
         } catch (err) {
           console.error(err)
           await SyncService.registerCancelledSync(sync)
+          if (err.exception) {
+            throw err.exception
+          }
           throw err
         }
       }
