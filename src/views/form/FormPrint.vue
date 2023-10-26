@@ -160,6 +160,7 @@ export default Vue.extend({
         questionNumbers: true,
         sectionHeaders: true,
         sectionIndicators: true,
+        showDkRf: false,
       } as DocxOpts,
     }
   },

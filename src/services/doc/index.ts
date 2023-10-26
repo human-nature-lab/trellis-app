@@ -3,6 +3,8 @@ import Locale from '../../entities/trellis/Locale'
 import Form from '../../entities/trellis/Form'
 import TranslationService from '../TranslationService'
 import { i18n } from '@/i18n'
+import Question from '@/entities/trellis/Question'
+import PT from '@/static/parameter.types'
 
 export type DocxOpts = {
   choices: boolean
@@ -13,6 +15,7 @@ export type DocxOpts = {
   pageSkips: boolean
   questionNumbers: boolean
   sectionHeaders: boolean
+  showDkRf: boolean
 }
 
 const defaultOpts: DocxOpts = {
@@ -24,6 +27,7 @@ const defaultOpts: DocxOpts = {
   pageHeaders: true,
   questionNumbers: true,
   sectionHeaders: true,
+  showDkRf: true,
 }
 
 export class DocService {
@@ -40,6 +44,7 @@ export class DocService {
     const sections = []
     let questionNum = 0
     let hasCreatedTitle = false
+    const questionMap = new Map<string, Question>()
     for (const section of form.sections) {
       const children = []
       if (!hasCreatedTitle) {
@@ -54,12 +59,30 @@ export class DocService {
           text: 'Section: ' + TranslationService.getAny(section.nameTranslation, locale),
           heading: HeadingLevel.HEADING_2,
         }))
+        const followUpId = section.followUpQuestionId || section.formSections[0].followUpQuestionId
+        if (followUpId) {
+          const isRandomized = section.formSections[0].randomizeFollowUp
+          const followUpQ = questionMap.get(followUpId)
+          if (!followUpQ) {
+            throw new Error('Follow up question not found: ' + followUpId)
+          }
+          children.push(new Paragraph({
+            children: [
+              new TextRun('For each value in '),
+              new TextRun({
+                text: followUpQ.varName,
+                bold: true,
+              }),
+              new TextRun(' ' + (isRandomized ? i18n.t('randomly') : i18n.t('sequentially'))),
+            ],
+          }))
+        }
       }
       for (let i = 0; i < section.pages.length; i++) {
         const page = section.pages[i]
         if (opts.pageTitles) {
           children.push(new Paragraph({
-            text: i18n.t('page_n', [i]) + '',
+            text: i18n.t('page_n', [i + 1]) + '',
             heading: HeadingLevel.HEADING_3,
           }))
         } else if (opts.pageHeaders) {
@@ -94,6 +117,7 @@ export class DocService {
           }
         }
         for (const question of page.questions) {
+          questionMap.set(question.id, question)
           questionNum++
           // Question header
           children.push(new Paragraph({
@@ -130,6 +154,24 @@ export class DocService {
                   reference: 'choice-vals',
                   level: 0,
                 },
+              }))
+            }
+          }
+          if (opts.showDkRf) {
+            const dkParameter = question.questionParameters.find(p => +p.parameterId === PT.show_dk)
+            const rfParameter = question.questionParameters.find(p => +p.parameterId === PT.show_rf)
+            const choices = []
+            if (!dkParameter || !!dkParameter.val) {
+              choices.push(i18n.t('dont_know') as string)
+            }
+            if (!rfParameter || !!rfParameter.val) {
+              choices.push(i18n.t('refused') as string)
+            }
+            if (choices.length) {
+              children.push(new Paragraph({
+                children: [
+                  new TextRun('(respondent can opt out by saying: ' + choices.join(', ') + ')'),
+                ],
               }))
             }
           }
