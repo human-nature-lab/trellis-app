@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="3" id="edu.yale.trellis.surveyview" ios-CFBundleVersion="2" version="{{VERSION}}" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<widget 
+  android-versionCode="3" 
+  id="edu.yale.trellis.surveyview"
+  ios-CFBundleVersion="2"
+  version="{{VERSION}}"
+  xmlns="http://www.w3.org/ns/widgets"
+  xmlns:cdv="http://cordova.apache.org/ns/1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
   <name>Trellis 3</name>
   <description>The mobile app for the Trellis platform.</description>
   <author email="trellis@yale.edu" href="http://trellis.yale.edu">
@@ -46,6 +53,9 @@
     <resource-file src="config/android/app/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
     <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
       <application android:networkSecurityConfig="@xml/network_security_config" />
+      {{#if ALLOW_CLEARTEXT_TRAFFIC}}
+        <application android:usesCleartextTraffic="true" />
+      {{/if}} 
     </edit-config>
   </platform>
   {{!-- <platform name="ios">
@@ -64,11 +74,6 @@
     <!-- TODO iOS splash screens -->
   {{!-- </platform> --}}
  
-  {{#if ALLOW_CLEARTEXT_TRAFFIC}}
-  <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-      <application android:usesCleartextTraffic="true" />
-  </edit-config>
-  {{/if}} 
 
   <engine name="android" spec="^11.0.0" />
 </widget>
