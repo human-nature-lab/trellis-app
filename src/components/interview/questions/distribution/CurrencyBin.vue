@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Bin } from '../../../../lib/distribution/bin'
-import { HNLCurrency } from '../../../../lib/currency/hnl'
-import { USDCurrency } from '../../../../lib/currency/usd'
-import { computeChange } from '../../../../lib/currency/Currency'
+import { useMemoize } from '@/hooks/useMemoize'
+import { Bin } from '@/lib/distribution/bin'
+import { HNLCurrency } from '@/lib/currency/hnl'
+import { USDCurrency } from '@/lib/currency/usd'
+import { computeChange } from '@/lib/currency/Currency'
+import { random } from 'lodash'
 
 const props = defineProps<{
   closed: boolean
@@ -18,20 +20,23 @@ const currency = computed(() => {
   return props.currency === 'hnl' ? HNLCurrency : USDCurrency
 })
 
+const memoChange = useMemoize(computeChange)
+
 const change = computed(() => {
-  return computeChange(Math.round(props.value), currency.value)
+  return memoChange(Math.round(props.value), currency.value)
 })
 
 const dxBill = 3
 const dxDenom = 8
 const dy = -4
 
-const bills = computed(() => {
+const cacheId = random(10)
+const getBills = useMemoize((padding: typeof props.bin.padding, c: typeof change.value) => {
   const res = []
-  let yOffset = (props.bin.padding && props.bin.padding.top ? props.bin.padding.top : 0) + 100
-  let xOffset = (props.bin.padding && props.bin.padding.left ? props.bin.padding.left : 0) + 18
-  for (let j = 0; j < change.value.length; j++) {
-    const denomination = change.value[j]
+  let yOffset = ((padding && padding.top) ? padding.top : 0) + 100
+  let xOffset = ((padding && padding.left) ? padding.left : 0) + 18
+  for (let j = 0; j < c.length; j++) {
+    const denomination = c[j]
     for (let i = 0; i < denomination.count; i++) {
       xOffset += dxBill
       res.push({
@@ -44,6 +49,12 @@ const bills = computed(() => {
     xOffset += dxDenom
   }
   return res
+}, (padding: typeof props.bin.padding, c: typeof change.value) => {
+  const paddingKey = padding ? `${padding.top}-${padding.left}` : ''
+  return `${cacheId}-${paddingKey}-${c.map(d => `${d.denomination}${d.count}`).join('')}`
+})
+const bills = computed(() => {
+  return getBills(props.bin.padding, change.value)
 })
 </script>
 

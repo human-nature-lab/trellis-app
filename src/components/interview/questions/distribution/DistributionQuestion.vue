@@ -11,6 +11,8 @@ import { exitFullscreen, isFullscreen, toggleFullscreen } from '@/helpers/fullsc
 
 const props = defineProps<{
   question: Question
+  respondent: object
+  location: object
 }>()
 
 const { config, loading, error } = jsonQuestionParameter<Config>(props.question)
@@ -33,7 +35,6 @@ function storeValue (v: number) {
 }
 
 function updateValue (v: number) {
-  console.log('updateValue', v)
   if (!config.value.useSubmit) {
     storeValue(v)
   }
@@ -108,7 +109,11 @@ function submit () {
   </div>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
   .distribution-question
     padding: 0
+  .fullscreen-container
+    padding-top: 10px
+    padding-bottom: 10px
+    background-color: white
 </style>
