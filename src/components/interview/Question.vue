@@ -23,10 +23,11 @@
         :disabled="disabled || hasDkRf"
         :respondent="interview.survey.respondent"></div>
     </v-card-text>
-    <v-card-actions v-if="question.type.name !== 'intro' && showDkRf">
+    <v-card-actions v-if="question.type.name !== 'intro' && showDkRf" class="mt-4">
       <DontKnowRefused
         :disabled="disabled"
-        :question="question" />
+        :question="question"
+      />
     </v-card-actions>
   </v-card>
 </template>
@@ -172,12 +173,10 @@
       },
       showDkRf (): boolean {
         let count = 0
-        for (const qp of this.question.questionParameters) {
-          const i = parseInt(qp.parameterId, 10)
-          if (i === ParameterType.show_dk || i === ParameterType.show_rf) {
-            if (!!+qp.val) {
-              count++
-            }
+        for (const id of [ParameterType.show_dk, ParameterType.show_rf]) {
+          const qp = this.question.questionParameters.find(qp => +qp.parameterId === id)
+          if (!qp || !!+qp.val) {
+            count++
           }
         }
         return count === 2
