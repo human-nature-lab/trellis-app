@@ -13,7 +13,7 @@ export function log (log: any): Promise<Log> {
   if (typeof log === 'object' && log && !log.component) {
     const instance = getCurrentInstance()
     debugger
-    log.component = instance.type.__name
+    log.component = instance ? instance.type.__name : 'unknown component'
   }
   return defaultLoggingService.log(log)
 }

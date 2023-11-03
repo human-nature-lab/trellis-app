@@ -553,14 +553,14 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 }
 
-export let sharedInterviewInstance = null
+export let sharedInterviewInstance: InterviewManager = null
 export function sharedInterview (interview: Interview,
   blueprint: Form,
   actions?: Action[],
   data?: QuestionDatum[],
   conditionTags?: ConditionTagInterface,
   respondentFills?: RespondentFill[],
-  baseRespondentConditionTags?: RespondentConditionTag[]) {
+  baseRespondentConditionTags?: RespondentConditionTag[]): InterviewManager {
   if (!sharedInterviewInstance) {
     sharedInterviewInstance = new InterviewManager(interview, blueprint, actions, data, conditionTags, respondentFills, baseRespondentConditionTags)
   }

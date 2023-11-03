@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useBuilder } from '@/helpers/injected.helper'
-import { useBuilderQuestions } from '@/helpers/builder.helper'
+import { useBuilderState, useBuilderQuestions } from '@/helpers/builder.helper'
 import MenuSelect from '../util/MenuSelect.vue'
+import Question from '@/entities/trellis/Question'
 
 const props = defineProps<{
   value?: string
-  excludeQuestionIds?: string[]
+  filter(q: Question): boolean
   disabled?: boolean
 }>()
 
-const builder = useBuilder()
+const builder = useBuilderState()
 const questions = useBuilderQuestions()
 const questionsList = computed(() =>
   Object.values(questions.value).filter(q =>
-    !props.excludeQuestionIds || !props.excludeQuestionIds.includes(q.id),
+    !props.filter || !props.filter(q),
   ),
 )
 </script>

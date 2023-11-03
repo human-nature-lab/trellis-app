@@ -12,13 +12,13 @@ import ExpandSection from './ExpandSection.vue'
 import DistributionQuestionBuilder from './question-builders/DistributionQuestionBuilder.vue'
 import SocialRingBuilder from './question-builders/SocialRingBuilder.vue'
 import { logError } from '@/helpers/log.helper'
-import { useBuilder } from '@/helpers/injected.helper'
+import { useBuilderState } from '@/helpers/builder.helper'
 
 const props = defineProps<{
   value: Question,
 }>()
 
-const builder = useBuilder()
+const builder = useBuilderState()
 const working = ref(false)
 const showParameters = ref(props.value && !!props.value.questionParameters.length)
 const showChoices = ref(choiceTypes.includes(props.value.questionTypeId))

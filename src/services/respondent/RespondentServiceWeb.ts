@@ -10,13 +10,12 @@ import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
 import { uriTemplate } from '../http/WebUtils'
 export class RespondentServiceWeb implements RespondentServiceInterface {
-
   async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     throw new Error("Can't add respondent photo yet") // TODO: Respondent photo web
   }
 
   async updatePhotos (photos: Array<PhotoWithPivotTable>) {
-    return http().post(`respondent-photos`, { photos: photos })
+    return http().post('respondent-photos', { photos: photos })
   }
 
   async removePhoto (photo: PhotoWithPivotTable) {
@@ -24,10 +23,10 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
   }
 
   async getRespondentPhotos (respondentId: string): Promise<Array<PhotoWithPivotTable>> {
-    let photos: PhotoWithPivotTable[] = []
-    let res = await http().get(uriTemplate('respondent/{respondentId}/photos', [respondentId]))
+    const photos: PhotoWithPivotTable[] = []
+    const res = await http().get(uriTemplate('respondent/{respondentId}/photos', [respondentId]))
     for (let i = 0; i < res.data.photos.length; i++) {
-      let respondentPhoto = new RespondentPhoto().fromSnakeJSON(res.data.photos[i])
+      const respondentPhoto = new RespondentPhoto().fromSnakeJSON(res.data.photos[i])
       respondentPhoto.photo = new Photo().fromSnakeJSON(res.data.photos[i].photo)
       photos.push(new PhotoWithPivotTable(respondentPhoto))
     }
@@ -35,98 +34,115 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
   }
 
   async getRespondentFillsById (respondentId: string): Promise<RespondentFill[]> {
-    let res = await http().get(uriTemplate('respondent/{}/fills', [respondentId]))
+    const res = await http().get(uriTemplate('respondent/{}/fills', [respondentId]))
     return res.data.fills.map((f: object) => {
       return new RespondentFill().fromSnakeJSON(f)
     })
   }
 
   async getRespondentById (respondentId: string): Promise<Respondent> {
-    let res = await http().get(uriTemplate('respondent/{}', [respondentId]))
+    const res = await http().get(uriTemplate('respondent/{}', [respondentId]))
     return new Respondent().fromSnakeJSON(res.data.respondent)
+  }
+
+  async getRespondentsByIds (respondentIds: string[]): Promise<Respondent[]> {
+    const res = await http().get('respondents', {
+      params: {
+        ids: respondentIds,
+      },
+    })
+    return res.data.respondents.map(r => new Respondent().fromSnakeJSON(r))
   }
 
   async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null): Promise<RandomPaginationResult<Respondent>> {
     // TODO: Add is_current filter
-    let params = {
+    const params = {
       q: query,
       page: pagination.page,
       size: pagination.size,
       seed: pagination.seed,
-      associated_respondent_id: respondentId
+      associated_respondent_id: respondentId,
     }
     if (filters.conditionTags) {
-      params['c'] = filters.conditionTags.join(',')
+      params.c = filters.conditionTags.join(',')
     }
     if (filters.orConditionTags) {
-      params['oc'] = filters.orConditionTags.join(',')
+      params.oc = filters.orConditionTags.join(',')
     }
     if (filters.geos) {
-      params['g'] = filters.geos.join(',')
+      params.g = filters.geos.join(',')
     }
     if (filters.includeChildren) {
-      params['i'] = filters.includeChildren
+      params.i = filters.includeChildren
     }
     if (filters.onlyCurrentGeo) {
-      params['cg'] = filters.onlyCurrentGeo
+      params.cg = filters.onlyCurrentGeo
     }
     if (filters.randomize) {
-      params['r'] = filters.randomize
+      params.r = filters.randomize
     }
-    let res = await http().get(uriTemplate('study/{studyId}/respondents/search', [studyId]), { params })
+    const res = await http().get(uriTemplate('study/{studyId}/respondents/search', [studyId]), { params })
     return {
       page: res.data.page,
       size: res.data.size,
       total: res.data.total,
       seed: res.data.seed,
-      data: res.data.data.map(r => new Respondent().fromSnakeJSON(r))
+      data: res.data.data.map(r => new Respondent().fromSnakeJSON(r)),
     }
   }
+
   async addName (respondentId, name, isDisplayName = null, localeId = null): Promise<RespondentName> {
-    let res = await http().post(uriTemplate('respondent/{}/name', [respondentId]), {
+    const res = await http().post(uriTemplate('respondent/{}/name', [respondentId]), {
       name: name,
       is_display_name: !!isDisplayName,
-      locale_id: localeId
+      locale_id: localeId,
     })
     return new RespondentName().fromSnakeJSON(res.data.name)
   }
+
   editName (respondentId, respondentNameId, newName, isDisplayName = null, localeId = null): Promise<RespondentName> {
     return http().put(uriTemplate('respondent/{}/name/{}', [respondentId, respondentNameId]), {
       name: newName,
       is_display_name: isDisplayName,
-      locale_id: localeId
+      locale_id: localeId,
     }).then(res => new RespondentName().fromSnakeJSON(res.data.name))
   }
+
   removeName (respondentId, respondentNameId): Promise<any> {
     return http().delete(uriTemplate('respondent/{}/name/{}', [respondentId, respondentNameId])).then(r => r.data)
   }
+
   createRespondent (studyId, name, geoId = null, associatedRespondentId = null) {
     return http().post(uriTemplate('study/{}/respondent', [studyId]), {
       name: name,
       geo_id: geoId,
-      associated_respondent_id: associatedRespondentId
+      associated_respondent_id: associatedRespondentId,
     }).then(res => new Respondent().fromSnakeJSON(res.data.respondent))
   }
+
   addRespondentGeo (respondentId: string, geoId: string, isCurrent: boolean): Promise<RespondentGeo> {
     return http().post(uriTemplate('respondent/{}/geo', [respondentId]), {
       geo_id: geoId,
-      is_current: isCurrent // TODO: Handle this on the web side
+      is_current: isCurrent, // TODO: Handle this on the web side
     }).then(res => new RespondentGeo().fromSnakeJSON(res.data.geo))
   }
+
   editRespondentGeo (respondentId, respondentGeoId, isCurrent) {
     return http().put(uriTemplate('respondent/{}/geo/{}', [respondentId, respondentGeoId]), {
-      is_current: isCurrent
+      is_current: isCurrent,
     }).then(res => new RespondentGeo().fromSnakeJSON(res.data.respondent_geo))
   }
+
   moveRespondentGeo (respondentId: string, respondentGeoId: string, newGeoId: string, isCurrent?: boolean, notes?: string) {
     return http().post(uriTemplate('respondent/{}/geo/{}/move', [respondentId, respondentGeoId]), {
       new_geo_id: newGeoId,
       is_current: isCurrent,
-      notes: notes
+      notes: notes,
     }).then(res => {
       return new RespondentGeo().fromSnakeJSON(res.data.respondentGeo)
     })
   }
+
   removeRespondentGeo (respondentId, respondentGeoId) {
     return http().delete(uriTemplate('respondent/{rid}/geo/{rgid}', [respondentId, respondentGeoId])).then(r => r.data)
   }
@@ -140,8 +156,8 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
     formData.append('file', file)
     const res = await adminInst.post(uriTemplate('study/{studyId}/respondent/import', [studyId]), formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     })
     return res.data.respondents.map(r => new Respondent().fromSnakeJSON(r))
   }
@@ -151,8 +167,8 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
     formData.append('file', file)
     await adminInst.post(uriTemplate('study/{studyId}/respondent-photo/import', [studyId]), formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     })
   }
 
@@ -161,8 +177,8 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
     formData.append('file', file)
     await adminInst.post(uriTemplate('study/{studyId}/respondent-geo/import', [studyId]), formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        'Content-Type': 'multipart/form-data',
+      },
     })
   }
 
@@ -170,5 +186,4 @@ export class RespondentServiceWeb implements RespondentServiceInterface {
     const res = await adminInst.get(uriTemplate('respondent/{respondentId}/edges', [respondentId]))
     return res.data as EdgeDatum[]
   }
-
 }

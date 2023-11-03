@@ -4,7 +4,6 @@ import Question from '../../../entities/trellis/Question'
 import { jsonQuestionParameter } from '../../../lib/json-question-parameter'
 import { bins } from '../../../lib/distribution/bin'
 import { numberTransformer } from '../../../lib/number-transformer'
-import { useBuilder } from '@/helpers/injected.helper'
 
 export type Config = {
   type: 'currency'

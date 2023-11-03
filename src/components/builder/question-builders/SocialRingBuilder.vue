@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+import QT from '@/static/question.types'
 import Question from '@/entities/trellis/Question'
 import { jsonQuestionParameter } from '@/lib/json-question-parameter'
 import TranslationIdEditor from '../TranslationIdEditor.vue'
-import { useBuilder } from '@/helpers/injected.helper'
+import { useBuilderState } from '@/helpers/builder.helper'
 import EditText from '@/components/util/EditText.vue'
 import QuestionSelector from '../QuestionSelector.vue'
 import SocialRingDisplay, { SocialRingConfig } from '@/components/interview/questions/social-ring/SocialRingDisplay.vue'
-import { computed, ref } from 'vue'
 
-const builder = useBuilder()
+const builder = useBuilderState()
 const props = defineProps<{
   value: Question
   locked: boolean
@@ -127,7 +128,7 @@ const demoRings = ref({})
             <h4>{{ $t('ring_respondents_source') }}</h4>
             <QuestionSelector
               v-model="config.sourceQuestionId"
-              :exclude-question-ids="[props.value.id]"
+              :filter="q => q.id === props.value.id || q.questionTypeId !== QT.relationship"
             >
               <template #selected="{ question }">
                 {{
