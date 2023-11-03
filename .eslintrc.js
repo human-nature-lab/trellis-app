@@ -37,8 +37,8 @@ module.exports = {
   },
   // add your custom rules here
   rules: {
-    // allow paren-less arrow functions
     'linebreak-style': ['warn', 'unix'],
+    // allow paren-less arrow functions
     'arrow-parens': 0,
     'max-len': ['warn', { code: 120, comments: 120 }],
     'lines-between-class-members': ['warn', 'always', { exceptAfterSingleLine: true }],
@@ -49,8 +49,8 @@ module.exports = {
     'no-useless-constructor': 'off',
     '@typescript-eslint/no-useless-constructor': ['error'],
     'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': ['error', { typedefs: false }],
     // typescript compiler has checks built into it
+    '@typescript-eslint/no-use-before-define': ['error', { typedefs: false }],
     'no-undef': 0,
     'comma-dangle': ['error', {
       arrays: 'always-multiline',

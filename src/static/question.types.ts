@@ -1,4 +1,4 @@
-export default {
+const allQuestionTypes = {
   time: '06162912-8048-4978-a8d2-92b6dd0c2ed1',
   multiple_select: '0f76b96f-613a-4925-bacd-74db45368edb',
   image: '1e9e577d-524c-4af1-bd70-26b561e14710',
@@ -18,4 +18,14 @@ export default {
   year_month_day_time: 'effab4ce-df07-459d-a2a4-25be77bcca1b',
   respondent_geo: 'db1192c9-a850-4427-ad67-388f6325fd23',
   distribution: 'd9a2de9f-411a-11ee-81c8-0242ac120003',
+  social_ring: 'adf49a4d-79a4-11ee-80e7-0242ac120004',
 }
+
+export const choiceTypes = [allQuestionTypes.multiple_choice, allQuestionTypes.multiple_select]
+export const builderTypes = [allQuestionTypes.distribution, allQuestionTypes.social_ring]
+
+export function isBuilderType (typeId: string) {
+  return builderTypes.includes(typeId)
+}
+
+export default allQuestionTypes

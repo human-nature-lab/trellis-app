@@ -1,6 +1,6 @@
 <template>
   <v-col>
-    <v-row no-gutters class="align-center">
+    <v-row class="no-gutters align-center">
       <h4>{{ $t('parameters') }}</h4>
       <v-spacer />
       <v-tooltip v-if="!disabled" left>
@@ -13,12 +13,15 @@
       </v-tooltip>
     </v-row>
     <v-list>
-      <v-list-item v-for="(p, index) in value" :key="p.id">
+      <v-list-item
+        v-for="(p, index) in visibleParameters"
+        :key="p.id"
+      >
         <ParameterRow
-          v-model="value[index]"
+          v-model="visibleParameters[index]"
           :parameters="parameters"
-          :conditionTags="conditionTags"
-          :geoTypes="geoTypes"
+          :condition-tags="conditionTags"
+          :geo-types="geoTypes"
           :choices="choices"
           :locale="locale"
           :disabled="disabled"
@@ -29,8 +32,8 @@
         <ParameterRow
           v-model="placeholder"
           :parameters="parameters"
-          :conditionTags="conditionTags"
-          :geoTypes="geoTypes"
+          :condition-tags="conditionTags"
+          :geo-types="geoTypes"
           :choices="choices"
           :disabled="disabled"
           :locale="locale"
@@ -45,7 +48,6 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue'
 import builder from '@/services/builder'
-import MenuSelect from '@/components/util/MenuSelect.vue'
 import ParameterRow from './ParameterRow.vue'
 import QuestionParameter from '@/entities/trellis/QuestionParameter'
 import Choice from '@/entities/trellis/Choice'
@@ -53,21 +55,23 @@ import ConditionTag from '@/entities/trellis/ConditionTag'
 import GeoType from '@/entities/trellis/GeoType'
 import Locale from '@/entities/trellis/Locale'
 import Parameter from '@/entities/trellis/Parameter'
-import QPType from '@/entities/trellis/QuestionParameter'
+import ParameterTypes from '@/static/parameter.types'
+import { isBuilderType } from '@/static/question.types'
 
 export default Vue.extend({
   name: 'QuestionParameters',
   props: {
     disabled: Boolean,
-    value: Array as PropType<QPType[]>,
+    value: Array as PropType<QuestionParameter[]>,
     parameters: Array as PropType<Parameter[]>,
     conditionTags: Array as PropType<ConditionTag[]>,
     choices: Array as PropType<Choice[]>,
     geoTypes: Array as PropType<GeoType[]>,
+    questionTypeId: String,
     questionId: String,
     locale: Object as PropType<Locale>,
   },
-  components: { MenuSelect, ParameterRow },
+  components: { ParameterRow },
   data() {
     return {
       working: false,
@@ -100,7 +104,15 @@ export default Vue.extend({
         this.working = false
       }
     },
-  }
+  },
+  computed: {
+    visibleParameters (): QuestionParameter[] {
+      if (isBuilderType(this.questionTypeId)) {
+        return this.value.filter(qp => +qp.parameterId !== ParameterTypes.json)
+      }
+      return this.value
+    },
+  },
 })
 </script>
 

@@ -1,21 +1,21 @@
+import { ref } from 'vue'
 import Translation from '@/entities/trellis/Translation'
+import builder from '@/services/builder'
 import TranslationTextService from '@/services/translation-text/'
 import TranslationTextInterface from '@/services/translation-text/TranslationTextServiceInterface'
-import { ref } from 'vue'
+import { logError } from './log.helper'
 
 const ttService: TranslationTextInterface = TranslationTextService
-export function useTranslation (translationId?: string) {
+export function useTranslation (translationId?: string, shouldCreate = false) {
   const translation = ref<Translation>()
   const loading = ref(false)
   const error = ref()
 
-  let prevTranslation: Translation
-
   async function reload () {
     try {
+      error.value = null
       loading.value = true
       translation.value = await ttService.getTranslationById(translationId)
-      prevTranslation = translation.value.copy()
     } catch (err) {
       error.value = err
     } finally {
@@ -23,12 +23,17 @@ export function useTranslation (translationId?: string) {
     }
   }
 
-  async function save () {
+  let notifycreated: (translation: Translation) => void
+  async function create () {
     try {
       loading.value = true
-      // TODO: figure out which translationText changed and update that one
-      // await ttService.updateTranslation(translation.value)
+      error.value = null
+      translation.value = await builder.createTranslation()
+      if (notifycreated) {
+        notifycreated(translation.value)
+      }
     } catch (err) {
+      logError(err)
       error.value = err
     } finally {
       loading.value = false
@@ -37,6 +42,13 @@ export function useTranslation (translationId?: string) {
 
   if (translationId) {
     reload()
+  } else if (shouldCreate) {
+    create()
   }
-  return { translation, loading, error, reload, save }
+
+  function onCreated (cb: (translation: Translation) => void) {
+    notifycreated = cb
+  }
+
+  return { translation, loading, error, reload, onCreated }
 }

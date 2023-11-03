@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <component :is="tag">
     <v-row
       v-if="code"
       no-gutters
@@ -87,7 +87,7 @@
       :height="2"
       indeterminate
     />
-  </div>
+  </component>
 </template>
 
 <script lang="ts">
@@ -117,6 +117,10 @@ export default Vue.extend({
     missingText: {
       type: String,
       default: () => i18n.t('add_text'),
+    },
+    tag: {
+      type: String,
+      default: 'div',
     },
   },
   data () {

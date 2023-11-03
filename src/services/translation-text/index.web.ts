@@ -27,7 +27,8 @@ class TranslationTextServiceWeb implements TranslationTextServiceInterface {
   }
 
   async getTranslationById (translationId: string): Promise<Translation> {
-    throw new Error('Method not implemented.')
+    const res = await http().get(uriTemplate('translation/{id}', [translationId]))
+    return new Translation().fromSnakeJSON(res.data.translation)
   }
 }
 
