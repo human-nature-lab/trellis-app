@@ -7,7 +7,7 @@ import TranslationIdEditor from '../TranslationIdEditor.vue'
 import { useBuilderState } from '@/helpers/builder.helper'
 import EditText from '@/components/util/EditText.vue'
 import QuestionSelector from '../QuestionSelector.vue'
-import SocialRingDisplay, { SocialRingConfig } from '@/components/interview/questions/social-ring/SocialRingDisplay.vue'
+import SocialRingDisplay, { Ring, SocialRingConfig } from '@/components/interview/questions/social-ring/SocialRingDisplay.vue'
 
 const builder = useBuilderState()
 const props = defineProps<{
@@ -52,7 +52,11 @@ const egoDemoRespondent = computed(() => {
     avatarSrc: `https://randomuser.me/api/portraits/${men ? 'men' : 'women'}/${egoRespondentImage.value}.jpg`,
   }
 })
-const demoRings = ref({})
+const demoRings = ref<Record<string, string | number>>({})
+function updateRings (respondentId: string, ring: Ring) {
+  demoRings.value[respondentId] = ring.varName
+  demoRings.value = { ...demoRings.value }
+}
 </script>
 
 <template>
@@ -175,15 +179,13 @@ const demoRings = ref({})
         </v-container>
       </v-tab-item>
       <v-tab-item>
-        <v-col>
-          {{ demoRings }}
-        </v-col>
         <SocialRingDisplay
           v-if="tab === 1"
+          :value="demoRings"
+          @change-ring="updateRings"
           :config="config"
           :respondents="demoRespondents"
           :ego="egoDemoRespondent"
-          @rings="demoRings = $event"
         />
       </v-tab-item>
     </v-tabs-items>

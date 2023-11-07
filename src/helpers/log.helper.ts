@@ -12,8 +12,15 @@ export function alert (color: TranslateResult, msg?: TranslateResult, config: Pa
 export function log (log: any): Promise<Log> {
   if (typeof log === 'object' && log && !log.component) {
     const instance = getCurrentInstance()
-    debugger
-    log.component = instance ? instance.type.__name : 'unknown component'
+    if (instance) {
+      if (instance.type && instance.type.__name) {
+        log.component = instance.type.__name
+      } else if (instance.proxy && instance.proxy.$vnode && instance.proxy.$vnode.tag) {
+        log.component = instance.proxy.$vnode.tag
+      } else {
+        log.component = 'Unknown component at: ' + new Error().stack
+      }
+    }
   }
   return defaultLoggingService.log(log)
 }

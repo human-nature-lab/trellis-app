@@ -1,12 +1,21 @@
-import { inject } from 'vue'
-import DataStore from '@/components/interview/classes/DataStore'
-import InterviewManager, { sharedInterviewInstance } from '@/components/interview/classes/InterviewManager'
-import { data, manager } from '@/symbols/interview'
+import { computed, onBeforeUnmount, ref } from 'vue'
+import InterviewManager, { watchSharedInterview } from '@/components/interview/classes/InterviewManager'
 
-export function useManager (): InterviewManager {
-  return inject(manager) || sharedInterviewInstance
+export function useManager () {
+  const managerInstance = ref<InterviewManager>()
+  const unsubscribe = watchSharedInterview(m => {
+    managerInstance.value = m
+  })
+  onBeforeUnmount(unsubscribe)
+  return managerInstance
 }
 
-export function useDataStore (): DataStore {
-  return inject(data) || sharedInterviewInstance.data
+export function useDataStore () {
+  const manager = useManager()
+  return computed(() => {
+    const res = manager.value ? manager.value.data : null
+    debugger
+    console.log('useDataStore computed', res)
+    return res
+  })
 }

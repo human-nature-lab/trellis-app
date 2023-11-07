@@ -104,7 +104,7 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
 
   async getRespondentsByIds (respondentIds: string[]) {
     const repository = await DatabaseService.getRepository(Respondent)
-    return repository.find({
+    const respondents = await repository.find({
       where: {
         deletedAt: IsNull(),
         id: In(respondentIds),
@@ -118,6 +118,12 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
         'geos.geo.nameTranslation',
       ],
     })
+    const photos = await Promise.all(respondents.map(r => this.getRespondentPhotos(r.id)))
+    for (const i in respondents) {
+      respondents[i].photos = photos[i]
+      removeSoftDeleted(respondents[i])
+    }
+    return respondents
   }
 
   /**

@@ -19,6 +19,7 @@ import PT from '../../../static/parameter.types'
 import { locToNumber } from '../services/LocationHelpers'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 import Section from '../../../entities/trellis/Section'
+import { Hook } from '@/lib/Hook'
 
 export default class InterviewManager extends InterviewManagerBase {
   private _isReplaying: boolean
@@ -553,6 +554,11 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 }
 
+const sharedInterviewHook = new Hook<[InterviewManager]>()
+export function watchSharedInterview (cb: (manager: InterviewManager | null) => void): (() => void) {
+  return sharedInterviewHook.add(cb)
+}
+
 export let sharedInterviewInstance: InterviewManager = null
 export function sharedInterview (interview: Interview,
   blueprint: Form,
@@ -562,7 +568,11 @@ export function sharedInterview (interview: Interview,
   respondentFills?: RespondentFill[],
   baseRespondentConditionTags?: RespondentConditionTag[]): InterviewManager {
   if (!sharedInterviewInstance) {
-    sharedInterviewInstance = new InterviewManager(interview, blueprint, actions, data, conditionTags, respondentFills, baseRespondentConditionTags)
+    sharedInterviewInstance = new InterviewManager(
+      interview, blueprint, actions, data, conditionTags, respondentFills, baseRespondentConditionTags,
+    )
+    console.log('sharedInterviewInstance', sharedInterviewInstance)
+    sharedInterviewHook.emit(sharedInterviewInstance)
   }
   return sharedInterviewInstance
 }
@@ -572,4 +582,5 @@ export function clearSharedInterview () {
     sharedInterviewInstance.destroy()
   }
   sharedInterviewInstance = null
+  sharedInterviewHook.emit(null)
 }
