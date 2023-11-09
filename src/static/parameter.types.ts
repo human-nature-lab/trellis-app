@@ -1,4 +1,4 @@
-enum ParameterType  {
+export enum ParameterType {
   min = 1,
   max = 2,
   other = 3,
@@ -30,6 +30,7 @@ enum ParameterType  {
   dictator_decision = 29,
   dictator_proposer = 30,
   dictator_receiver = 31,
+  step_size = 32,
 }
 
 export default ParameterType

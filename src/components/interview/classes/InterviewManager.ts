@@ -19,8 +19,10 @@ import PT from '../../../static/parameter.types'
 import { locToNumber } from '../services/LocationHelpers'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 import Section from '../../../entities/trellis/Section'
+import { manager } from '@/symbols/interview'
 
 export default class InterviewManager extends InterviewManagerBase {
+  public symbol = manager
   private _isReplaying: boolean
   private hasAddedActions = true
   private lastActionHasChanged = false

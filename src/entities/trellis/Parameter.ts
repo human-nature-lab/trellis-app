@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 import { Serializable } from '../decorators/WebOrmDecorators'
 import SparseTimestampedSoftDelete from '../base/SparseTimestampedSoftDelete'
 
-export enum ParameterType {
+export enum ParameterDataType {
   String = 'string',
   Number = 'number',
   Choice = 'choice',

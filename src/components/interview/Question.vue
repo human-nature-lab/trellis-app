@@ -23,7 +23,7 @@
         :disabled="disabled || hasDkRf"
         :respondent="interview.survey.respondent"></div>
     </v-card-text>
-    <v-card-actions v-if="question.type.name !== 'intro' && showDkRf" class="mt-4">
+    <v-card-actions v-if="question.questionType.name !== 'intro' && showDkRf" class="mt-4">
       <DontKnowRefused
         :disabled="disabled"
         :question="question"
@@ -57,6 +57,7 @@
   import TextAreaQuestion from './questions/TextAreaQuestion.vue'
   import TimeQuestion from './questions/TimeQuestion.vue'
   import DistributionQuestion from './questions/distribution/DistributionQuestion.vue'
+  import DurationQuestion from './questions/DurationQuestion.vue'
   import QuestionTimer from './QuestionTimer.vue'
   import QuestionText from './QuestionText.vue'
   import Question from '../../entities/trellis/Question'
@@ -82,6 +83,7 @@
     [questionTypes.time]: TimeQuestion,
     [questionTypes.image]: ImageQuestion,
     [questionTypes.distribution]: DistributionQuestion,
+    [questionTypes.duration]: DurationQuestion,
   }
 
   export default {
