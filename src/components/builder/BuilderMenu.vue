@@ -28,7 +28,6 @@ const openLocales = ref(false)
 const expandAll = ref(false)
 
 function updateLocale (newLocale: Locale) {
-  console.log('update locale', newLocale)
   openLocales.value = false
   emit('update:locale', newLocale)
 }

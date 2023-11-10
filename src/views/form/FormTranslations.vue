@@ -66,7 +66,6 @@ const translationMap = computed(() => {
 })
 
 function translationTextChange (tt: TranslationText) {
-  console.log('update', tt)
   const ttIndex = translationMap.value[tt.translationId].translationText.findIndex(t => t.id === tt.id)
   if (ttIndex > -1) {
     translationMap.value[tt.translationId].translationText[ttIndex] = tt

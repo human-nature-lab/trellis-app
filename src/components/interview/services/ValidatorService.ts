@@ -77,7 +77,6 @@ function makeValueValidator (validator: ValueValidator): ParameterValidator {
 function makeLengthValidator (validator: ValueValidator): ParameterValidator {
   return function (qd: QuestionDatum, pVal: number) {
     pVal = +pVal
-    console.log('calling length validator with', pVal, qd.data.length)
     return qd.data && validator(qd.data, pVal)
   }
 }

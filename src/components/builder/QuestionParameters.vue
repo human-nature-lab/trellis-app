@@ -11,8 +11,6 @@ import Parameter from '@/entities/trellis/Parameter'
 import { logError } from '@/helpers/log.helper'
 import { QuestionTypeParameters } from '@/static/question.types'
 
-console.log('QuestionTypeParameters', JSON.stringify(QuestionTypeParameters))
-
 const props = defineProps<{
   disabled?: boolean
   value: QuestionParameter[]

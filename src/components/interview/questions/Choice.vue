@@ -40,7 +40,6 @@ function onChange (displayChoice) {
 }
 
 function onOtherChange (otherVal) {
-  console.log('other change', otherVal)
   debouncedAction(props.question.id, AT.other_choice_text, {
     choice_id: props.choice.id,
     val: otherVal,

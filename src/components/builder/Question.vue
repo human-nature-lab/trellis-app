@@ -34,7 +34,6 @@ const isDistributionType = computed(() => {
   return props.value.questionTypeId === questionTypes.distribution
 })
 async function updateQuestion () {
-  console.log('Question.vue@updateQuestion')
   if (working.value) return
   working.value = true
   showChoices.value = isChoiceType.value

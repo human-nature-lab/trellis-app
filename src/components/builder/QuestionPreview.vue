@@ -25,17 +25,14 @@ const loading = ref(true)
 const question = ref<QuestionModel>()
 
 useActionHandler(async action => {
-  console.log('preview action', action)
   if (!manager.value) return
   await manager.value.pushAction(action)
   // question.value = question.value ? question.value.copy() : null
-  console.log(JSON.stringify(manager.value.data.data))
   question.value.datum = manager.value.data.getQuestionDatumById(question.value.datum.id)
   question.value.datum = question.value && question.value.datum ? question.value.datum.copy() : null
 })
 
 async function load () {
-  console.log('loading question preview', props.question.id)
   try {
     loading.value = true
     interview.value = new Interview().fromSnakeJSON({
