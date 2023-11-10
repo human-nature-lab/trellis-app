@@ -15,6 +15,7 @@ const Reports = () => import(/* webpackChunkName: "reports" */'@/views/admin/Rep
 const OldFormBuilder = () => import(/* webpackChunkName: "old-form-builder" */'@/views/form/OldFormBuilder.vue')
 const FormBuilder = () => import(/* webpackChunkName: "form-builder" */'@/views/form/FormBuilder.vue')
 const FormPrint = () => import(/* webpackChunkName: "form-print" */'@/views/form/FormPrint.vue')
+const FormTranslations = () => import(/* webpackChunkName: "form-translations" */'@/views/form/FormTranslations.vue')
 const Devices = () => import(/* webpackChunkName: "devices" */'@/views/admin/Devices.vue')
 const Studies = () => import(/* webpackChunkName: "studies" */'@/views/study/Studies.vue')
 const GeoTypes = () => import(/* webpackChunkName: "geo-types" */'@/views/geo/GeoTypes.vue')
@@ -71,6 +72,11 @@ export default sharedRoutes.concat([{
   name: 'FormPrint',
   component: FormPrint,
   beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard])
+}, {
+  path: '/form/:formId/translations',
+  name: 'FormTranslations',
+  component: FormTranslations,
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard]),
 }, {
   path: '/forms',
   name: 'Forms',

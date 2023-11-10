@@ -1,50 +1,64 @@
-<template>
-    <v-flex class="decimal-question">
-      <v-text-field
-        :rules="rules"
-        :disabled="isQuestionDisabled"
-        v-model.number="value"
-        :placeholder="$t('value')"
-        type="number"
-      ></v-text-field>
-    </v-flex>
-</template>
+<script lang="ts" setup>
+import { ref, computed } from 'vue'
+import AT from '@/static/action.types'
+import PT from '@/static/parameter.types'
+import { debouncedAction } from '../lib/action'
+import { useVuetifyQuestionRules, useQuestionDisabled } from '@/helpers/interview.helper'
+import Question from '@/entities/trellis/Question'
+import Respondent from '@/entities/trellis/Respondent'
 
-<script>
-  // TODO: It might be required to use https://github.com/text-mask/text-mask/tree/master/core to support decimal type
-  import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
-  import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
-  import ActionMixin from '../mixins/ActionMixin'
-  import AT from '../../../static/action.types'
+const props = defineProps<{
+  question: Question
+  disabled?: boolean
+  respondent: Respondent
+  location: Location
+}>()
 
-  export default {
-    name: 'decimal-question',
-    props: {
-      question: {
-        type: Object,
-        required: true
-      }
-    },
-    mixins: [QuestionDisabledMixin, VuetifyValidationRules, ActionMixin],
-    data: function () {
-      return {
-        _value: null
-      }
-    },
-    computed: {
-      value: {
-        get: function () {
-          return this.question.datum.data.length ? this.question.datum.data[0].val : this._value
-        },
-        set: function (val) {
-          this._value = val
-          this.question.isAnswered = this.value !== null && this.value !== undefined
-          this.debouncedAction(AT.number_change, {
-            name: 'decimal',
-            val: val
-          })
-        }
-      }
-    }
-  }
+const localVal = ref<number | null>(null)
+const value = computed(() => {
+  return props.question.datum.data.length ? props.question.datum.data[0].val : localVal.value
+})
+
+function setValue (val: string | number) {
+  localVal.value = +val
+  props.question.isAnswered = value.value !== null && value.value !== undefined
+  debouncedAction(props.question.id, AT.number_change, {
+    name: 'decimal',
+    val: '' + val,
+  })
+}
+
+const rules = useVuetifyQuestionRules(props)
+const isQuestionDisabled = useQuestionDisabled(props)
+const stepSize = computed(() => {
+  const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.step_size)
+  return qp ? +qp.val : 1
+})
+
+const min = computed(() => {
+  const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.min)
+  return qp ? +qp.val : null
+})
+
+const max = computed(() => {
+  const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.max)
+  return qp ? +qp.val : null
+})
+
 </script>
+
+<template>
+  <v-flex class="decimal-question">
+    <v-text-field
+      :rules="rules"
+      :disabled="isQuestionDisabled"
+      :value="+value"
+      :step="stepSize"
+      :min="min"
+      :max="max"
+      @input="setValue"
+      :placeholder="$t('value')"
+      type="number"
+    />
+  </v-flex>
+</template>

@@ -1,69 +1,72 @@
-import { ValidationRules } from '../../../classes/Validators'
-import { i18n as v18n } from '../../../i18n'
-import QuestionDatum from '../../../entities/trellis/QuestionDatum'
-import Question from '../../../entities/trellis/Question'
-import QuestionParameter from '../../../entities/trellis/QuestionParameter'
-import ParameterType from '../../../static/parameter.types'
-import QT from '../../../static/question.types'
-import PT from '../../../static/parameter.types'
+import { ValidationRules } from '@/classes/Validators'
+import { i18n as v18n } from '@/i18n'
+import QuestionDatum from '@/entities/trellis/QuestionDatum'
+import Question from '@/entities/trellis/Question'
+import QuestionParameter from '@/entities/trellis/QuestionParameter'
+import PT from '@/static/parameter.types'
+import QT from '@/static/question.types'
 
+// TODO: Clean up this cluster of a file
 // All of the validation errors that will be displayed when validation fails
 export const validationErrors = {
   min: min => v18n.t('value_must_be_greater_than_min', [min]),
   max: max => v18n.t('value_must_be_less_than_max', [max]),
   is_required: () => v18n.t('response_required'),
-  read_only: () => `How did you get here? This question is read only.`,
+  read_only: () => 'How did you get here? This question is read only.',
   min_geos: min => v18n.t('value_must_be_greater_than_min', [min]),
   max_geos: max => v18n.t('value_must_be_less_than_max', [max]),
   min_roster: min => v18n.t('value_must_be_greater_than_min', [min]),
   max_roster: max => v18n.t('value_must_be_less_than_max', [max]),
   min_relationships: min => v18n.t('value_must_be_greater_than_min', [min]),
-  max_relationships: max => v18n.t('value_must_be_less_than_max', [max])
+  max_relationships: max => v18n.t('value_must_be_less_than_max', [max]),
 }
 
-export const typeHandlers = {
-  'read_only': function () {
+type ParameterValidator = (qd: QuestionDatum, pVal: any, pMap?: Record<Partial<PT>, boolean>) => boolean
+type ValueValidator = (val: any, pVal: any) => boolean
+
+export const typeHandlers: Record<keyof typeof PT, ParameterValidator> = {
+  read_only: () => {
     return true
   },
-  'min': function (qd: QuestionDatum, pVal: any) {
+  min: function (qd: QuestionDatum, pVal: any) {
     pVal = parseInt(pVal, 10)
     return qd.data.length && qd.data[0].val >= pVal
   },
-  'max': function (qd: QuestionDatum, pVal: any) {
+  max: function (qd: QuestionDatum, pVal: any) {
     pVal = parseInt(pVal, 10)
     return qd.data.length && qd.data[0].val <= pVal
   },
-  'min_geos': function (qd: QuestionDatum, pVal: any) {
+  min_geos: function (qd: QuestionDatum, pVal: any) {
     pVal = parseInt(pVal, 10)
     return qd.data.length >= pVal
   },
-  'max_geos': function (qd: QuestionDatum, pVal: any) {
+  max_geos: function (qd: QuestionDatum, pVal: any) {
     pVal = parseInt(pVal, 10)
     return qd.data.length <= pVal
   },
-  'is_required': function (qd: QuestionDatum, pVal: any, pMap) {
+  is_required: function (qd: QuestionDatum, pVal: any, pMap) {
     if (pVal) {
       const isSingleDatumType = qd.data && qd.data.length && ['text', 'integer', 'decimal'].indexOf(qd.data[0].name) > -1
       if (qd.data && qd.data.length && (!isSingleDatumType || ('' + qd.data[0].val).length > 0)) {
         return true
       } else if (pMap[PT.show_dk] || pMap[PT.show_rf]) {
-        return qd.dkRf !== undefined && qd.dkRf !== null && qd.dkRfVal && qd.dkRfVal.length
+        return qd.dkRf !== undefined && qd.dkRf !== null && qd.dkRfVal && !!qd.dkRfVal.length
       } else {
         return false
       }
     } else {
       return true
     }
-  }
+  },
 }
 
 // Aliases
-typeHandlers['min_relationships'] = typeHandlers['min_geos']
-typeHandlers['max_relationships'] = typeHandlers['max_geos']
-typeHandlers['min_roster'] = typeHandlers['min_geos']
-typeHandlers['max_roster'] = typeHandlers['max_geos']
+typeHandlers.min_relationships = typeHandlers.min_geos
+typeHandlers.max_relationships = typeHandlers.max_geos
+typeHandlers.min_roster = typeHandlers.min_geos
+typeHandlers.max_roster = typeHandlers.max_geos
 
-function makeValueValidator (validator: Function): Function {
+function makeValueValidator (validator: ValueValidator): ParameterValidator {
   return function (qd: QuestionDatum, pVal: number) {
     pVal = +pVal // Cast as number
     const val = qd.data && qd.data.length && qd.data[0].val
@@ -71,15 +74,14 @@ function makeValueValidator (validator: Function): Function {
   }
 }
 
-function makeLengthValidator (validator: Function, invalidResponse?: Function): Function {
+function makeLengthValidator (validator: ValueValidator): ParameterValidator {
   return function (qd: QuestionDatum, pVal: number) {
     pVal = +pVal
-    console.log('calling length validator with', pVal, qd.data.length)
     return qd.data && validator(qd.data, pVal)
   }
 }
 
-export const parameterValidationRules = {
+export const parameterValidationRules: Record<keyof typeof PT, ParameterValidator> = {
   read_only () {
     return true
   },
@@ -100,14 +102,13 @@ export const parameterValidationRules = {
     } else {
       return true
     }
-  }
+  },
 }
 
-parameterValidationRules['min_relationships'] = parameterValidationRules['min_geos']
-parameterValidationRules['max_relationships'] = parameterValidationRules['max_geos']
-parameterValidationRules['min_roster'] = parameterValidationRules['min_geos']
-parameterValidationRules['max_roster'] = parameterValidationRules['max_geos']
-
+parameterValidationRules.min_relationships = parameterValidationRules.min_geos
+parameterValidationRules.max_relationships = parameterValidationRules.max_geos
+parameterValidationRules.min_roster = parameterValidationRules.min_geos
+parameterValidationRules.max_roster = parameterValidationRules.max_geos
 
 // The parameter types that are actually checked here
 const relevantTypes = [
@@ -119,7 +120,7 @@ const relevantTypes = [
   PT.min_roster,
   PT.max_roster,
   PT.max,
-  PT.is_required
+  PT.is_required,
 ]
 
 /**
@@ -149,20 +150,18 @@ function castParameter (questionType: string, parameterType: string | number, va
   }
 }
 
-// @ts-ignore
-export function parametersToMap (parameters: QuestionParameter[], question: Question): {[key: ParameterType]: boolean} {
-  let pMap = parameters.reduce((map, p) => {
+export function parametersToMap (parameters: QuestionParameter[], question: Question): Record<PT, boolean> {
+  const pMap = parameters.reduce((map, p) => {
     map[p.parameterId] = castParameter(question.questionTypeId, p.parameterId, p.val)
     return map
   }, {
     [PT.read_only]: question.questionTypeId === QT.intro,
     [PT.is_required]: true,
     [PT.show_dk]: true,
-    [PT.show_rf]: true
+    [PT.show_rf]: true,
   })
 
   if (typeof pMap[PT.is_required] === 'string') {
-    // @ts-ignore
     pMap[PT.is_required] = pMap[PT.is_required] === 'true'
   }
 
@@ -196,11 +195,11 @@ function validateIndependentParameters (questionDatum: QuestionDatum, pMap: {[ke
  * @returns {boolean}
  */
 export function validateParametersNew (question: Question, parameters: QuestionParameter[], questionDatum: QuestionDatum) {
-  let pMap = parametersToMap(parameters, question)
+  const pMap = parametersToMap(parameters, question)
 
   if (validateIndependentParameters(questionDatum, pMap)) return true
 
-  for (let type of relevantTypes) {
+  for (const type of relevantTypes) {
     if (pMap[type] !== undefined && pMap[type] !== null) {
       const parameterName = PT[type]
       if (!parameterValidationRules[parameterName](questionDatum, pMap[type], pMap)) {
@@ -230,9 +229,9 @@ export function allParametersAreValidWithError (question: Question, parameters: 
  * @returns {Array}
  */
 export function makeValidationRules (question: Question, parameters: QuestionParameter[]) {
-  let rules = []
-  for (let parameter of parameters) {
-    let parameterValue = castParameter(question.questionTypeId, parameter.parameterId, parameter.val)
+  const rules = []
+  for (const parameter of parameters) {
+    const parameterValue = castParameter(question.questionTypeId, parameter.parameterId, parameter.val)
     if (validationErrors[parameter.parameter.name]) {
       const errorMessage = validationErrors[parameter.parameter.name](parameterValue)
       rules.push(function () {

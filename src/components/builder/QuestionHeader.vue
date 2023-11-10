@@ -65,6 +65,12 @@
           :on-title="$t('hide_choices')"
           :off-title="$t('show_choices')"
         />
+        <ToggleItem
+          :value="inPreview"
+          @input="$emit('toggle-preview', $event)"
+          :on-title="$t('hide_preview')"
+          :off-title="$t('show_preview')"
+        />
         <v-list-item
           :disabled="builder.locked"
           @click="$emit('duplicate')"
@@ -108,9 +114,11 @@ export default Vue.extend({
     showConditions: Boolean,
     showChoices: Boolean,
     allowChoices: Boolean,
+    inPreview: Boolean,
   },
   methods: {
     updateQuestionType (typeId: string) {
+      this.value.questionType = this.builder.questionTypes.find(qt => qt.id === typeId)
       this.value.questionTypeId = typeId
       this.$emit('change', this.value)
     },

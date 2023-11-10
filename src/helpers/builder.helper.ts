@@ -17,12 +17,12 @@ type BuilderState = {
   geoTypes: GeoType[],
 }
 
-export function useBuilderState () {
+export function useBuilder () {
   return inject<BuilderState>(builder)
 }
 
 export function useBuilderQuestions () {
-  const builder = useBuilderState()
+  const builder = useBuilder()
   return computed(() => {
     const m: Record<string, Question> = {}
     if (!builder || !builder.form) {
@@ -37,4 +37,9 @@ export function useBuilderQuestions () {
     }
     return m
   })
+}
+
+export function useBuilderQuestionList () {
+  const questions = useBuilderQuestions()
+  return computed(() => Object.values(questions.value))
 }
