@@ -14,7 +14,7 @@ const props = defineProps<{
 const format = computed(() => {
   const qd = props.question.questionParameters.find(qp => qp.parameterId === PT.duration_format)
   if (!qd) return 'HH:mm:ss'
-  return qd.value
+  return qd.val
 })
 
 </script>
