@@ -29,11 +29,11 @@
         />
         <v-checkbox
           v-model="global.printMode"
-          label="Print mode"
+          :label="$t('print_mode')"
         />
         <LocaleSelector @change="global.locale = $event" />
         <v-btn @click="printToDoc">
-          Export as Word Document
+          {{ $t('export_as_word') }}
         </v-btn>
       </v-container>
     </TrellisModal>
@@ -62,13 +62,13 @@
           v-if="section.formSections[0].maxRepetitions > 0"
           label
         >
-          Repeated {{ section.formSections[0].maxRepetitions }} times
+          {{ $t('repeated', [section.formSections[0].maxRepetitions]) }}
         </v-chip>
         <v-chip
           v-if="section.formSections[0].followUpQuestionId"
           label
         >
-          Follow up to "{{ questionMap[section.formSections[0].followUpQuestionId].varName }}"
+          {{ $t('follow_up_to', [questionMap[section.formSections[0].followUpQuestionId].varName]) }}
         </v-chip>
       </v-row>
       <v-col class="section-content">
@@ -88,11 +88,11 @@
               class="pa-2"
             >
               <span v-if="opts.pageTitles">
-                Page: {{ pageIndex + 1 }}
+                {{ $t('page_n', [pageIndex + 1]) }}
               </span>
               <v-spacer />
               <v-chip v-if="page.skips.length">
-                Skips {{ page.skips.length }}
+                {{  $t('skip_count', [page.skips.length]) }}
               </v-chip>
             </v-card-title>
             <v-col v-if="opts.pageSkips && page.skips.length">
@@ -209,7 +209,7 @@ export default Vue.extend({
     async printToDoc () {
       const doc = await DocService.formToDocx(this.form, this.global.locale, this.opts)
       const name = this.translate(this.form.nameTranslation, this.global.locale)
-      saveAs(doc, `${name} v${this.form.version}.docx`)
+      saveAs(doc, `${name}_v${this.form.version}_${this.global.locale.languageTag}.docx`)
     },
   },
   computed: {

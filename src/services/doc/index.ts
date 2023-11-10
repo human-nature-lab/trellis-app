@@ -162,10 +162,10 @@ export class DocService {
             const rfParameter = question.questionParameters.find(p => +p.parameterId === PT.show_rf)
             const choices = []
             if (!dkParameter || !!dkParameter.val) {
-              choices.push(i18n.t('dont_know') as string)
+              choices.push(i18n.t('do_not_know') as string)
             }
             if (!rfParameter || !!rfParameter.val) {
-              choices.push(i18n.t('refused') as string)
+              choices.push(i18n.t('refuse_to_answer') as string)
             }
             if (choices.length) {
               children.push(new Paragraph({

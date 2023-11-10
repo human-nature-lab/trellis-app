@@ -1,4 +1,6 @@
-export default {
+import { ParameterType as PT } from './parameter.types'
+
+const qt = {
   time: '06162912-8048-4978-a8d2-92b6dd0c2ed1',
   multiple_select: '0f76b96f-613a-4925-bacd-74db45368edb',
   image: '1e9e577d-524c-4af1-bd70-26b561e14710',
@@ -19,3 +21,43 @@ export default {
   respondent_geo: 'db1192c9-a850-4427-ad67-388f6325fd23',
   distribution: 'd9a2de9f-411a-11ee-81c8-0242ac120003',
 }
+
+// Here we create the list of accepted parameters for each question type
+const defaultParams = [PT.show_dk, PT.show_rf, PT.is_required, PT.read_only, PT.allowed_time, PT.show_timer_controls]
+const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
+  [qt.time]: [PT.min_time, PT.max_time],
+  [qt.multiple_select]: [PT.other, PT.exclusive],
+  [qt.image]: [PT.min, PT.max],
+  [qt.relationship]: [
+    PT.min_relationships,
+    PT.max_relationships,
+    PT.and_respondent_condition_tag,
+    PT.or_respondent_condition_tag,
+    PT.can_add_respondent,
+    PT.hide_no_one,
+    PT.dictator_receiver,
+  ],
+  [qt.integer]: [PT.min, PT.max],
+  [qt.decimal]: [PT.min, PT.max, PT.step_size],
+  [qt.group]: [],
+  [qt.roster]: [PT.allow_barcode, PT.min_roster, PT.max_roster],
+  [qt.text]: [PT.allow_barcode],
+  [qt.text_area]: [PT.allow_barcode],
+  [qt.multiple_choice]: [PT.other, PT.exclusive],
+  [qt.geo]: [PT.geo_type, PT.min_geos, PT.max_geos],
+  [qt.intro]: [],
+  [qt.year]: [PT.min_date, PT.max_date],
+  [qt.year_month]: [PT.min_date, PT.max_date],
+  [qt.year_month_day]: [PT.min_date, PT.max_date],
+  [qt.year_month_day_time]: [PT.min_date, PT.max_date, PT.min_time, PT.max_time],
+  [qt.respondent_geo]: [PT.geo_type],
+  [qt.distribution]: [PT.json, PT.dictator_decision],
+}
+
+for (const key in questionTypeParameters) {
+  questionTypeParameters[key] = questionTypeParameters[key].concat(defaultParams)
+}
+
+export const QuestionTypeParameters = Object.freeze(questionTypeParameters)
+
+export default qt

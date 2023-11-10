@@ -1,3 +1,48 @@
+<script lang="ts" setup>
+import { inject, ref } from 'vue'
+import { study as studySymbol } from '@/symbols/main'
+import Locale from '@/entities/trellis/Locale'
+import LocaleSelectorMenu from '@/components/locale/LocaleSelectorMenu.vue'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import expandAllBus from '@/events/builder/expandAll'
+import FormService from '@/services/form'
+import Study from '@/entities/trellis/Study'
+
+const study = inject<Study>(studySymbol)
+
+const props = defineProps<{
+  locked: boolean
+  locale: Locale
+  formId: string
+}>()
+
+const emit = defineEmits<{
+  (event: 'update:locked', value: boolean): void
+  (event: 'update:locale', value: Locale): void
+  (event: 'add-section'): void
+  (event: 'add-existing-section'): void
+  (event: 'refresh'): void
+}>()
+
+const openLocales = ref(false)
+const expandAll = ref(false)
+
+function updateLocale (newLocale: Locale) {
+  openLocales.value = false
+  emit('update:locale', newLocale)
+}
+
+function toggleExpandAll () {
+  expandAll.value = !expandAll.value
+  expandAllBus.$emit('change', expandAll.value)
+}
+
+function exportForm () {
+  FormService.exportForm(props.formId)
+}
+
+</script>
+
 <template>
   <DotsMenu>
     <v-list>
@@ -26,7 +71,7 @@
         </v-list-item-content>
       </v-list-item>
       <v-list-item
-        @click="$emit('addSection')"
+        @click="$emit('add-section')"
         :disabled="locked"
       >
         <v-list-item-action>
@@ -36,7 +81,7 @@
       </v-list-item>
       <v-list-item
         :disabled="locked"
-        @click="$emit('addExistingSection')"
+        @click="$emit('add-existing-section')"
       >
         <v-list-item-action>
           <v-icon>
@@ -47,14 +92,33 @@
           {{ $t('add_existing_section') }}
         </v-list-item-content>
       </v-list-item>
+      <v-list-item :to="{ name: 'FormTranslations', params: { formId } }">
+        <v-list-item-action>
+          <v-icon>mdi-translate</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          {{ $t('edit_translations') }}
+        </v-list-item-content>
+      </v-list-item>
       <v-list-item
-        :to="{ name: 'InterviewPreview', params: { formId: formId } }"
+        :to="{ name: 'InterviewPreview', params: { formId } }"
         target="_blank"
       >
         <v-list-item-action>
           <v-icon>mdi-open-in-new</v-icon>
         </v-list-item-action>
         <v-list-item-content>{{ $t('preview_form') }}</v-list-item-content>
+      </v-list-item>
+      <v-list-item
+        :to="{ name: 'FormPrint', params: { formId } }"
+        target="_blank"
+      >
+        <v-list-item-action>
+          <v-icon>mdi-open-in-new</v-icon>
+        </v-list-item-action>
+        <v-list-item-content>
+          {{ $t('print_form') }}
+        </v-list-item-content>
       </v-list-item>
       <v-list-item @click="exportForm">
         <v-list-item-action>
@@ -86,53 +150,5 @@
         <v-list-item-content>{{ $t('refresh') }}</v-list-item-content>
       </v-list-item>
     </v-list>
-
   </DotsMenu>
 </template>
-
-<script lang="ts">
-import Vue, { PropType } from 'vue'
-import { study } from '@/symbols/main'
-import Locale from '@/entities/trellis/Locale'
-import LocaleSelectorMenu from '@/components/locale/LocaleSelectorMenu.vue'
-import DotsMenu from '@/components/util/DotsMenu.vue'
-import expandAll from '@/events/builder/expandAll'
-import FormService from '@/services/form'
-import TrellisModal from '@/components/TrellisModal.vue'
-import ExistingSectionSelector from './ExistingSectionSelector.vue'
-
-export default Vue.extend({
-  name: 'BuilderMenu',
-  inject: { study },
-  components: { LocaleSelectorMenu, DotsMenu, TrellisModal, ExistingSectionSelector },
-  props: {
-    locked: Boolean,
-    locale: Object as PropType<Locale>,
-    formId: String,
-  },
-  data () {
-    return {
-      openLocales: false,
-      expandAll: false,
-      showSectionSelector: false,
-    }
-  },
-  methods: {
-    updateLocale (newLocale: Locale) {
-      console.log('update locale', newLocale)
-      this.$emit('update:locale', newLocale)
-    },
-    toggleExpandAll () {
-      this.expandAll = !this.expandAll
-      expandAll.$emit('change', this.expandAll)
-    },
-    exportForm () {
-      FormService.exportForm(this.formId)
-    },
-  },
-})
-</script>
-
-<style lang="sass">
-
-</style>

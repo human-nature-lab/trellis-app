@@ -1,8 +1,62 @@
+<script lang="ts" setup>
+import Question from '@/entities/trellis/Question'
+import AT from '@/static/action.types'
+import QT from '@/static/question.types'
+import { InterviewLocation } from '../services/InterviewAlligator'
+import ChoiceText from './ChoiceText.vue'
+import RadioCheckbox from './RadioCheckbox.vue'
+import { action, debouncedAction } from '../lib/action'
+import Choice from '@/entities/trellis/Choice'
+
+export type DisplayChoice = Pick<Choice, 'id' | 'choiceTranslation'> & {
+  choice: Choice
+  isSelected: boolean
+  isOther: boolean
+  otherText?: string
+}
+
+const props = defineProps<{
+  choice: DisplayChoice
+  question: Question
+  location: InterviewLocation
+  disabled: boolean
+}>()
+
+function onChange (displayChoice) {
+  const choice = displayChoice.choice
+  if (displayChoice.isSelected) {
+    action(props.question.id, AT.select_choice, {
+      choice_id: choice.id,
+      val: choice.val,
+      name: choice.val,
+    })
+  } else {
+    action(props.question.id, AT.deselect_choice, {
+      choice_id: choice.id,
+      val: choice.val,
+      name: choice.val,
+    })
+  }
+}
+
+function onOtherChange (otherVal) {
+  debouncedAction(props.question.id, AT.other_choice_text, {
+    choice_id: props.choice.id,
+    val: otherVal,
+    name: otherVal,
+  })
+}
+
+function choiceClasses (choice: DisplayChoice) {
+  return { other: choice.isOther && choice.isSelected }
+}
+</script>
+
 <template>
   <v-row class="checkbox-group">
     <v-checkbox
       class="checkbox"
-      v-if="question.type.name==='multiple_select'"
+      v-if="question.questionTypeId === QT.multiple_select"
       :disabled="disabled"
       v-model="choice.isSelected"
       :class="choiceClasses(choice)"
@@ -39,57 +93,6 @@
     />
   </v-row>
 </template>
-
-<script>
-import AT from '../../../static/action.types'
-import ActionMixin from '../mixins/ActionMixin'
-import ChoiceText from './ChoiceText.vue'
-import RadioCheckbox from './RadioCheckbox.vue'
-
-export default {
-  name: 'Choice',
-  props: {
-    choice: Object,
-    question: Object,
-    location: Object,
-    disabled: Boolean,
-  },
-  methods: {
-    onChange (displayChoice) {
-      const choice = displayChoice.choice
-      if (displayChoice.isSelected) {
-        this.action(AT.select_choice, {
-          choice_id: choice.id,
-          val: choice.val,
-          name: choice.val,
-        })
-      } else {
-        this.action(AT.deselect_choice, {
-          choice_id: choice.id,
-          val: choice.val,
-          name: choice.val,
-        })
-      }
-    },
-    onOtherChange (otherVal) {
-      console.log('other change', otherVal)
-      this.debouncedAction(AT.other_choice_text, {
-        choice_id: this.choice.id,
-        val: otherVal,
-        name: otherVal,
-      })
-    },
-    choiceClasses (choice) {
-      return { other: choice.isOther && choice.isSelected }
-    },
-  },
-  mixins: [ActionMixin],
-  components: {
-    ChoiceText,
-    RadioCheckbox,
-  },
-}
-</script>
 
 <style lang="sass">
 .input-group

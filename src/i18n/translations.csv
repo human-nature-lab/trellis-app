@@ -699,3 +699,11 @@ discovering,Discovering,Buscando,Status indicator
 finished,Finished,Finalizado,Status indicator
 stopped,Stopped,Detenido,Status indicator
 failure,Failure,Falla,Status indicator
+export_as_word,Export as Word Document,,
+print_mode,Print mode,,
+question_type,Question type,,
+edit_translations,Edit translations,,
+randomly,Randomly,,
+sequentially,Sequentially,,
+hide_preview,Hide preview,,
+show_preview,Show preview,,
