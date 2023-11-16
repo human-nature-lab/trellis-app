@@ -86,7 +86,7 @@
     [questionTypes.duration]: DurationQuestion,
   }
 
-  export default {
+  export default Vue.extend({
     name: 'question',
     mixins: [TranslationMixin],
     components: {
@@ -184,10 +184,10 @@
         return count === 2
       },
       hasDkRf (): boolean {
-        return this.question.dkRf !== null && this.question.dkRf !== undefined
+        return this.question.datum && this.question.datum.dkRf !== null && this.question.datum.dkRf !== undefined
       }
     }
-  }
+  })
 </script>
 <style lang="sass">
   $question-margin: 15px

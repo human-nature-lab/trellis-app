@@ -54,14 +54,14 @@
     mixins: [ActionMixin],
     name: 'dont-know-refused',
     data: function () {
-      console.log('dkrf data')
       return {
         _reason: this.question.datum.dk_rf_val,
         rules: [value => !!value || this.$t('required_field')]
       }
     },
     created: function () {
-      this._reason = this.question.datum.dk_rf_val // We're actually binding to a text model so here we need to initialize that var
+      // We're actually binding to a text model so here we need to initialize that var
+      this._reason = this.question.datum.dk_rf_val
     },
     computed: {
       showDk () {
