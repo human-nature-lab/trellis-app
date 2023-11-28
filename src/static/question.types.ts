@@ -45,7 +45,7 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
     PT.hide_no_one,
     PT.dictator_receiver,
   ],
-  [qt.integer]: [PT.min, PT.max],
+  [qt.integer]: [PT.min, PT.max, PT.step_size],
   [qt.decimal]: [PT.min, PT.max, PT.step_size],
   [qt.group]: [],
   [qt.roster]: [PT.allow_barcode, PT.min_roster, PT.max_roster],
