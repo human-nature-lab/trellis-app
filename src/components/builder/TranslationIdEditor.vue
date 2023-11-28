@@ -21,7 +21,6 @@ onCreated(t => {
 })
 
 function updateTranslation (newTranslation: TranslationModel) {
-  console.log('updateTranslation', newTranslation)
   if (newTranslation.id !== translation.value.id) {
     emit('input', newTranslation.id)
   }

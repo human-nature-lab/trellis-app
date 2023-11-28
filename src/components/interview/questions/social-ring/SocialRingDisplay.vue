@@ -140,7 +140,6 @@ const rings = computed(() => props.config.rings.slice().reverse().map((_, i) => 
 }))
 
 function startDrag (respondent: RespondentCircle, pos: Pos) {
-  console.log('start drag', respondent.respondent.id)
   startPosition.value.mouse = pos
   startPosition.value.circle = { x: respondent.cx, y: respondent.cy }
   draggingCircle.value = respondent
@@ -203,7 +202,6 @@ function dragMoveTouch (event: TouchEvent) {
 }
 
 function stopDrag (pos: Pos) {
-  console.log('stopDrag')
   updateDragginPos(pos)
   if (draggingRing.value !== null) {
     // Reset the grid if they were put in a ring

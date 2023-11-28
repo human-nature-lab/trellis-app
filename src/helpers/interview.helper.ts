@@ -16,8 +16,6 @@ export function useDataStore () {
   const manager = useManager()
   return computed(() => {
     const res = manager.value ? manager.value.data : null
-    debugger
-    console.log('useDataStore computed', res)
     return res
   })
 }

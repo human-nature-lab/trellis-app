@@ -44,11 +44,8 @@ watch(config, async () => {
     // Ensure consistent random sort order
     data.sort((a, b) => a.randomSortOrder - b.randomSortOrder)
     const edgeIds = data.map(d => d.edgeId)
-    console.log('source data', data, edgeIds)
     const edges = await EdgeService.getEdges(edgeIds)
-    console.log('edges', edges)
     const respondentIds = edges.map(e => e.targetRespondentId)
-    console.log('respondentIds', respondentIds)
     const res = await rs.getRespondentsByIds(respondentIds.concat(props.respondent.id))
     respondents.value = res.filter(r => r.id !== props.respondent.id)
 
