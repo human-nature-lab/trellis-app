@@ -5,16 +5,20 @@
       :disabled="isQuestionDisabled"
       v-model.number="value"
       type="number"
-      :step="1" />
+      :step="stepSize"
+      :min="min"
+      :max="max" />
   </v-flex>
 </template>
 
 <script>
+  import { computed } from 'vue'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
   import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
   import ActionMixin from '../mixins/ActionMixin'
-  import AT from '../../../static/action.types'
-  import Question from '../../../entities/trellis/Question'
+  import AT from '@/static/action.types'
+  import PT from '@/static/parameter.types'
+  import Question from '@/entities/trellis/Question'
   export default {
     name: 'integer-question',
     props: {
@@ -28,6 +32,23 @@
       return {
         _value: null
       }
+    },
+    setup (props) {
+      const stepSize = computed(() => {
+        const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.step_size)
+        return qp ? +qp.val : 1
+      })
+
+      const min = computed(() => {
+        const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.min)
+        return qp ? +qp.val : null
+      })
+
+      const max = computed(() => {
+        const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.max)
+        return qp ? +qp.val : null
+      })
+      return { stepSize, min, max }
     },
     computed: {
       value: {

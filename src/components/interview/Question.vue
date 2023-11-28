@@ -10,7 +10,7 @@
     </v-alert>
     <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
     <v-card-text class="question-content">
-      <v-flex class="question-text title">
+      <v-flex class="question-text title" v-if="showQuestionText">
         <QuestionText 
           :location="location"
           :question="question"
@@ -40,7 +40,7 @@
   import DontKnowRefused from './DontKnowRefused.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
   import TranslationMixin from '../../mixins/TranslationMixin'
-  import questionTypes from '../../static/question.types'
+  import questionTypes, { builderTypes } from '@/static/question.types'
   import ParameterType from '../../static/parameter.types'
 
   import DateQuestion from './questions/DateQuestion.vue'
@@ -57,6 +57,7 @@
   import TextAreaQuestion from './questions/TextAreaQuestion.vue'
   import TimeQuestion from './questions/TimeQuestion.vue'
   import DistributionQuestion from './questions/distribution/DistributionQuestion.vue'
+  import SocialRingQuestion from './questions/social-ring/SocialRingQuestion.vue'
   import DurationQuestion from './questions/DurationQuestion.vue'
   import QuestionTimer from './QuestionTimer.vue'
   import QuestionText from './QuestionText.vue'
@@ -83,6 +84,7 @@
     [questionTypes.time]: TimeQuestion,
     [questionTypes.image]: ImageQuestion,
     [questionTypes.distribution]: DistributionQuestion,
+    [questionTypes.social_ring]: SocialRingQuestion,
     [questionTypes.duration]: DurationQuestion,
   }
 
@@ -185,6 +187,9 @@
       },
       hasDkRf (): boolean {
         return this.question.datum && this.question.datum.dkRf !== null && this.question.datum.dkRf !== undefined
+      },
+      showQuestionText (): boolean {
+        return !builderTypes.includes(this.question.questionTypeId)
       }
     }
   })

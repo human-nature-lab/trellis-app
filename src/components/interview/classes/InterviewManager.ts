@@ -19,6 +19,7 @@ import PT from '../../../static/parameter.types'
 import { locToNumber } from '../services/LocationHelpers'
 import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
 import Section from '../../../entities/trellis/Section'
+import { Hook } from '@/lib/Hook'
 import { manager } from '@/symbols/interview'
 
 export default class InterviewManager extends InterviewManagerBase {
@@ -48,7 +49,6 @@ export default class InterviewManager extends InterviewManagerBase {
     this.data = new DataStore()
     this.actions = new ActionStore(this.blueprint)
 
-    console.log('InterviewManager: initial data', data)
     if (data) this.data.loadData(data, actions)
     if (conditionTags) this.data.loadConditionTags(conditionTags, baseRespondentConditionTags)
     if (respondentFills) this.respondentFills.fill(respondentFills)
@@ -61,7 +61,6 @@ export default class InterviewManager extends InterviewManagerBase {
    * Run anything that needs to wait until other stuff is initialized before being run
    */
   async initialize () {
-    console.log('Initial condition tags', this.data.conditionTags)
     this.actions.initialize() // This emits an initial state event to any subscribers (the actionsPersistSlave)
     await this.data.initialize() // This emits an initial state event to any subscribers (the dataPersistSlave)
     this.data.reset()
@@ -79,7 +78,6 @@ export default class InterviewManager extends InterviewManagerBase {
    */
   finalSave (): Promise<any> {
     if (!this.actions.store.length || !this.data.data.length) {
-      console.log('nothing to finalSave')
       return new Promise(resolve => setTimeout(resolve))
     }
     this.playAllActions()
@@ -211,7 +209,6 @@ export default class InterviewManager extends InterviewManagerBase {
     const questions = this.questionsWithData()
     for (const question of questions) {
       if (question.datum.dkRf != null) {
-        console.log('dkRf found. Removing data for question', question.id)
         this.data.removeAllDatum(question.datum)
       } else if (question.datum.dkRf === null) {
         question.datum.dkRfVal = null
@@ -428,10 +425,8 @@ export default class InterviewManager extends InterviewManagerBase {
    * @param sectionFollowUpRepetition
    */
   seek (section: number, page: number, sectionRepetition: number, sectionFollowUpRepetition: number) {
-    // console.log('desired location', {section, page, sectionRepetition, sectionFollowUpRepetition})
     let currentLoc = locToNumber(this.navigator.loc)
     const desiredLoc = locToNumber({ section, page, sectionRepetition, sectionFollowUpRepetition })
-    // console.log('current location', currentLoc, desiredLoc)
     if (currentLoc < desiredLoc) {
       let c
       for (c = 0; c < 100; c++) {
@@ -472,7 +467,6 @@ export default class InterviewManager extends InterviewManagerBase {
    */
   _markAsSkipped () {
     // TODO: Mark all questions on the current page as skipped
-    // console.log('Skipped ', JSON.parse(JSON.stringify(this.location)))
   }
 
   /**
@@ -482,7 +476,6 @@ export default class InterviewManager extends InterviewManagerBase {
     if (!this._isReplaying) {
       this.emit('atBeginning', JSON.parse(JSON.stringify(this.location)))
     }
-    console.log('Reached the beginning of the survey')
   }
 
   /**
@@ -555,16 +548,24 @@ export default class InterviewManager extends InterviewManagerBase {
   }
 }
 
-export let sharedInterviewInstance = null
+const sharedInterviewHook = new Hook<[InterviewManager]>()
+export function watchSharedInterview (cb: (manager: InterviewManager | null) => void): (() => void) {
+  return sharedInterviewHook.add(cb)
+}
+
+export let sharedInterviewInstance: InterviewManager = null
 export function sharedInterview (interview: Interview,
   blueprint: Form,
   actions?: Action[],
   data?: QuestionDatum[],
   conditionTags?: ConditionTagInterface,
   respondentFills?: RespondentFill[],
-  baseRespondentConditionTags?: RespondentConditionTag[]) {
+  baseRespondentConditionTags?: RespondentConditionTag[]): InterviewManager {
   if (!sharedInterviewInstance) {
-    sharedInterviewInstance = new InterviewManager(interview, blueprint, actions, data, conditionTags, respondentFills, baseRespondentConditionTags)
+    sharedInterviewInstance = new InterviewManager(
+      interview, blueprint, actions, data, conditionTags, respondentFills, baseRespondentConditionTags,
+    )
+    sharedInterviewHook.emit(sharedInterviewInstance)
   }
   return sharedInterviewInstance
 }
@@ -574,4 +575,5 @@ export function clearSharedInterview () {
     sharedInterviewInstance.destroy()
   }
   sharedInterviewInstance = null
+  sharedInterviewHook.emit(null)
 }

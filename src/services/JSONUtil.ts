@@ -220,7 +220,6 @@ export function getDot (obj: object, key: string) {
  * @param val
  */
 export function setDot (obj: object, key: string, val: any, setter?: (obj: object, key: string, val: any) => void) {
-  console.log('setDot', obj, key, val)
   const parts = key.split('.')
   let ref = obj
   let i

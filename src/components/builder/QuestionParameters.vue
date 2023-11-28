@@ -79,10 +79,7 @@ async function remove (p: QuestionParameter) {
 
 <template>
   <v-col>
-    <v-row
-      no-gutters
-      class="align-center"
-    >
+    <v-row class="no-gutters align-center">
       <h4>{{ $t('parameters') }}</h4>
       <v-spacer />
       <v-tooltip

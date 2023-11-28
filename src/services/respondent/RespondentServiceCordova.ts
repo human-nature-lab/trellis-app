@@ -1,13 +1,13 @@
 import { randomIntBits } from '../../classes/M'
 import { RandomPagination, RandomPaginationResult } from '../../types/Pagination'
-import RespondentServiceInterface, {SearchFilter} from './RespondentServiceInterface'
+import RespondentServiceInterface, { SearchFilter } from './RespondentServiceInterface'
 import RespondentFill from '../../entities/trellis/RespondentFill'
 import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../../services/database'
-import { Brackets, Connection, EntityManager, IsNull } from 'typeorm'
+import { Brackets, Connection, EntityManager, In, IsNull } from 'typeorm'
 import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
 import Photo from '../../entities/trellis/Photo'
 import { removeSoftDeleted } from '../database/SoftDeleteHelper'
@@ -15,21 +15,20 @@ import Geo from '../../entities/trellis/Geo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export class RespondentServiceCordova implements RespondentServiceInterface {
-
   async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     const repo = await DatabaseService.getRepository(RespondentPhoto)
-    let rPhoto = new RespondentPhoto()
+    const rPhoto = new RespondentPhoto()
     rPhoto.photoId = photo.id
     rPhoto.respondentId = respondentId
     rPhoto.sortOrder = await repo.createQueryBuilder('rp').where('rp.respondentId = :respondentId', { respondentId }).getCount()
     await repo.save(rPhoto)
-    let respondentPhoto = await repo.findOne({
+    const respondentPhoto = await repo.findOne({
       where: {
-        id: rPhoto.id
+        id: rPhoto.id,
       },
       relations: [
-        'photo'
-      ]
+        'photo',
+      ],
     })
     return new PhotoWithPivotTable(respondentPhoto)
   }
@@ -37,20 +36,20 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
   async removePhoto (photo: PhotoWithPivotTable) {
     const repository = await DatabaseService.getRepository(RespondentPhoto)
     await repository.update({
-      id: photo.pivot.id
+      id: photo.pivot.id,
     }, {
-      deletedAt: new Date()
+      deletedAt: new Date(),
     })
   }
 
   async updatePhotos (photosWithPivotTable : Array<PhotoWithPivotTable>) {
     const repository = await DatabaseService.getRepository(RespondentPhoto)
-    for (let photoWithPivotTable of photosWithPivotTable) {
+    for (const photoWithPivotTable of photosWithPivotTable) {
       await repository.update({
-        id: photoWithPivotTable.pivot.id
+        id: photoWithPivotTable.pivot.id,
       }, {
         sortOrder: photoWithPivotTable.pivot.sortOrder,
-        notes: photoWithPivotTable.pivot.notes
+        notes: photoWithPivotTable.pivot.notes,
       })
     }
   }
@@ -63,18 +62,18 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
 
   async getRespondentPhotos (respondentId: string): Promise<Array<PhotoWithPivotTable>> {
     const respondentPhotoRepository = await DatabaseService.getRepository(RespondentPhoto)
-    let respondentPhotos = await respondentPhotoRepository.find({
+    const respondentPhotos = await respondentPhotoRepository.find({
       where: {
         deletedAt: IsNull(),
-        respondentId: respondentId
+        respondentId: respondentId,
       },
       relations: [
-        'photo'
-      ]
+        'photo',
+      ],
     })
-    let photos: PhotoWithPivotTable[] = []
+    const photos: PhotoWithPivotTable[] = []
     for (let i = 0; i < respondentPhotos.length; i++) {
-      let respondentPhoto = respondentPhotos[i]
+      const respondentPhoto = respondentPhotos[i]
       photos.push(new PhotoWithPivotTable(respondentPhoto))
     }
 
@@ -83,10 +82,10 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
 
   async getRespondentById (respondentId: string): Promise<Respondent> {
     const repository = await DatabaseService.getRepository(Respondent)
-    let respondent = await repository.findOne({
+    const respondent = await repository.findOne({
       where: {
         deletedAt: IsNull(),
-        id: respondentId
+        id: respondentId,
       },
       relations: [
         'geos',
@@ -94,13 +93,37 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
         'geos.geo',
         'geos.geo.photos',
         'geos.geo.geoType',
-        'geos.geo.nameTranslation'
-      ]
+        'geos.geo.nameTranslation',
+      ],
     })
 
     respondent.photos = await this.getRespondentPhotos(respondentId)
     removeSoftDeleted(respondent)
     return respondent
+  }
+
+  async getRespondentsByIds (respondentIds: string[]) {
+    const repository = await DatabaseService.getRepository(Respondent)
+    const respondents = await repository.find({
+      where: {
+        deletedAt: IsNull(),
+        id: In(respondentIds),
+      },
+      relations: [
+        'geos',
+        'names',
+        'geos.geo',
+        'geos.geo.photos',
+        'geos.geo.geoType',
+        'geos.geo.nameTranslation',
+      ],
+    })
+    const photos = await Promise.all(respondents.map(r => this.getRespondentPhotos(r.id)))
+    for (const i in respondents) {
+      respondents[i].photos = photos[i]
+      removeSoftDeleted(respondents[i])
+    }
+    return respondents
   }
 
   /**
@@ -115,13 +138,13 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
     const maxLimit = 10
     if (includeChildren) {
       const geoRepo = await DatabaseService.getRepository(Geo)
-      let hasMoreChildren = true;
-      let c = 0;
+      let hasMoreChildren = true
+      let c = 0
       while (hasMoreChildren && c < maxLimit) {
-        c++;
-        hasMoreChildren = false;
+        c++
+        hasMoreChildren = false
         const q = (await geoRepo.createQueryBuilder('geo'))
-          .where('geo.parent_id in (:...parentGeos)', {parentGeos})
+          .where('geo.parent_id in (:...parentGeos)', { parentGeos })
           .andWhere('geo.deleted_at is null')
           .leftJoinAndSelect('geo.geoType', 'gt')
         const children = await q.getMany()
@@ -134,7 +157,7 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
     return geos
   }
 
-  async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null,): Promise<RandomPaginationResult<Respondent>> {
+  async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null): Promise<RandomPaginationResult<Respondent>> {
     const repository = await DatabaseService.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
     let geos
@@ -151,14 +174,13 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
       and r.id in (
         select respondent_id from study_respondent where study_id = '${studyId}'
       )`
-    let params = {studyId}
-
+    const params = { studyId }
 
     // Query string broken into words
     if (typeof query === 'string' && query.trim().length > 0) {
       const searchTerms = query.split(' ')
       for (let i = 0; i < searchTerms.length; i++) {
-        let searchTerm = '% ' + searchTerms[i].trim() + '%'
+        const searchTerm = '% ' + searchTerms[i].trim() + '%'
         const key = `searchTerm${i}`
         limitQuery += ` and r.id in (select distinct respondent_id from respondent_name where " " || name like :${key})`
         params[key] = searchTerm
@@ -167,7 +189,7 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
 
     // Condition tag filters
     if (Array.isArray(filters.conditionTags) && filters.conditionTags.length > 0) {
-      let conditionTagNames = filters.conditionTags
+      const conditionTagNames = filters.conditionTags
       if (conditionTagNames.length > 1) {
         // TODO: Isn't this group by very expensive?
         // Doesn't it basically require grouping every single respondent_condition_tag regardless of how many responses we actually want?
@@ -175,15 +197,15 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
           select distinct respondent_id from respondent_condition_tag where condition_tag_id in (
           select id from condition_tag where name in (:...conditionTagNames)) 
           group by respondent_id having count(distinct condition_tag_id) = :conditionTagsLength)`
-        params['conditionTagNames'] = conditionTagNames
-        params['conditionTagsLength'] = conditionTagNames.length
+        params.conditionTagNames = conditionTagNames
+        params.conditionTagsLength = conditionTagNames.length
       } else {
         limitQuery += ` and r.id in (
           select distinct respondent_id from respondent_condition_tag where condition_tag_id in (
             select id from condition_tag where name in (:...conditionTagNames)
           )
         )`
-        params['conditionTagNames'] = conditionTagNames
+        params.conditionTagNames = conditionTagNames
       }
     }
 
@@ -196,28 +218,28 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
         throw new Error('Too many respondent geos')
       }
 
-      let subselect = `select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geoIds)`
-      params['geoIds'] = geos
+      let subselect = 'select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geoIds)'
+      params.geoIds = geos
 
       if (filters.onlyCurrentGeo) {
-        subselect += ` and is_current = 1`
+        subselect += ' and is_current = 1'
       }
       limitQuery += ` and r.id in (${subselect})`
     }
     limitQuery += ')'
     if (respondentId) {
       limitQuery += ' or r.associated_respondent_id = :respondentId'
-      params['respondentId'] = respondentId
+      params.respondentId = respondentId
     }
 
     // Or Condition tags
     if (Array.isArray(filters.orConditionTags) && filters.orConditionTags.length > 0) {
-      let orConditionTagNames = filters.orConditionTags
+      const orConditionTagNames = filters.orConditionTags
       limitQuery += ` or r.id in (
         select distinct respondent_id from respondent_condition_tag where deleted_at is null and condition_tag_id in (
           select id from condition_tag where name in (:...orConditionTags)
       ))`
-      params['orConditionTags'] = orConditionTagNames
+      params.orConditionTags = orConditionTagNames
     }
     limitQuery += ')'
 
@@ -231,7 +253,7 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
     q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
-    
+
     const respondents = await q.getMany()
     removeSoftDeleted(respondents)
     return {
@@ -239,14 +261,14 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
       size: pagination.size,
       seed: seed,
       total: 0,
-      data: respondents
+      data: respondents,
     }
   }
 
   async addName (respondentId, name, isDisplayName = false, localeId = null): Promise<RespondentName> {
     const conn: Connection = await DatabaseService.getDatabase()
     let respondentName: RespondentName
-    await conn.transaction(async manager  => {
+    await conn.transaction(async manager => {
       respondentName = new RespondentName()
       respondentName.isDisplayName = isDisplayName
       respondentName.name = name
@@ -275,7 +297,7 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
     editedRespondentName.previousRespondentNameId = oldRespondentName.id
     await repository.save(editedRespondentName)
     // Soft delete the old name
-    await repository.update({id: oldRespondentName.id}, {deletedAt: new Date()})
+    await repository.update({ id: oldRespondentName.id }, { deletedAt: new Date() })
     return editedRespondentName
   }
 
@@ -283,7 +305,7 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentName)
     const respondentName = await repository.findOne(respondentNameId)
-    await repository.update({id: respondentName.id}, {deletedAt: new Date()})
+    await repository.update({ id: respondentName.id }, { deletedAt: new Date() })
   }
 
   async createRespondent (studyId, name, geoId = null, associatedRespondentId = null) {
@@ -328,24 +350,23 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
       const repository = connection.getRepository(Respondent)
       return repository.findOne({
         where: {
-          id: respondent.id
+          id: respondent.id,
         },
-        relations: ['photos', 'names']
+        relations: ['photos', 'names'],
       })
     } catch (err) {
       console.error(err)
       await queryRunner.rollbackTransaction()
       throw err
     }
-
   }
 
   async clearRespondentNameIsDisplay (manager: EntityManager, respondentId: string) {
-    await manager.update(RespondentName, {respondentId}, {isDisplayName: false})
+    await manager.update(RespondentName, { respondentId }, { isDisplayName: false })
   }
 
   async clearRespondentGeoIsCurrent (manager: EntityManager, respondentId: string) {
-    await manager.update(RespondentGeo, {respondentId}, {isCurrent: false})
+    await manager.update(RespondentGeo, { respondentId }, { isCurrent: false })
   }
 
   async addRespondentGeo (respondentId: string, geoId: string, isCurrent: boolean): Promise<RespondentGeo> {
@@ -364,14 +385,14 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
       rGeo = await manager.save(respondentGeo)
       rGeo = await manager.findOne(RespondentGeo, {
         where: {
-          id: rGeo.id
+          id: rGeo.id,
         },
         relations: [
           'geo',
           'geo.photos',
           'geo.geoType',
-          'geo.nameTranslation'
-        ]
+          'geo.nameTranslation',
+        ],
       })
     })
     return rGeo
@@ -380,7 +401,7 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
   async editRespondentGeo (respondentId: string, respondentGeoId: string, isCurrent: boolean) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
-    await repository.update({id: respondentGeoId}, {isCurrent: isCurrent})
+    await repository.update({ id: respondentGeoId }, { isCurrent: isCurrent })
     return repository.findOne({ deletedAt: null, id: respondentGeoId })
   }
 
@@ -393,25 +414,25 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
     newRespondentGeo.geoId = newGeoId
     newRespondentGeo.respondentId = respondentId
     newRespondentGeo.previousRespondentGeoId = respondentGeoId
-    newRespondentGeo.notes = notes ? notes : oldRespondentGeo.isCurrent
+    newRespondentGeo.notes = notes || oldRespondentGeo.isCurrent
     newRespondentGeo.isCurrent = isCurrent !== undefined ? isCurrent : oldRespondentGeo.isCurrent
     await connection.manager.save(newRespondentGeo)
 
     // Set the previous respondent geo is_current to 0
-    await repository.update({id: respondentGeoId}, {isCurrent: 0})
+    await repository.update({ id: respondentGeoId }, { isCurrent: 0 })
 
     return repository.findOne({
       where: {
-        id: newRespondentGeo.id
+        id: newRespondentGeo.id,
       },
-      relations: ['geo', 'geo.geoType', 'geo.nameTranslation']
+      relations: ['geo', 'geo.geoType', 'geo.nameTranslation'],
     })
   }
 
   async removeRespondentGeo (respondentId: string, respondentGeoId: string) {
     const connection = await DatabaseService.getDatabase()
     const repository = await connection.getRepository(RespondentGeo)
-    await repository.update({id: respondentGeoId}, {deletedAt: new Date()})
+    await repository.update({ id: respondentGeoId }, { deletedAt: new Date() })
   }
 
   async removeRespondent (respondentId: string) {
@@ -438,5 +459,4 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
   async listEdges (respondentId: string) {
     throw new Error('Not implemented')
   }
-
 }

@@ -1,35 +1,31 @@
+import { computed, inject } from 'vue'
+import Question from '@/entities/trellis/Question'
 import ConditionTag from '@/entities/trellis/ConditionTag'
 import Form from '@/entities/trellis/Form'
 import GeoType from '@/entities/trellis/GeoType'
-import Locale from '@/entities/trellis/Locale'
 import Parameter from '@/entities/trellis/Parameter'
-import Question from '@/entities/trellis/Question'
 import QuestionType from '@/entities/trellis/QuestionType'
+import Locale from '@/entities/trellis/Locale'
 import { builder } from '@/symbols/builder'
-import { ref, inject, provide, computed } from 'vue'
 
-export type BuilderState = {
-  form: Form
-  locale?: Locale
-  locked: boolean
-  questionTypes: QuestionType[]
-  parameters: Parameter[]
-  conditionTags: ConditionTag[]
-  geoTypes: GeoType[]
-}
-
-export function provideBuilder (builderState: BuilderState) {
-  provide(builder, builderState)
+type BuilderState = {
+  form?: Form,
+  locale?: Locale,
+  locked: boolean,
+  questionTypes: QuestionType[],
+  parameters: Parameter[],
+  conditionTags: ConditionTag[],
+  geoTypes: GeoType[],
 }
 
 export function useBuilder () {
-  return inject(builder) as BuilderState
+  return inject<BuilderState>(builder)
 }
 
 export function useBuilderQuestions () {
+  const builder = useBuilder()
   return computed(() => {
-    const m = {}
-    const builder = useBuilder()
+    const m: Record<string, Question> = {}
     if (!builder || !builder.form) {
       return m
     }

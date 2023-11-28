@@ -13,7 +13,11 @@ import ConditionTag from '../../entities/trellis/ConditionTag'
 import Skip from '../../entities/trellis/Skip'
 import FormSection from '../../entities/trellis/FormSection'
 import StudyForm from '../../entities/trellis/StudyForm'
+import Translation from '@/entities/trellis/Translation'
 
+
+type questionPayload = { translated_text: string, var_name: string, question_type_id: string, locale_id }
+type pageSkipPayload = { show_hide: boolean, any_all: boolean, precedence: number, conditions: { condition_tag_name: string }[]}
 class FormBuilderService {
   async getQuestionTypes (): Promise<QuestionType[]> {
     const res = await adminInst.get('/question/type')
@@ -62,13 +66,19 @@ class FormBuilderService {
     await builderInst.delete(uriTemplate('section/{section}', [formSectionId]))
   }
 
-  async createQuestion (pageId: string, question: { translated_text: string, var_name: string, question_type_id: string, locale_id }) {
+  async createQuestion (pageId: string, question: questionPayload) {
     const res = await builderInst.post(uriTemplate('/group/{group}/question', [pageId]), question)
     return new Question().fromSnakeJSON(res.data.question)
   }
 
+  async createTranslation () {
+    const res = await builderInst.put('/translation')
+    return new Translation().fromSnakeJSON(res.data.translation)
+  }
+
   async duplicateQuestion (pageId: string, question: Question) {
-    const res = await builderInst.post(uriTemplate('/group/{group}/question/{question}/duplicate', [pageId, question.id]), question.toSnakeJSON({ includeRelationships: true }))
+    const uri = uriTemplate('/group/{group}/question/{question}/duplicate', [pageId, question.id])
+    const res = await builderInst.post(uri, question.toSnakeJSON({ includeRelationships: true }))
     return new Question().fromSnakeJSON(res.data.question)
   }
 
@@ -131,7 +141,7 @@ class FormBuilderService {
     return new ConditionTag().fromSnakeJSON(res.data.condition)
   }
 
-  async createPageSkip (pageId: string, data: { show_hide: boolean, any_all: boolean, precedence: number, conditions: { condition_tag_name: string }[]}) {
+  async createPageSkip (pageId: string, data: pageSkipPayload) {
     const res = await builderInst.post(uriTemplate('/group/{page}/skip', [pageId]), data)
     return new Skip().fromSnakeJSON(res.data.question_group_skip.skip)
   }

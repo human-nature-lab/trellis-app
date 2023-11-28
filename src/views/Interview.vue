@@ -31,7 +31,7 @@
         v-if="conditionAssignmentErrors"
         :errors="conditionAssignmentErrors"
       />
-      <v-flex>
+      <v-flex v-if="!isLoading">
         <v-progress-linear
           v-if="isSaving"
           :indeterminate="true"
@@ -174,6 +174,7 @@ import Form from '@/entities/trellis/Form'
 import TranslationService from '@/services/TranslationService'
 import Respondent from '@/entities/trellis/Respondent'
 import { onBeforeUnload } from '@/helpers/window.helper'
+import { provideDataStore, provideManager } from '@/helpers/interview.helper'
 
 function load (to) {
   return new Promise(async (resolve, reject) => {

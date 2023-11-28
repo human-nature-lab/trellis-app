@@ -4,7 +4,7 @@ import { cache } from './cache'
 import PhotoServiceAbstract, { CancelFunction } from './PhotoServiceAbstract'
 import Photo from '../../entities/trellis/Photo'
 
-export class PhotoServiceWeb extends PhotoServiceAbstract {
+export default class PhotoServiceWeb extends PhotoServiceAbstract {
 
   private existingCancelTokens = new Set()
 
@@ -19,7 +19,7 @@ export class PhotoServiceWeb extends PhotoServiceAbstract {
 
   cancelAllOutstanding () {
     let count = 0
-    for (let source of this.existingCancelTokens) {
+    for (const source of this.existingCancelTokens) {
       source.cancel('All outstanding requests cancelled')
       count++
     }

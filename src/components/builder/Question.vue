@@ -5,25 +5,37 @@ import Translation from './Translation.vue'
 import QuestionHeader from './QuestionHeader.vue'
 import QuestionParameters from './QuestionParameters.vue'
 import QuestionChoices from './QuestionChoices.vue'
-import questionTypes from '@/static/question.types'
+import questionTypes, { choiceTypes, builderTypes } from '@/static/question.types'
 import QuestionConditions from './QuestionConditions.vue'
 import builderService from '@/services/builder'
 import ExpandSection from './ExpandSection.vue'
 import DistributionQuestionBuilder from './question-builders/DistributionQuestionBuilder.vue'
+import SocialRingBuilder from './question-builders/SocialRingBuilder.vue'
 import { logError } from '@/helpers/log.helper'
 import { useBuilder } from '@/helpers/builder.helper'
 import QuestionPreview from './QuestionPreview.vue'
 
 const props = defineProps<{
-  value: Question
+  value: Question,
 }>()
 
 const builder = useBuilder()
 const working = ref(false)
 const showParameters = ref(props.value && !!props.value.questionParameters.length)
-const showChoices = ref(props.value.questionTypeId === questionTypes.multiple_choice ||
-props.value.questionTypeId === questionTypes.multiple_select)
+const showChoices = ref(choiceTypes.includes(props.value.questionTypeId))
 const showConditions = ref(props.value && !!props.value.assignConditionTags.length)
+const isBuilderType = computed(() => builderTypes.includes(props.value.questionTypeId))
+
+const questionBuilderComponent = computed(() => {
+  switch (props.value.questionTypeId) {
+    case questionTypes.distribution:
+      return DistributionQuestionBuilder
+    case questionTypes.social_ring:
+      return SocialRingBuilder
+    default:
+      return null
+  }
+})
 
 const isChoiceType = computed(() => {
   return props.value.questionTypeId === questionTypes.multiple_choice ||
@@ -33,6 +45,7 @@ const isChoiceType = computed(() => {
 const isDistributionType = computed(() => {
   return props.value.questionTypeId === questionTypes.distribution
 })
+
 async function updateQuestion () {
   if (working.value) return
   working.value = true
@@ -68,9 +81,11 @@ const inPreview = ref(false)
     <v-col
       v-if="!inPreview"
       class="ma-0 pa-0"
+      :class="{ builder: isBuilderType }"
     >
       <v-col class="question-content">
         <Translation
+          v-if="!isBuilderType"
           :locale="builder.locale"
           :locked="builder.locked"
           v-model="value.questionTranslation"
@@ -79,19 +94,13 @@ const inPreview = ref(false)
           editable
           textarea
         />
-        <ExpandSection
-          v-if="isDistributionType"
-          v-model="isDistributionType"
-          global
-        >
-          <v-col>
-            <DistributionQuestionBuilder
-              :locked="builder.locked"
-              :value="value"
-              @input="$emit('input', $event)"
-            />
-          </v-col>
-        </ExpandSection>
+        <component
+          v-if="isBuilderType"
+          :is="questionBuilderComponent"
+          :locked="builder.locked"
+          :value="value"
+          @input="$emit('input', $event)"
+        />
         <v-col>
           <ExpandSection
             v-if="isChoiceType"
@@ -155,4 +164,7 @@ const inPreview = ref(false)
 .theme--dark
   .question-content
     border: 1px solid darken(lightgrey, 50)
+.question-content.builder
+  padding: 0
+  margin: 0
 </style>
