@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useBuilderState, useBuilderQuestions } from '@/helpers/builder.helper'
+import { useBuilder, useBuilderQuestions } from '@/helpers/builder.helper'
 import MenuSelect from '../util/MenuSelect.vue'
 import Question from '@/entities/trellis/Question'
 
@@ -10,11 +10,11 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const builder = useBuilderState()
+const builder = useBuilder()
 const questions = useBuilderQuestions()
 const questionsList = computed(() =>
   Object.values(questions.value).filter(q =>
-    !props.filter || !props.filter(q),
+    !props.filter || props.filter(q),
   ),
 )
 </script>

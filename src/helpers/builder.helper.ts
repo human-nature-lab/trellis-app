@@ -5,6 +5,7 @@ import Form from '@/entities/trellis/Form'
 import GeoType from '@/entities/trellis/GeoType'
 import Parameter from '@/entities/trellis/Parameter'
 import QuestionType from '@/entities/trellis/QuestionType'
+import Locale from '@/entities/trellis/Locale'
 import { builder } from '@/symbols/builder'
 
 type BuilderState = {

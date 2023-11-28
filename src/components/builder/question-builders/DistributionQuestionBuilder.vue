@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import Translation from '../Translation.vue'
-import Question from '../../../entities/trellis/Question'
-import { jsonQuestionParameter } from '../../../lib/json-question-parameter'
-import { bins } from '../../../lib/distribution/bin'
-import { numberTransformer } from '../../../lib/number-transformer'
+import Question from '@/entities/trellis/Question'
+import { jsonQuestionParameter } from '@/lib/json-question-parameter'
+import { bins } from '@/lib/distribution/bin'
+import { numberTransformer } from '@/lib/number-transformer'
+import { useBuilder } from '@/helpers/builder.helper'
 
 export type Config = {
   type: 'currency'

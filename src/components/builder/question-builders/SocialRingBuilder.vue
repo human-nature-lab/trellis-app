@@ -4,12 +4,12 @@ import QT from '@/static/question.types'
 import Question from '@/entities/trellis/Question'
 import { jsonQuestionParameter } from '@/lib/json-question-parameter'
 import TranslationIdEditor from '../TranslationIdEditor.vue'
-import { useBuilderState } from '@/helpers/builder.helper'
+import { useBuilder } from '@/helpers/builder.helper'
 import EditText from '@/components/util/EditText.vue'
 import QuestionSelector from '../QuestionSelector.vue'
 import SocialRingDisplay, { Ring, SocialRingConfig } from '@/components/interview/questions/social-ring/SocialRingDisplay.vue'
 
-const builder = useBuilderState()
+const builder = useBuilder()
 const props = defineProps<{
   value: Question
   locked: boolean
@@ -132,7 +132,7 @@ function updateRings (respondentId: string, ring: Ring) {
             <h4>{{ $t('ring_respondents_source') }}</h4>
             <QuestionSelector
               v-model="config.sourceQuestionId"
-              :filter="q => q.id === props.value.id || q.questionTypeId !== QT.relationship"
+              :filter="q => q.id === props.value.id || q.questionTypeId === QT.relationship"
             >
               <template #selected="{ question }">
                 {{
@@ -142,7 +142,7 @@ function updateRings (respondentId: string, ring: Ring) {
                 }}
               </template>
             </QuestionSelector>
-            TODO: Other sources?
+            <!-- TODO: Include other sources of respondents? -->
           </v-col>
           <v-col>
             <h4>{{ $t('config') }}</h4>
@@ -163,19 +163,7 @@ function updateRings (respondentId: string, ring: Ring) {
                 :readonly="props.locked"
               />
             </v-row>
-            <v-col>
-              <h4>{{ $t('ring_final_review_content') }}</h4>
-              <TranslationIdEditor
-                v-model="config.finalReviewTranslationId"
-                :locale="builder.locale"
-                :locked="props.locked"
-                autogrow
-                editable
-                textarea
-              />
-            </v-col>
           </v-col>
-          {{ config }}
         </v-container>
       </v-tab-item>
       <v-tab-item>

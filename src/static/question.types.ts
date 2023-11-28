@@ -60,6 +60,7 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
   [qt.year_month_day_time]: [PT.min_date, PT.max_date, PT.min_time, PT.max_time],
   [qt.respondent_geo]: [PT.geo_type],
   [qt.distribution]: [PT.json, PT.dictator_decision],
+  [qt.social_ring]: [PT.json],
 }
 
 for (const key in questionTypeParameters) {

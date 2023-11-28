@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import SocialRingDisplay, { PartialRespondent, Ring, SocialRingConfig } from './SocialRingDisplay.vue'
+import Translated from '@/components/translation/Translated.vue'
 import AT from '@/static/action.types'
 import RespondentService from '@/services/respondent'
 import EdgeService from '@/services/edge'
 import RespondentServiceInterface from '@/services/respondent/RespondentServiceInterface'
 import Question from '@/entities/trellis/Question'
 import { jsonQuestionParameter } from '@/lib/json-question-parameter'
-import SocialRingDisplay, { PartialRespondent, Ring, SocialRingConfig } from './SocialRingDisplay.vue'
 import Respondent from '@/entities/trellis/Respondent'
 import { logError } from '@/helpers/log.helper'
-import { useDataStore } from '@/helpers/interview.helper'
 import { action } from '../../lib/action'
+import URL_PLACEHOLDER from '@/assets/baseline-image-24px.svg'
 import { sharedInterviewInstance } from '../../classes/InterviewManager'
 import PhotoService from '@/services/photo'
+import global from '@/static/singleton'
 
 const rs: RespondentServiceInterface = RespondentService
 const props = defineProps<{
@@ -38,14 +40,22 @@ watch(config, async () => {
       throw new Error('Unable to get data from source question')
     }
     const data = qds[0].data
+
+    // Ensure consistent random sort order
+    data.sort((a, b) => a.randomSortOrder - b.randomSortOrder)
     const edgeIds = data.map(d => d.edgeId)
     console.log('source data', data, edgeIds)
     const edges = await EdgeService.getEdges(edgeIds)
     console.log('edges', edges)
     const respondentIds = edges.map(e => e.targetRespondentId)
     console.log('respondentIds', respondentIds)
-    respondents.value = await rs.getRespondentsByIds(respondentIds)
-    const respondentSrcs = await Promise.all(respondents.value.map(async respondent => {
+    const res = await rs.getRespondentsByIds(respondentIds.concat(props.respondent.id))
+    respondents.value = res.filter(r => r.id !== props.respondent.id)
+
+    const respondentSrcs = await Promise.all(res.map(async respondent => {
+      if (!respondent.photos || !respondent.photos.length) {
+        return [respondent.id, URL_PLACEHOLDER]
+      }
       const [p, cancel] = PhotoService.getPhotoSrc(respondent.photos[0].id)
       const src = await p
       return [respondent.id, src] as [string, string]
@@ -65,9 +75,11 @@ const loading = computed(() => loadingConfig.value || loadingRespondents.value)
 
 const ringMap = computed<Record<string, string|number>>(() => {
   const map = {}
-  for (const d of props.question.datum.data) {
+  const data = props.question.datum.data.slice()
+  data.sort((a, b) => a.sortOrder - b.sortOrder)
+  for (const d of data) {
     if (d.name === 'ring') {
-      const parts = d.val.split('->')
+      const parts = JSON.parse(d.val)
       map[parts[0]] = parts[1]
     }
   }
@@ -91,28 +103,42 @@ const ringRespondents = computed<PartialRespondent[]>(() => {
 const ego = computed<PartialRespondent>(() => {
   return respondentToPartialRespondent(props.respondent)
 })
-function onRingChange (respondentId: string, ring: Ring) {
+function onRingChange (respondentId: string, ring: Ring, duringReview: boolean) {
   action(props.question.id, AT.add_val, {
     name: 'ring',
-    val: `${respondentId}->${ring.varName}`,
+    val: JSON.stringify([respondentId, ring.varName, duringReview ? 'review' : 'initial']),
   })
 }
 </script>
 
 <template>
-  <v-col>
+  <v-col class="pa-0 ma-0">
     <v-progress-linear
       v-if="loading"
       indeterminate
     />
-    <v-col v-else>
-      <!-- {{ ringMap }} -->
+    <v-col
+      v-else
+      class="pa-0 ma-0"
+    >
+      <v-list>
+        <v-list-item
+          v-for="ring in config.rings"
+          :key="ring.varName"
+        >
+          <span class="mr-4">{{ ring.varName }})</span>
+          <Translated
+            v-if="ring.labelTranslationId"
+            :translation-id="ring.labelTranslationId"
+            :locale="global.locale"
+          />
+        </v-list-item>
+      </v-list>
       <SocialRingDisplay
         :value="ringMap"
         @change-ring="onRingChange"
         :respondents="ringRespondents"
         :ego="ego"
-        hide-after-move
         :config="config"
       />
     </v-col>

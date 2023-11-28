@@ -10,7 +10,7 @@
     </v-alert>
     <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
     <v-card-text class="question-content">
-      <v-flex class="question-text title">
+      <v-flex class="question-text title" v-if="showQuestionText">
         <QuestionText 
           :location="location"
           :question="question"
@@ -36,11 +36,11 @@
 <script lang="ts">
   // This parent component servers the purpose of handling general functionality that is used across all questions.
   // For example, question title and message fills will be applied here. The question header text will be applied here
-  import { PropOptions } from 'vue'
+  import Vue, { PropOptions } from 'vue'
   import DontKnowRefused from './DontKnowRefused.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
   import TranslationMixin from '../../mixins/TranslationMixin'
-  import questionTypes from '../../static/question.types'
+  import questionTypes, { builderTypes } from '@/static/question.types'
   import ParameterType from '../../static/parameter.types'
 
   import DateQuestion from './questions/DateQuestion.vue'
@@ -187,6 +187,9 @@
       },
       hasDkRf (): boolean {
         return this.question.datum && this.question.datum.dkRf !== null && this.question.datum.dkRf !== undefined
+      },
+      showQuestionText (): boolean {
+        return !builderTypes.includes(this.question.questionTypeId)
       }
     }
   })

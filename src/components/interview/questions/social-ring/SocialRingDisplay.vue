@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useVuetify } from '@/helpers/vuetify.helper'
 
 export type Ring = {
   varName: string | number
@@ -14,7 +15,6 @@ export type SocialRingConfig = {
   hideAfterMove: boolean
   allowFinalReview: boolean
   showRingVarName: boolean
-  finalReviewTranslationId?: string
 }
 
 export type PartialRespondent = {
@@ -25,23 +25,24 @@ export type PartialRespondent = {
 const props = defineProps<{
   value: Record<string, string | number> // Map of respondent id to ring varName
   ego: PartialRespondent
-  hideAfterMove?: boolean
   config: SocialRingConfig
   vertical?: boolean
   respondents: PartialRespondent[]
 }>()
 
 const emit = defineEmits<{
-  (event: 'change-ring', respondentId: string, ring: Ring): void
+  (event: 'change-ring', respondentId: string, ring: Ring, duringReview: boolean): void
 }>()
 
+const $vuetify = useVuetify()
 const scale = ref(0.5)
 const unitSize = computed(() => scale.value * 130)
 const viewBox = computed(() => props.vertical ? { width: 900, height: 1200 } : { width: 1200, height: 900 })
 const ringCenter = computed(() => {
-  return props.vertical
-    ? { x: viewBox.value.width / 2, y: viewBox.value.height / 2 }
-    : { x: viewBox.value.width * (3 / 4), y: viewBox.value.height / 2 }
+  return {
+    x: viewBox.value.width / 2,
+    y: viewBox.value.height / 2 + unitSize.value,
+  }
 })
 
 type RespondentCircle = {
@@ -50,38 +51,59 @@ type RespondentCircle = {
   cy: number
   radius: number
 }
-const numPerRow = 7
-const padding = 20
-const yOffset = 0
-const xOffset = 0
 
 function hasRing (respondentId: string) {
   return props.value[respondentId] !== undefined
 }
 
-const respondents = ref<RespondentCircle[]>(props.respondents.map((respondent, i) => {
-  if (!hasRing(respondent.id)) {
-    return { respondent, cx: 0, cy: 0, radius: unitSize.value / 2 }
-  } else {
-    const ring = props.value[respondent.id]
-    const ringIndex = props.config.rings.findIndex(r => r.varName === ring)
-    const ringRadius = (props.config.rings.length - ringIndex) * unitSize.value
-    const cx = ringCenter.value.x + ringRadius * Math.cos(i * 2 * Math.PI / props.respondents.length)
-    const cy = ringCenter.value.y + ringRadius * Math.sin(i * 2 * Math.PI / props.respondents.length)
-    return { respondent, cx, cy, radius: unitSize.value / 2 }
-  }
+const respondents = ref<RespondentCircle[]>(props.respondents.map(respondent => {
+  return { respondent, cx: unitSize.value, cy: unitSize.value, radius: unitSize.value / 2 }
 }))
+const allRespondentsInRing = computed(() => respondents.value.every(r => hasRing(r.respondent.id)))
 
-function alignGrid () {
-  const gridRespondents = respondents.value.filter(r => !hasRing(r.respondent.id))
-  for (let i = 0; i < gridRespondents.length; i++) {
-    const row = Math.floor(i / numPerRow)
-    const col = i % numPerRow
-    gridRespondents[i].cx = xOffset + col * (unitSize.value + padding) + unitSize.value / 2 + padding
-    gridRespondents[i].cy = yOffset + row * (unitSize.value + padding) + unitSize.value / 2 + padding
+const ringDistribution = computed(() => {
+  const rings = {}
+  for (const r of respondents.value) {
+    if (hasRing(r.respondent.id)) {
+      const ring = props.value[r.respondent.id]
+      const ringIndex = props.config.rings.findIndex(r => r.varName === ring)
+      if (!rings[ringIndex]) {
+        rings[ringIndex] = 0
+      }
+      rings[ringIndex]++
+    }
+  }
+  return rings
+})
+
+const ringOffsets = ref(props.config.rings.map(() => Math.random() * Math.PI))
+
+function fixRing () {
+  const ringCount = Array.from({ length: props.config.rings.length }, () => 0)
+  for (let i = 0; i < respondents.value.length; i++) {
+    const r = respondents.value[i]
+    if (hasRing(r.respondent.id)) {
+      const ringVarName = props.value[r.respondent.id]
+      const ringIndex = props.config.rings.findIndex(r => r.varName === ringVarName)
+      const ringTotal = ringDistribution.value[ringIndex]
+      const ringPosition = ringCount[ringIndex]
+      const ringRadius = (ringIndex + 1) * unitSize.value
+      const offset = ringOffsets.value[ringIndex]
+      r.cx = ringCenter.value.x + ringRadius * Math.cos(offset + ringPosition * 2 * Math.PI / ringTotal)
+      r.cy = ringCenter.value.y + ringRadius * Math.sin(offset + ringPosition * 2 * Math.PI / ringTotal)
+      r.radius = unitSize.value / 2
+      ringCount[ringIndex]++
+    }
   }
 }
-alignGrid()
+
+watch(() => [props.value, props.respondents], () => {
+  fixRing()
+}, { immediate: true })
+
+const currentRespondent = computed(() => {
+  return respondents.value.find(r => !hasRing(r.respondent.id))
+})
 
 const egoCircle = ref<RespondentCircle>({
   respondent: props.ego,
@@ -105,12 +127,16 @@ function absPosToSvgPos (p: Pos) {
   }
 }
 
-const rings = computed<{ cx: number, cy: number, r: number}[]>(() => props.config.rings.map((_, i) => {
+type ViewRing = { index: number, cx: number, cy: number, r: number, varName: string }
+const rings = computed(() => props.config.rings.slice().reverse().map((_, i) => {
+  const index = props.config.rings.length - i - 1
   return {
+    index,
     cx: ringCenter.value.x,
     cy: ringCenter.value.y,
     r: (props.config.rings.length + 0.5 - i) * unitSize.value,
-  }
+    varName: props.config.rings[index].varName,
+  } as ViewRing
 }))
 
 function startDrag (respondent: RespondentCircle, pos: Pos) {
@@ -121,9 +147,13 @@ function startDrag (respondent: RespondentCircle, pos: Pos) {
   draggingRing.value = null
 }
 
+function canDrag (respondent: RespondentCircle) {
+  return !hasRing(respondent.respondent.id) || (props.config.allowFinalReview && allRespondentsInRing.value)
+}
+
 function startDragMouse (index: number, event: MouseEvent) {
   const respondent = respondents.value[index]
-  if (hasRing(respondent.respondent.id)) return
+  if (!canDrag(respondent)) return
   event.preventDefault()
   event.stopPropagation()
   return startDrag(respondent, absPosToSvgPos({ x: event.clientX, y: event.clientY }))
@@ -131,7 +161,7 @@ function startDragMouse (index: number, event: MouseEvent) {
 
 function startDragTouch (index: number, event: TouchEvent) {
   const respondent = respondents.value[index]
-  if (hasRing(respondent.respondent.id)) return
+  if (!canDrag(respondent)) return
   event.preventDefault()
   event.stopPropagation()
   return startDrag(respondent, absPosToSvgPos({ x: event.touches[0].clientX, y: event.touches[0].clientY }))
@@ -153,7 +183,7 @@ function dragMove (pos: Pos) {
   // check rings in reverse order
   for (let i = rings.value.length; i--; i > -1) {
     if (radius <= rings.value[i].r) {
-      ring = i
+      ring = rings.value[i].index
       break
     }
   }
@@ -178,8 +208,8 @@ function stopDrag (pos: Pos) {
   if (draggingRing.value !== null) {
     // Reset the grid if they were put in a ring
     const r = draggingCircle.value
-    emit('change-ring', r.respondent.id, props.config.rings[draggingRing.value])
-    setTimeout(alignGrid, 10)
+    emit('change-ring', r.respondent.id, props.config.rings[draggingRing.value], allRespondentsInRing.value)
+    fixRing()
   } else {
     // Return them to their original position in the grid
     draggingCircle.value.cx = startPosition.value.circle.x
@@ -202,6 +232,14 @@ function stopDragTouch (event: TouchEvent) {
 }
 
 const imageBorder = 2
+const textColor = computed(() => $vuetify.theme.dark ? 'white' : 'black')
+const darkTextColor = computed(() => $vuetify.theme.dark ? 'black' : 'white')
+function respondentHidden (r: RespondentCircle) {
+  if (allRespondentsInRing.value || currentRespondent.value === r) {
+    return false
+  }
+  return hasRing(r.respondent.id) ? props.config.hideAfterMove : true
+}
 </script>
 
 <template>
@@ -217,8 +255,8 @@ const imageBorder = 2
     @touchend="stopDragTouch"
   >
     <text
-      fill="black"
-      stroke="black"
+      :fill="textColor"
+      :stroke="textColor"
       x="100"
       y="500"
     >{{ draggingRing }}</text>
@@ -232,18 +270,19 @@ const imageBorder = 2
       stroke="grey"
       stroke-width="1"
       class="ring"
-      :class="{ active: draggingCircle && draggingRing === i }"
+      :class="{ active: draggingCircle && draggingRing === ring.index }"
       :r="ring.r"
     />
     <text
-      v-for="(ring, i) in props.config.rings"
+      v-for="ring in rings"
       :key="`label-${ring.varName}`"
-      :x="rings[i].cx"
-      :y="rings[i].cy - (rings[i].r - 22)"
+      :x="ring.cx"
+      :y="ring.cy - (ring.r - 22)"
       :font-size="18"
       fill="black"
       stroke="black"
       text-anchor="middle"
+      :class="{ hidden: !props.config.showRingVarName }"
     >
       {{ ring.varName }}
     </text>
@@ -269,7 +308,7 @@ const imageBorder = 2
       v-for="(r, i) in respondents"
       :key="`respondent-${r.respondent.id}`"
       :transform="`translate(${r.cx}, ${r.cy})`"
-      :class="{ hidden: hasRing(r.respondent.id) && props.hideAfterMove }"
+      :class="{ hidden: respondentHidden(r) }"
     >
       <circle
         :r="r.radius"
@@ -278,7 +317,7 @@ const imageBorder = 2
       />
       <image
         class="respondent-avatar"
-        :class="{ dragging: draggingCircle === r }"
+        :class="{ dragging: draggingCircle === r, draggable: canDrag(r) }"
         :href="r.respondent.avatarSrc"
         :width="(r.radius - imageBorder) * 2"
         :height="(r.radius - imageBorder) * 2"
@@ -290,6 +329,18 @@ const imageBorder = 2
         @mousedown="startDragMouse(i, $event)"
         @touchstart="startDragTouch(i, $event)"
       />
+      <text
+        v-if="!hasRing(r.respondent.id)"
+        :x="2 * (r.radius + imageBorder)"
+        :fill="textColor"
+        :stroke="darkTextColor"
+        :font-size="unitSize / 2"
+        font-weight="bold"
+        text-anchor="start"
+        dominant-baseline="middle"
+      >
+        {{ r.respondent.name }}
+      </text>
     </g>
   </svg>
 </template>
@@ -304,7 +355,7 @@ const imageBorder = 2
       fill: yellow
   .respondent-avatar
     transition: all 0.5s ease-in-out
-    &:hover
+    &.draggable:hover
       cursor: grab
     &.dragging
       cursor: grabbing
