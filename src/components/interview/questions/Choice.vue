@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
 import Question from '@/entities/trellis/Question'
 import AT from '@/static/action.types'
 import QT from '@/static/question.types'
@@ -22,9 +23,12 @@ const props = defineProps<{
   disabled: boolean
 }>()
 
+const isSelected = computed(() => props.choice.isSelected)
+
 function onChange (displayChoice) {
+  if (props.disabled) return
   const choice = displayChoice.choice
-  if (displayChoice.isSelected) {
+  if (!isSelected.value) {
     action(props.question.id, AT.select_choice, {
       choice_id: choice.id,
       val: choice.val,
@@ -58,7 +62,7 @@ function choiceClasses (choice: DisplayChoice) {
       class="checkbox"
       v-if="question.questionTypeId === QT.multiple_select"
       :disabled="disabled"
-      v-model="choice.isSelected"
+      :value="isSelected"
       :class="choiceClasses(choice)"
       @change="onChange(choice)"
     >
@@ -71,7 +75,7 @@ function choiceClasses (choice: DisplayChoice) {
     <radio-checkbox
       v-else
       :disabled="disabled"
-      v-model="choice.isSelected"
+      :value="isSelected"
       :class="choiceClasses(choice)"
       @change="onChange(choice)"
     >
