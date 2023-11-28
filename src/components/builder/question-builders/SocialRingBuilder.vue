@@ -145,7 +145,7 @@ function updateRings (respondentId: string, ring: Ring) {
             <!-- TODO: Include other sources of respondents? -->
           </v-col>
           <v-col>
-            <h4>{{ $t('config') }}</h4>
+            <h4>{{ $t('configuration') }}</h4>
             <v-row class="no-gutters justify-space-between">
               <v-switch
                 v-model="config.allowFinalReview"
