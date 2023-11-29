@@ -360,13 +360,14 @@ const zRespondents = computed(() => {
           @touchstart="startDragTouch(r, $event)"
         />
         <text
-          v-if="!hasRing(r.respondent.id)"
-          :x="2 * (r.radius + imageBorder)"
+          v-if="!hasRing(r.respondent.id) || i === zRespondents.length - 1"
+          :x="hasRing(r.respondent.id) ? 0 : 2 * (r.radius + imageBorder)"
+          :y="hasRing(r.respondent.id) ? -unitSize : 0"
           :fill="invertedColor"
           :stroke="themeColor"
           :font-size="unitSize / 2"
           font-weight="bold"
-          text-anchor="start"
+          :text-anchor="hasRing(r.respondent.id) ? 'middle' : 'start'"
           dominant-baseline="middle"
         >
           {{ r.respondent.name }}
@@ -395,4 +396,6 @@ const zRespondents = computed(() => {
       cursor: grabbing
   .hidden
     display: none
+  text
+    pointer-events: none
 </style>
