@@ -112,6 +112,7 @@ export class RespondentServiceCordova implements RespondentServiceInterface {
       relations: [
         'geos',
         'names',
+        'photos',
         'geos.geo',
         'geos.geo.photos',
         'geos.geo.geoType',

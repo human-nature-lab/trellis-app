@@ -29,6 +29,7 @@ const respondents = ref<Respondent[]>([])
 const srcs = new Map<string, string>()
 
 watch(config, async () => {
+  console.log('config changed', config.value)
   if (!config.value) return
   if (!sharedInterviewInstance || !sharedInterviewInstance.data) {
     throw new Error('Data store not initialized. Make sure it is initialized before using this component')
@@ -54,14 +55,23 @@ watch(config, async () => {
         return [respondent.id, URL_PLACEHOLDER]
       }
       const [p, cancel] = PhotoService.getPhotoSrc(respondent.photos[0].id)
-      const src = await p
-      return [respondent.id, src] as [string, string]
+      try {
+        const src = await p
+        return [respondent.id, src] as [string, string]
+      } catch (err) {
+        if (!('code' in err)) {
+          logError(err)
+          throw err
+        }
+        return [respondent.id, URL_PLACEHOLDER]
+      }
     }))
     srcs.clear()
     for (const [id, src] of respondentSrcs) {
       srcs.set(id, src)
     }
   } catch (err) {
+    debugger
     logError(err)
   } finally {
     loadingRespondents.value = false
