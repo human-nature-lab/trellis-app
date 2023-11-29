@@ -15,6 +15,7 @@ export type SocialRingConfig = {
   hideAfterMove: boolean
   allowFinalReview: boolean
   showRingVarName: boolean
+  showRingText: boolean
 }
 
 export type PartialRespondent = {
@@ -26,7 +27,6 @@ const props = defineProps<{
   value: Record<string, string | number> // Map of respondent id to ring varName
   ego: PartialRespondent
   config: SocialRingConfig
-  vertical?: boolean
   respondents: PartialRespondent[]
 }>()
 
@@ -37,11 +37,17 @@ const emit = defineEmits<{
 const $vuetify = useVuetify()
 const scale = ref(0.5)
 const unitSize = computed(() => scale.value * 130)
-const viewBox = computed(() => props.vertical ? { width: 900, height: 1200 } : { width: 1200, height: 900 })
+const aspectRatio = 1 // w/h
+const height = 900
+const viewBox = ref({ width: aspectRatio * height, height })
+
+const ringRadius = computed(() => {
+  return (props.config.rings.length + 1) * unitSize.value
+})
 const ringCenter = computed(() => {
   return {
     x: viewBox.value.width / 2,
-    y: viewBox.value.height / 2 + unitSize.value,
+    y: ringRadius.value + 2 * unitSize.value,
   }
 })
 

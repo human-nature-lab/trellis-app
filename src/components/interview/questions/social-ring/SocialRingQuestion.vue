@@ -118,7 +118,10 @@ function onRingChange (respondentId: string, ring: Ring, duringReview: boolean) 
       v-else
       class="pa-0 ma-0"
     >
-      <v-list dense>
+      <v-list
+        v-if="config.showRingText"
+        dense
+      >
         <v-list-item
           v-for="ring in config.rings"
           :key="ring.varName"
