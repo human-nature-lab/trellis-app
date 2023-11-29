@@ -1,10 +1,11 @@
-import formTypes from '../../static/form.types'
-import http, { adminInst } from '../http/AxiosInstance'
-import FormServiceInterface from './FormServiceInterface'
-import StudyForm from '../../entities/trellis/StudyForm'
 import { saveAs } from 'file-saver'
-import Form from '../../entities/trellis/Form'
+import http, { adminInst } from '../http/AxiosInstance'
 import { uriTemplate } from '../http/WebUtils'
+import FormServiceInterface from './FormServiceInterface'
+import StudyForm from '@/entities/trellis/StudyForm'
+import Form from '@/entities/trellis/Form'
+import formTypes from '@/static/form.types'
+
 export class FormServiceWeb implements FormServiceInterface {
   getStudyForms (studyId: string): Promise<StudyForm[]> {
     return http().get(uriTemplate('study/{study}/forms/published', [studyId])).then(res => {
@@ -22,7 +23,7 @@ export class FormServiceWeb implements FormServiceInterface {
     return res.data.forms.map(f => new StudyForm().fromSnakeJSON(f))
   }
 
-  getForm (formId: string, bareBones = false): Promise<Form> {
+  getForm (formId: string): Promise<Form> {
     return http().get(uriTemplate('form/{form}', [formId]))
       .then(res => {
         if (res.data.form) {

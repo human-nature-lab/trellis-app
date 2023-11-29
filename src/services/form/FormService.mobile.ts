@@ -7,11 +7,9 @@ import Question from '../../entities/trellis/Question'
 import { In, IsNull, Not } from 'typeorm'
 import { removeSoftDeleted } from '../database/SoftDeleteHelper'
 import Section from '../../entities/trellis/Section'
-import PT from '@/static/parameter.types'
 import { namedQuery } from '../database/named'
 
 export default class FormServiceCordova implements FormServiceInterface {
-
   async getStudyForms (studyId: string): Promise<StudyForm[]> {
     const repo = await DatabaseService.getRepository(StudyForm)
     const studyForms: StudyForm[] = await repo.find({
@@ -35,10 +33,10 @@ export default class FormServiceCordova implements FormServiceInterface {
     return this.getStudyForms(studyId)
   }
 
-  async getForm (id: string, bareBones: boolean = false): Promise<Form> {
+  async getForm (id: string): Promise<Form> {
     console.log('getForm', id)
     const connection = await DatabaseService.getDatabase()
-    const formRepository = await connection.getRepository(Form)
+    const formRepository = connection.getRepository(Form)
 
     const form: Form = await formRepository.findOne({
       where: {
@@ -118,26 +116,34 @@ export default class FormServiceCordova implements FormServiceInterface {
   }
 
   createForm (studyId: string, formType: formTypes): Promise<StudyForm> {
-    throw Error('Not implemented')
+    throw Error('Not implemented' + studyId + formType)
   }
 
   updateForm (form: Form): Promise<Form> {
-    throw Error('Not implemented')
+    throw Error('Not implemented:' + form)
   }
 
   async updateStudyForm (studyId: string, studyForm: StudyForm): Promise<StudyForm> {
-    throw Error('Not implemented')
+    throw Error('Not implemented: ' + studyId + studyForm)
   }
 
   exportForm (formId: string): Promise<any> {
-    throw Error('Not implemented')
+    throw Error('Not implemented:' + formId)
   }
 
   deleteForm (studyId: string, formId: string): Promise<any> {
-    throw Error('Not implemented')
+    throw Error('Not implemented:' + studyId + formId)
   }
 
   reorderForms (studyId: string, studyForms: StudyForm[]): Promise<StudyForm[]> {
-    throw new Error('Not implemented')
+    throw new Error('Not implemented:' + studyId + studyForms)
+  }
+
+  getVersions (formId: string): PromiseLike<Form[]> {
+    throw new Error('Method not implemented:' + formId)
+  }
+
+  revertVersion (formMasterId: string, formVersionId: string): PromiseLike<StudyForm> {
+    throw new Error('Method not implemented:' + formMasterId + formVersionId)
   }
 }

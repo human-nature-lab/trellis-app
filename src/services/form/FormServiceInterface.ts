@@ -1,7 +1,5 @@
 import Form from '../../entities/trellis/Form'
 import StudyForm from '../../entities/trellis/StudyForm'
-import Skip from '../../entities/trellis/Skip'
-import FormSkip from '../../entities/trellis/FormSkip'
 import formTypes from '../../static/form.types'
 
 export default interface FormServiceInterface {
@@ -25,8 +23,8 @@ export default interface FormServiceInterface {
    * @param {boolean} bareBones - Only get the parts required to navigate the form
    * @returns {PromiseLike<Form>}
    */
-  getForm (formId: string, bareBones: boolean): PromiseLike<Form>
-  
+  getForm (formId: string): PromiseLike<Form>
+
   /**
    * Get all version of a form
    */

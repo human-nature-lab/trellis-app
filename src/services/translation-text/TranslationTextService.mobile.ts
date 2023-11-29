@@ -29,7 +29,10 @@ class TranslationTextServiceCordova implements TranslationTextServiceInterface {
 
   async getTranslationById (translationId: string): Promise<Translation> {
     const repo = await DatabaseService.getRepository(Translation)
-    return repo.findOne({ id: translationId })
+    return repo.findOne({
+      where: { id: translationId },
+      relations: ['translationText'],
+    })
   }
 }
 

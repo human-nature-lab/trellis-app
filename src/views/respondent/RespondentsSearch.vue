@@ -6,7 +6,7 @@
     <ScrollContainer>
       <template #header>
         <v-col class="py-0">
-          <v-row no-gutters class="align-center">
+          <v-row class="no-gutters align-center">
             <v-text-field
               :placeholder="$t('search')"
               v-model="query"
@@ -38,7 +38,7 @@
           </v-row>
           <v-slide-y-transition>
             <v-col v-if="filtersIsOpen" class="px-0">
-              <v-row no-gutters>
+              <v-row class="no-gutters">
                 <ConditionTagAutocomplete v-model="filters.conditionTags" />
                 <v-tooltip bottom>
                   <template #activator="{ on, attrs }">
@@ -54,7 +54,7 @@
                   <span>{{ $t("clear") }}</span>
                 </v-tooltip>
               </v-row>
-              <v-row no-gutters v-if="showGeoFilterOptions">
+              <v-row class="no-gutters" v-if="showGeoFilterOptions">
                 <v-col>
                   <v-checkbox
                     v-model="filters.includeChildren"
@@ -70,12 +70,12 @@
               </v-row>
             </v-col>
           </v-slide-y-transition>
-          <v-row>
+          <v-row class="my-1">
             <v-divider v-if="filters.geos && filters.geos.length" />
           </v-row>
           <v-row
             v-if="filters.geos && filters.geos.length"
-            class="align-center"
+            class="align-center no-gutters"
           >
             <v-col class="subheading pa-0">
               <v-container>{{ $t("filters") }}</v-container>
@@ -98,7 +98,7 @@
               />
             </v-chip>
           </v-row>
-          <v-row>
+          <v-row class="my-1">
             <v-divider v-if="selected.length > 0" />
           </v-row>
           <v-col v-if="selected.length > 0">
@@ -111,10 +111,7 @@
               {{ getRespondentName(r) }}
             </v-chip>
           </v-col>
-          <v-row
-            no-gutters
-            class="justify-space-between pa-0 pb-2"
-          >
+          <v-row class="no-gutters justify-space-between pa-0 pb-2">
             <v-col cols="auto" class="px-0">
               <v-pagination
                 :length="pagination.maxPages + 2"
@@ -143,7 +140,7 @@
         fluid
         grid-list-sm
       >
-        <v-row no-gutters>
+        <v-row class="no-gutters">
           <RespondentItem
             v-for="respondent in respondentResults"
             :key="respondent.id"

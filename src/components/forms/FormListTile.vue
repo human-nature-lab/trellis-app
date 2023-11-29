@@ -78,15 +78,16 @@
 
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
-import Form from '../../entities/trellis/Form'
-import TranslationTextField from '../TranslationTextField.vue'
-import FormService from '../../services/form'
 import { debounce } from 'lodash'
-import formTypes from '../../static/form.types'
-import censusTypes from '../../static/census.types'
-import StudyForm from '../../entities/trellis/StudyForm'
-import singleton from '../../static/singleton'
-import PermissionMixin from '../../mixins/PermissionMixin'
+
+import Form from '@/entities/trellis/Form'
+import StudyForm from '@/entities/trellis/StudyForm'
+import PermissionMixin from '@/mixins/PermissionMixin'
+import formTypes from '@/static/form.types'
+import censusTypes from '@/static/census.types'
+import singleton from '@/static/singleton'
+import FormService from '@/services/form'
+import TranslationTextField from '../TranslationTextField.vue'
 import FormActions from './FormActions.vue'
 import VersionModal from './VersionModal.vue'
 

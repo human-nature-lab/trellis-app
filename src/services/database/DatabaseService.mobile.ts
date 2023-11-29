@@ -1,5 +1,5 @@
 import DeviceService from '../device'
-import { Entity, QueryRunner, EntityTarget, createConnection, getConnection } from 'typeorm'
+import { Entity, EntitySchema, ObjectType, QueryRunner, createConnection, getConnection } from 'typeorm'
 import asyncForEach from '../../classes/AsyncForEach'
 import Config from '../../entities/trellis-config/Config'
 import Sync from '../../entities/trellis-config/Sync'
@@ -21,7 +21,7 @@ const trellisConfigOptions = {
   location: 'default',
   entities: trellisConfigEntities,
   logging: (config.database && config.database.logging !== null) ? config.database.logging : ['error'],
-  synchronize: true
+  synchronize: true,
 }
 
 const trellisOptions = {
@@ -96,9 +96,9 @@ export default class DatabaseServiceCordova {
     return false
   }
 
-  async getRepository<T extends object> (entity: EntityTarget<T>) {
+  async getRepository<T> (entity: string | EntitySchema<T> | ObjectType<T>) {
     const conn = await this.getDatabase()
-    return conn.getRepository<T>(entity)
+    return conn.getRepository(entity)
   }
 
   async createConfigDatabase () {
@@ -127,7 +127,9 @@ export default class DatabaseServiceCordova {
 
   async createUpdatedRecordsTable (queryRunner: QueryRunner, status: { message: string }) {
     try {
-      await queryRunner.query(`create table if not exists updated_records (table_name text, updated_record_id text, uploaded_at datetime);`)
+      const q = `create table if not exists updated_records 
+      (table_name text, updated_record_id text, uploaded_at datetime);`
+      await queryRunner.query(q)
     } catch (err) {
       status.message = 'Rolling back transaction...'
       await queryRunner.rollbackTransaction()
@@ -139,18 +141,20 @@ export default class DatabaseServiceCordova {
     try {
       const operations = ['update', 'insert']
       const tableNameResults = await queryRunner.query('select tbl_name from SQLite_master where type = "table"')
-      const tableNames: string[] = tableNameResults.map((tableNameObject) => { return tableNameObject['tbl_name'] }).filter(n => n !== 'sqlite_sequence')
+      const tableNames: string[] = tableNameResults.map((tableNameObject) => {
+        return tableNameObject.tbl_name
+      }).filter(n => n !== 'sqlite_sequence')
       console.log('tableNames', tableNames)
       await asyncForEach(tableNames, async tableName => {
         if (tableName !== 'updated_records') {
           await asyncForEach(operations, async operation => {
-            await queryRunner.query(
-              `create trigger if not exists trigger__updated_records__${operation}__${tableName} 
-               after ${operation} on ${tableName} 
-                 BEGIN 
-                   insert into updated_records (table_name, updated_record_id) values ('${tableName}',NEW.id);
-                 END;`
-            )
+            const q = `
+            create trigger if not exists trigger__updated_records__${operation}__${tableName}
+            after ${operation} on ${tableName}
+            BEGIN
+              insert into updated_records (table_name, updated_record_id) values ('${tableName}',NEW.id);
+            END;`
+            await queryRunner.query(q)
           })
         }
       })
@@ -168,9 +172,11 @@ export default class DatabaseServiceCordova {
     await queryRunner.query('PRAGMA foreign_keys = OFF;')
     await queryRunner.startTransaction()
     try {
-      const selectDropsQuery = `SELECT 'DROP TABLE "' || name || '";' as query FROM "sqlite_master" WHERE "type" = 'table' AND "name" != 'sqlite_sequence'`
-      const dropQueries = await queryRunner.query(selectDropsQuery)
-      await Promise.all(dropQueries.map(q => queryRunner.query(q['query'])))
+      const query = `
+      SELECT 'DROP TABLE "' || name || '";' as query FROM "sqlite_master" 
+      WHERE "type" = 'table' AND "name" != 'sqlite_sequence'`
+      const dropQueries = await queryRunner.query(query)
+      await Promise.all(dropQueries.map(q => queryRunner.query(q.query)))
       await queryRunner.query('PRAGMA foreign_keys = ON;')
       return queryRunner
     } catch (err) {
@@ -186,7 +192,7 @@ export default class DatabaseServiceCordova {
       const fileReader = new FileReader(file)
       const CHUNK_SIZE = 1024000
       let start = 0
-      let fileSize = file.size
+      const fileSize = file.size
       let end = Math.min(fileSize, (start + CHUNK_SIZE))
       let inQuotes = false
       let escaped = false
@@ -194,9 +200,9 @@ export default class DatabaseServiceCordova {
       fileReader.onload = async function (event) {
         try {
           trackProgress({ inserted: start, total: fileSize })
-          buffer += decoder.decode(event.target.result, {stream: true})
+          buffer += decoder.decode(event.target.result, { stream: true })
           for (let curChar = 0; curChar < buffer.length; curChar++) {
-            let char = buffer.charAt(curChar)
+            const char = buffer.charAt(curChar)
             if (!escaped && char === '\'') {
               inQuotes = !inQuotes
             }
@@ -209,7 +215,7 @@ export default class DatabaseServiceCordova {
             }
             if (!inQuotes) {
               if (char === ';') {
-                let query = buffer.substring(0, (curChar + 1))
+                const query = buffer.substring(0, (curChar + 1))
                 await queryRunner.query(query)
                 buffer = buffer.substring(curChar + 1, buffer.length)
                 curChar = 0
@@ -223,7 +229,7 @@ export default class DatabaseServiceCordova {
             } else {
               start += CHUNK_SIZE
               end = Math.min(fileSize, (end + CHUNK_SIZE))
-              let slice = file.slice(start, end)
+              const slice = file.slice(start, end)
               inQuotes = false
               escaped = false
               fileReader.readAsArrayBuffer(slice)
@@ -237,7 +243,7 @@ export default class DatabaseServiceCordova {
         }
       }
       fileReader.onerror = (error) => { reject(error) }
-      let slice = file.slice(start, end)
+      const slice = file.slice(start, end)
       fileReader.readAsArrayBuffer(slice)
     })
   }
@@ -289,8 +295,8 @@ export default class DatabaseServiceCordova {
     const repository = await connection.getRepository(Sync)
     const queryBuilder = await repository.createQueryBuilder('sync')
     return queryBuilder
-      .where('type = :type', {type: 'download'})
-      .andWhere('status = :status', {status: 'success'})
+      .where('type = :type', { type: 'download' })
+      .andWhere('status = :status', { status: 'success' })
       .orderBy('sync.createdAt', 'DESC')
       .limit(1)
       .getOne()
@@ -298,11 +304,11 @@ export default class DatabaseServiceCordova {
 
   async getLatestUpload (): Promise<Sync> {
     const connection = await this.getConfigDatabase()
-    const repository = await connection.getRepository(Sync)
-    const queryBuilder = await repository.createQueryBuilder('sync')
+    const repository = connection.getRepository(Sync)
+    const queryBuilder = repository.createQueryBuilder('sync')
     return queryBuilder
-      .where('type = :type', {type: 'upload'})
-      .where('status = :status', {status: 'success'})
+      .where('type = :type', { type: 'upload' })
+      .where('status = :status', { status: 'success' })
       .orderBy('sync.createdAt', 'DESC')
       .limit(1)
       .getOne()
@@ -310,18 +316,11 @@ export default class DatabaseServiceCordova {
 
   async getUpdatedRecordsCount (): Promise<number> {
     const connection = await this.getDatabase()
-    /*
-    const updatedRecords = await connection.query(
-      `select *
-        from updated_records
-        where uploaded_at is null;`)
-    console.log('updatedRecords', updatedRecords)
-    */
     const totalRowResults = await connection.query(
       `select count(distinct updated_record_id) as total_rows
         from updated_records
         where uploaded_at is null;`)
-    return totalRowResults[0]['total_rows']
+    return totalRowResults[0].total_rows
   }
 
   async getDatabaseFileUri (): Promise<string> {

@@ -2,7 +2,8 @@ import http from '../http/AxiosInstance'
 import SurveyServiceInterface from './SurveyServiceInterface'
 import Survey from '../../entities/trellis/Survey'
 import { uriTemplate } from '../http/WebUtils'
-export class SurveyServiceWeb implements SurveyServiceInterface {
+
+export class SurveyService implements SurveyServiceInterface {
   async getSurveyById (surveyId: string): Promise<Survey> {
     surveyId = encodeURIComponent(surveyId)
     const res = await http().get(`/survey/${surveyId}/`)

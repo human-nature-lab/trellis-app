@@ -5,8 +5,7 @@ import uuidv4 from 'uuid/v4'
 import { now } from '../DateService'
 import { IsNull } from 'typeorm'
 
-export class SurveyServiceCordova implements SurveyServiceInterface {
-
+export class SurveyService implements SurveyServiceInterface {
   async getSurveyById (surveyId: string): Promise<Survey> {
     const repo = await DatabaseService.getRepository(Survey)
     return repo.findOne({
