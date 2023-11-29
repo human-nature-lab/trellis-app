@@ -50,6 +50,7 @@ type RespondentCircle = {
   cx: number
   cy: number
   radius: number
+  lastTouchedAt: number
 }
 
 function hasRing (respondentId: string) {
@@ -57,7 +58,7 @@ function hasRing (respondentId: string) {
 }
 
 const respondents = ref<RespondentCircle[]>(props.respondents.map(respondent => {
-  return { respondent, cx: unitSize.value, cy: unitSize.value, radius: unitSize.value / 2 }
+  return { respondent, cx: unitSize.value, cy: unitSize.value, radius: unitSize.value / 2, lastTouchedAt: 0 }
 }))
 const allRespondentsInRing = computed(() => respondents.value.every(r => hasRing(r.respondent.id)))
 
@@ -110,6 +111,7 @@ const egoCircle = ref<RespondentCircle>({
   cx: viewBox.value.width / 2,
   cy: viewBox.value.height / 2,
   radius: unitSize.value / 2,
+  lastTouchedAt: 0,
 })
 
 type Pos = { x: number, y: number }
@@ -150,16 +152,16 @@ function canDrag (respondent: RespondentCircle) {
   return !hasRing(respondent.respondent.id) || (props.config.allowFinalReview && allRespondentsInRing.value)
 }
 
-function startDragMouse (index: number, event: MouseEvent) {
-  const respondent = respondents.value[index]
+function startDragMouse (respondent: RespondentCircle, event: MouseEvent) {
+  respondent.lastTouchedAt = Date.now()
   if (!canDrag(respondent)) return
   event.preventDefault()
   event.stopPropagation()
   return startDrag(respondent, absPosToSvgPos({ x: event.clientX, y: event.clientY }))
 }
 
-function startDragTouch (index: number, event: TouchEvent) {
-  const respondent = respondents.value[index]
+function startDragTouch (respondent: RespondentCircle, event: TouchEvent) {
+  respondent.lastTouchedAt = Date.now()
   if (!canDrag(respondent)) return
   event.preventDefault()
   event.stopPropagation()
@@ -230,123 +232,151 @@ function stopDragTouch (event: TouchEvent) {
 }
 
 const imageBorder = 2
-const textColor = computed(() => $vuetify.theme.dark ? 'white' : 'black')
-const darkTextColor = computed(() => $vuetify.theme.dark ? 'black' : 'white')
+const darkTheme = computed(() => $vuetify.theme.dark)
+const invertedColor = computed(() => darkTheme.value ? 'white' : 'black')
+const themeColor = computed(() => darkTheme.value ? 'black' : 'white')
 function respondentHidden (r: RespondentCircle) {
   if (allRespondentsInRing.value || currentRespondent.value === r) {
     return false
   }
   return hasRing(r.respondent.id) ? props.config.hideAfterMove : true
 }
+
+const remainingRespondentCount = computed(() => {
+  return respondents.value.filter(r => !hasRing(r.respondent.id)).length
+})
+
+// SVG renders in the order things are drawn so we need to sort the respondents how we want them to appear on the screen
+// this is manual z-indexing
+const zRespondents = computed(() => {
+  const order = respondents.value.slice()
+  order.sort((a, b) => {
+    return a.lastTouchedAt - b.lastTouchedAt
+  })
+  return order
+})
 </script>
 
 <template>
-  <svg
-    ref="svg"
-    id="social-ring"
-    xmlns="http://www.w3.org/2000/svg"
-    :viewBox="`0 0 ${viewBox.width} ${viewBox.height}`"
-    @mouseup="stopDragMouse"
-    @mouseleave="stopDragMouse"
-    @mousemove="dragMoveMouse"
-    @touchmove="dragMoveTouch"
-    @touchend="stopDragTouch"
-  >
-    <text
-      :fill="textColor"
-      :stroke="textColor"
-      x="100"
-      y="500"
-    >{{ draggingRing }}</text>
-    <!-- RINGS -->
-    <circle
-      v-for="(ring, i) in rings"
-      :key="`ring-${i}`"
-      :cx="ring.cx"
-      :cy="ring.cy"
-      fill="lightgrey"
-      stroke="grey"
-      stroke-width="1"
-      class="ring"
-      :class="{ active: draggingCircle && draggingRing === ring.index }"
-      :r="ring.r"
-    />
-    <text
-      v-for="ring in rings"
-      :key="`label-${ring.varName}`"
-      :x="ring.cx"
-      :y="ring.cy - (ring.r - 22)"
-      :font-size="18"
-      fill="black"
-      stroke="black"
-      text-anchor="middle"
-      :class="{ hidden: !props.config.showRingVarName }"
+  <v-row class="no-gutters justify-center">
+    <svg
+      ref="svg"
+      id="social-ring"
+      :class="{ dark: darkTheme }"
+      xmlns="http://www.w3.org/2000/svg"
+      :viewBox="`0 0 ${viewBox.width} ${viewBox.height}`"
+      @mouseup="stopDragMouse"
+      @mouseleave="stopDragMouse"
+      @mousemove="dragMoveMouse"
+      @touchmove="dragMoveTouch"
+      @touchend="stopDragTouch"
     >
-      {{ ring.varName }}
-    </text>
-
-    <!-- EGO -->
-    <g :transform="`translate(${ringCenter.x}, ${ringCenter.y})`">
-      <circle
-        :r="egoCircle.radius"
-        class="respondent ego"
-      />
-      <image
-        :href="egoCircle.respondent.avatarSrc"
-        :width="egoCircle.radius * 2"
-        :height="egoCircle.radius * 2"
-        :x="-egoCircle.radius"
-        :y="-egoCircle.radius"
-        style="clip-path: inset(100 0 0 0 round 50%);"
-      />
-    </g>
-
-    <!-- Respondents -->
-    <g
-      v-for="(r, i) in respondents"
-      :key="`respondent-${r.respondent.id}`"
-      :transform="`translate(${r.cx}, ${r.cy})`"
-      :class="{ hidden: respondentHidden(r) }"
-    >
-      <circle
-        :r="r.radius"
-        :fill="i === hoverIndex ? 'red' : 'black'"
-        class="respondent"
-      />
-      <image
-        class="respondent-avatar"
-        :class="{ dragging: draggingCircle === r, draggable: canDrag(r) }"
-        :href="r.respondent.avatarSrc"
-        :width="(r.radius - imageBorder) * 2"
-        :height="(r.radius - imageBorder) * 2"
-        :x="-(r.radius - imageBorder)"
-        :y="-(r.radius - imageBorder)"
-        style="clip-path: inset(0 0 0 0 round 50%);"
-        @mouseenter="hoverIndex = i"
-        @mouseleave="hoverIndex = -1"
-        @mousedown="startDragMouse(i, $event)"
-        @touchstart="startDragTouch(i, $event)"
-      />
       <text
-        v-if="!hasRing(r.respondent.id)"
-        :x="2 * (r.radius + imageBorder)"
-        :fill="textColor"
-        :stroke="darkTextColor"
-        :font-size="unitSize / 2"
-        font-weight="bold"
-        text-anchor="start"
+        v-if="remainingRespondentCount > 0"
+        :x="viewBox.width"
+        :y="unitSize"
+        :fill="invertedColor"
+        :stroke="invertedColor"
+        :font-size="unitSize / 3"
+        text-anchor="end"
         dominant-baseline="middle"
       >
-        {{ r.respondent.name }}
+        {{ $t('remaining_respondents_n', [remainingRespondentCount]) }}
       </text>
-    </g>
-  </svg>
+
+      <!-- RINGS -->
+      <circle
+        v-for="(ring, i) in rings"
+        :key="`ring-${i}`"
+        :cx="ring.cx"
+        :cy="ring.cy"
+        fill="lightgrey"
+        stroke="grey"
+        stroke-width="1"
+        class="ring"
+        :class="{ active: draggingCircle && draggingRing === ring.index }"
+        :r="ring.r"
+      />
+      <text
+        v-for="ring in rings"
+        :key="`label-${ring.varName}`"
+        :x="ring.cx"
+        :y="ring.cy - (ring.r - 22)"
+        :font-size="18"
+        fill="black"
+        stroke="black"
+        text-anchor="middle"
+        :class="{ hidden: !props.config.showRingVarName }"
+      >
+        {{ ring.varName }}
+      </text>
+
+      <!-- EGO -->
+      <g :transform="`translate(${ringCenter.x}, ${ringCenter.y})`">
+        <circle
+          :r="egoCircle.radius"
+          class="respondent ego"
+        />
+        <image
+          :href="egoCircle.respondent.avatarSrc"
+          :width="egoCircle.radius * 2"
+          :height="egoCircle.radius * 2"
+          :x="-egoCircle.radius"
+          :y="-egoCircle.radius"
+          style="clip-path: inset(0 0 0 0 round 50%);"
+        />
+      </g>
+
+      <!-- Respondents -->
+      <g
+        v-for="(r, i) in zRespondents"
+        :key="`respondent-${r.respondent.id}`"
+        :transform="`translate(${r.cx}, ${r.cy})`"
+        :class="{ hidden: respondentHidden(r) }"
+      >
+        <circle
+          :r="r.radius"
+          :fill="i === hoverIndex ? 'red' : invertedColor"
+          class="respondent"
+        />
+        <image
+          class="respondent-avatar"
+          :class="{ dragging: draggingCircle === r, draggable: canDrag(r) }"
+          :href="r.respondent.avatarSrc"
+          :width="(r.radius - imageBorder) * 2"
+          :height="(r.radius - imageBorder) * 2"
+          :x="-(r.radius - imageBorder)"
+          :y="-(r.radius - imageBorder)"
+          style="clip-path: inset(0 0 0 0 round 50%);"
+          @mouseenter="hoverIndex = i"
+          @mouseleave="hoverIndex = -1"
+          @mousedown="startDragMouse(r, $event)"
+          @touchstart="startDragTouch(r, $event)"
+        />
+        <text
+          v-if="!hasRing(r.respondent.id)"
+          :x="2 * (r.radius + imageBorder)"
+          :fill="invertedColor"
+          :stroke="themeColor"
+          :font-size="unitSize / 2"
+          font-weight="bold"
+          text-anchor="start"
+          dominant-baseline="middle"
+        >
+          {{ r.respondent.name }}
+        </text>
+      </g>
+    </svg>
+  </v-row>
 </template>
 
 <style lang="sass">
 #social-ring
   width: 100%
   height: 100%
+  max-height: 900px
+  max-width: 900px
+  margin: auto
   .ring
     transition: all 0.5s ease-in-out
     &.active
