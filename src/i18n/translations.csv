@@ -679,7 +679,7 @@ follow_leader,Follow leader,Seguir Lider,
 follower,Follower,Seguidor,
 leader,Leader,Lider,
 disconnect,Disconnect,Desconectar,
-generate_ring,Generate ring,Generar *,
+generate_ring,Generate ring,Generar,
 decisions_n,Decisions ({0}),Decisiones ({0}),# of pending decisions like: Decisions (12)
 connections_n,Connections ({0}),Conexiones ({0}),# of active connections like: Connections (3)
 report,Report,Reporte,
@@ -717,3 +717,4 @@ ring_hide_after_move,Hide after moving,Ocultar despue de mover,
 ring_show_var_name,Show ring variable,Mostrar variable del anillo,
 unknown_question,Unknown question,Pregunta desconocida,
 remaining_respondents_n,{0} remaining respondents,Quedan {0} participantes,Number of respondents remaining
+ring_show_text,Show ring text,Mostrar texto del anillo,

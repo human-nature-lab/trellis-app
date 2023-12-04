@@ -164,7 +164,7 @@ function updateRings (respondentId: string, ring: Ring) {
               />
               <v-switch
                 v-model="config.showRingText"
-                :label="$t('show_ring_text')"
+                :label="$t('ring_show_text')"
                 :readonly="props.locked"
               />
             </v-row>
