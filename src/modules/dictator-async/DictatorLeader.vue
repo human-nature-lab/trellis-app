@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onBeforeUnmount, onBeforeMount, computed, watch } from 'vue'
+import { shuffle } from 'lodash'
 import TrellisModal from '@/components/TrellisModal.vue'
 import PreviousReports from './PreviousReports.vue'
 import ReportTable from './ReportTable.vue'
@@ -8,7 +9,6 @@ import { Message, CandidatesRequest, CandidatesResponse, Device, Decision, Actor
 import { Server, ServerSocket } from '@/services/nearby-communications/server'
 import { onBeforeUnload } from '@/helpers/window.helper'
 import { reactiveSet } from '@/lib/reactive-set'
-import { shuffle } from 'lodash'
 import { useReports, Report } from './useReports'
 import { watchRespondents } from '@/helpers/respondent.helper'
 

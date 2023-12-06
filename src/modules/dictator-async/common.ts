@@ -78,7 +78,8 @@ export class DBActor implements Actor {
       )
       and id in (
         select question_id from question_parameter
-        where parameter_id = ?
+        where parameter_id = ? and val = "1"
+        and deleted_at is null
       )
       and deleted_at is null`, [formId, PT.dictator_decision])
 
@@ -95,7 +96,8 @@ export class DBActor implements Actor {
         )
         and id in (
           select question_id from question_parameter
-          where parameter_id = ?
+          where parameter_id = ? and val = "1"
+          and deleted_at is null
         )
         and deleted_at is null
       `, [formId, PT.dictator_receiver])
@@ -103,15 +105,20 @@ export class DBActor implements Actor {
     const decisionIdsInStr = decisionQuestionIds.map(q => `"${q.id}"`).join(', ')
     const receiverIdsInStr = receiverQuestionIds.map(q => `"${q.id}"`).join(', ')
     const maxVals = await db.query(`
-    select question_id, val from question_parameter
-    where parameter_id = ?
+    select parameter_id, question_id, val from question_parameter
+    where parameter_id in ("${PT.json}", "${PT.max}")
     and deleted_at is null
-    and question_id in (${decisionIdsInStr})`, [PT.json])
+    and question_id in (${decisionIdsInStr})`)
     const maxValsMap = new Map<string, number>()
     for (const v of maxVals) {
-      const d = JSON.parse(v.val)
-      console.log('maxVals', v.question_id, d.quantity)
-      maxValsMap.set(v.question_id, d.quantity)
+      if (+v.parameter_id === PT.json) {
+        const d = JSON.parse(v.val)
+        maxValsMap.set(v.question_id, d.quantity)
+      } else if (+v.parameter_id === PT.max) {
+        maxValsMap.set(v.question_id, +v.val)
+      } else {
+        throw new Error('Unexpected parameter id: ' + v.parameter_id)
+      }
     }
     const decisionData = await db.query(`
       select
