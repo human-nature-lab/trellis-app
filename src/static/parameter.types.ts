@@ -31,6 +31,8 @@ export enum ParameterType {
   dictator_proposer = 30,
   dictator_receiver = 31,
   step_size = 32,
+  display_slider = 33,
+  initial_value = 34,
 }
 
 export default ParameterType
