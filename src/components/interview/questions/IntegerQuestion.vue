@@ -9,6 +9,7 @@
       :step="stepSize"
       :min="min"
       :max="max"
+      :tick-labels="tickLabels"
       thumb-label="always"
     />
     <v-text-field
@@ -75,6 +76,38 @@ export default {
         return null
       }
     })
+    const tickLabels = computed(() => {
+      if (!isSlider.value) return []
+      const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.tick_labels)
+      const d = max.value - min.value
+      const numSteps = Math.floor(d / stepSize.value)
+      debugger
+      if (qp) {
+        const labels = JSON.parse(qp.val)
+        if (labels.length === 0) return []
+        if (labels.length === numSteps) {
+          return labels
+        }
+        const res = []
+        const gapSize = Math.floor((d / stepSize.value) / (labels.length - 1))
+        // interpolate labels and add nulls for missing labels
+        for (let i = 0; i <= numSteps; i++) {
+          if (i % (gapSize) === 0) {
+            res.push(labels[i / (gapSize)])
+          } else {
+            res.push(null)
+          }
+        }
+        return res
+      }
+      const labels = []
+
+      const tickSize = d <= 10 ? 1 : Math.round(d / 10)
+      for (let i = min.value; i <= max.value; i++) {
+        labels.push((i === min.value || i % tickSize === 0) ? ('' + i) : null)
+      }
+      return labels
+    })
     const initialValue = computed(() => {
       const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.initial_value)
       if (qp) {
@@ -87,7 +120,7 @@ export default {
         return null
       }
     })
-    return { stepSize, min, max, initialValue, isSlider }
+    return { stepSize, min, max, initialValue, isSlider, tickLabels }
   },
   computed: {
     value: {
