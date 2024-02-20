@@ -6,6 +6,10 @@ import { debouncedAction } from '../lib/action'
 import { useVuetifyQuestionRules, useQuestionDisabled } from '@/helpers/interview.helper'
 import Question from '@/entities/trellis/Question'
 import Respondent from '@/entities/trellis/Respondent'
+import { translate, useTranslations } from '@/helpers/translation.helper'
+import { i18n } from '@/i18n'
+import singleton from '@/static/singleton'
+import Translation from '@/entities/trellis/Translation'
 
 const props = defineProps<{
   question: Question
@@ -78,6 +82,26 @@ const tickLabels = computed(() => {
   return labels
 })
 
+const { translations, loading } = useTranslations(computed(() =>
+  tickLabels.value.filter(t => !!t).map(t => t.translationId),
+))
+const translationMap = computed(() => {
+  const map: Record<string, Translation> = {}
+  translations.value.forEach(t => {
+    if (!t) return
+    map[t.id] = t as Translation
+  })
+  return map
+})
+
+const translatedLabels = computed(() => {
+  return tickLabels.value.map(t => {
+    if (!t) return null
+    if (loading.value) return i18n.t('loading') as string
+    return translate(translationMap.value[t.translationId], singleton.locale.id)
+  })
+})
+
 const initialValue = computed(() => {
   const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.initial_value)
   if (qp) {
@@ -108,7 +132,6 @@ function setValue (val: string | number) {
 const rules = useVuetifyQuestionRules(props)
 const isQuestionDisabled = useQuestionDisabled(props)
 
-
 </script>
 
 <template>
@@ -122,7 +145,7 @@ const isQuestionDisabled = useQuestionDisabled(props)
       :step="stepSize"
       :min="min"
       :max="max"
-      :tick-labels="tickLabels"
+      :tick-labels="translatedLabels"
       thumb-label="always"
       @input="setValue"
     />

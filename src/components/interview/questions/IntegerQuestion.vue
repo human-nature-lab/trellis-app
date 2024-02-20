@@ -9,7 +9,7 @@
       :step="stepSize"
       :min="min"
       :max="max"
-      :tick-labels="tickLabels"
+      :tick-labels="translatedLabels"
       thumb-label="always"
     />
     <v-text-field
@@ -25,7 +25,7 @@
   </v-flex>
 </template>
 
-<script>
+<script lang="ts">
 import { computed } from 'vue'
 import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
 import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
@@ -33,6 +33,11 @@ import ActionMixin from '../mixins/ActionMixin'
 import AT from '@/static/action.types'
 import PT from '@/static/parameter.types'
 import Question from '@/entities/trellis/Question'
+import { translate, useTranslations } from '@/helpers/translation.helper'
+import Translation from '@/entities/trellis/Translation'
+import { i18n } from '@/i18n'
+import singleton from '@/static/singleton'
+
 export default {
   name: 'IntegerQuestion',
   props: {
@@ -81,7 +86,6 @@ export default {
       const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.tick_labels)
       const d = max.value - min.value
       const numSteps = Math.floor(d / stepSize.value)
-      debugger
       if (qp) {
         const labels = JSON.parse(qp.val)
         if (labels.length === 0) return []
@@ -108,6 +112,25 @@ export default {
       }
       return labels
     })
+    const { translations, loading } = useTranslations(computed(() => {
+      return tickLabels.value.filter(t => !!t).map(t => t.translationId)
+    }))
+    const translationMap = computed(() => {
+      const map: Record<string, Translation> = {}
+      translations.value.forEach(t => {
+        if (!t) return
+        map[t.id] = t as Translation
+      })
+      return map
+    })
+
+    const translatedLabels = computed(() => {
+      return tickLabels.value.map(t => {
+        if (!t) return null
+        if (loading.value) return i18n.t('loading') as string
+        return translate(translationMap.value[t.translationId], singleton.locale.id)
+      })
+    })
     const initialValue = computed(() => {
       const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.initial_value)
       if (qp) {
@@ -120,7 +143,7 @@ export default {
         return null
       }
     })
-    return { stepSize, min, max, initialValue, isSlider, tickLabels }
+    return { stepSize, min, max, initialValue, isSlider, translatedLabels }
   },
   computed: {
     value: {

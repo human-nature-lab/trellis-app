@@ -1,4 +1,4 @@
-import { IsNull } from 'typeorm'
+import { In, IsNull } from 'typeorm'
 import DatabaseService from '../database'
 import TranslationText from '@/entities/trellis/TranslationText'
 import Translation from '@/entities/trellis/Translation'
@@ -31,6 +31,16 @@ class TranslationTextServiceCordova implements TranslationTextServiceInterface {
     const repo = await DatabaseService.getRepository(Translation)
     return repo.findOne({
       where: { id: translationId },
+      relations: ['translationText'],
+    })
+  }
+
+  async getTranslationsById (translationIds: string[]): Promise<Translation[]> {
+    const repo = await DatabaseService.getRepository(Translation)
+    return repo.find({
+      where: {
+        id: In(translationIds),
+      },
       relations: ['translationText'],
     })
   }

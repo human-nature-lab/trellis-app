@@ -58,6 +58,7 @@
   import TimeQuestion from './questions/TimeQuestion.vue'
   import DistributionQuestion from './questions/distribution/DistributionQuestion.vue'
   import SocialRingQuestion from './questions/social-ring/SocialRingQuestion.vue'
+  import ScaleQuestion from './questions/scale/ScaleQuestion.vue'
   import DurationQuestion from './questions/DurationQuestion.vue'
   import QuestionTimer from './QuestionTimer.vue'
   import QuestionText from './QuestionText.vue'
@@ -86,6 +87,7 @@
     [questionTypes.distribution]: DistributionQuestion,
     [questionTypes.social_ring]: SocialRingQuestion,
     [questionTypes.duration]: DurationQuestion,
+    [questionTypes.scale]: ScaleQuestion
   }
 
   export default Vue.extend({
@@ -109,6 +111,7 @@
       TimeQuestion,
       DistributionQuestion,
       QuestionText,
+      ScaleQuestion,
     },
     props: {
       question: {

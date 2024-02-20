@@ -34,6 +34,7 @@ export enum ParameterType {
   display_slider = 33,
   initial_value = 34,
   tick_labels = 35,
+  continous_scale = 36,
 }
 
 export default ParameterType
