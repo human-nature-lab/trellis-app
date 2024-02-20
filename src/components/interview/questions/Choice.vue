@@ -58,20 +58,24 @@ function choiceClasses (choice: DisplayChoice) {
 
 <template>
   <v-row class="checkbox-group">
-    <v-checkbox
-      class="checkbox"
+    <v-row
       v-if="question.questionTypeId === QT.multiple_select"
-      :disabled="disabled"
-      :value="isSelected"
-      :class="choiceClasses(choice)"
-      @change="onChange(choice)"
+      no-gutters
+      class="mx-4"
     >
+      <v-simple-checkbox
+        class="checkbox"
+        :disabled="disabled"
+        :value="isSelected"
+        :class="choiceClasses(choice)"
+        @input="onChange(choice)"
+      />
       <ChoiceText
         :translation="choice.choiceTranslation"
         :location="location"
         slot="label"
       />
-    </v-checkbox>
+    </v-row>
     <radio-checkbox
       v-else
       :disabled="disabled"

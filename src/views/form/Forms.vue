@@ -52,7 +52,7 @@
               :list="items"
               @end="reorderForms"
               tag="tbody">
-              <form-list-tile
+              <FormListTile
                 v-for="item in items"
                 :key="item.id"
                 :form="item.form"
@@ -65,8 +65,8 @@
                 @update="loadForms"
                 @update:studyForm="updateStudyForm"
                 @changeStudyForm="changeStudyForm"
-                @delete="deleteForm(item)">
-              </form-list-tile>
+                @delete="deleteForm(item)"
+              />
             </draggable>
           </template>
         </v-data-table>
