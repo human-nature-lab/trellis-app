@@ -9,6 +9,7 @@ export enum ParameterDataType {
   Boolean = 'boolean',
   ConditionTag = 'condition_tag',
   GeoType = 'geo_type',
+  Json = 'json',
 }
 
 @Entity()

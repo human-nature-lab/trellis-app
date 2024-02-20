@@ -11,9 +11,11 @@ import builderService from '@/services/builder'
 import ExpandSection from './ExpandSection.vue'
 import DistributionQuestionBuilder from './question-builders/DistributionQuestionBuilder.vue'
 import SocialRingBuilder from './question-builders/SocialRingBuilder.vue'
+import ScaleBuilder from './question-builders/ScaleBuilder.vue'
 import { logError } from '@/helpers/log.helper'
 import { useBuilder } from '@/helpers/builder.helper'
 import QuestionPreview from './QuestionPreview.vue'
+import NumberBuilder from './question-builders/NumberBuilder.vue'
 
 const props = defineProps<{
   value: Question,
@@ -32,6 +34,11 @@ const questionBuilderComponent = computed(() => {
       return DistributionQuestionBuilder
     case questionTypes.social_ring:
       return SocialRingBuilder
+    case questionTypes.scale:
+      return ScaleBuilder
+    case questionTypes.integer:
+    case questionTypes.decimal:
+      return NumberBuilder
     default:
       return null
   }
@@ -40,10 +47,6 @@ const questionBuilderComponent = computed(() => {
 const isChoiceType = computed(() => {
   return props.value.questionTypeId === questionTypes.multiple_choice ||
   props.value.questionTypeId === questionTypes.multiple_select
-})
-
-const isDistributionType = computed(() => {
-  return props.value.questionTypeId === questionTypes.distribution
 })
 
 async function updateQuestion () {
@@ -60,6 +63,14 @@ async function updateQuestion () {
 }
 
 const inPreview = ref(false)
+const builderRef = ref()
+
+const hiddenParameters = computed(() => {
+  if (builderRef.value && builderRef.value.hiddenParameters) {
+    return builderRef.value.hiddenParameters
+  }
+  return []
+})
 
 </script>
 
@@ -96,6 +107,7 @@ const inPreview = ref(false)
         />
         <component
           v-if="isBuilderType"
+          ref="builderRef"
           :is="questionBuilderComponent"
           :locked="builder.locked"
           :value="value"
@@ -123,6 +135,7 @@ const inPreview = ref(false)
               :disabled="builder.locked || !value.questionTypeId"
               v-model="value.questionParameters"
               :parameters="builder.parameters"
+              :hidden-parameters="hiddenParameters"
               :condition-tags="builder.conditionTags"
               :locale="builder.locale"
               :geo-types="builder.geoTypes"

@@ -21,10 +21,11 @@ const qt = {
   respondent_geo: 'db1192c9-a850-4427-ad67-388f6325fd23',
   distribution: 'd9a2de9f-411a-11ee-81c8-0242ac120003',
   social_ring: 'adf49a4d-79a4-11ee-80e7-0242ac120004',
+  scale: 'c0d963e8-cf5a-11ee-b2f9-0242ac120003',
 }
 
 export const choiceTypes = [qt.multiple_choice, qt.multiple_select]
-export const builderTypes = [qt.distribution, qt.social_ring]
+export const builderTypes = [qt.distribution, qt.social_ring, qt.scale, qt.integer, qt.decimal]
 
 export function isBuilderType (typeId: string) {
   return builderTypes.includes(typeId)
@@ -45,8 +46,8 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
     PT.hide_no_one,
     PT.dictator_receiver,
   ],
-  [qt.integer]: [PT.min, PT.max, PT.step_size, PT.display_slider, PT.initial_value],
-  [qt.decimal]: [PT.min, PT.max, PT.step_size, PT.display_slider, PT.initial_value],
+  [qt.integer]: [PT.min, PT.max, PT.step_size, PT.display_slider, PT.initial_value, PT.tick_labels],
+  [qt.decimal]: [PT.min, PT.max, PT.step_size, PT.display_slider, PT.initial_value, PT.tick_labels],
   [qt.group]: [],
   [qt.roster]: [PT.allow_barcode, PT.min_roster, PT.max_roster],
   [qt.text]: [PT.allow_barcode],
@@ -61,6 +62,7 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
   [qt.respondent_geo]: [PT.geo_type],
   [qt.distribution]: [PT.json, PT.dictator_decision],
   [qt.social_ring]: [PT.json],
+  [qt.scale]: [PT.json],
 }
 
 for (const key in questionTypeParameters) {

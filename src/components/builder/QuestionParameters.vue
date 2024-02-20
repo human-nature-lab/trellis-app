@@ -10,6 +10,7 @@ import Locale from '@/entities/trellis/Locale'
 import Parameter from '@/entities/trellis/Parameter'
 import { logError } from '@/helpers/log.helper'
 import { QuestionTypeParameters } from '@/static/question.types'
+import PT from '@/static/parameter.types'
 
 const props = defineProps<{
   disabled?: boolean
@@ -18,6 +19,7 @@ const props = defineProps<{
   conditionTags: ConditionTag[]
   choices: Choice[]
   geoTypes: GeoType[]
+  hiddenParameters?: PT[]
   questionTypeId: string
   questionId: string
   locale: Locale
@@ -39,6 +41,7 @@ const availableParameters = computed(() => {
   }
   return parameters
 })
+
 const working = ref(false)
 const placeholder = ref<QuestionParameter | null>(null)
 
@@ -106,6 +109,7 @@ async function remove (p: QuestionParameter) {
         :key="p.id"
       >
         <ParameterRow
+          v-if="!hiddenParameters || !hiddenParameters.includes(+p.parameterId)"
           :value="props.value[index]"
           @input="updateParameter(index, $event)"
           :parameters="availableParameters"

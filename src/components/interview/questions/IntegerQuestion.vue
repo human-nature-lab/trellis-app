@@ -1,5 +1,6 @@
 <template>
   <v-flex class="integer-question">
+    <QuestionText :question="question" />
     <v-slider
       v-if="isSlider"
       class="mt-6"
@@ -9,6 +10,7 @@
       :step="stepSize"
       :min="min"
       :max="max"
+      :tick-labels="translatedLabels"
       thumb-label="always"
     />
     <v-text-field
@@ -24,16 +26,19 @@
   </v-flex>
 </template>
 
-<script>
+<script lang="ts">
 import { computed } from 'vue'
 import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
 import VuetifyValidationRules from '../mixins/VuetifyValidationRules'
 import ActionMixin from '../mixins/ActionMixin'
 import AT from '@/static/action.types'
-import PT from '@/static/parameter.types'
 import Question from '@/entities/trellis/Question'
+import { useNumberParams } from '../hooks/useNumberParams'
+import QuestionText from '../QuestionText.vue'
+
 export default {
   name: 'IntegerQuestion',
+  components: { QuestionText },
   props: {
     question: {
       type: Question,
@@ -47,47 +52,8 @@ export default {
     }
   },
   setup (props) {
-    const stepSize = computed(() => {
-      const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.step_size)
-      return qp ? +qp.val : 1
-    })
-    const isSlider = computed(() => {
-      const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.display_slider)
-      return qp ? !!+qp.val : false
-    })
-    const min = computed(() => {
-      const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.min)
-      if (qp) {
-        return +qp.val
-      } else if (isSlider.value) {
-        return 0
-      } else {
-        return null
-      }
-    })
-    const max = computed(() => {
-      const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.max)
-      if (qp) {
-        return +qp.val
-      } else if (isSlider.value) {
-        return 100
-      } else {
-        return null
-      }
-    })
-    const initialValue = computed(() => {
-      const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.initial_value)
-      if (qp) {
-        return +qp.val
-      } else if (isSlider.value) {
-        const midpoint = (max.value - min.value) / 2
-        // round to nearest step size
-        return Math.round(midpoint / stepSize.value) * stepSize.value
-      } else {
-        return null
-      }
-    })
-    return { stepSize, min, max, initialValue, isSlider }
+    const { stepSize, min, max, isSlider, translatedLabels, initialValue } = useNumberParams(computed(() => props.question), 1)
+    return { stepSize, min, max, initialValue, isSlider, translatedLabels }
   },
   computed: {
     value: {

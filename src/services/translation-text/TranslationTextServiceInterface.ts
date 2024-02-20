@@ -27,4 +27,6 @@ export default interface TranslationTextServiceInterface {
 
 
   getTranslationById (translationId: string): PromiseLike<Translation>
+
+  getTranslationsById (translationIds: string[]): PromiseLike<Translation[]>
 }

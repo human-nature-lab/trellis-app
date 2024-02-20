@@ -6,6 +6,12 @@ import { debouncedAction } from '../lib/action'
 import { useVuetifyQuestionRules, useQuestionDisabled } from '@/helpers/interview.helper'
 import Question from '@/entities/trellis/Question'
 import Respondent from '@/entities/trellis/Respondent'
+import { translate, useTranslations } from '@/helpers/translation.helper'
+import { i18n } from '@/i18n'
+import singleton from '@/static/singleton'
+import Translation from '@/entities/trellis/Translation'
+import { useNumberParams } from '../hooks/useNumberParams'
+import QuestionText from '../QuestionText.vue'
 
 const props = defineProps<{
   question: Question
@@ -14,50 +20,7 @@ const props = defineProps<{
   location: Location
 }>()
 
-const isSlider = computed(() => {
-  const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.display_slider)
-  return qp ? !!+qp.val : false
-})
-
-const min = computed(() => {
-  const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.min)
-  if (qp) {
-    return +qp.val
-  } else if (isSlider.value) {
-    return 0
-  } else {
-    return null
-  }
-})
-
-const max = computed(() => {
-  const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.max)
-  if (qp) {
-    return +qp.val
-  } else if (isSlider.value) {
-    return 100
-  } else {
-    return null
-  }
-})
-
-const stepSize = computed(() => {
-  const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.step_size)
-  return qp ? +qp.val : 0.1
-})
-
-const initialValue = computed(() => {
-  const qp = props.question.questionParameters.find(qp => +qp.parameterId === PT.initial_value)
-  if (qp) {
-    return +qp.val
-  } else if (isSlider.value) {
-    const midpoint = (max.value - min.value) / 2
-    // round to nearest step size
-    return Math.round(midpoint / stepSize.value) * stepSize.value
-  } else {
-    return null
-  }
-})
+const { stepSize, min, max, isSlider, translatedLabels, initialValue } = useNumberParams(computed(() => props.question), 0.1)
 
 const localVal = ref<number | null>(initialValue.value || null)
 const value = computed(() => {
@@ -76,11 +39,11 @@ function setValue (val: string | number) {
 const rules = useVuetifyQuestionRules(props)
 const isQuestionDisabled = useQuestionDisabled(props)
 
-
 </script>
 
 <template>
   <v-flex class="decimal-question">
+    <QuestionText :question="question" />
     <v-slider
       v-if="isSlider"
       class="mt-6"
@@ -90,6 +53,7 @@ const isQuestionDisabled = useQuestionDisabled(props)
       :step="stepSize"
       :min="min"
       :max="max"
+      :tick-labels="translatedLabels"
       thumb-label="always"
       @input="setValue"
     />

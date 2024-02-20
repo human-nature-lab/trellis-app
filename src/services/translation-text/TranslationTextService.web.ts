@@ -30,6 +30,11 @@ class TranslationTextServiceWeb implements TranslationTextServiceInterface {
     const res = await http().get(uriTemplate('translation/{id}', [translationId]))
     return new Translation().fromSnakeJSON(res.data.translation)
   }
+
+  async getTranslationsById (translationIds: string[]): Promise<Translation[]> {
+    const res = await http().get(uriTemplate('translations', []), { params: { id: translationIds } })
+    return res.data.translations.map(t => new Translation().fromSnakeJSON(t))
+  }
 }
 
 export default new TranslationTextServiceWeb()

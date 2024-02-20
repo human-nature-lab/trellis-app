@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { WatchSource, ref, watch } from 'vue'
 import Translation from '@/entities/trellis/Translation'
 import builder from '@/services/builder'
 import TranslationTextService from '@/services/translation-text/'
@@ -68,4 +68,27 @@ export function translate (translation: Translation, localeId: string) {
     return null
   }
   return tt.translatedText
+}
+
+export function useTranslations (ids: WatchSource<string[]>) {
+  const translations = ref<Translation[]>([])
+  const loading = ref(false)
+  const error = ref<Error>(null)
+
+  async function reload (ids: string[]) {
+    if (!ids || !ids.length) return
+    try {
+      error.value = null
+      loading.value = true
+      translations.value = await ttService.getTranslationsById(ids)
+    } catch (err) {
+      error.value = err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  watch(ids, reload, { immediate: true })
+
+  return { translations, loading, error, reload }
 }

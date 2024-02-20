@@ -42,8 +42,9 @@
           v-else
           :readonly="disabled"
           v-model="value.val"
+          :rules="[isValid || $t('invalid_json')]"
           :label="$t('value')"
-          hide-details
+          :hide-details="isValid"
           @change="onChange"
         />
       </v-col>
@@ -65,6 +66,7 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue'
 import Parameter, { ParameterDataType } from '@/entities/trellis/Parameter'
+import PT from '@/static/parameter.types'
 import QuestionParameter from '@/entities/trellis/QuestionParameter'
 import MenuSelect from '@/components/util/MenuSelect.vue'
 import ConditionTag from '@/entities/trellis/ConditionTag'
@@ -98,7 +100,7 @@ export default Vue.extend({
   },
   methods: {
     async onChange () {
-      if (this.working) return
+      if (this.working || !this.isValid) return
       this.working = true
       try {
         const p = this.parameters.find(p => p.id === this.value.parameterId)
@@ -126,6 +128,9 @@ export default Vue.extend({
     },
   },
   computed: {
+    isValid (): boolean {
+      return !this.isJson || this.jsonIsValid
+    },
     parameter (): Parameter {
       return this.parameters.find(p => p.id === this.value.parameterId)
     },
@@ -149,6 +154,20 @@ export default Vue.extend({
     },
     boolVal (): boolean {
       return !!+this.value.val
+    },
+    isJson (): boolean {
+      return this.parameter.type === ParameterDataType.Json
+    },
+    jsonIsValid (): boolean {
+      try {
+        const v = JSON.parse(this.value.val)
+        if (PT.tick_labels === +this.value.parameterId) {
+          return Array.isArray(v)
+        }
+        return true
+      } catch (err) {
+        return false
+      }
     },
   },
 })
