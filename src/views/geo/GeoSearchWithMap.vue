@@ -323,15 +323,13 @@
         let tooltipsToDisplay = geoResults.length
         return new Promise((resolve) => {
           geoResults.forEach((geo) => {
-            let latitude = (geo.latitude) ? geo.latitude : 0
-            let longitude = (geo.longitude) ? geo.longitude : 0
-            let markerCoords = [latitude, longitude]
+            const markerCoords = [geo.latitude || 0, geo.longitude || 0]
             this.markerPositions.push(markerCoords)
-            let geoMarker = L.marker(markerCoords, {icon: defaultIcon, interactive: false})
+            const geoMarker = L.marker(markerCoords, {icon: defaultIcon, interactive: false})
             this.geoMarkers.push(geoMarker)
-            let tooltipMarker = L.marker(markerCoords, {icon: hiddenIcon, interactive: false})
-            let translation = TranslationService.getTranslated(geo.nameTranslation, this.global.locale)
-            tooltipMarker.geoName = (translation) ? translation : '[No translation]'
+            const tooltipMarker = L.marker(markerCoords, {icon: hiddenIcon, interactive: false})
+            const translation = TranslationService.getAny(geo.nameTranslation, this.global.locale)
+            tooltipMarker.geoName = translation || '[No translation]'
             tooltipMarker.geoId = geo.id
             tooltipMarker.geo = geo
             tooltipMarker.origin = geoMarker

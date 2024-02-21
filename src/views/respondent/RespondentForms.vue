@@ -65,7 +65,7 @@
       <v-toolbar flat>
         <v-toolbar-title>{{ $t('census_forms') }}</v-toolbar-title>
       </v-toolbar>
-      <forms-view
+      <FormsView
         v-if="censusForms"
         :loading="loading"
         :disabled="loading"
