@@ -14,7 +14,7 @@ const conditionTags = ref<string[]>([])
 const hasLoaded = ref(false)
 const query = ref<string | null>(null)
 
-watch(() => props.value, async () => {
+watch(() => [props.value, query.value], async () => {
   if (conditionTags.value.length || isLoading.value || hasLoaded.value) return
   isLoading.value = true
   try {
