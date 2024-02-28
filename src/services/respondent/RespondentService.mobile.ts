@@ -94,6 +94,7 @@ export class RespondentService implements RespondentServiceInterface {
         'geos.geo.photos',
         'geos.geo.geoType',
         'geos.geo.nameTranslation',
+        'respondentConditionTags',
       ],
     })
 
@@ -254,6 +255,8 @@ export class RespondentService implements RespondentServiceInterface {
     q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
+    q = q.leftJoinAndSelect('respondent.respondentConditionTags', 'respondent_condition_tag')
+    q = q.leftJoinAndSelect('respondent_condition_tag.conditionTag', 'condition_tag')
 
     const respondents = await q.getMany()
     removeSoftDeleted(respondents)
