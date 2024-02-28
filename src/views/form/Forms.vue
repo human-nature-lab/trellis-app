@@ -301,6 +301,6 @@
 </script>
 
 <style lang="sass" scoped>
-  .small
-    column-width: 20px
+  // .small
+  //   column-width: 90px
 </style>

@@ -6,15 +6,15 @@ import Respondent from '../../entities/trellis/Respondent'
 import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
-import DatabaseService from '../../services/database'
-import { Brackets, Connection, EntityManager, In, IsNull } from 'typeorm'
+import DatabaseService from '../database'
+import { Connection, EntityManager, In, IsNull } from 'typeorm'
 import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
 import Photo from '../../entities/trellis/Photo'
 import { removeSoftDeleted } from '../database/SoftDeleteHelper'
 import Geo from '../../entities/trellis/Geo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
-export class RespondentServiceCordova implements RespondentServiceInterface {
+export class RespondentService implements RespondentServiceInterface {
   async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     const repo = await DatabaseService.getRepository(RespondentPhoto)
     const rPhoto = new RespondentPhoto()

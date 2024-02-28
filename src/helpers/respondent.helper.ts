@@ -1,9 +1,6 @@
 import { WatchSource, ref, watch } from 'vue'
 import RespondentService from '@/services/respondent'
 import Respondent from '@/entities/trellis/Respondent'
-import { RespondentServiceCordova } from '@/services/respondent/RespondentServiceCordova'
-
-const rs = RespondentService as RespondentServiceCordova
 
 export function useRespondent (id: string) {
   const respondent = ref<Respondent | null>(null)
@@ -12,7 +9,7 @@ export function useRespondent (id: string) {
   async function reload () {
     try {
       loading.value = true
-      respondent.value = await rs.getRespondentById(id)
+      respondent.value = await RespondentService.getRespondentById(id)
     } catch (err) {
       error.value = err
     } finally {
@@ -30,7 +27,7 @@ export function useRespondents (ids: string[]) {
   async function reload () {
     try {
       loading.value = true
-      respondents.value = await Promise.all(ids.map(id => rs.getRespondentById(id)))
+      respondents.value = await Promise.all(ids.map(id => RespondentService.getRespondentById(id)))
     } catch (err) {
       error.value = err
     } finally {
@@ -53,7 +50,7 @@ export function watchRespondents (source: WatchSource<string[]>) {
     pending.push(...newRespondentIds)
     loading.value = true
     try {
-      const newRespondents = await Promise.all(newRespondentIds.map(id => rs.getRespondentById(id)))
+      const newRespondents = await Promise.all(newRespondentIds.map(id => RespondentService.getRespondentById(id)))
       for (const r of newRespondents) {
         respondents.value[r.id] = r
       }
