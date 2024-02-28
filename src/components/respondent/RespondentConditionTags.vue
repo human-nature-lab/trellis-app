@@ -29,7 +29,9 @@
       :items="conditionTags">
       <template v-slot:item="{ item }">
         <tr>
-          <td>{{ item.conditionTag.name }}</td>
+          <td>
+            {{ item.conditionTag.name }} <ConditionTagDot :name="item.conditionTag.name" /> 
+          </td>
           <td class="text-xs-right">{{ item.createdAt | dateFormat }}</td>
           <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_CONDITION_TAG">
             <td>
@@ -61,13 +63,15 @@
   import RespondentConditionTag from '@/entities/trellis/RespondentConditionTag'
   import ConditionTagService from '@/services/condition-tag'
   import { dateFormat } from '@/filters/date'
+import ConditionTagDot from './ConditionTagDot.vue'
 
   export default Vue.extend({
     name: 'RespondentConditionTags',
     components: {
-      Permission,
-      RespondentConditionTagForm,
-    },
+    Permission,
+    RespondentConditionTagForm,
+    ConditionTagDot
+},
     filters: { dateFormat },
     data () {
       return {
