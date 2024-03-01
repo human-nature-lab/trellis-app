@@ -205,7 +205,7 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .small
   width: 20px
 .medium
