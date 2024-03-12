@@ -91,7 +91,7 @@ export function useNumberParams (question: Ref<Question>, defaultStepSize: numbe
     if (qp) {
       return +qp.val
     } else if (isSlider.value) {
-      const midpoint = (max.value - min.value) / 2
+      const midpoint = (max.value + min.value) / 2
       // round to nearest step size
       return Math.round(midpoint / stepSize.value) * stepSize.value
     } else {
