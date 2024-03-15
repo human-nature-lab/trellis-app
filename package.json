@@ -9,6 +9,7 @@
   "author": "wyattis <wyatt.israel@yale.edu>",
   "private": true,
   "scripts": {
+    "dev": "npm run start:web",
     "vite": "npm run compile && vite --host 0.0.0.0",
     "compile": "node compile-translations.js",
     "setup:cordova": "node ./build/build-cordova-config.js",
