@@ -10,6 +10,7 @@ import TranslationTextService from '@/services/translation-text'
 export type TranslationRow = {
   type: string
   ownerId: string
+  varName?: string
   translation: Translation
 }
 

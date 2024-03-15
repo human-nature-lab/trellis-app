@@ -121,7 +121,7 @@ if (isProd) {
 //   }))
 // }
 
-const devtool = sourceMap && 'eval-source-map'
+const devtool = sourceMap && 'source-map'
 module.exports = {
   target: 'web',
   mode: isProd ? 'production' : 'development',

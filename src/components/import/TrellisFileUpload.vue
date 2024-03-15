@@ -175,7 +175,6 @@
         this.isUploading = false
       },
       dragover (event: Event) {
-        console.log('dragover', event)
         // @ts-ignore
         const files: File[] = event.dataTransfer.files
         for (const file of files) {
