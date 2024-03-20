@@ -8,9 +8,9 @@ import TranslationText from '@/entities/trellis/TranslationText'
 import Translation from '@/entities/trellis/Translation'
 import { logError, alert } from '@/helpers/log.helper'
 import Papa from 'papaparse'
-import { saveAs } from 'file-saver'
 import TrellisFileUpload from '@/components/import/TrellisFileUpload.vue'
 import TranslationTextService from '@/services/translation-text'
+import { DocService } from '@/services/doc'
 
 const route = useRoute()
 const form = ref<Form>()
@@ -93,29 +93,12 @@ function translationTextChange (tt: TranslationText) {
   }
 }
 
-function exportToCSV () {
-  const rows = []
-  const headers = ['translation_id', 'type', 'var_name']
-  if (!translations.value.length) {
-    logError('No translations to export')
-    return
-  }
-  const first = translations.value[0]
-  const locales = first.translation.translationText.map(tt => tt.locale.languageTag)
-  headers.push(...locales)
-  for (const t of translations.value) {
-    const row = [t.translation.id, t.type, t.varName]
-    for (const tag of locales) {
-      const tt = t.translation.translationText.find(tt => tt.locale.languageTag === tag)
-      row.push(tt ? tt.translatedText : '')
-    }
-    rows.push(row)
-  }
-  console.log(headers, rows)
-  const blob = new Blob([Papa.unparse({ fields: headers, data: rows })], { type: 'text/csv' })
-  const englishTT = form.value.nameTranslation.translationText.find(tt => tt.locale.languageTag === 'en')
-  const englishFormName = englishTT ? englishTT.translatedText : form.value.id
-  saveAs(blob, `${englishFormName}_trellis_translations.csv`)
+async function exportToCSV () {
+  const csv = await DocService.formToTranslationCsv(form.value)
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const english = form.value.nameTranslation.translationText.find(tt => tt.locale.languageTag === 'en')
+  const name = DocService.getFormName(form.value, english.locale, 'csv', '_translations')
+  return DocService.saveAs(blob, name)
 }
 
 function parseCsv (file: File): Promise<Papa.ParseResult<Record<string, string>>> {

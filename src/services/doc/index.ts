@@ -6,6 +6,11 @@ import { i18n } from '@/i18n'
 import Question from '@/entities/trellis/Question'
 import PT from '@/static/parameter.types'
 import FormService from '@/services/form'
+import Translation from '@/entities/trellis/Translation'
+import TranslationText from '@/entities/trellis/TranslationText'
+const papa = () => import(/* webpackChunkName: "papaparse" */'papaparse')
+const zipjs = () => import(/* webpackChunkName: "zipjs" */'@zip.js/zip.js')
+const saver = () => import(/* webpackChunkName: "file-saver" */'file-saver')
 
 export type DocxOpts = {
   choices: boolean
@@ -31,7 +36,17 @@ export const defaultOpts: DocxOpts = {
   showDkRf: true,
 }
 
-const zipjs = () => import(/* webpackChunkName: "zipjs" */'@zip.js/zip.js')
+export type TranslationRow = {
+  type: string
+  ownerId: string
+  varName?: string
+  translation: Translation
+}
+
+function sortByLocale (a: TranslationText, b: TranslationText) {
+  return a.locale.languageTag.localeCompare(b.locale.languageTag)
+}
+
 export class DocService {
   static transformScriptToText (str: string) {
     const children = []
@@ -42,9 +57,9 @@ export class DocService {
     return children
   }
 
-  static getFormName (form: Form, locale: Locale) {
+  static getFormName (form: Form, locale: Locale, ext = 'docx', suffix = '') {
     const name = TranslationService.getAny(form.nameTranslation, locale)
-    return `${name}_v${form.version}_${locale.languageTag}.docx`
+    return `${name}_v${form.version}_${locale.languageTag}${suffix}.${ext}`
   }
 
   static async multipleFormsToDocx (formIds: string[], loc: Locale, opts: Partial<DocxOpts> = defaultOpts): Promise<Blob> {
@@ -282,5 +297,76 @@ export class DocService {
       sections,
     })
     return Packer.toBlob(doc)
+  }
+
+  static formToTranslationRows (form: Form) {
+    const translations: TranslationRow[] = []
+    if (!form) return translations
+    const f = form
+    f.nameTranslation.translationText.sort(sortByLocale)
+    translations.push({
+      type: 'form',
+      ownerId: form.id,
+      translation: f.nameTranslation,
+    })
+    for (const section of form.sections) {
+      section.nameTranslation.translationText.sort(sortByLocale)
+      translations.push({
+        type: 'section',
+        ownerId: section.id,
+        translation: section.nameTranslation,
+      })
+      for (const qg of section.questionGroups) {
+        for (const question of qg.questions) {
+          question.questionTranslation.translationText.sort(sortByLocale)
+          translations.push({
+            type: 'question',
+            ownerId: question.id,
+            varName: question.varName,
+            translation: question.questionTranslation,
+          })
+          for (const choice of question.choices) {
+            choice.choice.choiceTranslation.translationText.sort(sortByLocale)
+            translations.push({
+              type: 'choice',
+              ownerId: choice.choice.id,
+              varName: question.varName,
+              translation: choice.choice.choiceTranslation,
+            })
+          }
+        }
+      }
+    }
+  }
+
+  static async formToTranslationCsv (form: Form) {
+    const translations = this.formToTranslationRows(form)
+    const localeMap = new Map<string, Locale>()
+    for (const t of translations) {
+      for (const tt of t.translation.translationText) {
+        localeMap.set(tt.localeId, tt.locale)
+      }
+    }
+    const locales = Array.from(localeMap.entries())
+    const fields = ['translation_id', 'var_name', 'type'].concat(locales.map(l => l[1].languageTag))
+    const data = translations.map(t => {
+      const row = {
+        translation_id: t.translation.id,
+        var_name: t.varName,
+        type: t.type,
+      }
+      for (const l of locales) {
+        const text = t.translation.translationText.find(tt => tt.localeId === l[0])
+        row[l[1].languageTag] = text ? text.translatedText : ''
+      }
+      return row
+    })
+    const csv = await papa()
+    return csv.unparse({ fields, data })
+  }
+
+  static async saveAs (doc: Blob, name: string) {
+    const s = await saver()
+    s.saveAs(doc, name)
   }
 }

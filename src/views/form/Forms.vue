@@ -7,7 +7,7 @@ import StudyForm from '@/entities/trellis/StudyForm'
 import FormService from '@/services/form'
 import TranslationService from '@/services/TranslationService'
 import formTypes from '@/static/form.types'
-import global, { Singleton } from '@/static/singleton'
+import global from '@/static/singleton'
 import Form from '@/entities/trellis/Form'
 import FormListTile from '@/components/forms/FormListTile.vue'
 import TrellisModal from '@/components/TrellisModal.vue'
@@ -24,6 +24,7 @@ import { setDocsLink } from '@/helpers/docs.helper'
 import { DocService, DocxOpts } from '@/services/doc'
 import { saveAs } from 'file-saver'
 import PrintOptionsForm from '@/components/print/PrintOptionsForm.vue'
+import TransformService from '@/services/transform'
 
 const isLoading = ref(false)
 const studyForms = ref<StudyForm[]>([])
@@ -244,6 +245,20 @@ async function exportForms () {
   }
 }
 
+async function exportTranslations () {
+  if (isLoading.value) return
+  try {
+    isLoading.value = true
+    await TransformService.downloadFormTranslations(selectedForms.value.map(sf => sf.form.id), global.study.id)
+  } catch (err) {
+    console.error(err)
+    debugger
+    logError(err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
 </script>
 
 <template>
@@ -304,6 +319,17 @@ async function exportForms () {
                   </v-list-item-action>
                   <v-list-item-content>
                     {{ $t('export_word_docs') }}
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item
+                  @click="exportTranslations"
+                  :disabled="!selectedForms.length"
+                >
+                  <v-list-item-action>
+                    <v-icon>mdi-export</v-icon>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    {{ $t('export_translations') }}
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
