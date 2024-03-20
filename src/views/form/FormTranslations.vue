@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import Papa from 'papaparse'
 import { useRoute } from 'vue-router/composables'
 import TranslationEditor, { TranslationRow } from '@/components/builder/TranslationEditor.vue'
 import Form from '@/entities/trellis/Form'
@@ -7,10 +8,11 @@ import FormService from '@/services/form'
 import TranslationText from '@/entities/trellis/TranslationText'
 import Translation from '@/entities/trellis/Translation'
 import { logError, alert } from '@/helpers/log.helper'
-import Papa from 'papaparse'
+import global from '@/static/singleton'
 import TrellisFileUpload from '@/components/import/TrellisFileUpload.vue'
 import TranslationTextService from '@/services/translation-text'
 import { DocService } from '@/services/doc'
+import TransformService from '@/services/transform'
 
 const route = useRoute()
 const form = ref<Form>()
@@ -94,10 +96,9 @@ function translationTextChange (tt: TranslationText) {
 }
 
 async function exportToCSV () {
-  const csv = await DocService.formToTranslationCsv(form.value)
-  const blob = new Blob([csv], { type: 'text/csv' })
+  const blob = await TransformService.getFormTranslations([form.value.id], global.study.id)
   const english = form.value.nameTranslation.translationText.find(tt => tt.locale.languageTag === 'en')
-  const name = DocService.getFormName(form.value, english.locale, 'csv', '_translations')
+  const name = DocService.getFormName(form.value, english.locale, 'zip', '_translations')
   return DocService.saveAs(blob, name)
 }
 

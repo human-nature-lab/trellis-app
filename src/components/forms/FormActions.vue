@@ -15,7 +15,18 @@
           }"
           :disabled="!isTestStudy"
         >
-          <v-list-item-content>Edit</v-list-item-content>
+          <v-list-item-content>{{ $t('edit') }}</v-list-item-content>
+        </v-list-item>
+      </Permission>
+      <Permission :requires="TrellisPermission.EDIT_FORM">
+        <v-list-item 
+          :to="{
+            name: 'FormTranslations',
+            params: { formId: form.id },
+          }"
+          :disabled="!isTestStudy"
+        >
+          <v-list-item-content>{{ $t('edit_translations') }}</v-list-item-content>
         </v-list-item>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
@@ -24,7 +35,7 @@
           :disabled="!isTestStudy"
         >
           <v-list-item-content>
-            {{ $t("edit_skips") }}
+            {{ $t('edit_skips') }}
           </v-list-item-content>
         </v-list-item>
       </Permission>

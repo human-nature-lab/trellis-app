@@ -164,7 +164,7 @@ const panels = ref([0])
       <v-col class="px-2">
         <v-checkbox
           v-model="config.slider"
-          :label="$t('show_slider')"
+          :label="$t('show_as_slider')"
         />
       </v-col>
       <v-col class="px-2">
