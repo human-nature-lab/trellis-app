@@ -336,6 +336,10 @@ module.exports = {
           },
         }),
       },
+      {
+        test: /\.js$/,
+        loader: require.resolve('@open-wc/webpack-import-meta-loader'),
+      },
     ],
   },
   plugins,

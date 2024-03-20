@@ -16,3 +16,7 @@ export const isDebug = computed(() => {
 export const isLoggedIn = computed(() => {
   return !!global && !!global.user
 })
+
+export const isTestStudy = computed(() => {
+  return !!global.study && !global.study.testStudyId
+})

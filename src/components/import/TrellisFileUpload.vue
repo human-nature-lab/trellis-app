@@ -1,5 +1,5 @@
 <template>
-  <TrellisModal :title="title" :max-width="800" v-bind="$attrs" v-on="$listeners">
+  <TrellisModal :title="title" :max-width="800" :persistent="isUploading" v-bind="$attrs" v-on="$listeners">
     <template #activator="{ on, attrs }" v-if="showButton">
       <v-btn v-bind="attrs" v-on="on">
         <slot>
@@ -7,6 +7,7 @@
         </slot>
       </v-btn>
     </template>
+    <slot name="header" />
     <v-col class="upload">
       <v-row
         class="dropzone justify-space-around"
@@ -106,7 +107,6 @@
 
 <script lang="ts">
   import Vue, { PropOptions } from 'vue'
-  import FileUpload from 'vue-upload-component'
   import TrellisModal from '../TrellisModal.vue'
   import formatBytes from '../../filters/format-bytes.filter'
 
@@ -115,7 +115,7 @@
 
   export default Vue.extend({
     name: 'TrellisFileUpload',
-    components: { FileUpload, TrellisModal },
+    components: { TrellisModal },
     filters: { formatBytes },
     props: {
       title: String,
@@ -126,7 +126,7 @@
       } as PropOptions<string[]>,
       multiple: {
         type: Boolean,
-        default: true,
+        default: false,
       },
       axiosResponse: {
         type: Boolean,

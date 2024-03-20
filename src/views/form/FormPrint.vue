@@ -208,8 +208,8 @@ export default Vue.extend({
     },
     async printToDoc () {
       const doc = await DocService.formToDocx(this.form, this.global.locale, this.opts)
-      const name = this.translate(this.form.nameTranslation, this.global.locale)
-      saveAs(doc, `${name}_v${this.form.version}_${this.global.locale.languageTag}.docx`)
+      const name = DocService.getFormName(this.form, this.global.locale)
+      saveAs(doc, name)
     },
   },
   computed: {
