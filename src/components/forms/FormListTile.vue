@@ -1,5 +1,11 @@
 <template>
   <tr class="form-list-row">
+    <td>
+      <v-simple-checkbox
+        :value="isSelected"
+        @input="$emit('selected', $event)"
+      />
+    </td>
     <td class="small">
       <span
         v-show="dragging"
@@ -111,6 +117,7 @@ export default Vue.extend({
     form: Object as PropOptions<Form>,
     studyForm: Object as PropOptions<StudyForm>,
     formType: String,
+    isSelected: Boolean,
     value: {
       type: Boolean,
     },

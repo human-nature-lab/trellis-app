@@ -5,6 +5,7 @@ import TranslationService from '../TranslationService'
 import { i18n } from '@/i18n'
 import Question from '@/entities/trellis/Question'
 import PT from '@/static/parameter.types'
+import FormService from '@/services/form'
 
 export type DocxOpts = {
   choices: boolean
@@ -18,7 +19,7 @@ export type DocxOpts = {
   showDkRf: boolean
 }
 
-const defaultOpts: DocxOpts = {
+export const defaultOpts: DocxOpts = {
   choices: true,
   parameters: true,
   pageSkips: true,
@@ -30,6 +31,7 @@ const defaultOpts: DocxOpts = {
   showDkRf: true,
 }
 
+const zipjs = () => import(/* webpackChunkName: "zipjs" */'@zip.js/zip.js')
 export class DocService {
   static transformScriptToText (str: string) {
     const children = []
@@ -38,6 +40,28 @@ export class DocService {
       children.push(new TextRun({ text: line, break: 1, font: 'Consolas', size: '10pt' }))
     }
     return children
+  }
+
+  static getFormName (form: Form, locale: Locale) {
+    const name = TranslationService.getAny(form.nameTranslation, locale)
+    return `${name}_v${form.version}_${locale.languageTag}.docx`
+  }
+
+  static async multipleFormsToDocx (formIds: string[], loc: Locale, opts: Partial<DocxOpts> = defaultOpts): Promise<Blob> {
+    // load the zip service
+    const z = await zipjs()
+    const { BlobWriter, BlobReader, ZipWriter } = z
+    const zip = new BlobWriter()
+    const writer = new ZipWriter(zip)
+    for (const id of formIds) {
+      const form = await FormService.getForm(id)
+      const blob = await this.formToDocx(form, loc, opts)
+      const name = this.getFormName(form, loc)
+      const reader = new BlobReader(blob)
+      await writer.add(name, reader)
+    }
+    await writer.close()
+    return zip.getData()
   }
 
   static async formToDocx (form: Form, locale: Locale, opts: Partial<DocxOpts> = defaultOpts) {

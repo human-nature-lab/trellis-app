@@ -21,6 +21,9 @@ import { logError, alert } from '@/helpers/log.helper'
 import { i18n } from '@/i18n'
 import { isTestStudy } from '@/helpers/singleton.helper'
 import { setDocsLink } from '@/helpers/docs.helper'
+import { DocService, DocxOpts } from '@/services/doc'
+import { saveAs } from 'file-saver'
+import PrintOptionsForm from '@/components/print/PrintOptionsForm.vue'
 
 const isLoading = ref(false)
 const studyForms = ref<StudyForm[]>([])
@@ -30,10 +33,12 @@ const showImportForm = ref(false)
 const importFormType = ref(formTypes.CENSUS)
 const isDragging = ref(false)
 const sortBy = ref('sortOrder')
+const selectedForms = ref<StudyForm[]>([])
+const showExport = ref(false)
 
 setDocsLink(DocsFiles.getting_started.create_form)
 
-async function loadForms() {
+async function loadForms () {
   if (isLoading.value) return
   isLoading.value = true
   try {
@@ -55,8 +60,8 @@ const studyFormsByType = computed(() => {
 })
 
 const numericFormTypes = computed(() => {
-  let formTypeKeys = Object.keys(formTypes).filter(formType => {
-    return (!isNaN(Number(formType)));
+  const formTypeKeys = Object.keys(formTypes).filter(formType => {
+    return (!isNaN(Number(formType)))
   })
   return formTypeKeys.filter(formType => {
     // Filter out DEFAULT_CENSUS formType until it is implemented
@@ -64,7 +69,7 @@ const numericFormTypes = computed(() => {
   })
 })
 
-function headers(formType: formTypes) {
+function headers (formType: formTypes) {
   let hdr = []
 
   // if (formType != formTypes.CENSUS) {
@@ -74,21 +79,21 @@ function headers(formType: formTypes) {
   // }
 
   hdr = hdr.concat([{
-    text: 'Actions'
+    text: 'Actions',
   }, {
     text: 'Name',
-    class: 'max-width'
+    class: 'max-width',
   }])
 
   if (formType == formTypes.CENSUS) {
     hdr.push({
-      text: 'Census type'
+      text: 'Census type',
     })
   }
 
   hdr = hdr.concat([{
     text: 'Version',
-    align: 'center'
+    align: 'center',
   }])
 
   return hdr.map((h, i) => {
@@ -96,19 +101,19 @@ function headers(formType: formTypes) {
     h.value = i
     h.class = h.class || 'small'
     return h
-  });
+  })
 }
 
-function toggleFormSkips(form: StudyForm) {
+function toggleFormSkips (form: StudyForm) {
   formSkipsForm.value = form
   showFormSkips.value = !showFormSkips.value
 }
 
-function formName(form: Form) {
+function formName (form: Form) {
   return TranslationService.getAny(form.nameTranslation, global.locale)
 }
 
-async function addForm(type: formTypes) {
+async function addForm (type: formTypes) {
   if (isLoading.value) return
   try {
     isLoading.value = true
@@ -124,7 +129,7 @@ async function addForm(type: formTypes) {
   }
 }
 
-async function reorderForms(evt) {
+async function reorderForms (evt) {
   // bail early if nothing has changed or we're currently reordering the forms
   if (isLoading.value) return
   if (evt.newIndex === evt.oldIndex) {
@@ -132,8 +137,8 @@ async function reorderForms(evt) {
     return
   }
   isLoading.value = true
-  let tempStudyForms = studyFormsByType.value[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
-  let shifted = tempStudyForms[evt.oldIndex]
+  const tempStudyForms = studyFormsByType.value[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
+  const shifted = tempStudyForms[evt.oldIndex]
   tempStudyForms.splice(evt.oldIndex, 1)
   tempStudyForms.splice(evt.newIndex, 0, shifted)
   for (let i = 0; i < tempStudyForms.length; i++) {
@@ -155,9 +160,7 @@ async function reorderForms(evt) {
   }
 }
 
-
-
-async function updateForm(form: Form) {
+async function updateForm (form: Form) {
   try {
     const newForm = await FormService.updateForm(form)
     const sf = studyForms.value.find((sf: StudyForm) => sf.form.id === form.id)
@@ -170,7 +173,7 @@ async function updateForm(form: Form) {
   }
 }
 
-async function changeStudyForm(studyForm: StudyForm) {
+async function changeStudyForm (studyForm: StudyForm) {
   try {
     const newStudyForm = await FormService.updateStudyForm(studyForm.studyId, studyForm)
     const sf = studyForms.value.find((sf: StudyForm) => sf.id === newStudyForm.id)
@@ -183,7 +186,7 @@ async function changeStudyForm(studyForm: StudyForm) {
   }
 }
 
-async function updateStudyForm(studyForm: StudyForm) {
+async function updateStudyForm (studyForm: StudyForm) {
   const index = studyForms.value.findIndex(sf => sf.id === studyForm.id)
   if (index > -1) {
     studyForm.form = studyForms.value[index].form
@@ -191,8 +194,8 @@ async function updateStudyForm(studyForm: StudyForm) {
   }
 }
 
-function formTypeName(formType: formTypes) {
-  formType = +formType  // convert to int
+function formTypeName (formType: formTypes) {
+  formType = +formType // convert to int
   switch (formType) {
     case formTypes.CENSUS:
       return i18n.t('census_forms')
@@ -203,7 +206,7 @@ function formTypeName(formType: formTypes) {
   }
 }
 
-async function deleteForm(studyForm: StudyForm) {
+async function deleteForm (studyForm: StudyForm) {
   if (!isLoading.value && confirm(i18n.t('confirm_resource_delete', [formName(studyForm.form)]) as string)) {
     isLoading.value = true
     try {
@@ -221,6 +224,26 @@ async function deleteForm(studyForm: StudyForm) {
   }
 }
 
+const printOpts = ref<DocxOpts>()
+async function exportForms () {
+  if (isLoading.value) return
+  try {
+    isLoading.value = true
+    const zip = await DocService.multipleFormsToDocx(
+      selectedForms.value.map(sf => sf.form.id),
+      global.locale,
+      printOpts.value,
+    )
+    saveAs(zip, 'forms.zip')
+  } catch (err) {
+    console.error(err)
+    debugger
+    logError(err)
+  } finally {
+    isLoading.value = false
+  }
+}
+
 </script>
 
 <template>
@@ -228,18 +251,30 @@ async function deleteForm(studyForm: StudyForm) {
     <v-col>
       <v-progress-linear
         v-show="isLoading"
-        indeterminate />
-      <v-card class="mt-4" v-for="formType in numericFormTypes" :key="formType">
+        indeterminate
+      />
+      <v-card
+        class="mt-4"
+        v-for="formType in numericFormTypes"
+        :key="formType"
+      >
         <v-toolbar flat>
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <Permission :requires="TrellisPermission.ADD_FORM" v-if="isTestStudy">
-            <v-menu  offset-y left>
-              <template v-slot:activator="{ on, attrs }">
+          <v-spacer />
+          <Permission
+            :requires="TrellisPermission.ADD_FORM"
+            v-if="isTestStudy"
+          >
+            <v-menu
+              offset-y
+              left
+            >
+              <template #activator="{ on, attrs }">
                 <v-btn
                   v-on="on"
                   v-bind="attrs"
-                  icon>
+                  icon
+                >
                   <v-icon>mdi-dots-vertical</v-icon>
                 </v-btn>
               </template>
@@ -260,24 +295,39 @@ async function deleteForm(studyForm: StudyForm) {
                     {{ $t('import_form') }}
                   </v-list-item-content>
                 </v-list-item>
+                <v-list-item
+                  @click="showExport = true"
+                  :disabled="!selectedForms.length"
+                >
+                  <v-list-item-action>
+                    <v-icon>mdi-export</v-icon>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    {{ $t('export_word_docs') }}
+                  </v-list-item-content>
+                </v-list-item>
               </v-list>
             </v-menu>
           </Permission>
         </v-toolbar>
         <v-data-table
+          v-model="selectedForms"
           class="forms-table"
           :sort-by.sync="sortBy"
           :headers="headers(formType)"
           hide-default-footer
+          show-select
           :items-per-page="-1"
-          :items="studyFormsByType[formType]">
-          <template #body="{ items }">
+          :items="studyFormsByType[formType]"
+        >
+          <template #body="{ items, isSelected, select }">
             <draggable
               handle=".drag-handle"
               @start="isDragging = true"
               :list="items"
               @end="reorderForms"
-              tag="tbody">
+              tag="tbody"
+            >
               <FormListTile
                 v-for="item in items"
                 :key="item.id"
@@ -286,6 +336,8 @@ async function deleteForm(studyForm: StudyForm) {
                 :form-type="formType"
                 :dragging="isDragging"
                 v-model="item.showHidden"
+                :is-selected="isSelected(item)"
+                @selected="select(item)"
                 @toggleFormSkips="toggleFormSkips"
                 @save="updateForm"
                 @update="loadForms"
@@ -298,14 +350,54 @@ async function deleteForm(studyForm: StudyForm) {
         </v-data-table>
       </v-card>
     </v-col>
-    <FormImport 
+    <FormImport
       v-model="showImportForm"
       :form-type="importFormType"
-      @imported-form="loadForms" />
-    <TrellisModal v-model="showFormSkips" :title="$t('skips')">
+      @imported-form="loadForms"
+    />
+    <TrellisModal
+      v-model="showFormSkips"
+      :title="$t('skips')"
+    >
       <FormSkips
         @close="showFormSkips = false"
-        v-model="formSkipsForm" />
+        v-model="formSkipsForm"
+      />
+    </TrellisModal>
+    <TrellisModal
+      v-model="showExport"
+      :title="$t('export_forms')"
+    >
+      <v-card>
+        <v-simple-table>
+          <tbody>
+            <tr
+              v-for="f in selectedForms"
+              :key="f.id"
+            >
+              <td>
+                {{ TranslationService.getAny(f.form.nameTranslation, global.locale) }}
+              </td>
+            </tr>
+          </tbody>
+        </v-simple-table>
+        <PrintOptionsForm v-model="printOpts" />
+        <v-card-actions>
+          <v-btn
+            :disabled="isLoading"
+            @click="showExport = false"
+          >
+            {{ $t('cancel') }}
+          </v-btn>
+          <v-btn
+            :disabled="isLoading"
+            @click="exportForms"
+            color="primary"
+          >
+            {{ $t('export') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </TrellisModal>
   </v-container>
 </template>
