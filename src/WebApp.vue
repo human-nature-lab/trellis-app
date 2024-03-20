@@ -1,4 +1,114 @@
 <template>
+  <MainLayout>
+
+    <template #drawer>
+      <MainMenu />
+    </template>
+
+    <template #app-bar>
+      <v-app-bar-nav-icon
+        :disabled="maintenanceMode"
+        @click="global.menuDrawer.open = !global.menuDrawer.open" />
+      <v-toolbar-title class="logo">
+        <router-link :to="{name: 'Home'}" class="deep-orange--text">
+          <img src="./assets/trellis-logo.png?url" alt="trellis" />
+        </router-link>
+      </v-toolbar-title>
+      <v-toolbar-title v-if="global.study" class="study">
+        <v-tooltip right>
+          <template #activator="{ on, attrs }">
+            <v-btn 
+              class="subheading"
+              v-on="on"
+              v-bind="attrs"
+              :color="isTestStudy ? 'error' : null"
+              text
+              @click="toStudySelector">
+              {{global.study.name}}
+              <v-icon class="ml-2" v-if="isTestStudy" color="error">
+                mdi-dev-to
+              </v-icon>
+            </v-btn>
+          </template>
+          <span>{{$t('change_study')}}</span>
+        </v-tooltip>
+      </v-toolbar-title>
+      <v-spacer />
+      <v-tooltip left>
+        <template #activator="{ on, attrs }">
+          <v-btn 
+            class="subheading"
+            icon
+            v-bind="attrs"
+            v-on="on"
+            @click="toLocaleSelector">
+            {{global.locale ? global.locale.languageTag : ''}}
+          </v-btn>
+        </template>
+        <span>{{$t('change_locale')}}</span>
+      </v-tooltip>
+      <v-tooltip
+        v-if="secondaryDrawerIcon"
+        left>
+        <template #activator="{on, attrs}">
+          <v-icon
+            v-on="on"
+            v-bind="attrs"
+            @click.stop="secondaryDrawerOnClick">
+            {{ secondaryDrawerIcon }}
+          </v-icon>
+        </template>
+        <span>{{$t('view_current_documentation')}}</span>
+      </v-tooltip>
+    </template>
+
+    <template #dialog>
+      <div class="dialogs">
+        <v-dialog :value="alerts && alerts.length > 0" persistent>
+          <v-card>
+            <v-card-text>
+              <TrellisAlert :current-log="alerts[alerts.length - 1]" />
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn @click="dismissAlert()">Dismiss</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog
+          max-width="300"
+          :value="global.loading.fullscreen && global.loading.active"
+          persistent>
+          <v-card>
+            <v-card-title primary-title>
+              <h3>{{ $t('loading') }}</h3>
+            </v-card-title>
+            <v-card-text>
+              <v-layout row justify-center>
+                <TrellisLoadingCircular />
+              </v-layout>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+        <LocationFinder />
+        <CensusFormChecker />
+        <SnackbarQueue />
+        <DocsSidebar />
+        <LoginModal />
+      </div>
+    </template>
+
+    <v-container v-if="!maintenanceMode" fluid class="flex-grow-1 fill-height pa-0 align-start" >
+      <router-view class="route-container fill-height fade-in align-start align-content-start" />
+    </v-container>
+    <v-container fluid class="fill-height align-start" v-else>
+      <Maintenance v-model="maintenanceMode" />
+    </v-container>
+  </MainLayout>
+</template>
+
+
+<!-- <template>
   <div class="main-wrapper">
     <Banner :serverMode="serverMode" />
     <v-app
@@ -13,9 +123,7 @@
       </v-navigation-drawer>
       <v-app-bar
         app
-        absolute
-        elevate-on-scroll
-        scroll-target="#trellis-main">
+        >
         <v-app-bar-nav-icon
           :disabled="maintenanceMode"
           @click="global.menuDrawer.open = !global.menuDrawer.open" />
@@ -71,22 +179,7 @@
           <span>{{$t('view_current_documentation')}}</span>
         </v-tooltip>
       </v-app-bar>
-      <v-dialog
-        max-width="300"
-        :value="global.loading.fullscreen && global.loading.active"
-        persistent>
-        <v-card>
-          <v-card-title primary-title>
-            <h3>{{ $t('loading') }}</h3>
-          </v-card-title>
-          <v-card-text>
-            <v-layout row justify-center>
-              <TrellisLoadingCircular />
-            </v-layout>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
-      <v-main id="trellis-main" class="scroll-container d-flex flex-column">
+      <v-main id="trellis-main" class="">
         <v-dialog :value="alerts && alerts.length > 0" persistent>
           <v-card>
             <v-card-text>
@@ -105,6 +198,21 @@
           <Maintenance v-model="maintenanceMode" />
         </v-container>
       </v-main>
+      <v-dialog
+        max-width="300"
+        :value="global.loading.fullscreen && global.loading.active"
+        persistent>
+        <v-card>
+          <v-card-title primary-title>
+            <h3>{{ $t('loading') }}</h3>
+          </v-card-title>
+          <v-card-text>
+            <v-layout row justify-center>
+              <TrellisLoadingCircular />
+            </v-layout>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
       <LocationFinder />
       <CensusFormChecker />
       <SnackbarQueue />
@@ -112,10 +220,11 @@
       <LoginModal />
     </v-app>
   </div>
-</template>
+</template> -->
 
 <script lang="ts">
   import './services/device'
+  import MainLayout from './MainLayout.vue'
   import MainMenu from './components/main-menu/MainMenu.vue'
   import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
@@ -210,6 +319,7 @@
       Banner,
       LoginModal,
       Maintenance,
+      MainLayout,
     },
     computed: {
       withinCordova () {

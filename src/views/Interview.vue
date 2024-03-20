@@ -1,10 +1,9 @@
 <template>
   <v-container
     fluid
-    fill-height
     class="ma-0 pa-0 justify-start align-start trellis-interview"
   >
-    <v-col>
+    <v-col class="page-height pa-0">
       <v-toolbar
         flat
         dense
@@ -31,7 +30,7 @@
         v-if="conditionAssignmentErrors"
         :errors="conditionAssignmentErrors"
       />
-      <v-flex v-if="!isLoading">
+      <v-col v-if="!isLoading" class="fill-height pa-0">
         <v-progress-linear
           v-if="isSaving"
           :indeterminate="true"
@@ -53,7 +52,7 @@
           :condition-tags="interviewConditionTags"
           :interview="interview"
         />
-      </v-flex>
+      </v-col>
     </v-col>
     <v-dialog
       v-model="dialog.beginning"

@@ -1,7 +1,6 @@
 <template>
-  <v-container
-    fluid
-    class="page ma-0 pa-0 mb-16"
+  <v-col
+    class="page fill-height ma-0 pa-0"
   >
     <v-expansion-panels>
       <debug name="Location">
@@ -42,7 +41,7 @@
       />
     </div>
     <v-col class="page-footer">
-      <v-row no-gutter>
+      <v-row no-gutters>
         <v-col>
           <v-btn
             @click="onPrevious"
@@ -85,7 +84,7 @@
         </v-col>
       </v-row>
     </v-col>
-  </v-container>
+  </v-col>
 </template>
 
 <script>
@@ -189,15 +188,26 @@ export default {
 </script>
 
 <style lang="sass">
+.page-height
+  height: calc(100% - 56px)
 
 $btn-height: 60px
 .page
-  margin-bottom: 80px
+  position: relative
+  display: flex
+  flex-direction: column
+  overflow: hidden
+  .page-content
+    height: 100%
+    flex-grow: 1
+    overflow: auto
+    margin-bottom: 80px
   .page-footer
+    flex-grow: 0
     background-color: white
     box-shadow: 0 0px 10px rgba(0, 0, 0, .3)
     height: $btn-height
-    position: fixed
+    position: absolute
     z-index: 100
     left: 0
     bottom: 0
