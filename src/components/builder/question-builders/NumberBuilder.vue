@@ -106,7 +106,7 @@ defineExpose({ hiddenParameters: [PT.min, PT.max, PT.display_slider, PT.tick_lab
     </v-expansion-panels>
     <v-container v-if="displaySlider">
       <v-row no-gutters>
-        <h3>{{ $t('Labels') }}</h3>
+        <h3>{{ $t('labels') }}</h3>
         <v-spacer />
         <v-btn
           icon

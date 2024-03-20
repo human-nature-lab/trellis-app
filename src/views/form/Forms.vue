@@ -245,11 +245,15 @@ async function exportForms () {
   }
 }
 
-async function exportTranslations () {
+async function exportTranslations (config: { asXlsx?: boolean } = {}) {
   if (isLoading.value) return
   try {
     isLoading.value = true
-    await TransformService.downloadFormTranslations(selectedForms.value.map(sf => sf.form.id), global.study.id)
+    let data = await TransformService.getFormTranslations(selectedForms.value.map(sf => sf.form.id), global.study.id)
+    if (config.asXlsx) {
+      data = await DocService.csvZipToXlsx(data)
+    }
+    saveAs(data, `trellis_form_translations.${config.asXlsx ? 'xlsx' : 'zip'}`)
   } catch (err) {
     console.error(err)
     debugger
@@ -315,18 +319,18 @@ async function exportTranslations () {
                   :disabled="!selectedForms.length"
                 >
                   <v-list-item-action>
-                    <v-icon>mdi-export</v-icon>
+                    <v-icon>mdi-file-word-box</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
                     {{ $t('export_word_docs') }}
                   </v-list-item-content>
                 </v-list-item>
                 <v-list-item
-                  @click="exportTranslations"
+                  @click="() => exportTranslations({ asXlsx: true })"
                   :disabled="!selectedForms.length"
                 >
                   <v-list-item-action>
-                    <v-icon>mdi-export</v-icon>
+                    <v-icon>mdi-file-excel-box</v-icon>
                   </v-list-item-action>
                   <v-list-item-content>
                     {{ $t('export_translations') }}
@@ -420,7 +424,7 @@ async function exportTranslations () {
             @click="exportForms"
             color="primary"
           >
-            {{ $t('export') }}
+            {{ $t('export_word_docs') }}
           </v-btn>
         </v-card-actions>
       </v-card>

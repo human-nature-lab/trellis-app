@@ -1,4 +1,15 @@
-import { Document, Paragraph, HeadingLevel, Packer, TextRun, TabStopType, TabStopPosition, LevelFormat, AlignmentType } from 'docx'
+import {
+  Document,
+  Paragraph,
+  HeadingLevel,
+  Packer,
+  TextRun,
+  TabStopType,
+  TabStopPosition,
+  LevelFormat,
+  AlignmentType,
+} from 'docx'
+import ExcelJS from 'exceljs'
 import Locale from '../../entities/trellis/Locale'
 import Form from '../../entities/trellis/Form'
 import TranslationService from '../TranslationService'
@@ -8,7 +19,7 @@ import PT from '@/static/parameter.types'
 import FormService from '@/services/form'
 import Translation from '@/entities/trellis/Translation'
 import TranslationText from '@/entities/trellis/TranslationText'
-const papa = () => import(/* webpackChunkName: "papaparse" */'papaparse')
+import Papa from 'papaparse'
 const zipjs = () => import(/* webpackChunkName: "zipjs" */'@zip.js/zip.js')
 const saver = () => import(/* webpackChunkName: "file-saver" */'file-saver')
 
@@ -62,6 +73,7 @@ export class DocService {
     return `${name}_v${form.version}_${locale.languageTag}${suffix}.${ext}`
   }
 
+  // Conver multiple forms to docx and return as a zipped blob
   static async multipleFormsToDocx (formIds: string[], loc: Locale, opts: Partial<DocxOpts> = defaultOpts): Promise<Blob> {
     // load the zip service
     const z = await zipjs()
@@ -79,6 +91,7 @@ export class DocService {
     return zip.getData()
   }
 
+  // Convert a form to a docx blob
   static async formToDocx (form: Form, locale: Locale, opts: Partial<DocxOpts> = defaultOpts) {
     const sections = []
     let questionNum = 0
@@ -361,12 +374,55 @@ export class DocService {
       }
       return row
     })
-    const csv = await papa()
-    return csv.unparse({ fields, data })
+    return Papa.unparse({ fields, data })
   }
 
+  // Download any blob as a file
   static async saveAs (doc: Blob, name: string) {
     const s = await saver()
     s.saveAs(doc, name)
+  }
+
+  static async parseCsv (csv: Blob): Promise<Papa.ParseResult<object[]>> {
+    return new Promise((resolve, reject) => {
+      Papa.parse<object[]>(csv, {
+        header: true,
+        complete: resolve,
+        error: reject,
+      })
+    })
+  }
+
+  // Convert a zipped blob of CSV files into a single xlsx file with multiple sheets. return as a blob
+  static async csvZipToXlsx (zip: Blob) {
+    const z = await zipjs()
+    const { BlobReader, BlobWriter, ZipReader } = z
+    const reader = new ZipReader(new BlobReader(zip))
+    const entries = await reader.getEntries()
+    const wb = new ExcelJS.Workbook()
+    const formNames = []
+    for (const entry of entries) {
+      const csv = await entry.getData(new BlobWriter())
+      const res = await this.parseCsv(csv)
+      console.log('res', res)
+      const name = entry.filename.replace('.csv', '')
+      formNames.push(name)
+      const ws = wb.addWorksheet(name)
+      ws.addRow(res.meta.fields)
+      for (const record of res.data) {
+        const row = []
+        for (const key of res.meta.fields) {
+          row.push(record[key])
+        }
+        ws.addRow(row)
+      }
+    }
+    wb.creator = 'Trellis'
+    wb.lastModifiedBy = 'Trellis'
+    wb.created = new Date()
+    wb.modified = new Date()
+    wb.description = `Translations for forms: ${formNames.join(', ')}`
+    const out = await wb.xlsx.writeBuffer()
+    return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
   }
 }
