@@ -337,7 +337,7 @@ async function exportForms () {
                 :dragging="isDragging"
                 v-model="item.showHidden"
                 :is-selected="isSelected(item)"
-                @selected="select(item)"
+                @selected="select(item, !isSelected(item))"
                 @toggleFormSkips="toggleFormSkips"
                 @save="updateForm"
                 @update="loadForms"
