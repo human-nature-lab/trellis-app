@@ -1,3 +1,228 @@
+<script lang="ts" setup>
+import { ref, computed, onMounted } from 'vue'
+import { groupBy } from 'lodash'
+import draggable from 'vuedraggable'
+import Permission from '@/components/Permission.vue'
+import StudyForm from '@/entities/trellis/StudyForm'
+import FormService from '@/services/form'
+import TranslationService from '@/services/TranslationService'
+import formTypes from '@/static/form.types'
+import global, { Singleton } from '@/static/singleton'
+import Form from '@/entities/trellis/Form'
+import FormListTile from '@/components/forms/FormListTile.vue'
+import TrellisModal from '@/components/TrellisModal.vue'
+import FormSkips from '@/components/forms/FormSkips.vue'
+import { TrellisPermission } from '@/static/permissions.base'
+import DocsFiles from '@/components/documentation/DocsFiles'
+import FormImport from '@/components/import/FormImport.vue'
+import { delay } from '@/classes/delay'
+import { isNotAuthError } from '@/helpers/auth.helper'
+import { logError, alert } from '@/helpers/log.helper'
+import { i18n } from '@/i18n'
+import { isTestStudy } from '@/helpers/singleton.helper'
+import { setDocsLink } from '@/helpers/docs.helper'
+
+const isLoading = ref(false)
+const studyForms = ref<StudyForm[]>([])
+const formSkipsForm = ref<StudyForm | null>(null)
+const showFormSkips = ref(false)
+const showImportForm = ref(false)
+const importFormType = ref(formTypes.CENSUS)
+const isDragging = ref(false)
+const sortBy = ref('sortOrder')
+
+setDocsLink(DocsFiles.getting_started.create_form)
+
+async function loadForms() {
+  if (isLoading.value) return
+  isLoading.value = true
+  try {
+    studyForms.value = await FormService.getAllStudyForms(global.study.id)
+    showImportForm.value = false
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err, 'Unable to load forms')
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(loadForms)
+
+const studyFormsByType = computed(() => {
+  return groupBy(studyForms.value, 'formTypeId')
+})
+
+const numericFormTypes = computed(() => {
+  let formTypeKeys = Object.keys(formTypes).filter(formType => {
+    return (!isNaN(Number(formType)));
+  })
+  return formTypeKeys.filter(formType => {
+    // Filter out DEFAULT_CENSUS formType until it is implemented
+    return formType != formTypes.DEFAULT_CENSUS
+  })
+})
+
+function headers(formType: formTypes) {
+  let hdr = []
+
+  // if (formType != formTypes.CENSUS) {
+  //   hdr = hdr.concat([{
+  //     text: 'Order'
+  //   }])
+  // }
+
+  hdr = hdr.concat([{
+    text: 'Actions'
+  }, {
+    text: 'Name',
+    class: 'max-width'
+  }])
+
+  if (formType == formTypes.CENSUS) {
+    hdr.push({
+      text: 'Census type'
+    })
+  }
+
+  hdr = hdr.concat([{
+    text: 'Version',
+    align: 'center'
+  }])
+
+  return hdr.map((h, i) => {
+    h.sortable = false
+    h.value = i
+    h.class = h.class || 'small'
+    return h
+  });
+}
+
+function toggleFormSkips(form: StudyForm) {
+  formSkipsForm.value = form
+  showFormSkips.value = !showFormSkips.value
+}
+
+function formName(form: Form) {
+  return TranslationService.getAny(form.nameTranslation, global.locale)
+}
+
+async function addForm(type: formTypes) {
+  if (isLoading.value) return
+  try {
+    isLoading.value = true
+    const studyForm = await FormService.createForm(global.study.id, type)
+    studyForms.value.push(studyForm)
+    alert('success', i18n.t('resource_created', [formName(studyForm.form)]))
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err, i18n.t('failed_resource_create', [i18n.t('form')]))
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function reorderForms(evt) {
+  // bail early if nothing has changed or we're currently reordering the forms
+  if (isLoading.value) return
+  if (evt.newIndex === evt.oldIndex) {
+    isDragging.value = false
+    return
+  }
+  isLoading.value = true
+  let tempStudyForms = studyFormsByType.value[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
+  let shifted = tempStudyForms[evt.oldIndex]
+  tempStudyForms.splice(evt.oldIndex, 1)
+  tempStudyForms.splice(evt.newIndex, 0, shifted)
+  for (let i = 0; i < tempStudyForms.length; i++) {
+    tempStudyForms[i].sortOrder = i + 1
+  }
+  try {
+    const forms = await FormService.reorderForms(global.study.id, tempStudyForms)
+    studyForms.value = forms
+    sortBy.value = 'sortOrder'
+    alert('success', i18n.t('resource_updated', [i18n.t('forms')]))
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err, i18n.t('failed_resource_update', [i18n.t('forms')]))
+    }
+  } finally {
+    await delay(1000)
+    isDragging.value = false
+    isLoading.value = false
+  }
+}
+
+
+
+async function updateForm(form: Form) {
+  try {
+    const newForm = await FormService.updateForm(form)
+    const sf = studyForms.value.find((sf: StudyForm) => sf.form.id === form.id)
+    Object.assign(sf.form, newForm)
+    alert('success', i18n.t('resource_updated', [formName(form)]))
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err, i18n.t('failed_resource_update', [formName(form)]))
+    }
+  }
+}
+
+async function changeStudyForm(studyForm: StudyForm) {
+  try {
+    const newStudyForm = await FormService.updateStudyForm(studyForm.studyId, studyForm)
+    const sf = studyForms.value.find((sf: StudyForm) => sf.id === newStudyForm.id)
+    Object.assign(sf.form, newStudyForm)
+    alert('success', i18n.t('resource_updated', [formName(studyForm.form)]))
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err, i18n.t('failed_resource_update', [formName(studyForm.form)]))
+    }
+  }
+}
+
+async function updateStudyForm(studyForm: StudyForm) {
+  const index = studyForms.value.findIndex(sf => sf.id === studyForm.id)
+  if (index > -1) {
+    studyForm.form = studyForms.value[index].form
+    studyForms.value[index] = studyForm
+  }
+}
+
+function formTypeName(formType: formTypes) {
+  formType = +formType  // convert to int
+  switch (formType) {
+    case formTypes.CENSUS:
+      return i18n.t('census_forms')
+    case formTypes.DEFAULT_CENSUS:
+      return i18n.t('default_census_forms')
+    default:
+      return i18n.t('forms')
+  }
+}
+
+async function deleteForm(studyForm: StudyForm) {
+  if (!isLoading.value && confirm(i18n.t('confirm_resource_delete', [formName(studyForm.form)]) as string)) {
+    isLoading.value = true
+    try {
+      await FormService.deleteForm(global.study.id, studyForm.form.id)
+      const index = studyForms.value.findIndex(sf => sf.id === studyForm.id)
+      studyForms.value.splice(index, 1)
+      alert('success', i18n.t('resource_deleted', [formName(studyForm.form)]))
+    } catch (err) {
+      if (isNotAuthError(err)) {
+        logError(err, i18n.t('failed_resource_delete', [formName(studyForm.form)]))
+      }
+    } finally {
+      isLoading.value = false
+    }
+  }
+}
+
+</script>
+
 <template>
   <v-container>
     <v-col>
@@ -73,11 +298,10 @@
         </v-data-table>
       </v-card>
     </v-col>
-    <TrellisModal v-model="showImportForm" :title="$t('import_form')">
-      <FormImport 
-        :form-type="importFormType"
-        @formImported="onFormImported(importedForm)" />
-    </TrellisModal>
+    <FormImport 
+      v-model="showImportForm"
+      :form-type="importFormType"
+      @imported-form="loadForms" />
     <TrellisModal v-model="showFormSkips" :title="$t('skips')">
       <FormSkips
         @close="showFormSkips = false"
@@ -85,221 +309,6 @@
     </TrellisModal>
   </v-container>
 </template>
-
-<script lang="ts">
-  import Vue from 'vue'
-  import { groupBy } from 'lodash'
-  import draggable from 'vuedraggable'
-  import Permission from '@/components/Permission.vue'
-  import StudyForm from '@/entities/trellis/StudyForm'
-  import FormService from '@/services/form'
-  import TranslationService from '@/services/TranslationService'
-  import formTypes from '@/static/form.types'
-  import global, { Singleton } from '@/static/singleton'
-  import Form from '@/entities/trellis/Form'
-  import FormListTile from '@/components/forms/FormListTile.vue'
-  import TrellisModal from '@/components/TrellisModal.vue'
-  import FormSkips from '@/components/forms/FormSkips.vue'
-  import DocsFiles from '@/components/documentation/DocsFiles'
-  import DocsLinkMixin from '@/mixins/DocsLinkMixin'
-  import FormImport from '@/components/import/FormImport.vue'
-  import { delay } from '@/classes/delay'
-  import PermissionMixin from '@/mixins/PermissionMixin'
-
-  export default Vue.extend({
-    name: 'Forms',
-    mixins: [DocsLinkMixin(DocsFiles.getting_started.create_form), PermissionMixin],
-    components: {FormListTile, TrellisModal, FormSkips, Permission, FormImport, draggable},
-    created() {
-      this.loadForms()
-    },
-    data() {
-      return {
-        formTypes,
-        global: global as Singleton,
-        studyForms: null,
-        isAddingNewForm: false,
-        isLoading: false,
-        isDragging: false,
-        importFormType: formTypes.CENSUS,
-        sortBy: 'sortOrder',
-        formSkipsForm: null,
-        showFormSkips: false,
-        showImportForm: false,
-      }
-    },
-    computed: {
-      studyFormsByType() {
-        return groupBy(this.studyForms, 'formTypeId')
-      },
-      numericFormTypes: function () {
-        let formTypeKeys = Object.keys(formTypes).filter(formType => {
-          return (!isNaN(Number(formType)));
-        })
-        return formTypeKeys.filter(formType => {
-          // Filter out DEFAULT_CENSUS formType until it is implemented
-          return formType != formTypes.DEFAULT_CENSUS
-        })
-      }
-    },
-    methods: {
-      headers(formType) {
-        let hdr = []
-
-        // if (formType != formTypes.CENSUS) {
-        //   hdr = hdr.concat([{
-        //     text: 'Order'
-        //   }])
-        // }
-
-        hdr = hdr.concat([{
-          text: 'Actions'
-        }, {
-          text: 'Name',
-          class: 'max-width'
-        }])
-
-        if (formType == formTypes.CENSUS) {
-          hdr.push({
-            text: 'Census type'
-          })
-        }
-
-        hdr = hdr.concat([{
-          text: 'Version',
-          align: 'center'
-        }])
-
-        return hdr.map((h, i) => {
-          h.sortable = false
-          h.value = i
-          h.class = h.class || 'small'
-          return h
-        });
-      },
-      toggleFormSkips(form) {
-        this.formSkipsForm = form
-        this.showFormSkips = !this.showFormSkips
-      },
-      formName(form: Form) {
-        return TranslationService.getAny(form.nameTranslation, this.global.locale)
-      },
-      async addForm(type: formTypes) {
-        try {
-          const studyForm = await FormService.createForm(this.global.study.id, type)
-          this.studyForms.push(studyForm)
-          this.alert('success', this.$t('resource_created', [this.formName(studyForm.form)]))
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('failed_resource_create', [this.$t('form')]))
-          }
-        }
-      },
-      async reorderForms(evt) {
-        // bail early if nothing has changed or we're currently reordering the forms
-        if (this.isLoading) return
-        if (evt.newIndex === evt.oldIndex) {
-          this.isDragging = false
-          return
-        }
-        this.isLoading = true
-        let tempStudyForms = this.studyFormsByType[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
-        let shifted = tempStudyForms[evt.oldIndex]
-        tempStudyForms.splice(evt.oldIndex, 1)
-        tempStudyForms.splice(evt.newIndex, 0, shifted)
-        for (let i = 0; i < tempStudyForms.length; i++) {
-          tempStudyForms[i].sortOrder = i + 1
-        }
-        try {
-          const forms = await FormService.reorderForms(this.global.study.id, tempStudyForms)
-          this.studyForms = forms
-          this.sortBy = 'sortOrder'
-          this.alert('success', this.$t('resource_updated', [this.$t('forms')]))
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('failed_resource_update', [this.$t('forms')]))
-          }
-          // TODO: Should probably return to the original order here
-        } finally {
-          await delay(1000)
-          this.isDragging = false
-          this.isLoading = false
-        }
-      },
-      formImported(importedForm: Form) {
-        this.studyForms.push(importedForm)
-      },
-      async updateForm(form: Form) {
-        try {
-          const newForm = await FormService.updateForm(form)
-          const sf = this.studyForms.find((sf: StudyForm) => sf.form.id === form.id)
-          Object.assign(sf.form, newForm)
-          this.alert('success', this.$t('resource_updated', [this.formName(form)]))
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('failed_resource_update', [this.formName(form)]))
-          }
-        }
-      },
-      async changeStudyForm(studyForm: StudyForm) {
-        try {
-          const newStudyForm = await FormService.updateStudyForm(studyForm.studyId, studyForm)
-          const sf = this.studyForms.find((sf: StudyForm) => sf.id === newStudyForm.id)
-          Object.assign(sf.form, newStudyForm)
-          this.alert('success', this.$t('resource_updated', [this.formName(studyForm.form)]))
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, this.$t('failed_resource_update', [this.formName(studyForm.form)]))
-          }
-        }
-      },
-      async updateStudyForm(studyForm: StudyForm) {
-        const index = this.studyForms.findIndex(sf => sf.id === studyForm.id)
-        if (index > -1) {
-          studyForm.form = this.studyForms[index].form
-          this.studyForms[index] = studyForm
-        }
-      },
-      async loadForms() {
-        this.isLoading = true
-        try {
-          this.studyForms = await FormService.getAllStudyForms(global.study.id)
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, 'Unable to load forms')
-          }
-        } finally {
-          this.isLoading = false
-        }
-      },
-      formTypeName(formType: formTypes) {
-        formType = +formType  // convert to int
-        switch (formType) {
-          case formTypes.CENSUS:
-            return this.$t('census_forms')
-          case formTypes.DEFAULT_CENSUS:
-            return this.$t('default_census_forms')
-          default:
-            return this.$t('forms')
-        }
-      },
-      async deleteForm(studyForm: StudyForm) {
-        if (confirm(this.$t('confirm_resource_delete', [this.formName(studyForm.form)]))) {
-          try {
-            await FormService.deleteForm(this.global.study.id, studyForm.form.id)
-            const index = this.studyForms.findIndex(sf => sf.id === studyForm.id)
-            this.studyForms.splice(index, 1)
-            this.alert('success', this.$t('resource_deleted', [this.formName(studyForm.form)]))
-          } catch (err) {
-            if (this.isNotAuthError(err)) {
-              this.logError(err, this.$t('failed_resource_delete', [this.formName(studyForm.form)]))
-            }
-          }
-        }
-      }
-    }
-  })
-</script>
 
 <style lang="sass">
 .forms-table
