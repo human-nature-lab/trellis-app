@@ -1,16 +1,10 @@
 <template>
   <tr class="form-list-row">
-    <td
-      class="medium drag-handle"
-      v-if="Number(formType) !== formTypes.CENSUS"
-    >
+    <td class="small">
       <span
         v-show="dragging"
         class="text-button"
       >{{ studyForm.sortOrder }}</span>
-      <span class="ml-2"><v-icon>mdi-drag-horizontal-variant</v-icon></span>
-    </td>
-    <td class="small">
       <FormActions
         :is-busy="isBusy"
         :form="form"
@@ -67,12 +61,12 @@
           </v-list-item>
         </template>
       </v-select>
+      <VersionModal
+        v-model="showVersionModal"
+        @update:studyForm="$emit('update:studyForm', $event)"
+        :study-form="studyForm"
+      />
     </td>
-    <VersionModal
-      v-model="showVersionModal"
-      @update:studyForm="$emit('update:studyForm', $event)"
-      :study-form="studyForm"
-    />
   </tr>
 </template>
 
@@ -206,10 +200,5 @@ export default Vue.extend({
 </script>
 
 <style lang="sass" scoped>
-.small
-  width: 20px
-.medium
-  width: 80px
-.drag-handle
-  cursor: grab
+
 </style>

@@ -40,6 +40,7 @@
           </Permission>
         </v-toolbar>
         <v-data-table
+          class="forms-table"
           :sort-by.sync="sortBy"
           :headers="headers(formType)"
           hide-default-footer
@@ -145,11 +146,11 @@
       headers(formType) {
         let hdr = []
 
-        if (formType != formTypes.CENSUS) {
-          hdr = hdr.concat([{
-            text: 'Order'
-          }])
-        }
+        // if (formType != formTypes.CENSUS) {
+        //   hdr = hdr.concat([{
+        //     text: 'Order'
+        //   }])
+        // }
 
         hdr = hdr.concat([{
           text: 'Actions'
@@ -300,7 +301,13 @@
   })
 </script>
 
-<style lang="sass" scoped>
-  // .small
-  //   column-width: 90px
+<style lang="sass">
+.forms-table
+  .small
+    column-width: 20px
+    width: 90px
+  .medium
+    width: 80px
+  .drag-handle
+    cursor: grab
 </style>

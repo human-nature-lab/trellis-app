@@ -1,7 +1,7 @@
 <template>
   <v-menu offset-y right v-model="isOpen">
     <template #activator="{ on, attrs }">
-      <v-btn icon v-on="on" v-bind="attrs" :disabled="isBusy">
+      <v-btn icon v-on="on" v-bind="attrs" :disabled="isBusy" class="drag-handle">
         <v-progress-circular v-if="isBusy" indeterminate />
         <v-icon v-else>mdi-dots-vertical</v-icon>
       </v-btn>
