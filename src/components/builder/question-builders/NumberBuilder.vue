@@ -67,6 +67,9 @@ defineExpose({ hiddenParameters: [PT.min, PT.max, PT.display_slider, PT.tick_lab
       :locked="builder.locked"
       v-model="props.value.questionTranslation"
       class="text-body-1"
+      autogrow
+      editable
+      textarea
     />
     <v-expansion-panels flat>
       <v-expansion-panel>
