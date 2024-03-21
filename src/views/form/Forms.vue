@@ -21,7 +21,7 @@ import { logError, alert } from '@/helpers/log.helper'
 import { i18n } from '@/i18n'
 import { isTestStudy } from '@/helpers/singleton.helper'
 import { setDocsLink } from '@/helpers/docs.helper'
-import { DocService, DocxOpts } from '@/services/doc'
+import { DocService, DocxOpts, ExcelColumn } from '@/services/doc'
 import { saveAs } from 'file-saver'
 import PrintOptionsForm from '@/components/print/PrintOptionsForm.vue'
 import TransformService from '@/services/transform'
@@ -251,7 +251,26 @@ async function exportTranslations (config: { asXlsx?: boolean } = {}) {
     isLoading.value = true
     let data = await TransformService.getFormTranslations(selectedForms.value.map(sf => sf.form.id), global.study.id)
     if (config.asXlsx) {
-      data = await DocService.csvZipToXlsx(data)
+      const columns: ExcelColumn[] = [{
+        width: 10,
+        alignment: { vertical: 'middle' },
+      }, {
+        width: 15,
+        alignment: { vertical: 'middle' },
+      }, {
+        width: 60,
+        alignment: { vertical: 'middle', wrapText: true },
+      }, {
+        width: 60,
+        alignment: { vertical: 'middle', wrapText: true },
+      }, {
+        width: 10,
+        alignment: { vertical: 'middle' },
+      }, {
+        width: 10,
+        alignment: { vertical: 'middle' },
+      }]
+      data = await DocService.csvZipToXlsx(data, columns)
     }
     saveAs(data, `trellis_form_translations.${config.asXlsx ? 'xlsx' : 'zip'}`)
   } catch (err) {

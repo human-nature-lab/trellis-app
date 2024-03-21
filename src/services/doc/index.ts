@@ -58,6 +58,8 @@ function sortByLocale (a: TranslationText, b: TranslationText) {
   return a.locale.languageTag.localeCompare(b.locale.languageTag)
 }
 
+export type ExcelColumn = Partial<ExcelJS.Column> & { alignment?: Partial<ExcelJS.Alignment> }
+
 export class DocService {
   static transformScriptToText (str: string) {
     const children = []
@@ -394,7 +396,7 @@ export class DocService {
   }
 
   // Convert a zipped blob of CSV files into a single xlsx file with multiple sheets. return as a blob
-  static async csvZipToXlsx (zip: Blob) {
+  static async csvZipToXlsx (zip: Blob, columns?: ExcelColumn[]) {
     const z = await zipjs()
     const { BlobReader, BlobWriter, ZipReader } = z
     const reader = new ZipReader(new BlobReader(zip))
@@ -408,13 +410,26 @@ export class DocService {
       const name = entry.filename.replace('.csv', '')
       formNames.push(name)
       const ws = wb.addWorksheet(name)
-      ws.addRow(res.meta.fields)
+      ws.columns = res.meta.fields.map((f, i) => {
+        const col = columns ? columns[i] : {}
+        return {
+          header: f,
+          key: f,
+          width: 10,
+          ...col,
+        }
+      })
       for (const record of res.data) {
         const row = []
         for (const key of res.meta.fields) {
           row.push(record[key])
         }
-        ws.addRow(row)
+        ws.addRow(row).eachCell((cell, colNumber) => {
+          const col = columns ? columns[colNumber - 1] : {}
+          if (col.alignment) {
+            cell.alignment = col.alignment
+          }
+        })
       }
     }
     wb.creator = 'Trellis'
