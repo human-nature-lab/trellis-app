@@ -1,5 +1,5 @@
 <template>
-  <v-col class="pa-0">
+  <v-col class="pa-0 background" :class="{ sticky: visible }">
     <v-row
       no-gutters
       class="align-center"
@@ -145,8 +145,6 @@ export default Vue.extend({
 .v-chip
   margin-left: 3px
   margin-right: 3px
-  .sticky
-    top: 70px
-    background: #f5f5f5
-    z-index: 110
+.sticky
+  top: 56px !important
 </style>

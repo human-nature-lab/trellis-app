@@ -13,7 +13,7 @@ import DistributionQuestionBuilder from './question-builders/DistributionQuestio
 import SocialRingBuilder from './question-builders/SocialRingBuilder.vue'
 import ScaleBuilder from './question-builders/ScaleBuilder.vue'
 import { logError } from '@/helpers/log.helper'
-import { useBuilder } from '@/helpers/builder.helper'
+import { useBuilder, useQuestionErrors } from '@/helpers/builder.helper'
 import QuestionPreview from './QuestionPreview.vue'
 import NumberBuilder from './question-builders/NumberBuilder.vue'
 
@@ -22,6 +22,7 @@ const props = defineProps<{
 }>()
 
 const builder = useBuilder()
+const errors = useQuestionErrors(() => props.value.id)
 const working = ref(false)
 const showParameters = ref(props.value && !!props.value.questionParameters.length)
 const showChoices = ref(choiceTypes.includes(props.value.questionTypeId))
@@ -95,6 +96,20 @@ const hiddenParameters = computed(() => {
       :class="{ builder: isBuilderType }"
     >
       <v-col class="question-content">
+        <v-col
+          v-if="errors"
+          class="pa-0"
+        >
+          <v-alert
+            v-for="(e, index) in errors"
+            :key="index"
+            dense
+            outlined
+            type="warning"
+          >
+            {{ e.message }}
+          </v-alert>
+        </v-col>
         <Translation
           v-if="!isBuilderType"
           :locale="builder.locale"

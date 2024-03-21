@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Vue, { computed, provide, reactive, ref, watch } from 'vue'
+import { computed, provide, reactive, ref, watch } from 'vue'
 import Form from '@/entities/trellis/Form'
 import SectionModel from '@/entities/trellis/Section'
 import FormService from '@/services/form'
@@ -11,7 +11,7 @@ import QuestionType from '@/entities/trellis/QuestionType'
 import builderService from '@/services/builder'
 import Translation from '@/components/builder/Translation.vue'
 import BuilderMenu from '@/components/builder/BuilderMenu.vue'
-import { builder as builderSymbol } from '@/symbols/builder'
+import { builder as builderSymbol, questionErrors } from '@/symbols/builder'
 import { study } from '@/symbols/main'
 import Parameter from '@/entities/trellis/Parameter'
 import GeoType from '@/entities/trellis/GeoType'
@@ -22,6 +22,7 @@ import TrellisModal from '@/components/TrellisModal.vue'
 import ExistingSectionSelector from '@/components/builder/ExistingSectionSelector.vue'
 import { useRoute } from 'vue-router/composables'
 import { logError } from '@/helpers/log.helper'
+import { useBuilderQuestionErrors } from '@/helpers/builder.helper'
 
 const $route = useRoute()
 const isLoading = ref(true)
@@ -38,6 +39,7 @@ const builder = reactive({
 
 provide(builderSymbol, builder)
 provide(study, reactive(singleton.study))
+provide(questionErrors, useBuilderQuestionErrors(() => builder.form))
 
 async function load () {
   isLoading.value = true
@@ -131,12 +133,12 @@ watch(() => $route, load, { immediate: true })
 </script>
 
 <template>
-  <v-col class="bg-grey lighten-3 min-h-screen">
+  <v-col class="bg-grey lighten-3 min-h-screen form-builder">
     <v-col class="w-full w-max-normal mx-auto">
       <v-row
         v-if="builder.form"
         no-gutters
-        class="dheader align-center"
+        class="sticky align-center background"
       >
         <div class="title">
           <Translation
@@ -188,11 +190,10 @@ watch(() => $route, load, { immediate: true })
   </v-col>
 </template>
 
-<style lang="sass" scoped>
-
-.header
-  background: #f5f5f5
-  top: 0px
-  z-index: 100
-    // width: calc(100% - 10px)
+<style lang="sass">
+.form-builder
+  .sticky
+    position: sticky !important
+    top: 0
+    z-index: 2
 </style>

@@ -76,9 +76,13 @@ class FormBuilderService {
     return new Translation().fromSnakeJSON(res.data.translation)
   }
 
-  async duplicateQuestion (pageId: string, question: Question) {
+  async duplicateQuestion (pageId: string, question: Question, newVarName: string) {
     const uri = uriTemplate('/group/{group}/question/{question}/duplicate', [pageId, question.id])
-    const res = await builderInst.post(uri, question.toSnakeJSON({ includeRelationships: true }))
+    const res = await builderInst.post(uri, null, {
+      params: {
+        var_name: newVarName,
+      },
+    })
     return new Question().fromSnakeJSON(res.data.question)
   }
 
