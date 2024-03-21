@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
+import config from '@/config'
 import Photo from '../photo/Photo.vue'
 import FullscreenPhoto from '../photo/FullscreenPhoto.vue'
 import Respondent from '../../entities/trellis/Respondent'
@@ -40,6 +41,17 @@ const name = computed(() => {
 
 const photo = computed(() => {
   return props.respondent && props.respondent.photos && props.respondent.photos.length ? props.respondent.photos[0] : null
+})
+
+const displayConditionTags = computed(() => {
+  if (!props.respondent.respondentConditionTags) {
+    return []
+  }
+  const rcts = props.respondent.respondentConditionTags
+
+  return (config.search && config.search.visibleConditionTags && config.search.visibleConditionTags.size)
+    ? rcts.filter(rct => config.search.visibleConditionTags.has(rct.conditionTag.name))
+    : rcts
 })
 
 </script>
@@ -100,11 +112,11 @@ const photo = computed(() => {
             </v-col>
           </v-row>
           <v-row
-            v-if="respondent.respondentConditionTags && respondent.respondentConditionTags.length"
+            v-if="displayConditionTags"
             no-gutters
           >
             <ConditionTagDot
-              v-for="tag in respondent.respondentConditionTags"
+              v-for="tag in displayConditionTags"
               :key="tag.id"
               :name="tag.conditionTag.name"
             />

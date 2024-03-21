@@ -41,7 +41,7 @@ type Config = {
     password: string
   }
   search?: {
-    visibleConditionTags?: string[]
+    visibleConditionTags?: Set<string>
   }
 }
 
