@@ -2,7 +2,7 @@
   <v-col class="ma-0 pa-0 relative">
     <v-row
       no-gutters
-      class="blue-grey lighten-1 pa-4 white--text question-drag-handle align-center"
+      class="accent lighten-1 pa-4 white--text question-drag-handle align-center"
     >
       <MenuSelect
         :disabled="builder.locked || loading"

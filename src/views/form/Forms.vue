@@ -274,8 +274,6 @@ async function exportTranslations (config: { asXlsx?: boolean } = {}) {
     }
     saveAs(data, `trellis_form_translations.${config.asXlsx ? 'xlsx' : 'zip'}`)
   } catch (err) {
-    console.error(err)
-    debugger
     logError(err)
   } finally {
     isLoading.value = false

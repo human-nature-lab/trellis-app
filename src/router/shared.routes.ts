@@ -25,6 +25,7 @@ const DocsRoute = () => import(/* webpackChunkName: "documentation" */'@/views/D
 const Changelog = () => import(/* webpackChunkName: "changelog" */'@/views/info/Changelog.vue')
 const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'@/views/geo/GeoInfo.vue')
 const Geo = () => import(/* webpackChunkName: "geo-search" */'@/views/geo/Geo.vue')
+const Theme = () => import(/* webpackChunkName: "theme" */'@/views/Theme.vue')
 
 console.log(docs)
 const docsRoutes = Object.keys(docs.content).map(path => ({
@@ -116,4 +117,8 @@ export default [{
   path: '/changelog',
   name: 'Changelog',
   component: Changelog,
+}, {
+  path: '/theme',
+  name: 'Theme',
+  component: Theme,
 }] as RouteConfig[]
