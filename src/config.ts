@@ -1,4 +1,4 @@
-import { reactive, watch } from "vue"
+import { reactive, watch } from 'vue'
 
 type Config = {
   apiRoot: string
@@ -39,6 +39,9 @@ type Config = {
     username: string
     roleId: string
     password: string
+  }
+  search?: {
+    visibleConditionTags?: Set<string>
   }
 }
 
