@@ -208,14 +208,14 @@ async function importTranslations (file: File) {
         :disabled="loading"
         class="mx-2"
       >
-        Export CSV
+        {{ $t('export_csv') }}
       </v-btn>
       <v-btn
         @click="showImport = true"
         :disabled="loading"
         class="mx-2"
       >
-        Import CSV
+        {{ $t('import_csv') }}
       </v-btn>
       <v-btn
         :disabled="loading"

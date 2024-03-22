@@ -26,7 +26,7 @@ watch(() => formId.value, async () => {
     try {
       canRunDictator.value = await FormService.formHasQuestionsWithParameters(
         formId.value,
-        [PT.dictator_decision, PT.dictator_receiver],
+        [PT.dictator_keep_decision, PT.dictator_receiver],
       )
     } finally {
       working.value = false

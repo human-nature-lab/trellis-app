@@ -12,7 +12,7 @@ const colors = {
 } as VuetifyThemeVariant
 const darkColors = {
   ...colors,
-  background: '#2E3532',
+  background: '#272727',
 } as VuetifyThemeVariant
 
 export default {

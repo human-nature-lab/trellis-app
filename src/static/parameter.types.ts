@@ -27,7 +27,7 @@ export enum ParameterType {
   min_time = 26,
   max_time = 27,
   json = 28,
-  dictator_decision = 29,
+  dictator_keep_decision = 29,
   dictator_proposer = 30,
   dictator_receiver = 31,
   step_size = 32,

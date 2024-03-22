@@ -81,7 +81,7 @@ export class DBActor implements Actor {
         where parameter_id = ? and val = "1"
         and deleted_at is null
       )
-      and deleted_at is null`, [formId, PT.dictator_decision])
+      and deleted_at is null`, [formId, PT.dictator_keep_decision])
 
     const receiverQuestionIds: { id: string }[] = await db.query(`
         select id from question

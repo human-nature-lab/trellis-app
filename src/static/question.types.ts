@@ -33,6 +33,10 @@ export function isBuilderType (typeId: string) {
 
 // Here we create the list of accepted parameters for each question type
 const defaultParams = [PT.show_dk, PT.show_rf, PT.is_required, PT.read_only, PT.allowed_time, PT.show_timer_controls]
+const numParams = [
+  PT.min, PT.max, PT.step_size, PT.display_slider,
+  PT.initial_value, PT.tick_labels, PT.dictator_keep_decision,
+]
 const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
   [qt.time]: [PT.min_time, PT.max_time],
   [qt.multiple_select]: [PT.other, PT.exclusive],
@@ -46,8 +50,8 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
     PT.hide_no_one,
     PT.dictator_receiver,
   ],
-  [qt.integer]: [PT.min, PT.max, PT.step_size, PT.display_slider, PT.initial_value, PT.tick_labels],
-  [qt.decimal]: [PT.min, PT.max, PT.step_size, PT.display_slider, PT.initial_value, PT.tick_labels],
+  [qt.integer]: numParams,
+  [qt.decimal]: numParams,
   [qt.group]: [],
   [qt.roster]: [PT.allow_barcode, PT.min_roster, PT.max_roster],
   [qt.text]: [PT.allow_barcode],
@@ -60,7 +64,7 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
   [qt.year_month_day]: [PT.min_date, PT.max_date],
   [qt.year_month_day_time]: [PT.min_date, PT.max_date, PT.min_time, PT.max_time],
   [qt.respondent_geo]: [PT.geo_type],
-  [qt.distribution]: [PT.json, PT.dictator_decision],
+  [qt.distribution]: [PT.json, PT.dictator_keep_decision],
   [qt.social_ring]: [PT.json],
   [qt.scale]: [PT.json],
 }
