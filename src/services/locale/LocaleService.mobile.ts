@@ -1,10 +1,10 @@
-import StudyLocale from '../../entities/trellis/StudyLocale'
-import LocaleServiceAbstract from './LocaleServiceAbstract'
-import Locale from '../../entities/trellis/Locale'
+import StudyLocale from '@/entities/trellis/StudyLocale'
+import { LocaleServiceAbstract } from './LocaleServiceAbstract'
+import Locale from '@/entities/trellis/Locale'
 import StudyService from '../study'
 import DatabaseService from '../database'
 
-export class LocaleServiceCordova extends LocaleServiceAbstract {
+export class LocaleService extends LocaleServiceAbstract {
   
   async getLocaleById (localeId: string): Promise<Locale> {
     const connection = await DatabaseService.getDatabase()

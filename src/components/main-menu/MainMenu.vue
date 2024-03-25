@@ -225,14 +225,14 @@ const sections = computed(() => {
       click: toggleTestMode,
       icon: isTestMode.value ? 'mdi-test-tube' : 'mdi-test-tube-empty',
       title: i18n.t('test_mode'),
-      switchColor: 'yellow',
+      switchColor: 'warning',
       iconColor: null,
       switchValue: isTestMode.value,
     }, {
       click: toggleDarkTheme,
       icon: 'mdi-theme-light-dark',
       title: i18n.t('toggle_dark'),
-      switchColor: 'green',
+      switchColor: 'success',
       iconColor: null,
       switchValue: global.darkTheme,
     }, {

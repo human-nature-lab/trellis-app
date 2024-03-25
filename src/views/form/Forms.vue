@@ -25,6 +25,7 @@ import { DocService, DocxOpts, ExcelColumn } from '@/services/doc'
 import { saveAs } from 'file-saver'
 import PrintOptionsForm from '@/components/print/PrintOptionsForm.vue'
 import TransformService from '@/services/transform'
+import TrellisFileUpload from '@/components/import/TrellisFileUpload.vue'
 
 const isLoading = ref(false)
 const studyForms = ref<StudyForm[]>([])
@@ -250,6 +251,7 @@ async function exportTranslations (config: { asXlsx?: boolean } = {}) {
   try {
     isLoading.value = true
     let data = await TransformService.getFormTranslations(selectedForms.value.map(sf => sf.form.id), global.study.id)
+    saveAs(data, 'trellis_form_translations.zip')
     if (config.asXlsx) {
       const columns: ExcelColumn[] = [{
         width: 10,
@@ -274,9 +276,32 @@ async function exportTranslations (config: { asXlsx?: boolean } = {}) {
     }
     saveAs(data, `trellis_form_translations.${config.asXlsx ? 'xlsx' : 'zip'}`)
   } catch (err) {
+    debugger
     logError(err)
   } finally {
     isLoading.value = false
+  }
+}
+
+const showTranslationImport = ref(false)
+async function importTranslations (file: File) {
+  if (isLoading.value) return
+  console.log('type', file.type, file.name)
+  let uploadFile: File
+  if (file.name.endsWith('.xlsx')) {
+    uploadFile = new File([await DocService.xlsxToCsvZip(file)], file.name + '.zip')
+    saveAs(uploadFile, 'upload.zip')
+    // TODO: convert to zip file with a csv file for each sheet
+  } else if (file.name.endsWith('.csv')) {
+    // TODO: convert to zip file containing this single csv file
+    uploadFile = new File([await DocService.filesToZip(file)], file.name + '.zip')
+    saveAs(uploadFile, 'upload.zip')
+  } else {
+    uploadFile = file
+  }
+  const res = await TransformService.importFormTranslations(global.study.id, uploadFile)
+  if (res.status === 200) {
+    alert('success', i18n.t('translation_import_complete', [res.data.added || 0, res.data.updated || 0]))
   }
 }
 
@@ -351,6 +376,17 @@ async function exportTranslations (config: { asXlsx?: boolean } = {}) {
                   </v-list-item-action>
                   <v-list-item-content>
                     {{ $t('export_translations') }}
+                  </v-list-item-content>
+                </v-list-item>
+                <v-list-item
+                  @click="showTranslationImport = true"
+                  :disabled="!selectedForms.length"
+                >
+                  <v-list-item-action>
+                    <v-icon>mdi-file-excel-box</v-icon>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    {{ $t('import_translations') }}
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
@@ -446,6 +482,13 @@ async function exportTranslations (config: { asXlsx?: boolean } = {}) {
         </v-card-actions>
       </v-card>
     </TrellisModal>
+    <TrellisFileUpload
+      v-model="showTranslationImport"
+      :title="$t('import_translations')"
+      :upload-file="importTranslations"
+      :extensions="['zip', 'csv', 'xlsx']"
+      multiple
+    />
   </v-container>
 </template>
 

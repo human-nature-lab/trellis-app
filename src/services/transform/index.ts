@@ -11,6 +11,20 @@ export class TransformService {
     })
     return res.data
   }
+
+  async importFormTranslations (studyId: string, file: File, formId?: string) {
+    const uri = uriTemplate('study/{study}/form-translation-import', [studyId])
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await adminInst.post(uri, formData, {
+      params: { formId },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return res
+  }
+
 }
 
 export default new TransformService()

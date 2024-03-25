@@ -440,4 +440,32 @@ export class DocService {
     const out = await wb.xlsx.writeBuffer()
     return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
   }
+
+  static async filesToZip (...files: File[]) {
+    const z = await zipjs()
+    const { BlobWriter, BlobReader, ZipWriter } = z
+    const zip = new BlobWriter()
+    const writer = new ZipWriter(zip)
+    for (const file of files) {
+      const reader = new BlobReader(file)
+      await writer.add(file.name, reader)
+    }
+    await writer.close()
+    return zip.getData()
+  }
+
+  static async xlsxToCsvZip (xlsx: Blob) {
+    const wb = new ExcelJS.Workbook()
+    await wb.xlsx.load(await xlsx.arrayBuffer())
+    const z = await zipjs()
+    const { BlobWriter, ZipWriter, BlobReader } = z
+    const zip = new BlobWriter()
+    const writer = new ZipWriter(zip)
+    for (const ws of wb.worksheets) {
+      const csv = await wb.csv.writeBuffer({ sheetId: ws.id })
+      writer.add(ws.name + '.csv', new BlobReader(new Blob([csv])))
+    }
+    await writer.close()
+    return zip.getData()
+  }
 }
