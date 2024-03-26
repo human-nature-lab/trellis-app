@@ -4,6 +4,7 @@
     v-bind="$attrs"
     v-on="$listeners"
     :value="value"
+    :persistent="persistent"
     @input="$emit('input', $event)"
     class="d-flex flex-column"
   >
@@ -15,6 +16,7 @@
         <slot name="title">
           <ModalTitle
             :title="title"
+            :disabled="persistent"
             @close="onClose"
           />
         </slot>
@@ -44,6 +46,10 @@ export default Vue.extend({
     title: {
       type: String,
       default: i18n.t('dialog'),
+    },
+    persistent: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {

@@ -82,7 +82,7 @@
         <span v-if="isSearching">{{ $t('searching') }}</span>
         <span v-else>{{ $t('no_locations_found') }}</span>
       </v-container>
-      <v-list v-show="results.length">
+      <v-list v-show="results.length" class="geo-list">
         <geo-list-tile
           v-for="geo in orderedResults"
           :is-selectable="geoIsSelectable(geo)"
@@ -105,21 +105,22 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <v-fab-transition v-if="showAddLocationButton">
+        <v-btn
+          class="deep-orange"
+          @click="$emit('add')"
+          fab
+          dark
+          fixed
+          bottom
+          right
+        >
+          <v-icon style="height:auto;">
+            mdi-plus
+          </v-icon>
+        </v-btn>
+      </v-fab-transition>
     </div>
-    <v-fab-transition v-if="showAddLocationButton">
-      <v-btn
-        class="deep-orange"
-        @click="$emit('add')"
-        fab
-        dark
-        fixed
-        right
-      >
-        <v-icon style="height:auto;">
-          mdi-plus
-        </v-icon>
-      </v-btn>
-    </v-fab-transition>
   </ScrollContainer>
 </template>
 
@@ -363,10 +364,13 @@ export default {
 </script>
 
 <style lang="sass">
+  .geo-list
+    padding-bottom: 60px
   .list__tile__title
     height: 30px
   .geo-search
     padding-bottom: 60px
+
   .move-up
     cursor: pointer
     &:hover
