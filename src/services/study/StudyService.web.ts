@@ -1,18 +1,17 @@
 import { uriTemplate } from '../http/WebUtils'
-import StudyServiceAbstract from './StudyServiceAbstract'
+import { StudyServiceAbstract } from './StudyServiceAbstract'
 import Study from '../../entities/trellis/Study'
 import User from '../../entities/trellis/User'
-import http, {adminInst} from '../http/AxiosInstance'
+import http, { adminInst } from '../http/AxiosInstance'
 
-export class StudyServiceWeb extends StudyServiceAbstract {
-
+export class StudyService extends StudyServiceAbstract {
   private allStudiesPromise!: Promise<Study[]>
 
   async getStudy (studyId: string): Promise<Study> {
     const res = await http().get(`study/${studyId}`)
     return new Study().fromSnakeJSON(res.data.study)
   }
-  
+
   async getProdStudyFromTest (studyId: string): Promise<Study> {
     const res = await http().get(uriTemplate('study/{study}/prod', [studyId]))
     return new Study().fromSnakeJSON(res.data.study)
@@ -22,15 +21,15 @@ export class StudyServiceWeb extends StudyServiceAbstract {
     // TODO: implement this correctly for web
     return this.getMyStudies()
   }
-  
+
   async getStudyUsers (studyId: string): Promise<User[]> {
     const res = await adminInst.get(`study/${studyId}/users`)
     return res.data.map(u => new User().fromSnakeJSON(u))
   }
 
   async getMyStudies (): Promise<Study[]> {
-    const res = await http().get(`me/studies`)
-    return res.data.studies.map( s => new Study().fromSnakeJSON(s) )
+    const res = await http().get('me/studies')
+    return res.data.studies.map(s => new Study().fromSnakeJSON(s))
   }
 
   async getAllStudies (): Promise<Study[]> {

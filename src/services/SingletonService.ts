@@ -9,12 +9,21 @@ import config from '../config'
 import { APP_ENV } from '../static/constants'
 import theme from '../static/theme'
 import { setLocale } from './DateService'
+import Locale from '@/entities/trellis/Locale'
 
-enum StorageKey {
+export enum StorageKey {
   theme = 'dark-theme',
   study = 'current-study',
   locale = 'current-locale',
   offline = 'offline'
+}
+
+export enum SingletonEvent {
+  study = 'study',
+  locale = 'locale',
+  darkTheme = 'dark-theme',
+  offline = 'offline'
+
 }
 
 class SingletonService extends Emitter {
@@ -67,29 +76,29 @@ class SingletonService extends Emitter {
     storage.set(StorageKey.study, study.id)
   }
 
-  setCurrentLocale (locale) {
+  setCurrentLocale (locale: Locale) {
     const tag = locale.languageTag
     setLocale(tag)
     loadLanguageAsync(tag)
     // i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
     singleton.locale = locale
     storage.set(StorageKey.locale, locale.id)
-    this.dispatch('locale', locale)
+    this.dispatch(SingletonEvent.locale, locale)
   }
 
   setDarkTheme (useDarkTheme: boolean) {
     singleton.darkTheme = useDarkTheme
     storage.set(StorageKey.theme, useDarkTheme)
-    this.dispatch('dark-theme', useDarkTheme)
+    this.dispatch(SingletonEvent.darkTheme, useDarkTheme)
   }
 
   setOnlineOffline (isOffline) {
     storage.set(StorageKey.offline, isOffline)
     singleton.offline = isOffline
-    this.dispatch('offline', isOffline)
+    this.dispatch(SingletonEvent.offline, isOffline)
   }
 
-  get (key) {
+  get (key: StorageKey) {
     if (singleton.hasOwnProperty(key)) {
       return singleton[key]
     }
@@ -100,7 +109,7 @@ class SingletonService extends Emitter {
     return null
   }
 
-  set (key, value) {
+  set (key: StorageKey, value) {
     singleton[key] = value
     storage.set(key, value)
     this.dispatch(key, value)

@@ -78,6 +78,12 @@ async function remove (p: QuestionParameter) {
   }
 }
 
+const visibleParameters = computed(() => {
+  return props.value
+    .map((p, index) => ({ ...p, index }))
+    .filter(p => !props.hiddenParameters || !props.hiddenParameters.includes(+p.parameterId))
+})
+
 </script>
 
 <template>
@@ -105,13 +111,12 @@ async function remove (p: QuestionParameter) {
     </v-row>
     <v-list>
       <v-list-item
-        v-for="(p, index) in props.value"
+        v-for="p in visibleParameters"
         :key="p.id"
       >
         <ParameterRow
-          v-if="!hiddenParameters || !hiddenParameters.includes(+p.parameterId)"
-          :value="props.value[index]"
-          @input="updateParameter(index, $event)"
+          :value="props.value[p.index]"
+          @input="updateParameter(p.index, $event)"
           :parameters="availableParameters"
           :condition-tags="conditionTags"
           :geo-types="geoTypes"
