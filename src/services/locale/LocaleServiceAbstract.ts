@@ -20,6 +20,7 @@ export abstract class LocaleServiceAbstract {
       return locale
     }
     try {
+      console.log('Getting default locale')
       const defaultLocale: Locale = await this.getLocaleById(study.defaultLocaleId)
       if (defaultLocale instanceof Locale) {
         this.setCurrentLocale(defaultLocale)
@@ -41,6 +42,7 @@ export abstract class LocaleServiceAbstract {
   }
 
   setCurrentLocale (locale: Locale): void {
+    console.log('setting current locale', locale)
     SingletonService.setCurrentLocale(locale)
   }
 

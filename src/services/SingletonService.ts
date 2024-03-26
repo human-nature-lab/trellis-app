@@ -13,17 +13,18 @@ import Locale from '@/entities/trellis/Locale'
 
 export enum StorageKey {
   theme = 'dark-theme',
-  study = 'current-study',
-  locale = 'current-locale',
-  offline = 'offline'
+  study = 'study',
+  locale = 'locale',
+  offline = 'offline',
+  user = 'user',
 }
 
 export enum SingletonEvent {
   study = 'study',
   locale = 'locale',
   darkTheme = 'dark-theme',
-  offline = 'offline'
-
+  offline = 'offline',
+  user = 'user',
 }
 
 class SingletonService extends Emitter {
@@ -81,6 +82,7 @@ class SingletonService extends Emitter {
     setLocale(tag)
     loadLanguageAsync(tag)
     // i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
+    singleton
     singleton.locale = locale
     storage.set(StorageKey.locale, locale.id)
     this.dispatch(SingletonEvent.locale, locale)

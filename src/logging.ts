@@ -7,7 +7,7 @@ import DeviceService from './services/device'
 import SentryOfflineTransport from './services/logging/SentryOfflineTransport'
 import { BrowserOptions } from '@sentry/browser/esm'
 import { APP_ENV } from './static/constants'
-import SingletonService from './services/SingletonService'
+import SingletonService, { SingletonEvent } from './services/SingletonService'
 import DatabaseService from './services/database'
 declare const VERSION: string
 
@@ -28,7 +28,7 @@ async function asyncSetup () {
 }
 
 if (config.sentry && config.sentry.dsn) {
-  let release = 'trellis-' + VERSION
+  const release = 'trellis-' + VERSION
   // if (!config.debug) {
   //   release += (config.appEnv === APP_ENV.CORDOVA ? '-cordova' : '-web')
   // }
@@ -37,12 +37,12 @@ if (config.sentry && config.sentry.dsn) {
     release: release,
     environment: config.debug ? 'dev' : 'prod',
     integrations: [new Sentry.Integrations.Vue({ Vue }), new Sentry.Integrations.RewriteFrames()],
-    debug: config.debug
+    debug: config.debug,
   }
   if (config.sentry.offline) {
     console.info('SentryOfflineTransport implemented')
     sentryConfig.transportOptions = {
-      dsn: config.sentry.dsn
+      dsn: config.sentry.dsn,
     }
     if (config.sentry.onlineIntervalRate) {
       sentryConfig.transportOptions.onlineIntervalRate = config.sentry.onlineIntervalRate
@@ -57,26 +57,26 @@ if (config.sentry && config.sentry.dsn) {
   })
 
   // Subscribe to changes to the user and locale via the SingletonService
-  SingletonService.on('user', user => {
+  SingletonService.on(SingletonEvent.user, user => {
     Sentry.configureScope(scope => {
       if (user && user.id) {
         scope.setUser({
           id: user.id,
-          username: user.username
+          username: user.username,
         })
       } else {
         scope.setUser(null)
       }
     })
   })
-  SingletonService.on('locale', (locale: Locale) => {
+  SingletonService.on(SingletonEvent.locale, (locale: Locale) => {
     if (locale) {
       Sentry.configureScope(scope => {
         scope.setTag('locale', locale.languageName)
       })
     }
   })
-  SingletonService.on('study', (study: Study) => {
+  SingletonService.on(SingletonEvent.study, (study: Study) => {
     if (study) {
       Sentry.configureScope(scope => {
         scope.setTag('study', study.id)
@@ -85,10 +85,6 @@ if (config.sentry && config.sentry.dsn) {
   })
 
   asyncSetup()
-
 } else {
   console.info('Not using sentry for logging')
 }
-
-
-

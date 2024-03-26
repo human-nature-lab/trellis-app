@@ -6,7 +6,7 @@ import DatabaseService from './database'
 import DeviceService from './device'
 import { requestSyncAuthentication, syncInstance } from './http/AxiosInstance'
 import LoginService from './login'
-import SingletonService from './SingletonService'
+import SingletonService, { StorageKey } from './SingletonService'
 import { parseISO } from 'date-fns'
 import Snapshot from '@/entities/trellis/Snapshot'
 import { filetransfer } from '@/cordova/filetransfer'
@@ -162,10 +162,10 @@ class SyncService {
     })
     // Log out user, un-set study, locale (in case User, Study, Locale tables have changed)
     await LoginService.logout()
-    SingletonService.set('study', null)
-    SingletonService.set('locale', null)
+    SingletonService.set(StorageKey.study, null)
+    SingletonService.set(StorageKey.locale, null)
     // TODO: is this necessary
-    SingletonService.set('user', null)
+    SingletonService.set(StorageKey.user, null)
   }
 
   async registerCancelledSync (_sync: Sync): Promise<void> {
