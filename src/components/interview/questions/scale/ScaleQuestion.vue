@@ -115,7 +115,7 @@ const tickLabels = computed(() => {
   </div>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
   table
     table-layout: fixed
 </style>

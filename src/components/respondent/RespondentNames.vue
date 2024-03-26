@@ -32,7 +32,7 @@
           <td>
             <v-icon v-if="props.item.isDisplayName">mdi-check</v-icon>
           </td>
-          <td>
+          <td class="actions">
             <Permission :requires="TrellisPermission.EDIT_RESPONDENT_NAME">
               <v-btn
                 icon
@@ -82,13 +82,14 @@
         nameHeaders: [{
           text: 'Name',
           value: 'name',
-          class: 'main-column'
+          class: 'main-column',
         }, {
           text: 'Current',
-          value: 'isCurrent'
+          value: 'isCurrent',
         }, {
           text: '',
-          value: 'actions'
+          value: 'actions',
+          class: 'actions',
         }]
       }
     },
