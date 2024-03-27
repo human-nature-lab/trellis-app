@@ -2,44 +2,25 @@ import ConditionTag from '../../entities/trellis/ConditionTag'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
 
 export default interface ConditionTagInterface {
-  /**
-   * Creates a new condition tag
-   * @param name
-   */
+
+  // Get all of the available condition tags
+  getRespondentConditionTagNames (): Promise<string[]>
+
+  // Creates a new condition tag
   createConditionTag (name: string): Promise<ConditionTag>
 
-  /**
-   * Create a respondent condition tag with the supplied id
-   * @param {String} respondentId
-   * @param {String} conditionTagId
-   * @returns {Promise<Object>}
-   */
+  // Create a respondent condition tag with the supplied id
   createRespondentConditionTag (respondentId: string, conditionTagId: string): Promise<RespondentConditionTag>
 
-  /**
-   * Removes a respondent condition tag
-   * @param {String} respondentId
-   * @param {String} conditionTagId
-   * @returns {*}
-   */
+  // Removes a respondent condition tag
   removeRespondentConditionTag (respondentId: string, conditionTagId: string): Promise<void>
 
-  /**
-   * Get all of the available condition tags
-   * @returns {Array} - An array of condition tags
-   */
+  // Get all of the available condition tags
   respondent (): Promise<ConditionTag[]>
 
-  /**
-   * Get all condition tags
-   * @returns {Promise<Object[]>}
-   */
+  // Get all condition tags
   all (): Promise<ConditionTag[]>
 
-  /**
-   * Import a CSV of respondent condition tags
-   * @param file
-   * @param studyId
-   */
+  // Import a CSV of respondent condition tags
   importRespondentConditionTags (file: File, studyId: string): Promise<any>
 }

@@ -1,52 +1,13 @@
-import config from '../config'
-import global from '../static/singleton'
-import bus, {DocsEventTypes} from '../components/documentation/DocsEventBus'
+import { setDocsLink } from '@/helpers/docs.helper'
+import { clearSecondaryDrawerIcon } from '@/helpers/drawer.helper'
 
 export default function DocsLinkMixin (docLink: any) {
-
-  let previousState
-  function detachDocLink () {
-    if (previousState) {
-      global.secondaryDrawer.isEnabled = previousState.isEnabled
-      global.secondaryDrawer.icon = previousState.icon
-      global.secondaryDrawer.onClick = previousState.onClick
-    } else {
-      previousState = null
-    }
-  }
-
-  function attachDocLink () {
-    previousState = JSON.parse(JSON.stringify(global.secondaryDrawer))
-    previousState.onClick = global.secondaryDrawer.onClick
-    global.secondaryDrawer.isEnabled = true
-    global.secondaryDrawer.icon = 'mdi-help-circle-outline'
-    global.secondaryDrawer.onClick = () => {
-      bus.$emit(DocsEventTypes.open, docLink)
-    }
-  }
-
   return {
-    data () {
-      return {
-        config
-      }
+    beforeMount () {
+      setDocsLink(docLink)
     },
-    beforeRouteEnter (to, from, next) {
-      attachDocLink()
-      next()
+    beforeUnmount () {
+      clearSecondaryDrawerIcon()
     },
-    beforeRouteLeave (to, from, next) {
-      detachDocLink()
-      next()
-    },
-    watch: {
-      'config.debug' (newVal, oldVal) {
-        // if (newVal && newVal !== oldVal) {
-        //   attachDocLink()
-        // } else if (!newVal) {
-        //   detachDocLink()
-        // }
-      }
-    }
   }
 }

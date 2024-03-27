@@ -3,7 +3,7 @@
     title="revert_version"
     :value="value" 
     @input="$emit('input', $event)">
-    <v-container>
+    <v-container v-if="value">
       <v-row>
         <AsyncTranslationText :translation="studyForm.form.nameTranslation" />
       </v-row>

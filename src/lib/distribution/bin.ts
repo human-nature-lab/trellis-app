@@ -1,8 +1,8 @@
 import envelopeBackSrc from '../../assets/distribution/envelope-back.svg'
 import envelopeFrontSrc from '../../assets/distribution/envelope-front.svg'
 import envelopeClosedSrc from '../../assets/distribution/envelope-closed.svg'
-import walletOpenSrc from '../../assets/distribution/wallet.svg'
-const walletClosedSrc = walletOpenSrc
+import walletOpenSrc from '../../assets/distribution/wallet-open.svg'
+import walletClosedSrc from '../../assets/distribution/wallet-closed.svg'
 
 export type Bin = {
   name: string

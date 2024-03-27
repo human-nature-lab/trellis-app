@@ -34,7 +34,7 @@ import { InterviewLocation } from '../../src/components/interview/services/Inter
 import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
 import { ConditionTagInterface } from '../../src/services/interview/InterviewDataInterface'
 import { locToNumber } from '../../src/components/interview/services/LocationHelpers'
-import moment from 'moment'
+import { addSeconds } from 'date-fns'
 import InterviewLoader from '../../src/components/interview/services/InterviewLoader'
 import Form from '../../src/entities/trellis/Form'
 import Skip from '../../src/entities/trellis/Skip'
@@ -118,7 +118,7 @@ function makeAction (questionId: string, actionType: string, payload: ActionPayl
   action.actionType = actionType
   action.payload = payload
   action.questionId = questionId
-  action.createdAt = moment().add(n, 'seconds')
+  actions.createdAt = addSeconds(new Date(), n)
   n++
   return action
 }

@@ -38,22 +38,8 @@
     <td
       class="actions flex flex-nowrap"
       v-show="showControls">
-      <v-tooltip
-        bottom
-        v-if="!respondentGeo.isCurrent">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            v-on="on"
-            v-bind="attrs"
-            icon
-            @click="$emit('remove', respondentGeo.id)">
-            <v-icon>mdi-delete</v-icon>
-          </v-btn>
-        </template>
-        <span>{{ $t('remove_location') }}</span>
-      </v-tooltip>
       <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
+        <template #activator="{ on, attrs }">
           <v-btn
             v-on="on"
             v-bind="attrs"
@@ -63,6 +49,20 @@
           </v-btn>
         </template>
         <span>{{ $t('move_respondent_location') }}</span>
+      </v-tooltip>
+      <v-tooltip
+        bottom
+        v-if="!respondentGeo.isCurrent">
+        <template #activator="{ on, attrs }">
+          <v-btn
+            v-on="on"
+            v-bind="attrs"
+            icon
+            @click="$emit('remove', respondentGeo.id)">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </template>
+        <span>{{ $t('remove_location') }}</span>
       </v-tooltip>
     </td>
   </tr>
@@ -106,5 +106,6 @@
 <style lang="sass">
   td, th
     &.actions
+      white-space: nowrap
       padding: 0 !important
 </style>

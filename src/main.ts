@@ -6,7 +6,6 @@ import './assets/main.sass'
 
 import Vue from 'vue'
 import VueCordova from 'vue-cordova'
-import VueHead from 'vue-head'
 import { i18n } from './i18n'
 import './mixins/GlobalMixin'
 import 'typeface-roboto/index.css'
@@ -27,7 +26,6 @@ async function init () {
   await ConfigService.load()
 
   Vue.config.productionTip = false
-  Vue.use(VueHead)
   if (config.appEnv === APP_ENV.CORDOVA) {
     Vue.use(VueCordova)
   }
@@ -41,15 +39,6 @@ async function init () {
     template: '<WebApp />',
     components: {
       WebApp,
-    },
-    // @ts-ignore
-    head: {
-      meta: [
-        {
-          name: 'viewport',
-          content: 'width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover',
-        },
-      ],
     },
   })
 }

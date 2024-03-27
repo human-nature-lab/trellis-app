@@ -1,7 +1,7 @@
-import {expect} from 'chai'
-import moment from 'moment'
+import { expect } from 'chai'
 import SparseTimestamped from "../../src/entities/base/SparseTimestamped";
 import SparseTimestampedSoftDelete from "../../src/entities/base/SparseTimestampedSoftDelete";
+import { formatISO } from 'date-fns'
 
 export const timestamps = ['createdAt', 'updatedAt', 'deletedAt']
 
@@ -55,8 +55,8 @@ export function isSorted (vals, sortValueExtractor, ascending = true) {
 }
 
 function dateToStringIfDate (a) {
-  if (moment.isMoment(a) || moment.isDate(a)) {
-    return moment.utc(a).toISOString()
+  if (isDate(a)) {
+    return formatISO(a)
   } else {
     return a
   }

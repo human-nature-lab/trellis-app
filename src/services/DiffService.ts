@@ -4,8 +4,8 @@ import SectionConditionTag from '../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../entities/trellis/SurveyConditionTag'
 import RespondentConditionTag from '../entities/trellis/RespondentConditionTag'
 import { ConditionTagInterface } from './interview/InterviewDataInterface'
-import * as Moment from 'moment'
 import { union } from 'lodash'
+import { isEqual } from 'date-fns'
 export default class DiffService {
   /**
    * Take two maps and return their
@@ -111,8 +111,8 @@ export default class DiffService {
     }
     for (let key of keys) {
       let isSame = true
-      if (Moment.isMoment(one[key])) {
-        isSame = one[key].isSame(two[key])
+      if (one[key] instanceof Date) {
+        isSame = isEqual(one[key], two[key])
       } else if (one[key] === null || one[key] === undefined) {
         // Behave as though null === undefined
         isSame = two[key] === null || two[key] === undefined

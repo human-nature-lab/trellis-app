@@ -5,7 +5,7 @@ import { merge } from 'lodash'
 import { marked } from 'marked'
 import fs from 'fs'
 import path from 'path'
-import { replaceAll } from '../classes/replaceAll'
+import { replaceAll } from '@/classes/strings'
 import hljs from 'highlight.js'
 
 type MarkdownOpts = {

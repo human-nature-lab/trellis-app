@@ -24,3 +24,23 @@ export function routesAreSame (routeA: QueuableRoute, routeB: QueuableRoute): bo
   if (routeA.path !== routeB.path) return false
   return true
 }
+
+export function geoSearchRoute (geoId: string) {
+  return {
+    name: 'GeoSearch',
+    query: {
+      filters: JSON.stringify({
+        parent: geoId,
+      }),
+    },
+  }
+}
+
+export function geoMapSearchRoute (geoId: string) {
+  return {
+    name: 'GeoSearchWithMap',
+    params: {
+      geoId,
+    },
+  }
+}

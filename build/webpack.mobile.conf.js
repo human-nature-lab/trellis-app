@@ -2,7 +2,6 @@ const path = require('path')
 const express = require('express')
 const webpackMerge = require('webpack-merge')
 const config = require('./webpack.base.conf')
-const HandlebarsPlugin = require('handlebars-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 function mobileOnly (req, res, next) {
@@ -38,17 +37,12 @@ module.exports = webpackMerge({
         })
       })
       app.use('/plugins', express.static(path.join(__dirname, '../platforms/android/platform_www/plugins')))
-    }
+    },
   },
   plugins: [
-    new HandlebarsPlugin({
-      data: require(isProd ? '../config/config-xml.prod' : '../config/config-xml.dev'),
-      entry: path.join(__dirname, '../src/config.xml.hbs'),
-      output: path.join(__dirname, '../www/config.xml')
-    }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: 'index.webpack.html',
+      template: isProd ? 'index.webpack.html' : 'index.webpack.dev.html',
       inject: true,
       minify: {
         removeComments: true,
@@ -57,5 +51,5 @@ module.exports = webpackMerge({
       },
       chunksSortMode: 'none',
     }),
-  ]
+  ],
 }, config)

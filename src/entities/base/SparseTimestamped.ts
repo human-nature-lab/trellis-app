@@ -1,13 +1,11 @@
 import { CreateDateColumn, UpdateDateColumn } from 'typeorm'
 import { AsDate, Serializable } from '../decorators/WebOrmDecorators'
 import BaseEntity from './BaseEntity'
-import MomentTransformer from './MomentTransformer'
-import { Moment } from 'moment'
 
 export default abstract class SparseTimestamped extends BaseEntity {
-  @CreateDateColumn({ select: false, type: 'datetime', transformer: MomentTransformer }) @AsDate @Serializable
-  public createdAt: Moment
+  @CreateDateColumn({ select: false, type: 'datetime' }) @AsDate @Serializable
+  public createdAt: Date
 
-  @UpdateDateColumn({ select: false, type: 'datetime', transformer: MomentTransformer }) @AsDate @Serializable
-  public updatedAt: Moment
+  @UpdateDateColumn({ select: false, type: 'datetime' }) @AsDate @Serializable
+  public updatedAt: Date
 }

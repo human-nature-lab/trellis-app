@@ -1,7 +1,11 @@
 <template>
-    <span class="async-translation-text">
-        {{ translated }}
-    </span>
+  <component
+    :is="tag"
+    class="async-translation-text"
+    v-bind="$attrs"
+  >
+    {{ translated }}
+  </component>
 </template>
 
 <script>
@@ -26,6 +30,10 @@
       passive: {
         type: Boolean,
         default: false
+      },
+      tag: {
+        type: String,
+        default: 'span',
       }
     },
     data () {

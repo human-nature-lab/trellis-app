@@ -23,12 +23,10 @@ export default abstract class PermissionServiceAbstract {
    * @param user
    */
   public async getUserPermissions (user: User): Promise<PermissionMap> {
-
     this.resetUserPermissions()
-
     // Get permissions for this user only if they've logged in
     if (user) {
-      let updatedPermissions = await this.fetchUserPermissions(user)
+      const updatedPermissions = await this.fetchUserPermissions(user)
       for (const p of updatedPermissions) {
         this.userPermissions[TrellisPermission[p]] = true
       }

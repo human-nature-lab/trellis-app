@@ -5,6 +5,8 @@ const { loadTranslations } = require('./compile-translations')
 
 const $tReg = /\$t\((.*?)\)/gm
 const $tcReg = /\$tc\((.*?)\)/gm
+const i18nReg = /i18n\.t\((.*?)\)/gm
+const i18nReg2 = /i18n\.tc\((.*?)\)/gm
 
 function matches(regex, str) {
   const res = []
@@ -52,7 +54,9 @@ if (require.main === module) {
     const data = fs.readFileSync(file, 'utf-8')
     const $tMatches = matches($tReg, data)
     const $tcMatches = matches($tcReg, data)
-    for (const match of $tMatches.concat($tcMatches)) {
+    const i18nMatches = matches(i18nReg, data)
+      .concat(matches(i18nReg2, data))
+    for (const match of $tMatches.concat($tcMatches).concat(i18nMatches)) {
       const parts = match.split(',')
       const key = replaceAll(replaceAll(replaceAll(parts[0], '`', ''), "'", ''), '"', '').trim()
       if (key === parts[0]) {

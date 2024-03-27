@@ -64,13 +64,13 @@ export default Vue.extend({
     showForm (form: Form): boolean {
       const isTestStudy = this.global.study.testStudyId === null
       if (isTestStudy) {
-        return true
+        return !form.isSkipped
       }
       if (form.isPublished && !form.isSkipped) {
         return true
       } else if (form.isSkipped) {
         return this.showHidden
-      } else if (!form.isPulbished) {
+      } else if (!form.isPublished) {
         return this.showUnpublished
       } else {
         return false

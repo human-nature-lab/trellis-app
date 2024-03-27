@@ -30,36 +30,30 @@
         </v-btn>
       </v-card>
       <!--we need the geo-search-dialog class for geo search to work correctly in the dialog-->
-      <v-dialog
-        content-class="geo-search-dialog"
-        v-model="geoSearchDialog">
-        <modal-title
-          :title="$t('location_search')"
-          @close="geoSearchDialog=false">
-        </modal-title>
+      <trellis-modal v-model="geoSearchDialog" :title="$t('location_search')">
         <geo-search
           :showCart="true"
           :isSelectable="isGeoSelectable"
           :selectedGeos="selectedGeos"
           :shouldUpdateRoute="false"
-          @doneSelecting="onDoneSelecting">
-        </geo-search>
-      </v-dialog>
+          @doneSelecting="onDoneSelecting" />
+      </trellis-modal>
     </v-flex>
 </template>
 
 <script>
-  import GeoService from '../../../services/geo'
-  import GeoSearch from '../../geo/GeoSearch.vue'
+  import GeoService from '@/services/geo'
+  import GeoSearch from '@/components/geo/GeoSearch.vue'
   import GeoBreadcrumbs from '../../geo/GeoBreadcrumbs.vue'
   import GeoListTile from '../../geo/GeoListTile.vue'
-  import TranslationService from '../../../services/TranslationService'
+  import TranslationService from '@/services/TranslationService'
   import ActionMixin from '../mixins/ActionMixin'
-  import AT from '../../../static/action.types'
-  import global from '../../../static/singleton'
+  import AT from '@/static/action.types'
+  import global from '@/static/singleton'
   import ModalTitle from '../../ModalTitle.vue'
   import GeoTypeParameterMixin from '../mixins/GeoTypeParameterMixin'
   import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
+import TrellisModal from '@/components/TrellisModal.vue'
   export default {
     name: 'geo-question',
     mixins: [ActionMixin, GeoTypeParameterMixin, QuestionDisabledMixin],
@@ -67,8 +61,9 @@
       GeoSearch,
       GeoListTile,
       ModalTitle,
-      GeoBreadcrumbs
-    },
+      GeoBreadcrumbs,
+      TrellisModal,
+   },
     props: {
       question: {
         type: Object,

@@ -57,43 +57,41 @@
     >
       {{ $t('no_one') }}
     </v-btn>
-    <v-dialog v-model="respondentSearchDialog">
-      <ModalTitle
-        :title="$t('respondent_search')"
-        @close="respondentSearchDialog = false"
+    <TrellisModal
+      v-model="respondentSearchDialog"
+      :title="$t('respondent_search')"
+    >
+      <RespondentsSearch
+        :can-select="true"
+        :limit="selectLimit"
+        :should-update-route="false"
+        :can-add-respondent="canAddRespondent"
+        @selected="onSelected"
+        :on-respondent-added="onRespondentAdded"
+        :respondent-id="respondent.id"
+        :forms-button-visible="false"
+        :base-filters="baseRespondentFilters"
+        :selected-respondents="selectedRespondents"
+        :can-remove-geos="false"
+        :search-query="searchQuery"
+        :is-loading="isSavingEdges"
       />
-      <v-card>
-        <RespondentsSearch
-          :can-select="true"
-          :limit="selectLimit"
-          :should-update-route="false"
-          :can-add-respondent="canAddRespondent"
-          @selected="onSelected"
-          :on-respondent-added="onRespondentAdded"
-          :respondent-id="respondent.id"
-          :forms-button-visible="false"
-          :base-filters="baseRespondentFilters"
-          :selected-respondents="selectedRespondents"
-          :can-remove-geos="false"
-          :search-query="searchQuery"
-          :is-loading="isSavingEdges"
-        />
-      </v-card>
-    </v-dialog>
+    </TrellisModal>
   </v-flex>
 </template>
 
 <script>
-import ActionTypes from '../../../static/action.types'
+import { uniq } from 'lodash'
+import ActionTypes from '@/static/action.types'
 import QuestionDisabledMixin from '../mixins/QuestionDisabledMixin'
 import ActionMixin from '../mixins/ActionMixin'
 import Photo from '../../photo/Photo.vue'
-import RespondentsSearch from '../../respondent/RespondentsSearch.vue'
+import RespondentsSearch from '@/views/respondent/RespondentsSearch.vue'
 import ModalTitle from '../../ModalTitle.vue'
-import EdgeService from '../../../services/edge'
-import parameterTypes from '../../../static/parameter.types'
-import GeoService from '../../../services/geo'
-import { uniq } from 'lodash'
+import EdgeService from '@/services/edge'
+import parameterTypes from '@/static/parameter.types'
+import GeoService from '@/services/geo'
+import TrellisModal from '@/components/TrellisModal.vue'
 
 export default {
   name: 'RelationshipQuestion',
@@ -307,6 +305,7 @@ export default {
     Photo,
     RespondentsSearch,
     ModalTitle,
+    TrellisModal,
   },
 }
 </script>

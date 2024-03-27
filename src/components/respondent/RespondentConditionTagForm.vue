@@ -1,13 +1,12 @@
 <template>
-  <v-dialog
+  <TrellisModal
     :value="value"
-    @input="$emit('input', $event)">
+    @input="$emit('input', $event)"
+    :title="$t('add_condition_tag')"
+    >
     <v-card>
-      <modal-title
-        :title="$t('add_condition_tag')"
-        @close="$emit('input', false)"></modal-title>
       <v-card-text>
-        <v-layout row>
+        <v-row class="no-gutters">
           <v-combobox
             autofocus
             v-model="conditionTagName"
@@ -15,22 +14,22 @@
             :items="conditions" />
           <v-btn
             @click="save">
-            <v-progress-circular v-if="isSaving" indeterminate></v-progress-circular>
+            <v-progress-circular v-if="isSaving" indeterminate />
             <span v-else>
             {{ $t('save') }}
           </span>
           </v-btn>
-        </v-layout>
+        </v-row>
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </TrellisModal>
 </template>
 
 <script>
-  import ModalTitle from '../ModalTitle.vue'
+  import TrellisModal from '../TrellisModal.vue'
   import ConditionTagService from '../../services/condition-tag'
   export default {
-    components: {ModalTitle},
+    components: { TrellisModal },
     name: 'respondent-condition-form',
     data: () => ({
       conditionTagName: '',

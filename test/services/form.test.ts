@@ -1,7 +1,7 @@
 import './globals'
-import {expect} from 'chai'
-import FormServiceCordova from '../../src/services/form/FormServiceCordova'
-import FormServiceWeb from '../../src/services/form/FormServiceWeb'
+import { expect } from 'chai'
+import FormServiceCordova from '../../src/services/form/FormService.mobile'
+import FormServiceWeb from '../../src/services/form/FormService.web'
 import Form from '../../src/entities/trellis/Form'
 import Translation from "../../src/entities/trellis/Translation";
 import Section from "../../src/entities/trellis/Section";

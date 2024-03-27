@@ -1,9 +1,9 @@
-import moment from 'moment'
 import { ExpiringValue } from '../../classes/ExpiringValue'
+import { parseDate } from '../DateService'
 import { adminInst } from '../http/AxiosInstance'
 
-export type MaintenanceData = { 
-  active: boolean 
+export type MaintenanceData = {
+  active: boolean
   key?: string
   began?: Date
   duration?: number
@@ -20,7 +20,7 @@ class MaintenanceService {
     const data: MaintenanceData = { active: res.data.active }
     if (data.active) {
       data.key = res.data.key
-      data.began = moment(res.data.began).toDate()
+      data.began = parseDate(res.data.began)
       data.duration = res.data.duration
     }
     this.cache.set(data)

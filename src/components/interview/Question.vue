@@ -10,7 +10,7 @@
     </v-alert>
     <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
     <v-card-text class="question-content">
-      <v-flex class="question-text title">
+      <v-flex class="question-text title" v-if="showQuestionText">
         <QuestionText 
           :location="location"
           :question="question"
@@ -23,10 +23,11 @@
         :disabled="disabled || hasDkRf"
         :respondent="interview.survey.respondent"></div>
     </v-card-text>
-    <v-card-actions v-if="question.type.name !== 'intro' && showDkRf">
+    <v-card-actions v-if="question.questionType.name !== 'intro' && showDkRf" class="mt-4">
       <DontKnowRefused
         :disabled="disabled"
-        :question="question" />
+        :question="question"
+      />
     </v-card-actions>
   </v-card>
 </template>
@@ -39,7 +40,7 @@
   import DontKnowRefused from './DontKnowRefused.vue'
   import AsyncTranslationText from '../AsyncTranslationText.vue'
   import TranslationMixin from '../../mixins/TranslationMixin'
-  import questionTypes from '../../static/question.types'
+  import questionTypes, { builderTypes } from '@/static/question.types'
   import ParameterType from '../../static/parameter.types'
 
   import DateQuestion from './questions/DateQuestion.vue'
@@ -56,6 +57,9 @@
   import TextAreaQuestion from './questions/TextAreaQuestion.vue'
   import TimeQuestion from './questions/TimeQuestion.vue'
   import DistributionQuestion from './questions/distribution/DistributionQuestion.vue'
+  import SocialRingQuestion from './questions/social-ring/SocialRingQuestion.vue'
+  import ScaleQuestion from './questions/scale/ScaleQuestion.vue'
+  import DurationQuestion from './questions/DurationQuestion.vue'
   import QuestionTimer from './QuestionTimer.vue'
   import QuestionText from './QuestionText.vue'
   import Question from '../../entities/trellis/Question'
@@ -81,9 +85,12 @@
     [questionTypes.time]: TimeQuestion,
     [questionTypes.image]: ImageQuestion,
     [questionTypes.distribution]: DistributionQuestion,
+    [questionTypes.social_ring]: SocialRingQuestion,
+    [questionTypes.duration]: DurationQuestion,
+    [questionTypes.scale]: ScaleQuestion
   }
 
-  export default {
+  export default Vue.extend({
     name: 'question',
     mixins: [TranslationMixin],
     components: {
@@ -104,6 +111,7 @@
       TimeQuestion,
       DistributionQuestion,
       QuestionText,
+      ScaleQuestion,
     },
     props: {
       question: {
@@ -172,21 +180,22 @@
       },
       showDkRf (): boolean {
         let count = 0
-        for (const qp of this.question.questionParameters) {
-          const i = parseInt(qp.parameterId, 10)
-          if (i === ParameterType.show_dk || i === ParameterType.show_rf) {
-            if (!!+qp.val) {
-              count++
-            }
+        for (const id of [ParameterType.show_dk, ParameterType.show_rf]) {
+          const qp = this.question.questionParameters.find(qp => +qp.parameterId === id)
+          if (!qp || !!+qp.val) {
+            count++
           }
         }
         return count === 2
       },
       hasDkRf (): boolean {
-        return this.question.dkRf !== null && this.question.dkRf !== undefined
+        return this.question.datum && this.question.datum.dkRf !== null && this.question.datum.dkRf !== undefined
+      },
+      showQuestionText (): boolean {
+        return !builderTypes.includes(this.question.questionTypeId)
       }
     }
-  }
+  })
 </script>
 <style lang="sass">
   $question-margin: 15px

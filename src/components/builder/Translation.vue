@@ -22,11 +22,11 @@
 
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
-import EditText from './EditText.vue'
-import Translation from '../../entities/trellis/Translation'
-import TranslationText from '../../entities/trellis/TranslationText'
-import TranslationTextService from '../../services/translation-text'
-import Locale from '../../entities/trellis/Locale'
+import EditText from '@/components/util/EditText.vue'
+import Translation from '@/entities/trellis/Translation'
+import TranslationText from '@/entities/trellis/TranslationText'
+import TranslationTextService from '@/services/translation-text'
+import Locale from '@/entities/trellis/Locale'
 
 export default Vue.extend({
   name: 'Translation',
