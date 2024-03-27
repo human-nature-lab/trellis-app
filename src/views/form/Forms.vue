@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { groupBy } from 'lodash'
 import draggable from 'vuedraggable'
+import config from '@/config'
 import Permission from '@/components/Permission.vue'
 import StudyForm from '@/entities/trellis/StudyForm'
 import FormService from '@/services/form'
@@ -290,12 +291,16 @@ async function importTranslations (file: File) {
   let uploadFile: File
   if (file.name.endsWith('.xlsx')) {
     uploadFile = new File([await DocService.xlsxToCsvZip(file)], file.name + '.zip')
-    saveAs(uploadFile, 'upload.zip')
+    if (config.debug) {
+      saveAs(uploadFile, 'upload.zip')
+    }
     // TODO: convert to zip file with a csv file for each sheet
   } else if (file.name.endsWith('.csv')) {
     // TODO: convert to zip file containing this single csv file
     uploadFile = new File([await DocService.filesToZip(file)], file.name + '.zip')
-    saveAs(uploadFile, 'upload.zip')
+    if (config.debug) {
+      saveAs(uploadFile, 'upload.zip')
+    }
   } else {
     uploadFile = file
   }
