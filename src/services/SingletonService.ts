@@ -44,25 +44,6 @@ class SingletonService extends Emitter {
       singleton.darkTheme = storage.get(StorageKey.theme)
       theme.dark = singleton.darkTheme
     }
-    /* Moved to ValidateStudy Guard
-    if (storage.get(StorageKey.study)) {
-      const studyId = storage.get(StorageKey.study)
-      if (!studyId) return
-      singleton.study = await StudyService.getStudy(studyId)
-      this.dispatch('study', singleton.study)
-    }
-    */
-    /* Moved to ValidateLocale Guard
-    if (storage.get(StorageKey.locale)) {
-      const localeId = storage.get(StorageKey.locale)
-      if (!localeId) return
-      const locale = await LocaleService.getLocaleById(localeId)
-      if (locale) {
-        this.setCurrentLocale(locale)
-      }
-      console.log('loaded locale', singleton.locale)
-    }
-    */
     singleton.deviceId = await DeviceService.getUUID()
     if (config.appEnv === APP_ENV.CORDOVA && config.sentry) {
       const server = await DatabaseService.getServerIPAddress()
@@ -81,8 +62,6 @@ class SingletonService extends Emitter {
     const tag = locale.languageTag
     setLocale(tag)
     loadLanguageAsync(tag)
-    // i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
-    singleton
     singleton.locale = locale
     storage.set(StorageKey.locale, locale.id)
     this.dispatch(SingletonEvent.locale, locale)

@@ -12,7 +12,9 @@ export async function loadUser () {
   loading.value = true
   try {
     user.value = await UserService.loadCurrentUser()
-    userPermissions.value = await PermissionService.fetchUserPermissions(user.value)
+    if (user.value) {
+      userPermissions.value = await PermissionService.fetchUserPermissions(user.value)
+    }
   } finally {
     loading.value = false
   }

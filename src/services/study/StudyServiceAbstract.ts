@@ -1,10 +1,10 @@
 import User from '../../entities/trellis/User'
 import Study from '../../entities/trellis/Study'
-import SingletonService from '../SingletonService'
+import SingletonService, { StorageKey } from '../SingletonService'
 
 export abstract class StudyServiceAbstract {
   getCurrentStudy (): Study | undefined {
-    const study = SingletonService.get('study')
+    const study = SingletonService.get(StorageKey.study)
     return (study instanceof Study) ? study : undefined
   }
 
