@@ -4,7 +4,7 @@ import transformToPaths from './transformToPaths'
 export default transformToPaths({
   device_installation: {
     android: 'Android',
-    ios: 'IOS'
+    ios: 'IOS',
   },
   form_builder: {
     adding_questions: 'Adding-questions',
@@ -12,27 +12,24 @@ export default transformToPaths({
     question_parameters: 'Question-parameters',
     question_types: 'Question-types',
     repeated_sections: 'Repeated-sections',
-    skips: 'Skips'
+    skips: 'Skips',
   },
-  getting_started: {
-    introduction: 'Introduction',
-    create_form: 'Create-form'
-  },
+  getting_started: 'getting-started',
   locations: {
     info: 'Geo-info',
     map: 'Map',
-    search: 'Search'
+    search: 'Search',
   },
   respondents: {
-    search: 'Search'
+    search: 'Search',
   },
   sync: {
     admin: 'Admin',
-    introduction: 'Introduction'
+    introduction: 'Introduction',
   },
   users: {
-    intro: 'Introduction'
+    intro: 'Introduction',
   },
   sidebar: '_Sidebar',
-  home: 'Home'
+  home: 'Home',
 }, '.md')

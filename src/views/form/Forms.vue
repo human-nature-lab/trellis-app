@@ -39,7 +39,7 @@ const sortBy = ref('sortOrder')
 const selectedForms = ref<StudyForm[]>([])
 const showExport = ref(false)
 
-setDocsLink(DocsFiles.getting_started.create_form)
+setDocsLink(DocsFiles.getting_started + '#creating-a-form')
 
 async function loadForms () {
   if (isLoading.value) return
@@ -327,24 +327,25 @@ async function importTranslations (file: File) {
         <v-toolbar flat>
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer />
-          <Permission
-            :requires="TrellisPermission.ADD_FORM"
-            v-if="isTestStudy"
+
+          <v-menu
+            offset-y
+            left
           >
-            <v-menu
-              offset-y
-              left
-            >
-              <template #activator="{ on, attrs }">
-                <v-btn
-                  v-on="on"
-                  v-bind="attrs"
-                  icon
-                >
-                  <v-icon>mdi-dots-vertical</v-icon>
-                </v-btn>
-              </template>
-              <v-list>
+            <template #activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                icon
+              >
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
+            <v-list>
+              <Permission
+                v-if="isTestStudy"
+                :requires="TrellisPermission.ADD_FORM"
+              >
                 <v-list-item @click="addForm(formType)">
                   <v-list-item-action>
                     <v-icon>mdi-plus</v-icon>
@@ -353,6 +354,11 @@ async function importTranslations (file: File) {
                     {{ $t('add_form') }}
                   </v-list-item-content>
                 </v-list-item>
+              </Permission>
+              <Permission
+                v-if="isTestStudy"
+                :requires="TrellisPermission.ADD_FORM"
+              >
                 <v-list-item @click="showImportForm = true; importFormType = Number(formType)">
                   <v-list-item-action>
                     <v-icon>mdi-swap-vertical</v-icon>
@@ -361,28 +367,33 @@ async function importTranslations (file: File) {
                     {{ $t('import_form') }}
                   </v-list-item-content>
                 </v-list-item>
-                <v-list-item
-                  @click="showExport = true"
-                  :disabled="!selectedForms.length"
-                >
-                  <v-list-item-action>
-                    <v-icon>mdi-file-word-box</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    {{ $t('export_word_docs') }}
-                  </v-list-item-content>
-                </v-list-item>
-                <v-list-item
-                  @click="() => exportTranslations({ asXlsx: true })"
-                  :disabled="!selectedForms.length"
-                >
-                  <v-list-item-action>
-                    <v-icon>mdi-file-excel-box</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    {{ $t('export_translations') }}
-                  </v-list-item-content>
-                </v-list-item>
+              </Permission>
+              <v-list-item
+                @click="showExport = true"
+                :disabled="!selectedForms.length"
+              >
+                <v-list-item-action>
+                  <v-icon>mdi-file-word-box</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  {{ $t('export_word_docs') }}
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item
+                @click="() => exportTranslations({ asXlsx: true })"
+                :disabled="!selectedForms.length"
+              >
+                <v-list-item-action>
+                  <v-icon>mdi-file-excel-box</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  {{ $t('export_translations') }}
+                </v-list-item-content>
+              </v-list-item>
+              <Permission
+                v-if="isTestStudy"
+                :requires="TrellisPermission.EDIT_FORM"
+              >
                 <v-list-item
                   @click="showTranslationImport = true"
                   :disabled="!selectedForms.length"
@@ -394,9 +405,9 @@ async function importTranslations (file: File) {
                     {{ $t('import_translations') }}
                   </v-list-item-content>
                 </v-list-item>
-              </v-list>
-            </v-menu>
-          </Permission>
+              </Permission>
+            </v-list>
+          </v-menu>
         </v-toolbar>
         <v-data-table
           v-model="selectedForms"
