@@ -5,7 +5,6 @@ import RespondentConditionTag from '@/entities/trellis/RespondentConditionTag'
 import { isNotAuthError } from '@/helpers/auth.helper'
 import { logError } from '@/helpers/log.helper'
 
-
 const props = defineProps<{
   value: boolean
   respondentId: string
@@ -59,61 +58,8 @@ async function save () {
     isSaving.value = false
   }
 }
-// export default {
-//   components: { TrellisModal },
-//   name: 'respondent-condition-form',
-//   data: () => ({
-//     conditionTagName: '',
-//     conditions: [],
-//     isLoading: false,
-//     isSaving: false
-//   }),
-//   created () {
-//     this.load()
-//   },
-//   props: {
-//     value: {
-//       type: Boolean,
-//       required: true
-//     },
-//     respondentId: {
-//       type: String,
-//       required: true
-//     }
-//   },
-//   methods: {
-//     async load () {
-//       this.isLoading = true
-//       try {
-//         this.conditions = await ConditionTagService.getRespondentConditionTagNames()
-//       } catch (err) {
-//         if (this.isNotAuthError(err)) {
-//           this.logError(err)
-//         }
-//       } finally {
-//         this.isLoading = false
-//       }
-//     },
-//     async save () {
-//       if (this.conditionTagName.trim() === '') return
-//       this.isSaving = true
-//       try {
-//         const newConditionTag = await ConditionTagService.createConditionTag(this.conditionTagName.trim())
-//         const respondentConditionTag = await ConditionTagService.createRespondentConditionTag(this.respondentId, newConditionTag.id)
-//         respondentConditionTag.conditionTag = newConditionTag.copy()
-//         this.$emit('close', respondentConditionTag)
-//         this.conditionTagName = ''
-//       } catch (err) {
-//         if (this.isNotAuthError(err)) {
-//           this.logError(err)
-//         }
-//       } finally {
-//         this.isSaving = false
-//       }
-//     },
-//   }
-// }
 </script>
+
 <template>
   <TrellisModal
     :value="value"
