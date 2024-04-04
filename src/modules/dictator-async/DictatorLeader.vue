@@ -183,8 +183,8 @@ async function generateRing () {
   }
   const shuffledPairs = shuffle(pairs)
   for (const pair of shuffledPairs) {
-    const kept = pair.decider.value
-    const given = pair.receiver.max - pair.receiver.value
+    const kept = pair.decider.max - pair.decider.value
+    const given = pair.receiver.value
     report.value.rows.push({
       respondentId: pair.receiver.respondentId,
       pair,
