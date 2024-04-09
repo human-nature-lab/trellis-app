@@ -1,7 +1,7 @@
 import Interview from '../../entities/trellis/Interview'
 import { now } from '../DateService'
 import DatabaseService from '../database'
-import InterviewServiceAbstract from './InterviewServiceAbstract'
+import { InterviewServiceAbstract } from './InterviewServiceAbstract'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
 import QuestionDatum from '../../entities/trellis/QuestionDatum'
@@ -17,7 +17,7 @@ import InterviewDataInterface from './InterviewDataInterface'
 import { randomIntBits } from '../../classes/M'
 import { Coordinates } from '../geolocation/GeoLocationAbstract'
 
-export default class InterviewServiceCordova extends InterviewServiceAbstract {
+export class InterviewService extends InterviewServiceAbstract {
 
   public async getInterview (interviewId: string): Promise<Interview> {
     const repo = await DatabaseService.getRepository(Interview)

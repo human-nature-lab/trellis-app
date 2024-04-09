@@ -1,30 +1,33 @@
-import FormService from '../../../services/form'
-import InterviewService from '../../../services/interview'
-import LocaleService from '../../../services/locale'
-import RespondentService from '../../../services/respondent'
 import { Route } from 'vue-router'
-import RespondentFill from '../../../entities/trellis/RespondentFill'
-import Locale from '../../../entities/trellis/Locale'
-import Interview from '../../../entities/trellis/Interview'
-import Action from '../../../entities/trellis/Action'
-import Form from '../../../entities/trellis/Form'
-import InterviewDataInterface, { ConditionTagInterface } from '../../../services/interview/InterviewDataInterface'
-import QuestionDatum from '../../../entities/trellis/QuestionDatum'
-import RespondentConditionTag from '../../../entities/trellis/RespondentConditionTag'
-import { defaultLoggingService as logger } from '../../../services/logging'
+import FormService from '@/services/form'
+import InterviewService from '@/services/interview'
+import LocaleService from '@/services/locale'
+import RespondentService from '@/services/respondent'
+import RespondentFill from '@/entities/trellis/RespondentFill'
+import Locale from '@/entities/trellis/Locale'
+import Interview from '@/entities/trellis/Interview'
+import Action from '@/entities/trellis/Action'
+import Form from '@/entities/trellis/Form'
+import InterviewDataInterface, { ConditionTagInterface } from '@/services/interview/InterviewDataInterface'
+import QuestionDatum from '@/entities/trellis/QuestionDatum'
+import RespondentConditionTag from '@/entities/trellis/RespondentConditionTag'
+import { defaultLoggingService as logger } from '@/services/logging'
 import { AddSnack } from '../../SnackbarQueue.vue'
 import Respondent from '@/entities/trellis/Respondent'
 
-export interface InterviewData {
+export type InterviewData = {
+  locale: Locale
+  interviewType: string
+} & BaseInterviewData
+
+export type BaseInterviewData = {
   respondentFills?: RespondentFill[]
   conditionTags?: ConditionTagInterface
-  locale: Locale
   form: Form
   respondent?: Respondent
-  data?: QuestionDatum[]
+  data?: InterviewDataInterface
   interview: Interview
   actions?: Action[]
-  interviewType: string
   baseRespondentConditionTags?: RespondentConditionTag[]
 }
 
@@ -45,7 +48,7 @@ export default class InterviewLoader {
         return {
           respondentFills: res.respondentFills,
           conditionTags: res.data.conditionTags,
-          data: res.data && res.data.data,
+          data: res.data,
           interview: res.interview,
           form: res.form,
           respondent: res.respondent,
@@ -90,8 +93,8 @@ export default class InterviewLoader {
    * @param {Function} progressCb - Called when a single step of progress is made
    * @returns {Promise<Object>}
    */
-  static loadPreview (formId: string): Promise<{form: Form}> {
-    return FormService.getForm(formId, true).then(form => {
+  static loadPreview (formId: string): PromiseLike<{form: Form}> {
+    return FormService.getForm(formId).then(form => {
       return {
         form,
       }
@@ -104,23 +107,32 @@ export default class InterviewLoader {
    * @param {Function} progressCb - Callback for progress updates
    * @returns {{data: <Array>}}
    */
-  static async loadInterview (interviewId: string): Promise<{
-    interview: Interview,
-    actions: Action[],
-    data: InterviewDataInterface,
-    form: Form,
-    respondent: Respondent,
-    respondentFills: RespondentFill[],
-    baseRespondentConditionTags: RespondentConditionTag[]
-  }> {
+  static async loadInterview (interviewId: string, form?: Form): Promise<BaseInterviewData> {
     const interview = await InterviewService.getInterview(interviewId)
-    const [actions, data, form, respondentFills, respondent] = await Promise.all([
+    if (!form) {
+      form = await FormService.getForm(interview.survey.formId)
+    }
+    const [actions, data, respondentFills, respondent] = await Promise.all([
       InterviewService.getActions(interviewId),
       InterviewService.getData(interviewId),
-      FormService.getForm(interview.survey.formId, true),
       RespondentService.getRespondentFillsById(interview.survey.respondentId),
       RespondentService.getRespondentById(interview.survey.respondentId),
     ])
+
+    const baseRespondentConditionTags = InterviewLoader.getBaseConditionTags(form, data)
+
+    return {
+      interview,
+      actions,
+      data,
+      form,
+      respondent,
+      respondentFills,
+      baseRespondentConditionTags,
+    }
+  }
+
+  static getBaseConditionTags (form: Form, data: InterviewDataInterface): RespondentConditionTag[] {
     // Base respondent condition tags start with all respondent scope condition tags
     let baseRespondentConditionTags: RespondentConditionTag[] = data.conditionTags.respondent
 
@@ -142,16 +154,7 @@ export default class InterviewLoader {
       return !conditionTagIds.get(rct.conditionTagId)
     })
     // We're left by condition tags that were assigned outside of the scope of this form
-
-    return {
-      interview,
-      actions,
-      data,
-      form,
-      respondent,
-      respondentFills,
-      baseRespondentConditionTags,
-    }
+    return baseRespondentConditionTags
   }
 
   /**
@@ -159,7 +162,7 @@ export default class InterviewLoader {
    * @param {Object} route - A valid vue-router route
    * @returns {Promise<Object>}
    */
-  static loadLocale (route): Promise<Locale> {
+  static loadLocale (route): PromiseLike<Locale> {
     if (route.params.locale) {
       return LocaleService.getLocaleById(route.params.locale)
     } else {

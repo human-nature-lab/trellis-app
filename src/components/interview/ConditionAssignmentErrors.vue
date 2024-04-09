@@ -6,7 +6,7 @@
     </v-layout>
     <TrellisModal v-model="showErrors" :title="$t('condition_assignment_errors')">
       <v-expansion-panel>
-        <v-expansion-panel-content v-for="err of errors" :key="err">
+        <v-expansion-panel-content v-for="(err, index) of errors" :key="index">
           <v-layout slot="header">
             <v-flex>{{err.error.name}}</v-flex>
             <v-flex>message: {{err.error.message}}</v-flex>

@@ -1,9 +1,10 @@
 import DiffService from '../../src/services/DiffService'
 import uuid from 'uuid/v4'
-import {now} from '../../src/services/DateService'
-import {expect} from 'chai'
-import QuestionDatum from "../../src/entities/trellis/QuestionDatum";
-import Datum from "../../src/entities/trellis/Datum";
+import { now } from '../../src/services/DateService'
+import { add } from 'date-fns'
+import { expect } from 'chai'
+import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
+import Datum from '../../src/entities/trellis/Datum'
 
 export default function () {
   describe('DiffService.spec', () => {
@@ -11,7 +12,7 @@ export default function () {
       return JSON.parse(JSON.stringify(arr))
     }
     describe('data diff', () => {
-      let baseQDatum = new QuestionDatum().fromSnakeJSON({
+      const baseQDatum = new QuestionDatum().fromSnakeJSON({
         id: uuid(),
         answered_at: now(),
         dk_rf_val: null,
@@ -19,17 +20,17 @@ export default function () {
         updated_at: now(),
         deleted_at: now(),
         created_at: now(),
-        data: []
+        data: [],
       })
-      let baseDatum = new Datum().fromSnakeJSON({
+      const baseDatum = new Datum().fromSnakeJSON({
         id: uuid(),
         val: 'wowowowow',
         choic_id: 'asdfasdf',
         edge_id: 'asdfff',
         geo_id: 'about that',
-        roster_id: 'okiday'
+        roster_id: 'okiday',
       })
-      let oldQDatum: QuestionDatum[] = copy([baseQDatum, baseQDatum, baseQDatum]).map(qDatum => {
+      const oldQDatum: QuestionDatum[] = copy([baseQDatum, baseQDatum, baseQDatum]).map(qDatum => {
         qDatum.id = uuid()
         qDatum.data = copy([baseDatum, baseDatum, baseDatum]).map(datum => {
           datum.id = uuid()
@@ -46,7 +47,7 @@ export default function () {
           qDatum.id = uuid()
           return qDatum
         }))
-        let diff = DiffService.dataDiff(newQDatum, oldQDatum)
+        const diff = DiffService.dataDiff(newQDatum, oldQDatum)
         expect(diff).to.have.keys('questionDatum', 'datum')
         expect(diff.questionDatum).to.have.keys('added', 'removed', 'modified')
         expect(diff.datum).to.have.keys('added', 'removed', 'modified')
@@ -58,27 +59,27 @@ export default function () {
           .and.deep.include(newQDatum[5], 'should have the third additional question datum')
       })
       it('should handle removed question_datum', () => {
-        let removedQDatum = []
+        const removedQDatum = []
         newQDatum = newQDatum.filter((q, i) => {
           if (i !== 1) {
             removedQDatum.push(q)
           }
           return i === 1
         })
-        let diff = DiffService.dataDiff(newQDatum, oldQDatum)
-        let removedDatum = []
-        for (let removed of removedQDatum) {
+        const diff = DiffService.dataDiff(newQDatum, oldQDatum)
+        const removedDatum = []
+        for (const removed of removedQDatum) {
           removedDatum.push(...removed.data)
           expect(diff.questionDatum.removed).to.deep.include(removed, 'should have all removed question datum preset')
         }
-        for (let removed of removedDatum) {
+        for (const removed of removedDatum) {
           expect(diff.datum.removed).to.deep.include(removed, 'should have all removed datum preset')
         }
       })
       it('should handle modified question_datum values as well as added and removed keys', () => {
         newQDatum[1].dkRf = true
-        newQDatum[1].dkRfVal = `There are many things I don't know`
-        newQDatum[2]['a_wild_property_appeared'] = `It's a dragon!`
+        newQDatum[1].dkRfVal = 'There are many things I don\'t know'
+        newQDatum[2].a_wild_property_appeared = 'It\'s a dragon!'
         let diff = DiffService.dataDiff(newQDatum, oldQDatum)
         expect(diff.questionDatum.removed).to.be.an('array').that.is.empty
         expect(diff.questionDatum.added).to.be.an('array').that.is.empty
@@ -94,29 +95,28 @@ export default function () {
           .and.deep.include(newQDatum[2], 'should include all added keys')
       })
       it('should handle modified datum values as well as added and removed keys', () => {
-        newQDatum[0].data[1].updatedAt = now().add(1000)
-        newQDatum[1].data[0]['a_wild_property_appeared'] = null
+        newQDatum[0].data[1].updatedAt = new Date(now().getTime() + 100000)
+        newQDatum[1].data[0].a_wild_property_appeared = null
         const changeDatum = newQDatum[2].data[2]
         changeDatum.geoId = null
         newQDatum[2].data[2] = changeDatum
-        let diff = DiffService.dataDiff(newQDatum, oldQDatum)
+        const diff = DiffService.dataDiff(newQDatum, oldQDatum)
         expect(diff.datum.modified).to.deep.include(newQDatum[0].data[1], 'should include modified properties on datum')
           .and.deep.include(newQDatum[1].data[0], 'should include added properties as modifications')
           .and.deep.include(newQDatum[2].data[2], 'should include deleted properties as modifications')
       })
       it('should handle added datum', () => {
-        let newDatum = copy(newQDatum[0].data[0])
+        const newDatum = copy(newQDatum[0].data[0])
         newDatum.id = uuid()
         newQDatum[0].data.push(newDatum)
-        let diff = DiffService.dataDiff(newQDatum, oldQDatum)
+        const diff = DiffService.dataDiff(newQDatum, oldQDatum)
         expect(diff.datum.added).to.deep.include(newDatum, 'datum.added array should include an added datum if it has a new id')
       })
       it('should handle removed datum', () => {
-        let removed = newQDatum[1].data.splice(0, 1)[0]
-        let diff = DiffService.dataDiff(newQDatum, oldQDatum)
+        const removed = newQDatum[1].data.splice(0, 1)[0]
+        const diff = DiffService.dataDiff(newQDatum, oldQDatum)
         expect(diff.datum.removed).to.deep.include(removed, 'datum.removed array should include a removed datum')
       })
     })
   })
-
 }

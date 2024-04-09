@@ -4,13 +4,12 @@ import RespondentConditionTag from '../../entities/trellis/RespondentConditionTa
 import SectionConditionTag from '../../entities/trellis/SectionConditionTag'
 import SurveyConditionTag from '../../entities/trellis/SurveyConditionTag'
 
-import InterviewServiceAbstract from './InterviewServiceAbstract'
+import { InterviewServiceAbstract } from './InterviewServiceAbstract'
 import Interview from '../../entities/trellis/Interview'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
-import GeoLocationService from '../geolocation'
 
-export default class InterviewServiceWeb extends InterviewServiceAbstract {
+export class InterviewService extends InterviewServiceAbstract {
 
   async getInterview (interviewId: string) {
     let res = await http().get(`interview/${interviewId}`)

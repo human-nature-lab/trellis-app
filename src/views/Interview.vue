@@ -217,7 +217,6 @@ export default {
       interviewActions: {},
       interviewConditionTags: {},
       interview: {},
-      form: null as Form,
       location: {
         section: 0,
         page: 0,
@@ -344,6 +343,7 @@ export default {
     updateInterview () {
       this.isAtEnd = interviewState.navigator.isAtEnd
       this.isAtBeginning = interviewState.navigator.isAtStart
+      this.conditionAssignmentErrors = interviewState.conditionAssignmentErrors
       const sameLocation = locationsAreEqual(this.location, interviewState.location)
       if (this.location) {
         merge(this.location, interviewState.location)

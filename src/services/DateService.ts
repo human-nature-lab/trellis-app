@@ -52,7 +52,10 @@ export function nowStr () {
 /**
  * Creates a Date object from our applications date format string and makes sure it serializes back correctly
  */
-export function parseDate (date: string): Date {
+export function parseDate (date: string | Date): Date {
+  if (date instanceof Date) {
+    return copyDate(date)
+  }
   const d = parse(date, LARAVEL_DATE, new Date())
   d.toJSON = function () {
     return dateFormat(this)

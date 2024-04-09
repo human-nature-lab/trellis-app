@@ -64,6 +64,7 @@ export default class SaferEvalService {
   run (id: string, ...args): boolean {
     try {
       if (this.methods.get(id)) {
+        console.log('Running', id, 'with', args)
         return this.methods.get(id).call(null, ...args)
       } else {
         return false

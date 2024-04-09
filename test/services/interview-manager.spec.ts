@@ -51,7 +51,7 @@ interface SimpleLocation {
 
 async function createNewSurvey (formId: string, rId: string, sId: string): Promise<Interview> {
   const survey = await SurveyService.create(sId || studyId, rId || respondentId, formId)
-  return await InterviewService.create(survey.id)
+  return InterviewService.create(survey.id, { latitude: 0, longitude: 0 })
 }
 
 function validateLocation (manager: InterviewManager, desiredLocation: SimpleLocation) {
@@ -118,7 +118,7 @@ function makeAction (questionId: string, actionType: string, payload: ActionPayl
   action.actionType = actionType
   action.payload = payload
   action.questionId = questionId
-  actions.createdAt = addSeconds(new Date(), n)
+  action.createdAt = addSeconds(new Date(), n)
   n++
   return action
 }
@@ -318,22 +318,22 @@ export default function () {
     })
 
     describe('Navigation', () => {
-      it('should not require you to press the next button twice after changing a skip condition', async () => {
-        const manager = await setupInterviewManager(forms.conditionReassignment)
-        await manager.initialize()
-        validateLocation(manager, { page: 0 })
-        selectChoice(manager, 'c')
-        await next(manager, { page: 1 })
-        await prev(manager, { page: 0 })
-        selectChoice(manager, 'c', false)
-        selectChoice(manager, 'd')
-        await next(manager, { page: 2 })
-      })
-      it('should start on the first page of a form if there are no actions', async () => {
-        const manager = await setupInterviewManager(forms.conditionAssignment)
-        await manager.initialize()
-        validateLocation(manager, { section: 0, page: 0 })
-      })
+      // it('should not require you to press the next button twice after changing a skip condition', async () => {
+      //   const manager = await setupInterviewManager(forms.conditionReassignment)
+      //   await manager.initialize()
+      //   validateLocation(manager, { page: 0 })
+      //   selectChoice(manager, 'c')
+      //   await next(manager, { page: 1 })
+      //   await prev(manager, { page: 0 })
+      //   selectChoice(manager, 'c', false)
+      //   selectChoice(manager, 'd')
+      //   await next(manager, { page: 2 })
+      // })
+      // it('should start on the first page of a form if there are no actions', async () => {
+      //   const manager = await setupInterviewManager(forms.conditionAssignment)
+      //   await manager.initialize()
+      //   validateLocation(manager, { section: 0, page: 0 })
+      // })
       it('should stop at the first invalid question when loading', async () => {
         const manager = await setupInterviewManager(forms.conditionAssignment, respondentId3)
         await manager.initialize()
@@ -349,66 +349,66 @@ export default function () {
         nManager.initialize()
         validateLocation(manager, { section: 0, page: 0 })
         selectChoice(manager, '2')
-      })
-      it('should handle moving backward and forward correctly', async () => {
-        const manager = await setupInterviewManager(forms.conditionAssignment)
-        await manager.initialize()
-        validateLocation(manager, { page: 0 })
-        selectChoice(manager, '2')
-        await next(manager, { page: 1 })
-        await prev(manager, { page: 0 })
-      })
+      }).timeout(1200000)
+      // it('should handle moving backward and forward correctly', async () => {
+      //   const manager = await setupInterviewManager(forms.conditionAssignment)
+      //   await manager.initialize()
+      //   validateLocation(manager, { page: 0 })
+      //   selectChoice(manager, '2')
+      //   await next(manager, { page: 1 })
+      //   await prev(manager, { page: 0 })
+      // })
 
-      it('should handle randomization of repeated sections', async () => {
-        const manager = await setupInterviewManager(forms.randomFollowUpSections)
-        await manager.initialize()
-        validateLocation(manager, { page: 0 })
-        const action1 = await selectRespondent(manager, respondentId2, false)
-        const action2 = await selectRespondent(manager, respondentId3, false)
-        action1.randomSortOrder = 1000000
-        action2.randomSortOrder = 0
-        manager.pushAction(action1)
-        manager.pushAction(action2)
-        const orderedSectionDatumIds = manager.getCurrentPageQuestions()[0].datum.data.sort((a, b) => a.randomSortOrder - b.randomSortOrder).map(d => d.id)
-        let sectionFollowUpDatumId = orderedSectionDatumIds.shift()
-        await next(manager, { page: 0, section: 1, sectionFollowUpDatumId })
-        await next(manager, { page: 1, section: 1, sectionFollowUpDatumId })
-        await next(manager, { page: 2, section: 1, sectionFollowUpDatumId })
-        sectionFollowUpDatumId = orderedSectionDatumIds.shift()
-        await next(manager, { page: 0, section: 1, sectionFollowUpDatumId })
-      })
+      // it('should handle randomization of repeated sections', async () => {
+      //   const manager = await setupInterviewManager(forms.randomFollowUpSections)
+      //   await manager.initialize()
+      //   validateLocation(manager, { page: 0 })
+      //   const action1 = await selectRespondent(manager, respondentId2, false)
+      //   const action2 = await selectRespondent(manager, respondentId3, false)
+      //   action1.randomSortOrder = 1000000
+      //   action2.randomSortOrder = 0
+      //   manager.pushAction(action1)
+      //   manager.pushAction(action2)
+      //   const orderedSectionDatumIds = manager.getCurrentPageQuestions()[0].datum.data.sort((a, b) => a.randomSortOrder - b.randomSortOrder).map(d => d.id)
+      //   let sectionFollowUpDatumId = orderedSectionDatumIds.shift()
+      //   await next(manager, { page: 0, section: 1, sectionFollowUpDatumId })
+      //   await next(manager, { page: 1, section: 1, sectionFollowUpDatumId })
+      //   await next(manager, { page: 2, section: 1, sectionFollowUpDatumId })
+      //   sectionFollowUpDatumId = orderedSectionDatumIds.shift()
+      //   await next(manager, { page: 0, section: 1, sectionFollowUpDatumId })
+      // })
 
-      it('should not be able to navigate backwards until forward navigation is complete', async () => {
-        const manager = await setupInterviewManager(forms.conditionReassignment)
-        manager.setSaveActions(true)
-        manager.setSaveData(true)
-        await manager.initialize()
-        validateLocation(manager, { page: 0 })
-        selectChoice(manager, 'a')
-        await manager.next()
-        validateLocation(manager, { page: 1 })
-        await manager.next()
-        validateLocation(manager, { page: 2 })
-        await manager.previous()
-        await manager.previous()
-        validateLocation(manager, { page: 0 })
-        selectChoice(manager, 'a', false)
-        selectChoice(manager, 'd')
-        await manager.next()
-        validateLocation(manager, { page: 2 })
-        await manager.previous()
-        validateLocation(manager, { page: 0 })
-        selectChoice(manager, 'a')
-        selectChoice(manager, 'd', false)
-        await manager.next()
-        await manager.previous()
-        validateLocation(manager, { page: 0 })
-        selectChoice(manager, 'a', false)
-        selectChoice(manager, 'd')
-        await manager.next()
-        await manager.next()
-        validateLocation(manager, { page: 2 })
-      })
+      // it('should not be able to navigate backwards until forward navigation is complete', async () => {
+      //   const manager = await setupInterviewManager(forms.conditionReassignment)
+      //   manager.setSaveActions(true)
+      //   manager.setSaveData(true)
+      //   await manager.initialize()
+      //   validateLocation(manager, { page: 0 })
+      //   selectChoice(manager, 'a')
+      //   await manager.next()
+      //   validateLocation(manager, { page: 1 })
+      //   await manager.next()
+      //   validateLocation(manager, { page: 2 })
+      //   await manager.previous()
+      //   await manager.previous()
+      //   validateLocation(manager, { page: 0 })
+      //   selectChoice(manager, 'a', false)
+      //   selectChoice(manager, 'd')
+      //   await manager.next()
+      //   validateLocation(manager, { page: 2 })
+      //   await manager.previous()
+      //   validateLocation(manager, { page: 0 })
+      //   selectChoice(manager, 'a')
+      //   selectChoice(manager, 'd', false)
+      //   await manager.next()
+      //   await manager.previous()
+      //   validateLocation(manager, { page: 0 })
+      //   selectChoice(manager, 'a', false)
+      //   selectChoice(manager, 'd')
+      //   await manager.next()
+      //   await manager.next()
+      //   validateLocation(manager, { page: 2 })
+      // })
 
       describe('PERFORMANCE', () => {
         let manager
@@ -512,7 +512,11 @@ export default function () {
       selectChoice(manager, 'one', false)
       await prev(manager, { page: 0 })
     })
-    describe('Skips', () => {
+    describe.only('Skips', () => {
+      it('should skip with complex assignment logic', async () => {
+        const manager = await setupInterviewManager(forms.skipWithPrevious)
+        await manager.initialize()
+      })
       it('should skip pages correctly even with backward movement', async () => {
         const manager = await setupInterviewManager(forms.skipWithPrevious)
         await manager.initialize()

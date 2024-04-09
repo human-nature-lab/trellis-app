@@ -5,7 +5,7 @@ import InterviewDataInterface from './InterviewDataInterface'
 import DiffService from '../DiffService'
 import { dateFormat } from '../DateService'
 
-export default abstract class InterviewServiceAbstract {
+export abstract class InterviewServiceAbstract {
 
   /**
    * Compute the difference between two interview states and persist the differences to the database.
