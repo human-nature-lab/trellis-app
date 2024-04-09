@@ -16,9 +16,9 @@ export abstract class StudyServiceAbstract {
 
   abstract getStudy (studyId: string): PromiseLike<Study | undefined>
 
-  abstract getMyStudies (): PromiseLike<Study[]>
+  abstract getMyStudies (testMode: boolean): PromiseLike<Study[]>
 
-  abstract getUserStudies (userId: string): PromiseLike<Study[]>
+  abstract getUserStudies (userId: string, testMode: boolean): PromiseLike<Study[]>
 
   abstract getStudyUsers (studyId: string): PromiseLike<User[]>
 

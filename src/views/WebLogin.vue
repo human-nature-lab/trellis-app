@@ -8,7 +8,7 @@
       </v-col>
     </v-row>
     <v-row class="justify-space-around">
-      <v-col cols="10" xs="8">
+      <v-col cols="10" sm="8" md="6">
         <LoginForm
           :clearCredentials="false"
           :isWorking="isWorking"

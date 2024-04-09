@@ -17,9 +17,9 @@ export class StudyService extends StudyServiceAbstract {
     return new Study().fromSnakeJSON(res.data.study)
   }
 
-  async getUserStudies (userId: string): Promise<Study[]> {
+  async getUserStudies (userId: string, testMode: boolean): Promise<Study[]> {
     // TODO: implement this correctly for web
-    return this.getMyStudies()
+    return this.getMyStudies(testMode)
   }
 
   async getStudyUsers (studyId: string): Promise<User[]> {
@@ -27,9 +27,13 @@ export class StudyService extends StudyServiceAbstract {
     return res.data.map(u => new User().fromSnakeJSON(u))
   }
 
-  async getMyStudies (): Promise<Study[]> {
+  async getMyStudies (testMode: boolean): Promise<Study[]> {
     const res = await http().get('me/studies')
-    return res.data.studies.map(s => new Study().fromSnakeJSON(s))
+    const studies = res.data.studies.map(s => new Study().fromSnakeJSON(s))
+    if (testMode) {
+      return studies.map(s => s.testStudy)
+    }
+    return studies
   }
 
   async getAllStudies (): Promise<Study[]> {
