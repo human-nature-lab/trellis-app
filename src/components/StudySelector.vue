@@ -52,54 +52,6 @@ async function load () {
 onMounted(() => {
   load()
 })
-// export default {
-//   name: 'StudySelector',
-//   data () {
-//     return {
-//       error: null,
-//       studies: [],
-//       study: null,
-//       isWorking: false,
-//       showCreateStudy: false,
-//     }
-//   },
-//   created () {
-//     this.load()
-//   },
-//   methods: {
-//     change (studyId) {
-//       const study = this.getStudyById(studyId)
-//       this.study = study
-//       StudyService.setCurrentStudy(study)
-//       this.$emit('change', study)
-//     },
-//     async load () {
-//       try {
-//         this.isWorking = true
-//         this.study = await StudyService.getCurrentStudy()
-//         this.studies = await StudyService.getMyStudies()
-//         this.studies.sort(function (a, b) {
-//           return b.name.localeCompare(a.name)
-//         })
-//       } catch (err) {
-//         if (this.isNotAuthError(err)) {
-//           this.logError(err, 'Failed to load studies')
-//         }
-//       } finally {
-//         this.isWorking = false
-//         if (this.studies.length === 0) this.showCreateStudy = true
-//       }
-//     },
-//     getStudyById (studyId) {
-//       for (let i = 0; i < this.studies.length; i++) {
-//         if (this.studies[i].id === studyId) {
-//           return this.studies[i]
-//         }
-//       }
-//       return null
-//     },
-//   },
-// }
 </script>
 
 <template>
