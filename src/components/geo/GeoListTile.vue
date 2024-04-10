@@ -33,7 +33,8 @@
     </v-list-item-content>
     <v-list-item-action>
       <v-btn
-        @click.stop="showGeoMap"
+        @click.stop="() => {}"
+        :to="{ name: 'GeoSearchWithMap', params: { geoId: geo.id } }"
         :disabled="disabled"
         icon
       >
@@ -42,7 +43,8 @@
     </v-list-item-action>
     <v-list-item-action>
       <v-btn
-        @click.stop="showGeoInfo"
+        @click.stop="() => {}"
+        :to="{ name: 'Geo', params: { geoId: geo.id } }"
         :disabled="disabled"
         icon
       >
@@ -90,14 +92,6 @@ export default {
     showGeoMap () {
       routeQueue.redirect({
         name: 'GeoSearchWithMap',
-        params: {
-          geoId: this.geo.id,
-        },
-      })
-    },
-    showGeoInfo () {
-      routeQueue.redirect({
-        name: 'Geo',
         params: {
           geoId: this.geo.id,
         },
