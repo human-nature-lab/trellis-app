@@ -3,7 +3,7 @@
     <template #activator="{ on, attrs }" v-if="showButton">
       <v-btn v-bind="attrs" v-on="on">
         <slot>
-          {{title}}
+          {{title}} 
         </slot>
       </v-btn>
     </template>
@@ -216,7 +216,7 @@
         this.files.splice(index, 1)
       },
       canAcceptFile (file: File): boolean {
-        if (!this.extensions.length) {
+        if (!this.extensions || this.extensions.length) {
           return true
         }
         for (const ext of this.extensions) {
@@ -229,6 +229,7 @@
     },
     computed: {
       accept (): string {
+        if (!this.extensions) return '*.*'
         return this.extensions.map(e => '.' + e).join(',')
       }
     }
