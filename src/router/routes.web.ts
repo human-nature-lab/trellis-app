@@ -25,33 +25,34 @@ const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'@/
 const Permissions = () => import(/* webpackChunkName: "permissions" */'@/views/admin/Permissions.vue')
 const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'@/views/study/StudyDashboard.vue')
 const DataImport = () => import(/* webpackChunkName: "data-import" */'@/views/admin/DataImport.vue')
+const Assets = () => import(/* webpackChunkName: "assets" */'@/views/admin/Assets.vue')
 
 export default sharedRoutes.concat([{
   path: '/',
   name: 'Home',
   default: true,
   component: StudyDashboard,
-  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/sync-admin',
   name: 'SyncAdmin',
   component: SyncAdmin,
-  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/form/:formId/preview',
   name: 'InterviewPreview',
   component: Interview,
-  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/user',
   name: 'Users',
   component: Users,
-  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_USERS)])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_USERS)]),
 }, {
   path: '/reports',
   name: 'Reports',
   component: Reports,
-  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_REPORTS), StudyGuard])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_REPORTS), StudyGuard]),
 }, {
   path: '/import-data',
   name: 'DataImport',
@@ -61,17 +62,17 @@ export default sharedRoutes.concat([{
   path: '/form/:formId/old-builder',
   name: 'OldFormBuilder',
   component: OldFormBuilder,
-  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard]),
 }, {
   path: '/form/:formId/builder',
   name: 'FormBuilder',
   component: FormBuilder,
-  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard, LocaleGuard]),
 }, {
   path: '/form/:formId/print',
   name: 'FormPrint',
   component: FormPrint,
-  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.EDIT_FORM), StudyGuard]),
 }, {
   path: '/form/:formId/translations',
   name: 'FormTranslations',
@@ -81,22 +82,22 @@ export default sharedRoutes.concat([{
   path: '/forms',
   name: 'Forms',
   component: Forms,
-  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/devices',
   name: 'Devices',
   component: Devices,
-  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_DEVICES)])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_DEVICES)]),
 }, {
   path: '/studies',
   name: 'Studies',
   component: Studies,
-  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_STUDIES)])
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_STUDIES)]),
 }, {
   path: '/geo-types',
   name: 'GeoTypes',
   component: GeoTypes,
-  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard])
+  beforeEnter: guardQueue([LoginGuard, StudyGuard, LocaleGuard]),
 }, {
   path: '/server-config',
   name: 'ServerConfig',
@@ -105,14 +106,19 @@ export default sharedRoutes.concat([{
 }, {
   path: '/demo-signup',
   name: 'DemoSignUp',
-  component: DemoSignUp
+  component: DemoSignUp,
 }, {
   path: '/email-confirmation/:key',
   name: 'EmailConfirmation',
-  component: EmailConfirmation
+  component: EmailConfirmation,
 }, {
   path: '/permissions',
   name: 'Permissions',
   component: Permissions,
+  beforeEnter: guardQueue([LoginGuard]),
+}, {
+  path: '/assets',
+  name: 'Assets',
+  component: Assets,
   beforeEnter: guardQueue([LoginGuard]),
 }])
