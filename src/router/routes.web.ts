@@ -25,7 +25,8 @@ const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'@/
 const Permissions = () => import(/* webpackChunkName: "permissions" */'@/views/admin/Permissions.vue')
 const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'@/views/study/StudyDashboard.vue')
 const DataImport = () => import(/* webpackChunkName: "data-import" */'@/views/admin/DataImport.vue')
-const Assets = () => import(/* webpackChunkName: "assets" */'@/views/admin/Assets.vue')
+const Assets = () => import(/* webpackChunkName: "assets" */'@/views/assets/Assets.vue')
+const Asset = () => import(/* webpackChunkName: "asset" */'@/views/assets/Asset.vue')
 
 export default sharedRoutes.concat([{
   path: '/',
@@ -120,5 +121,10 @@ export default sharedRoutes.concat([{
   path: '/assets',
   name: 'Assets',
   component: Assets,
+  beforeEnter: guardQueue([LoginGuard]),
+}, {
+  path: '/asset/:id',
+  name: 'Asset',
+  component: Asset,
   beforeEnter: guardQueue([LoginGuard]),
 }])

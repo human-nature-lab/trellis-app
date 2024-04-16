@@ -45,7 +45,7 @@ export default Vue.extend({
     },
     title: {
       type: String,
-      default: i18n.t('dialog'),
+      default: '',
     },
     persistent: {
       type: Boolean,

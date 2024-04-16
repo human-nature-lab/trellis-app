@@ -3,16 +3,20 @@ import { AssetServiceInterface } from './AssetServiceInterface'
 import http from '@/services/http/AxiosInstance'
 
 export class AssetService implements AssetServiceInterface {
-  async getAsset (id: string) {
+  async getAssets (...ids: string[]) {
+    const res = await http().get('/assets', {
+      params: {
+        ids,
+      },
+    })
+    return res.data.assets.map((asset: any) => new Asset().fromSnakeJSON(asset))
+  }
+
+  async downloadAsset (id: string) {
     const res = await http().get(`/asset/${id}`, {
       responseType: 'blob',
     })
     return res.data as Blob
-  }
-
-  async listAssets () {
-    const res = await http().get('/assets')
-    return res.data.assets.map(a => new Asset().fromSnakeJSON(a))
   }
 
   async createAsset (asset: Pick<Asset, 'fileName' | 'shouldSync'>, file: File) {
@@ -41,7 +45,11 @@ export class AssetService implements AssetServiceInterface {
     return new Asset().fromSnakeJSON(res.data.asset)
   }
 
-  async deleteAsset (id: string) {
-    await http().delete(`/asset/${id}`)
+  async deleteAssets (...ids: string[]) {
+    await http().delete('/assets', {
+      params: {
+        ids,
+      },
+    })
   }
 }
