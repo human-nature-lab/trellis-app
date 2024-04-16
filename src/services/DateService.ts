@@ -1,4 +1,4 @@
-import { format, parse } from 'date-fns'
+import { format, parse, parseJSON } from 'date-fns'
 import { enUS, es } from 'date-fns/locale'
 export const LARAVEL_DATE = 'yyyy-MM-dd HH:mm:ss'
 export const l_DATE = 'P' // momentjs 'l' format
@@ -53,7 +53,7 @@ export function nowStr () {
  * Creates a Date object from our applications date format string and makes sure it serializes back correctly
  */
 export function parseDate (date: string): Date {
-  const d = parse(date, LARAVEL_DATE, new Date())
+  const d = parseJSON(date)
   d.toJSON = function () {
     return dateFormat(this)
   }
