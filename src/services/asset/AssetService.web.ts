@@ -12,11 +12,11 @@ export class AssetService implements AssetServiceInterface {
     return res.data.assets.map((asset: any) => new Asset().fromSnakeJSON(asset))
   }
 
-  async downloadAsset (id: string) {
+  async getAssetUrl (id: string) {
     const res = await http().get(`/asset/${id}`, {
       responseType: 'blob',
     })
-    return res.data as Blob
+    return URL.createObjectURL(res.data as Blob)
   }
 
   async createAsset (asset: Pick<Asset, 'fileName' | 'shouldSync'>, file: File) {

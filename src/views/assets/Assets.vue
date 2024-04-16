@@ -3,13 +3,13 @@ import { computed, onMounted, ref } from 'vue'
 import saveAs from 'file-saver'
 import { i18n } from '@/i18n'
 import FormatBytes from '@/filters/format-bytes.filter'
-import { routeQueue } from '@/router'
 import Asset from '@/entities/trellis/Asset'
 import AssetService from '@/services/asset'
 import { isNotAuthError } from '@/helpers/auth.helper'
 import { logError } from '@/helpers/log.helper'
 import { relativeTime } from '@/filters/date'
 import TrellisFileUpload from '@/components/import/TrellisFileUpload.vue'
+import { isWeb } from '@/helpers/singleton.helper'
 
 const assets = ref<Asset[]>([])
 const loading = ref(false)
@@ -76,8 +76,8 @@ async function downloadAsset (asset: Asset) {
   if (loading.value) return
   loading.value = true
   try {
-    const data = await AssetService.downloadAsset(asset.id)
-    saveAs(data, asset.fileName)
+    const url = await AssetService.getAssetUrl(asset.id)
+    saveAs(url, asset.fileName)
   } catch (e) {
     logError(e)
   } finally {
@@ -87,9 +87,9 @@ async function downloadAsset (asset: Asset) {
 
 const deleteConfirmation = computed(() => {
   if (selected.value.length === 1) {
-    return i18n.t('confirm_delete_single', { asset: selected.value[0].fileName }) as string
+    return i18n.t('confirm_delete_single', [selected.value[0].fileName]) as string
   }
-  return i18n.t('confirm_delete_multiple_asset', { count: selected.value.length }) as string
+  return i18n.t('confirm_delete_multiple_asset', [selected.value.length]) as string
 })
 
 async function deleteAssets () {
@@ -160,8 +160,9 @@ onMounted(() => {
         </v-icon>
       </template>
       <template #item.actions="{ item }">
-        <v-row class="no-gutters actions flex-nowrap">
+        <v-row class="no-gutters flex-nowrap">
           <v-btn
+            v-if="isWeb"
             @click="downloadAsset(item)"
             icon
             :disabled="loading"
@@ -187,11 +188,3 @@ onMounted(() => {
     />
   </v-col>
 </template>
-
-<style lang="sass" scoped>
-tr:hover
-  .actions
-    visibility: visible
-.actions
-  visibility: hidden
-</style>

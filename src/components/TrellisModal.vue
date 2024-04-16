@@ -5,7 +5,7 @@
     v-on="$listeners"
     :value="value"
     :persistent="persistent"
-    @input="$emit('input', $event)"
+    @input="onInput"
     class="d-flex flex-column"
   >
     <ScrollContainer
@@ -31,7 +31,6 @@
 </template>
 
 <script lang="ts">
-import { i18n } from '@/i18n'
 import Vue from 'vue'
 import ModalTitle from './ModalTitle.vue'
 import ScrollContainer from './styles/ScrollContainer.vue'
@@ -58,6 +57,13 @@ export default Vue.extend({
       this.$refs.dialog.onClickOutside($event)
       this.$emit('close')
       this.$emit('input', false)
+    },
+    onInput ($event: any) {
+      // this.$emit('input', v)
+      if (!$event) {
+        this.onClose($event)
+      }
+      this.$emit('input', $event)
     },
   },
 })
