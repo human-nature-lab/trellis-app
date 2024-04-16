@@ -6,13 +6,12 @@ import FormatBytes from '@/filters/format-bytes.filter'
 import Asset from '@/entities/trellis/Asset'
 import { logError } from '@/helpers/log.helper'
 import AssetService from '@/services/asset'
+import { isWeb } from '@/helpers/singleton.helper'
 
 const route = useRoute()
 const asset = ref<Asset>(null)
 const loading = ref(false)
 const downloading = ref(false)
-const blob = ref<Blob>(null)
-const blobText = ref<string | null>(null)
 const blobUrl = ref<string>()
 async function fetchAsset (id: string) {
   if (loading.value) return
@@ -20,18 +19,6 @@ async function fetchAsset (id: string) {
   try {
     const res = await AssetService.getAssets(id)
     asset.value = res[0]
-    switch (asset.value.type) {
-      case 'image':
-      case 'video':
-      case 'audio':
-        blob.value = await AssetService.downloadAsset(id)
-        blobUrl.value = URL.createObjectURL(blob.value)
-        break
-      case 'text':
-        blob.value = await AssetService.downloadAsset(id)
-        blobText.value = await blob.value.text()
-        break
-    }
   } finally {
     loading.value = false
   }
@@ -43,12 +30,28 @@ watch(() => route.params.id, async (id) => {
   }
 }, { immediate: true })
 
-async function downloadAsset (asset: Asset) {
+const loadingUrl = ref(false)
+watch(asset, async a => {
+  if (a) {
+    if (['image', 'video', 'audio'].includes(a.type)) {
+      try {
+        loadingUrl.value = true
+        blobUrl.value = await AssetService.getAssetUrl(a.id)
+      } catch (e) {
+        logError(e)
+      } finally {
+        loadingUrl.value = false
+      }
+    }
+  }
+}, { immediate: true })
+
+async function downloadAsset () {
   if (downloading.value) return
   downloading.value = true
   try {
-    const data = await AssetService.downloadAsset(asset.id)
-    saveAs(data, asset.fileName)
+    const url = blobUrl.value || (await AssetService.getAssetUrl(asset.value.id))
+    saveAs(url, asset.value.fileName)
   } catch (e) {
     logError(e)
   } finally {
@@ -61,7 +64,7 @@ async function downloadAsset (asset: Asset) {
 <template>
   <v-col>
     <v-progress-linear
-      v-if="loading || downloading"
+      v-if="loading"
       indeterminate
     />
     <v-col v-else>
@@ -72,8 +75,9 @@ async function downloadAsset (asset: Asset) {
           {{ FormatBytes(asset.size) }}
         </div>
         <v-btn
-          @click="downloadAsset(asset)"
-          :disabled="loading || downloading"
+          v-if="isWeb"
+          @click="downloadAsset"
+          :disabled="downloading"
           class="ml-2"
         >
           {{ $t('download_asset_type', [asset.type === 'unknown' ? '' : asset.type]) }} <v-icon>mdi-download</v-icon>
@@ -85,8 +89,12 @@ async function downloadAsset (asset: Asset) {
       <v-card class="my-4">
         <v-card-title>{{ $t('asset_preview') }}</v-card-title>
         <v-card-text>
+          <v-progress-linear
+            v-if="loadingUrl"
+            indeterminate
+          />
           <img
-            v-if="asset.type === 'image'"
+            v-else-if="asset.type === 'image'"
             :src="blobUrl"
           >
           <video
@@ -109,7 +117,6 @@ async function downloadAsset (asset: Asset) {
             >
             {{ $t('audio_not_supported') }}
           </audio>
-          <pre v-else-if="asset.type === 'text'">{{ blobText.slice(0, 1000) }}...</pre>
           <v-row
             v-else
             no-gutters
@@ -122,6 +129,7 @@ async function downloadAsset (asset: Asset) {
   </v-col>
 </template>
 
-<style lang="sass">
-
+<style lang="sass" scoped>
+img, video
+  max-width: 100%
 </style>

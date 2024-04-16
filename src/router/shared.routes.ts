@@ -26,6 +26,8 @@ const Changelog = () => import(/* webpackChunkName: "changelog" */'@/views/info/
 const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'@/views/geo/GeoInfo.vue')
 const Geo = () => import(/* webpackChunkName: "geo-search" */'@/views/geo/Geo.vue')
 const Theme = () => import(/* webpackChunkName: "theme" */'@/views/Theme.vue')
+const Assets = () => import(/* webpackChunkName: "assets" */'@/views/assets/Assets.vue')
+const Asset = () => import(/* webpackChunkName: "asset" */'@/views/assets/Asset.vue')
 
 console.log(docs)
 const docsRoutes = Object.keys(docs.content).map(path => ({
@@ -121,4 +123,14 @@ export default [{
   path: '/theme',
   name: 'Theme',
   component: Theme,
+}, {
+  path: '/assets',
+  name: 'Assets',
+  component: Assets,
+  beforeEnter: guardQueue([LoginGuard]),
+}, {
+  path: '/asset/:id',
+  name: 'Asset',
+  component: Asset,
+  beforeEnter: guardQueue([LoginGuard]),
 }] as RouteConfig[]
