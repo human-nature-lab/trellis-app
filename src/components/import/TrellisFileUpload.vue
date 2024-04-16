@@ -5,6 +5,7 @@
     :persistent="isUploading"
     v-bind="$attrs"
     v-on="$listeners"
+    @close="onClose"
   >
     <template
       #activator="{ on, attrs }"
@@ -272,6 +273,10 @@ export default Vue.extend({
       for (const file of files) {
         this.files.push(file as UFile)
       }
+    },
+    onClose () {
+      this.files = []
+      this.$emit('close')
     },
     removeFile (file: UFile) {
       const index = this.files.indexOf(file)

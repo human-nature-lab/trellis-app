@@ -46,8 +46,8 @@ export class FSFileEntry extends BaseEntry {
 
   constructor (public fileSystem: FS, protected entry: FileEntry) {
     super(fileSystem, entry)
-    this.toInternalURL = entry.toInternalURL
-    this.toURL = entry.toURL
+    this.toInternalURL = () => entry.toInternalURL()
+    this.toURL = () => entry.toURL()
     this.nativeURL = entry.nativeURL
   }
 
@@ -55,6 +55,19 @@ export class FSFileEntry extends BaseEntry {
     return new Promise((resolve, reject) => {
       this.entry.createWriter(writer => {
         resolve(new FSFileWriter(writer))
+      }, reject)
+    })
+  }
+
+  getDataURL (): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.entry.file(file => {
+        const reader = new FileReader()
+        reader.onloadend = function () {
+          resolve(this.result as string)
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
       }, reject)
     })
   }
@@ -202,6 +215,7 @@ export class FSDirectoryEntry extends BaseEntry {
 
   getFile (path?: string, opts?: FileSystemGetFileOptions | { exclusive: boolean }): Promise<FSFileEntry> {
     return new Promise((resolve, reject) => {
+      console.log('getFile', this.entry.fullPath, path, opts)
       this.entry.getFile(path, opts, entry => {
         resolve(new FSFileEntry(this.fileSystem, entry))
       }, reject)
@@ -224,6 +238,17 @@ export class FSDirectoryEntry extends BaseEntry {
   readEntries () {
     const reader = this.createReader()
     return reader.readEntries()
+  }
+
+  writeFile (path: string, file: File | Blob, opts: FileSystemGetFileOptions = { create: true }): Promise<FSFileEntry> {
+    return new Promise((resolve, reject) => {
+      this.entry.getFile(path, opts, entry => {
+        entry.createWriter(writer => {
+          writer.write(file)
+          resolve(new FSFileEntry(this.fileSystem, entry as FileEntry))
+        }, reject)
+      }, reject)
+    })
   }
 
   async walk (handler: (entry: FSEntry) => void | Promise<void>): Promise<void> {

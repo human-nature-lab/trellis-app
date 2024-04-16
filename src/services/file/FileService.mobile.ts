@@ -22,11 +22,11 @@ interface FileEntryOptions {
   exclusive: boolean
 }
 
-class FileServiceCordova {
+export class FileService {
 
   requestFileSystem (options?: FileSystemOptions): Promise<FileSystem> {
     return new Promise((resolve, reject) => {
-      options = merge(FileServiceCordova.getDefaultRequestFileSystemOptions(), options)
+      options = merge(FileService.getDefaultRequestFileSystemOptions(), options)
       DeviceService.isDeviceReady().then(() =>
         window.requestFileSystem(options.storageType as number, options.requestedBytes, resolve, reject)
       )
@@ -35,14 +35,14 @@ class FileServiceCordova {
 
   getDirectoryEntry (fileSystem: FileSystem, directory: string, options?: FileEntryOptions): Promise<DirectoryEntry> {
     return new Promise((resolve, reject) => {
-      options = merge(FileServiceCordova.getDefaultGetDirectoryEntryOptions(), options)
+      options = merge(FileService.getDefaultGetDirectoryEntryOptions(), options)
       fileSystem.root.getDirectory(directory, options, resolve, reject)
     })
   }
 
   getFileEntry (directoryEntry: DirectoryEntry, fileName: string, options?: FileEntryOptions): Promise<FileEntry> {
     return new Promise((resolve, reject) => {
-      options = merge(FileServiceCordova.getDefaultGetFileEntryOptions(), options)
+      options = merge(FileService.getDefaultGetFileEntryOptions(), options)
       directoryEntry.getFile(fileName, options, resolve, reject)
     })
   }
@@ -52,6 +52,7 @@ class FileServiceCordova {
       storageType: (storageType === 'PERSISTENT') ? window.PERSISTENT : window.TEMPORARY,
       requestedBytes: fileSize,
     }
+    console.log('writing file', directory, fileName, fileSize, requestFileSystemOptions, create, exclusive)
     return this.requestFileSystem(requestFileSystemOptions)
       .then((fileSystem) => this.getDirectoryEntry(fileSystem, directory))
       .then((directoryEntry: DirectoryEntry) => this.getFileEntry(directoryEntry, fileName))
@@ -503,5 +504,3 @@ class FileServiceCordova {
     }
   }
 }
-
-export default FileServiceCordova
