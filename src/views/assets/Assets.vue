@@ -1,31 +1,30 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import saveAs from 'file-saver'
+import { i18n } from '@/i18n'
+import FormatBytes from '@/filters/format-bytes.filter'
+import { routeQueue } from '@/router'
 import Asset from '@/entities/trellis/Asset'
 import AssetService from '@/services/asset'
 import { isNotAuthError } from '@/helpers/auth.helper'
 import { logError } from '@/helpers/log.helper'
-import TrellisFileUpload from '@/components/import/TrellisFileUpload.vue'
-import { i18n } from '@/i18n'
 import { relativeTime } from '@/filters/date'
-import FormatBytes from '@/filters/format-bytes.filter'
-import saveAs from 'file-saver'
+import TrellisFileUpload from '@/components/import/TrellisFileUpload.vue'
 
 const assets = ref<Asset[]>([])
 const loading = ref(false)
 const showUpload = ref(false)
 const search = ref('')
+const selected = ref<Asset[]>([])
 const tableHeaders = computed(() => [{
   text: i18n.t('filename'),
   value: 'fileName',
 }, {
-  text: i18n.t('size'),
+  text: i18n.t('filesize'),
   value: 'size',
 }, {
   text: i18n.t('file_type'),
   value: 'type',
-}, {
-  text: i18n.t('mime_type'),
-  value: 'mimeType',
 }, {
   text: i18n.t('should_sync'),
   value: 'shouldSync',
@@ -41,7 +40,7 @@ async function fetchAssets () {
   if (loading.value) return
   loading.value = true
   try {
-    assets.value = await AssetService.listAssets()
+    assets.value = await AssetService.getAssets()
   } catch (e) {
     if (isNotAuthError(e)) {
       logError(e)
@@ -51,7 +50,7 @@ async function fetchAssets () {
   }
 }
 
-async function createAssets (file: File) {
+async function createAsset (file: File) {
   if (loading.value) return
   loading.value = true
   try {
@@ -70,14 +69,14 @@ async function createAssets (file: File) {
 }
 
 async function uploadFile (file: File) {
-  await createAssets(file)
+  await createAsset(file)
 }
 
 async function downloadAsset (asset: Asset) {
   if (loading.value) return
   loading.value = true
   try {
-    const data = await AssetService.getAsset(asset.id)
+    const data = await AssetService.downloadAsset(asset.id)
     saveAs(data, asset.fileName)
   } catch (e) {
     logError(e)
@@ -86,13 +85,22 @@ async function downloadAsset (asset: Asset) {
   }
 }
 
-async function deleteAsset (asset: Asset) {
+const deleteConfirmation = computed(() => {
+  if (selected.value.length === 1) {
+    return i18n.t('confirm_delete_single', { asset: selected.value[0].fileName }) as string
+  }
+  return i18n.t('confirm_delete_multiple_asset', { count: selected.value.length }) as string
+})
+
+async function deleteAssets () {
   if (loading.value) return
   loading.value = true
   try {
-    if (!confirm(i18n.t('confirm_delete') as string)) return
-    await AssetService.deleteAsset(asset.id)
-    assets.value = assets.value.filter((a) => a.id !== asset.id)
+    if (!confirm(deleteConfirmation.value as string)) return
+    const ids = selected.value.map(a => a.id)
+    await AssetService.deleteAssets(...ids)
+    assets.value = assets.value.filter((a) => !ids.includes(a.id))
+    selected.value = []
   } catch (e) {
     logError(e)
   } finally {
@@ -107,18 +115,34 @@ onMounted(() => {
 
 <template>
   <v-col>
-    <h3>{{ $t('assets') }}</h3>
-    <v-text-field
-      v-model="search"
-      :placeholder="$t('search')"
-    />
-    <v-btn
-      @click="showUpload = true"
-      icon
-    >
-      <v-icon>mdi-plus</v-icon>
-    </v-btn>
+    <v-row no-gutters>
+      <h3>{{ $t('assets') }}</h3>
+      <v-spacer />
+      <v-text-field
+        v-model="search"
+        dense
+        :placeholder="$t('search')"
+      />
+      <v-btn
+        @click="showUpload = true"
+        icon
+        :disabled="loading"
+        class="ml-2"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+      <v-btn
+        @click="deleteAssets"
+        :disabled="!selected.length"
+        color="error"
+        icon
+      >
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+    </v-row>
     <v-data-table
+      v-model="selected"
+      show-select
       :items="assets"
       :loading="loading"
       :search="search"
@@ -130,6 +154,11 @@ onMounted(() => {
       <template #item.createdAt="{ item }">
         {{ relativeTime(item.createdAt) }}
       </template>
+      <template #item.shouldSync="{ item }">
+        <v-icon v-if="item.shouldSync">
+          mdi-check
+        </v-icon>
+      </template>
       <template #item.actions="{ item }">
         <v-row class="no-gutters actions flex-nowrap">
           <v-btn
@@ -140,19 +169,21 @@ onMounted(() => {
             <v-icon>mdi-download</v-icon>
           </v-btn>
           <v-btn
-            @click="deleteAsset(item)"
+            :to="{ name: 'Asset', params: { id: item.id } }"
             icon
-            :disabled="loading"
-            color="error"
+            class="ml-2"
           >
-            <v-icon>mdi-delete</v-icon>
+            <v-icon>mdi-arrow-right-bold-box-outline</v-icon>
           </v-btn>
         </v-row>
       </template>
     </v-data-table>
     <TrellisFileUpload
       v-model="showUpload"
+      :title="$t('upload_assets')"
       :upload-file="uploadFile"
+      multiple
+      :persistent="loading"
     />
   </v-col>
 </template>

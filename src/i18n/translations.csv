@@ -732,3 +732,14 @@ builder.var_name_conflict,Another question has the same variable name,Otra pregu
 import_csv,Import CSV,Importar CSV,
 export_csv,Export CSV,Exportar CSV,
 translation_import_complete,Added {0} translations and updated {1},Añadidas {0} traducciones y modificadas {1},
+asset,Asset,,
+download_asset_type,Download {0},,"Download audio, Download video, etc."
+asset_preview,Asset preview,,
+video_not_supported,This kind of video is not supported by this browser,,
+audio_not_supported,This kind of audio is not supported by this browser,,
+no_preview_available,No preview available,,
+assets,Assets,,
+file_type,File type,,"image,audio,video,etc"
+should_sync,Should sync,,
+confirm_delete_single,Are you sure you want to delete {0}?,,
+confirm_delete_multiple_asset,Are you sure you want to delete {0} assets?,,
