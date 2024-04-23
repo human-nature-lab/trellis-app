@@ -13,6 +13,7 @@ import { delay } from '@/classes/delay'
 import ZipService from '@/services/zip'
 import Sync from '@/entities/trellis-config/Sync'
 import { filetransfer } from '@/cordova/filetransfer'
+import { file } from '@/cordova/file'
 
 export async function checkDownloadSize (ctrl: StepController, data: { snapshot: Snapshot }) {
   const [freeDiskSpace, snapshotFileSize] = await Promise.all([
@@ -113,16 +114,15 @@ export async function configureDatabase (ctrl: StepController) {
 export async function downloadSnapshot (ctrl: StepController, { snapshot }: { snapshot: Snapshot }) {
   ctrl.setProgress(0, 1)
   const fileName = snapshot.id + '.sql.zip'
-  const [deviceId, deviceKey, apiRoot, fileSystem, syncAuth] = await Promise.all([
+  const [deviceId, deviceKey, apiRoot, syncAuth] = await Promise.all([
     DeviceService.getUUID(),
     DeviceService.getDeviceKey(),
     DatabaseService.getServerIPAddress(),
-    FileService.requestFileSystem(),
     getSyncAuthentication(),
   ])
   const uri = apiRoot + `/sync/device/${deviceId}/snapshot/${snapshot.id}/download`
-  const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'snapshots')
-  const fileEntry = await FileService.getFileEntry(directoryEntry, fileName)
+  const directoryEntry = await file.applicationStorageDirectory('snapshots', { create: true })
+  const fileEntry = await directoryEntry.getFile(fileName, { create: true, exclusive: true })
   ctrl.log.info('starting download')
   const p = filetransfer.download(uri, path.join(directoryEntry.toURL(), fileName), false, {
     headers: {
@@ -146,8 +146,15 @@ export async function downloadSnapshot (ctrl: StepController, { snapshot }: { sn
 
 export async function emptySnapshotDirectory () {
   const fileSystem = await FileService.requestFileSystem()
-  const directoryEntry = await FileService.getDirectoryEntry(fileSystem, 'snapshots')
-  await FileService.emptyDirectory(directoryEntry)
+  const tempFs = await file.temporary()
+  const appDir = await file.applicationStorageDirectory()
+  console.log(fileSystem.root.fullPath, tempFs.root.fullPath, appDir.fullPath)
+  const rootEntries = await appDir.readEntries()
+  console.log('rootEntries', rootEntries.map(e => e.name))
+  const snapshotsDir = await appDir.getDirectory('snapshots', { create: true })
+  const existingSnapshots = await snapshotsDir.readEntries()
+  console.log('existingSnapshots', existingSnapshots.map(e => e.name))
+  await snapshotsDir.empty(true)
 }
 
 export async function extractSnapshot (ctrl: StepController, data: { fileEntry: any }) {

@@ -1,5 +1,35 @@
 import path from 'path'
 
+const FileErrorCodes = {
+  1: 'NOT_FOUND_ERR',
+  2: 'SECURITY_ERR',
+  3: 'ABORT_ERR',
+  4: 'NOT_READABLE_ERR',
+  5: 'ENCODING_ERR',
+  6: 'NO_MODIFICATION_ALLOWED_ERR',
+  7: 'INVALID_STATE_ERR',
+  8: 'SYNTAX_ERR',
+  9: 'INVALID_MODIFICATION_ERR',
+  10: 'QUOTA_EXCEEDED_ERR',
+  11: 'TYPE_MISMATCH_ERR',
+  12: 'PATH_EXISTS_ERR',
+}
+
+// Make file errors more readable
+function rejectFileError (cb: (err: Error) => void): (err: any) => void {
+  return err => {
+    const code = err && err.code
+    if (code) {
+      const msg = FileErrorCodes[code] || 'Unknown FileError'
+      const res = new Error(`FileError: ${msg} (${code})`)
+      res.code = code
+      cb(res)
+    } else {
+      cb(err as Error)
+    }
+  }
+}
+
 interface SimplestEntry {
   fullPath: FileEntry['fullPath']
   isDirectory: FileEntry['isDirectory']
@@ -23,8 +53,8 @@ export class BaseEntry {
   constructor (public fileSystem: FS, protected entry: SimplestEntry) {
     this.fullPath = entry.fullPath
     this.name = entry.name
-    this.toURL = entry.toURL.bind(this)
-    this.toInternalURL = entry.toInternalURL.bind(this)
+    this.toURL = entry.toURL.bind(entry)
+    this.toInternalURL = entry.toInternalURL.bind(entry)
     this.nativeURL = entry.nativeURL
   }
 
@@ -32,7 +62,7 @@ export class BaseEntry {
     return new Promise((resolve, reject) => {
       this.entry.getParent(entry => {
         resolve(new FSDirectoryEntry(this.fileSystem, entry))
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 }
@@ -46,16 +76,13 @@ export class FSFileEntry extends BaseEntry {
 
   constructor (public fileSystem: FS, protected entry: FileEntry) {
     super(fileSystem, entry)
-    this.toInternalURL = () => entry.toInternalURL()
-    this.toURL = () => entry.toURL()
-    this.nativeURL = entry.nativeURL
   }
 
   createWriter (): Promise<FSFileWriter> {
     return new Promise((resolve, reject) => {
       this.entry.createWriter(writer => {
         resolve(new FSFileWriter(writer))
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 
@@ -68,7 +95,7 @@ export class FSFileEntry extends BaseEntry {
         }
         reader.onerror = reject
         reader.readAsDataURL(file)
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 
@@ -76,7 +103,7 @@ export class FSFileEntry extends BaseEntry {
     return new Promise((resolve, reject) => {
       this.entry.copyTo(parent, newName, entry => {
         resolve(new FSFileEntry(this.fileSystem, entry as FileEntry))
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 
@@ -84,13 +111,13 @@ export class FSFileEntry extends BaseEntry {
     return new Promise((resolve, reject) => {
       this.entry.moveTo(parent.entry, newName, entry => {
         resolve(new FSFileEntry(this.fileSystem, entry as FileEntry))
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 
   file (): Promise<globalThis.File> {
     return new Promise((resolve, reject) => {
-      this.entry.file(resolve, reject)
+      this.entry.file(resolve, rejectFileError(reject))
     })
   }
 
@@ -101,20 +128,20 @@ export class FSFileEntry extends BaseEntry {
       reader.onloadend = function () {
         resolve(this.result as string)
       }
-      reader.onerror = reject
+      reader.onerror = rejectFileError(reject)
       reader.readAsText(file)
     })
   }
 
   getMetadata (): Promise<Metadata> {
     return new Promise((resolve, reject) => {
-      this.entry.getMetadata(resolve, reject)
+      this.entry.getMetadata(resolve, rejectFileError(reject))
     })
   }
 
   remove (): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.entry.remove(resolve, reject)
+      this.entry.remove(resolve, rejectFileError(reject))
     })
   }
 }
@@ -152,7 +179,7 @@ export class FSFileWriter {
   abort () {
     return new Promise((resolve, reject) => {
       this.writer.onabort = resolve
-      this.writer.onerror = reject
+      this.writer.onerror = rejectFileError(reject)
       this.writer.abort()
     })
   }
@@ -178,7 +205,7 @@ export class FSFileWriter {
   write (val: Writeable): Promise<void> {
     return new Promise((resolve, reject) => {
       this.writer.onwrite = () => resolve()
-      this.writer.onerror = reject
+      this.writer.onerror = rejectFileError(reject)
       if (val instanceof Blob) {
         this.writer.write(val)
       } else {
@@ -198,7 +225,7 @@ export class FSDirectoryReader {
         resolve(
           entries.map(e => e.isDirectory ? new FSDirectoryEntry(this.fs, e) : new FSFileEntry(this.fs, e as FileEntry)),
         )
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 }
@@ -210,7 +237,6 @@ export class FSDirectoryEntry extends BaseEntry {
 
   constructor (public fileSystem: FS, entry: Entry) {
     super(fileSystem, entry)
-    this.entry = entry as DirectoryEntry
   }
 
   getFile (path?: string, opts?: FileSystemGetFileOptions | { exclusive: boolean }): Promise<FSFileEntry> {
@@ -218,7 +244,7 @@ export class FSDirectoryEntry extends BaseEntry {
       console.log('getFile', this.entry.fullPath, path, opts)
       this.entry.getFile(path, opts, entry => {
         resolve(new FSFileEntry(this.fileSystem, entry))
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 
@@ -226,7 +252,7 @@ export class FSDirectoryEntry extends BaseEntry {
     return new Promise((resolve, reject) => {
       this.entry.getDirectory(path, opts, entry => {
         resolve(new FSDirectoryEntry(this.fileSystem, entry))
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 
@@ -240,15 +266,30 @@ export class FSDirectoryEntry extends BaseEntry {
     return reader.readEntries()
   }
 
-  writeFile (path: string, file: File | Blob, opts: FileSystemGetFileOptions = { create: true }): Promise<FSFileEntry> {
+  removeRecursively (): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.entry.getFile(path, opts, entry => {
-        entry.createWriter(writer => {
-          writer.write(file)
-          resolve(new FSFileEntry(this.fileSystem, entry as FileEntry))
-        }, reject)
-      }, reject)
+      this.entry.removeRecursively(resolve, rejectFileError(reject))
     })
+  }
+
+  empty (recursive = false) {
+    if (recursive) {
+      return this.removeRecursively()
+    }
+    return this.walk(entry => {
+      if (entry.isFile) {
+        return entry.remove()
+      } else if (recursive) {
+        return (entry as FSDirectoryEntry).empty()
+      }
+    })
+  }
+
+  async writeFile (path: string, file: File | Blob, opts: FileSystemGetFileOptions = { create: true }): Promise<FSFileEntry> {
+    const fileEntry = await this.getFile(path, opts)
+    const writer = await fileEntry.createWriter()
+    await writer.write(file)
+    return fileEntry
   }
 
   async walk (handler: (entry: FSEntry) => void | Promise<void>): Promise<void> {
@@ -277,15 +318,16 @@ export class FS {
   }
 
   async emptyDirectory (dirURL: string, recursive = false, opts?: FileSystemGetDirectoryOptions) {
-    const entry = await this.root.getDirectory(dirURL, opts)
-    return entry.walk(async e => {
-      console.log('walking', e.toURL())
-      if (e.isFile) {
-        await e.remove()
-      } else if (recursive) {
-        await this.emptyDirectory(e.toURL())
+    try {
+      const entry = await this.root.getDirectory(dirURL, opts)
+      return entry.empty(recursive)
+    } catch (err) {
+      if (err.code === 12) {
+        // directory doesn't exist
+        return
       }
-    })
+      throw err
+    }
   }
 
   async resolve (relPath: string) {
@@ -300,6 +342,15 @@ export class FS {
 }
 
 export class file {
+  static async applicationStorageDirectory (dirPath = '', opts?: FileSystemGetDirectoryOptions) {
+    const e = await this.resolveLocalFileSystemURL(cordova!.file.applicationStorageDirectory)
+    const dir = e as FSDirectoryEntry
+    if (dirPath) {
+      return dir.getDirectory(dirPath, opts)
+    }
+    return dir
+  }
+
   static persistent (size?: number) {
     return this.requestFileSystem(LocalFileSystem.PERSISTENT, size)
   }
@@ -312,31 +363,31 @@ export class file {
     return new Promise((resolve, reject) => {
       window.requestFileSystem(type, size, fs => {
         resolve(new FS(fs))
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 
   static resolveLocalFileSystemURL (filePath: string): Promise<FSFileEntry | FSDirectoryEntry> {
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(filePath, async entry => {
-        const fs = new FS(entry.fileSystem)
+        const fs = new FS(entry.filesystem)
         resolve(entry.isDirectory
           ? new FSDirectoryEntry(fs, entry)
           : new FSFileEntry(fs, (entry as unknown) as FileEntry),
         )
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 
   static resolveLocalFileSystemURI (filePath: string): Promise<FSFileEntry | FSDirectoryEntry> {
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURI(filePath, async entry => {
-        const fs = new FS(entry.fileSystem)
+        const fs = new FS(entry.filesystem)
         resolve(entry.isDirectory
           ? new FSDirectoryEntry(fs, entry)
           : new FSFileEntry(fs, (entry as unknown) as FileEntry),
         )
-      }, reject)
+      }, rejectFileError(reject))
     })
   }
 }
