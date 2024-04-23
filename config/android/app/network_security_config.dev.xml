@@ -5,10 +5,13 @@
       <!-- Trust preinstalled CAs -->  
       <certificates src="system" />  
       <!-- Additionally trust user added CAs -->  
-      <certificates src="user" />  
+      <certificates src="user" /> 
+       <!-- Dev server certificates  -->
+      <certificates src="@raw/dev_ca" />
     </trust-anchors>  
   </base-config>  
   <domain-config cleartextTrafficPermitted="true">
     <domain>localhost</domain>
+    <domain includeSubdomains="true">192.168.0.48</domain>
   </domain-config>
  </network-security-config>

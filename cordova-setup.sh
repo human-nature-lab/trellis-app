@@ -14,3 +14,4 @@ cordova plugin add cordova-plugin-zeep
 cordova plugin add @red-mobile/cordova-plugin-barcodescanner
 cordova plugin add https://github.com/human-nature-lab/cordova-plugin-google-nearby-connections.git
 cordova plugin add https://github.com/apache/cordova-plugin-file-transfer#5c29f9a0e1b0cddb9c0cdf7b79139ae8e523e5c1
+cordova plugin add cordova-plugin-media-capture
