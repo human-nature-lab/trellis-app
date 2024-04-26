@@ -31,12 +31,12 @@ export class AssetService implements AssetServiceInterface {
     if (!asset) {
       throw new Error('Asset not found')
     }
-    const fs = await file.persistent()
-    const f = await fs.root.getFile(path.join('assets', asset.id))
+    const assetDir = await file.applicationStorageDirectory('assets', { create: true })
+    const f = await assetDir.getFile(asset.id)
     return f.getDataURL()
   }
 
-  async createAsset (asset: Pick<Asset, 'fileName' | 'shouldSync'>, f: File) {
+  async createAsset (asset: Pick<Asset, 'fileName' | 'shouldSync'>, f: File | Blob) {
     const repo = await DatabaseService.getRepository(Asset)
     const newAsset = new Asset()
     newAsset.id = uuidv4()
@@ -45,12 +45,12 @@ export class AssetService implements AssetServiceInterface {
     newAsset.mimeType = f.type
     newAsset.type = getTypeFromMime(f.type)
     newAsset.size = f.size
-    const fs = await file.persistent()
-    await fs.root.writeFile(path.join('assets', newAsset.id), f)
+    const assetDir = await file.applicationStorageDirectory('assets', { create: true })
+    await assetDir.writeFile(newAsset.id, f)
     return repo.save(newAsset)
   }
 
-  async updateAsset (data: Pick<Asset, 'id' | 'fileName' | 'shouldSync'>, f: File) {
+  async updateAsset (data: Pick<Asset, 'id' | 'fileName' | 'shouldSync'>, f: File | Blob) {
     const repo = await DatabaseService.getRepository(Asset)
     const asset = await repo.findOne(data.id)
     if (!asset) {
@@ -62,8 +62,8 @@ export class AssetService implements AssetServiceInterface {
     asset.type = getTypeFromMime(f.type)
     asset.size = f.size
     asset.deletedAt = null
-    const fs = await file.persistent()
-    await fs.root.writeFile(path.join('assets', asset.id), f)
+    const assetDir = await file.applicationStorageDirectory('assets', { create: true })
+    await assetDir.writeFile(asset.id, f)
     return repo.save(asset)
   }
 

@@ -35,6 +35,7 @@ export class filetransfer {
     opts?: FileDownloadOptions,
     onProgress?: ProgressHandler,
   ) {
+    console.log('FileTransfer.download', serverURL, fileURL, trustAllHosts, opts, onProgress)
     let ft: FileTransfer
     const promise = new Promise((resolve, reject) => {
       ft = new FileTransfer()

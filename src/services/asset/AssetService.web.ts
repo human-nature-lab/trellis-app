@@ -19,7 +19,7 @@ export class AssetService implements AssetServiceInterface {
     return URL.createObjectURL(res.data as Blob)
   }
 
-  async createAsset (asset: Pick<Asset, 'fileName' | 'shouldSync'>, file: File) {
+  async createAsset (asset: Pick<Asset, 'fileName' | 'shouldSync'>, file: File | Blob) {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('fileName', asset.fileName)
@@ -32,7 +32,7 @@ export class AssetService implements AssetServiceInterface {
     return new Asset().fromSnakeJSON(res.data.asset)
   }
 
-  async updateAsset (asset: Pick<Asset, 'id' | 'fileName' | 'shouldSync'>, file: File) {
+  async updateAsset (asset: Pick<Asset, 'id' | 'fileName' | 'shouldSync'>, file: File | Blob) {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('fileName', asset.fileName)

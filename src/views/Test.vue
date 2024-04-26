@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import mediaCapture from '@/cordova/media-capture'
-import AudioRecorder from '@/components/audio-recorder/AudioRecorder.vue'
-import { requestRecording } from '@/components/audio-recorder/recorder'
+import WebAudioRecorder from '@/components/audio-recorder/WebAudioRecorder.vue'
+import { requestWebRecording } from '@/components/audio-recorder/recorder'
 import { logError } from '@/helpers/log.helper'
 
 const limit = ref(0)
 const durationSeconds = ref(30)
-const files = ref<MediaFile[]>([])
+const files = ref<(MediaFile)[]>([])
 async function captureImage () {
   const res = await mediaCapture.captureImage({ limit: limit.value })
   console.log(res)
@@ -26,8 +26,8 @@ async function captureAudio () {
 
 async function recordAudio () {
   try {
-    const res = await requestRecording()
-    console.log(res)
+    const res = await requestWebRecording()
+    files.value.push(res)
   } catch (err) {
     console.error(err)
     logError(err)
@@ -95,7 +95,7 @@ onMounted(async () => {
         {{ file }}
       </v-list-item>
     </v-list>
-    <AudioRecorder />
+    <WebAudioRecorder />
   </v-col>
 </template>
 

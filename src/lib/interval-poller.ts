@@ -10,7 +10,6 @@ export class IntervalPoller {
   constructor (private poller: PollerFunc, private intervalMS: number, private timeoutMS = 30 * 1000) {}
 
   private check = () => {
-    console.log('checking')
     if (this.poller()) {
       console.log('success')
       clearInterval(this.intervalId)
