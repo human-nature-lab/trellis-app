@@ -34,7 +34,7 @@
     <preference name="AndroidWindowSplashScreenBackground" value="#FF5722" />
     <preference name="AndroidWindowSplashScreenIconBackgroundColor" value="#FF5722" />
 
-    <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+    {{!-- <preference name="AndroidPersistentFileLocation" value="Compatibility" /> --}}
     <icon src="static/img/icons/android-icon-36x36.png" density="ldpi" />
     <icon src="static/img/icons/android-icon-48x48.png" density="mdpi" />
     <icon src="static/img/icons/android-icon-72x72.png" density="hdpi" />
@@ -53,6 +53,8 @@
       <resource-file src="config/android/app/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
     {{/if}}
     <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+      <uses-permission android:name="android.permission.RECORD_AUDIO" />
+      <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
       <application android:networkSecurityConfig="@xml/network_security_config" />
       {{#if ALLOW_CLEARTEXT_TRAFFIC}}
         <application android:usesCleartextTraffic="true" />

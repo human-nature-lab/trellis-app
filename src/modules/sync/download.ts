@@ -122,16 +122,24 @@ export async function downloadSnapshot (ctrl: StepController, { snapshot }: { sn
   ])
   const uri = apiRoot + `/sync/device/${deviceId}/snapshot/${snapshot.id}/download`
   const directoryEntry = await file.applicationStorageDirectory('snapshots', { create: true })
-  const fileEntry = await directoryEntry.getFile(fileName, { create: true, exclusive: true })
-  ctrl.log.info('starting download')
-  const p = filetransfer.download(uri, path.join(directoryEntry.toURL(), fileName), false, {
+  // const directoryEntry = await FileService.getDirectoryEntry(fs, 'snapshots')
+  const fileEntry = await directoryEntry.getFile(fileName, { create: true })
+  const url = new URL(uri)
+  // if (DEV && url.protocol === 'https:') {
+  //   url.protocol = 'http:'
+  //   url.port = '9000'
+  //   ctrl.log.warn('downloading over http in dev mode', url.href)
+  // }
+  const snapshotFilePath = path.join(directoryEntry.toURL(), fileName)
+  console.log('snapshotFilePath', snapshotFilePath, fileEntry.toURL())
+  const p = filetransfer.download(url.toString(), snapshotFilePath, DEV, {
     headers: {
       'X-Key': deviceKey,
       Authorization: syncAuth,
     },
   }, throttle((progressEvent) => {
     ctrl.setProgress(progressEvent.loaded, progressEvent.total)
-  }, 1000))
+  }, 250))
   // const p: CancelPromise<void> = FileService.download(uri, fileEntry, throttle((progressEvent) => {
   //   ctrl.setProgress(progressEvent.loaded, progressEvent.total)
   // }, 1000), syncAuth)

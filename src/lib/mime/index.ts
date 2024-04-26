@@ -3,6 +3,7 @@ const audioMimeTypes = [
   'audio/ogg',
   'audio/wav',
   'audio/aac',
+  'audio/webm',
 ]
 
 const imageMimeTypes = [
