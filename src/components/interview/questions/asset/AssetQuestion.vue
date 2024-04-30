@@ -3,67 +3,100 @@ import { ref, watch, computed } from 'vue'
 import Question from '@/entities/trellis/Question'
 import Respondent from '@/entities/trellis/Respondent'
 import { logError } from '@/helpers/log.helper'
-import mediaCapture from '@/cordova/media-capture'
+import { useAssets } from '@/helpers/assets.helper'
+import MediaCaptureService from '@/services/media-capture'
+import AssetService from '@/services/asset'
+import { FSFileEntry } from '@/cordova/file'
+import { action } from '../../lib/action'
+import ActionTypes from '@/static/action.types'
+import Asset from '@/entities/trellis/Asset'
 
 const props = defineProps<{
   question: Question
   respondent: Respondent
   location: object
 }>()
+const working = ref(false)
 
-const loading = ref(false)
 const types = computed(() => {
   const qp = props.question.questionParameters.find(qp => qp.parameter.name === 'asset_types')
   return qp.val ? JSON.parse(qp.val) : ['audio', 'video', 'image', 'file']
 })
 
-const files = computed(() => {
-  const data = (props.question.datum && props.question.datum.data) || []
-  
-})
+const allowAudio = computed(() => types.value.includes('audio'))
+const allowVideo = computed(() => types.value.includes('video'))
+const allowImage = computed(() => types.value.includes('image'))
+const allowFile = computed(() => types.value.includes('file'))
+
+const { assets, loading: assetsLoading, error } = useAssets(() =>
+  (props.question.datum && props.question.datum.data.map(d => d.assetId)) || [],
+)
+
+function addAssets (assets: Asset[]) {
+  for (const asset of assets) {
+    action(props.question.id, ActionTypes.add_asset, {
+      asset_id: asset.id,
+    })
+  }
+}
+
+async function mediaToAssets (files: (Blob | FSFileEntry)[]) {
+  return Promise.all(files.map(async f => {
+    const fileName = (f instanceof FSFileEntry) ? f.name : `audio-${Date.now()}.webm`
+    const type = (f instanceof FSFileEntry) ? await f.type() : f.type
+    return AssetService.createAsset({ fileName, type }, f)
+  }))
+}
 
 async function captureAudio () {
-  const files = await mediaCapture.captureAudio({ limit: 1 })
-}
-
-async function captureVideo () {
-
-}
-
-async function captureImage () {
-
-}
-
-async function uploadFile () {
-
-}
-
-async function addType (t: string) {
-  if (loading.value) return
-  loading.value = true
-
+  if (working.value) return
+  working.value = true
   try {
-    console.log('add type', t)
-    switch (t) {
-      case 'audio':
-        await captureAudio()
-        break
-      case 'video':
-        await captureVideo()
-        break
-      case 'image':
-        await captureImage()
-        break
-      case 'file':
-        await uploadFile()
-        break
-      default:
-        throw new Error('Unknown type: ' + t)
-    }
+    const files = await MediaCaptureService.captureAudio()
+    addAssets(await mediaToAssets(files))
   } catch (e) {
     logError(e)
   } finally {
-    loading.value = false
+    working.value = false
+  }
+}
+
+async function captureVideo () {
+  if (working.value) return
+  working.value = true
+  try {
+    const files = await MediaCaptureService.captureVideo()
+    addAssets(await mediaToAssets(files))
+  } catch (e) {
+    logError(e)
+  } finally {
+    working.value = false
+  }
+}
+
+async function captureImage () {
+  if (working.value) return
+  working.value = true
+  try {
+    const files = await MediaCaptureService.captureImage()
+    addAssets(await mediaToAssets(files))
+  } catch (e) {
+    logError(e)
+  } finally {
+    working.value = false
+  }
+}
+
+async function uploadFile () {
+  if (working.value) return
+  working.value = true
+  try {
+    const files = await MediaCaptureService.uploadFile()
+    addAssets(await mediaToAssets(files))
+  } catch (e) {
+    logError(e)
+  } finally {
+    working.value = false
   }
 }
 
@@ -73,24 +106,19 @@ async function addType (t: string) {
   <v-col>
     <v-row no-gutters>
       <v-btn
-        v-for="t in types"
-        :key="t"
-        @click="addType(t)"
+        v-if="allowAudio"
+        @click="captureAudio"
       >
-        Add {{ t }}
+        {{ $t('capture_audio') }}
       </v-btn>
     </v-row>
     <v-list>
       <v-list-item
-        v-for="(file, index) in files"
-        :key="index"
+        v-for="asset in assets"
+        :key="asset.id"
       >
-        {{ file }}
+        {{ asset }}
       </v-list-item>
     </v-list>
   </v-col>
 </template>
-
-<style lang="sass">
-
-</style>

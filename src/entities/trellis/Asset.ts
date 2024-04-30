@@ -19,7 +19,4 @@ export default class Asset extends TimestampedSoftDelete implements SnakeSeriali
 
   @Column() @Serializable
   mimeType: string
-
-  @Column() @Serializable
-  shouldSync: boolean
 }

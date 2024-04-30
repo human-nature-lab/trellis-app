@@ -27,6 +27,8 @@ const ActionTypes = {
   select_no_one: 'select-no-one',
   deselect_no_one: 'deselect-no-one',
   add_val: 'add-val',
+  add_asset: 'add-asset',
+  remove_asset: 'remove-asset',
 }
 
 export default ActionTypes
