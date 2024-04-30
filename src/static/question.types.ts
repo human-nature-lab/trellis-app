@@ -22,6 +22,7 @@ const qt = {
   distribution: 'd9a2de9f-411a-11ee-81c8-0242ac120003',
   social_ring: 'adf49a4d-79a4-11ee-80e7-0242ac120004',
   scale: 'c0d963e8-cf5a-11ee-b2f9-0242ac120003',
+  asset: '572020ee-0720-11ef-b6c1-0242ac120003',
 }
 
 export const choiceTypes = [qt.multiple_choice, qt.multiple_select]
@@ -67,6 +68,7 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
   [qt.distribution]: [PT.json, PT.dictator_keep_decision],
   [qt.social_ring]: [PT.json],
   [qt.scale]: [PT.json],
+  [qt.asset]: [PT.min, PT.max],
 }
 
 for (const key in questionTypeParameters) {

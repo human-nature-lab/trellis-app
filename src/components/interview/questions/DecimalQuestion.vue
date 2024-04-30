@@ -1,15 +1,10 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
 import AT from '@/static/action.types'
-import PT from '@/static/parameter.types'
 import { debouncedAction } from '../lib/action'
 import { useVuetifyQuestionRules, useQuestionDisabled } from '@/helpers/interview.helper'
 import Question from '@/entities/trellis/Question'
 import Respondent from '@/entities/trellis/Respondent'
-import { translate, useTranslations } from '@/helpers/translation.helper'
-import { i18n } from '@/i18n'
-import singleton from '@/static/singleton'
-import Translation from '@/entities/trellis/Translation'
 import { useNumberParams } from '../hooks/useNumberParams'
 import QuestionText from '../QuestionText.vue'
 
