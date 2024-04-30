@@ -1,5 +1,5 @@
 import Asset from '@/entities/trellis/Asset'
-import { AssetServiceInterface } from './AssetServiceInterface'
+import { AssetServiceInterface, CreateAsset, UpdateAsset } from './AssetServiceInterface'
 import http from '@/services/http/AxiosInstance'
 
 export class AssetService implements AssetServiceInterface {
@@ -19,7 +19,7 @@ export class AssetService implements AssetServiceInterface {
     return URL.createObjectURL(res.data as Blob)
   }
 
-  async createAsset (asset: Pick<Asset, 'fileName' | 'shouldSync'>, file: File | Blob) {
+  async createAsset (asset: CreateAsset, file: File | Blob) {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('fileName', asset.fileName)
@@ -32,7 +32,7 @@ export class AssetService implements AssetServiceInterface {
     return new Asset().fromSnakeJSON(res.data.asset)
   }
 
-  async updateAsset (asset: Pick<Asset, 'id' | 'fileName' | 'shouldSync'>, file: File | Blob) {
+  async updateAsset (asset: UpdateAsset, file: File | Blob) {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('fileName', asset.fileName)

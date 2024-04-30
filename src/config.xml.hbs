@@ -53,8 +53,6 @@
       <resource-file src="config/android/app/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
     {{/if}}
     <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-      <uses-permission android:name="android.permission.RECORD_AUDIO" />
-      <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
       <application android:networkSecurityConfig="@xml/network_security_config" />
       {{#if ALLOW_CLEARTEXT_TRAFFIC}}
         <application android:usesCleartextTraffic="true" />
