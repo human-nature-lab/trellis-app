@@ -23,7 +23,7 @@ export class AssetService implements AssetServiceInterface {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('fileName', asset.fileName)
-    formData.append('shouldSync', asset.shouldSync.toString())
+    formData.append('isFromSurvey', asset.isFromSurvey ? 'true' : 'false')
     const res = await http().post('/asset', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -36,7 +36,7 @@ export class AssetService implements AssetServiceInterface {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('fileName', asset.fileName)
-    formData.append('shouldSync', asset.shouldSync.toString())
+    formData.append('isFromSurvey', asset.isFromSurvey ? 'true' : 'false')
     const res = await http().put(`/asset/${asset.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',

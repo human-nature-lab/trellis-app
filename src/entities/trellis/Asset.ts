@@ -19,4 +19,10 @@ export default class Asset extends TimestampedSoftDelete implements SnakeSeriali
 
   @Column() @Serializable
   mimeType: string
+
+  @Column() @Serializable
+  isFromSurvey: boolean
+
+  @Column() @Serializable
+  md5Hash: string
 }

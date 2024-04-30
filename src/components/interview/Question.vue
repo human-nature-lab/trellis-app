@@ -60,6 +60,7 @@
   import SocialRingQuestion from './questions/social-ring/SocialRingQuestion.vue'
   import ScaleQuestion from './questions/scale/ScaleQuestion.vue'
   import DurationQuestion from './questions/DurationQuestion.vue'
+  import AssetQuestion from './questions/asset/AssetQuestion.vue'
   import QuestionTimer from './QuestionTimer.vue'
   import QuestionText from './QuestionText.vue'
   import Question from '../../entities/trellis/Question'
@@ -86,8 +87,8 @@
     [questionTypes.image]: ImageQuestion,
     [questionTypes.distribution]: DistributionQuestion,
     [questionTypes.social_ring]: SocialRingQuestion,
-    [questionTypes.duration]: DurationQuestion,
-    [questionTypes.scale]: ScaleQuestion
+    [questionTypes.scale]: ScaleQuestion,
+    [questionTypes.asset]: AssetQuestion,
   }
 
   export default Vue.extend({
@@ -112,6 +113,7 @@
       DistributionQuestion,
       QuestionText,
       ScaleQuestion,
+      AssetQuestion,
     },
     props: {
       question: {

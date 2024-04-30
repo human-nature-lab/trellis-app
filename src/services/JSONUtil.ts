@@ -11,8 +11,10 @@ import { isDate } from 'date-fns'
 export function camelToSnake (str: string) {
   let snake = ''
   for (let i = 0; i < str.length; i++) {
-    let char = str[i]
-    snake += char === char.toUpperCase() ? ((i > 0) ? `_${char.toLowerCase()}` : `${char.toLowerCase()}`) : char
+    const char = str[i]
+    // Indicates if the character is uppercase and part of the alphabet eg. A-Z and not a special character or number
+    const isUpperAlpha = char === char.toUpperCase() && char !== char.toLowerCase()
+    snake += isUpperAlpha ? ((i > 0) ? `_${char.toLowerCase()}` : `${char.toLowerCase()}`) : char
   }
   return snake
 }
@@ -43,17 +45,17 @@ export function snakeToCamel (str: string) {
  */
 export function mapPropsFromJSON (target: object, source: object, map?: object | string[]) {
   if (Array.isArray(map)) {
-    for (let sourceKey of map) {
-      let camel = snakeToCamel(sourceKey)
+    for (const sourceKey of map) {
+      const camel = snakeToCamel(sourceKey)
       target[camel] = source[sourceKey]
     }
   } else if (typeof map === 'object') {
-    for (let sourceKey in map) {
+    for (const sourceKey in map) {
       target[map[sourceKey]] = source[sourceKey]
     }
   } else {
-    for (let sourceKey in source) {
-      let camel = snakeToCamel(sourceKey)
+    for (const sourceKey in source) {
+      const camel = snakeToCamel(sourceKey)
       target[camel] = source[sourceKey]
     }
   }
@@ -67,8 +69,8 @@ export function mapPropsFromJSON (target: object, source: object, map?: object |
  * @param {object} keyMap
  */
 export function mapFromSnakeJSON (target: object, source: object, keyMap: object) {
-  for (let targetKey in keyMap) {
-    let opts = keyMap[targetKey] as RelationshipOpts
+  for (const targetKey in keyMap) {
+    const opts = keyMap[targetKey] as RelationshipOpts
     getSnakeAssignmentFunc(targetKey, opts)(target, source)
   }
 }
@@ -81,13 +83,12 @@ export function mapFromSnakeJSON (target: object, source: object, keyMap: object
  * @returns {AssignerFunction}
  */
 export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpts): AssignerFunction {
-
   function assign (key: string, to: object, value: any): void {
     if (typeof opts === 'object' && opts.async) {
       Object.defineProperty(to, key, {
         get () {
           return new Promise(resolve => resolve(value))
-        }
+        },
       })
     } else {
       to[key] = value
@@ -102,12 +103,14 @@ export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpt
     let generator
     let sourceKey = camelToSnake(targetKey)
     if (typeof opts === 'object') {
-      generator = opts.hasOwnProperty('constructor') ? s => {
-        let constructor = opts.constructor()
-        // @ts-ignore
-        let d = new constructor()
-        return d.fromSnakeJSON ? d.fromSnakeJSON(s): d
-      } : opts.generator
+      generator = opts.hasOwnProperty('constructor')
+        ? s => {
+          const constructor = opts.constructor()
+          // @ts-ignore
+          const d = new constructor()
+          return d.fromSnakeJSON ? d.fromSnakeJSON(s) : d
+        }
+        : opts.generator
       if (opts.jsonKey) sourceKey = opts.jsonKey
     } else if (typeof opts === 'function') {
       // @ts-ignore
@@ -117,7 +120,6 @@ export function getSnakeAssignmentFunc (targetKey: string, opts: RelationshipOpt
       assign(targetKey, to, Array.isArray(from[sourceKey]) ? from[sourceKey].map(generator) : generator(from[sourceKey]))
     }
   }
-
 }
 
 /**
@@ -137,15 +139,15 @@ export function mapCamelToPlain (source: any, skipSnakeJSON = false, keyMap?: st
     } else if ('toJSON' in source) {
       return source.toJSON()
     } else {
-      let d = {}
+      const d = {}
       if (Array.isArray(keyMap)) {
-        for (let sourceKey of keyMap) {
-          let targetKey = camelToSnake(sourceKey)
+        for (const sourceKey of keyMap) {
+          const targetKey = camelToSnake(sourceKey)
           d[targetKey] = mapCamelToPlain(source[sourceKey])
         }
       } else {
-        for (let sourceKey in keyMap) {
-          let targetKey = keyMap[sourceKey]
+        for (const sourceKey in keyMap) {
+          const targetKey = keyMap[sourceKey]
           d[targetKey] = mapCamelToPlain(source[sourceKey])
         }
       }
@@ -161,7 +163,7 @@ export function mapCamelToPlain (source: any, skipSnakeJSON = false, keyMap?: st
  * @param obj
  * @returns {any}
  */
-export function deepCopy (obj: any, copySelf: boolean = false): any {
+export function deepCopy (obj: any, copySelf = false): any {
   if (isUndefined(obj)) {
     return obj
   } else if (Array.isArray(obj)) {
@@ -179,7 +181,7 @@ export function deepCopy (obj: any, copySelf: boolean = false): any {
       } catch (err) {
         d = {}
       }
-      for (let key in obj) {
+      for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
           d[key] = deepCopy(obj[key], true)
         }
@@ -230,7 +232,7 @@ export function setDot (obj: object, key: string, val: any, setter?: (obj: objec
         ref = ref[key]
       } else {
         if (setter) {
-          setter(ref, key, {}) 
+          setter(ref, key, {})
         } else {
           ref[key] = {}
         }
@@ -266,7 +268,7 @@ export function copyWhitelist<T extends HashTable> (obj: {[key: keyof T]: any}, 
   if (Array.isArray(obj)) {
     return obj.map(o => deepCopy(o))
   } else if (typeof obj === 'object') {
-    let r: HashTable = {}
+    const r: HashTable = {}
     for (const key in obj) {
       if (obj[key] && whitelist && whitelist.indexOf(key) > -1) {
         const o = deepCopy(obj[key])

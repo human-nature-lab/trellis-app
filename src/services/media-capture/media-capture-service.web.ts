@@ -1,3 +1,4 @@
+import { requestWebRecording } from '@/components/audio-recorder/recorder'
 import { MediaCaptureServiceInterface, FileUploadOptions } from './media-capture-interface'
 
 export class MediaCaptureService implements MediaCaptureServiceInterface {
@@ -10,7 +11,8 @@ export class MediaCaptureService implements MediaCaptureServiceInterface {
   }
 
   async captureAudio (): Promise<Blob[]> {
-    throw new Error('Not implemented')
+    const blob = await requestWebRecording()
+    return [blob]
   }
 
   async uploadFile (opts?: FileUploadOptions): Promise<Blob[]> {

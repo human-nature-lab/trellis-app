@@ -99,6 +99,23 @@ export class FSFileEntry extends BaseEntry {
     })
   }
 
+  getArrayBuffer (): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      this.entry.file(file => {
+        const reader = new FileReader()
+        reader.onloadend = function () {
+          if (this.result instanceof ArrayBuffer) {
+            resolve(this.result)
+          } else {
+            reject(new Error('Failed to read file as ArrayBuffer'))
+          }
+        }
+        reader.onerror = reject
+        reader.readAsArrayBuffer(file)
+      }, rejectFileError(reject))
+    })
+  }
+
   getDataURL (): Promise<string> {
     return new Promise((resolve, reject) => {
       this.entry.file(file => {
