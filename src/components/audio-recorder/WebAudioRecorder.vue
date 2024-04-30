@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import TrellisModal from '@/components/TrellisModal.vue'
-import { visible, recording, recorderRef, resolver, rejecter } from './recorder'
+import { visible, recording, recorderRef, resolver, rejecter, useAnalyserNode } from './recorder'
 
-const audioContext = new AudioContext()
-const analyser = audioContext.createAnalyser()
-analyser.fftSize = 2048
+const { analyser, audioContext } = useAnalyserNode()
 let ctx: CanvasRenderingContext2D | null = null
 const dataArray = new Uint8Array(analyser.frequencyBinCount)
 const canvas = ref<HTMLCanvasElement>()
@@ -32,8 +30,6 @@ function cleanup () {
   if (recorder) {
     recorder.stop()
     recorder = null
-    analyser.disconnect()
-    audioContext.close()
   }
   if (stream) {
     stream.getTracks().forEach(track => track.stop())
@@ -43,7 +39,8 @@ function cleanup () {
 function resolve () {
   cleanup()
   if (resolver.value) {
-    resolver.value(new File(chunks, 'recording.webm', { type: mimeType.value }))
+    console.log('resolving', chunks.length, 'chunks')
+    resolver.value(new Blob(chunks, { type: mimeType.value }))
   }
 }
 
@@ -72,7 +69,6 @@ watch(visible, async (value) => {
 }, { immediate: true })
 
 function draw () {
-  console.log('draw')
   const width = canvas.value.width
   const height = canvas.value.height
   ctx.fillStyle = 'rgb(200 200 200)'
@@ -132,10 +128,8 @@ async function startRecording () {
   // const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
   chunks = []
   recorder.ondataavailable = async e => {
-    if (e.data.size) {
-      chunks.push(e.data)
-      console.log('dataavailable', e.data.size)
-    }
+    chunks.push(e.data)
+    console.log('dataavailable', e.data.size)
   }
   recorder.onerror = e => {
     debugger

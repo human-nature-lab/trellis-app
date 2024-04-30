@@ -1,5 +1,17 @@
 import path from 'path'
 
+interface CordovaFile {
+  name: string
+  localURL: string
+  type: string
+  lastModified: number
+  lastModifiedDate: number
+  size: number
+  start: number
+  end: number
+  slice (start: number, end: number): CordovaFile
+}
+
 const FileErrorCodes = {
   1: 'NOT_FOUND_ERR',
   2: 'SECURITY_ERR',
@@ -16,16 +28,16 @@ const FileErrorCodes = {
 }
 
 // Make file errors more readable
-function rejectFileError (cb: (err: Error) => void): (err: any) => void {
+function rejectFileError (cb: (err: Error) => void): (err: Error | FileError) => void {
   return err => {
     const code = err && err.code
-    if (code) {
+    if (err.code) {
       const msg = FileErrorCodes[code] || 'Unknown FileError'
       const res = new Error(`FileError: ${msg} (${code})`)
       res.code = code
       cb(res)
     } else {
-      cb(err as Error)
+      cb(err)
     }
   }
 }
@@ -41,7 +53,7 @@ interface SimplestEntry {
   nativeURL: FileEntry['nativeURL']
 }
 
-type FSEntry = FSFileEntry | FSDirectoryEntry
+export type FSEntry = FSFileEntry | FSDirectoryEntry
 
 export class BaseEntry {
   fullPath: FileEntry['fullPath']
@@ -71,8 +83,9 @@ export class FSFileEntry extends BaseEntry {
   public toInternalURL: FileEntry['toInternalURL']
   public toURL: FileEntry['toURL']
   public nativeURL: FileEntry['nativeURL']
-  public isFile: true = true
-  public isDirectory: false = false
+  public isFile = true as const
+  public isDirectory = false as const
+  private meta: Metadata
 
   constructor (public fileSystem: FS, protected entry: FileEntry) {
     super(fileSystem, entry)
@@ -115,28 +128,44 @@ export class FSFileEntry extends BaseEntry {
     })
   }
 
-  file (): Promise<globalThis.File> {
-    return new Promise((resolve, reject) => {
+  file () {
+    return new Promise<globalThis.File>((resolve, reject) => {
       this.entry.file(resolve, rejectFileError(reject))
     })
   }
 
-  async text (): Promise<string> {
+  async text (encoding?: string): Promise<string> {
     const file = await this.file()
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.onloadend = function () {
         resolve(this.result as string)
       }
-      reader.onerror = rejectFileError(reject)
-      reader.readAsText(file)
+      reader.onerror = reject
+      reader.readAsText(file, encoding)
     })
   }
 
-  getMetadata (): Promise<Metadata> {
-    return new Promise((resolve, reject) => {
+  getMetadata () {
+    if (this.meta) {
+      return Promise.resolve(this.meta)
+    }
+    return new Promise<Metadata>((resolve, reject) => {
       this.entry.getMetadata(resolve, rejectFileError(reject))
+    }).then(meta => {
+      this.meta = meta
+      return meta
     })
+  }
+
+  async size () {
+    const meta = await this.getMetadata()
+    return meta.size
+  }
+
+  async type () {
+    const file = await this.file()
+    return file.type
   }
 
   remove (): Promise<void> {
@@ -146,11 +175,11 @@ export class FSFileEntry extends BaseEntry {
   }
 }
 
-type Writeable = Buffer | Blob | string | number | boolean
+type Writeable = FSFileEntry | FileEntry | Primitive
+type Primitive = string | number | boolean | Blob | Buffer | ReadableStream
 
 export class FSFileWriter {
-  constructor (private writer: FileWriter) {
-  }
+  constructor (private writer: FileWriter, private entry: FSFileEntry) {}
 
   get position () {
     return this.writer.position
@@ -179,7 +208,7 @@ export class FSFileWriter {
   abort () {
     return new Promise((resolve, reject) => {
       this.writer.onabort = resolve
-      this.writer.onerror = rejectFileError(reject)
+      this.writer.onerror = reject
       this.writer.abort()
     })
   }
@@ -202,10 +231,39 @@ export class FSFileWriter {
     return this.writeJoin(lines)
   }
 
-  write (val: Writeable): Promise<void> {
+  async writeStream (data: ReadableStream) {
+    const reader = data.getReader()
+    while (true) {
+      const { value, done } = await reader.read()
+      if (done) {
+        break
+      }
+      this.writer.write(value)
+    }
+  }
+
+  async write (data: Writeable): Promise<void> {
+    debugger
+    let val: Primitive
+    if (data instanceof Buffer) {
+      val = new Blob([data])
+    } else if (data instanceof File) {
+      debugger
+      return this.writeStream(data.stream())
+    } else if (data instanceof FSFileEntry) {
+      const parent = await this.entry.getParent()
+      await data.copyTo(parent.entry, this.entry.name)
+      return
+    } else if (data instanceof ReadableStream) {
+      return this.writeStream(data)
+    } else if (data instanceof Blob || typeof data === 'string' || typeof data === 'number' || typeof data === 'boolean') {
+      val = data
+    } else {
+      val = await new Promise((resolve, reject) => data.file(resolve, rejectFileError(reject)))
+    }
     return new Promise((resolve, reject) => {
       this.writer.onwrite = () => resolve()
-      this.writer.onerror = rejectFileError(reject)
+      this.writer.onerror = reject
       if (val instanceof Blob) {
         this.writer.write(val)
       } else {
@@ -232,8 +290,8 @@ export class FSDirectoryReader {
 
 export class FSDirectoryEntry extends BaseEntry {
   public entry: DirectoryEntry
-  public isFile: false = false
-  public isDirectory: true = true
+  public isFile = false as const
+  public isDirectory = true as const
 
   constructor (public fileSystem: FS, entry: Entry) {
     super(fileSystem, entry)
@@ -262,8 +320,7 @@ export class FSDirectoryEntry extends BaseEntry {
   }
 
   readEntries () {
-    const reader = this.createReader()
-    return reader.readEntries()
+    return this.createReader().readEntries()
   }
 
   removeRecursively (): Promise<void> {
@@ -285,10 +342,14 @@ export class FSDirectoryEntry extends BaseEntry {
     })
   }
 
-  async writeFile (path: string, file: File | Blob, opts: FileSystemGetFileOptions = { create: true }): Promise<FSFileEntry> {
+  async writeFile (path: string, data: Writeable, opts?: FileSystemGetFileOptions): Promise<FSFileEntry> {
+    opts = Object.assign({ create: true }, opts)
     const fileEntry = await this.getFile(path, opts)
+    if (data instanceof FSFileEntry) {
+      return data.copyTo(this.entry, path)
+    }
     const writer = await fileEntry.createWriter()
-    await writer.write(file)
+    await writer.write(data)
     return fileEntry
   }
 
@@ -351,6 +412,23 @@ export class file {
     return dir
   }
 
+  static async dataDirectory (dirPath = '', opts?: FileSystemGetDirectoryOptions) {
+    const e = await this.resolveLocalFileSystemURL(cordova!.file.dataDirectory)
+    const dir = e as FSDirectoryEntry
+    if (dirPath) {
+      return dir.getDirectory(dirPath, opts)
+    }
+    return dir
+  }
+
+  static root () {
+    return this.resolveLocalFileSystemURL('file:///storage/')
+  }
+
+  static sdCard () {
+    return this.resolveLocalFileSystemURL('file:///storage/extSdCard/')
+  }
+
   static persistent (size?: number) {
     return this.requestFileSystem(LocalFileSystem.PERSISTENT, size)
   }
@@ -389,5 +467,38 @@ export class file {
         )
       }, rejectFileError(reject))
     })
+  }
+
+  static isFile (entry: any) {
+    return entry && entry.isFile
+  }
+
+  static isDirectory (entry: any) {
+    return entry && entry.isDirectory
+  }
+}
+
+export type FsRoot = 'temporary' | 'persistent' | 'application' | 'data' | 'root' | 'sdCard'
+
+export async function getFs (root: FsRoot) {
+  switch (root) {
+    case 'persistent': {
+      const fs = await file.persistent()
+      return fs.root
+    }
+    case 'temporary': {
+      const fs = await file.temporary()
+      return fs.root
+    }
+    case 'application':
+      return file.applicationStorageDirectory()
+    case 'data':
+      return file.dataDirectory()
+    case 'root':
+      return file.root()
+    case 'sdCard':
+      return file.sdCard()
+    default:
+      throw new Error(`Unknown root: ${root}`)
   }
 }

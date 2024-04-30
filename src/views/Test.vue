@@ -4,6 +4,8 @@ import mediaCapture from '@/cordova/media-capture'
 import WebAudioRecorder from '@/components/audio-recorder/WebAudioRecorder.vue'
 import { requestWebRecording } from '@/components/audio-recorder/recorder'
 import { logError } from '@/helpers/log.helper'
+import AssetService from '@/services/asset'
+import { FSFileEntry, file } from '@/cordova/file'
 
 const limit = ref(0)
 const durationSeconds = ref(30)
@@ -42,10 +44,27 @@ onMounted(async () => {
   videoModes.value = await mediaCapture.supportedVideoModes()
   imageModes.value = await mediaCapture.supportedImageModes()
 })
+
+async function addAsset (f: MediaFile) {
+  const entry = await file.resolveLocalFileSystemURL(f.fullPath)
+  if (!entry || !(entry instanceof FSFileEntry)) {
+    console.error('no file', entry)
+    return
+  }
+  await AssetService.createAsset({ fileName: f.name, shouldSync: false, mimeType: f.type }, entry)
+}
 </script>
 
 <template>
   <v-col>
+    <v-row no-gutters>
+      <v-btn :to="{ name: 'Files'}">
+        Files
+      </v-btn>
+      <v-btn :to="{ name: 'Assets'}">
+        Assets
+      </v-btn>
+    </v-row>
     <v-row no-gutters>
       <v-text-field
         v-model.number="limit"
@@ -93,6 +112,9 @@ onMounted(async () => {
         :key="file.fullPath"
       >
         {{ file }}
+        <v-btn @click="addAsset(file)">
+          Add asset
+        </v-btn>
       </v-list-item>
     </v-list>
     <WebAudioRecorder />
