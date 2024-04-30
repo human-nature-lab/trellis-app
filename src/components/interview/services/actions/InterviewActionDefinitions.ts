@@ -114,6 +114,8 @@ actionManager.add(AT.change_sort_order, function (interview, action: Action, que
     throw new Error('No datum exists with this id: ' + action.payload.datum_id)
   }
 })
+actionManager.add(AT.add_asset, addDatum)
+actionManager.add(AT.remove_asset, removeDatum((datum, payload) => datum.assetId === payload.asset_id))
 
 actionManager.add(AT.set_val, addOrUpdateSingleDatum)
 actionManager.add(AT.remove_geo, removeDatum((datum, payload) => datum.geoId === payload.geo_id))

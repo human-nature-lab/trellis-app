@@ -5,6 +5,7 @@ import { AssetServiceInterface, CreateAsset, UpdateAsset } from './AssetServiceI
 import DatabaseService from '../database'
 import { getTypeFromMime } from '@/lib/mime'
 import { FSFileEntry, file } from '@/cordova/file'
+import HashService from '../hash'
 
 export class AssetService implements AssetServiceInterface {
   async getAssets (...ids: string[]) {
@@ -40,14 +41,16 @@ export class AssetService implements AssetServiceInterface {
     const newAsset = new Asset()
     newAsset.id = uuidv4()
     newAsset.fileName = asset.fileName
-    newAsset.shouldSync = asset.shouldSync
+    newAsset.isFromSurvey = !!asset.isFromSurvey
     if (f instanceof FSFileEntry) {
       const meta = await f.getMetadata()
       newAsset.size = meta.size
       newAsset.mimeType = asset.mimeType || (await f.type())
+      newAsset.md5Hash = await HashService.hashEntry(f)
     } else {
       newAsset.size = f.size
       newAsset.mimeType = asset.mimeType || f.type
+      newAsset.md5Hash = await HashService.hashBlob(f)
     }
     newAsset.type = asset.type || getTypeFromMime(newAsset.mimeType)
     const assetDir = await file.dataDirectory('assets', { create: true })
@@ -59,17 +62,25 @@ export class AssetService implements AssetServiceInterface {
     return repo.save(newAsset)
   }
 
-  async updateAsset (data: UpdateAsset, f: File | Blob) {
+  async updateAsset (data: UpdateAsset, f: FSFileEntry | Blob) {
     const repo = await DatabaseService.getRepository(Asset)
     const asset = await repo.findOne(data.id)
     if (!asset) {
       throw new Error('Asset not found')
     }
     asset.fileName = data.fileName
-    asset.shouldSync = data.shouldSync
-    asset.mimeType = f.type
-    asset.type = getTypeFromMime(f.type)
-    asset.size = f.size
+    if (f instanceof FSFileEntry) {
+      const meta = await f.getMetadata()
+      asset.size = meta.size
+      asset.mimeType = data.mimeType || (await f.type())
+      asset.md5Hash = await HashService.hashEntry(f)
+    } else {
+      asset.size = f.size
+      asset.mimeType = data.mimeType || f.type
+      asset.md5Hash = await HashService.hashBlob(f)
+    }
+    asset.isFromSurvey = !!data.isFromSurvey
+    asset.type = getTypeFromMime(asset.mimeType)
     asset.deletedAt = null
     const assetDir = await file.dataDirectory('assets', { create: true })
     await assetDir.writeFile(asset.id, f)

@@ -110,6 +110,7 @@
       <SnackbarQueue />
       <DocsSidebar />
       <LoginModal />
+      <WebAudioRecorder />
     </v-app>
   </div>
 </template>
@@ -119,6 +120,7 @@
   import MainMenu from './components/main-menu/MainMenu.vue'
   import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
+  import WebAudioRecorder from './components/audio-recorder/WebAudioRecorder.vue'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
   import TrellisLoadingCircular from './components/TrellisLoadingCircle.vue'
@@ -210,6 +212,7 @@
       Banner,
       LoginModal,
       Maintenance,
+      WebAudioRecorder,
     },
     computed: {
       withinCordova () {

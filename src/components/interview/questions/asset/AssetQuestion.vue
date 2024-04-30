@@ -19,8 +19,9 @@ const props = defineProps<{
 const working = ref(false)
 
 const types = computed(() => {
+  if (!props.question || !props.question.questionParameters) return ['audio', 'video', 'image', 'file']
   const qp = props.question.questionParameters.find(qp => qp.parameter.name === 'asset_types')
-  return qp.val ? JSON.parse(qp.val) : ['audio', 'video', 'image', 'file']
+  return (qp && qp.val) ? JSON.parse(qp.val) : ['audio', 'video', 'image', 'file']
 })
 
 const allowAudio = computed(() => types.value.includes('audio'))
@@ -35,6 +36,8 @@ const { assets, loading: assetsLoading, error } = useAssets(() =>
 function addAssets (assets: Asset[]) {
   for (const asset of assets) {
     action(props.question.id, ActionTypes.add_asset, {
+      val: asset.id,
+      name: 'asset',
       asset_id: asset.id,
     })
   }
@@ -44,7 +47,7 @@ async function mediaToAssets (files: (Blob | FSFileEntry)[]) {
   return Promise.all(files.map(async f => {
     const fileName = (f instanceof FSFileEntry) ? f.name : `audio-${Date.now()}.webm`
     const type = (f instanceof FSFileEntry) ? await f.type() : f.type
-    return AssetService.createAsset({ fileName, type }, f)
+    return AssetService.createAsset({ fileName, type, isFromSurvey: true }, f)
   }))
 }
 
@@ -100,16 +103,44 @@ async function uploadFile () {
   }
 }
 
+const isBusy = computed(() => working.value || assetsLoading.value)
+
 </script>
 
 <template>
   <v-col>
+    <v-progress-linear
+      v-if="isBusy"
+      indeterminate
+    />
     <v-row no-gutters>
       <v-btn
         v-if="allowAudio"
         @click="captureAudio"
+        :disabled="isBusy"
       >
         {{ $t('capture_audio') }}
+      </v-btn>
+      <v-btn
+        v-if="allowVideo"
+        @click="captureVideo"
+        :disabled="isBusy"
+      >
+        {{ $t('capture_video') }}
+      </v-btn>
+      <v-btn
+        v-if="allowImage"
+        @click="captureImage"
+        :disabled="isBusy"
+      >
+        {{ $t('capture_image') }}
+      </v-btn>
+      <v-btn
+        v-if="allowFile"
+        @click="uploadFile"
+        :disabled="isBusy"
+      >
+        {{ $t('upload_file') }}
       </v-btn>
     </v-row>
     <v-list>

@@ -1,7 +1,7 @@
 import { FSFileEntry } from '@/cordova/file'
 import Asset from '@/entities/trellis/Asset'
 
-export type CreateAsset = Pick<Asset, 'fileName'> & Partial<Pick<Asset, 'type' | 'mimeType'>>
+export type CreateAsset = Pick<Asset, 'fileName' | 'isFromSurvey'> & Partial<Pick<Asset, 'type' | 'mimeType'>>
 export type UpdateAsset = CreateAsset & Pick<Asset, 'id'>
 export interface AssetServiceInterface {
   // downloadAsset(id: string): PromiseLike<Blob>
