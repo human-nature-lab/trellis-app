@@ -243,12 +243,10 @@ export class FSFileWriter {
   }
 
   async write (data: Writeable): Promise<void> {
-    debugger
     let val: Primitive
     if (data instanceof Buffer) {
       val = new Blob([data])
     } else if (data instanceof File) {
-      debugger
       return this.writeStream(data.stream())
     } else if (data instanceof FSFileEntry) {
       const parent = await this.entry.getParent()
