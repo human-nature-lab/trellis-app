@@ -7,6 +7,7 @@
     @remove="remove"
     @create="create"
     :condition-tags="conditionTags"
+    :disabled="disabled"
   />
 </template>
 
@@ -16,7 +17,6 @@ import SkipEditor from '../skips/SkipEditor.vue'
 import ConditionTag from '@/entities/trellis/ConditionTag'
 import builderService from '@/services/builder'
 import Skip from '@/entities/trellis/Skip'
-import { Added, Moved } from '@/components/util/SortableList.vue'
 
 export default Vue.extend({
   name: 'PageSkips',
