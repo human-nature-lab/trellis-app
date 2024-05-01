@@ -33,8 +33,8 @@ export const fetchSnapshot = new Task(i18n.t('checking_snapshot'), checkLatestSn
   .add(i18n.t('verifying_download'), verifyDownload)
 
 export const unravelSnapshot = new Task(i18n.t('extracting_snapshot'), extractSnapshot)
-  .add(i18n.t('closing_db'), closeDatabase)
-  .add(i18n.t('removing_db'), removeDatabase)
-  .add(i18n.t('moving_db'), moveDatabase)
-  .add(i18n.t('configuring_db'), configureDatabase)
+  .addMerge(i18n.t('closing_db'), closeDatabase)
+  .addMerge(i18n.t('removing_db'), removeDatabase)
+  .addMerge(i18n.t('moving_db'), moveDatabase)
+  .addMerge(i18n.t('configuring_db'), configureDatabase)
   .add(i18n.t('registering_download'), registerDownload)

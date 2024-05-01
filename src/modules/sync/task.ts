@@ -1,3 +1,4 @@
+import { Stringable } from '@/types'
 import { TranslateResult } from 'vue-i18n'
 
 export class TaskExecution {
@@ -40,19 +41,31 @@ type TaskExec<I = any, O = any> = (input: I, task: TaskExecution) => (PromiseLik
 
 export class Task<Input = any, Output = any> {
   public data: Record<string, any> = {}
+  public mergeData = false
+  public parent?: Task<any, Input>
 
-  constructor (public name: TranslateResult, public exec: TaskExec<Input, Output>, public parent?: Task<any, Input>) {}
-  add<NextOutput = any> (name: TranslateResult, exec: TaskExec<Output, NextOutput>, data?: Record<string, any>) {
-    const task = new Task(name, exec, this)
+  constructor (public name: Stringable, public exec: TaskExec<Input, Output>) {}
+  add<NextOutput = any> (name: Stringable, exec: TaskExec<Output, NextOutput>, data?: Record<string, any>) {
+    const task = new Task(name, exec)
     if (data) {
       Object.assign(task.data, data)
     }
-    return task
+    return this.addTask(task)
   }
 
   addTask<NextOutput = any> (task: Task<Output, NextOutput>) {
     task.parent = this
     return task
+  }
+
+  addMerge<NextOutput = any, Merged = NextOutput & Output> (name: Stringable, exec: TaskExec<Output, NextOutput>, data?: Record<string, any>) {
+    const task = new Task(name, exec)
+    if (data) {
+      Object.assign(task.data, data)
+    }
+    task.mergeData = true
+    task.parent = this
+    return task as Task<Output, Merged>
   }
 }
 
