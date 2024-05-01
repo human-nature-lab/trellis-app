@@ -13,9 +13,12 @@ import { delay } from '@/classes/delay'
 import ZipService from '@/services/zip'
 import Sync from '@/entities/trellis-config/Sync'
 import { filetransfer } from '@/cordova/filetransfer'
-import { file } from '@/cordova/file'
+import { FSFileEntry, file } from '@/cordova/file'
+import { TaskExecution } from './task'
+import axios from 'axios'
+import { confirm } from '@/components/confirm'
 
-export async function checkDownloadSize (ctrl: StepController, data: { snapshot: Snapshot }) {
+export async function checkDownloadSize (data: { snapshot: Snapshot }, ctrl: TaskExecution) {
   const [freeDiskSpace, snapshotFileSize] = await Promise.all([
     DeviceService.getFreeDiskSpace(),
     SyncService.getSnapshotFileSize(ctrl.source, data.snapshot.id),
@@ -37,8 +40,10 @@ export async function checkDownloadSize (ctrl: StepController, data: { snapshot:
   return data
 }
 
-export async function checkLatestSnapshot (ctrl: StepController) {
-  const serverLatestSnapshot = await SyncService.getLatestSnapshot(ctrl.source)
+export async function checkLatestSnapshot (_, ctrl: TaskExecution) {
+  const source = axios.CancelToken.source()
+  ctrl.onCancel(() => source.cancel())
+  const serverLatestSnapshot = await SyncService.getLatestSnapshot(source)
   if (Object.keys(serverLatestSnapshot).length === 0) {
     ctrl.log.warn(i18n.t('no_snapshot_found'))
   }
@@ -51,7 +56,7 @@ export async function closeDatabase () {
   await DatabaseService.closeDatabase()
 }
 
-export async function compareDownload (ctrl: StepController, data: { snapshot: Snapshot }) {
+export async function compareDownload (data: { snapshot: Snapshot }) {
   const localDownload = await DatabaseService.getLatestDownload()
   // We haven't downloaded a snapshot yet
   if (!localDownload) {
@@ -61,13 +66,13 @@ export async function compareDownload (ctrl: StepController, data: { snapshot: S
   const isSame = localDownload.createdAt.getTime() === data.snapshot.createdAt.getTime()
   if (isOlder) {
     const msg = i18n.t('older_snapshot', [data.snapshot.createdAt, localDownload.createdAt])
-    const proceed = await ctrl.confirm(msg)
+    const proceed = await confirm(msg)
     if (!proceed) {
       throw new Error(msg.toString())
     }
   } else if (isSame) {
     const msg = i18n.t('last_snapshot_date', [data.snapshot.createdAt])
-    const proceed = await ctrl.confirm(msg)
+    const proceed = await confirm(msg)
     if (!proceed) {
       throw new Error(msg.toString())
     }
@@ -75,9 +80,11 @@ export async function compareDownload (ctrl: StepController, data: { snapshot: S
   return data
 }
 
-export async function compareUpload (ctrl: StepController, data: { snapshot: Snapshot }) {
+export async function compareUpload (data: { snapshot: Snapshot }, ctrl: TaskExecution) {
   const deviceId = await DeviceService.getUUID()
-  const pendingUploads = await SyncService.getPendingUploads(ctrl.source)
+  const source = axios.CancelToken.source()
+  ctrl.onCancel(() => source.cancel())
+  const pendingUploads = await SyncService.getPendingUploads(source)
   let pendingFromThisDevice = 0
   for (let i = 0; i < pendingUploads.length; i++) {
     if (pendingUploads[i].device_id === deviceId) {
@@ -86,12 +93,12 @@ export async function compareUpload (ctrl: StepController, data: { snapshot: Sna
   }
 
   if (pendingFromThisDevice > 0) {
-    const proceed = await ctrl.confirm(i18n.t('pending_uploads_device', [pendingFromThisDevice]))
+    const proceed = await confirm(i18n.t('pending_uploads_device', [pendingFromThisDevice]))
     if (!proceed) {
       throw new Error('Stopped because of pending uploads')
     }
   } else if (pendingUploads.length > 0) {
-    const proceed = await ctrl.confirm(i18n.t('pending_uploads', [pendingUploads.length]))
+    const proceed = await confirm(i18n.t('pending_uploads', [pendingUploads.length]))
     if (!proceed) {
       throw new Error('Stopped because of pending uploads')
     }
@@ -99,20 +106,20 @@ export async function compareUpload (ctrl: StepController, data: { snapshot: Sna
   return data
 }
 
-export async function configureDatabase (ctrl: StepController) {
-  const status = { message: i18n.t('configuring_db') }
-  ctrl.setProgress(0, 2)
+export async function configureDatabase (_, ctrl: TaskExecution) {
+  const status = { message: i18n.t('configuring_db') as string }
+  ctrl.progress.total = 2
   await DatabaseService.createDatabase()
   const queryRunner = (await DatabaseService.getDatabase()).createQueryRunner()
   await DatabaseService.createUpdatedRecordsTable(queryRunner, status)
-  ctrl.setProgress(1, 2)
+  ctrl.progress.current = 1
   await DatabaseService.addTriggers(queryRunner, status)
-  ctrl.setProgress(2, 2)
+  ctrl.progress.current = 2
   return delay(500)
 }
 
-export async function downloadSnapshot (ctrl: StepController, { snapshot }: { snapshot: Snapshot }) {
-  ctrl.setProgress(0, 1)
+export async function downloadSnapshot ({ snapshot }: { snapshot: Snapshot }, ctrl: TaskExecution) {
+  ctrl.progress.total = 1
   const fileName = snapshot.id + '.sql.zip'
   const [deviceId, deviceKey, apiRoot, syncAuth] = await Promise.all([
     DeviceService.getUUID(),
@@ -138,12 +145,13 @@ export async function downloadSnapshot (ctrl: StepController, { snapshot }: { sn
       Authorization: syncAuth,
     },
   }, throttle((progressEvent) => {
-    ctrl.setProgress(progressEvent.loaded, progressEvent.total)
+    ctrl.progress.total = progressEvent.total
+    ctrl.progress.current = progressEvent.loaded
   }, 250))
   // const p: CancelPromise<void> = FileService.download(uri, fileEntry, throttle((progressEvent) => {
   //   ctrl.setProgress(progressEvent.loaded, progressEvent.total)
   // }, 1000), syncAuth)
-  ctrl.onCancel.add(p.cancel)
+  ctrl.onCancel(p.cancel)
   await p
   ctrl.log.info('download complete')
   return {
@@ -165,9 +173,10 @@ export async function emptySnapshotDirectory () {
   await snapshotsDir.empty(true)
 }
 
-export async function extractSnapshot (ctrl: StepController, data: { fileEntry: any }) {
+export async function extractSnapshot (data: { fileEntry: any }, ctrl: TaskExecution) {
   const unzippedFile = await ZipService.unzipFile(data.fileEntry, throttle(progressEvent => {
-    ctrl.setProgress(progressEvent.loaded, progressEvent.total)
+    ctrl.progress.total = progressEvent.total
+    ctrl.progress.current = progressEvent.loaded
   }, 1000))
   ctrl.log.info('unzippedFile', unzippedFile)
   return data
@@ -192,7 +201,7 @@ export async function removeDatabase () {
   }
 }
 
-export async function verifyDownload (ctrl: StepController, data: { fileEntry: FileEntry, snapshot: Snapshot }) {
+export async function verifyDownload (data: { fileEntry: FSFileEntry, snapshot: Snapshot }, ctrl: TaskExecution) {
   const md5Hash = await FileService.calculateMD5Hash(data.fileEntry)
   if (md5Hash !== data.snapshot.hash) {
     ctrl.log.error('hashes dont match', data.snapshot.hash, md5Hash)

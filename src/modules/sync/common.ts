@@ -4,17 +4,23 @@ import { StepController } from '../controller'
 import DatabaseService from '@/services/database'
 import { i18n } from '@/i18n'
 import config from '@/config'
+import { TaskExecution } from './task'
+import axios from 'axios'
 
-export async function authenticateDevice (ctrl: StepController) {
+export async function authenticateDevice (_, ctrl: TaskExecution) {
   const deviceId = await DeviceService.getUUID()
-  await SyncService.authenticate(ctrl.source, deviceId)
+  const source = axios.CancelToken.source()
+  ctrl.onCancel(() => source.cancel())
+  await SyncService.authenticate(source, deviceId)
   return { deviceId }
 }
 
-export async function checkConnection (ctrl: StepController) {
+export async function checkConnection (_, ctrl: TaskExecution) {
   const apiRoot = await DatabaseService.getServerIPAddress()
   try {
-    await SyncService.getHeartbeat(ctrl.source)
+    const source = axios.CancelToken.source()
+    ctrl.onCancel(() => source.cancel())
+    await SyncService.getHeartbeat(source)
   } catch (err) {
     ctrl.log.error(i18n.t('unable_to_establish_connection', [apiRoot]))
     throw new Error(`Unable to establish connection with '${apiRoot}'`)
