@@ -46,11 +46,11 @@ export class AssetService implements AssetServiceInterface {
       const meta = await f.getMetadata()
       newAsset.size = meta.size
       newAsset.mimeType = asset.mimeType || (await f.type())
-      newAsset.md5Hash = await HashService.hashEntry(f)
+      newAsset.md5Hash = await HashService.md5Entry(f)
     } else {
       newAsset.size = f.size
       newAsset.mimeType = asset.mimeType || f.type
-      newAsset.md5Hash = await HashService.hashBlob(f)
+      newAsset.md5Hash = await HashService.md5Blob(f)
     }
     newAsset.type = asset.type || getTypeFromMime(newAsset.mimeType)
     const assetDir = await file.dataDirectory('assets', { create: true })
@@ -73,11 +73,11 @@ export class AssetService implements AssetServiceInterface {
       const meta = await f.getMetadata()
       asset.size = meta.size
       asset.mimeType = data.mimeType || (await f.type())
-      asset.md5Hash = await HashService.hashEntry(f)
+      asset.md5Hash = await HashService.md5Entry(f)
     } else {
       asset.size = f.size
       asset.mimeType = data.mimeType || f.type
-      asset.md5Hash = await HashService.hashBlob(f)
+      asset.md5Hash = await HashService.md5Blob(f)
     }
     asset.isFromSurvey = !!data.isFromSurvey
     asset.type = getTypeFromMime(asset.mimeType)

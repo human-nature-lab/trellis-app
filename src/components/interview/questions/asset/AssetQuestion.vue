@@ -46,8 +46,7 @@ function addAssets (assets: Asset[]) {
 async function mediaToAssets (files: (Blob | FSFileEntry)[]) {
   return Promise.all(files.map(async f => {
     const fileName = (f instanceof FSFileEntry) ? f.name : `audio-${Date.now()}.webm`
-    const type = (f instanceof FSFileEntry) ? await f.type() : f.type
-    return AssetService.createAsset({ fileName, type, isFromSurvey: true }, f)
+    return AssetService.createAsset({ fileName, isFromSurvey: true }, f)
   }))
 }
 
@@ -58,7 +57,9 @@ async function captureAudio () {
     const files = await MediaCaptureService.captureAudio()
     addAssets(await mediaToAssets(files))
   } catch (e) {
+    debugger
     logError(e)
+    throw e
   } finally {
     working.value = false
   }

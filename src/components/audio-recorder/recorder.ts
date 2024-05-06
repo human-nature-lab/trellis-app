@@ -4,8 +4,9 @@ import { insomnia } from '@/cordova/insomnia'
 export const visible = ref(false)
 export const recording = ref(false)
 export const recorderRef = ref<Vue>()
-export const resolver = ref<(f: Blob) => void>()
+export const resolver = ref<(f: File) => void>()
 export const rejecter = ref<(e: Error) => void>()
+export let writer: WritableStream
 
 export function requestWebRecording () {
   if (visible.value || recording.value) {
@@ -13,7 +14,7 @@ export function requestWebRecording () {
   }
   if (!recorderRef.value) return Promise.reject(new Error('WebAudioRecorder element is not in DOM'))
   return insomnia.withScreenOn(async () => {
-    return new Promise<Blob>((resolve, reject) => {
+    return new Promise<File>((resolve, reject) => {
       visible.value = true
       resolver.value = resolve
       rejecter.value = reject

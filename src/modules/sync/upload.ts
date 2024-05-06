@@ -23,13 +23,14 @@ export async function createUpload (ctrl: VueController) {
   const directoryEntry = await fs.root.getDirectory('upload_temp', { create: true })
   let fileEntry = await directoryEntry.getFile(fileName, { create: true })
   console.log('creating upload file')
-  const updatedPhotos = await SyncService.createUploadFile(fileEntry, p => {
+  const { updatedPhotos, updatedAssets } = await SyncService.createUploadFile(fileEntry, p => {
     ctrl.setProgress(p.created, p.total)
   }, () => ctrl.isCancelled)
   fileEntry = await directoryEntry.getFile(fileName)
   return {
     fileEntry,
     updatedPhotos,
+    updatedAssets,
   }
 }
 
