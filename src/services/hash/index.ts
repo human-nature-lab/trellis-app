@@ -2,12 +2,12 @@ import md5 from 'js-md5'
 import { FSFileEntry } from '@/cordova/file'
 
 export default class HashService {
-  static async hashEntry (entry: FSFileEntry) {
+  static async md5Entry (entry: FSFileEntry) {
     const buffer = await entry.getArrayBuffer()
     return md5(buffer)
   }
 
-  static async hashBlob (blob: Blob) {
+  static async md5Blob (blob: Blob) {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader()
       reader.onload = () => {

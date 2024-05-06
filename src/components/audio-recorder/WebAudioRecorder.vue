@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import TrellisModal from '@/components/TrellisModal.vue'
 import { visible, recording, recorderRef, resolver, rejecter, useAnalyserNode } from './recorder'
+import { v4 as uuidv4 } from 'uuid'
 
 const { analyser, audioContext } = useAnalyserNode()
 let ctx: CanvasRenderingContext2D | null = null
@@ -13,12 +14,12 @@ const startTime = ref(0)
 const endTime = ref(0)
 let running = true
 let animationId: number
-let chunks: Blob[] = []
 let recorder: MediaRecorder | null = null
 let stream: MediaStream | null = null
+let file: FileSystemFileHandle
 
 const mimeType = computed(() => {
-  const mimeTypePrefernces = ['audio/mp3', 'audio/wav', 'audio/ogg', 'audio/webm']
+  const mimeTypePrefernces = ['audio/mp3', 'audio/wav', 'audio/webm', 'audio/ogg']
   return mimeTypePrefernces.find(type => MediaRecorder.isTypeSupported(type))
 })
 
@@ -36,18 +37,17 @@ function cleanup () {
     stream = null
   }
 }
-function resolve () {
+async function resolve () {
   cleanup()
-  if (resolver.value) {
-    console.log('resolving', chunks.length, 'chunks')
-    resolver.value(new Blob(chunks, { type: mimeType.value }))
+  if (resolver.value && file) {
+    const f = await file.getFile()
+    resolver.value(f)
   }
 }
 
 function reject (err: Error) {
   cleanup()
   if (rejecter.value) {
-    chunks = []
     rejecter.value(err)
   }
 }
@@ -124,24 +124,31 @@ async function startRecording () {
   const streamSrc = audioContext.createMediaStreamSource(stream)
   streamSrc.connect(analyser)
   recorder = new MediaRecorder(stream, { mimeType: mimeType.value })
+  const dir = await (await navigator.storage.getDirectory()).getDirectoryHandle('audio', { create: true })
+  // for (const entry of await dir.entries()) {
+  //   console.log(entry.name)
+  // }
+  file = await dir.getFileHandle(`recording-${uuidv4()}.webm`, { create: true })
+  const writer = await file.createWritable()
 
   // const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-  chunks = []
   recorder.ondataavailable = async e => {
-    chunks.push(e.data)
     console.log('dataavailable', e.data.size)
+    await writer.write(e.data)
   }
-  recorder.onerror = e => {
+  recorder.onerror = async e => {
     debugger
+    await writer.close()
     recording.value = false
     state.value = recorder.state
     reject(new Error(e.error))
   }
-  recorder.onstop = () => {
+  recorder.onstop = async () => {
     endTime.value = Date.now()
     streamSrc.disconnect()
     recording.value = false
     state.value = recorder.state
+    await writer.close()
     resolve()
   }
   recorder.onstart = () => {
@@ -149,7 +156,8 @@ async function startRecording () {
     state.value = recorder.state
     animationId = requestAnimationFrame(render)
   }
-  recorder.start()
+  const timesliceMS = 30 * 1000 // try to write data every 30 seconds
+  recorder.start(timesliceMS)
   recording.value = true
   state.value = recorder.state
 }

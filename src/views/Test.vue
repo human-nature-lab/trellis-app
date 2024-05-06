@@ -1,39 +1,28 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import mediaCapture from '@/cordova/media-capture'
-import WebAudioRecorder from '@/components/audio-recorder/WebAudioRecorder.vue'
-import { requestWebRecording } from '@/components/audio-recorder/recorder'
-import { logError } from '@/helpers/log.helper'
+import { v4 as uuidv4 } from 'uuid'
 import AssetService from '@/services/asset'
 import { FSFileEntry, file } from '@/cordova/file'
+import MediaCaptureService from '@/services/media-capture'
 
 const limit = ref(0)
 const durationSeconds = ref(30)
-const files = ref<(MediaFile)[]>([])
+const files = ref<(FSFileEntry | Blob)[]>([])
 async function captureImage () {
-  const res = await mediaCapture.captureImage({ limit: limit.value })
+  const res = await MediaCaptureService.captureImage()
   console.log(res)
   files.value.push(...res)
 }
 async function captureVideo () {
-  const res = await mediaCapture.captureVideo({ limit: limit.value, duration: durationSeconds.value })
+  const res = await MediaCaptureService.captureVideo()
   console.log(res)
   files.value.push(...res)
 }
 async function captureAudio () {
-  const res = await mediaCapture.captureAudio({ limit: limit.value, duration: durationSeconds.value })
+  const res = await MediaCaptureService.captureAudio()
   console.log(res)
   files.value.push(...res)
-}
-
-async function recordAudio () {
-  try {
-    const res = await requestWebRecording()
-    files.value.push(res)
-  } catch (err) {
-    console.error(err)
-    logError(err)
-  }
 }
 
 const audioModes = ref()
@@ -45,13 +34,10 @@ onMounted(async () => {
   imageModes.value = await mediaCapture.supportedImageModes()
 })
 
-async function addAsset (f: MediaFile) {
-  const entry = await file.resolveLocalFileSystemURL(f.fullPath)
-  if (!entry || !(entry instanceof FSFileEntry)) {
-    console.error('no file', entry)
-    return
-  }
-  await AssetService.createAsset({ fileName: f.name, shouldSync: false, mimeType: f.type }, entry)
+async function addAsset (f: FSFileEntry | Blob) {
+  const fileName = f instanceof FSFileEntry ? f.name : uuidv4()
+  const type = f instanceof FSFileEntry ? (await f.type()) : f.type
+  await AssetService.createAsset({ fileName, type, isFromSurvey: false }, f)
 }
 </script>
 
@@ -101,23 +87,17 @@ async function addAsset (f: MediaFile) {
         Capture audio
       </v-btn>
     </v-row>
-    <v-row no-gutters>
-      <v-btn @click="recordAudio">
-        Record audio
-      </v-btn>
-    </v-row>
     <v-list>
       <v-list-item
-        v-for="file in files"
-        :key="file.fullPath"
+        v-for="(file, index) in files"
+        :key="index"
       >
-        {{ file }}
+        {{ index }}
         <v-btn @click="addAsset(file)">
           Add asset
         </v-btn>
       </v-list-item>
     </v-list>
-    <WebAudioRecorder />
   </v-col>
 </template>
 

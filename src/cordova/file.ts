@@ -248,42 +248,63 @@ export class FSFileWriter {
     return this.writeJoin(lines)
   }
 
+  writeRaw (data: string | Blob) {
+    return new Promise((resolve, reject) => {
+      this.writer.onwriteend = resolve
+      this.writer.onerror = reject
+      this.writer.write(data)
+    })
+  }
+
   async writeStream (data: ReadableStream) {
+    console.log('writeStream')
     const reader = data.getReader()
     while (true) {
+      console.log('reading')
       const { value, done } = await reader.read()
+      console.log('read', typeof value, done)
       if (done) {
         break
       }
-      this.writer.write(value)
+      console.log('read type', value?.constructor?.name)
+      await this.writeRaw(value)
     }
   }
 
   async write (data: Writeable): Promise<void> {
+    debugger
     let val: Primitive
     if (data instanceof Buffer) {
       val = new Blob([data])
-    } else if (data instanceof File) {
-      return this.writeStream(data.stream())
+    } else if (typeof data === 'object' && 'stream' in data && typeof data.stream === 'function') {
+      console.log('writing stream')
+      const stream = await data.stream()
+      return this.writeStream(stream)
     } else if (data instanceof FSFileEntry) {
+      console.log('copying file')
       const parent = await this.entry.getParent()
       await data.copyTo(parent.entry, this.entry.name)
       return
     } else if (data instanceof ReadableStream) {
+      console.log('writing readablestream')
       return this.writeStream(data)
     } else if (data instanceof Blob || typeof data === 'string' || typeof data === 'number' || typeof data === 'boolean') {
       val = data
     } else {
+      console.log('resolving file')
       val = await new Promise((resolve, reject) => data.file(resolve, rejectFileError(reject)))
     }
+    console.log('full write')
+
     return new Promise((resolve, reject) => {
       this.writer.onwrite = () => resolve()
       this.writer.onerror = reject
-      if (val instanceof Blob) {
-        this.writer.write(val)
+      if (typeof val === 'string' || val instanceof Blob) {
+        console.log('calling write with', val)
+        return this.writeRaw(val)
       } else {
         const wVal = '' + val
-        this.writer.write(new Blob([wVal]))
+        return this.writeRaw(wVal)
       }
     })
   }
@@ -336,6 +357,28 @@ export class FSDirectoryEntry extends BaseEntry {
 
   readEntries () {
     return this.createReader().readEntries()
+  }
+
+  async files () {
+    const files: FSFileEntry[] = []
+    const entries = await this.readEntries()
+    for (const entry of entries) {
+      if (entry.isFile) {
+        files.push(entry)
+      }
+    }
+    return files
+  }
+
+  async directories () {
+    const dirs: FSDirectoryEntry[] = []
+    const entries = await this.readEntries()
+    for (const entry of entries) {
+      if (entry.isDirectory) {
+        dirs.push(entry)
+      }
+    }
+    return dirs
   }
 
   removeRecursively (): Promise<void> {
@@ -417,6 +460,20 @@ export class FS {
   }
 }
 
+export class convert {
+  static fileSystem (fs: FileSystem) {
+    return new FS(fs)
+  }
+
+  static fileEntry (entry: FileEntry) {
+    return new FSFileEntry(this.fileSystem(entry.filesystem), entry)
+  }
+
+  static directoryEntry (entry: DirectoryEntry) {
+    return new FSDirectoryEntry(this.fileSystem(entry.filesystem), entry)
+  }
+}
+
 export class file {
   static async applicationStorageDirectory (dirPath = '', opts?: FileSystemGetDirectoryOptions) {
     const e = await this.resolveLocalFileSystemURL(cordova!.file.applicationStorageDirectory)
@@ -463,10 +520,9 @@ export class file {
   static resolveLocalFileSystemURL (filePath: string): Promise<FSFileEntry | FSDirectoryEntry> {
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURL(filePath, async entry => {
-        const fs = new FS(entry.filesystem)
         resolve(entry.isDirectory
-          ? new FSDirectoryEntry(fs, entry)
-          : new FSFileEntry(fs, (entry as unknown) as FileEntry),
+          ? convert.directoryEntry(entry as DirectoryEntry)
+          : convert.fileEntry(entry as FileEntry),
         )
       }, rejectFileError(reject))
     })
@@ -475,10 +531,9 @@ export class file {
   static resolveLocalFileSystemURI (filePath: string): Promise<FSFileEntry | FSDirectoryEntry> {
     return new Promise((resolve, reject) => {
       window.resolveLocalFileSystemURI(filePath, async entry => {
-        const fs = new FS(entry.filesystem)
         resolve(entry.isDirectory
-          ? new FSDirectoryEntry(fs, entry)
-          : new FSFileEntry(fs, (entry as unknown) as FileEntry),
+          ? convert.directoryEntry(entry as DirectoryEntry)
+          : convert.fileEntry(entry as FileEntry),
         )
       }, rejectFileError(reject))
     })
