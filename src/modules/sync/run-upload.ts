@@ -100,7 +100,6 @@ export function runUpload (ctrl: VueController, onlyImageUpload: boolean) {
       ctrl.setStep(g4s01)
       const missingAssetIds = await getMissingServerAssets(ctrl)
       ctrl.setStep(g4s02)
-      debugger
       if (uploadData) {
         missingAssetIds.push(...uploadData.updatedAssets)
       }
