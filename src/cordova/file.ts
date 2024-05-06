@@ -195,6 +195,7 @@ export class FSFileEntry extends BaseEntry {
 type Writeable = FSFileEntry | FileEntry | Primitive
 type Primitive = string | number | boolean | Blob | Buffer | ReadableStream
 
+const MAX_WRITE_SIZE = 1024 * 1024
 export class FSFileWriter {
   constructor (private writer: FileWriter, private entry: FSFileEntry) {}
 
@@ -248,9 +249,9 @@ export class FSFileWriter {
     return this.writeJoin(lines)
   }
 
-  writeRaw (data: string | Blob) {
-    return new Promise((resolve, reject) => {
-      this.writer.onwriteend = resolve
+  writeRaw (data: string | Blob | Uint8Array) {
+    return new Promise<void>((resolve, reject) => {
+      this.writer.onwrite = () => resolve()
       this.writer.onerror = reject
       this.writer.write(data)
     })
@@ -260,26 +261,18 @@ export class FSFileWriter {
     console.log('writeStream')
     const reader = data.getReader()
     while (true) {
-      console.log('reading')
       const { value, done } = await reader.read()
-      console.log('read', typeof value, done)
       if (done) {
         break
       }
-      console.log('read type', value?.constructor?.name)
       await this.writeRaw(value)
     }
   }
 
   async write (data: Writeable): Promise<void> {
-    debugger
     let val: Primitive
     if (data instanceof Buffer) {
       val = new Blob([data])
-    } else if (typeof data === 'object' && 'stream' in data && typeof data.stream === 'function') {
-      console.log('writing stream')
-      const stream = await data.stream()
-      return this.writeStream(stream)
     } else if (data instanceof FSFileEntry) {
       console.log('copying file')
       const parent = await this.entry.getParent()
@@ -296,17 +289,13 @@ export class FSFileWriter {
     }
     console.log('full write')
 
-    return new Promise((resolve, reject) => {
-      this.writer.onwrite = () => resolve()
-      this.writer.onerror = reject
-      if (typeof val === 'string' || val instanceof Blob) {
-        console.log('calling write with', val)
-        return this.writeRaw(val)
-      } else {
-        const wVal = '' + val
-        return this.writeRaw(wVal)
-      }
-    })
+    if (typeof val === 'string' || val instanceof Blob) {
+      console.log('calling write with', val)
+      return this.writeRaw(val)
+    } else {
+      const wVal = '' + val
+      return this.writeRaw(wVal)
+    }
   }
 }
 
@@ -537,6 +526,22 @@ export class file {
         )
       }, rejectFileError(reject))
     })
+  }
+
+  static async resolveFileUri (uri: string): Promise<FSFileEntry> {
+    const entry = await this.resolveLocalFileSystemURI(uri)
+    if (entry.isFile) {
+      return entry
+    }
+    throw new Error('Expected file, got directory')
+  }
+
+  static async resolveDirectoryUri (uri: string): Promise<FSDirectoryEntry> {
+    const entry = await this.resolveLocalFileSystemURI(uri)
+    if (entry.isDirectory) {
+      return entry
+    }
+    throw new Error('Expected directory, got file')
   }
 
   static isFile (entry: any) {
