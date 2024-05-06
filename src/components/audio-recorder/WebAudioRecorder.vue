@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import TrellisModal from '@/components/TrellisModal.vue'
-import { visible, recording, recorderRef, resolver, rejecter, useAnalyserNode } from './recorder'
+import { visible, recording, recorderRef, resolver, rejecter, useAnalyserNode } from './web-recorder'
 import { v4 as uuidv4 } from 'uuid'
 
 const { analyser, audioContext } = useAnalyserNode()

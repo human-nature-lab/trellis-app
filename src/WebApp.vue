@@ -111,6 +111,7 @@
       <DocsSidebar />
       <LoginModal />
       <WebAudioRecorder />
+      <MediaAudioRecorder />
     </v-app>
   </div>
 </template>
@@ -121,6 +122,7 @@
   import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
   import WebAudioRecorder from './components/audio-recorder/WebAudioRecorder.vue'
+  import MediaAudioRecorder from './components/audio-recorder/MediaAudioRecorder.vue'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
   import TrellisLoadingCircular from './components/TrellisLoadingCircle.vue'
@@ -213,6 +215,7 @@
       LoginModal,
       Maintenance,
       WebAudioRecorder,
+      MediaAudioRecorder,
     },
     computed: {
       withinCordova () {
