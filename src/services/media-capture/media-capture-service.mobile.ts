@@ -1,8 +1,9 @@
 import mediaCapture from '@/cordova/media-capture'
 import { MediaCaptureServiceInterface, FileUploadOptions } from './media-capture-interface'
-import { requestWebRecording } from '@/components/audio-recorder/recorder'
+import { requestWebRecording } from '@/components/audio-recorder/web-recorder'
 import { file, FSFileEntry } from '@/cordova/file'
 import uuidv4 from 'uuid/v4'
+import { requestMediaRecording } from '@/components/audio-recorder/media-recorder'
 
 export class MediaCaptureService implements MediaCaptureServiceInterface {
   private async mediaToEntries (media: MediaFile[]): Promise<FSFileEntry[]> {
@@ -27,12 +28,8 @@ export class MediaCaptureService implements MediaCaptureServiceInterface {
   }
 
   async captureAudio (): Promise<FSFileEntry[]> {
-    const data = await requestWebRecording()
-    const dir = await file.temporary()
-    const id = uuidv4()
-    const name = `${id}.webm`
-    const fileEntry = await dir.root.writeFile(name, data)
-    return [fileEntry]
+    const media = await requestMediaRecording()
+    return [media]
   }
 
   async uploadFile (opts?: FileUploadOptions): Promise<FSFileEntry[]> {

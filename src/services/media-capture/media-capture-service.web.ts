@@ -1,4 +1,4 @@
-import { requestWebRecording } from '@/components/audio-recorder/recorder'
+import { requestWebRecording } from '@/components/audio-recorder/web-recorder'
 import { MediaCaptureServiceInterface, FileUploadOptions } from './media-capture-interface'
 
 export class MediaCaptureService implements MediaCaptureServiceInterface {
