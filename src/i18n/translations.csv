@@ -732,7 +732,7 @@ builder.var_name_conflict,Another question has the same variable name,Otra pregu
 import_csv,Import CSV,Importar CSV,
 export_csv,Export CSV,Exportar CSV,
 translation_import_complete,Added {0} translations and updated {1},Añadidas {0} traducciones y modificadas {1},
-asset,Asset,,
+asset,Asset,,Any kind of file
 download_asset_type,Download {0},,"Download audio, Download video, etc."
 asset_preview,Asset preview,,
 video_not_supported,This kind of video is not supported by this browser,,
@@ -762,3 +762,5 @@ capture_image,Capture image,,
 upload_file,Upload file,,
 survey_report,Survey report,,
 survey_report_title,Report of {form} with {respondent},,
+survey_report_score,Score: {correct}/{total},,
+only_show_answers,Only show answers,,

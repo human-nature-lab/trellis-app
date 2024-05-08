@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import QT from '@/static/question.types'
+import { computed, ref } from 'vue'
+import { lookupQuestionType } from '@/static/question.types'
+import ParameterTypes from '@/static/parameter.types'
 import Respondent from '@/entities/trellis/Respondent'
 import Survey from '@/entities/trellis/Survey'
 import Translation from '@/entities/trellis/Translation'
@@ -23,8 +24,11 @@ type Row = {
   index: number
   translation: Translation
   response?: any
-  correct: boolean
+  answer?: any
+  isCorrect: boolean
 }
+
+const limitToAnswers = ref(false)
 
 const rows = computed(() => {
   if (!form.value) return []
@@ -35,14 +39,23 @@ const rows = computed(() => {
       for (const question of page.questions) {
         const row = {
           varName: question.varName,
-          type: QT[question.questionTypeId],
+          type: lookupQuestionType(question.questionTypeId),
           translation: question.questionTranslation,
           index: index++,
           questionId: question.id,
         } as Row
         const questionData = data.value.data.filter(d => d.questionId === question.id)
         if (questionData.length === 1) {
-          row.response = questionData[0].data.map(d => d.val).join(', ')
+          const responses = questionData[0].data.map(d => d.val)
+          responses.sort()
+          row.response = responses.join(', ')
+        }
+        const correct = question.questionParameters?.filter(p => (+p.parameterId) === ParameterTypes.correct_choice)
+        if (correct && correct.length) {
+          const answers = correct.map(c => c.val)
+          answers.sort()
+          row.answer = answers.join(', ')
+          row.isCorrect = row.response === row.answer
         }
         r.push(row)
       }
@@ -55,16 +68,26 @@ const title = computed(() => {
   if (!form.value) return i18n.t('loading')
   const respondentName = props.respondent.names.find(n => n.isDisplayName)?.name || props.respondent.name
   return i18n.t('survey_report_title', {
-    form: TranslationService.getTranslated(form.value.nameTranslation, singleton.locale),
+    form: TranslationService.getTranslated(form.value.nameTranslation as Translation, singleton.locale),
     respondent: respondentName,
   })
 })
+
+const visibleRows = computed(() => {
+  if (!limitToAnswers.value) return rows.value
+  return rows.value.filter(r => r.answer)
+})
+
+const correctCount = computed(() => rows.value.reduce((c, r) => r.isCorrect ? c + 1 : c, 0))
+const numRowsWithAnswer = computed(() => rows.value.reduce((c, r) => r.answer ? c + 1 : c, 0))
 
 </script>
 
 <template>
   <v-card>
-    <v-card-title>{{ title }}</v-card-title>
+    <v-card-title>
+      {{ title }}
+    </v-card-title>
     <v-alert
       v-if="error"
       color="error"
@@ -76,6 +99,21 @@ const title = computed(() => {
       indeterminate
     />
     <v-card-text v-else>
+      <v-row
+        v-if="numRowsWithAnswer"
+        class="justify-space-betwee align-center"
+        no-gutters
+      >
+        <v-col>
+          <h3>
+            {{ $t('survey_report_score', { correct: correctCount, total: numRowsWithAnswer }) }}
+          </h3>
+        </v-col>
+        <v-checkbox
+          v-model="limitToAnswers"
+          :label="$t('only_show_answers')"
+        />
+      </v-row>
       <v-simple-table>
         <thead>
           <tr>
@@ -95,13 +133,15 @@ const title = computed(() => {
         </thead>
         <tbody>
           <tr
-            v-for="row in rows"
+            v-for="row in visibleRows"
             :key="row.index"
           >
             <td>{{ row.varName }}</td>
             <td>{{ row.type }}</td>
-            <td>{{ row.response }}</td>
-            <td>{{ row.correct }}</td>
+            <td :class="{ 'success': row.isCorrect }">
+              {{ row.response }}
+            </td>
+            <td>{{ row.answer }}</td>
           </tr>
         </tbody>
       </v-simple-table>

@@ -1,159 +1,154 @@
 <template>
-  <v-container
-    fill-width
-    class="ma-1"
+  <v-col
+    :id="'form-' + form.id"
+    class="w-full"
+    :class="{'open': isOpen}"
   >
-    <v-col
-      :id="'form-' + form.id"
-      class="w-full"
-      :class="{'open': isOpen}"
+    <v-row
+      no-gutters
+      class="align-content-center fill-width"
+      @click="$emit('click')"
     >
-      <v-row
-        no-gutters
-        class="align-content-center fill-width"
-        @click="$emit('click')"
+      <v-col
+        class="icon-container clickable flex-grow-0 mr-4"
+        @click="tryCreatingSurvey"
       >
-        <v-col
-          class="icon-container clickable flex-grow-0 mr-4"
-          @click="tryCreatingSurvey"
-        >
-          <v-icon
-            @click.stop="tryCreatingSurvey"
-            :disabled="disabled"
-            :color="status.color"
-          >
-            {{ status.icon }}
-          </v-icon>
-        </v-col>
-        <AsyncTranslationText
-          :translation="form.nameTranslation"
-        />
-        <v-spacer />
-        <v-chip
-          v-if="status.msg"
-          outlined
-          label
+        <v-icon
+          @click.stop="tryCreatingSurvey"
+          :disabled="disabled"
           :color="status.color"
         >
-          {{ status.msg }}
-        </v-chip>
-        <div class="version d-flex align-center">
-          (v{{ form.version }})
-        </div>
-        <v-col class="icon-container">
-          <v-btn
-            :disabled="!form.surveys.length"
-            icon
-            @click="isOpen = !isOpen"
-          >
-            <v-icon v-if="!isOpen">
-              mdi-chevron-down
-            </v-icon>
-            <v-icon v-else>
-              mdi-chevron-up
-            </v-icon>
-          </v-btn>
-        </v-col>
-      </v-row>
-      <v-row
-        class="ml-12"
-        v-if="isOpen"
+          {{ status.icon }}
+        </v-icon>
+      </v-col>
+      <AsyncTranslationText
+        :translation="form.nameTranslation"
+      />
+      <v-spacer />
+      <v-chip
+        v-if="status.msg"
+        outlined
+        label
+        :color="status.color"
       >
-        <v-flex>
-          <v-simple-table>
-            <thead>
-              <tr>
-                <th>{{ $t('interview_status') }}</th>
-                <th class="a-left">
-                  {{ $t('interviews') }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="survey in form.surveys"
-                :data-survey-id="survey.id"
-                :key="survey.id"
-                @click="tryStartingSurvey(survey)"
-                :class="{ clickable: !disabled }"
-              >
-                <td>
-                  <span
-                    v-if="survey.completedAt"
-                    class="complete"
+        {{ status.msg }}
+      </v-chip>
+      <div class="version d-flex align-center">
+        (v{{ form.version }})
+      </div>
+      <v-col class="icon-container">
+        <v-btn
+          :disabled="!form.surveys.length"
+          icon
+          @click="isOpen = !isOpen"
+        >
+          <v-icon v-if="!isOpen">
+            mdi-chevron-down
+          </v-icon>
+          <v-icon v-else>
+            mdi-chevron-up
+          </v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row
+      class="ml-12"
+      v-if="isOpen"
+    >
+      <v-flex>
+        <v-simple-table>
+          <thead>
+            <tr>
+              <th>{{ $t('interview_status') }}</th>
+              <th class="a-left">
+                {{ $t('interviews') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="survey in form.surveys"
+              :data-survey-id="survey.id"
+              :key="survey.id"
+              @click="tryStartingSurvey(survey)"
+              :class="{ clickable: !disabled }"
+            >
+              <td>
+                <span
+                  v-if="survey.completedAt"
+                  class="complete"
+                >
+                  {{ $t('completed') }}
+                </span>
+                <span
+                  v-else
+                  class="incomplete"
+                >
+                  {{ $t('in_progress') }}
+                </span>
+              </td>
+              <td>
+                <table class="table no-wrap">
+                  <tr>
+                    <th>{{ $t('surveyor') }}</th>
+                    <th>{{ $t('version') }}</th>
+                    <th>{{ $t('start_time') }}</th>
+                    <th>{{ $t('duration') }}</th>
+                  </tr>
+                  <tr
+                    v-for="interview in survey.interviews"
+                    :data-interview-id="interview.id"
+                    :key="interview.id"
                   >
-                    {{ $t('completed') }}
-                  </span>
-                  <span
-                    v-else
-                    class="incomplete"
+                    <td>
+                      {{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span>
+                    </td>
+                    <td>{{ survey.form.version }}</td>
+                    <td><FormattedDate :date="interview.startTime" /></td>
+                    <td>
+                      <TimeDuration
+                        :end="interview.endTime"
+                        :start="interview.startTime"
+                      />
+                    </td>
+                  </tr>
+                </table>
+              </td>
+              <td>
+                <DotsMenu>
+                  <v-list-item
+                    @click="$emit('view-report', survey)"
+                    :disabled="disabled"
                   >
-                    {{ $t('in_progress') }}
-                  </span>
-                </td>
-                <td>
-                  <table class="table no-wrap">
-                    <tr>
-                      <th>{{ $t('surveyor') }}</th>
-                      <th>{{ $t('version') }}</th>
-                      <th>{{ $t('start_time') }}</th>
-                      <th>{{ $t('duration') }}</th>
-                    </tr>
-                    <tr
-                      v-for="interview in survey.interviews"
-                      :data-interview-id="interview.id"
-                      :key="interview.id"
-                    >
-                      <td>
-                        {{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span>
-                      </td>
-                      <td>{{ survey.form.version }}</td>
-                      <td><FormattedDate :date="interview.startTime" /></td>
-                      <td>
-                        <TimeDuration
-                          :end="interview.endTime"
-                          :start="interview.startTime"
-                        />
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-                <td>
-                  <DotsMenu>
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ $t('survey_report') }}
+                      </v-list-item-title>
+                    </v-list-item-content>
+                  </v-list-item>
+                  <Permission
+                    web-only
+                    :allowed-roles="['admin']"
+                  >
                     <v-list-item
-                      @click="$emit('view-report', survey)"
-                      :disabled="disabled"
+                      @click="uncompleteSurvey(survey)"
+                      :disabled="disabled || !survey.completedAt"
                     >
                       <v-list-item-content>
                         <v-list-item-title>
-                          {{ $t('view_report') }}
+                          {{ $t('reopen_survey') }}
                         </v-list-item-title>
                       </v-list-item-content>
                     </v-list-item>
-                    <Permission
-                      web-only
-                      :allowed-roles="['admin']"
-                    >
-                      <v-list-item
-                        @click="uncompleteSurvey(survey)"
-                        :disabled="disabled || !survey.completedAt"
-                      >
-                        <v-list-item-content>
-                          <v-list-item-title>
-                            {{ $t('reopen_survey') }}
-                          </v-list-item-title>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </Permission>
-                  </DotsMenu>
-                </td>
-              </tr>
-            </tbody>
-          </v-simple-table>
-        </v-flex>
-      </v-row>
-    </v-col>
-  </v-container>
+                  </Permission>
+                </DotsMenu>
+              </td>
+            </tr>
+          </tbody>
+        </v-simple-table>
+      </v-flex>
+    </v-row>
+  </v-col>
 </template>
 
 <script lang="ts">
@@ -172,8 +167,8 @@ import { Moment } from 'moment'
 import DotsMenu from '../util/DotsMenu.vue'
 import Permission from '../Permission.vue'
 import { humanizeDateDiff } from '../../filters/humanizeDateDiff'
-import FormattedDate from '../style/FormattedDate.vue'
-import TimeDuration from '../style/TimeDuration.vue'
+import FormattedDate from '../styles/FormattedDate.vue'
+import TimeDuration from '../styles/TimeDuration.vue'
 
 export type DisplayForm = {
   isComplete?: boolean

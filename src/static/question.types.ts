@@ -41,6 +41,7 @@ const numParams = [
 const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
   [qt.time]: [PT.min_time, PT.max_time],
   [qt.multiple_select]: [PT.other, PT.exclusive],
+  [qt.multiple_choice]: [PT.other, PT.exclusive, PT.correct_choice],
   [qt.image]: [PT.min, PT.max],
   [qt.relationship]: [
     PT.min_relationships,
@@ -57,7 +58,6 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
   [qt.roster]: [PT.allow_barcode, PT.min_roster, PT.max_roster],
   [qt.text]: [PT.allow_barcode],
   [qt.text_area]: [PT.allow_barcode],
-  [qt.multiple_choice]: [PT.other, PT.exclusive],
   [qt.geo]: [PT.geo_type, PT.min_geos, PT.max_geos],
   [qt.intro]: [],
   [qt.year]: [PT.min_date, PT.max_date],
@@ -76,5 +76,14 @@ for (const key in questionTypeParameters) {
 }
 
 export const QuestionTypeParameters = Object.freeze(questionTypeParameters)
+
+export function lookupQuestionType (typeId: string) {
+  for (const key in qt) {
+    if (qt[key] === typeId) {
+      return key
+    }
+  }
+  return null
+}
 
 export default qt

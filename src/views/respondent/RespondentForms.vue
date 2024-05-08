@@ -1,5 +1,5 @@
 <template>
-  <v-container class="respondent-forms fill-width">
+  <v-col class="respondent-forms fill-width">
     <v-alert v-if="error">
       {{ error }}
     </v-alert>
@@ -77,20 +77,20 @@
         @newInterview="startInterview"
         @view-report="showReport"
       />
+      <TrellisModal
+        v-if="reportSurvey"
+        :value="!!reportSurvey"
+        @input="reportSurvey = null"
+        :title="$t('survey_report')"
+        @close="reportSurvey = null"
+      >
+        <SurveyReport
+          :respondent="respondent"
+          :survey="reportSurvey"
+        />
+      </TrellisModal>
     </v-card>
-    <TrellisModal
-      v-if="reportSurvey"
-      :value="!!reportSurvey"
-      @input="reportSurvey = null"
-      :title="$t('survey_report')"
-      @close="reportSurvey = null"
-    >
-      <SurveyReport
-        :respondent="respondent"
-        :survey="reportSurvey"
-      />
-    </TrellisModal>
-  </v-container>
+  </v-col>
 </template>
 
 <script lang="ts">
