@@ -104,27 +104,49 @@
                       :data-interview-id="interview.id"
                       :key="interview.id"
                     >
-                      <td>{{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span></td>
-                      <td>{{ interview.startTime && interview.startTime | dateFormat }}</td>
-                      <td>{{ interview.endTime && interview.endTime | dateFormat }}</td>
+                      <td>
+                        {{ getName(interview.user) }} <span class="light">({{ getUsername(interview.user) }})</span>
+                      </td>
+                      <td>{{ survey.form.version }}</td>
+                      <td><FormattedDate :date="interview.startTime" /></td>
+                      <td>
+                        <TimeDuration
+                          :end="interview.endTime"
+                          :start="interview.startTime"
+                        />
+                      </td>
                     </tr>
                   </table>
                 </td>
-                <Permission
-                  web-only
-                  :allowed-roles="['admin']"
-                >
-                  <td>
-                    <DotsMenu>
+                <td>
+                  <DotsMenu>
+                    <v-list-item
+                      @click="$emit('view-report', survey)"
+                      :disabled="disabled"
+                    >
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ $t('view_report') }}
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                    <Permission
+                      web-only
+                      :allowed-roles="['admin']"
+                    >
                       <v-list-item
                         @click="uncompleteSurvey(survey)"
                         :disabled="disabled || !survey.completedAt"
                       >
-                        {{ $t('reopen_survey') }}
+                        <v-list-item-content>
+                          <v-list-item-title>
+                            {{ $t('reopen_survey') }}
+                          </v-list-item-title>
+                        </v-list-item-content>
                       </v-list-item>
-                    </DotsMenu>
-                  </td>
-                </Permission>
+                    </Permission>
+                  </DotsMenu>
+                </td>
               </tr>
             </tbody>
           </v-simple-table>
@@ -150,6 +172,8 @@ import { Moment } from 'moment'
 import DotsMenu from '../util/DotsMenu.vue'
 import Permission from '../Permission.vue'
 import { humanizeDateDiff } from '../../filters/humanizeDateDiff'
+import FormattedDate from '../style/FormattedDate.vue'
+import TimeDuration from '../style/TimeDuration.vue'
 
 export type DisplayForm = {
   isComplete?: boolean
@@ -311,6 +335,8 @@ export default Vue.extend({
     AsyncTranslationText,
     DotsMenu,
     Permission,
+    FormattedDate,
+    TimeDuration,
   },
 })
 </script>
