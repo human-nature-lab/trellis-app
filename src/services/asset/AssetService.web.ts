@@ -23,6 +23,14 @@ export class AssetService implements AssetServiceInterface {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('fileName', asset.fileName)
+    if (asset.mimeType) {
+      formData.append('mimeType', asset.mimeType)
+    } else if (file instanceof File) {
+      formData.append('mimeType', file.type)
+    }
+    if (asset.type) {
+      formData.append('type', asset.type)
+    }
     formData.append('isFromSurvey', asset.isFromSurvey ? 'true' : 'false')
     const res = await http().post('/asset', formData, {
       headers: {

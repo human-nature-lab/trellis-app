@@ -10,6 +10,9 @@ import { FSFileEntry } from '@/cordova/file'
 import { action } from '../../lib/action'
 import ActionTypes from '@/static/action.types'
 import Asset from '@/entities/trellis/Asset'
+import AssetRow from './AssetRow.vue'
+import AssetViewer from '@/components/asset/AssetViewer.vue'
+import TrellisModal from '@/components/TrellisModal.vue'
 
 const props = defineProps<{
   question: Question
@@ -43,10 +46,11 @@ function addAssets (assets: Asset[]) {
   }
 }
 
-async function mediaToAssets (files: (Blob | FSFileEntry)[]) {
+async function mediaToAssets (files: (File | FSFileEntry)[]) {
   return Promise.all(files.map(async f => {
     const fileName = (f instanceof FSFileEntry) ? f.name : `audio-${Date.now()}.webm`
-    return AssetService.createAsset({ fileName, isFromSurvey: true }, f)
+    const mimeType = (f instanceof FSFileEntry) ? (await f.type()) : f.type
+    return AssetService.createAsset({ fileName, isFromSurvey: true, mimeType }, f)
   }))
 }
 
@@ -104,6 +108,15 @@ async function uploadFile () {
   }
 }
 
+async function removeAsset (asset: Asset) {
+  action(props.question.id, ActionTypes.remove_asset, {
+    val: asset.id,
+    name: 'asset',
+    asset_id: asset.id,
+  })
+}
+
+const previewAsset = ref<Asset | null>(null)
 const isBusy = computed(() => working.value || assetsLoading.value)
 
 </script>
@@ -145,12 +158,20 @@ const isBusy = computed(() => working.value || assetsLoading.value)
       </v-btn>
     </v-row>
     <v-list>
-      <v-list-item
+      <AssetRow
         v-for="asset in assets"
         :key="asset.id"
-      >
-        {{ asset }}
-      </v-list-item>
+        :asset="asset"
+        @remove="removeAsset(asset)"
+        @preview="previewAsset = asset"
+      />
     </v-list>
+    <TrellisModal
+      v-if="previewAsset"
+      :value="!!previewAsset"
+      @input="previewAsset = null"
+    >
+      <AssetViewer :asset="previewAsset" />
+    </TrellisModal>
   </v-col>
 </template>

@@ -1,12 +1,11 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import Asset from '@/entities/trellis/Asset'
 import AssetService from '@/services/asset'
-import { ref, watch } from 'vue'
 
 const props = defineProps<{
-  asset: Asset
-} | {
-  assetId: string
+  asset?: Asset
+  assetId?: string
 }>()
 
 const asset = ref<Asset>(null)
@@ -51,11 +50,11 @@ watch(asset, async a => {
       indetermiante
     />
     <img
-      v-else-if="asset.type === 'image'"
+      v-else-if="asset.type === 'image' && blobUrl"
       :src="blobUrl"
     >
     <video
-      v-else-if="asset.type === 'video'"
+      v-else-if="asset.type === 'video' && blobUrl"
       controls
     >
       <source
@@ -65,7 +64,7 @@ watch(asset, async a => {
       {{ $t('video_not_supported') }}
     </video>
     <audio
-      v-else-if="asset.type === 'audio'"
+      v-else-if="asset.type === 'audio' && blobUrl"
       controls
     >
       <source

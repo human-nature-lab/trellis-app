@@ -112,6 +112,7 @@
       <LoginModal />
       <WebAudioRecorder />
       <MediaAudioRecorder />
+      <AssetUploader />
     </v-app>
   </div>
 </template>
@@ -143,6 +144,7 @@
   import Maintenance from './components/Maintenance.vue'
   import maintenanceService from './services/maintenance'
   import { secondaryDrawerIcon, secondaryDrawerOnClick } from '@/helpers/drawer.helper'
+import AssetUploader from './components/asset/AssetUploader.vue'
 
   export default {
     name: 'WebApp',
@@ -216,6 +218,7 @@
       Maintenance,
       WebAudioRecorder,
       MediaAudioRecorder,
+      AssetUploader,
     },
     computed: {
       withinCordova () {

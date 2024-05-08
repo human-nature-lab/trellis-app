@@ -202,50 +202,52 @@ watch(canvas, el => {
 </script>
 
 <template>
-  <TrellisModal
-    :title="$t('record_audio')"
-    v-model="visible"
-    @close="onClose"
-    fullscreen
-    ref="recorderRef"
-    :persistent="recording"
-  >
-    <v-col v-if="visible">
-      <v-row no-gutters>
-        <canvas
-          ref="canvas"
-          width="400"
-          height="200"
-        />
-      </v-row>
-      <v-row
-        no-gutters
-        class="justify-center"
-      >
-        <v-btn @click="toggleRecording">
-          <v-icon v-if="recording">
-            mdi-stop
-          </v-icon>
-          <v-icon v-else>
-            mdi-record
-          </v-icon>
-        </v-btn>
-        <v-col>
-          Duration: {{ duration }}
-        </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col>
-          Visible: {{ visible }}
-          Recording: {{ recording }}
-        </v-col>
-        <v-col>
-          State: {{ state }}
-          Mime type: {{ mimeType }}
-        </v-col>
-      </v-row>
-    </v-col>
-  </TrellisModal>
+  <div ref="recorderRef">
+    <TrellisModal
+      v-if="visible"
+      :title="$t('record_audio')"
+      v-model="visible"
+      @close="onClose"
+      fullscreen
+      :persistent="recording"
+    >
+      <v-col v-if="visible">
+        <v-row no-gutters>
+          <canvas
+            ref="canvas"
+            width="400"
+            height="200"
+          />
+        </v-row>
+        <v-row
+          no-gutters
+          class="justify-center"
+        >
+          <v-btn @click="toggleRecording">
+            <v-icon v-if="recording">
+              mdi-stop
+            </v-icon>
+            <v-icon v-else>
+              mdi-record
+            </v-icon>
+          </v-btn>
+          <v-col>
+            Duration: {{ duration }}
+          </v-col>
+        </v-row>
+        <v-row no-gutters>
+          <v-col>
+            Visible: {{ visible }}
+            Recording: {{ recording }}
+          </v-col>
+          <v-col>
+            State: {{ state }}
+            Mime type: {{ mimeType }}
+          </v-col>
+        </v-row>
+      </v-col>
+    </TrellisModal>
+  </div>
 </template>
 
 <style lang="sass">

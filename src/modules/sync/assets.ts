@@ -2,7 +2,7 @@ import Asset from '@/entities/trellis/Asset'
 import { StepController } from './controller'
 import { delay } from '@/classes/delay'
 import DatabaseService from '@/services/database'
-import { FSFileEntry, file } from '@/cordova/file'
+import { file } from '@/cordova/file'
 import { AsyncQueue } from '@/classes/AsyncQueue'
 import SyncService from '@/services/SyncService'
 import { i18n } from '@/i18n'
@@ -11,19 +11,22 @@ import HashService from '@/services/hash'
 
 export async function analyzeAssets (ctrl: StepController): Promise<Asset[]> {
   ctrl.setProgress(0, 3)
-  // TODO: Check for all assets that are referenced in survey data
+  // Check for all assets that are referenced in survey data
   const db = await DatabaseService.getDatabase()
   const q = db.createQueryBuilder(Asset, 'asset')
-  // q.where(`asset.id in (
-  //   select asset_id from datum where asset_id is not null and deleted_at is null
-  // )`)
-  // const assets = await q.getMany()
+  q.where(`asset.id in (
+    select asset_id from datum where asset_id is not null and deleted_at is null
+    and datum.question_datum_id in (
+      select id from question_datum where survey_id in (
+        select id from survey where deleted_at is null and completed_at is null
+      ) and deleted_at is null
+    )
+  )`)
   const assets = await q.getMany()
-  // TODO: Compare that list to the list of assets that are already downloaded
+  // Compare that list to the list of assets that are already downloaded
   ctrl.setProgress(1, 3)
   const assetDir = await file.dataDirectory('assets', { create: true })
   const assetFiles = await assetDir.files()
-  // TODO: Return a list of assets that need to be downloaded
   ctrl.setProgress(2, 3)
   await delay(100)
   const missingIds = new Set(assets.map(a => a.id))
@@ -32,7 +35,9 @@ export async function analyzeAssets (ctrl: StepController): Promise<Asset[]> {
   }
   ctrl.setProgress(3, 3)
   await delay(500)
-  return assets.filter(a => missingIds.has(a.id))
+  const results = assets.filter(a => missingIds.has(a.id))
+  // Return a list of assets that need to be downloaded
+  return results
 }
 
 export async function downloadAssets (ctrl: StepController, assets: Asset[]) {
