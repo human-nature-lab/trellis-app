@@ -8,6 +8,7 @@
     @create="create"
     :condition-tags="conditionTags"
     :disabled="disabled"
+    allow-custom
   />
 </template>
 
