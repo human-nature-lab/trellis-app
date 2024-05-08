@@ -1,9 +1,8 @@
 import mediaCapture from '@/cordova/media-capture'
 import { MediaCaptureServiceInterface, FileUploadOptions } from './media-capture-interface'
-import { requestWebRecording } from '@/components/audio-recorder/web-recorder'
 import { file, FSFileEntry } from '@/cordova/file'
-import uuidv4 from 'uuid/v4'
 import { requestMediaRecording } from '@/components/audio-recorder/media-recorder'
+import { requestUpload } from '@/components/asset/asset-upload'
 
 export class MediaCaptureService implements MediaCaptureServiceInterface {
   private async mediaToEntries (media: MediaFile[]): Promise<FSFileEntry[]> {
@@ -32,7 +31,7 @@ export class MediaCaptureService implements MediaCaptureServiceInterface {
     return [media]
   }
 
-  async uploadFile (opts?: FileUploadOptions): Promise<FSFileEntry[]> {
-    throw new Error('Not implemented')
+  async uploadFile (opts?: FileUploadOptions): Promise<File[]> {
+    return requestUpload(opts)
   }
 }

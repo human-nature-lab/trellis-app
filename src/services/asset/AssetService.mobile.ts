@@ -55,6 +55,7 @@ export class AssetService implements AssetServiceInterface {
     newAsset.type = asset.type || getTypeFromMime(newAsset.mimeType)
     const assetDir = await file.dataDirectory('assets', { create: true })
     if (f instanceof FSFileEntry) {
+      console.log(`moving file (${f.fullPath}) to assets dir (${newAsset.id})`)
       await f.moveTo(assetDir, newAsset.id)
     } else {
       await assetDir.writeFile(newAsset.id, f)

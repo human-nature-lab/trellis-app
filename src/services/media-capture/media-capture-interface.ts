@@ -1,15 +1,16 @@
 import { FSFileEntry } from '@/cordova/file'
 
 export type FileUploadOptions = {
-  types?: string[]
+  extensions?: string[]
+  max?: number
 }
 
 export interface MediaCaptureServiceInterface {
-  captureImage (): Promise<(Blob | FSFileEntry)[]>
+  captureImage (): Promise<(File | FSFileEntry)[]>
 
-  captureVideo (): Promise<(Blob | FSFileEntry)[]>
+  captureVideo (): Promise<(File | FSFileEntry)[]>
 
-  captureAudio (): Promise<(Blob | FSFileEntry)[]>
+  captureAudio (): Promise<(File | FSFileEntry)[]>
 
-  uploadFile (opts?: FileUploadOptions): Promise<(Blob | FSFileEntry)[]>
+  uploadFile (opts?: FileUploadOptions): Promise<(FSFileEntry | File)[]>
 }

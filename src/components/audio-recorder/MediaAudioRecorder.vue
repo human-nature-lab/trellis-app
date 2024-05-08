@@ -50,7 +50,7 @@ const amplitudes = ref([])
 function update () {
   if (!media) return
   media.getCurrentAmplitude(amp => {
-    console.log('amp', amp, ampSum, )
+    console.log('amp', amp, ampSum)
     ampSum += amp
     updateCount++
     if (updateCount % updateWindow === 0) {
@@ -97,27 +97,29 @@ async function onClose () {
 </script>
 
 <template>
-  <TrellisModal
-    :title="$t('record_audio')"
-    v-model="visible"
-    @close="onClose"
-    fullscreen
-    ref="recorderRef"
-    :persistent="recording"
-  >
-    {{ status }} ({{ elapsed }}ms)
-    <v-row no-gutters>
-      <v-btn @click="startRecording">
-        Start
-      </v-btn>
-      <v-btn @click="stopRecording">
-        Stop
-      </v-btn>
-    </v-row>
-    <v-col>
-      {{ amplitudes }}
-    </v-col>
-  </TrellisModal>
+  <div ref="recorderRef">
+    <TrellisModal
+      v-if="visible"
+      :title="$t('record_audio')"
+      v-model="visible"
+      @close="onClose"
+      fullscreen
+      :persistent="recording"
+    >
+      {{ status }} ({{ elapsed }}ms)
+      <v-row no-gutters>
+        <v-btn @click="startRecording">
+          Start
+        </v-btn>
+        <v-btn @click="stopRecording">
+          Stop
+        </v-btn>
+      </v-row>
+      <v-col>
+        {{ amplitudes }}
+      </v-col>
+    </TrellisModal>
+  </div>
 </template>
 
 <style lang="sass">

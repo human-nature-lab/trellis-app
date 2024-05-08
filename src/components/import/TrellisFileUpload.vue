@@ -174,6 +174,14 @@ import Vue, { PropOptions } from 'vue'
 import TrellisModal from '../TrellisModal.vue'
 import formatBytes from '../../filters/format-bytes.filter'
 
+enum FileType {
+  Image = 'image/*',
+  Video = 'video/*',
+  Audio = 'audio/*',
+  Text = 'text/*',
+  Application = 'application/*',
+}
+
 type UFile = File & { status: 'uploaded' | 'uploading' | 'failed', error: any, response: any }
 
 export default Vue.extend({
@@ -183,6 +191,10 @@ export default Vue.extend({
   props: {
     title: String,
     uploadFile: Function,
+    types: {
+      type: Array,
+      required: false,
+    } as PropOptions<FileType[]>,
     extensions: {
       type: Array,
       required: false,
@@ -219,6 +231,7 @@ export default Vue.extend({
         }
       }
       this.isUploading = false
+      this.$emit('upload-done')
     },
     async uploadOne (file: UFile) {
       try {
@@ -296,8 +309,14 @@ export default Vue.extend({
   },
   computed: {
     accept (): string {
-      if (!this.extensions) return ''
-      return this.extensions.map(e => '.' + e).join(',')
+      let res = ''
+      if (this.types) {
+        res = this.types.join(',')
+      }
+      if (this.extensions) {
+        res += (res ? ',' : '') + this.extensions.map(e => '.' + e).join(',')
+      }
+      return res
     },
   },
 })
