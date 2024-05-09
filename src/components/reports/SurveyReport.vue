@@ -127,7 +127,7 @@ const numRowsWithAnswer = computed(() => rows.value.reduce((c, r) => r.answer ? 
               {{ $t('response') }}
             </th>
             <th>
-              {{ $t('correct') }}
+              {{ $t('answer') }}
             </th>
           </tr>
         </thead>
