@@ -8,44 +8,43 @@ import InterviewServiceAbstract from './InterviewServiceAbstract'
 import Interview from '../../entities/trellis/Interview'
 import Action from '../../entities/trellis/Action'
 import InterviewDeltaInterface from './InterviewDeltaInterface'
-import GeoLocationService from '../geolocation'
+import { Coordinates } from '../geolocation/GeoLocationAbstract'
 
 export default class InterviewServiceWeb extends InterviewServiceAbstract {
-
   async getInterview (interviewId: string) {
-    let res = await http().get(`interview/${interviewId}`)
+    const res = await http().get(`interview/${interviewId}`)
     return new Interview().fromSnakeJSON(res.data.interview)
   }
 
   async getActions (interviewId: string): Promise<Action[]> {
     interviewId = encodeURI(interviewId)
-    let res = await http().get(`interview/${interviewId}/actions`)
+    const res = await http().get(`interview/${interviewId}/actions`)
     return res.data.actions.map(a => new Action().fromSnakeJSON(a))
   }
 
   async saveActions (interviewId: string, actions: Action[]) {
     interviewId = encodeURI(interviewId)
-    let nActions = actions.map(a => a.toSnakeJSON())
+    const nActions = actions.map(a => a.toSnakeJSON())
     return http().post(`interview/${interviewId}/actions`, {
-      'actions': nActions
+      actions: nActions,
     }).then(r => r.data)
   }
 
   async getData (interviewId: string) {
-    let res = await http().get(`interview/${interviewId}/data`)
+    const res = await http().get(`interview/${interviewId}/data`)
     return {
       data: res.data.data.map(q => (new QuestionDatum()).fromSnakeJSON(q)),
       conditionTags: {
         survey: res.data.conditionTags.survey.map(s => (new SurveyConditionTag()).fromSnakeJSON(s)),
         section: res.data.conditionTags.section.map(s => (new SectionConditionTag()).fromSnakeJSON(s)),
-        respondent: res.data.conditionTags.respondent.map(r => (new RespondentConditionTag()).fromSnakeJSON(r))
-      }
+        respondent: res.data.conditionTags.respondent.map(r => (new RespondentConditionTag()).fromSnakeJSON(r)),
+      },
     }
   }
 
   async saveData (interviewId: string, diff: InterviewDeltaInterface) {
     interviewId = encodeURIComponent(interviewId)
-    let d = diff.toSnakeJSON()
+    const d = diff.toSnakeJSON()
     const res = await http().post(`interview/${interviewId}/data`, d)
     if (res.status >= 200 && res.status < 300) {
       return res.data
@@ -62,12 +61,12 @@ export default class InterviewServiceWeb extends InterviewServiceAbstract {
     return http().post(`interview/${interviewId}/complete`)
   }
 
-  async create (surveyId: string, coordinates: Coordinates): Promise<Interview> {
-    let data = {
+  async create (surveyId: string, coordinates?: Coordinates): Promise<Interview> {
+    const data = {
       latitude: null,
       longitude: null,
       altitude: null,
-      accuracy: null
+      accuracy: null,
     }
     if (coordinates) {
       data.latitude = coordinates.latitude
@@ -75,7 +74,7 @@ export default class InterviewServiceWeb extends InterviewServiceAbstract {
       data.altitude = coordinates.altitude
       data.accuracy = coordinates.accuracy
     }
-    let res = await http().post(`survey/${surveyId}/interview`, data)
+    const res = await http().post(`survey/${surveyId}/interview`, data)
     return new Interview().fromSnakeJSON(res.data.interview)
   }
 

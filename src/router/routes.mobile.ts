@@ -14,6 +14,7 @@ const Storage = () => import(/* webpackChunkName: "storage" */'@/views/info/Stor
 const RegisterDevice = () => import(/* webpackChunkName: "register-device" */'@/views/setup/RegisterDevice.vue')
 const ConfigureServer = () => import(/* webpackChunkName: "configure-server" */'@/views/setup/ServerIPConfig.vue')
 const HistoryView = () => import(/* webpackChunkName: "history" */'@/views/HistoryView.vue')
+const FilesView = () => import(/* webpackChunkName: "files" */'@/views/FilesView.vue')
 
 export default sharedRoutes.concat([{
   path: '/',
@@ -49,6 +50,11 @@ export default sharedRoutes.concat([{
   name: 'HistoryView',
   component: HistoryView,
   beforeEnter: guardQueue([LoginGuard, StudyGuard]),
+}, {
+  path: '/files',
+  name: 'Files',
+  component: FilesView,
+  beforeEnter: guardQueue([LoginGuard]),
 }]).concat(extraRoutes.map(r => ({
   ...r,
   beforeEnter: guardQueue([LoginGuard, StudyGuard]),

@@ -18,15 +18,17 @@ import { randomIntBits } from '../../classes/M'
 import { Coordinates } from '../geolocation/GeoLocationAbstract'
 
 export default class InterviewServiceCordova extends InterviewServiceAbstract {
-
   public async getInterview (interviewId: string): Promise<Interview> {
     const repo = await DatabaseService.getRepository(Interview)
     const interview = await repo.findOne({
       where: {
         id: interviewId,
-        deletedAt: IsNull()
+        deletedAt: IsNull(),
       },
-      relations: ['survey', 'user', 'survey.respondent', 'survey.form', 'survey.respondent.geos', 'survey.respondent.geos.geo', 'survey.respondent.geos.geo.nameTranslation', 'survey.respondent.geos.geo.geoType']
+      relations: [
+        'survey', 'user', 'survey.respondent', 'survey.form', 'survey.respondent.geos', 'survey.respondent.geos.geo',
+        'survey.respondent.geos.geo.nameTranslation', 'survey.respondent.geos.geo.geoType',
+      ],
     })
     return interview
   }
@@ -39,9 +41,9 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
     interview.surveyId = surveyId
     interview.userId = user.id
     if (coordinates) {
-      interview.latitude = coordinates.latitude ? coordinates.latitude.toString(): null
-      interview.longitude = coordinates.longitude ? coordinates.longitude.toString(): null
-      interview.altitude = coordinates.altitude ? coordinates.altitude.toString(): null
+      interview.latitude = coordinates.latitude ? coordinates.latitude.toString() : null
+      interview.longitude = coordinates.longitude ? coordinates.longitude.toString() : null
+      interview.altitude = coordinates.altitude ? coordinates.altitude.toString() : null
     }
     interview = await repo.save(interview)
     return this.getInterview(interview.id)
@@ -49,18 +51,17 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
 
   public async complete (id: string): Promise<void> {
     const repo = await DatabaseService.getRepository(Interview)
-    let interview = await repo.createQueryBuilder()
+    const res = await repo.createQueryBuilder()
       .update(Interview)
-      .set({ endTime: now()})
+      .set({ endTime: now() })
       .where('id = :id', { id })
       .execute()
-    return interview
   }
 
   private async copyPreloadActions (interviewId: string): Promise<Repository<Action>> {
     const repository = await DatabaseService.getRepository(PreloadAction)
     const queryBuilder = await repository.createQueryBuilder('preload_action')
-    let q = queryBuilder.where(`preload_action.respondentId = (
+    const q = queryBuilder.where(`preload_action.respondentId = (
       select respondent_id from survey where id = (select survey_id from interview where id = :interviewId)
     )`)
       .andWhere(`preload_action.questionId in (
@@ -78,9 +79,9 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
     )`, {
         interviewId,
       }).andWhere('preload_action.deleted_at is null')
-    let preloadActions = await q.getMany()
+    const preloadActions = await q.getMany()
     const insertActions = preloadActions.map((p, i) => {
-      let a = new Action()
+      const a = new Action()
       a.preloadActionId = p.id
       a.payload = p.payload
       a.actionType = p.actionType
@@ -95,7 +96,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
     })
     const repo = await DatabaseService.getRepository(Action)
     if (preloadActions.length) {
-      let res = await repo.insert(insertActions)
+      const res = await repo.insert(insertActions)
     }
     return repo
   }
@@ -103,15 +104,15 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
   public async getActions (interviewId: string): Promise<Action[]> {
     // Get preload actions for this respondent_id and question_id (via form_id)
     // that have not already been copied into the action table
-    let repo = await this.copyPreloadActions(interviewId)
-    let actions = await repo.createQueryBuilder('action')
+    const repo = await this.copyPreloadActions(interviewId)
+    const actions = await repo.createQueryBuilder('action')
       .where(qb => {
-        return 'action.interviewId in ' +  qb.subQuery().select('interview.id')
+        return 'action.interviewId in ' + qb.subQuery().select('interview.id')
           .from(Interview, 'interview')
           .where(qb2 => {
             return 'interview.surveyId = ' + qb2.subQuery().select('interview.surveyId')
               .from(Interview, 'interview')
-              .where('interview.id = :interviewId', {interviewId})
+              .where('interview.id = :interviewId', { interviewId })
               .getQuery()
           }).getQuery()
       }).getMany()
@@ -120,7 +121,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
 
   public async saveActions (interviewId: string, actions: Action[]): Promise<any> {
     const repo = await DatabaseService.getRepository(Action)
-    let res = await repo.insert(actions)
+    const res = await repo.insert(actions)
     return res
   }
 
@@ -128,7 +129,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
     return qb.subQuery()
       .select('interview.surveyId')
       .from(Interview, 'interview')
-      .where('interview.id = :interviewId', {interviewId})
+      .where('interview.id = :interviewId', { interviewId })
       .getQuery()
   }
 
@@ -187,8 +188,8 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
       conditionTags: {
         survey,
         section,
-        respondent
-      }
+        respondent,
+      },
     }
   }
 
@@ -198,19 +199,19 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
 
     return connection.transaction(async manager => {
       console.log('saveData transaction open')
-      await manager.query(`PRAGMA defer_foreign_keys = true;`)
+      await manager.query('PRAGMA defer_foreign_keys = true;')
 
       // Remove stuff first
-      for (let removedDatum of diff.data.datum.removed) {
+      for (const removedDatum of diff.data.datum.removed) {
         await manager.update(Datum, { id: removedDatum.id }, { deletedAt: new Date() })
       }
-      for (let removedQuestionDatum of diff.data.questionDatum.removed) {
+      for (const removedQuestionDatum of diff.data.questionDatum.removed) {
         await manager.update(QuestionDatum, { id: removedQuestionDatum.id }, { deletedAt: new Date() })
       }
 
       // Insert 2nd
-      for (let addedQuestionDatum of diff.data.questionDatum.added) {
-        let questionDatumExists = await manager.findOne(QuestionDatum, { where: { id: addedQuestionDatum.id } })
+      for (const addedQuestionDatum of diff.data.questionDatum.added) {
+        const questionDatumExists = await manager.findOne(QuestionDatum, { where: { id: addedQuestionDatum.id } })
         if (questionDatumExists instanceof QuestionDatum) {
           // Just undelete it
           await manager.update(QuestionDatum, { id: addedQuestionDatum.id }, { deletedAt: null })
@@ -229,16 +230,16 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
               createdAt: addedQuestionDatum.createdAt,
               updatedAt: addedQuestionDatum.updatedAt,
               deletedAt: addedQuestionDatum.deletedAt,
-              noOne: addedQuestionDatum.noOne
+              noOne: addedQuestionDatum.noOne,
             })
         }
       }
 
-      for (let addedDatum of diff.data.datum.added) {
-        let datumExists = await manager.findOne(Datum, { where: { id: addedDatum.id } })
+      for (const addedDatum of diff.data.datum.added) {
+        const datumExists = await manager.findOne(Datum, { where: { id: addedDatum.id } })
         if (datumExists instanceof Datum) {
           // Just undelete it
-          await manager.update(Datum, {id: addedDatum.id}, {deletedAt: null})
+          await manager.update(Datum, { id: addedDatum.id }, { deletedAt: null })
         } else {
           if (addedDatum.val === null) {
             console.log('addedDatum.val === null', addedDatum)
@@ -264,13 +265,13 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
               actionId: addedDatum.actionId,
               createdAt: addedDatum.createdAt,
               updatedAt: addedDatum.updatedAt,
-              deletedAt: addedDatum.deletedAt
+              deletedAt: addedDatum.deletedAt,
             })
         }
       }
 
       // Update last
-      for (let updatedQuestionDatum of diff.data.questionDatum.modified) {
+      for (const updatedQuestionDatum of diff.data.questionDatum.modified) {
         await manager.update(QuestionDatum, { id: updatedQuestionDatum.id },
           {
             sectionRepetition: updatedQuestionDatum.sectionRepetition,
@@ -279,11 +280,11 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
             skippedAt: updatedQuestionDatum.skippedAt,
             dkRf: updatedQuestionDatum.dkRf,
             dkRfVal: updatedQuestionDatum.dkRfVal,
-            noOne: updatedQuestionDatum.noOne
+            noOne: updatedQuestionDatum.noOne,
           })
       }
 
-      for (let updatedDatum of diff.data.datum.modified) {
+      for (const updatedDatum of diff.data.datum.modified) {
         await manager.update(Datum, { id: updatedDatum.id },
           {
             name: updatedDatum.name,
@@ -303,7 +304,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
           })
       }
 
-      for (let addedRespondentConditionTag of diff.conditionTags.respondent.added) {
+      for (const addedRespondentConditionTag of diff.conditionTags.respondent.added) {
         if (await manager.findOne(RespondentConditionTag, addedRespondentConditionTag.id) === undefined) {
           // Doesn't exist, save it
           await manager.save(addedRespondentConditionTag)
@@ -313,7 +314,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
         }
       }
 
-      for (let addedSectionConditionTag of diff.conditionTags.section.added) {
+      for (const addedSectionConditionTag of diff.conditionTags.section.added) {
         if (await manager.findOne(SectionConditionTag, addedSectionConditionTag.id) === undefined) {
           // Doesn't exist, save it
           await manager.save(addedSectionConditionTag)
@@ -323,7 +324,7 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
         }
       }
 
-      for (let addedSurveyConditionTag of diff.conditionTags.survey.added) {
+      for (const addedSurveyConditionTag of diff.conditionTags.survey.added) {
         if (await manager.findOne(SurveyConditionTag, addedSurveyConditionTag.id) === undefined) {
           // Doesn't exist, save it
           await manager.save(addedSurveyConditionTag)
@@ -333,21 +334,20 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
         }
       }
 
-      for (let removedRespondentConditionTag of diff.conditionTags.respondent.removed) {
+      for (const removedRespondentConditionTag of diff.conditionTags.respondent.removed) {
         await manager.update(RespondentConditionTag, { id: removedRespondentConditionTag.id }, { deletedAt: new Date() })
       }
 
-      for (let removedSectionConditionTag of diff.conditionTags.section.removed) {
+      for (const removedSectionConditionTag of diff.conditionTags.section.removed) {
         await manager.update(SectionConditionTag, { id: removedSectionConditionTag.id }, { deletedAt: new Date() })
       }
 
-      for (let removedSurveyConditionTag of diff.conditionTags.survey.removed) {
+      for (const removedSurveyConditionTag of diff.conditionTags.survey.removed) {
         await manager.update(SurveyConditionTag, { id: removedSurveyConditionTag.id }, { deletedAt: new Date() })
       }
 
       console.log('saveData transaction closing')
     })
-
   }
 
   public async getPreload (interviewId: string) {
@@ -358,18 +358,17 @@ export default class InterviewServiceCordova extends InterviewServiceAbstract {
     const repo = await DatabaseService.getRepository(Interview)
     const interview = await repo.createQueryBuilder('interview')
       .where('interview.survey_id in (select id from survey where respondent_id = :respondentId)', { respondentId })
-      .andWhere('interview.createdAt >= :oldestDate', {oldestDate: this.getDateFromTolerance(tolerance)})
+      .andWhere('interview.createdAt >= :oldestDate', { oldestDate: this.getDateFromTolerance(tolerance) })
       .andWhere('interview.latitude is not NULL')
       .getOne()
     if (interview) {
       return {
         latitude: interview.latitude,
         longitude: interview.longitude,
-        altitude: interview.altitude
+        altitude: interview.altitude,
       } as Coordinates
     } else {
       throw Error('No previous interview matching these criteria')
     }
   }
-
 }

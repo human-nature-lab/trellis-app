@@ -13,7 +13,7 @@ function mobileOnly (req, res, next) {
 
 const isProd = process.env.NODE_ENV === 'production'
 console.log('isProd', isProd, process.env.NODE_ENV, process.env.APP_ENV)
-module.exports = webpackMerge({
+const mobileConfig = webpackMerge({
   resolve: {
     extensions: [
       '.mobile.ts',
@@ -53,3 +53,13 @@ module.exports = webpackMerge({
     }),
   ],
 }, config)
+
+if (!isProd) {
+  mobileConfig.devServer.https = {
+    key: path.resolve(__dirname, '../dev_cert.key'),
+    cert: path.resolve(__dirname, '../dev_cert.crt'),
+    ca: path.resolve(__dirname, '../res/cert/dev_ca.crt'),
+  }
+}
+
+module.exports = mobileConfig

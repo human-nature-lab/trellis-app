@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true
+  }
+}

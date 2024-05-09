@@ -231,7 +231,7 @@ const sections = computed(() => {
     }, {
       click: toggleDarkTheme,
       icon: 'mdi-theme-light-dark',
-      title: i18n.t('toggle_dark'),
+      title: i18n.t('dark_theme'),
       switchColor: 'success',
       iconColor: null,
       switchValue: global.darkTheme,

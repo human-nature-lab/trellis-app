@@ -6,7 +6,7 @@
       </div>
       <v-spacer />
       <v-btn @click="downloadForms" class="mx-1">
-        Download
+        {{ $t('download') }}
         <v-icon small class="ml-2">mdi-download</v-icon>
       </v-btn>
       <v-menu offset-y left>
@@ -93,7 +93,7 @@
       </v-menu>
     </v-card-title>
     <v-row no-gutters>
-      <div class="pl-1 mr-4 subtitle-1">{{total}} surveys</div>
+      <div class="pl-1 mr-4 subtitle-1">{{ $t('total_surveys', { total }) }}</div>
       <UserChip
         v-for="user in users"
         :key="user"

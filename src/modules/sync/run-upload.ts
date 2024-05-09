@@ -14,6 +14,7 @@ import {
   uploadSnapshot,
   verifyUpload,
 } from './upload'
+import { getMissingServerAssets, uploadAssets } from './assets'
 
 export function runUpload (ctrl: VueController, onlyImageUpload: boolean) {
   const g1 = ctrl.addGroup(i18n.t('connecting'))
@@ -37,6 +38,8 @@ export function runUpload (ctrl: VueController, onlyImageUpload: boolean) {
   }
 
   const g4 = ctrl.addGroup(i18n.t('uploading_images'))
+  const g4s01 = ctrl.addStep(g4, i18n.t('analyzing_assets'))
+  const g4s02 = ctrl.addStep(g4, i18n.t('uploading_assets'))
   const g4s1 = ctrl.addStep(g4, i18n.t('requesting_image_list'))
   const g4s2 = ctrl.addStep(g4, i18n.t('finding_images'))
   const g4s3 = ctrl.addStep(g4, i18n.t('uploading_images'))
@@ -54,6 +57,7 @@ export function runUpload (ctrl: VueController, onlyImageUpload: boolean) {
       let uploadData: {
         fileEntry: FSFileEntry
         updatedPhotos: any[]
+        updatedAssets: string[]
       }
       if (!onlyImageUpload) {
         const sync = await SyncService.createSync('upload', a.deviceId)
@@ -93,6 +97,14 @@ export function runUpload (ctrl: VueController, onlyImageUpload: boolean) {
         throw new Error(i18n.t('operation_canceled').toString())
       }
       ctrl.setGroup(g4)
+      ctrl.setStep(g4s01)
+      const missingAssetIds = await getMissingServerAssets(ctrl)
+      ctrl.setStep(g4s02)
+      if (uploadData) {
+        missingAssetIds.push(...uploadData.updatedAssets)
+      }
+      await uploadAssets(ctrl, missingAssetIds)
+
       ctrl.setStep(g4s1)
       const imA = await getServerMissingImages(ctrl)
       ctrl.setStep(g4s2)

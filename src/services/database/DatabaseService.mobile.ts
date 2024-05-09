@@ -101,6 +101,11 @@ export default class DatabaseServiceCordova {
     return conn.getRepository(entity)
   }
 
+  async getConfigRepository<T> (entity: string | EntitySchema<T> | ObjectType<T>) {
+    const conn = await this.getConfigDatabase()
+    return conn.getRepository(entity)
+  }
+
   async createConfigDatabase () {
     const release = await this.configMutex.acquire()
     try {
@@ -120,10 +125,7 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  async getConfigRepository (entity: typeof Entity) {
-    const conn = await this.getConfigDatabase()
-    return conn.getRepository(entity)
-  }
+ 
 
   async createUpdatedRecordsTable (queryRunner: QueryRunner, status: { message: string }) {
     try {

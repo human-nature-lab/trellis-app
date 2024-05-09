@@ -1,8 +1,8 @@
 import './globals'
 import {expect} from 'chai'
 
-import InterviewServiceWeb from '../../src/services/interview/InterviewServiceWeb'
-import InterviewServiceCordova from '../../src/services/interview/InterviewServiceCordova'
+import InterviewServiceWeb from '../../src/services/interview/InterviewService.web'
+import InterviewServiceCordova from '../../src/services/interview/InterviewService.mobile'
 import Interview from '../../src/entities/trellis/Interview'
 import User from '../../src/entities/trellis/User'
 import Survey from '../../src/entities/trellis/Survey'

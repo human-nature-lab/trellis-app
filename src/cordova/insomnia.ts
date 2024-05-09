@@ -17,7 +17,7 @@ export class insomnia {
     }
   }
 
-  static async withScreenOn<T> (cb: () => T) {
+  static async withScreenOn<T> (cb: () => Promise<T>) {
     let res: T
     try {
       await this.keepAwake()

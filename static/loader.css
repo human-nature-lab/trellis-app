@@ -1,0 +1,41 @@
+html, body {
+  margin: 0;
+}
+.init-loading {
+  position: relative;
+  background: #FF5722;
+  height: 100vh;
+  width: 100vw;
+}
+.init-loader {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}
+.init-loader::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-top: 0px;
+  border-right: 1px solid white;
+  border-bottom: 4px solid white;
+  border-left: 7px solid white;
+  border-radius: 50%;
+  animation: linear infinite spin 1s;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

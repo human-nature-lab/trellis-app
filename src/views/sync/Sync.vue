@@ -54,7 +54,7 @@
       <v-spacer />
       <v-col>
         <h4 class="py-2 text-center">
-          {{ $t('photos') }}
+          {{ $t('assets') }}
         </h4>
         <v-spacer />
         <v-row

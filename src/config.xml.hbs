@@ -30,6 +30,11 @@
   <content src="{{CONTENT_SOURCE}}" />
   <platform name="android">
     <allow-intent href="market:*" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/trellis_identity_white.png" />
+    <preference name="AndroidWindowSplashScreenBackground" value="#FF5722" />
+    <preference name="AndroidWindowSplashScreenIconBackgroundColor" value="#FF5722" />
+
+    {{!-- <preference name="AndroidPersistentFileLocation" value="Compatibility" /> --}}
     <icon src="static/img/icons/android-icon-36x36.png" density="ldpi" />
     <icon src="static/img/icons/android-icon-48x48.png" density="mdpi" />
     <icon src="static/img/icons/android-icon-72x72.png" density="hdpi" />
@@ -37,20 +42,16 @@
     <icon src="static/img/icons/android-icon-144x144.png" density="xxhdpi" />
     <icon src="static/img/icons/android-icon-192x192.png" density="xxxhdpi" />
 
-    <splash src="res/screen/android/screen-hdpi-landscape.png" density="land-hdpi"/>
-    <splash src="res/screen/android/screen-ldpi-landscape.png" density="land-ldpi"/>
-    <splash src="res/screen/android/screen-mdpi-landscape.png" density="land-mdpi"/>
-    <splash src="res/screen/android/screen-xhdpi-landscape.png" density="land-xhdpi"/>
-
-    <splash src="res/screen/android/screen-hdpi-portrait.png" density="port-hdpi"/>
-    <splash src="res/screen/android/screen-ldpi-portrait.png" density="port-ldpi"/>
-    <splash src="res/screen/android/screen-mdpi-portrait.png" density="port-mdpi"/>
-    <splash src="res/screen/android/screen-xhdpi-portrait.png" density="port-xhdpi"/>
     <preference name="android-targetSdkVersion" value="31" />
     <preference name="AndroidLaunchMode" value="singleTask"/>
     <hook type="before_build" src="hooks/android_before_build.sh" />
      
-    <resource-file src="config/android/app/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
+    {{#if DEV}}
+      <resource-file src="config/android/app/network_security_config.dev.xml" target="app/src/main/res/xml/network_security_config.xml" />
+      <resource-file src="res/raw/dev_ca.crt" target="app/src/main/res/raw/dev_ca.crt" />
+    {{else}}
+      <resource-file src="config/android/app/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
+    {{/if}}
     <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
       <application android:networkSecurityConfig="@xml/network_security_config" />
       {{#if ALLOW_CLEARTEXT_TRAFFIC}}

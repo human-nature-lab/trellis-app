@@ -44,3 +44,6 @@ releases
 
 .sentryclirc
 components.d.ts
+*.crt
+*.key
+logcat.log
