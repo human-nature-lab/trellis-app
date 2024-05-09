@@ -14,6 +14,7 @@
       :can-create-surveys="canCreateSurveys"
       @survey="survey => updateSurvey(form, survey)"
       @newInterview="$emit('newInterview', $event)"
+      @view-report="survey => $emit('view-report', survey)"
     />
   </v-col>
 </template>

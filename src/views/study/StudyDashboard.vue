@@ -7,7 +7,7 @@
     </v-row>
     <v-row class="px-1">
       <div class="pa-2">
-        Dates:
+        {{ $t('dates') }}
       </div>
       <v-dialog v-model="showDates" width="300">
         <template #activator="{ on, attrs }">
@@ -27,7 +27,7 @@
     <v-row>
       <v-col cols="12" md="6">
         <SparkLoader
-          title="Respondents"
+          :title="$t('respondents')"
           :min="min"
           :max="max"
           :study="global.study.id"
@@ -35,7 +35,7 @@
       </v-col>
       <v-col cols="12" md="6">
         <SparkLoader
-          title="Surveys"
+          :title="$t('surveys')"
           :min="min"
           :max="max"
           :study="global.study.id"
@@ -45,7 +45,7 @@
     <v-row>
       <v-col cols="12" md="6">
         <SparkLoader
-          title="Users"
+          :title="$t('users')"
           :min="min"
           :max="max"
           :study="global.study.id"
@@ -53,7 +53,7 @@
       </v-col>
       <v-col cols="12" md="6">
         <SparkLoader
-          title="Locations"
+          :title="$t('locations')"
           :min="min"
           :max="max"
           :study="global.study.id"
