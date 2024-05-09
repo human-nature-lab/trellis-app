@@ -17,11 +17,14 @@
           :subject="interview.survey.respondent" />
       </v-flex>
       <div
+        v-if="currentQuestionComponent"
         :is="currentQuestionComponent"
         :question="question"
         :location="location"
         :disabled="disabled || hasDkRf"
-        :respondent="interview.survey.respondent"></div>
+        :respondent="interview.survey.respondent"
+      />
+      <div v-else>Unknown question type</div>
     </v-card-text>
     <v-card-actions v-if="question.questionType.name !== 'intro' && showDkRf" class="mt-4">
       <DontKnowRefused
