@@ -12,7 +12,7 @@ export async function requestMediaRecording () {
   if (visible.value || recording.value) {
     return Promise.reject(new Error('Recording already in progress'))
   }
-  if (!recorderRef.value) return Promise.reject(new Error('WebAudioRecorder element is not in DOM'))
+  if (!recorderRef.value) return Promise.reject(new Error('MediaAudioRecorder element is not in DOM'))
   const src = await new Promise<string>((resolve, reject) => {
     visible.value = true
     resolver.value = resolve
