@@ -260,12 +260,7 @@
       },
       handleError (err, defaultMessage) {
         if (this.isNotAuthError(err)) {
-          this.log(err)
-          if (err && err.response) {
-            this.alertRes('error', err.response.data, defaultMessage)
-          } else {
-            this.alert('error', defaultMessage)
-          }
+          this.logError(err)
         }
       }
     }

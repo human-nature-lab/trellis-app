@@ -145,7 +145,7 @@ const barColor = computed(() => {
       </v-col>
       <v-row
         no-gutters
-        class="justify-center"
+        class="justify-center my-4"
       >
         <h2>{{ formattedElapsed }}</h2>
       </v-row>

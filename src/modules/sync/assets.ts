@@ -75,13 +75,19 @@ export function getMissingServerAssets (ctrl: StepController) {
 export async function uploadAssets (ctrl: StepController, assetIds: string[]) {
   const { deviceUUID } = await SyncService.getDeviceInfo()
   const failed: {err: Error, asset: string }[] = []
+  const initialAvgSize = 1024 * 1024
+  let completedBytes = 0
+  const MB = 1024 * 1024
+  ctrl.setProgress(0, (assetIds.length * initialAvgSize) / MB, true)
   const queue = new AsyncQueue<string>(async assetId => {
     try {
       const path = `/sync/device/${deviceUUID}/upload/asset/${assetId}`
       const entry = await (await file.dataDirectory('assets')).getFile(assetId)
+      completedBytes += await entry.size()
       const res = await SyncService.uploadEntry(path, entry)
-      ctrl.setProgress(queue.total - queue.pending.length, queue.total, true)
-      console.log('res', res)
+      const completedCount = queue.total - queue.pending.length
+      const totalSizeEstimate = completedBytes + (completedBytes / completedCount) * queue.pending.length
+      ctrl.setProgress(completedBytes / MB, totalSizeEstimate / MB, true)
     } catch (err) {
       failed.push({ err, asset: assetId })
     }

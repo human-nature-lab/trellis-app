@@ -1,4 +1,5 @@
 import { file } from '@/cordova/file'
+import { insomnia } from '@/cordova/insomnia'
 import Vue, { onBeforeUnmount, ref } from 'vue'
 
 export const visible = ref(false)
@@ -13,14 +14,16 @@ export async function requestMediaRecording () {
     return Promise.reject(new Error('Recording already in progress'))
   }
   if (!recorderRef.value) return Promise.reject(new Error('MediaAudioRecorder element is not in DOM'))
-  const src = await new Promise<string>((resolve, reject) => {
-    visible.value = true
-    resolver.value = resolve
-    rejecter.value = reject
-  }).finally(() => {
-    visible.value = false
+  return insomnia.withScreenOn(async () => {
+    const src = await new Promise<string>((resolve, reject) => {
+      visible.value = true
+      resolver.value = resolve
+      rejecter.value = reject
+    }).finally(() => {
+      visible.value = false
+    })
+    return file.resolveFileUri(src)
   })
-  return file.resolveFileUri(src)
 }
 
 export function useAnalyserNode () {
