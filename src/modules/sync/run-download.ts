@@ -20,6 +20,7 @@ import SyncService from '@/services/SyncService'
 import { insomnia } from '@/cordova/insomnia'
 import { getLocalMissingImages, checkDiskSpace, downloadImages } from './images'
 import { delay } from '@/classes/delay'
+import { analyzeAssets, downloadAssets } from './assets'
 
 export function runDownload (ctrl: VueController, onlyPhotos = false) {
   const g1 = ctrl.addGroup(i18n.t('connecting'))
@@ -52,6 +53,8 @@ export function runDownload (ctrl: VueController, onlyPhotos = false) {
     g3s6 = ctrl.addStep(g3, i18n.t('registering_download'))
   }
 
+  const g4s01 = ctrl.addStep(g4, i18n.t('analyzing_assets'))
+  const g4s02 = ctrl.addStep(g4, i18n.t('downloading_assets'))
   const g4s1 = ctrl.addStep(g4, i18n.t('requesting_image_list'))
   const g4s2 = ctrl.addStep(g4, i18n.t('checking_space'))
   const g4s3 = ctrl.addStep(g4, i18n.t('downloading_images'))
@@ -115,6 +118,10 @@ export function runDownload (ctrl: VueController, onlyPhotos = false) {
       }
 
       ctrl.setGroup(g4)
+      ctrl.setStep(g4s01)
+      const assets = await analyzeAssets(ctrl)
+      ctrl.setStep(g4s02)
+      await downloadAssets(ctrl, assets)
       ctrl.setStep(g4s1)
       const images = await getLocalMissingImages(ctrl)
       ctrl.setStep(g4s2)

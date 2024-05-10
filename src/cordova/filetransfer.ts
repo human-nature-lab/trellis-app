@@ -1,5 +1,5 @@
 import { CancelPromise } from '@/types/CancelPromise'
-import { FS } from './file'
+import { FSFileEntry, convert } from './file'
 
 type ProgressHandler = (evt: { loaded: number, total: number, lengthComputable: boolean }) => void
 
@@ -35,6 +35,7 @@ export class filetransfer {
     opts?: FileDownloadOptions,
     onProgress?: ProgressHandler,
   ) {
+    console.log('FileTransfer.download', serverURL, fileURL, trustAllHosts, opts, onProgress)
     let ft: FileTransfer
     const promise = new Promise((resolve, reject) => {
       ft = new FileTransfer()
@@ -49,7 +50,28 @@ export class filetransfer {
         ft.abort()
       }
     }
-    return promise
+    return promise.then(entry => {
+      return convert.fileEntry(entry)
+    })
+  }
+
+  static uploadEntry (
+    serverURL: string,
+    entry: FileEntry | FSFileEntry,
+    opts?: FileUploadOptions,
+    onProgress?: ProgressHandler,
+  ) {
+    return this.upload(serverURL, entry.nativeURL, opts, onProgress)
+  }
+
+  static downloadEntry (
+    serverURL: string,
+    entry: FileEntry | FSFileEntry,
+    trustAllHosts = false,
+    opts?: FileDownloadOptions,
+    onProgress?: ProgressHandler,
+  ) {
+    return this.download(serverURL, entry.nativeURL, trustAllHosts, opts, onProgress)
   }
 
   static downloadWithTemp (
@@ -61,8 +83,7 @@ export class filetransfer {
   ) {
     const p = this.download(serverURL, fileURL + '.tmp', trustAllHosts, opts, onProgress)
     p.then(async entry => {
-      const fs = new FS(entry.fileSystem)
-      return fs.mv(entry.toURL(), fileURL)
+      return entry.fileSystem.mv(entry.toURL(), fileURL)
     })
     return p
   }

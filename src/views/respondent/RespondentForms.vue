@@ -1,5 +1,5 @@
 <template>
-  <v-container class="respondent-forms fill-width">
+  <v-col class="respondent-forms fill-width">
     <v-alert v-if="error">
       {{ error }}
     </v-alert>
@@ -59,6 +59,7 @@
         :show-unpublished="showUnpublished"
         :allow-multiple-surveys="false"
         @newInterview="startInterview"
+        @view-report="showReport"
       />
     </v-card>
     <v-card>
@@ -74,9 +75,22 @@
         :respondent="respondent"
         :can-create-surveys="true"
         @newInterview="startInterview"
+        @view-report="showReport"
       />
+      <TrellisModal
+        v-if="reportSurvey"
+        :value="!!reportSurvey"
+        @input="reportSurvey = null"
+        :title="$t('survey_report')"
+        @close="reportSurvey = null"
+      >
+        <SurveyReport
+          :respondent="respondent"
+          :survey="reportSurvey"
+        />
+      </TrellisModal>
     </v-card>
-  </v-container>
+  </v-col>
 </template>
 
 <script lang="ts">
@@ -97,6 +111,8 @@ import { routeQueue } from '@/router'
 import Interview from '@/entities/trellis/Interview'
 import { DisplayForm } from '@/components/respondent/FormListItem.vue'
 import { computedTitle } from '@/router/history'
+import TrellisModal from '@/components/TrellisModal.vue'
+import SurveyReport from '@/components/reports/SurveyReport.vue'
 
 interface RespondentFormsData {
   respondent: Respondent
@@ -143,6 +159,7 @@ export default Vue.extend({
       skipService: new SkipService(),
       error: '',
       loading: false,
+      reportSurvey: null as Survey | null,
     }
   },
   created () {
@@ -155,6 +172,8 @@ export default Vue.extend({
   },
   components: {
     FormsView,
+    TrellisModal,
+    SurveyReport,
   },
   methods: {
     async startInterview (interview: Interview) {
@@ -183,6 +202,9 @@ export default Vue.extend({
       this.forms = data.forms
       this.respondent = data.respondent
       this.loading = false
+    },
+    showReport (survey: Survey) {
+      this.reportSurvey = survey
     },
   },
   computed: {

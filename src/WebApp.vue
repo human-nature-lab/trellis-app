@@ -110,6 +110,9 @@
       <SnackbarQueue />
       <DocsSidebar />
       <LoginModal />
+      <WebAudioRecorder />
+      <MediaAudioRecorder />
+      <AssetUploader />
     </v-app>
   </div>
 </template>
@@ -119,6 +122,8 @@
   import MainMenu from './components/main-menu/MainMenu.vue'
   import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
+  import WebAudioRecorder from './components/audio-recorder/WebAudioRecorder.vue'
+  import MediaAudioRecorder from './components/audio-recorder/MediaAudioRecorder.vue'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
   import TrellisLoadingCircular from './components/TrellisLoadingCircle.vue'
@@ -139,6 +144,7 @@
   import Maintenance from './components/Maintenance.vue'
   import maintenanceService from './services/maintenance'
   import { secondaryDrawerIcon, secondaryDrawerOnClick } from '@/helpers/drawer.helper'
+import AssetUploader from './components/asset/AssetUploader.vue'
 
   export default {
     name: 'WebApp',
@@ -210,6 +216,9 @@
       Banner,
       LoginModal,
       Maintenance,
+      WebAudioRecorder,
+      MediaAudioRecorder,
+      AssetUploader,
     },
     computed: {
       withinCordova () {

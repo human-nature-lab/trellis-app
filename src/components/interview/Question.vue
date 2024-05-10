@@ -17,11 +17,14 @@
           :subject="interview.survey.respondent" />
       </v-flex>
       <div
+        v-if="currentQuestionComponent"
         :is="currentQuestionComponent"
         :question="question"
         :location="location"
         :disabled="disabled || hasDkRf"
-        :respondent="interview.survey.respondent"></div>
+        :respondent="interview.survey.respondent"
+      />
+      <div v-else>Unknown question type</div>
     </v-card-text>
     <v-card-actions v-if="question.questionType.name !== 'intro' && showDkRf" class="mt-4">
       <DontKnowRefused
@@ -60,6 +63,7 @@
   import SocialRingQuestion from './questions/social-ring/SocialRingQuestion.vue'
   import ScaleQuestion from './questions/scale/ScaleQuestion.vue'
   import DurationQuestion from './questions/DurationQuestion.vue'
+  import AssetQuestion from './questions/asset/AssetQuestion.vue'
   import QuestionTimer from './QuestionTimer.vue'
   import QuestionText from './QuestionText.vue'
   import Question from '../../entities/trellis/Question'
@@ -86,8 +90,8 @@
     [questionTypes.image]: ImageQuestion,
     [questionTypes.distribution]: DistributionQuestion,
     [questionTypes.social_ring]: SocialRingQuestion,
-    [questionTypes.duration]: DurationQuestion,
-    [questionTypes.scale]: ScaleQuestion
+    [questionTypes.scale]: ScaleQuestion,
+    [questionTypes.asset]: AssetQuestion,
   }
 
   export default Vue.extend({
@@ -112,6 +116,7 @@
       DistributionQuestion,
       QuestionText,
       ScaleQuestion,
+      AssetQuestion,
     },
     props: {
       question: {
