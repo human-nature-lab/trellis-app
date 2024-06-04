@@ -13,6 +13,7 @@ import Asset from '@/entities/trellis/Asset'
 import AssetRow from './AssetRow.vue'
 import AssetViewer from '@/components/asset/AssetViewer.vue'
 import TrellisModal from '@/components/TrellisModal.vue'
+import { i18n } from '@/i18n'
 
 const props = defineProps<{
   question: Question
@@ -109,6 +110,7 @@ async function uploadFile () {
 }
 
 async function removeAsset (asset: Asset) {
+  if (!confirm(i18n.t('remove_confirm', [i18n.t('asset')]) as string)) return
   action(props.question.id, ActionTypes.remove_asset, {
     val: asset.id,
     name: 'asset',

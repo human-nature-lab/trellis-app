@@ -61,7 +61,6 @@ export async function uploadSnapshot (ctrl: VueController, data: { compressedFil
     getSyncAuthentication(),
   ])
   const uri = apiRoot + `/sync/device/${deviceId}/upload`
-  console.log('compressed', await data.compressedFileEntry.text())
   const res = await filetransfer.upload(uri, data.compressedFileEntry.nativeURL, {
     params: {
       fileName: data.compressedFileEntry.name,

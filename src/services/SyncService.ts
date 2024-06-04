@@ -9,7 +9,7 @@ import LoginService from './login'
 import SingletonService, { StorageKey } from './SingletonService'
 import { parseISO } from 'date-fns'
 import Snapshot from '@/entities/trellis/Snapshot'
-import { filetransfer } from '@/cordova/filetransfer'
+import { ProgressHandler, filetransfer } from '@/cordova/filetransfer'
 import { FSDirectoryEntry, FSFileEntry } from '@/cordova/file'
 import { Mutex } from 'async-mutex'
 import { merge } from 'lodash'
@@ -188,7 +188,7 @@ class SyncService {
     })
   }
 
-  async uploadEntry (path: string, entry: FSFileEntry, opts?: FileUploadOptions) {
+  async uploadEntry (path: string, entry: FSFileEntry, opts?: FileUploadOptions, onProgress?: ProgressHandler) {
     const { deviceKey, apiAddress } = await this.getDeviceInfo()
     const authHeader = await requestSyncAuthentication()
     const url = new URL(apiAddress)
@@ -200,7 +200,7 @@ class SyncService {
       },
     }, opts)
 
-    return filetransfer.uploadEntry(url.toString(), entry, uploadOpts)
+    return filetransfer.uploadEntry(url.toString(), entry, uploadOpts, onProgress)
   }
 
   async hasSynced (): Promise<boolean> {

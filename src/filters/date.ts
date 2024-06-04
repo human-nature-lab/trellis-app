@@ -1,5 +1,5 @@
 import { locale } from '@/services/DateService'
-import { parse, formatDistanceToNow, format, utc } from 'date-fns'
+import { parse, formatDistanceToNow, format } from 'date-fns'
 
 export function relativeTime (val: string | Date) {
   if (typeof val === 'string') {

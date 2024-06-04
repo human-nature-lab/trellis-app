@@ -8,6 +8,7 @@ import SyncService from '@/services/SyncService'
 import { i18n } from '@/i18n'
 import axios from 'axios'
 import HashService from '@/services/hash'
+import { roundDecimals } from '@/classes/M'
 
 export async function analyzeAssets (ctrl: StepController): Promise<Asset[]> {
   ctrl.setProgress(0, 3)
@@ -83,11 +84,13 @@ export async function uploadAssets (ctrl: StepController, assetIds: string[]) {
     try {
       const path = `/sync/device/${deviceUUID}/upload/asset/${assetId}`
       const entry = await (await file.dataDirectory('assets')).getFile(assetId)
-      completedBytes += await entry.size()
-      const res = await SyncService.uploadEntry(path, entry)
       const completedCount = queue.total - queue.pending.length
       const totalSizeEstimate = completedBytes + (completedBytes / completedCount) * queue.pending.length
-      ctrl.setProgress(completedBytes / MB, totalSizeEstimate / MB, true)
+      const res = await SyncService.uploadEntry(path, entry, {}, p => {
+        ctrl.setProgress(roundDecimals((p.loaded + completedBytes) / MB), roundDecimals((p.total + totalSizeEstimate) / MB), true)
+      })
+      completedBytes += await entry.size()
+      ctrl.setProgress(roundDecimals((completedBytes) / MB), roundDecimals(totalSizeEstimate / MB), true)
     } catch (err) {
       failed.push({ err, asset: assetId })
     }

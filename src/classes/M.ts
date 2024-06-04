@@ -32,12 +32,12 @@ export function randomIntBits (bits: number): number {
  * @param object
  */
 export function roughSizeOf (object: any) {
-  let objectList = []
-  let stack = [object]
+  const objectList = []
+  const stack = [object]
   let bytes = 0
 
   while (stack.length) {
-    let value = stack.pop()
+    const value = stack.pop()
 
     if (typeof value === 'boolean') {
       bytes += 4
@@ -47,10 +47,18 @@ export function roughSizeOf (object: any) {
       bytes += 8
     } else if (typeof value === 'object' && objectList.indexOf(value) === -1) {
       objectList.push(value)
-      for (let i in value) {
+      for (const i in value) {
         stack.push(value[i])
       }
     }
   }
   return bytes
 }
+
+// Returns the number rounded to the specified number of decimal places
+export function roundDecimals (value: number, decimals = 2): number {
+  const d = Math.pow(10, decimals)
+  return Math.round(value * d) / d
+}
+
+window.roundDecimals = roundDecimals

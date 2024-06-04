@@ -1,7 +1,7 @@
 import { CancelPromise } from '@/types/CancelPromise'
 import { FSFileEntry, convert } from './file'
 
-type ProgressHandler = (evt: { loaded: number, total: number, lengthComputable: boolean }) => void
+export type ProgressHandler = (evt: { loaded: number, total: number, lengthComputable: boolean }) => void
 
 export class filetransfer {
   static upload (
