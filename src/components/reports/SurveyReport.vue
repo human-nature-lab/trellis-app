@@ -81,6 +81,11 @@ const visibleRows = computed(() => {
 const correctCount = computed(() => rows.value.reduce((c, r) => r.isCorrect ? c + 1 : c, 0))
 const numRowsWithAnswer = computed(() => rows.value.reduce((c, r) => r.answer ? c + 1 : c, 0))
 
+const hasSectionConditionTags = computed(() => data.value && data.value.conditionTags && !!data.value.conditionTags.section.length)
+const hasSurveyConditionTags = computed(() => data.value && data.value.conditionTags && !!data.value.conditionTags.survey.length)
+const hasRespondentConditionTags = computed(() => data.value && data.value.conditionTags && !!data.value.conditionTags.respondent.length)
+
+const hasConditionTags = computed(() => hasSectionConditionTags.value || hasSurveyConditionTags.value || hasRespondentConditionTags.value)
 </script>
 
 <template>
@@ -100,7 +105,7 @@ const numRowsWithAnswer = computed(() => rows.value.reduce((c, r) => r.answer ? 
     />
     <v-card-text v-else>
       <v-row
-        v-if="numRowsWithAnswer"
+        v-if="numRowsWithAnswer > 0"
         class="justify-space-betwee align-center"
         no-gutters
       >
@@ -145,35 +150,44 @@ const numRowsWithAnswer = computed(() => rows.value.reduce((c, r) => r.answer ? 
           </tr>
         </tbody>
       </v-simple-table>
-      <v-col v-if="data && data.conditionTags">
+      <v-col
+        v-if="hasConditionTags"
+        class="mt-8"
+      >
         <h2>{{ $t('condition_tags') }}</h2>
-        <h4>{{ $t('section') }}</h4>
-        <v-row no-gutters>
-          <v-chip
-            v-for="ct in data.conditionTags.section"
-            :key="ct.id"
-          >
-            {{ ct.conditionTag.name }}
-          </v-chip>
-        </v-row>
-        <h4>{{ $t('form') }}</h4>
-        <v-row no-gutters>
-          <v-chip
-            v-for="ct in data.conditionTags.survey"
-            :key="ct.id"
-          >
-            {{ ct.conditionTag.name }}
-          </v-chip>
-        </v-row>
-        <h4>{{ $t('respondent') }}</h4>
-        <v-row no-gutters>
-          <v-chip
-            v-for="ct in data.conditionTags.respondent"
-            :key="ct.id"
-          >
-            {{ ct.conditionTag.name }}
-          </v-chip>
-        </v-row>
+        <v-col v-if="hasSectionConditionTags">
+          <h4>{{ $t('section') }}</h4>
+          <v-row no-gutters>
+            <v-chip
+              v-for="ct in data.conditionTags.section"
+              :key="ct.id"
+            >
+              {{ ct.conditionTag.name }}
+            </v-chip>
+          </v-row>
+        </v-col>
+        <v-col v-if="hasSurveyConditionTags">
+          <h4>{{ $t('form') }}</h4>
+          <v-row no-gutters>
+            <v-chip
+              v-for="ct in data.conditionTags.survey"
+              :key="ct.id"
+            >
+              {{ ct.conditionTag.name }}
+            </v-chip>
+          </v-row>
+        </v-col>
+        <v-col v-if="hasRespondentConditionTags">
+          <h4>{{ $t('respondent') }}</h4>
+          <v-row no-gutters>
+            <v-chip
+              v-for="ct in data.conditionTags.respondent"
+              :key="ct.id"
+            >
+              {{ ct.conditionTag.name }}
+            </v-chip>
+          </v-row>
+        </v-col>
       </v-col>
     </v-card-text>
   </v-card>
