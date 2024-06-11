@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import Respondent from '@/entities/trellis/Respondent'
 import { isNotAuthError } from '@/helpers/auth.helper'
 import { logError } from '@/helpers/log.helper'
 
@@ -8,7 +7,7 @@ import RespondentFill from '../../entities/trellis/RespondentFill'
 import RespondentService from '../../services/respondent'
 
 const props = defineProps<{
-  respondent: Respondent
+  respondentId: string
 }>()
 
 const respondentFills = ref<RespondentFill[]>()
@@ -33,7 +32,7 @@ const loading = ref(false)
 async function load () {
   loading.value = true
   try {
-    respondentFills.value = await RespondentService.getRespondentFillsById(props.respondent.id)
+    respondentFills.value = await RespondentService.getRespondentFillsById(props.respondentId)
   } catch (err) {
     if (isNotAuthError(err)) {
       logError(err)
@@ -43,7 +42,7 @@ async function load () {
   }
 }
 
-watch(() => props.respondent, () => {
+watch(() => props.respondentId, () => {
   load()
 }, { immediate: true })
 

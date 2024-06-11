@@ -178,12 +178,12 @@ const err = computed(() => {
               @update:respondent-names="names => respondent.names = names"
             />
             <respondent-fill
-              :respondent="respondent"
+              :respondent-id="route.params.respondentId"
             />
             <Permission web-only>
               <RespondentEdges
                 v-if="respondent && global.study"
-                :respondent-id="respondent.id"
+                :respondent-id="route.params.respondentId"
                 :study-id="global.study.id"
               />
             </Permission>
