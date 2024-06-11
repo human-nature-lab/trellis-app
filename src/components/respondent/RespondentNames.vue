@@ -1,3 +1,89 @@
+<script lang="ts" setup>
+import { ref } from 'vue'
+import { TrellisPermission } from '@/static/permissions.base'
+import Permission from '../Permission.vue'
+import RespondentNameForm from './RespondentNameForm.vue'
+import RespondentName from '../../entities/trellis/RespondentName'
+import RespondentService from '../../services/respondent'
+import Respondent from '@/entities/trellis/Respondent'
+import { isNotAuthError } from '@/helpers/auth.helper'
+import { logError, alert } from '@/helpers/log.helper'
+
+const props = defineProps<{
+  respondent: Respondent
+}>()
+
+const emit = defineEmits<{
+  (event: 'update:respondent-names', value: RespondentName[]): void
+}>()
+
+const isEditing = ref(false)
+const isAdding = ref(false)
+const deleting = ref({} as Record<string, boolean>)
+const currentName = ref(null)
+const nameHeaders = ref([{
+  text: 'Name',
+  value: 'name',
+  class: 'main-column',
+}, {
+  text: 'Current',
+  value: 'isCurrent',
+}, {
+  text: '',
+  value: 'actions',
+  class: 'actions',
+}])
+
+async function removeName (nameId: string): Promise<void> {
+  const name = props.respondent.names.find(name => name.id === nameId)
+  if (name && name.isDisplayName) {
+    alert('error', 'Cannot delete the display name for a respondent')
+    return
+  }
+  if (!name || !confirm(`Are you sure you want to delete the name "${name.name}"?`)) {
+    return
+  }
+  deleting.value[nameId] = true
+  try {
+    await RespondentService.removeName(props.respondent.id, nameId)
+    const index = props.respondent.names.findIndex(name => name.id === nameId)
+    const names = props.respondent.names.slice()
+    names.splice(index, 1)
+    emit('update:respondent-names', names)
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err, `Failed to delete the respondent name -> ${name.name}`)
+    }
+  } finally {
+    deleting.value[nameId] = false
+    deleting.value = Object.assign({}, deleting.value)
+  }
+}
+
+function doneAddingName (name: RespondentName): void {
+  if (name) {
+    if (name.isDisplayName) {
+      props.respondent.names.forEach(name => {
+        name.isDisplayName = false
+      })
+    }
+    const names = props.respondent.names.slice()
+    names.push(name)
+    emit('update:respondent-names', names)
+  }
+  isAdding.value = false
+}
+
+function doneEditingName (name: RespondentName): void {
+  const oldIndex = props.respondent.names.findIndex(n => name.previousRespondentNameId === n.id)
+  const names = props.respondent.names.slice()
+  names.splice(oldIndex, 1, name)
+  emit('update:respondent-names', names)
+  isEditing.value = false
+}
+
+</script>
+
 <template>
   <v-flex>
     <v-toolbar flat>
@@ -7,16 +93,17 @@
       <v-spacer />
       <Permission :requires="TrellisPermission.ADD_RESPONDENT_NAME">
         <v-tooltip left>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn
               v-on="on"
               v-bind="attrs"
               icon
-              @click="isAdding = true">
+              @click="isAdding = true"
+            >
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </template>
-          <span>{{$t('add_respondent_name')}}</span>
+          <span>{{ $t('add_respondent_name') }}</span>
         </v-tooltip>
       </Permission>
     </v-toolbar>
@@ -25,27 +112,37 @@
       :headers="nameHeaders"
       :items="respondent.names"
       :items-per-page="-1"
-      hide-default-footer>
-      <template v-slot:item="props">
+      hide-default-footer
+    >
+      <template #item="props">
         <tr>
-          <td>{{props.item.name}}</td>
+          <td>{{ props.item.name }}</td>
           <td>
-            <v-icon v-if="props.item.isDisplayName">mdi-check</v-icon>
+            <v-icon v-if="props.item.isDisplayName">
+              mdi-check
+            </v-icon>
           </td>
           <td class="actions">
             <Permission :requires="TrellisPermission.EDIT_RESPONDENT_NAME">
               <v-btn
                 icon
-                @click="currentName = props.item; isEditing = true">
+                @click="currentName = props.item; isEditing = true"
+              >
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
             </Permission>
             <Permission :requires="TrellisPermission.REMOVE_RESPONDENT_NAME">
               <v-btn
                 icon
-                @click="removeName(props.item.id)">
-                <v-progress-circular v-if="isDeleting(props.item.id)" indeterminate/>
-                <v-icon v-else>mdi-delete</v-icon>
+                @click="removeName(props.item.id)"
+              >
+                <v-progress-circular
+                  v-if="deleting[props.item.id]"
+                  indeterminate
+                />
+                <v-icon v-else>
+                  mdi-delete
+                </v-icon>
               </v-btn>
             </Permission>
           </td>
@@ -55,92 +152,14 @@
     <RespondentNameForm
       v-model="isAdding"
       :respondent="respondent"
-      @close="doneAddingName"/>
+      @close="doneAddingName"
+    />
     <RespondentNameForm
       v-if="currentName !== null"
       v-model="isEditing"
       :name="currentName"
       :respondent="respondent"
-      @close="doneEditingName"/>
+      @close="doneEditingName"
+    />
   </v-flex>
 </template>
-
-<script lang="ts">
-  import Permission from '../Permission.vue'
-  import RespondentNameForm from './RespondentNameForm.vue'
-  import Vue from 'vue'
-  import RespondentName from '../../entities/trellis/RespondentName'
-  import RespondentService from '../../services/respondent'
-
-  export default Vue.extend({
-    data () {
-      return {
-        isEditing: false,
-        isAdding: false,
-        deleting: [],
-        currentName: null,
-        nameHeaders: [{
-          text: 'Name',
-          value: 'name',
-          class: 'main-column',
-        }, {
-          text: 'Current',
-          value: 'isCurrent',
-        }, {
-          text: '',
-          value: 'actions',
-          class: 'actions',
-        }]
-      }
-    },
-    props: {
-      respondent: {
-        type: Object,
-        required: true
-      }
-    },
-    components: {RespondentNameForm, Permission},
-    name: 'RespondentNames',
-    methods: {
-      isDeleting (id: string): boolean {
-        return this.deleting[id]
-      },
-      async removeName (nameId: string): Promise<void> {
-        let name = this.respondent.names.find(name => name.id === nameId)
-        if (name && name.isDisplayName) {
-          this.alert('error', `Cannot delete the display name for a respondent`)
-          return
-        }
-        this.deleting[nameId] = true
-        try {
-          await RespondentService.removeName(this.respondent.id, nameId)
-          let index = this.respondent.names.findIndex(name => name.id === nameId)
-          this.respondent.names.splice(index, 1)
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err, `Failed to delete the respondent name -> ${name.name}`)
-          }
-        } finally {
-          this.deleting[nameId] = false
-          this.$forceUpdate()
-        }
-      },
-      doneAddingName (name: RespondentName): void {
-        if (name) {
-          if (name.isDisplayName) {
-            this.respondent.names.forEach(name => {
-              name.isDisplayName = false
-            })
-          }
-          this.respondent.names.push(name)
-        }
-        this.isAdding = false
-      },
-      doneEditingName (name: RespondentName): void {
-        let oldIndex = this.respondent.names.findIndex(n => name.previousRespondentNameId === n.id)
-        this.respondent.names.splice(oldIndex, 1, name)
-        this.isEditing = false
-      },
-    }
-  })
-</script>

@@ -112,9 +112,10 @@ const err = computed(() => {
 </script>
 
 <template>
-  <v-flex
-    xs12
+  <v-col
     v-if="respondent"
+    xs="12"
+    class="pa-0"
   >
     <v-card tile>
       <v-toolbar flat>
@@ -134,6 +135,10 @@ const err = computed(() => {
           {{ $t('forms') }}
         </v-btn>
       </v-toolbar>
+      <v-progress-linear
+        v-if="loading"
+        indeterminate
+      />
       <v-alert
         v-if="err"
         color="error"
@@ -145,7 +150,7 @@ const err = computed(() => {
           fluid
           xs12
         >
-          <v-layout column>
+          <v-col class="pa-0">
             <v-alert
               v-show="error"
               type="error"
@@ -170,6 +175,7 @@ const err = computed(() => {
             />
             <respondent-names
               :respondent="respondent"
+              @update:respondent-names="names => respondent.names = names"
             />
             <respondent-fill
               :respondent="respondent"
@@ -181,7 +187,7 @@ const err = computed(() => {
                 :study-id="global.study.id"
               />
             </Permission>
-            <v-flex v-if="userHasPermission(TrellisPermission.REMOVE_RESPONDENT)">
+            <v-col v-if="userHasPermission(TrellisPermission.REMOVE_RESPONDENT)">
               <v-toolbar flat>
                 <v-toolbar-title>{{ $t('admin') }}</v-toolbar-title>
               </v-toolbar>
@@ -194,12 +200,12 @@ const err = computed(() => {
                   {{ $t('delete') }}
                 </v-btn>
               </Permission>
-            </v-flex>
-          </v-layout>
+            </v-col>
+          </v-col>
         </v-container>
       </v-card-text>
     </v-card>
-  </v-flex>
+  </v-col>
 </template>
 
 <style lang="sass" scoped>

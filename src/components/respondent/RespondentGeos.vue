@@ -1,5 +1,5 @@
 <template>
-  <v-flex>
+  <v-col class="pa-0">
     <v-toolbar flat>
       <v-toolbar-title>{{ $t('locations') }}</v-toolbar-title>
       <v-spacer />
@@ -63,7 +63,7 @@
       :geoSelectionFilter="geoSelectionFilter"
       :respondent-geo="movingRespondentGeo"
       :respondent="respondent"></move-respondent-geo-form>
-  </v-flex>
+  </v-col>
 </template>
 
 <script lang="ts">
