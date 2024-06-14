@@ -99,6 +99,7 @@ export class DocService {
     let questionNum = 0
     let hasCreatedTitle = false
     const questionMap = new Map<string, Question>()
+    form.sort()
     for (const section of form.sections) {
       const children = []
       if (!hasCreatedTitle) {

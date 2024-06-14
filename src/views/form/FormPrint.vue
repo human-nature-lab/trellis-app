@@ -176,26 +176,7 @@ export default Vue.extend({
       this.isLoading = true
       this.form = await FormService.getForm(this.$route.params.formId)
       this.conditionTags = await ConditionTagService.all()
-      this.form.sections.sort((a, b) => {
-        return a.formSections[0].sortOrder - b.formSections[0].sortOrder
-      })
-      for (const section of this.form.sections) {
-        section.questionGroups.sort((a, b) => {
-          return a.sectionQuestionGroup.questionGroupOrder - b.sectionQuestionGroup.questionGroupOrder
-        })
-        for (const page of section.questionGroups) {
-          page.questions.sort((a, b) => {
-            return a.sortOrder - b.sortOrder
-          })
-          for (const question of page.questions) {
-            if (question.choices) {
-              question.choices.sort((a, b) => {
-                return a.sortOrder - b.sortOrder
-              })
-            }
-          }
-        }
-      }
+      this.form.sort()
       this.isLoading = false
     },
     questionText (question: QuestionEntity): string {
