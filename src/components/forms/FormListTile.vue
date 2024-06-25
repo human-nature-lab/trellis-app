@@ -63,7 +63,7 @@
                 mdi-dev-to
               </v-icon>
             </v-list-item-icon>
-            {{ item.version }}
+            {{ item.version }} 
           </v-list-item>
         </template>
       </v-select>

@@ -25,7 +25,7 @@
                   mdi-dev-to
                 </v-icon>
               </v-list-item-icon>
-              v{{form.version}}
+              v{{ form.version }}
             </v-list-item>
           </template>
           <template #selection="{ item: form}">
