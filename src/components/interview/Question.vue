@@ -10,7 +10,7 @@
     </v-alert>
     <QuestionTimer v-if="showTimer" :duration="timerDuration" :showControls="showTimerControls"/>
     <v-card-text class="question-content">
-      <v-flex class="question-text title" v-if="showQuestionText">
+      <v-flex v-if="showQuestionText" class="question-text title" >
         <QuestionText 
           :location="location"
           :question="question"

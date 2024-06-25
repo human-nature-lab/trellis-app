@@ -1,6 +1,9 @@
 <template>
-  <v-flex class="integer-question">
-    <QuestionText :question="question" />
+  <v-col class="integer-question">
+    <QuestionText
+      :question="question"
+      :location="location"
+    />
     <v-slider
       v-if="isSlider"
       class="mt-6"
@@ -23,7 +26,7 @@
       :min="min"
       :max="max"
     />
-  </v-flex>
+  </v-col>
 </template>
 
 <script lang="ts">
@@ -42,6 +45,10 @@ export default {
   props: {
     question: {
       type: Question,
+      required: true,
+    },
+    location: {
+      type: Object,
       required: true,
     },
   },

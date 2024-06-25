@@ -38,7 +38,10 @@ const isQuestionDisabled = useQuestionDisabled(props)
 
 <template>
   <v-flex class="decimal-question">
-    <QuestionText :question="question" />
+    <QuestionText
+      :question="question"
+      :location="location"
+    />
     <v-slider
       v-if="isSlider"
       class="mt-6"
