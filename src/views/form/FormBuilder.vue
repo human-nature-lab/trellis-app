@@ -85,9 +85,10 @@ async function addExistingSection (sectionId: string) {
   if (isLoading.value) return
   isLoading.value = true
   try {
-    const section = await builderService.linkSection($route.params.formId, sectionId)
-    builder.form.sections.push(section)
-    builder.form.sections = builder.form.sections.slice()
+    await builderService.linkSection($route.params.formId, sectionId)
+    isLoading.value = false
+    await load()
+    showSectionSelector.value = false
   } catch (err) {
     logError(err)
   } finally {
@@ -184,6 +185,7 @@ watch(() => $route, load, { immediate: true })
     <TrellisModal
       v-model="showSectionSelector"
       :title="$t('sections')"
+      lazy
     >
       <ExistingSectionSelector @select="addExistingSection" />
     </TrellisModal>

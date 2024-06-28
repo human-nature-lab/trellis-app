@@ -20,3 +20,9 @@ export const isLoggedIn = computed(() => {
 export const isTestStudy = computed(() => {
   return !!global.study && !global.study.testStudyId
 })
+
+export function useStudy () {
+  return computed(() => {
+    return global.study
+  })
+}
