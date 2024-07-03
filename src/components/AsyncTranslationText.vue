@@ -3,6 +3,7 @@
     :is="tag"
     class="async-translation-text"
     v-bind="$attrs"
+    v-on="$listeners"
   >
     {{ translated }}
   </component>

@@ -60,8 +60,7 @@ function choiceClasses (choice: DisplayChoice) {
   <v-row class="checkbox-group">
     <v-row
       v-if="question.questionTypeId === QT.multiple_select"
-      no-gutters
-      class="mx-4"
+      class="mx-4 no-gutters flex-nowrap"
     >
       <v-simple-checkbox
         class="checkbox"
@@ -74,6 +73,7 @@ function choiceClasses (choice: DisplayChoice) {
         :translation="choice.choiceTranslation"
         :location="location"
         slot="label"
+        @click="onChange(choice)"
       />
     </v-row>
     <radio-checkbox
