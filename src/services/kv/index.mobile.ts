@@ -1,6 +1,7 @@
 import KV from '@/entities/trellis/KV'
 import DatabaseService from '../database/'
-import { AbstractRepository, Connection, Repository, SaveOptions, TreeRepository } from 'typeorm'
+import { Connection, TreeRepository } from 'typeorm'
+import uuidv4 from 'uuid/v4'
 
 export class KVStore {
   async get (namespace: string, key: string) {
@@ -21,10 +22,10 @@ export class KVStore {
       throw new Error('Namespace is too large')
     }
     const db: Connection = await DatabaseService.getDatabase()
-    const q = 'INSERT INTO `kv` (`namespace`, `key`, `value`, `created_at`, `updated_at`) ' +
-      'VALUES (?, ?, ?, datetime("now"), datetime("now")) ' +
+    const q = 'INSERT INTO `kv` (`id`, `namespace`, `key`, `value`, `created_at`, `updated_at`) ' +
+      'VALUES (?, ?, ?, ?, datetime("now"), datetime("now")) ' +
       'ON CONFLICT (`namespace`, `key`) DO UPDATE SET `value` = excluded.value, `updated_at` = datetime("now")'
-    await db.query(q, [namespace, key, value])
+    await db.query(q, [uuidv4(), namespace, key, value])
   }
 
   async remove (namespace: string, key: string) {
