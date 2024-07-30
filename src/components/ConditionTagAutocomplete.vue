@@ -43,6 +43,7 @@ watch(() => [props.value, query.value], async () => {
     dense
     chips
     tags
+    clearable
     :hide-no-data="!hasLoaded"
     :search-input.sync="query"
     :loading="isLoading"
