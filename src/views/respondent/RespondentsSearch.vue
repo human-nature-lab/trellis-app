@@ -6,7 +6,7 @@
     <ScrollContainer>
       <template #header>
         <v-col class="py-0">
-          <v-row class="no-gutters align-center">
+          <v-row class="no-gutters align-center flex-nowrap">
             <v-text-field
               :placeholder="$t('search')"
               v-model="query"
@@ -16,124 +16,55 @@
               spellcheck="false"
               clearable
             />
+            <RespondentSearchFilters
+              v-if="filters"
+              :condition-tags="filters.conditionTags"
+              @update:conditionTags="filters.conditionTags = $event"
+              :include-children="filters.includeChildren"
+              @update:includeChildren="filters.includeChildren = $event"
+              :show-past-residents="showPastResidents"
+              @update:showPastResidents="showPastResidents = $event"
+              :show-geo-filter-options="showGeoFilterOptions"
+              :geos="filters.geos"
+              @update:geos="filters.geos = $event"
+              :can-remove-geos="canRemoveGeos"
+            />
             <v-btn
               v-if="canSelect"
               @click="onDone"
-              class="text--primary ml-2"
+              class="text--primary ml-4"
               :disabled="isLoading"
+              :fab="!$vuetify.breakpoint.smAndUp"
+              :small="!$vuetify.breakpoint.smAndUp"
+              color="success"
             >
-              {{ $t("done") }}
-            </v-btn>
-            <v-btn
-              icon
-              @click="filtersIsOpen = !filtersIsOpen"
-            >
-              <v-icon v-if="filtersIsOpen">
-                mdi-chevron-up
-              </v-icon>
-              <v-icon v-else>
-                mdi-chevron-down
+              <span v-if="$vuetify.breakpoint.smAndUp">{{ $t("done") }}</span>
+              <v-icon class="mx-1">
+                mdi-check
               </v-icon>
             </v-btn>
           </v-row>
-          <v-slide-y-transition>
-            <v-col v-if="filtersIsOpen" class="px-0">
-              <v-row class="no-gutters">
-                <ConditionTagAutocomplete v-model="filters.conditionTags" />
-                <v-tooltip bottom>
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      v-on="on"
-                      v-bind="attrs"
-                      icon
-                      @click="clearFilters"
-                    >
-                      <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>{{ $t("clear") }}</span>
-                </v-tooltip>
-              </v-row>
-              <v-row class="no-gutters" v-if="showGeoFilterOptions">
-                <v-col>
-                  <v-checkbox
-                    v-model="filters.includeChildren"
-                    :label="$t('include_child_locations')"
-                  />
-                </v-col>
-                <v-col>
-                  <v-checkbox
-                    v-model="showPastResidents"
-                    :label="$t('show_past_residents')"
-                  />
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-slide-y-transition>
-          <v-row class="my-1">
-            <v-divider v-if="filters.geos && filters.geos.length" />
-          </v-row>
-          <v-row
-            v-if="filters.geos && filters.geos.length"
-            class="align-center no-gutters"
-          >
-            <v-col class="subheading pa-0">
-              <v-container>{{ $t("filters") }}</v-container>
-            </v-col>
-            <v-spacer />
-            <v-chip
-              v-for="(geo, index) in filters.geos"
-              :key="geo.id"
-              color="primary"
-              outlined
-              @click:close="removeGeoFilter(index)"
-              :close="canRemoveGeos"
-            >
-              <v-avatar>
-                <v-icon>mdi-home</v-icon>
-              </v-avatar>
-              <GeoBreadcrumbs
-                :geo-id="geo"
-                :max-depth="2"
-              />
-            </v-chip>
-          </v-row>
-          <v-row class="my-1">
-            <v-divider v-if="selected.length > 0" />
-          </v-row>
-          <v-col v-if="selected.length > 0">
-            <v-chip
-              v-for="r in selected"
-              :key="r.id"
-              @click:close="onSelectRespondent(r)"
-              close
-            >
-              {{ getRespondentName(r) }}
-            </v-chip>
-          </v-col>
-          <v-row class="no-gutters justify-space-between pa-0 pb-2">
-            <v-col cols="auto" class="px-0">
-              <v-pagination
-                :length="pagination.maxPages + 2"
-                :value="pagination.page + 1"
-                total-visible="7"
-                :disabled="isLoading || (pagination.page === 0 && respondentResults.length !== pagination.size)"
-                @input="updateCurrentPage"
-              />
-            </v-col>
-            <v-col cols="auto">
-              <v-btn
-                v-if="canAddRespondent"
-                color="primary"
-                @click="showAssociatedRespondentDialog = true"
-                :disabled="isLoading"
-              >
-                <span v-if="respondentId">{{ $t("add_other_respondent") }}</span>
-                <span v-else>{{ $t("add_respondent") }}</span>
-              </v-btn>
-            </v-col>
-          </v-row>
+          <v-divider
+            v-if="selected.length > 0"
+            class="my-1"
+          />
+          <RespondentChipList
+            v-model="selected"
+            @remove="onSelectRespondent"
+          />
         </v-col>
+        <v-row
+          v-if="canSelect"
+          class="no-gutters"
+        >
+          <v-spacer />
+          <v-btn
+            @click="toggleAll"
+            :disabled="!respondentResults.length"
+          >
+            {{ fullPageIsSelected ? $t('deselect_all') : $t('select_all') }}
+          </v-btn>
+        </v-row>
       </template>
       <v-container
         class="respondents px-2 py-0"
@@ -159,6 +90,31 @@
         >
           <v-container>{{ $t("no_results") }}: {{ query }}</v-container>
         </v-col>
+        <v-row class="no-gutters justify-space-between px-0 py-4">
+          <v-col
+            cols="auto"
+            class="px-0"
+          >
+            <v-pagination
+              :length="pagination.maxPages + 2"
+              :value="pagination.page + 1"
+              total-visible="7"
+              :disabled="isLoading || (pagination.page === 0 && respondentResults.length !== pagination.size)"
+              @input="updateCurrentPage"
+            />
+          </v-col>
+          <v-col cols="auto">
+            <v-btn
+              v-if="canAddRespondent"
+              color="primary"
+              @click="showAssociatedRespondentDialog = true"
+              :disabled="isLoading"
+            >
+              <span v-if="respondentId">{{ $t("add_other_respondent") }}</span>
+              <span v-else>{{ $t("add_respondent") }}</span>
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-container>
     </ScrollContainer>
     <TrellisModal
@@ -181,8 +137,8 @@ import { debounce, orderBy, merge } from 'lodash'
 import RespondentService from '@/services/respondent'
 import RespondentItem from '@/components/respondent/RespondentItem.vue'
 import AddRespondentForm from '@/components/respondent/AddRespondentForm.vue'
-import GeoBreadcrumbs from '@/components/geo/GeoBreadcrumbs.vue'
-import ConditionTagAutocomplete from '@/components/ConditionTagAutocomplete.vue'
+import RespondentSearchFilters from '@/components/respondent/RespondentSearchFilters.vue'
+import RespondentChipList from '@/components/respondent/RespondentChipList.vue'
 import { routeQueue } from '@/router'
 import TranslationService from '@/services/TranslationService'
 import singleton from '@/static/singleton'
@@ -239,9 +195,9 @@ export default {
   components: {
     RespondentItem,
     AddRespondentForm,
-    GeoBreadcrumbs,
+    RespondentChipList,
     TrellisModal,
-    ConditionTagAutocomplete,
+    RespondentSearchFilters,
     ScrollContainer,
   },
   props: {
@@ -302,8 +258,10 @@ export default {
       required: false,
     },
   },
-  setup () {
-    updateTitle('RespondentsSearch', { key: 'respondent_search' })
+  setup (props) {
+    if (props.shouldUpdateRoute) {
+      updateTitle('RespondentsSearch', { key: 'respondent_search' })
+    }
   },
   data () {
     return {
@@ -342,9 +300,6 @@ export default {
     leaving () {
       PhotoService.cancelAllOutstanding()
     },
-    removeGeoFilter (index) {
-      this.filters.geos.splice(index, 1)
-    },
     translate (translation) {
       return TranslationService.getAny(translation, this.global.locale.id)
     },
@@ -360,8 +315,19 @@ export default {
       this.pagination.maxPages = 0
       return this.getCurrentPage()
     },
-    clearFilters () {
-      this.filters.conditionTags = []
+    toggleAll () {
+      let changing = []
+      for (const r of this.respondentResults) {
+        if (this.selected.findIndex((s) => s.id === r.id) === -1) {
+          changing.push(r)
+        }
+      }
+      if (!changing.length) {
+        changing = this.selected
+      }
+      for (const r of changing) {
+        this.onSelectRespondent(r)
+      }
     },
     async updateCurrentPage (pageVal) {
       this.pagination.page = pageVal - 1
@@ -468,6 +434,14 @@ export default {
     },
     showLabels () {
       return this.filters.geos.length > 0
+    },
+    fullPageIsSelected () {
+      for (const r of this.respondentResults) {
+        if (this.selected.findIndex((s) => s.id === r.id) === -1) {
+          return false
+        }
+      }
+      return true
     },
     showPastResidents: {
       get () {

@@ -51,6 +51,7 @@ const questionTypeParameters: Record<typeof qt[keyof typeof qt], PT[]> = {
     PT.can_add_respondent,
     PT.hide_no_one,
     PT.dictator_receiver,
+    PT.geo_type,
   ],
   [qt.integer]: numParams,
   [qt.decimal]: numParams,

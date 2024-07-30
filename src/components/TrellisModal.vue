@@ -22,7 +22,7 @@
         </slot>
       </template>
       <v-card class="h-full">
-        <v-container fluid>
+        <v-container>
           <slot />
         </v-container>
       </v-card>
