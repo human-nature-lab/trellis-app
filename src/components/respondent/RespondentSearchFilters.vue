@@ -74,7 +74,6 @@ const hasChanged = computed(() => {
     <v-badge
       :value="!!numAppliedFilters"
       :content="numAppliedFilters"
-      bottom
       color="accent"
     >
       <v-icon>
@@ -138,7 +137,7 @@ const hasChanged = computed(() => {
           />
         </v-col>
       </v-row>
-      <v-row class="no-gutters">
+      <v-row class="no-gutters mt-4">
         <v-spacer />
         <v-btn
           @click="cancel"

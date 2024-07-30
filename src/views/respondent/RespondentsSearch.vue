@@ -6,7 +6,7 @@
     <ScrollContainer>
       <template #header>
         <v-col class="py-0">
-          <v-row class="no-gutters align-center">
+          <v-row class="no-gutters align-center flex-nowrap">
             <v-text-field
               :placeholder="$t('search')"
               v-model="query"
@@ -34,16 +34,22 @@
               @click="onDone"
               class="text--primary ml-4"
               :disabled="isLoading"
+              :fab="!$vuetify.breakpoint.smAndUp"
+              :small="!$vuetify.breakpoint.smAndUp"
+              color="success"
             >
-              {{ $t("done") }}
+              <span v-if="$vuetify.breakpoint.smAndUp">{{ $t("done") }}</span>
+              <v-icon class="mx-1">
+                mdi-check
+              </v-icon>
             </v-btn>
           </v-row>
-          <v-row class="my-1">
-            <v-divider v-if="selected.length > 0" />
-          </v-row>
+          <v-divider
+            v-if="selected.length > 0"
+            class="my-1"
+          />
           <RespondentChipList
             v-model="selected"
-            :max-visible="5"
             @remove="onSelectRespondent"
           />
         </v-col>
@@ -252,8 +258,10 @@ export default {
       required: false,
     },
   },
-  setup () {
-    updateTitle('RespondentsSearch', { key: 'respondent_search' })
+  setup (props) {
+    if (props.shouldUpdateRoute) {
+      updateTitle('RespondentsSearch', { key: 'respondent_search' })
+    }
   },
   data () {
     return {
