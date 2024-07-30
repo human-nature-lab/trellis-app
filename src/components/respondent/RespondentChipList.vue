@@ -4,7 +4,6 @@ import Respondent from '@/entities/trellis/Respondent'
 
 const props = defineProps<{
   value: Respondent[]
-  maxVisible?: number
 }>()
 
 const emit = defineEmits<{
@@ -34,13 +33,6 @@ const list = computed(() => {
     >
       {{ getRespondentName(r) }}
     </v-chip>
-
-    <!-- <v-chip
-      v-if="exceedsMax && !isExpanded"
-      class="ma-1"
-    >
-      +{{ props.value.length - props.maxVisible }}
-    </v-chip> -->
   </v-row>
 </template>
 

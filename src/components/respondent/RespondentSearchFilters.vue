@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import ConditionTagAutocomplete from '../ConditionTagAutocomplete.vue'
 import TrellisModal from '../TrellisModal.vue'
-import { dirtyRef } from '@/hooks/defaultRef'
+import { dirtyRef } from '@/hooks/dirtyRef'
 import Geo from '@/entities/trellis/Geo'
 import GeoBreadcrumbs from '@/components/geo/GeoBreadcrumbs.vue'
 
