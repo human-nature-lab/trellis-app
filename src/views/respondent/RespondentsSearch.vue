@@ -16,14 +16,6 @@
               spellcheck="false"
               clearable
             />
-            <v-btn
-              v-if="canSelect"
-              @click="onDone"
-              class="text--primary ml-2"
-              :disabled="isLoading"
-            >
-              {{ $t("done") }}
-            </v-btn>
             <RespondentSearchFilters
               v-if="filters"
               :condition-tags="filters.conditionTags"
@@ -37,6 +29,14 @@
               @update:geos="filters.geos = $event"
               :can-remove-geos="canRemoveGeos"
             />
+            <v-btn
+              v-if="canSelect"
+              @click="onDone"
+              class="text--primary ml-4"
+              :disabled="isLoading"
+            >
+              {{ $t("done") }}
+            </v-btn>
           </v-row>
           <v-row class="my-1">
             <v-divider v-if="selected.length > 0" />
