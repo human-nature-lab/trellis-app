@@ -3,7 +3,6 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router/composables'
 import { uniq } from 'lodash'
 import ActionTypes from '@/static/action.types'
-import Photo from '../../photo/Photo.vue'
 import RespondentsSearch from '@/views/respondent/RespondentsSearch.vue'
 import EdgeService from '@/services/edge'
 import parameterTypes from '@/static/parameter.types'
@@ -16,11 +15,13 @@ import { action } from '../lib/action'
 import { useQuestionDisabled } from '@/helpers/interview.helper'
 import { InterviewLocation } from '../services/InterviewAlligator'
 import Edge from '@/entities/trellis/Edge'
+import RespondentEdgeList from '@/components/respondent/RespondentEdgeList.vue'
 
 const props = defineProps<{
   respondent: Respondent,
   question: Question,
   location: InterviewLocation
+  disabled?: boolean
 }>()
 
 const $router = useRouter()
@@ -249,6 +250,10 @@ onMounted(() => {
   loadEdges(edgeIds.value)
   handleAssociatedRespondentQuery()
 })
+
+const isDisabled = computed(() => {
+  return props.disabled || isQuestionDisabled.value
+})
 </script>
 
 <template>
@@ -263,45 +268,13 @@ onMounted(() => {
       v-if="isLoading"
       indeterminate
     />
-    <v-row class="no-gutters">
-      <v-chip
-        :close="!isQuestionDisabled"
-        @click:close="remove(edge.id)"
-        :id="edge.id"
-        :key="edge.id"
-        v-for="edge in edges"
-      >
-        <v-avatar v-if="respondent && !edge.isLoading && edge.sourceRespondentId !== respondent.id">
-          <Photo
-            :photo="edge.sourceRespondent.photos.length ? edge.sourceRespondent.photos[0] : null"
-            :show-alt="false"
-            immediate
-            width="20"
-            height="20"
-          />
-        </v-avatar>
-        <v-avatar v-if="edge.isLoading">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          />
-        </v-avatar>
-        <span v-if="!edge.isLoading && respondent && respondent.id !== edge.sourceRespondentId">
-          {{ edge.sourceRespondent.name }}
-          <v-icon>mdi-arrow-right</v-icon>
-        </span>
-        <v-avatar v-if="!edge.isLoading">
-          <Photo
-            :photo="edge.targetRespondent.photos.length ? edge.targetRespondent.photos[0] : null"
-            :show-alt="false"
-            immediate
-            width="20"
-            height="20"
-          />
-        </v-avatar>
-        {{ edge.isLoading ? 'Loading...' : edge.targetRespondent.name }}
-      </v-chip>
-    </v-row>
+    <RespondentEdgeList
+      :value="edges"
+      :current-respondent-id="props.respondent.id"
+      @remove="edge => remove(edge.id)"
+      :editable="true"
+      :disabled="isDisabled || isNoOneSelected"
+    />
     <v-row class="no-gutters my-2">
       <v-btn
         :disabled="isQuestionDisabled || isNoOneSelected"
