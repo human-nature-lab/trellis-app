@@ -83,7 +83,7 @@ class DriverFactoryPatched extends DriverFactory {
   create (connection: Connection): Driver {
     // console.log('monekypaitch DriverFactory.create', connection)
     const type = connection.options.type
-    if (type === 'cordova' ) {
+    if (type === 'cordova') {
       return new CordovaDriverPatched(connection)
     }
     return super.create(connection)

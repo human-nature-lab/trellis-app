@@ -16,6 +16,10 @@ export class MediaCaptureService implements MediaCaptureServiceInterface {
     return [blob]
   }
 
+  async captureExternalAudio(): Promise<File[]> {
+    throw new Error('This method is not available')
+  }
+
   async uploadFile (opts?: FileUploadOptions): Promise<File[]> {
     return requestUpload(opts)
   }

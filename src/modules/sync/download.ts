@@ -10,10 +10,10 @@ import Snapshot from '@/entities/trellis/Snapshot'
 import FileService from '@/services/file'
 import { getSyncAuthentication } from '@/services/http/AxiosInstance'
 import { delay } from '@/classes/delay'
-import ZipService from '@/services/zip'
 import Sync from '@/entities/trellis-config/Sync'
 import { filetransfer } from '@/cordova/filetransfer'
-import { file } from '@/cordova/file'
+import { file, FSFileEntry } from '@/cordova/file'
+import { zipper } from '@/cordova/zip'
 
 export async function checkDownloadSize (ctrl: StepController, data: { snapshot: Snapshot }) {
   const [freeDiskSpace, snapshotFileSize] = await Promise.all([
@@ -114,6 +114,7 @@ export async function configureDatabase (ctrl: StepController) {
 export async function downloadSnapshot (ctrl: StepController, { snapshot }: { snapshot: Snapshot }) {
   ctrl.setProgress(0, 1)
   const fileName = snapshot.id + '.sql.zip'
+  console.log('filename', fileName)
   const [deviceId, deviceKey, apiRoot, syncAuth] = await Promise.all([
     DeviceService.getUUID(),
     DeviceService.getDeviceKey(),
@@ -130,8 +131,8 @@ export async function downloadSnapshot (ctrl: StepController, { snapshot }: { sn
   //   url.port = '9000'
   //   ctrl.log.warn('downloading over http in dev mode', url.href)
   // }
-  const snapshotFilePath = path.join(directoryEntry.toURL(), fileName)
-  console.log('snapshotFilePath', snapshotFilePath, fileEntry.toURL())
+  const snapshotFilePath = path.join(directoryEntry.nativeURL, fileName)
+  console.log('snapshotFilePath', snapshotFilePath, fileEntry.nativeURL)
   const p = filetransfer.download(url.toString(), snapshotFilePath, DEV, {
     headers: {
       'X-Key': deviceKey,
@@ -165,19 +166,20 @@ export async function emptySnapshotDirectory () {
   await snapshotsDir.empty(true)
 }
 
-export async function extractSnapshot (ctrl: StepController, data: { fileEntry: any }) {
-  const unzippedFile = await ZipService.unzipFile(data.fileEntry, throttle(progressEvent => {
+export async function extractSnapshot (ctrl: StepController, data: { fileEntry: FSFileEntry }) {
+  const dir = await data.fileEntry.getParent()
+  const unzippedFile = await zipper.unzip(data.fileEntry, dir, throttle(progressEvent => {
     ctrl.setProgress(progressEvent.loaded, progressEvent.total)
-  }, 1000))
+  }, 250))
   ctrl.log.info('unzippedFile', unzippedFile)
-  return data
+  return { snapshotEntry: unzippedFile }
 }
 
-export async function moveDatabase () {
-  const dbUrl = cordova.file.applicationStorageDirectory + 'databases/trellis'
-  const snapshotUrl = cordova.file.applicationStorageDirectory + 'files/files/snapshots/snapshot.db'
-  console.log('moveDatabase', dbUrl, snapshotUrl)
-  await FileService.moveUrl(snapshotUrl, dbUrl)
+export async function moveDatabase (ctrl: StepController, data: { snapshotEntry: FSFileEntry}) {
+  const dest = await file.applicationStorageDirectory('databases', { create: true })
+  console.log('moveDatabase', data.snapshotEntry.nativeURL, dest.nativeURL)
+  await data.snapshotEntry.moveTo(dest, 'trellis.db')
+  // await FileService.moveUrl(snapshotUrl, dbUrl)
 }
 
 export async function registerDownload ({ sync, snapshot }: { sync: Sync, snapshot: Snapshot }) {
@@ -186,13 +188,17 @@ export async function registerDownload ({ sync, snapshot }: { sync: Sync, snapsh
 }
 
 export async function removeDatabase () {
-  const dbLoc = cordova.file.applicationStorageDirectory + 'databases/trellis'
-  if (await FileService.existsUrl(dbLoc)) {
-    await FileService.deleteUrl(dbLoc)
+  const dbEntry = await file.applicationStorageDirectory('databases')
+  const files = await dbEntry.files()
+  for (const file of files) {
+    if (file.name === 'trellis') {
+      console.log('removing database', file.name)
+      await file.remove()
+    }
   }
 }
 
-export async function verifyDownload (ctrl: StepController, data: { fileEntry: FileEntry, snapshot: Snapshot }) {
+export async function verifyDownload (ctrl: StepController, data: { fileEntry: FSFileEntry, snapshot: Snapshot }) {
   const md5Hash = await FileService.calculateMD5Hash(data.fileEntry)
   if (md5Hash !== data.snapshot.hash) {
     ctrl.log.error('hashes dont match', data.snapshot.hash, md5Hash)

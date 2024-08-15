@@ -18,8 +18,6 @@ const loading = ref(false)
 const error = ref<Error>()
 const fullPath = ref<string>()
 
-
-
 watch(() => [props.value, props.fs], async () => {
   error.value = undefined
   try {
@@ -57,6 +55,8 @@ function updateFs (value: FsRoot) {
   emit('input', '/')
   emit('update:fs', value)
 }
+
+const roots = ['persistent', 'temporary', 'application', 'application-storage', 'data', 'root', 'sdCard', 'cache', 'shared', 'synced']
 </script>
 
 <template>
@@ -65,23 +65,12 @@ function updateFs (value: FsRoot) {
       :value="props.fs"
       @change="updateFs"
     >
-      <v-tab tab-value="persistent">
-        {{ $t('persistent') }}
-      </v-tab>
-      <v-tab tab-value="temporary">
-        {{ $t('temporary') }}
-      </v-tab>
-      <v-tab tab-value="application">
-        {{ $t('application') }}
-      </v-tab>
-      <v-tab tab-value="data">
-        {{ $t('data') }}
-      </v-tab>
-      <v-tab tab-value="root">
-        {{ $t('root') }}
-      </v-tab>
-      <v-tab tab-value="sdCard">
-        {{ $t('sdCard') }}
+      <v-tab
+        v-for="root in roots"
+        :key="root"
+        :tab-value="root"
+      >
+        {{ $t(root) }}
       </v-tab>
     </v-tabs>
     <v-tabs-items>

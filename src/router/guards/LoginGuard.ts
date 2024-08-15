@@ -9,7 +9,7 @@ import RouteWhitelist from '../RouteWhitelist'
 export default {
   name: 'LoginGuard',
   async condition (to: Route) {
-    if (RouteWhitelist.indexOf(to.name) > -1) return true
+    if (DEV || RouteWhitelist.indexOf(to.name) > -1) return true
     const user = await UserService.loadCurrentUser()
     if (!user && config && config.user) {
       await LoginService.login(config.user.username, config.user.password)

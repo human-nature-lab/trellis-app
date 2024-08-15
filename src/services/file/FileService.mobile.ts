@@ -1,8 +1,10 @@
 import DeviceService from '../device'
-import md5 from 'js-md5'
+import jsmd5 from 'js-md5'
 import { merge } from 'lodash'
 import CancellablePromise from '../../classes/CancellablePromise'
 import { CancelPromise } from '@/types/CancelPromise'
+import { FSFileEntry } from '@/cordova/file'
+import { md5 } from '@/cordova/md5'
 
 const PHOTOS_DIR = 'photos'
 const FULL_RES_DIR = 'full-resolution-photos'
@@ -334,10 +336,10 @@ export class FileService {
       DeviceService.isDeviceReady()
         .then(() => {
           fileEntry.file((file) => {
-            let reader = new FileReader()
+            const reader = new FileReader()
             reader.onloadend = function () {
-              let file = this.result
-              let md5Hash = md5(file)
+              const file = this.result
+              const md5Hash = jsmd5(file)
               resolve(md5Hash)
             }
             reader.onerror = function (error) {
@@ -349,13 +351,9 @@ export class FileService {
     })
   }
 
-  calculateMD5Hash (fileEntry) {
-    return new Promise((resolve, reject) => {
-      DeviceService.isDeviceReady()
-        .then(() => {
-          md5chksum.file(fileEntry, resolve, reject)
-        })
-    })
+  async calculateMD5Hash (fileEntry: FSFileEntry) {
+    await DeviceService.isDeviceReady()
+    return md5.hash(fileEntry)
   }
 
   countDirectoryFiles (dir: DirectoryEntry): Promise<number> {

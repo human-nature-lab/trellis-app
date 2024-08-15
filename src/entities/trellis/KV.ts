@@ -4,7 +4,7 @@ import uuid from 'uuid/v4'
 
 @Entity()
 export default class KV extends TimestampedSoftDelete {
-  @PrimaryColumn({ type: 'uuid', default: () => uuid() })
+  @PrimaryColumn({ type: 'uuid' })
   id: string
 
   @Column({ type: 'varchar', default: 'default' })

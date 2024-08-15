@@ -34,7 +34,7 @@
     <preference name="AndroidWindowSplashScreenBackground" value="#FF5722" />
     <preference name="AndroidWindowSplashScreenIconBackgroundColor" value="#FF5722" />
 
-    {{!-- <preference name="AndroidPersistentFileLocation" value="Compatibility" /> --}}
+    <preference name="AndroidPersistentFileLocation" value="Compatibility" />
     <icon src="static/img/icons/android-icon-36x36.png" density="ldpi" />
     <icon src="static/img/icons/android-icon-48x48.png" density="mdpi" />
     <icon src="static/img/icons/android-icon-72x72.png" density="hdpi" />
@@ -42,9 +42,10 @@
     <icon src="static/img/icons/android-icon-144x144.png" density="xxhdpi" />
     <icon src="static/img/icons/android-icon-192x192.png" density="xxxhdpi" />
 
-    <preference name="android-targetSdkVersion" value="31" />
+    <preference name="android-targetSdkVersion" value="33" />
     <preference name="AndroidLaunchMode" value="singleTask"/>
     <hook type="before_build" src="hooks/android_before_build.sh" />
+    <hook type="after_prepare" src="hooks/fix-permissions.js" />
      
     {{#if DEV}}
       <resource-file src="config/android/app/network_security_config.dev.xml" target="app/src/main/res/xml/network_security_config.xml" />
@@ -76,5 +77,5 @@
   {{!-- </platform> --}}
  
 
-  <engine name="android" spec="^11.0.0" />
+  <engine name="android" spec="^12.0.0" />
 </widget>

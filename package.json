@@ -125,16 +125,16 @@
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^4.5.2",
     "cordova": "^11.1.0",
-    "cordova-android": "^11.0.0",
-    "cordova-plugin-camera": "^6.0.0",
-    "cordova-plugin-device": "^2.1.0",
-    "cordova-plugin-file": "^6.0.2",
+    "cordova-android": "^12.0.1",
+    "cordova-plugin-camera": "^7.0.0",
+    "cordova-plugin-device": "^3.0.0",
+    "cordova-plugin-file": "^8.0.0",
     "cordova-plugin-file-md5": "^0.3.3",
-    "cordova-plugin-file-transfer": "github:apache/cordova-plugin-file-transfer#5c29f9a0e1b0cddb9c0cdf7b79139ae8e523e5c1",
+    "cordova-plugin-file-transfer": "^2.0.0",
     "cordova-plugin-geolocation": "^5.0.0",
     "cordova-plugin-google-nearby-connections": "github:human-nature-lab/cordova-plugin-google-nearby-connections",
-    "cordova-plugin-media": "github:human-nature-lab/cordova-plugin-media#6.1.1",
-    "cordova-plugin-media-capture": "^4.0.0",
+    "cordova-plugin-media": "^7.0.0",
+    "cordova-plugin-media-capture": "^5.0.0",
     "cordova-plugin-splashscreen": "^6.0.1",
     "cordova-plugin-zeep": "^0.0.5",
     "cordova-plugin-zip": "^3.1.0",
@@ -206,20 +206,28 @@
   "cordova": {
     "plugins": {
       "cordova-plugin-device": {},
-      "cordova-plugin-camera": {},
       "cordova-plugin-file-md5": {},
       "cordova-plugin-zip": {},
       "cordova-plugin-splashscreen": {},
       "cordova-sqlite-storage": {},
-      "cordova-plugin-geolocation": {},
+      "cordova-plugin-geolocation": {
+        "GPS_REQUIRED": "true"
+      },
       "cordova-plugin-zeep": {},
       "cordova-plugin-insomnia": {},
-      "@red-mobile/cordova-plugin-barcodescanner": {},
-      "cordova-plugin-file-transfer": {},
-      "cordova-plugin-media-capture": {},
-      "cordova-plugin-file": {},
+      "@red-mobile/cordova-plugin-barcodescanner": {
+        "ANDROIDX_LEGACY_SUPPORT_V4_VERSION": "1.0.0"
+      },
       "cordova-plugin-google-nearby-connections": {},
-      "cordova-plugin-media": {}
+      "cordova-plugin-media": {},
+      "cordova-plugin-media-capture": {},
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      },
+      "cordova-plugin-camera": {
+        "ANDROIDX_CORE_VERSION": "1.6.+"
+      },
+      "cordova-plugin-file-transfer": {}
     },
     "platforms": [
       "android"

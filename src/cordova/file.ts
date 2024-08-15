@@ -473,6 +473,15 @@ export class file {
     return dir
   }
 
+  static async applicationDirectory (dirPath = '', opts?: FileSystemGetDirectoryOptions) {
+    const e = await this.resolveLocalFileSystemURL(cordova!.file.applicationDirectory)
+    const dir = e as FSDirectoryEntry
+    if (dirPath) {
+      return dir.getDirectory(dirPath, opts)
+    }
+    return dir
+  }
+
   static async dataDirectory (dirPath = '', opts?: FileSystemGetDirectoryOptions) {
     const e = await this.resolveLocalFileSystemURL(cordova!.file.dataDirectory)
     const dir = e as FSDirectoryEntry
@@ -484,6 +493,18 @@ export class file {
 
   static root () {
     return this.resolveLocalFileSystemURL('file:///storage/')
+  }
+
+  static cacheDirectory () {
+    return this.resolveLocalFileSystemURL(cordova!.file.cacheDirectory)
+  }
+
+  static sharedDirectory () {
+    return this.resolveLocalFileSystemURL(cordova!.file.sharedDirectory)
+  }
+
+  static syncedDataDirectory () {
+    return this.resolveLocalFileSystemURL(cordova!.file.syncedDataDirectory)
   }
 
   static sdCard () {
@@ -553,7 +574,16 @@ export class file {
   }
 }
 
-export type FsRoot = 'temporary' | 'persistent' | 'application' | 'data' | 'root' | 'sdCard'
+export type FsRoot = 'temporary' |
+ 'persistent' |
+ 'application' |
+ 'application-storage' |
+ 'data' |
+ 'root' |
+ 'sdCard' |
+ 'cache' |
+ 'shared' |
+ 'synced'
 
 export async function getFs (root: FsRoot) {
   switch (root) {
@@ -565,14 +595,22 @@ export async function getFs (root: FsRoot) {
       const fs = await file.temporary()
       return fs.root
     }
-    case 'application':
+    case 'application-storage':
       return file.applicationStorageDirectory()
+    case 'application':
+      return file.applicationDirectory()
     case 'data':
       return file.dataDirectory()
     case 'root':
       return file.root()
     case 'sdCard':
       return file.sdCard()
+    case 'cache':
+      return file.cacheDirectory()
+    case 'shared':
+      return file.sharedDirectory()
+    case 'synced':
+      return file.syncedDataDirectory()
     default:
       throw new Error(`Unknown root: ${root}`)
   }

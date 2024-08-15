@@ -7,11 +7,11 @@
       <v-card-title>
         {{ $t('confirm') }}
       </v-card-title>
-      <v-card-content>
+      <v-card-text>
         <p class="pa-4">
           <slot />
         </p>
-      </v-card-content>
+      </v-card-text>
       <v-row
         class="pa-4"
         no-gutters

@@ -24,6 +24,11 @@ async function captureAudio () {
   console.log(res)
   files.value.push(...res)
 }
+async function captureExternalAudio () {
+  const res = await MediaCaptureService.captureExternalAudio()
+  console.log(res)
+  files.value.push(...res)
+}
 
 const audioModes = ref()
 const videoModes = ref()
@@ -85,6 +90,11 @@ async function addAsset (f: FSFileEntry | Blob) {
     <v-row no-gutters>
       <v-btn @click="captureAudio">
         Capture audio
+      </v-btn>
+    </v-row>
+    <v-row no-gutters>
+      <v-btn @click="captureExternalAudio">
+        Capture external audio
       </v-btn>
     </v-row>
     <v-list>

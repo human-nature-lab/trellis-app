@@ -31,6 +31,11 @@ export class MediaCaptureService implements MediaCaptureServiceInterface {
     return [media]
   }
 
+  async captureExternalAudio(): Promise<(File | FSFileEntry)[]> {
+    const media = await mediaCapture.captureAudio({ limit: 1 })
+    return this.mediaToEntries(media)
+  }
+
   async uploadFile (opts?: FileUploadOptions): Promise<File[]> {
     return requestUpload(opts)
   }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import FileViewer from '@/components/files/FileViewer.vue'
-import { FsRoot } from '@/cordova/file';
+import { FsRoot } from '@/cordova/file'
 import { ref } from 'vue'
 
 const root = ref<string>('/')

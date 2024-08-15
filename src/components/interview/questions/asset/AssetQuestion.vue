@@ -23,12 +23,13 @@ const props = defineProps<{
 const working = ref(false)
 
 const types = computed(() => {
-  if (!props.question || !props.question.questionParameters) return ['audio', 'video', 'image', 'file']
+  if (!props.question || !props.question.questionParameters) return ['audio', 'video', 'image', 'file', 'external_audio']
   const qp = props.question.questionParameters.find(qp => qp.parameter.name === 'asset_types')
-  return (qp && qp.val) ? JSON.parse(qp.val) : ['audio', 'video', 'image', 'file']
+  return (qp && qp.val) ? JSON.parse(qp.val) : ['audio', 'video', 'image', 'file', 'external_audio']
 })
 
 const allowAudio = computed(() => types.value.includes('audio'))
+const allowExternalAudio = computed(() => types.value.includes('external_audio'))
 const allowVideo = computed(() => types.value.includes('video'))
 const allowImage = computed(() => types.value.includes('image'))
 const allowFile = computed(() => types.value.includes('file'))
@@ -65,6 +66,19 @@ async function captureAudio () {
     debugger
     logError(e)
     throw e
+  } finally {
+    working.value = false
+  }
+}
+
+async function captureExternalAudio () {
+  if (working.value) return
+  working.value = true
+  try {
+    const files = await MediaCaptureService.captureExternalAudio()
+    addAssets(await mediaToAssets(files))
+  } catch (e) {
+    logError(e)
   } finally {
     working.value = false
   }
@@ -136,6 +150,13 @@ const isBusy = computed(() => working.value || assetsLoading.value)
         :disabled="isBusy"
       >
         {{ $t('capture_audio') }}
+      </v-btn>
+      <v-btn
+        v-if="allowExternalAudio"
+        @click="captureExternalAudio"
+        :disabled="isBusy"
+      >
+        {{ $t('capture_external_audio') }}
       </v-btn>
       <v-btn
         v-if="allowVideo"

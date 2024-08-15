@@ -33,7 +33,7 @@ const trellisOptions = {
   namingStrategy: new SnakeCaseNamingStrategy(),
   // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
-  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['query', 'warning', 'error']
+  logging: (!DEV && config.database && config.database.logging !== null) ? config.database.logging : ['query', 'warning', 'error'],
 }
 
 console.log('database configs', trellisConfigOptions, trellisOptions)

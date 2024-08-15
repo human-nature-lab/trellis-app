@@ -18,9 +18,8 @@
       @cancel="downloadCanceled"
     />
     <v-row
-      no-gutters
-      class="pa-4"
       v-if="!needsServerConfig"
+      class="pa-4 no-gutters"
     >
       <v-col>
         <h4 class="py-2 text-center">
@@ -28,8 +27,7 @@
         </h4>
         <v-spacer />
         <v-row
-          no-gutters
-          class="justify-space-around"
+          class="justify-space-around flex-nowrap no-gutters"
         >
           <v-btn
             @click="onDownload"
@@ -58,8 +56,7 @@
         </h4>
         <v-spacer />
         <v-row
-          no-gutters
-          class="justify-space-around"
+          class="justify-space-around no-gutters flex-nowrap"
         >
           <v-btn
             @click="onDownloadPhotos"

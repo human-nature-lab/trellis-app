@@ -12,5 +12,7 @@ export interface MediaCaptureServiceInterface {
 
   captureAudio (): Promise<(File | FSFileEntry)[]>
 
+  captureExternalAudio (): Promise<(File | FSFileEntry)[]>
+
   uploadFile (opts?: FileUploadOptions): Promise<(FSFileEntry | File)[]>
 }
