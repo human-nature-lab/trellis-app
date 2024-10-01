@@ -1,3 +1,4 @@
+import log from '@/log'
 import path from 'path'
 
 interface CordovaFile {
@@ -195,7 +196,7 @@ export class FSFileEntry extends BaseEntry {
 type Writeable = FSFileEntry | FileEntry | Primitive
 type Primitive = string | number | boolean | Blob | Buffer | ReadableStream
 
-const MAX_WRITE_SIZE = 1024 * 1024
+const MAX_WRITE_SIZE = 2 * 1024 * 1024
 export class FSFileWriter {
   constructor (private writer: FileWriter, private entry: FSFileEntry) {}
 
@@ -258,15 +259,32 @@ export class FSFileWriter {
   }
 
   async writeStream (data: ReadableStream) {
-    console.log('writeStream')
+    log.debug('FSFileWriter.writeStream: with max write size', MAX_WRITE_SIZE)
     const reader = data.getReader()
+    log.debug('FSFileWriter.writeStream: reader', reader)
+    let total = 0
     while (true) {
+      log.debug('FSFileWriter.writeStream: reading')
       const { value, done } = await reader.read()
       if (done) {
         break
       }
-      await this.writeRaw(value)
+      log.debug('FSFileWriter.writeStream: read', value, done)
+      if (value instanceof Uint8Array) {
+        log.debug('FSFileWriter.writeStream: writing arraybuffer')
+        total += value.length
+        let index = 0
+        while (index < value.length) {
+          const blob = new Blob([value.subarray(index, index + MAX_WRITE_SIZE)])
+          index += MAX_WRITE_SIZE
+          log.debug('FSFileWriter.writeStream: writing slice', blob.size, 'remaining', value.length - index, 'total', total)
+          await this.writeRaw(blob)
+        }
+      } else {
+        await this.writeRaw(value)
+      }
     }
+    log.debug('FSFileWriter.writeStream: done', total)
   }
 
   async write (data: Writeable): Promise<void> {
@@ -281,6 +299,9 @@ export class FSFileWriter {
     } else if (data instanceof ReadableStream) {
       console.log('writing readablestream')
       return this.writeStream(data)
+    } else if (typeof data === 'object' && 'stream' in data && typeof data.stream === 'function') {
+      console.log('writing streamable data. probably a cordova file')
+      return this.writeStream(data.stream())
     } else if (data instanceof Blob || typeof data === 'string' || typeof data === 'number' || typeof data === 'boolean') {
       val = data
     } else {

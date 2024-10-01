@@ -13,6 +13,7 @@ import { file, FSFileEntry } from '@/cordova/file'
 import { delay } from '@/classes/delay'
 import { getSyncAuthentication } from '@/services/http/AxiosInstance'
 import { filetransfer } from '@/cordova/filetransfer'
+import { debounce } from 'lodash'
 
 type MinPhoto = Pick<Photo, 'id' | 'fileName'>
 
@@ -170,7 +171,8 @@ export async function uploadImages (ctrl: StepController, images: FSFileEntry[])
     getSyncAuthentication(),
   ])
   const uri = apiRoot + `/sync/device/${deviceId}/upload/image`
-  const failedImages: {err: Error, image: string }[] =  []
+  const failedImages: {err: Error, image: string }[] = []
+  const setProgress = debounce(ctrl.setProgress, 1000)
   const queue = new AsyncQueue<FSFileEntry>(async entry => {
     try {
       const res = await filetransfer.upload(uri, entry.nativeURL, {
@@ -182,7 +184,7 @@ export async function uploadImages (ctrl: StepController, images: FSFileEntry[])
           Authorization: syncAuth,
         },
       })
-      ctrl.setProgress(queue.total - queue.pending.length, queue.total, true)
+      setProgress(queue.total - queue.pending.length, queue.total, true)
       console.log('res', res)
     } catch (err) {
       failedImages.push({ err, image: entry.name })

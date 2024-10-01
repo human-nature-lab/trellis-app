@@ -9,6 +9,7 @@ import { i18n } from '@/i18n'
 import axios from 'axios'
 import HashService from '@/services/hash'
 import { roundDecimals } from '@/classes/M'
+import { debounce } from 'lodash'
 
 export async function analyzeAssets (ctrl: StepController): Promise<Asset[]> {
   ctrl.setProgress(0, 3)
@@ -79,7 +80,8 @@ export async function uploadAssets (ctrl: StepController, assetIds: string[]) {
   const initialAvgSize = 1024 * 1024
   let completedBytes = 0
   const MB = 1024 * 1024
-  ctrl.setProgress(0, (assetIds.length * initialAvgSize) / MB, true)
+  const setProgress = debounce(ctrl.setProgress, 1000)
+  setProgress(0, (assetIds.length * initialAvgSize) / MB, true)
   const queue = new AsyncQueue<string>(async assetId => {
     try {
       const path = `/sync/device/${deviceUUID}/upload/asset/${assetId}`
@@ -87,10 +89,10 @@ export async function uploadAssets (ctrl: StepController, assetIds: string[]) {
       const completedCount = queue.total - queue.pending.length
       const totalSizeEstimate = completedBytes + (completedBytes / completedCount) * queue.pending.length
       const res = await SyncService.uploadEntry(path, entry, {}, p => {
-        ctrl.setProgress(roundDecimals((p.loaded + completedBytes) / MB), roundDecimals((p.total + totalSizeEstimate) / MB), true)
+        setProgress(roundDecimals((p.loaded + completedBytes) / MB), roundDecimals((p.total + totalSizeEstimate) / MB), true)
       })
       completedBytes += await entry.size()
-      ctrl.setProgress(roundDecimals((completedBytes) / MB), roundDecimals(totalSizeEstimate / MB), true)
+      setProgress(roundDecimals((completedBytes) / MB), roundDecimals(totalSizeEstimate / MB), true)
     } catch (err) {
       failed.push({ err, asset: assetId })
     }
