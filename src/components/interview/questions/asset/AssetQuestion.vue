@@ -101,7 +101,11 @@ async function uploadFile () {
   working.value = true
   try {
     const files = await MediaCaptureService.uploadFile()
-    addAssets(await mediaToAssets(files))
+    console.log('uploaded', files)
+    const assets = await mediaToAssets(files)
+    console.log('assets', assets)
+    addAssets(assets)
+    console.log('added assets')
   } catch (e) {
     logError(e)
   } finally {
