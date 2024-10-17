@@ -9,7 +9,7 @@ function onUpload (f: File) {
 }
 
 function onDone () {
-  if (files.value.length) {
+  if (files.value.length && resolver.value) {
     resolver.value(files.value)
   } else {
     rejecter.value(new Error('No files uploaded'))

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, computed } from 'vue'
 import Question from '@/entities/trellis/Question'
 import Respondent from '@/entities/trellis/Respondent'
 import { logError } from '@/helpers/log.helper'
@@ -14,6 +14,7 @@ import AssetRow from './AssetRow.vue'
 import AssetViewer from '@/components/asset/AssetViewer.vue'
 import TrellisModal from '@/components/TrellisModal.vue'
 import { i18n } from '@/i18n'
+import { v4 as uuidv4 } from 'uuid'
 
 const props = defineProps<{
   question: Question
@@ -49,9 +50,14 @@ function addAssets (assets: Asset[]) {
 
 async function mediaToAssets (files: (File | FSFileEntry)[]) {
   return Promise.all(files.map(async f => {
-    const fileName = (f instanceof FSFileEntry) ? f.name : `audio-${Date.now()}.webm`
+    let fileName = ''
+    if (f instanceof FSFileEntry || ('name' in f && typeof f.name === 'string' && f.name.length > 3)) {
+      fileName = f.name
+    }
     const mimeType = (f instanceof FSFileEntry) ? (await f.type()) : f.type
-    return AssetService.createAsset({ fileName, isFromSurvey: true, mimeType }, f)
+    const payload = { fileName, isFromSurvey: true, mimeType }
+    console.log('creating asset', payload)
+    return AssetService.createAsset(payload, f)
   }))
 }
 

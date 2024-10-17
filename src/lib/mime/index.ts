@@ -4,6 +4,7 @@ const audioMimeTypes = [
   'audio/wav',
   'audio/aac',
   'audio/webm',
+  'audio/x-m4a',
 ]
 
 const imageMimeTypes = [
