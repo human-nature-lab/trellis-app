@@ -1,6 +1,7 @@
 <template>
   <AsyncTranslationText
     passive
+    @click="$emit('click')"
     :translation="translation"
     :location="location">
   </AsyncTranslationText>

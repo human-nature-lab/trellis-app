@@ -1,12 +1,18 @@
-import Sync from '../entities/trellis-config/Sync'
 import uuid from 'uuid/v4'
-import DatabaseService from './database'
-import DeviceService from './device'
-import { syncInstance } from './http/AxiosInstance'
 import { AxiosRequestConfig, CancelTokenSource } from 'axios'
 import { Connection } from 'typeorm'
+import Sync from '../entities/trellis-config/Sync'
+import DatabaseService from './database'
+import DeviceService from './device'
+import { requestSyncAuthentication, syncInstance } from './http/AxiosInstance'
 import LoginService from './login'
-import SingletonService from './SingletonService'
+import SingletonService, { StorageKey } from './SingletonService'
+import { parseISO } from 'date-fns'
+import Snapshot from '@/entities/trellis/Snapshot'
+import { ProgressHandler, filetransfer } from '@/cordova/filetransfer'
+import { FSDirectoryEntry, FSFileEntry } from '@/cordova/file'
+import { Mutex } from 'async-mutex'
+import { merge } from 'lodash'
 
 /**
  * Max number of rows to write to upload file at a time.
@@ -15,6 +21,31 @@ import SingletonService from './SingletonService'
 const UPLOAD_NUM_ROWS_WRITE = 100
 
 class SyncService {
+  private deviceData: {
+    deviceUUID: string
+    deviceKey: string
+    apiAddress: string
+  }
+
+  private mut = new Mutex()
+
+  public async getDeviceInfo () {
+    if (this.deviceData) {
+      return this.deviceData
+    }
+    return this.mut.runExclusive(async () => {
+      if (this.deviceData) {
+        return this.deviceData
+      }
+      const [deviceUUID, deviceKey, apiAddress] = await Promise.all([
+        DeviceService.getUUID(),
+        DeviceService.getDeviceKey(),
+        DatabaseService.getServerIPAddress(),
+      ])
+      this.deviceData = { deviceUUID, deviceKey, apiAddress }
+      return this.deviceData
+    })
+  }
 
   async createSync (type: string, deviceId: string): Promise<Sync> {
     const sync = new Sync()
@@ -30,131 +61,194 @@ class SyncService {
   }
 
   async getHeartbeat (source: CancelTokenSource) {
-    let options = {} as AxiosRequestConfig
+    const options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const http = await syncInstance()
-    const resp = await http.get(`heartbeat`, options)
+    const resp = await http.get('heartbeat', options)
     return resp.data
   }
 
+  async getServerTime (deviceId: string) {
+    const http = await syncInstance()
+    const res = await http.get(`device/${deviceId}/server-time`)
+    return parseISO(res.data.time)
+  }
+
   async authenticate (source: CancelTokenSource, deviceId: string) {
-    let options = {} as AxiosRequestConfig
+    const options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const http = await syncInstance()
     const resp = await http.get(`device/${deviceId}/syncv2/authenticate`, options)
     return resp.data
   }
 
-  async getLatestSnapshot (source: CancelTokenSource) {
-    const deviceId = await DeviceService.getUUID()
-    let options = {} as AxiosRequestConfig
+  async getLatestSnapshot (source?: CancelTokenSource): Promise<Snapshot> {
+    const { deviceUUID } = await this.getDeviceInfo()
+    const options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
     const http = await syncInstance()
-    const resp = await http.get(`device/${deviceId}/syncv2/snapshot`, options)
-    return resp.data
+    const resp = await http.get(`device/${deviceUUID}/syncv2/snapshot`, options)
+    return new Snapshot().fromSnakeJSON(resp.data)
   }
 
   async listUploads () {
     const http = await syncInstance()
-    return http.get(`list-uploads`)
+    return http.get('list-uploads')
   }
 
   async getMissingPhotos (source?: CancelTokenSource) {
-    let options = {} as AxiosRequestConfig
+    const options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    const deviceId = await DeviceService.getUUID()
+    const { deviceUUID } = await this.getDeviceInfo()
     const http = await syncInstance()
-    const resp = await http.get(`device/${deviceId}/missing-images`, options)
-    return resp.data
+    const resp = await http.get(`device/${deviceUUID}/missing-images`, options)
+    return resp.data as string[]
+  }
+
+  async getMissingAssets (source?: CancelTokenSource) {
+    const options = {} as AxiosRequestConfig
+    if (source) { options.cancelToken = source.token }
+    const { deviceUUID } = await this.getDeviceInfo()
+    const http = await syncInstance()
+    const resp = await http.get(`device/${deviceUUID}/missing-assets`, options)
+    return resp.data as string[]
   }
 
   async getPendingUploads (source: CancelTokenSource) {
-    const deviceId = await DeviceService.getUUID()
+    const { deviceUUID } = await this.getDeviceInfo()
     const http = await syncInstance()
-    let options = {} as AxiosRequestConfig
+    const options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    const resp = await http.get(`device/${deviceId}/uploads`, options)
+    const resp = await http.get(`device/${deviceUUID}/uploads`, options)
     return resp.data
   }
 
   async getSnapshotFileSize (source: CancelTokenSource, snapshotId: string): Promise<number> {
-    let options = {} as AxiosRequestConfig
+    const options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    const deviceId = await DeviceService.getUUID()
+    const { deviceUUID } = await this.getDeviceInfo()
     const http = await syncInstance()
-    const resp = await http.get(`device/${deviceId}/snapshot/${snapshotId}/file_size`, options)
+    const resp = await http.get(`device/${deviceUUID}/snapshot/${snapshotId}/file_size`, options)
     return resp.data
   }
 
-  async getImageFileList (source: CancelTokenSource, fileNames: string[]): Promise<string[]> {
-    let options = {} as AxiosRequestConfig
+  async getImageFileList (source: CancelTokenSource, fileNames: string[]) {
+    type Res = {
+      'total_size': number
+      'photos_requested': number
+      'is_estimate': number
+      'photos_found': number
+    }
+    const options = {} as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    const deviceId = await DeviceService.getUUID()
+    const { deviceUUID } = await this.getDeviceInfo()
     const http = await syncInstance()
-    const resp = await http.post(`device/${deviceId}/image_size`, fileNames, options)
-    return resp.data
+    const resp = await http.post(`device/${deviceUUID}/image_size`, fileNames, options)
+    return resp.data as Res
   }
 
   async downloadImage (source: CancelTokenSource, fileName: string): Promise<any> {
-    let options = {
+    const options = {
       timeout: 0,
-      responseType: 'blob'
+      responseType: 'blob',
     } as AxiosRequestConfig
     if (source) { options.cancelToken = source.token }
-    const deviceId = await DeviceService.getUUID()
+    const { deviceUUID } = await this.getDeviceInfo()
     const http = await syncInstance()
-    const res = await http.get(`device/${deviceId}/image/${fileName}`, options)
+    const res = await http.get(`device/${deviceUUID}/image/${fileName}`, options)
     if (res.status > 300) {
       throw new Error('Unable to download image')
     }
     return res
   }
 
+  async downloadImageTo (imageFileName: string, imageDir: FSDirectoryEntry) {
+    const { apiAddress, deviceUUID, deviceKey } = await this.getDeviceInfo()
+    const url = `${apiAddress}/sync/device/${deviceUUID}/image/${imageFileName}`
+    const authHeader = await requestSyncAuthentication()
+    const photo = await imageDir.getFile(imageFileName, { create: true })
+    return filetransfer.download(url, photo.toURL(), false, {
+      headers: {
+        Authorization: authHeader,
+        'X-Key': deviceKey,
+      },
+    })
+  }
+
+  async downloadAssetTo (assetId: string, dir: FSDirectoryEntry) {
+    const { apiAddress, deviceUUID, deviceKey } = await this.getDeviceInfo()
+    const url = `${apiAddress}/sync/device/${deviceUUID}/asset/${assetId}`
+    const authHeader = await requestSyncAuthentication()
+    const file = await dir.getFile(assetId, { create: true })
+    return filetransfer.downloadEntry(url, file, false, {
+      headers: {
+        Authorization: authHeader,
+        'X-Key': deviceKey,
+      },
+    })
+  }
+
+  async uploadEntry (path: string, entry: FSFileEntry, opts?: FileUploadOptions, onProgress?: ProgressHandler) {
+    const { deviceKey, apiAddress } = await this.getDeviceInfo()
+    const authHeader = await requestSyncAuthentication()
+    const url = new URL(apiAddress)
+    url.pathname = path
+    const uploadOpts = merge({}, {
+      headers: {
+        Authorization: authHeader,
+        'X-Key': deviceKey,
+      },
+    }, opts)
+
+    return filetransfer.uploadEntry(url.toString(), entry, uploadOpts, onProgress)
+  }
+
   async hasSynced (): Promise<boolean> {
-    const connection = await DatabaseService.getConfigDatabase()
-    const repository = await connection.getRepository(Sync)
+    const repository = await DatabaseService.getConfigRepository(Sync)
     const downloadCount = await repository.count({
       type: 'download',
-      status: 'success'
+      status: 'success',
     })
     return (downloadCount > 0)
   }
 
   async registerSuccessfulSync (_sync: Sync): Promise<void> {
-    const connection = await DatabaseService.getConfigDatabase()
-    const repository = await connection.getRepository(Sync)
-    await repository.update({id: _sync.id}, {completedAt: new Date(), status: 'success'})
+    const repository = await DatabaseService.getConfigRepository(Sync)
+    await repository.update({ id: _sync.id }, {
+      completedAt: new Date(),
+      status: 'success',
+      snapshotCreatedAt: _sync.snapshotCreatedAt,
+    })
     // Log out user, un-set study, locale (in case User, Study, Locale tables have changed)
     await LoginService.logout()
-    SingletonService.set('study', null)
-    SingletonService.set('locale', null)
+    SingletonService.set(StorageKey.study, null)
+    SingletonService.set(StorageKey.locale, null)
     // TODO: is this necessary
-    SingletonService.set('user', null)
+    SingletonService.set(StorageKey.user, null)
   }
 
   async registerCancelledSync (_sync: Sync): Promise<void> {
-    const connection = await DatabaseService.getConfigDatabase()
-    const repository = await connection.getRepository(Sync)
-    await repository.update({id: _sync.id}, {status: 'cancelled'})
+    const repository = await DatabaseService.getConfigRepository(Sync)
+    await repository.update({ id: _sync.id }, { status: 'cancelled' })
   }
 
   async verifyUpload (fileEntry, md5hash) {
-    const deviceId = await DeviceService.getUUID()
+    const { deviceUUID } = await this.getDeviceInfo()
     const http = await syncInstance()
-    const uri = `/device/${deviceId}/verify-upload`
+    const uri = `/device/${deviceUUID}/verify-upload`
     return http.post(uri, {
       fileName: fileEntry.name,
-      md5hash: md5hash
+      md5hash: md5hash,
     })
   }
 
   async writeUpdatedRows (fileWriter, updatedRows, isCancelled) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       let curRow = 0
 
-      fileWriter.onwriteend = function() {
+      fileWriter.onwriteend = function () {
         curRow++
-        if (curRow < updatedRows.length && (! isCancelled()) ) {
+        if (curRow < updatedRows.length && (!isCancelled())) {
           fileWriter.seek(fileWriter.length)
           fileWriter.write(JSON.stringify(updatedRows[curRow]) + '\n')
         } else {
@@ -165,12 +259,6 @@ class SyncService {
       fileWriter.onerror = function (err) { reject(err) }
 
       fileWriter.write(JSON.stringify(updatedRows[curRow]) + '\n')
-    })
-  }
-
-  createFileWriter (fileEntry) {
-    return new Promise((resolve, reject) => {
-      fileEntry.createWriter(resolve, reject)
     })
   }
 
@@ -187,62 +275,59 @@ class SyncService {
     return connection.query(`select *, "${tableName}" as table_name from ${tableName} where id in (${rowIds});`)
   }
 
-  async getUpdatedPhotos (connection:Connection, rowIds:string[]): Promise<object[]> {
+  async getUpdatedPhotos (connection:Connection, rowIds:string[]): Promise<string[]> {
     const results = await connection.query(`select file_name from photo where id in (${rowIds});`)
     return results.map((row) => row.file_name)
   }
 
   async markUpdatedRowsAsUploaded () {
     const connection = await DatabaseService.getDatabase()
-    return connection.query(`update updated_records set uploaded_at = date('now') where uploaded_at is null;`)
+    return connection.query('update updated_records set uploaded_at = date(\'now\') where uploaded_at is null;')
   }
 
-  async createUploadFile (fileEntry, trackProgress, isCancelled) {
+  async createUploadFile (fileEntry: FSFileEntry, trackProgress, isCancelled) {
     const connection = await DatabaseService.getDatabase()
-
-    /* For testing:
-    const repository = await connection.getRepository(Geo)
-    const entities = await repository.find({ take: 100 })
-    entities.forEach((entity) => {
-      repository.update({ id: entity.id }, { updatedAt: new Date() })
-    })
-    */
 
     const totalRowResults = await connection.query(`
       select count(*) as total_rows from (
         select distinct updated_record_id, table_name from updated_records where uploaded_at is null
       );`)
 
-    const totalRows = totalRowResults[0]['total_rows']
+    const totalRows = totalRowResults[0].total_rows
     const tables = await connection.query(
       'select table_name as tableName, count(*) as rowCount ' +
       'from (select distinct updated_record_id, table_name from updated_records ' +
       'where uploaded_at is null) ' +
       'group by table_name;')
 
-    const fileWriter = await this.createFileWriter(fileEntry)
+    const fileWriter = await fileEntry.createWriter()
     let writtenRows = 0
     let updatedPhotos = []
+    let updatedAssets = []
 
     for (const table of tables) {
       let rowIds = await connection.query(`
         select distinct updated_record_id from updated_records where table_name = ? and uploaded_at is null
-      `,[table.tableName])
+      `, [table.tableName])
       rowIds = rowIds.map((row) => row.updated_record_id)
       while (rowIds.length > 0) {
-        let subsetRowIds = rowIds.splice(0, UPLOAD_NUM_ROWS_WRITE)
-        subsetRowIds = subsetRowIds.map((rowId) => { return '"' + rowId + '"' }).join(',')
+        if (isCancelled()) return
+        const chunkRowIds = rowIds.splice(0, UPLOAD_NUM_ROWS_WRITE)
+        const subsetRowIds = chunkRowIds.map((rowId) => { return '"' + rowId + '"' }).join(',')
         const updatedRows = await this.getUpdatedRows(connection, table.tableName, subsetRowIds)
         if (table.tableName === 'photo') {
           updatedPhotos = await this.getUpdatedPhotos(connection, subsetRowIds)
+        } else if (table.tableName === 'asset') {
+          updatedAssets = chunkRowIds.slice()
         }
-        await this.writeUpdatedRows(fileWriter, updatedRows, isCancelled)
+        await fileWriter.writeLines(updatedRows.map(v => JSON.stringify(v)))
+        // await this.writeUpdatedRows(fileWriter, updatedRows, isCancelled)
         writtenRows += updatedRows.length
-        trackProgress({created: writtenRows, total: totalRows})
+        trackProgress({ created: writtenRows, total: totalRows })
       }
     }
 
-    return updatedPhotos
+    return { updatedPhotos, updatedAssets }
   }
 
   async getNewPhotosCount (): Promise<number> {
@@ -250,7 +335,6 @@ class SyncService {
     const res = await conn.query('select count(*) as c from updated_records where table_name = "photo"')
     return res[0].c
   }
-
 }
 
 export default new SyncService()

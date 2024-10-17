@@ -39,10 +39,10 @@
 
 <script lang="ts">
 import Vue, { PropType } from 'vue'
-import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
-import ConditionTag from '../../entities/trellis/ConditionTag'
+import AssignConditionTag from '@/entities/trellis/AssignConditionTag'
+import ConditionTag from '@/entities/trellis/ConditionTag'
 import ConditionRow from './ConditionRow.vue'
-import builderService from '../../services/builder'
+import builderService from '@/services/builder'
 
 const defaultLogic = 'function (vars, api) {\n  return true;\n}'
 export default Vue.extend({

@@ -1,20 +1,20 @@
 <template>
   <v-container class="web-login">
-    <v-layout justify-space-around>
-      <v-flex xs6>
+    <v-row class="justify-space-around">
+      <v-col cols="6" xs="6">
         <h2>
           {{ $t('login') }}
         </h2>
-      </v-flex>
-    </v-layout>
-    <v-layout justify-space-around>
-      <v-flex xs8>
+      </v-col>
+    </v-row>
+    <v-row class="justify-space-around">
+      <v-col cols="10" sm="8" md="6">
         <LoginForm
           :clearCredentials="false"
           :isWorking="isWorking"
           @login="login"/>
-      </v-flex>
-    </v-layout>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

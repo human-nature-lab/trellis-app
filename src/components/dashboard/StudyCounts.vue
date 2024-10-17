@@ -62,12 +62,12 @@
     computed: {
       sections () {
         return {
-          Surveys: this.counts.surveys,
-          Respondents: this.counts.respondents,
-          Locations: this.counts.geos,
-          Photos: this.counts.photos,
-          Users: this.counts.users,
-          Forms: this.counts.forms,
+          [this.$t('surveys')]: this.counts.surveys,
+          [this.$t('respondents')]: this.counts.respondents,
+          [this.$t('locations')]: this.counts.geos,
+          [this.$t('photos')]: this.counts.photos,
+          [this.$t('users')]: this.counts.users,
+          [this.$t('forms')]: this.counts.forms,
         }
       }
     }

@@ -48,14 +48,9 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
   @JoinTable({ name: 'respondent_photo' })
   photos: Photo[]
 
-  @Relationship({ generator: rctGenerator, async: true })
-  @LazyQuery(type => RespondentConditionTag, (repo, respondent) => {
-    return repo.find({
-      respondentId: respondent.id,
-      deletedAt: null,
-    })
-  }, { cached: false })
-  respondentConditionTags: Promise<RespondentConditionTag[]>
+  @Relationship(type => RespondentConditionTag)
+  @OneToMany(type => RespondentConditionTag, rct => rct.respondent)
+  respondentConditionTags: RespondentConditionTag[]
 
   // Inverse relationships
   @OneToMany(type => Survey, survey => survey.respondent)
@@ -66,6 +61,11 @@ export default class Respondent extends TimestampedSoftDelete implements SnakeSe
 
   @OneToMany(type => Edge, edge => edge.targetRespondent)
   targetEdges: Edge[]
+
+  getName () {
+    const displayName = this.names.find(name => name.isDisplayName)
+    return displayName ? displayName.name : this.name
+  }
 }
 
 function geoGenerator (geo) {

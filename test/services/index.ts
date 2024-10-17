@@ -13,5 +13,6 @@ export default {
   'SkipService': () => import('./skip-service.test'),
   'Transactions': () => import('./transactions.test'),
   'DiffService': () => import('./diff-service.test'),
-  'Validators': () => import('./validation.test')
+  'Validators': () => import('./validation.test'),
+  'KVStore': () => import('./kv.test'),
 }

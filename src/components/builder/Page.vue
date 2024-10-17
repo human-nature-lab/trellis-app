@@ -1,3 +1,117 @@
+<script lang="ts" setup>
+import { ref } from 'vue'
+import Question from './Question.vue'
+import QuestionGroup from '@/entities/trellis/QuestionGroup'
+import QuestionModel from '@/entities/trellis/Question'
+import TCard from '../styles/TCard.vue'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import builderService from '@/services/builder'
+import PageSkips from './PageSkips.vue'
+import ToggleItem from '@/components/util/ToggleItem.vue'
+import ExpandSection from './ExpandSection.vue'
+import SortableList, { Added, Moved } from '@/components/util/SortableList.vue'
+import { logError } from '@/helpers/log.helper'
+import { useBuilder, useBuilderQuestionList } from '@/helpers/builder.helper'
+
+const props = defineProps<{
+  value: QuestionGroup,
+  index: number,
+}>()
+
+const emit = defineEmits<{
+  (event: 'input', value: QuestionGroup): void
+  (event: 'remove'): void
+}>()
+
+const working = ref(false)
+const showSkips = ref(false)
+const builder = useBuilder()
+const questionsList = useBuilderQuestionList()
+
+function getNextQuestionVarName () {
+  const existing = questionsList.value.map(q => q.varName)
+  let i = questionsList.value.length + 1
+  let v = `q${i}`
+  while (existing.includes(v)) {
+    i++
+    v = `q${i}`
+  }
+  return v
+}
+
+async function addQuestion () {
+  if (working.value) return
+  try {
+    working.value = true
+    const q = await builderService.createQuestion(props.value.id, {
+      translated_text: '',
+      var_name: getNextQuestionVarName(),
+      question_type_id: builder.questionTypes[0].id,
+      locale_id: builder.locale.id,
+    })
+    const pageQuestions = props.value
+    pageQuestions.questions.push(q)
+    emit('input', pageQuestions)
+  } catch (err) {
+    logError(err)
+  } finally {
+    working.value = false
+  }
+}
+
+async function removeQuestion (question: QuestionModel) {
+  if (working.value) return
+  try {
+    working.value = true
+    await builderService.removeQuestion(question.id)
+    const index = props.value.questions.indexOf(question)
+    if (index >= 0) {
+      const page = props.value
+      page.questions.splice(index, 1)
+      emit('input', page)
+    }
+  } catch (err) {
+    logError(err)
+  } finally {
+    working.value = false
+  }
+}
+
+async function duplicateQuestion (question: QuestionModel) {
+  if (working.value) return
+  try {
+    working.value = true
+    const q = await builderService.duplicateQuestion(props.value.id, question, getNextQuestionVarName())
+    const page = props.value
+    const index = page.questions.indexOf(question)
+    if (index >= 0) {
+      page.questions.splice(index + 1, 0, q)
+    } else {
+      page.questions.push(q)
+    }
+    emit('input', page)
+  } catch (err) {
+    logError(err)
+  } finally {
+    working.value = false
+  }
+}
+
+async function questionMoved (e: Added<QuestionModel> | Moved<QuestionModel>) {
+  e.element.questionGroupId = props.value.id
+  e.element.sortOrder = e.newIndex
+  working.value = true
+  try {
+    await builderService.updateQuestion(e.element)
+  } catch (err) {
+    logError(err)
+  } finally {
+    working.value = false
+  }
+}
+
+</script>
+
 <template>
   <TCard
     elevation="1"
@@ -42,7 +156,10 @@
         </DotsMenu>
       </v-row>
     </template>
-    <ExpandSection v-model="showSkips" global>
+    <ExpandSection
+      v-model="showSkips"
+      global
+    >
       <PageSkips
         v-if="showSkips"
         v-model="value.skips"
@@ -70,103 +187,4 @@
       </template>
     </SortableList>
   </TCard>
-</template>
-
-<script lang="ts">
-import Vue, { PropOptions } from 'vue'
-import Question from './Question.vue'
-import QuestionGroup from '../../entities/trellis/QuestionGroup'
-import QuestionModel from '../../entities/trellis/Question'
-import TCard from '../styles/TCard.vue'
-import { builder } from '../../symbols/builder'
-import DotsMenu from './DotsMenu.vue'
-import builderService from '../../services/builder'
-import PageSkips from './PageSkips.vue'
-import ToggleItem from './ToggleItem.vue'
-import ExpandSection from './ExpandSection.vue'
-import SortableList, { Added, Moved } from './SortableList.vue'
-import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
-
-export default Vue.extend({
-  name: 'Page',
-  inject: { builder },
-  components: { Question, TCard, DotsMenu, PageSkips, ToggleItem, ExpandSection, SortableList },
-  mixins: [FormQuestionsMixin],
-  props: {
-    value: Object as PropOptions<QuestionGroup>,
-    index: Number,
-  },
-  data () {
-    return {
-      working: false,
-      showSkips: false,
-    }
-  },
-  methods: {
-    async addQuestion () {
-      if (this.working) return
-      try {
-        this.working = true
-        const q = await builderService.createQuestion(this.value.id, {
-          translated_text: '',
-          var_name: `q${this.questionsList.length + 1}`,
-          question_type_id: this.builder.questionTypes[0].id,
-          locale_id: this.builder.locale.id,
-        })
-        this.value.questions.push(q)
-        this.$emit('input', this.value)
-      } catch (err) {
-        this.logError(err)
-      } finally {
-        this.working = false
-      }
-    },
-    async removeQuestion (question: QuestionModel) {
-      if (this.working) return
-      try {
-        this.working = true
-        await builderService.removeQuestion(question.id)
-        const index = this.value.questions.indexOf(question)
-        if (index >= 0) {
-          this.value.questions.splice(index, 1)
-          this.$emit('input', this.value)
-        }
-      } catch (err) {
-        this.logError(err)
-      } finally {
-        this.working = false
-      }
-    },
-    async duplicateQuestion (question: QuestionModel) {
-      if (this.working) return
-      try {
-        this.working = true
-        const q = await builderService.duplicateQuestion(this.value.id, question)
-        const qs = this.value.questions
-        qs.push(q)
-        this.$emit('input', this.value)
-      } catch (err) {
-        this.logError(err)
-      } finally {
-        this.working = false
-      }
-    },
-    async questionMoved (e: Added<QuestionModel> | Moved<QuestionModel>) {
-      e.element.questionGroupId = this.value.id
-      e.element.sortOrder = e.newIndex
-      this.working = true
-      try {
-        await builderService.updateQuestion(e.element)
-      } catch (err) {
-        this.logError(err)
-      } finally {
-        this.working = false
-      }
-    },
-  },
-})
-</script>
-
-<style lang="sass">
-
-</style>
+</template>, refimport { useBuilder, useBuilderQuestions, useBuilderQuestionList } from '@/helpers/builder.helper'

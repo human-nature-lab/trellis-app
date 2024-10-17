@@ -1,6 +1,7 @@
 <template>
   <v-flex
     class="photo"
+    :tag="tag"
     :class="{contained: isContained, centered: isCentered}"
     ref="container"
     :style="photoStyles"
@@ -92,6 +93,10 @@ export default {
     immediate: {
       type: Boolean,
       default: false,
+    },
+    tag: {
+      type: String,
+      default: 'v-flex',
     },
   },
   data: function () {

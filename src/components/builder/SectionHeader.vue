@@ -1,5 +1,5 @@
 <template>
-  <v-col class="pa-0">
+  <v-col class="pa-0 background" :class="{ sticky: visible }">
     <v-row
       no-gutters
       class="align-center"
@@ -81,13 +81,13 @@
 </template>
 
 <script lang="ts">
-import Section from '../../entities/trellis/Section'
+import Section from '@/entities/trellis/Section'
 import Vue, { PropOptions } from 'vue'
 import Translation from './Translation.vue'
-import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
-import { builder } from '../../symbols/builder'
-import DotsMenu from './DotsMenu.vue'
-import MenuSelect from './MenuSelect.vue'
+import FormQuestionsMixin from '@/mixins/FormQuestionsMixin'
+import { builder } from '@/symbols/builder'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import MenuSelect from '@/components/util/MenuSelect.vue'
 import BuilderChip from './BuilderChip.vue'
 
 export default Vue.extend({
@@ -145,8 +145,6 @@ export default Vue.extend({
 .v-chip
   margin-left: 3px
   margin-right: 3px
-  .sticky
-    top: 70px
-    background: #f5f5f5
-    z-index: 110
+.sticky
+  top: 56px !important
 </style>

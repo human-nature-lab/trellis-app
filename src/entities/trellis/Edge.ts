@@ -23,4 +23,7 @@ export default class Edge extends TimestampedSoftDelete {
   @ManyToOne(type => Respondent, respondent => respondent.sourceEdges)
   @JoinColumn()
   sourceRespondent: Respondent
+
+  @Column() @Serializable
+  note?: string
 }

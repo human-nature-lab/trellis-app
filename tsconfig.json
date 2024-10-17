@@ -4,7 +4,7 @@
       "dom",
       "es2017"
     ],
-    "target": "es5",
+    "target": "es6",
     "module": "esnext",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
@@ -19,8 +19,8 @@
     "baseUrl": ".",
     "jsx": "preserve",
     "paths": {
-      "@": [
-        "./src"
+      "@/*": [
+        "./src/*"
       ]
     }
   },

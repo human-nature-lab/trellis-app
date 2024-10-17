@@ -30,15 +30,25 @@
     min-height: 100vh
 
 @media print
+  html, body, .v-application, .main-wrapper
+    height: auto !important
+  html, body
+    overflow: visible
   .main-wrapper
     overflow: visible !important
-    height: auto !important
-  .v-application--wrap
-    display: flex !important
-  .v-main
-    display: flex !important
-  
-  
+    min-height: 100% !important
+    nav
+      display: none
+    header.v-app-bar
+      display: none
+    #trellis-main
+      margin: 0 !important
+      min-height: 100vh !important
+  //   height: auto !important
+  // .v-application--wrap
+  //   display: flex !important
+  // .v-main
+  //   display: flex !important
 
 .pointer
   cursor: pointer
@@ -59,3 +69,10 @@ a.anchor
 .theme--dark
   a.anchor
     color: white
+
+
+.bottom
+  bottom: 0
+.fixed
+  position: fixed
+    

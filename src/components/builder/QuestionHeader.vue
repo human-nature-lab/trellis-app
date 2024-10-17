@@ -2,7 +2,7 @@
   <v-col class="ma-0 pa-0 relative">
     <v-row
       no-gutters
-      class="blue-grey lighten-1 pa-4 white--text question-drag-handle align-center"
+      class="accent lighten-1 pa-4 white--text question-drag-handle align-center"
     >
       <MenuSelect
         :disabled="builder.locked || loading"
@@ -65,6 +65,12 @@
           :on-title="$t('hide_choices')"
           :off-title="$t('show_choices')"
         />
+        <ToggleItem
+          :value="inPreview"
+          @input="$emit('toggle-preview', $event)"
+          :on-title="$t('hide_preview')"
+          :off-title="$t('show_preview')"
+        />
         <v-list-item
           :disabled="builder.locked"
           @click="$emit('duplicate')"
@@ -88,13 +94,13 @@
 </template>
 
 <script lang="ts">
-import Question from '../../entities/trellis/Question'
 import Vue, { PropType } from 'vue'
-import EditText from './EditText.vue'
-import MenuSelect from './MenuSelect.vue'
-import { builder } from '../../symbols/builder'
-import DotsMenu from './DotsMenu.vue'
-import ToggleItem from './ToggleItem.vue'
+import Question from '@/entities/trellis/Question'
+import EditText from '@/components/util/EditText.vue'
+import MenuSelect from '@/components/util/MenuSelect.vue'
+import { builder } from '@/symbols/builder'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import ToggleItem from '@/components/util/ToggleItem.vue'
 import BuilderChip from './BuilderChip.vue'
 
 export default Vue.extend({
@@ -108,9 +114,11 @@ export default Vue.extend({
     showConditions: Boolean,
     showChoices: Boolean,
     allowChoices: Boolean,
+    inPreview: Boolean,
   },
   methods: {
     updateQuestionType (typeId: string) {
+      this.value.questionType = this.builder.questionTypes.find(qt => qt.id === typeId)
       this.value.questionTypeId = typeId
       this.$emit('change', this.value)
     },

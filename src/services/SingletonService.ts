@@ -3,18 +3,28 @@ import Emitter from '../classes/Emitter'
 import singleton from '../static/singleton'
 import storage from './StorageService'
 import { loadLanguageAsync } from '../i18n/index'
-import moment from 'moment'
 import DeviceService from './device'
 import DatabaseService from './database'
 import config from '../config'
 import { APP_ENV } from '../static/constants'
 import theme from '../static/theme'
+import { setLocale } from './DateService'
+import Locale from '@/entities/trellis/Locale'
 
-enum StorageKey {
+export enum StorageKey {
   theme = 'dark-theme',
-  study = 'current-study',
-  locale = 'current-locale',
-  offline = 'offline'
+  study = 'study',
+  locale = 'locale',
+  offline = 'offline',
+  user = 'user',
+}
+
+export enum SingletonEvent {
+  study = 'study',
+  locale = 'locale',
+  darkTheme = 'dark-theme',
+  offline = 'offline',
+  user = 'user',
 }
 
 class SingletonService extends Emitter {
@@ -34,25 +44,6 @@ class SingletonService extends Emitter {
       singleton.darkTheme = storage.get(StorageKey.theme)
       theme.dark = singleton.darkTheme
     }
-    /* Moved to ValidateStudy Guard
-    if (storage.get(StorageKey.study)) {
-      const studyId = storage.get(StorageKey.study)
-      if (!studyId) return
-      singleton.study = await StudyService.getStudy(studyId)
-      this.dispatch('study', singleton.study)
-    }
-    */
-    /* Moved to ValidateLocale Guard
-    if (storage.get(StorageKey.locale)) {
-      const localeId = storage.get(StorageKey.locale)
-      if (!localeId) return
-      const locale = await LocaleService.getLocaleById(localeId)
-      if (locale) {
-        this.setCurrentLocale(locale)
-      }
-      console.log('loaded locale', singleton.locale)
-    }
-    */
     singleton.deviceId = await DeviceService.getUUID()
     if (config.appEnv === APP_ENV.CORDOVA && config.sentry) {
       const server = await DatabaseService.getServerIPAddress()
@@ -67,29 +58,28 @@ class SingletonService extends Emitter {
     storage.set(StorageKey.study, study.id)
   }
 
-  setCurrentLocale (locale) {
+  setCurrentLocale (locale: Locale) {
     const tag = locale.languageTag
-    moment.locale(tag)
+    setLocale(tag)
     loadLanguageAsync(tag)
-    // i18n.locale = i18n.messages[locale.languageTag] ? locale.languageTag : 'en'
     singleton.locale = locale
     storage.set(StorageKey.locale, locale.id)
-    this.dispatch('locale', locale)
+    this.dispatch(SingletonEvent.locale, locale)
   }
 
   setDarkTheme (useDarkTheme: boolean) {
     singleton.darkTheme = useDarkTheme
     storage.set(StorageKey.theme, useDarkTheme)
-    this.dispatch('dark-theme', useDarkTheme)
+    this.dispatch(SingletonEvent.darkTheme, useDarkTheme)
   }
 
   setOnlineOffline (isOffline) {
     storage.set(StorageKey.offline, isOffline)
     singleton.offline = isOffline
-    this.dispatch('offline', isOffline)
+    this.dispatch(SingletonEvent.offline, isOffline)
   }
 
-  get (key) {
+  get (key: StorageKey) {
     if (singleton.hasOwnProperty(key)) {
       return singleton[key]
     }
@@ -100,7 +90,7 @@ class SingletonService extends Emitter {
     return null
   }
 
-  set (key, value) {
+  set (key: StorageKey, value) {
     singleton[key] = value
     storage.set(key, value)
     this.dispatch(key, value)

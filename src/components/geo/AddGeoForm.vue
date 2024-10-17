@@ -1,19 +1,11 @@
 <template>
-  <v-dialog
-    v-model="adding"
-    :persistent="true">
+  <TrellisModal
+    :value="adding"
+    @input="$emit('close')"
+    :title="$t('add_location')"
+    :persistent="step > 1"
+  >
     <v-card>
-      <v-card-title>
-        <h2>{{ $t('add_location') }}</h2>
-        <v-spacer></v-spacer>
-        <v-btn
-          icon
-          text
-          style="top: 0"
-          @click="closeDialog(null)">
-          <v-icon>mdi-clear</v-icon>
-        </v-btn>
-      </v-card-title>
       <v-card-text>
         <v-alert type="error" :value="!!error">
           {{error}}
@@ -137,10 +129,11 @@
         </v-stepper>
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </TrellisModal>
 </template>
 
 <script>
+  import { isNumber } from 'lodash'
   import StudyService from '../../services/study'
   import GeoService from '../../services/geo'
   import CensusFormService from '../../services/census/index'
@@ -148,16 +141,17 @@
   import PhotoAlbum from '../photo/PhotoAlbum.vue'
   import TranslationTextField from '../TranslationTextField.vue'
   import GeoTypeSelector from './GeoTypeSelector.vue'
+  import TrellisModal from '../TrellisModal.vue'
   import { routeQueue } from '../../router'
   import { getCurrentPosition } from '../LocationFinder.vue'
-  import { isNumber } from 'lodash'
   import global from '../../static/singleton'
 
   export default {
     components: {
       PhotoAlbum,
       TranslationTextField,
-      GeoTypeSelector
+      GeoTypeSelector,
+      TrellisModal,
     },
     name: 'add-geo-form',
     props: {

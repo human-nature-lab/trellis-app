@@ -1,5 +1,4 @@
 export class ExpiringValue<T> {
-
   private val = null
   private expiresAt = 0
 
@@ -16,10 +15,9 @@ export class ExpiringValue<T> {
     }
     this.clear()
   }
-  
+
   clear () {
     this.val = null
     this.expiresAt = 0
   }
-  
 }

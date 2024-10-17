@@ -44,14 +44,14 @@
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
 import ExpandSection from './ExpandSection.vue'
-import FormBuilderService from '../../services/builder'
+import FormBuilderService from '@/services/builder'
 import Page from './Page.vue'
-import QuestionGroup from '../../entities/trellis/QuestionGroup'
-import Section from '../../entities/trellis/Section'
+import QuestionGroup from '@/entities/trellis/QuestionGroup'
+import Section from '@/entities/trellis/Section'
 import SectionHeader from './SectionHeader.vue'
-import SortableList, { Added, Moved } from './SortableList.vue'
-import { builder } from '../../symbols/builder'
-import FormSection from '../../entities/trellis/FormSection'
+import SortableList, { Added, Moved } from '@/components/util/SortableList.vue'
+import { builder } from '@/symbols/builder'
+import FormSection from '@/entities/trellis/FormSection'
 
 export default Vue.extend({
   name: 'Section',

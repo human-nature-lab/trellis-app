@@ -1,5 +1,5 @@
 import { Route } from 'vue-router'
-import SingletonService from '../../services/SingletonService'
+import SingletonService, { StorageKey } from '../../services/SingletonService'
 import StudyService from '../../services/study'
 import StorageService from '../../services/StorageService'
 import { GuardConfig } from '../GuardQueue'
@@ -7,7 +7,7 @@ import { GuardConfig } from '../GuardQueue'
 export default {
   name: 'StudyGuard',
   async condition (to: Route) {
-    const studyId = StorageService.get('current-study')
+    const studyId = StorageService.get(StorageKey.study)
     if (!studyId) {
       return false
     }
@@ -18,7 +18,7 @@ export default {
       }
       return !!study
     } catch (err) {
-      StorageService.delete('current-study')
+      StorageService.delete(StorageKey.study)
     }
     try {
       const study = to.params.studyId

@@ -1,1 +1,4 @@
-declare var cordova
+declare global {
+  const cordova: Cordova
+  const device: Device
+}

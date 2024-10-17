@@ -1,3 +1,38 @@
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import ConditionTagService from '../services/condition-tag'
+import { isNotAuthError } from '@/helpers/auth.helper'
+import { logError } from '@/helpers/log.helper'
+import { stringToColor } from '@/lib/string-to-color'
+
+const props = defineProps<{
+  value: string[];
+}>()
+
+const isLoading = ref(false)
+const conditionTags = ref<string[]>([])
+const hasLoaded = ref(false)
+const query = ref<string | null>(null)
+
+watch(() => [props.value, query.value], async () => {
+  if (conditionTags.value.length || isLoading.value || hasLoaded.value) return
+  isLoading.value = true
+  try {
+    const tags = await ConditionTagService.respondent()
+    tags.sort((a, b) => a.name.localeCompare(b.name))
+    conditionTags.value = tags.map((c) => c.name)
+    hasLoaded.value = true
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err)
+    }
+  } finally {
+    isLoading.value = false
+  }
+}, { immediate: true })
+
+</script>
+
 <template>
   <v-autocomplete
     v-on="$listeners"
@@ -8,76 +43,26 @@
     dense
     chips
     tags
+    clearable
     :hide-no-data="!hasLoaded"
     :search-input.sync="query"
     :loading="isLoading"
     @input="$emit('input', $event)"
-    v-bind="$attrs">
+    v-bind="$attrs"
+  >
     <template #selection="props">
-      <v-chip outlined color="primary">
-        <v-icon small class="mr-2">mdi-tag</v-icon>
+      <v-chip
+        outlined
+        :color="stringToColor(props.item)"
+      >
+        <v-icon
+          small
+          class="mr-2"
+        >
+          mdi-tag
+        </v-icon>
         {{ props.item }}
       </v-chip>
     </template>
   </v-autocomplete>
 </template>
-
-<script lang="ts">
-  import Vue from "vue";
-  import ConditionTagService from "../services/condition-tag";
-
-  export default Vue.extend({
-    name: "ConditionTagAutocomplete",
-    props: {
-      value: {
-        type: Array,
-        required: true,
-      }
-    },
-    data() {
-      return {
-        isLoading: false,
-        conditionTags: [],
-        hasLoaded: false,
-        query: null,
-      };
-    },
-    created() {
-      this.loadIfNecessary();
-    },
-    watch: {
-      value() {
-        this.loadIfNecessary();
-      },
-      query(val: string) {
-        this.loadConditionTags();
-      },
-    },
-    methods: {
-      loadIfNecessary() {
-        if (this.value && this.value.length) {
-          this.loadConditionTags();
-        }
-      },
-      async loadConditionTags() {
-        if (this.conditionTags.length || this.isLoading || this.hasLoaded) return;
-        this.isLoading = true;
-        try {
-          const tags = await ConditionTagService.respondent();
-          tags.sort((a, b) => a.name.localeCompare(b.name))
-          this.conditionTags = tags.map((c) => c.name);
-          this.hasLoaded = true;
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err);
-          }
-        } finally {
-          this.isLoading = false;
-        }
-      },
-    },
-  });
-</script>
-
-<style lang="sass">
-</style>

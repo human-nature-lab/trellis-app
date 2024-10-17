@@ -8,6 +8,7 @@ import QuestionDatum from './QuestionDatum'
 
 export interface DatumRecyclerData {
   surveyId: string
+  assetId: string
   questionDatumId: string
   eventOrder: number
   val: string
@@ -28,6 +29,9 @@ export interface DatumRecyclerData {
 export default class Datum extends TimestampedSoftDelete implements SnakeSerializable {
   @Column() @Serializable
   public choiceId: string;
+
+  @Column() @Serializable
+  public assetId: string;
 
   @Column('varchar') @Serializable
   public datumTypeId = '0';
@@ -100,6 +104,7 @@ export default class Datum extends TimestampedSoftDelete implements SnakeSeriali
 
   copy () {
     const d = new Datum()
+    d.assetId = this.assetId
     d.actionId = this.actionId
     d.choiceId = this.choiceId
     d.datumTypeId = this.datumTypeId

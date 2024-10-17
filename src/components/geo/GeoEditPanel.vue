@@ -1,15 +1,6 @@
 <template>
   <v-flex v-show="showPanel">
     <v-card>
-      <v-btn
-        icon
-        text
-        absolute
-        top
-        right
-        mt-12
-        style="top: 0"
-        @click="closePanel"><v-icon>mdi-clear</v-icon></v-btn>
       <v-card-title>
         <translation-text-field
           v-if="curStatus === STATUS.EDIT_NAME || curStatus === STATUS.NEW_EDIT_NAME"
@@ -19,15 +10,28 @@
           @cancelled="onEditingCancelled"
           @save="onEditingDone">
         </translation-text-field>
-        <div slot="header" v-if="curStatus === STATUS.NEW_POSITION">
+        <div slot="header" v-else-if="curStatus === STATUS.NEW_POSITION">
           <h2>{{ $t('new_location') }}</h2>
           <p>{{ $t('click_on_the_map') }}</p>
         </div>
-        <div slot="header" v-if="curStatus === STATUS.SELECTED"><h2>{{ geoTranslation }}</h2></div>
-        <div slot="header" v-if="curStatus === STATUS.MOVING">
+        <div slot="header" v-else-if="curStatus === STATUS.SELECTED">
+          <h2>{{ geoTranslation }}</h2>
+        </div>
+        <div slot="header" v-else-if="curStatus === STATUS.MOVING">
           <h2>{{ $t('moving') }} {{ geoTranslation }}</h2>
           <p>{{ $t('click_on_the_map') }}</p>
         </div>
+        <v-btn
+          icon
+          text
+          absolute
+          top
+          right
+          mt-12
+          @click="closePanel"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </v-card-title>
       <v-card-actions v-if="curStatus === STATUS.SELECTED">
         <v-btn large @click="selectGeo">{{ $t('view_children') }}</v-btn>

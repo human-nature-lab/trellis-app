@@ -6,7 +6,7 @@
       </div>
       <v-spacer />
       <v-btn @click="downloadForms" class="mx-1">
-        Download
+        {{ $t('download') }}
         <v-icon small class="ml-2">mdi-download</v-icon>
       </v-btn>
       <v-menu offset-y left>
@@ -93,7 +93,7 @@
       </v-menu>
     </v-card-title>
     <v-row no-gutters>
-      <div class="pl-1 mr-4 subtitle-1">{{total}} surveys</div>
+      <div class="pl-1 mr-4 subtitle-1">{{ $t('total_surveys', { total }) }}</div>
       <UserChip
         v-for="user in users"
         :key="user"
@@ -154,25 +154,25 @@
 
 <script lang="ts">
   import Vue from 'vue'
-  import Form from '../../entities/trellis/Form'
-  import { adminInst } from '../../services/http/AxiosInstance'
-  import SparkCard, { SparkData } from './SparkCard.vue'
-  import TranslatedText from '../TranslatedText.vue'
-  import TrellisModal from '../TrellisModal.vue'
-  import ConditionTagAutocomplete from '../ConditionTagAutocomplete.vue'
-  import UserAutocomplete from '../user/UserAutocomplete.vue'
-  import RespondentsSearch from '../respondent/RespondentsSearch.vue'
-  import RespondentChip from '../respondent/RespondentChip.vue'
-  import GeoChip from '../geo/GeoChip.vue'
-  import GeoSearch from '../geo/GeoSearch.vue'
-  import UserChip from '../user/UserChip.vue'
-  import StudyForm from '../../entities/trellis/StudyForm'
-  import TranslationService from '../../services/TranslationService'
+  import { debounce } from 'lodash'
   import PapaParse from 'papaparse'
   import { saveAs } from 'file-saver'
-  import { QueryPersistMixin } from '../../mixins/QueryPersistMixin'
-  import { debounce } from 'lodash'
-  import Geo from '../../entities/trellis/Geo'
+  import Form from '@/entities/trellis/Form'
+  import { adminInst } from '@/services/http/AxiosInstance'
+  import SparkCard, { SparkData } from './SparkCard.vue'
+  import TranslatedText from '@/components/TranslatedText.vue'
+  import TrellisModal from '@/components/TrellisModal.vue'
+  import ConditionTagAutocomplete from '@/components/ConditionTagAutocomplete.vue'
+  import UserAutocomplete from '@/components/user/UserAutocomplete.vue'
+  import RespondentsSearch from '@/views/respondent/RespondentsSearch.vue'
+  import RespondentChip from '@/components/respondent/RespondentChip.vue'
+  import GeoChip from '@/components/geo/GeoChip.vue'
+  import GeoSearch from '@/components/geo/GeoSearch.vue'
+  import UserChip from '@/components/user/UserChip.vue'
+  import StudyForm from '@/entities/trellis/StudyForm'
+  import TranslationService from '@/services/TranslationService'
+  import { QueryPersistMixin } from '@/mixins/QueryPersistMixin'
+  import Geo from '@/entities/trellis/Geo'
 
   export default Vue.extend({
     name: 'DashboardForms',

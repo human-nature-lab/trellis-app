@@ -23,14 +23,13 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 16
+          cache: 'npm'
       
-      # Enable NPM cache before installing. This will restore the npm directory for subsequent builds
-      # - uses: c-hive/gha-npm-cache@v1
-      - run: npm install
-      # - run: npm ci
+      # - run: rm -rf node_modules  # hopefully this isn't necessary again
+      - run: npm ci
 
       - name: Copy config files
         run: |
@@ -46,21 +45,21 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
-          java-version: '8'
+          java-version: '11'
       
-      - name: Uninstall corrupt sdk build-tools
-        run: |
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
-          $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.1'
+      # - name: Uninstall corrupt sdk build-tools
+      #   run: |
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;32.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.0'
+      #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;33.0.1'
       
       - run: npm i -g @ionic/cli@6
       
       - uses: human-nature-lab/setup-ionic@v1
         with:
           install-java: false
-          cordova-version: 9
+          cordova-version: 11
       
 #       - name: Build dev APK
 #         run: |
@@ -72,14 +71,24 @@ jobs:
         run: |
           chmod +x -R hooks/*.sh
 
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.4.2
+
       - name: Build debug APK
         # continue-on-error: true
         run: |
-          npm run webpack:android
-          cordova prepare
+          npm run setup:cordova
+          sh cordova-setup.sh
           npm run webpack:release:android
           mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
       
+      # - name: Build proxy APK
+      #   run: |
+      #     cordova clean
+      #     npm run setup:cordova:proxy
+      #     cordova build android
+      #     mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-proxy.apk
       # - name: SSH Debug
       #   if: ${{ failure() }}
       #   run: curl -sL https://gist.githubusercontent.com/retyui/7115bb6acf151351a143ec8f96a7c561/raw/7099b9db76729dc5761da72aa8525f632d8875c9/debug-github-actions.sh | bash
@@ -141,4 +150,14 @@ jobs:
           asset_name: ${{ env.RELEASE_TITLE}}.apk
           asset_content_type: application/octet-stream
       
+      # - name: Upload debug proxy APK
+      #   id: upload-debug-proxy-apk
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+      #     asset_path: ./trellis-proxy.apk
+      #     asset_name: ${{ env.RELEASE_TITLE }}.proxy.apk
+      #     asset_content_type: application/octet-stream
 

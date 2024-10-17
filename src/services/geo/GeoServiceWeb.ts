@@ -36,7 +36,7 @@ export default class GeoServiceWeb extends GeoServiceAbstract {
   }
 
   async getGeosById (geoIds: string[]): Promise<Geo[]> {
-    geoIds = geoIds.map(g => encodeURIComponent(g))
+    geoIds = geoIds.filter(g => !!g).map(g => encodeURIComponent(g))
     if (!geoIds.length) {
       return []
     }

@@ -70,13 +70,13 @@
 </template>
 
 <script lang="ts">
-import AssignConditionTag from '../../entities/trellis/AssignConditionTag'
-import ConditionTag from '../../entities/trellis/ConditionTag'
 import Vue, { PropType } from 'vue'
-import EditText from './EditText.vue'
-import MenuSelect from './MenuSelect.vue'
-import builder from '../../services/builder'
-import DotsMenu from './DotsMenu.vue'
+import AssignConditionTag from '@/entities/trellis/AssignConditionTag'
+import ConditionTag from '@/entities/trellis/ConditionTag'
+import EditText from '@/components/util/EditText.vue'
+import MenuSelect from '@/components/util/MenuSelect.vue'
+import builder from '@/services/builder'
+import DotsMenu from '@/components/util/DotsMenu.vue'
 
 export default Vue.extend({
   name: 'ConditionRow',

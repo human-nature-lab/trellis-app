@@ -1,16 +1,16 @@
 <template>
   <tr class="form-list-row">
-    <td
-      class="medium drag-handle"
-      v-if="Number(formType) !== formTypes.CENSUS"
-    >
+    <td>
+      <v-simple-checkbox
+        :value="isSelected"
+        @input="$emit('selected', $event)"
+      />
+    </td>
+    <td class="small">
       <span
         v-show="dragging"
         class="text-button"
       >{{ studyForm.sortOrder }}</span>
-      <span class="ml-2"><v-icon>mdi-drag-horizontal-variant</v-icon></span>
-    </td>
-    <td class="small">
       <FormActions
         :is-busy="isBusy"
         :form="form"
@@ -63,30 +63,31 @@
                 mdi-dev-to
               </v-icon>
             </v-list-item-icon>
-            {{ item.version }}
+            {{ item.version }} 
           </v-list-item>
         </template>
       </v-select>
+      <VersionModal
+        v-model="showVersionModal"
+        @update:studyForm="$emit('update:studyForm', $event)"
+        :study-form="studyForm"
+      />
     </td>
-    <VersionModal
-      v-model="showVersionModal"
-      @update:studyForm="$emit('update:studyForm', $event)"
-      :study-form="studyForm"
-    />
   </tr>
 </template>
 
 <script lang="ts">
 import Vue, { PropOptions } from 'vue'
-import Form from '../../entities/trellis/Form'
-import TranslationTextField from '../TranslationTextField.vue'
-import FormService from '../../services/form'
 import { debounce } from 'lodash'
-import formTypes from '../../static/form.types'
-import censusTypes from '../../static/census.types'
-import StudyForm from '../../entities/trellis/StudyForm'
-import singleton from '../../static/singleton'
-import PermissionMixin from '../../mixins/PermissionMixin'
+
+import Form from '@/entities/trellis/Form'
+import StudyForm from '@/entities/trellis/StudyForm'
+import PermissionMixin from '@/mixins/PermissionMixin'
+import formTypes from '@/static/form.types'
+import censusTypes from '@/static/census.types'
+import singleton from '@/static/singleton'
+import FormService from '@/services/form'
+import TranslationTextField from '../TranslationTextField.vue'
 import FormActions from './FormActions.vue'
 import VersionModal from './VersionModal.vue'
 
@@ -116,6 +117,7 @@ export default Vue.extend({
     form: Object as PropOptions<Form>,
     studyForm: Object as PropOptions<StudyForm>,
     formType: String,
+    isSelected: Boolean,
     value: {
       type: Boolean,
     },
@@ -204,11 +206,6 @@ export default Vue.extend({
 })
 </script>
 
-<style lang="sass">
-.small
-  width: 20px
-.medium
-  width: 80px
-.drag-handle
-  cursor: grab
+<style lang="sass" scoped>
+
 </style>

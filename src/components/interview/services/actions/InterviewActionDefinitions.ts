@@ -7,17 +7,17 @@ import {
   addDatum,
   addOrUpdateSingleDatum,
   removeDatum,
-  updateDatum
+  updateDatum,
 } from './DatumOperations'
 import Question from '../../../../entities/trellis/Question'
-import InterviewManagerOld, {default as InterviewManager} from '../../classes/InterviewManager'
+import InterviewManagerOld, { default as InterviewManager } from '../../classes/InterviewManager'
 import Datum from '../../../../entities/trellis/Datum'
 import Choice from '../../../../entities/trellis/Choice'
 import Action from '../../../../entities/trellis/Action'
 
 // Options
-const shouldRemoveDkRfResponsesOnDeselect = false   // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
-const removeDataOnDkRf = false  // indicates if selecting dk_rf will remove the responses to the question
+const shouldRemoveDkRfResponsesOnDeselect = false // Indicate if dk_rf_val should be removed when dk_rf is set to null. This should likely be a property of the form
+const removeDataOnDkRf = false // indicates if selecting dk_rf will remove the responses to the question
 
 // Definitions
 /**
@@ -29,7 +29,7 @@ actionManager.add(AT.select_choice, function (interview: InterviewManagerOld, ac
   // The choice we are selecting
   let choice: Choice
   const choiceValMap: Map<string, Choice> = new Map()
-  for (let qc of questionBlueprint.choices) {
+  for (const qc of questionBlueprint.choices) {
     if (qc.choiceId === action.payload.choice_id) {
       choice = qc.choice
     }
@@ -37,9 +37,9 @@ actionManager.add(AT.select_choice, function (interview: InterviewManagerOld, ac
   }
 
   // Create an array of choices with the exclusive parameter
-  let exclusiveChoices: string[] = []
-  let otherChoices: string[] = []
-  for (let qp of questionBlueprint.questionParameters) {
+  const exclusiveChoices: string[] = []
+  const otherChoices: string[] = []
+  for (const qp of questionBlueprint.questionParameters) {
     if (+qp.parameterId === parameterTypes.exclusive) {
       exclusiveChoices.push(choiceValMap.get(qp.val).id)
     } else if (+qp.parameterId === parameterTypes.other) {
@@ -98,6 +98,7 @@ actionManager.add(AT.previous, async function (interview: InterviewManager, a, b
   await interview.previous()
 })
 actionManager.add(AT.number_change, addOrUpdateSingleDatum)
+actionManager.add(AT.add_val, addDatum)
 actionManager.add(AT.add_edge, addDatum)
 actionManager.add(AT.remove_edge, removeDatum((datum, payload) => datum.edgeId === payload.edge_id))
 actionManager.add(AT.add_photo, addDatum)
@@ -106,13 +107,15 @@ actionManager.add(AT.add_roster_row, addDatum)
 actionManager.add(AT.remove_roster_row, removeDatum((datum, payload) => datum.rosterId === payload.roster_id))
 actionManager.add(AT.change_sort_order, function (interview, action: Action, questionDatum: QuestionDatum) {
   // TODO: This is not right. We can't have a datum_id in the payload because the datum_ids can change
-  let datum = questionDatum.data.find(datum => datum.id === action.payload.datum_id)
+  const datum = questionDatum.data.find(datum => datum.id === action.payload.datum_id)
   if (datum) {
     datum.sortOrder = action.payload.sort_order
   } else {
     throw new Error('No datum exists with this id: ' + action.payload.datum_id)
   }
 })
+actionManager.add(AT.add_asset, addDatum)
+actionManager.add(AT.remove_asset, removeDatum((datum, payload) => datum.assetId === payload.asset_id))
 
 actionManager.add(AT.set_val, addOrUpdateSingleDatum)
 actionManager.add(AT.remove_geo, removeDatum((datum, payload) => datum.geoId === payload.geo_id))

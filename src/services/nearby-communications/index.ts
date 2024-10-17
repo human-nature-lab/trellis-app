@@ -4,6 +4,15 @@ import { Hook } from '@/lib/Hook'
 const GoogleNearbyConnections = cordova.plugins.GoogleNearbyConnections
 export type Strategy = 'mesh' | 'star' | 'point-to-point'
 
+export type ClientEvent<T> = {
+  data: T
+  event: string
+}
+
+export type ServerEvent<T> = ClientEvent<T> & {
+  authToken: string
+}
+
 export type Connection = {
   authToken: string
   endpointId: string
@@ -16,7 +25,9 @@ export enum StatusCode {
   ALREADY_CONNECTED_TO_ENDPOINT = 8003,
   OUT_OF_ORDER_API_CALL = 8009,
   ENDPOINT_UNKNOWN = 8011,
+  STATUS_ENDPOINT_IO_ERROR = 8012,
   MISSING_PERMISSION_BLUETOOTH = 8030,
+  STATUS_UNKNOWN_STATUS_CODE = 8037,
 }
 
 export type NCError = {
@@ -31,11 +42,12 @@ function logCallback<T = (...args: any[]) => any>(prefix: string, cb: T): T {
   }
 }
 
-function rejectParsed (cb: (err: NCError | Error) => void) {
+function rejectParsed (name: string, cb: (err: NCError | Error) => void) {
   return function (msg: string | Error) {
     if (msg instanceof Error) {
       return cb(msg)
     }
+    console.log('rejectParsed', name, msg)
     cb(parseError(msg))
   }
 }
@@ -55,11 +67,15 @@ export class NearbyCommunications {
     onError: new Hook<[Error]>(),
     onEndpointFound: new Hook(),
     onEndpointLost: new Hook(),
-    onConnection: new Hook<[Connection]>(),
+    onConnection: new Hook<[Pick<Connection, 'endpointId'>]>(),
     onConnectionFound: new Hook<[Connection]>(),
-    onConnectionLost: new Hook<[Connection]>(),
+    onConnectionLost: new Hook<[Pick<Connection, 'endpointId'>]>(),
     onPayloadReceived: new Hook(),
+    events: {} as Record<string, Hook<any>>,
   }
+
+  endpointConnectionMap = new Map<string, Connection>()
+  authConnectionMap = new Map<string, Connection>()
 
   private async init () {
     if (this.initialized) {
@@ -72,59 +88,72 @@ export class NearbyCommunications {
       GoogleNearbyConnections.onEndpointFound((...args: any[]) => {
         console.log('NearbyCommunications.onEndpointFound', ...args)
         this.hooks.onEndpointFound.emit(...args)
-      }, (msg: string) => {
-        console.error('NearbyCommunications.onEndpointFound', msg)
-        const err = parseError(msg)
-        this.hooks.onError.emit(err)
+      }, (...args: any[]) => {
+        console.error('NearbyCommunications.onEndpointFound', args)
+        const err = parseError(args[0])
+        this.hooks.onError.emit(...args)
       })
-      GoogleNearbyConnections.onConnection((...args: any[]) => {
-        console.log('NearbyCommunications.onConnection', ...args)
-        this.hooks.onConnection.emit(...args)
-      }, (msg: string) => {
-        console.error('NearbyCommunications.onConnection', msg)
-        const err = parseError(msg)
-        this.hooks.onError.emit(err)
+      GoogleNearbyConnections.onConnection((msg: string) => {
+        console.log('NearbyCommunications.onConnection', msg)
+        const endpointId = msg.replace('Connected to', '').trim()
+        this.hooks.onConnection.emit({ endpointId })
+      }, (...args: any[]) => {
+        console.error('NearbyCommunications.onConnection', args)
+        const err = parseError(args[0])
+        this.hooks.onError.emit(...args)
       })
-      GoogleNearbyConnections.onConnectionFound((...args: any[]) => {
-        console.log('NearbyCommunications.onConnectionFound', ...args)
-        this.hooks.onConnectionFound.emit(...args)
-      }, (msg: string) => {
-        console.error('NearbyCommunications.onConnectionFound', msg)
-        const err = parseError(msg)
-        this.hooks.onError.emit(err)
+      GoogleNearbyConnections.onConnectionFound((conn: Connection) => {
+        console.log('NearbyCommunications.onConnectionFound', conn)
+        this.endpointConnectionMap.set(conn.endpointId, conn)
+        this.hooks.onConnectionFound.emit(conn)
+      }, (...args: any[]) => {
+        console.error('NearbyCommunications.onConnectionFound', args)
+        const err = parseError(args[0])
+        this.hooks.onError.emit(...args)
       })
       GoogleNearbyConnections.onConnectionLost((msg: string) => {
         console.log('NearbyCommunications.onConnectionLost', msg)
         const endpointId = msg.split(' ')[0]
         this.hooks.onConnectionLost.emit({ endpointId })
-      }, (msg: string) => {
-        console.error('NearbyCommunications.onConnectionLost', msg)
-        const err = parseError(msg)
-        this.hooks.onError.emit(err)
+      }, (...args: any[]) => {
+        console.error('NearbyCommunications.onConnectionLost', args)
+        const err = parseError(args[0])
+        this.hooks.onError.emit(...args)
       })
       GoogleNearbyConnections.onEndpointFound((...args: any[]) => {
         console.log('NearbyCommunications.onEndpointFound', ...args)
         this.hooks.onEndpointFound.emit(...args)
-      }, (msg: string) => {
-        console.error('NearbyCommunications.onEndpointFound', msg)
-        const err = parseError(msg)
-        this.hooks.onError.emit(err)
+      }, (...args: any[]) => {
+        console.error('NearbyCommunications.onEndpointFound', args)
+        const err = parseError(args[0])
+        this.hooks.onError.emit(...args)
       })
       GoogleNearbyConnections.onEndpointLost((...args: any[]) => {
         console.log('NearbyCommunications.onEndpointLost', ...args)
         this.hooks.onEndpointLost.emit(...args)
-      }, (msg: string) => {
-        console.error('NearbyCommunications.onEndpointLost', msg)
-        const err = parseError(msg)
-        this.hooks.onError.emit(err)
+      }, (...args: any[]) => {
+        console.error('NearbyCommunications.onEndpointLost', args)
+        const err = parseError(args[0])
+        this.hooks.onError.emit(...args)
       })
-      GoogleNearbyConnections.onPayloadReceived((...args: any[]) => {
-        console.log('NearbyCommunications.onPayloadReceived', ...args)
-        this.hooks.onPayloadReceived.emit(...args)
-      }, (msg: string) => {
-        console.error('NearbyCommunications.onPayloadReceived', msg)
-        const err = parseError(msg)
-        this.hooks.onError.emit(err)
+      GoogleNearbyConnections.onPayloadReceived((msg: string) => {
+        // console.log('NearbyCommunications.onPayloadReceived', msg)
+        this.hooks.onPayloadReceived.emit(msg)
+        if (msg.startsWith('sevt:')) {
+          const { event, data } = JSON.parse(msg.slice(5))
+          if (this.hooks.events[event]) {
+            this.hooks.events[event].emit(data)
+          }
+        } else if (msg.startsWith('cevt:')) {
+          const { event, data, authToken } = JSON.parse(msg.slice(5))
+          if (this.hooks.events[event]) {
+            this.hooks.events[event].emit(data, authToken)
+          }
+        }
+      }, (...args: any[]) => {
+        console.error('NearbyCommunications.onPayloadReceived', args)
+        const err = parseError(args[0])
+        this.hooks.onError.emit(...args)
       })
       this.initialized = true
     })
@@ -155,7 +184,7 @@ export class NearbyCommunications {
     return new Promise((resolve, reject) => {
       GoogleNearbyConnections.stopAdvertising(
         logCallback('NearbyCommunications.stopAdvertising', resolve),
-        rejectParsed(reject),
+        rejectParsed('NearbyCommunications.stopAdvertising', reject),
       )
     })
   }
@@ -165,7 +194,7 @@ export class NearbyCommunications {
     return new Promise((resolve, reject) => {
       GoogleNearbyConnections.stopDiscovery(
         logCallback('NearbyCommunications.stopDiscovery', resolve),
-        rejectParsed(reject),
+        rejectParsed('NearbyCommunications.stopDiscovery', reject),
       )
     })
   }
@@ -182,6 +211,7 @@ export class NearbyCommunications {
           if (err.code === StatusCode.ALREADY_DISCOVERING) {
             resolve()
           } else {
+            console.error('NearbyCommunications.startDiscovery', msg)
             reject(err)
           }
         },
@@ -197,7 +227,7 @@ export class NearbyCommunications {
       GoogleNearbyConnections.acceptConnection(
         endpointId,
         logCallback('NearbyCommunications.acceptConnection', resolve),
-        rejectParsed(reject),
+        rejectParsed('NearbyCommunications.acceptConnection', reject),
       )
     })
   }
@@ -210,7 +240,7 @@ export class NearbyCommunications {
       GoogleNearbyConnections.denyConnection(
         endpointId,
         logCallback('NearbyCommunications.denyConnection', resolve),
-        rejectParsed(reject),
+        rejectParsed('NearbyCommunications.denyConnection', reject),
       )
     })
   }
@@ -219,12 +249,17 @@ export class NearbyCommunications {
     if (!this.initialized) {
       throw new Error('NearbyCommunications not initialized')
     }
+    // console.log('NearbyCommunications.sendPayload', endpointId, 'sending', payload)
     return new Promise((resolve, reject) => {
       GoogleNearbyConnections.sendPayload(
         endpointId,
         payload,
-        logCallback('NearbyCommunications.onSendPayload', resolve),
-        rejectParsed(reject),
+        resolve,
+        err => {
+          console.error('NearbyCommunications.onSendPayload', endpointId, payload)
+          console.error(err)
+          reject(err)
+        },
       )
     })
   }
@@ -236,7 +271,7 @@ export class NearbyCommunications {
     return new Promise((resolve, reject) => {
       GoogleNearbyConnections.stopAllEndpoints(
         logCallback('NearbyCommunications.denyConnection', resolve),
-        rejectParsed(reject),
+        rejectParsed('NearbyCommunications.denyConnection', reject),
       )
     })
   }
@@ -249,7 +284,7 @@ export class NearbyCommunications {
       GoogleNearbyConnections.disconnectFromEndpoint(
         endpointId,
         logCallback('NearbyCommunications.disconnectFromEndpoint', resolve),
-        rejectParsed(reject),
+        rejectParsed('NearbyCommunications.disconnectFromEndpoint', reject),
       )
     })
   }

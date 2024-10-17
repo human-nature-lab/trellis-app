@@ -4,8 +4,6 @@ import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
 import { AsDate, Relationship, Serializable } from '../decorators/WebOrmDecorators'
 import SnakeSerializable from '../interfaces/SnakeSerializable'
 import { now } from '../../services/DateService'
-import MomentTransformer from '../base/MomentTransformer'
-import { Moment } from 'moment'
 
 export interface QuestionDatumRecyclerData {
   id: string
@@ -38,11 +36,11 @@ export default class QuestionDatum extends TimestampedSoftDelete implements Snak
   @Column('integer') @Serializable
   public sectionRepetition: number
 
-  @Column({ name: 'answered_at', type: 'datetime', nullable: true, transformer: MomentTransformer }) @Serializable @AsDate
-  public answeredAt: Moment
+  @Column({ name: 'answered_at', type: 'datetime', nullable: true }) @Serializable @AsDate
+  public answeredAt: Date
 
-  @Column({ name: 'skipped_at', type: 'datetime', nullable: true, transformer: MomentTransformer }) @Serializable @AsDate
-  public skippedAt: Moment
+  @Column({ name: 'skipped_at', type: 'datetime', nullable: true }) @Serializable @AsDate
+  public skippedAt: Date
 
   @Column('boolean') @Serializable
   public dkRf: boolean
