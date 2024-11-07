@@ -1,3 +1,111 @@
+<script lang="ts" setup>
+import { ref, watch, computed } from 'vue'
+
+import Form from '@/entities/trellis/Form'
+import StudyForm from '@/entities/trellis/StudyForm'
+import formTypes from '@/static/form.types'
+import censusTypes from '@/static/census.types'
+import FormService from '@/services/form'
+import TranslationTextField from '../TranslationTextField.vue'
+import FormActions from './FormActions.vue'
+import VersionModal from './VersionModal.vue'
+import { i18n } from '@/i18n'
+import { isNotAuthError } from '@/helpers/auth.helper'
+import { logError, alert } from '@/helpers/log.helper'
+import { isTestStudy } from '@/helpers/singleton.helper'
+
+const props = defineProps<{
+  form: Form
+  studyForm: StudyForm
+  formType: string
+  isSelected: boolean
+  value?: boolean
+  dragging: boolean
+}>()
+
+const emit = defineEmits<{
+  (event: 'save', form: Form): void
+  (event: 'input', value: boolean): void
+  (event: 'update', res: any): void
+  (event: 'changeStudyForm', studyForm: StudyForm): void
+  (event: 'delete', form: Form): void
+  (event: 'selected', value: boolean): void
+  (event: 'toggleFormSkips', value: boolean): void
+  (event: 'update:studyForm', studyForm: StudyForm): void
+}>()
+
+const isBusy = ref(false)
+const showVersionModal = ref(false)
+const memForm = ref<Form | null>()
+
+watch(() => props.form, (newForm: Form) => {
+  if (newForm) {
+    memForm.value = newForm.copy()
+  }
+}, { immediate: true })
+
+const censusTypeList = computed(() => {
+  const returnTypes = []
+  for (const censusType in censusTypes) {
+    returnTypes.push({
+      text: i18n.t(censusType),
+      value: censusTypes[censusType],
+    })
+  }
+  return returnTypes
+})
+
+async function exportForm () {
+  isBusy.value = true
+  try {
+    await FormService.exportForm(props.form.id)
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err, 'Unable to export form')
+    }
+  } finally {
+    isBusy.value = false
+  }
+}
+
+async function onPublish () {
+  if (!confirm(i18n.t('confirm_publish') as string)) {
+    return
+  }
+  isBusy.value = true
+  try {
+    const res = await FormService.publishForm(props.studyForm.studyId, props.form.id)
+    emit('input', false)
+    emit('update', res)
+  } catch (err) {
+    alert('Unable to publish form', 'error')
+  } finally {
+    isBusy.value = false
+  }
+}
+
+async function onToggleEnabled (isPublished: boolean) {
+  try {
+    const f = props.form
+    f.isPublished = isPublished
+    const res = await FormService.updateForm(f)
+    emit('input', false)
+    emit('update', res)
+  } catch (err) {
+    alert('Unable to update form', 'error')
+  } finally {
+    isBusy.value = false
+  }
+}
+
+function changeCensusType (censusTypeId: number) {
+  const sf = props.studyForm.copy()
+  sf.censusTypeId = censusTypeId
+  emit('changeStudyForm', sf)
+}
+
+</script>
+
 <template>
   <tr class="form-list-row">
     <td>
@@ -34,7 +142,7 @@
       style="min-width: 20em"
     >
       <v-select
-        :items="censusTypes"
+        :items="censusTypeList"
         v-model="studyForm.censusTypeId"
         @change="changeCensusType"
         hide-detail
@@ -63,7 +171,7 @@
                 mdi-dev-to
               </v-icon>
             </v-list-item-icon>
-            {{ item.version }} 
+            {{ item.version }}
           </v-list-item>
         </template>
       </v-select>
@@ -75,137 +183,3 @@
     </td>
   </tr>
 </template>
-
-<script lang="ts">
-import Vue, { PropOptions } from 'vue'
-import { debounce } from 'lodash'
-
-import Form from '@/entities/trellis/Form'
-import StudyForm from '@/entities/trellis/StudyForm'
-import PermissionMixin from '@/mixins/PermissionMixin'
-import formTypes from '@/static/form.types'
-import censusTypes from '@/static/census.types'
-import singleton from '@/static/singleton'
-import FormService from '@/services/form'
-import TranslationTextField from '../TranslationTextField.vue'
-import FormActions from './FormActions.vue'
-import VersionModal from './VersionModal.vue'
-
-export default Vue.extend({
-  name: 'FormListTile',
-  mixins: [PermissionMixin],
-  components: {
-    FormActions,
-    TranslationTextField,
-    VersionModal,
-  },
-  data () {
-    return {
-      isBusy: false,
-      formTypes: formTypes,
-      global: singleton,
-      showMenu: false,
-      showVersionModal: false,
-      isOpen: false,
-      memForm: this.form.copy(),
-      saveThrottled: debounce(async () => {
-        this.$emit('save', this.memForm)
-      }, 2000),
-    }
-  },
-  props: {
-    form: Object as PropOptions<Form>,
-    studyForm: Object as PropOptions<StudyForm>,
-    formType: String,
-    isSelected: Boolean,
-    value: {
-      type: Boolean,
-    },
-    dragging: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  watch: {
-    form (newForm: Form) {
-      this.memForm = newForm.copy()
-    },
-  },
-  computed: {
-    censusTypes () {
-      const returnTypes = []
-      for (const censusType in censusTypes) {
-        returnTypes.push({
-          text: this.$t(censusType),
-          value: censusTypes[censusType],
-        })
-      }
-      return returnTypes
-    },
-  },
-  methods: {
-    idFrom (key: string): string {
-      return key + '-' + this.form.id
-    },
-    printForm () {},
-    async exportForm () {
-      this.isBusy = true
-      try {
-        await FormService.exportForm(this.form.id)
-      } catch (err) {
-        if (this.isNotAuthError(err)) {
-          this.logError(err, 'Unable to export form')
-        }
-      } finally {
-        this.isBusy = false
-      }
-    },
-    async onPublish () {
-      if (!confirm(this.$t('confirm_publish') as string)) {
-        return
-      }
-      try {
-        this.isBusy = true
-        const res = await FormService.publishForm(this.studyForm.studyId, this.form.id)
-        this.$emit('input', false)
-        this.$emit('update', res)
-      } catch (err) {
-        this.alert('Unable to publish form', 'error')
-      } finally {
-        this.isBusy = false
-      }
-    },
-    async onToggleEnabled (isPublished: boolean) {
-      try {
-        this.isBusy = true
-        const f = this.form
-        f.isPublished = isPublished
-        const res = await FormService.updateForm(f)
-        this.$emit('input', false)
-        this.$emit('update', res)
-      } catch (err) {
-        this.alert('Unable to update form', 'error')
-      } finally {
-        this.isBusy = false
-      }
-    },
-    save () {
-      this.$emit('save', this.memForm)
-    },
-    changeSortOrder (sortOrder) {
-      const sf = this.studyForm.copy()
-      sf.sortOrder = sortOrder
-      this.$emit('changeStudyForm', sf)
-    },
-    changeCensusType (censusTypeId) {
-      const sf = this.studyForm.copy()
-      sf.censusTypeId = censusTypeId
-      this.$emit('changeStudyForm', sf)
-    },
-  },
-})
-</script>
-
-<style lang="sass" scoped>
-
-</style>
