@@ -140,7 +140,14 @@ async function reorderForms (evt) {
     return
   }
   isLoading.value = true
-  const tempStudyForms = studyFormsByType.value[formTypes.DATA_COLLECTION_FORM].sort((a, b) => a.sortOrder - b.sortOrder).map((sf) => { return { id: sf.id, sortOrder: undefined } })
+  const tempStudyForms = studyFormsByType.value[formTypes.DATA_COLLECTION_FORM]
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map(sf => {
+      return {
+        id: sf.id,
+        sortOrder: undefined,
+      }
+    })
   const shifted = tempStudyForms[evt.oldIndex]
   tempStudyForms.splice(evt.oldIndex, 1)
   tempStudyForms.splice(evt.newIndex, 0, shifted)
@@ -213,7 +220,7 @@ async function deleteForm (studyForm: StudyForm) {
   if (!isLoading.value && confirm(i18n.t('confirm_resource_delete', [formName(studyForm.form)]) as string)) {
     isLoading.value = true
     try {
-      await FormService.deleteForm(global.study.id, studyForm.form.id)
+      await FormService.deleteForm(global.study.id, studyForm.formMasterId)
       const index = studyForms.value.findIndex(sf => sf.id === studyForm.id)
       studyForms.value.splice(index, 1)
       alert('success', i18n.t('resource_deleted', [formName(studyForm.form)]))
