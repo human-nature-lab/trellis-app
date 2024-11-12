@@ -1,15 +1,22 @@
 <template>
   <v-col no-gutter>
     <v-row no-gutter>
+      <v-spacer />
       <v-btn
         v-if="showDk"
+        small
+        depressed
         :class="{primary: dk}"
+        class="ml-2"
         :disabled="disabled"
         @click="dk =! dk">
         {{ $t('do_not_know') }}
       </v-btn>
       <v-btn
         v-if="showRf"
+        small
+        depressed
+        class="ml-2"
         :class="{primary: rf}"
         :disabled="disabled"
         @click="rf =! rf">
@@ -53,7 +60,8 @@
       }
     },
     created: function () {
-      this._reason = this.question.datum.dk_rf_val // We're actually binding to a text model so here we need to initialize that var
+      // We're actually binding to a text model so here we need to initialize that var
+      this._reason = this.question.datum.dk_rf_val
     },
     computed: {
       showDk () {

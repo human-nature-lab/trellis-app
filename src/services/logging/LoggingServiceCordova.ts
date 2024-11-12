@@ -85,10 +85,11 @@ export class LoggingServiceCordova extends LoggingServiceAbstract {
     let order = sortBy ? {
       [sortBy]: descending ? 'DESC' : 'ASC'
     } : {}
+    console.log('getLogPage', page, limit, sortBy, descending)
     return repo.find({
       take: limit,
       skip: page * limit,
-      order
+      order,
     })
   }
 

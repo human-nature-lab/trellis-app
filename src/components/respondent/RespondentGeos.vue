@@ -1,5 +1,5 @@
 <template>
-  <v-flex>
+  <v-col class="pa-0">
     <v-toolbar flat>
       <v-toolbar-title>{{ $t('locations') }}</v-toolbar-title>
       <v-spacer />
@@ -63,24 +63,23 @@
       :geoSelectionFilter="geoSelectionFilter"
       :respondent-geo="movingRespondentGeo"
       :respondent="respondent"></move-respondent-geo-form>
-  </v-flex>
+  </v-col>
 </template>
 
 <script lang="ts">
-  import GeoSearch from '../geo/GeoSearch.vue'
+  import Vue from 'vue'
+  import GeoSearch from '@/components/geo/GeoSearch.vue'
   import Permission from '../Permission.vue'
   import RespondentGeoRow from './RespondentGeoRow.vue'
   import AddRespondentGeoForm from './AddRespondentGeoForm.vue'
   import MoveRespondentGeoForm from './MoveRespondentGeoForm.vue'
+  import RespondentService from '@/services/respondent'
+  import censusTypes from '@/static/census.types'
+  import Respondent from '@/entities/trellis/Respondent'
+  import RespondentGeo from '@/entities/trellis/RespondentGeo'
+  import Geo from '@/entities/trellis/Geo'
+  import singleton from '@/static/singleton'
   import { checkForCensusForm } from '../CensusFormChecker.vue'
-
-  import RespondentService from '../../services/respondent'
-  import CensusTypes from '../../static/census.types'
-  import Respondent from '../../entities/trellis/Respondent'
-  import RespondentGeo from '../../entities/trellis/RespondentGeo'
-  import Geo from '../../entities/trellis/Geo'
-  import Vue from 'vue'
-  import singleton from '../../static/singleton'
 
   export default Vue.extend({
     components: {GeoSearch, Permission, RespondentGeoRow, AddRespondentGeoForm, MoveRespondentGeoForm},
@@ -154,7 +153,7 @@
       },
       startMove (respondentGeo: RespondentGeo): Promise<void> {
         if (this.useCensusForm) {
-          return checkForCensusForm(CensusTypes.move_respondent, this.global.study.id, this.respondent.id).then(hasCensusForm => {
+          return checkForCensusForm(censusTypes.move_respondent, this.global.study.id, this.respondent.id).then(hasCensusForm => {
             // Implicit redirect to existing census form so we don't redirect here... This is a dumb way to do this.
             if (!hasCensusForm) {
               this.movingRespondentGeo = respondentGeo

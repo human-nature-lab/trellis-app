@@ -1,23 +1,85 @@
+<script lang="ts" setup>
+import { computed } from 'vue'
+import Question from '@/entities/trellis/Question'
+import AT from '@/static/action.types'
+import QT from '@/static/question.types'
+import { InterviewLocation } from '../services/InterviewAlligator'
+import ChoiceText from './ChoiceText.vue'
+import RadioCheckbox from './RadioCheckbox.vue'
+import { action, debouncedAction } from '../lib/action'
+import Choice from '@/entities/trellis/Choice'
+
+export type DisplayChoice = Pick<Choice, 'id' | 'choiceTranslation'> & {
+  choice: Choice
+  isSelected: boolean
+  isOther: boolean
+  otherText?: string
+}
+
+const props = defineProps<{
+  choice: DisplayChoice
+  question: Question
+  location: InterviewLocation
+  disabled: boolean
+}>()
+
+const isSelected = computed(() => props.choice.isSelected)
+
+function onChange (displayChoice) {
+  if (props.disabled) return
+  const choice = displayChoice.choice
+  if (!isSelected.value) {
+    action(props.question.id, AT.select_choice, {
+      choice_id: choice.id,
+      val: choice.val,
+      name: choice.val,
+    })
+  } else {
+    action(props.question.id, AT.deselect_choice, {
+      choice_id: choice.id,
+      val: choice.val,
+      name: choice.val,
+    })
+  }
+}
+
+function onOtherChange (otherVal) {
+  debouncedAction(props.question.id, AT.other_choice_text, {
+    choice_id: props.choice.id,
+    val: otherVal,
+    name: otherVal,
+  })
+}
+
+function choiceClasses (choice: DisplayChoice) {
+  return { other: choice.isOther && choice.isSelected }
+}
+</script>
+
 <template>
   <v-row class="checkbox-group">
-    <v-checkbox
-      class="checkbox"
-      v-if="question.type.name==='multiple_select'"
-      :disabled="disabled"
-      v-model="choice.isSelected"
-      :class="choiceClasses(choice)"
-      @change="onChange(choice)"
+    <v-row
+      v-if="question.questionTypeId === QT.multiple_select"
+      class="mx-4 no-gutters flex-nowrap"
     >
+      <v-simple-checkbox
+        class="checkbox"
+        :disabled="disabled"
+        :value="isSelected"
+        :class="choiceClasses(choice)"
+        @input="onChange(choice)"
+      />
       <ChoiceText
         :translation="choice.choiceTranslation"
         :location="location"
         slot="label"
+        @click="onChange(choice)"
       />
-    </v-checkbox>
+    </v-row>
     <radio-checkbox
       v-else
       :disabled="disabled"
-      v-model="choice.isSelected"
+      :value="isSelected"
       :class="choiceClasses(choice)"
       @change="onChange(choice)"
     >
@@ -39,57 +101,6 @@
     />
   </v-row>
 </template>
-
-<script>
-import AT from '../../../static/action.types'
-import ActionMixin from '../mixins/ActionMixin'
-import ChoiceText from './ChoiceText.vue'
-import RadioCheckbox from './RadioCheckbox.vue'
-
-export default {
-  name: 'Choice',
-  props: {
-    choice: Object,
-    question: Object,
-    location: Object,
-    disabled: Boolean,
-  },
-  methods: {
-    onChange (displayChoice) {
-      const choice = displayChoice.choice
-      if (displayChoice.isSelected) {
-        this.action(AT.select_choice, {
-          choice_id: choice.id,
-          val: choice.val,
-          name: choice.val,
-        })
-      } else {
-        this.action(AT.deselect_choice, {
-          choice_id: choice.id,
-          val: choice.val,
-          name: choice.val,
-        })
-      }
-    },
-    onOtherChange (otherVal) {
-      console.log('other change', otherVal)
-      this.debouncedAction(AT.other_choice_text, {
-        choice_id: this.choice.id,
-        val: otherVal,
-        name: otherVal,
-      })
-    },
-    choiceClasses (choice) {
-      return { other: choice.isOther && choice.isSelected }
-    },
-  },
-  mixins: [ActionMixin],
-  components: {
-    ChoiceText,
-    RadioCheckbox,
-  },
-}
-</script>
 
 <style lang="sass">
 .input-group

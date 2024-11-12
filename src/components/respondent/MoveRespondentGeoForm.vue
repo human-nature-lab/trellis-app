@@ -1,168 +1,188 @@
+<script lang="ts" setup>
+import { ref } from 'vue'
+import GeoSearch from '@/components/geo/GeoSearch.vue'
+import RespondentService from '@/services/respondent'
+import GeoBreadcrumbs from '../geo/GeoBreadcrumbs.vue'
+import TrellisModal from '../TrellisModal.vue'
+import Respondent from '@/entities/trellis/Respondent'
+import RespondentGeo from '@/entities/trellis/RespondentGeo'
+import Geo from '@/entities/trellis/Geo'
+import { isNotAuthError } from '@/helpers/auth.helper'
+import { logError } from '@/helpers/log.helper'
+
+const props = defineProps<{
+  value: boolean,
+  respondent: Respondent,
+  respondentGeo: RespondentGeo,
+  geoSelectionFilter: boolean,
+}>()
+
+const emit = defineEmits<{
+  (event: 'input', value: boolean): void,
+  (event: 'done', oldGeo: RespondentGeo, newGeo: RespondentGeo): void,
+}>()
+
+const isSearchOpen = ref(false)
+const newGeo = ref<Geo | null>(null)
+const moveToUnknown = ref(false)
+const isCurrent = ref(true)
+const notes = ref('')
+
+const geoSelected = (geos: Geo[]) => {
+  newGeo.value = geos[0]
+  isSearchOpen.value = false
+}
+
+async function save () {
+  try {
+    let rGeo
+    if (moveToUnknown.value) {
+      rGeo = await RespondentService.moveRespondentGeo(props.respondent.id, props.respondentGeo.id, null, isCurrent.value)
+    } else if (newGeo.value && newGeo.value.id === props.respondentGeo.geoId) {
+      return
+    } else {
+      rGeo = await RespondentService.moveRespondentGeo(props.respondent.id, props.respondentGeo.id, newGeo.value.id, isCurrent.value)
+    }
+    emit('done', props.respondentGeo, rGeo)
+    newGeo.value = null
+    moveToUnknown.value = false
+    isCurrent.value = true
+    notes.value = ''
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err)
+    }
+    emit('input', false)
+  } finally {
+    newGeo.value = null
+    moveToUnknown.value = false
+    isCurrent.value = true
+    notes.value = ''
+  }
+}
+
+</script>
+
 <template>
-  <v-dialog
+  <TrellisModal
+    :title="$t('move_respondent_location')"
     :value="value"
-    @input="$emit('input', $event)">
+    @input="$emit('input', $event)"
+  >
     <v-card>
-      <ModalTitle
-        :title="$t('move_respondent_location')"
-        @close="$emit('input', false)" />
       <v-card-text>
         <v-container fluid>
-          <v-layout row wrap align-center>
-            <v-flex xs4>
+          <v-row no-gutters>
+            <v-col>
               {{ $t('moving_from') }}
-            </v-flex>
-            <v-flex xs8>
+            </v-col>
+            <v-col>
               <v-chip
                 color="primary"
                 outlined
-                label>
+                label
+              >
                 <GeoBreadcrumbs
                   v-if="respondentGeo.geoId !== null && respondentGeo.geo"
-                  :geoId="respondentGeo.geoId"
-                  :canNavigate="false"
-                  :maxDepth="4" />
-                <span v-if="respondentGeo.geoId === null">{{$t('unknown_location')}}</span>
+                  :geo-id="respondentGeo.geoId"
+                  :can-navigate="false"
+                  :max-depth="4"
+                />
+                <span v-if="respondentGeo.geoId === null">{{ $t('unknown_location') }}</span>
               </v-chip>
-            </v-flex>
-          </v-layout>
-          <v-layout row wrap align-center>
-            <v-flex xs4>
+            </v-col>
+          </v-row>
+          <v-row
+            no-gutters
+            class="mt-2"
+          >
+            <v-col xs4>
               {{ $t('moving_to') }}
-            </v-flex>
-            <v-flex xs8>
+            </v-col>
+            <v-col xs8>
               <v-chip
                 v-if="newGeo"
                 color="primary"
                 outline
                 label
-                @click="isSearchOpen = true">
-                <span v-if="moveToUnknown">{{$t('unknown_location')}}</span>
+                @click="isSearchOpen = true"
+              >
+                <span v-if="moveToUnknown">{{ $t('unknown_location') }}</span>
                 <GeoBreadcrumbs
                   v-else
-                  :geoId="newGeo.id"
-                  :canNavigate="false"
-                  :maxDepth="4" />
+                  :geo-id="newGeo.id"
+                  :can-navigate="false"
+                  :max-depth="4"
+                />
               </v-chip>
               <v-btn
                 v-else
                 :disabled="moveToUnknown"
-                @click="isSearchOpen = true">
-                {{$t('select_location')}}
+                @click="isSearchOpen = true"
+              >
+                {{ $t('select_location') }}
               </v-btn>
-            </v-flex>
-          </v-layout>
-          <v-layout row wrap mt-4>
-            <v-flex xs6>
+            </v-col>
+          </v-row>
+          <v-row
+            no-gutters
+            class="mt-4"
+          >
+            <v-col
+              sm="6"
+              cols="12"
+            >
               <v-checkbox
                 v-model="isCurrent"
-                :label="$t('current_geo_location')" />
-            </v-flex>
-            <v-flex xs6>
+                :label="$t('current_geo_location')"
+              />
+            </v-col>
+            <v-col
+              sm="6"
+              cols="12"
+            >
               <v-checkbox
                 v-model="moveToUnknown"
-                :label="$t('unknown_location')" />
-            </v-flex>
-          </v-layout>
+                :label="$t('unknown_location')"
+              />
+            </v-col>
+          </v-row>
           <v-expansion-panel inset>
             <v-expansion-panel-content>
-              <div slot="header">{{ $t('notes') }}</div>
+              <div slot="header">
+                {{ $t('notes') }}
+              </div>
               <v-textarea
                 v-model="notes"
                 auto-grow
                 full-width
-                :placeholder="$t('notes')" />
+                :placeholder="$t('notes')"
+              />
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <v-layout>
+          <v-row no-gutters>
             <v-spacer />
             <v-btn
               @click="save"
-              :disabled="!moveToUnknown && !newGeo">
-              {{$t('save')}}
+              :disabled="!moveToUnknown && !newGeo"
+            >
+              {{ $t('save') }}
             </v-btn>
-          </v-layout>
+          </v-row>
         </v-container>
       </v-card-text>
     </v-card>
-    <v-dialog v-model="isSearchOpen">
-      <ModalTitle
-        :title="$t('select_location')"
-        @close="isSearchOpen = false" />
+    <TrellisModal
+      v-model="isSearchOpen"
+      :title="$t('select_location')"
+    >
       <GeoSearch
         :limit="1"
-        :isSelectable="geoSelectionFilter"
-        :showCart="true"
-        :shouldUpdateRoute="false"
-        @doneSelecting="geoSelected" />
-    </v-dialog>
-  </v-dialog>
+        :is-selectable="geoSelectionFilter"
+        :show-cart="true"
+        :should-update-route="false"
+        @doneSelecting="geoSelected"
+      />
+    </TrellisModal>
+  </TrellisModal>
 </template>
-
-<script>
-  import ModalTitle from '../ModalTitle.vue'
-  import GeoSearch from '../geo/GeoSearch.vue'
-  import AsyncTranslationText from '../AsyncTranslationText.vue'
-  import RespondentService from '../../services/respondent'
-  import GeoBreadcrumbs from '../geo/GeoBreadcrumbs.vue'
-
-  export default {
-    name: 'MoveRespondentGeoForm',
-    components: {GeoBreadcrumbs, ModalTitle, AsyncTranslationText, GeoSearch},
-    data () {
-      return {
-        isSearchOpen: false,
-        newGeo: null,
-        moveToUnknown: false,
-        isCurrent: true,
-        notes: ''
-      }
-    },
-    props: {
-      value: {
-        type: Boolean,
-        required: true
-      },
-      respondent: {
-        type: Object,
-        required: true
-      },
-      respondentGeo: {
-        type: Object,
-        required: true
-      },
-      geoSelectionFilter: {
-        default: true
-      }
-    },
-    methods: {
-      geoSelected (geos) {
-        this.newGeo = geos[0]
-        this.isSearchOpen = false
-      },
-      async save () {
-        try {
-          let rGeo
-          if (this.moveToUnknown) {
-            rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, null, this.isCurrent)
-          } else if (this.newGeo && this.newGeo.id === this.respondentGeo.geoId) {
-            return
-          } else {
-            rGeo = await RespondentService.moveRespondentGeo(this.respondent.id, this.respondentGeo.id, this.newGeo.id, this.isCurrent)
-          }
-          this.$emit('done', this.respondentGeo, rGeo)
-        } catch (err) {
-          if (this.isNotAuthError(err)) {
-            this.logError(err)
-          }
-          this.$emit('input', false)
-        } finally {
-          this.newGeo = null
-          this.moveToUnknown = false
-          this.isCurrent = true
-          this.notes = ''
-        }
-      }
-    }
-  }
-</script>

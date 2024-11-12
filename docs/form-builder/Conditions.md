@@ -64,7 +64,7 @@ To access the current location within the form use `api.state`. This is an [obje
 
 The boilerplate function for condition assignment is:
 
-```
+```javascript
 function (vars, api) {
   // Code that returns true or false
 }
@@ -72,7 +72,7 @@ function (vars, api) {
 
 An example vars object passed to the function might be:
 
-```
+```javascript
 {
   'q0100': '1', // Response 1 chosen for a multiple-choice question
   'q0200': ['a', 'f', 'g'], // Responses a, f, and g chosen for a multiple-select question 
@@ -115,11 +115,21 @@ function (vars) {
 ```
 
 OR using the `api`
-
+                              
 ```javascript
 function (vars, api) {
   var data = api.data.get('q0200')
   return data.indexOf('a') > -1 || data.indexOf('c') > -1
+}
+```
+
+
+Deterministic randomization with 50% probability
+```javascript
+function (vars, api) {
+  const roll = (api.rawData.get('q0200')[0].randomSortOrder / (Number.MAX_SAFE_INTEGER - 1)) // a number between 0.0 - 1.0
+  const probability = 0.50
+  return roll < probability
 }
 ```
 

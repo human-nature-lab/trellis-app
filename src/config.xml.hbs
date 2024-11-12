@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="3" id="edu.yale.trellis.surveyview" ios-CFBundleVersion="2" version="{{VERSION}}" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<widget 
+  android-versionCode="3" 
+  id="edu.yale.trellis.surveyview"
+  ios-CFBundleVersion="2"
+  version="{{VERSION}}"
+  xmlns="http://www.w3.org/ns/widgets"
+  xmlns:cdv="http://cordova.apache.org/ns/1.0"
+  xmlns:android="http://schemas.android.com/apk/res/android">
   <name>Trellis 3</name>
   <description>The mobile app for the Trellis platform.</description>
   <author email="trellis@yale.edu" href="http://trellis.yale.edu">
@@ -23,6 +30,11 @@
   <content src="{{CONTENT_SOURCE}}" />
   <platform name="android">
     <allow-intent href="market:*" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/trellis_identity_white.png" />
+    <preference name="AndroidWindowSplashScreenBackground" value="#FF5722" />
+    <preference name="AndroidWindowSplashScreenIconBackgroundColor" value="#FF5722" />
+
+    {{!-- <preference name="AndroidPersistentFileLocation" value="Compatibility" /> --}}
     <icon src="static/img/icons/android-icon-36x36.png" density="ldpi" />
     <icon src="static/img/icons/android-icon-48x48.png" density="mdpi" />
     <icon src="static/img/icons/android-icon-72x72.png" density="hdpi" />
@@ -30,18 +42,22 @@
     <icon src="static/img/icons/android-icon-144x144.png" density="xxhdpi" />
     <icon src="static/img/icons/android-icon-192x192.png" density="xxxhdpi" />
 
-    <splash src="res/screen/android/screen-hdpi-landscape.png" density="land-hdpi"/>
-    <splash src="res/screen/android/screen-ldpi-landscape.png" density="land-ldpi"/>
-    <splash src="res/screen/android/screen-mdpi-landscape.png" density="land-mdpi"/>
-    <splash src="res/screen/android/screen-xhdpi-landscape.png" density="land-xhdpi"/>
-
-    <splash src="res/screen/android/screen-hdpi-portrait.png" density="port-hdpi"/>
-    <splash src="res/screen/android/screen-ldpi-portrait.png" density="port-ldpi"/>
-    <splash src="res/screen/android/screen-mdpi-portrait.png" density="port-mdpi"/>
-    <splash src="res/screen/android/screen-xhdpi-portrait.png" density="port-xhdpi"/>
     <preference name="android-targetSdkVersion" value="31" />
     <preference name="AndroidLaunchMode" value="singleTask"/>
     <hook type="before_build" src="hooks/android_before_build.sh" />
+     
+    {{#if DEV}}
+      <resource-file src="config/android/app/network_security_config.dev.xml" target="app/src/main/res/xml/network_security_config.xml" />
+      <resource-file src="res/raw/dev_ca.crt" target="app/src/main/res/raw/dev_ca.crt" />
+    {{else}}
+      <resource-file src="config/android/app/network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
+    {{/if}}
+    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+      <application android:networkSecurityConfig="@xml/network_security_config" />
+      {{#if ALLOW_CLEARTEXT_TRAFFIC}}
+        <application android:usesCleartextTraffic="true" />
+      {{/if}} 
+    </edit-config>
   </platform>
   {{!-- <platform name="ios">
     <allow-intent href="itms:*" />
@@ -58,10 +74,7 @@
 
     <!-- TODO iOS splash screens -->
   {{!-- </platform> --}}
-  {{#if DEV}}
-      <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-          <application android:usesCleartextTraffic="true" />
-      </edit-config>
-  {{/if}}
-  <engine name="android" spec="^7.1.1" />
+ 
+
+  <engine name="android" spec="^11.0.0" />
 </widget>

@@ -7,8 +7,8 @@
 </template>
 
 <script lang="ts">
-import expandAll from '../../events/builder/expandAll'
 import Vue from 'vue'
+import expandAll from '@/events/builder/expandAll'
 
 export default Vue.extend({
   name: 'ExpandSection',

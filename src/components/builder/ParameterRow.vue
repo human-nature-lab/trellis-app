@@ -42,8 +42,9 @@
           v-else
           :readonly="disabled"
           v-model="value.val"
+          :rules="[isValid || $t('invalid_json')]"
           :label="$t('value')"
-          hide-details
+          :hide-details="isValid"
           @change="onChange"
         />
       </v-col>
@@ -63,24 +64,29 @@
 </template>
 
 <script lang="ts">
-import Parameter, { ParameterType } from '../../entities/trellis/Parameter'
 import Vue, { PropType } from 'vue'
-import QuestionParameter from '../../entities/trellis/QuestionParameter'
-import MenuSelect from './MenuSelect.vue'
-import ConditionTag from '../../entities/trellis/ConditionTag'
-import Choice from '../../entities/trellis/Choice'
-import GeoType from '../../entities/trellis/GeoType'
-import builder from '../../services/builder'
+import Parameter, { ParameterDataType } from '@/entities/trellis/Parameter'
+import PT from '@/static/parameter.types'
+import QuestionParameter from '@/entities/trellis/QuestionParameter'
+import MenuSelect from '@/components/util/MenuSelect.vue'
+import ConditionTag from '@/entities/trellis/ConditionTag'
+import Choice from '@/entities/trellis/Choice'
+import GeoType from '@/entities/trellis/GeoType'
+import builder from '@/services/builder'
 import ChoiceSelector from './ChoiceSelector.vue'
-import Locale from '../../entities/trellis/Locale'
-import DotsMenu from './DotsMenu.vue'
+import Locale from '@/entities/trellis/Locale'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+
+export type ValidParameter = Parameter & {
+  valid: boolean
+}
 
 export default Vue.extend({
   name: 'ParameterRow',
   components: { MenuSelect, ChoiceSelector, DotsMenu },
   props: {
     value: Object as PropType<QuestionParameter>,
-    parameters: Array as PropType<Parameter[]>,
+    parameters: Array as PropType<ValidParameter[]>,
     conditionTags: Array as PropType<ConditionTag[]>,
     locale: Object as PropType<Locale>,
     choices: Array as PropType<Choice[]>,
@@ -94,15 +100,17 @@ export default Vue.extend({
   },
   methods: {
     async onChange () {
-      if (this.working) return
+      if (this.working || !this.isValid) return
       this.working = true
       try {
-        const updated = await builder.createOrUpdateParameter({
+        const p = this.parameters.find(p => p.id === this.value.parameterId)
+        const payload = {
           id: this.value.id,
           question_id: this.value.questionId,
-          name: this.parameter ? this.parameter.name : '',
+          name: p ? p.name : '',
           val: this.value.val,
-        })
+        }
+        const updated = await builder.createOrUpdateParameter(payload)
         this.$emit('input', updated)
         this.$emit('save', updated)
       } catch (err) {
@@ -120,29 +128,46 @@ export default Vue.extend({
     },
   },
   computed: {
+    isValid (): boolean {
+      return !this.isJson || this.jsonIsValid
+    },
     parameter (): Parameter {
       return this.parameters.find(p => p.id === this.value.parameterId)
     },
     isText (): boolean {
-      return this.parameter.type === ParameterType.String
+      return this.parameter.type === ParameterDataType.String
     },
     isNumber (): boolean {
-      return this.parameter.type === ParameterType.Number
+      return this.parameter.type === ParameterDataType.Number
     },
     isChoice (): boolean {
-      return this.parameter.type === ParameterType.Choice
+      return this.parameter.type === ParameterDataType.Choice
     },
     isBoolean (): boolean {
-      return this.parameter.type === ParameterType.Boolean
+      return this.parameter.type === ParameterDataType.Boolean
     },
     isGeoType (): boolean {
-      return this.parameter.type === ParameterType.GeoType
+      return this.parameter.type === ParameterDataType.GeoType
     },
     isConditionTag (): boolean {
-      return this.parameter.type === ParameterType.ConditionTag
+      return this.parameter.type === ParameterDataType.ConditionTag
     },
     boolVal (): boolean {
       return !!+this.value.val
+    },
+    isJson (): boolean {
+      return this.parameter.type === ParameterDataType.Json
+    },
+    jsonIsValid (): boolean {
+      try {
+        const v = JSON.parse(this.value.val)
+        if (PT.tick_labels === +this.value.parameterId) {
+          return Array.isArray(v)
+        }
+        return true
+      } catch (err) {
+        return false
+      }
     },
   },
 })

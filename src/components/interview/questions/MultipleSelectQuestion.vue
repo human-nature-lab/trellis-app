@@ -1,12 +1,16 @@
 <template>
-  <div class="multiple-select" role="radiogroup">
+  <div
+    class="multiple-select"
+    role="radiogroup"
+  >
     <Choice
+      v-for="displayChoice in displayChoices"
+      :key="displayChoice.id"
       :choice="displayChoice"
       :question="question"
       :location="location"
       :disabled="isQuestionDisabled"
-      v-for="displayChoice in displayChoices"
-      :key="displayChoice.id"/>
+    />
   </div>
 </template>
 

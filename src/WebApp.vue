@@ -7,7 +7,8 @@
       :class="{ 'print-mode' : global.printMode, 'cpu-optimized': global.cpuOptimized }">
       <v-navigation-drawer
         v-model="global.menuDrawer.open"
-        app>
+        app
+      >
         <MainMenu />
       </v-navigation-drawer>
       <v-app-bar
@@ -25,7 +26,7 @@
         </v-toolbar-title>
         <v-toolbar-title v-if="global.study" class="study">
           <v-tooltip right>
-            <template v-slot:activator="{ on, attrs }">
+            <template #activator="{ on, attrs }">
               <v-btn 
                 class="subheading"
                 v-on="on"
@@ -42,9 +43,9 @@
             <span>{{$t('change_study')}}</span>
           </v-tooltip>
         </v-toolbar-title>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-tooltip left>
-          <template v-slot:activator="{ on, attrs }">
+          <template #activator="{ on, attrs }">
             <v-btn 
               class="subheading"
               icon
@@ -57,14 +58,14 @@
           <span>{{$t('change_locale')}}</span>
         </v-tooltip>
         <v-tooltip
-          v-if="global.secondaryDrawer.isEnabled"
+          v-if="secondaryDrawerIcon"
           left>
-          <template v-slot:activator="{on, attrs}">
+          <template #activator="{on, attrs}">
             <v-icon
               v-on="on"
               v-bind="attrs"
-              @click.stop="global.secondaryDrawer.onClick">
-              {{global.secondaryDrawer.icon || 'mdi-magnify'}}
+              @click.stop="secondaryDrawerOnClick">
+              {{ secondaryDrawerIcon }}
             </v-icon>
           </template>
           <span>{{$t('view_current_documentation')}}</span>
@@ -85,32 +86,33 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-      <v-main id="trellis-main" class="scroll-container">
+      <v-main id="trellis-main" class="scroll-container d-flex flex-column">
         <v-dialog :value="alerts && alerts.length > 0" persistent>
           <v-card>
             <v-card-text>
-              <trellis-alert :current-log="alerts[alerts.length - 1]"></trellis-alert>
+              <TrellisAlert :current-log="alerts[alerts.length - 1]" />
             </v-card-text>
             <v-card-actions>
-              <v-spacer></v-spacer>
+              <v-spacer />
               <v-btn @click="dismissAlert()">Dismiss</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <v-container fluid fill-height class="pa-0 align-start" v-if="!maintenanceMode">
-          <router-view class="route-container fade-in" />
+        <v-container fluid class="flex-grow-1 fill-height pa-0 align-start" v-if="!maintenanceMode">
+          <router-view class="route-container fill-height fade-in align-start align-content-start" />
         </v-container>
-        <v-container fluid fill-height class="align-start" v-else>
+        <v-container fluid class="fill-height align-start" v-else>
           <Maintenance v-model="maintenanceMode" />
         </v-container>
       </v-main>
-
       <LocationFinder />
       <CensusFormChecker />
       <SnackbarQueue />
       <DocsSidebar />
       <LoginModal />
-
+      <WebAudioRecorder />
+      <MediaAudioRecorder />
+      <AssetUploader />
     </v-app>
   </div>
 </template>
@@ -120,6 +122,8 @@
   import MainMenu from './components/main-menu/MainMenu.vue'
   import CensusFormChecker from './components/CensusFormChecker.vue'
   import LoginModal from './components/login/LoginModal.vue'
+  import WebAudioRecorder from './components/audio-recorder/WebAudioRecorder.vue'
+  import MediaAudioRecorder from './components/audio-recorder/MediaAudioRecorder.vue'
   import AlertService from './services/AlertService'
   import TrellisAlert from './components/TrellisAlert.vue'
   import TrellisLoadingCircular from './components/TrellisLoadingCircle.vue'
@@ -139,6 +143,8 @@
   import PermissionMixin from './mixins/PermissionMixin'
   import Maintenance from './components/Maintenance.vue'
   import maintenanceService from './services/maintenance'
+  import { secondaryDrawerIcon, secondaryDrawerOnClick } from '@/helpers/drawer.helper'
+import AssetUploader from './components/asset/AssetUploader.vue'
 
   export default {
     name: 'WebApp',
@@ -152,7 +158,9 @@
         interviewIds: ['0011bbc8-59e7-4c68-ab48-97d64760961c', 'f8a82e2a-b6c9-42e5-9803-aacec589f796', '9457d7c8-0b37-4098-8aa4-4b928b2503e5'],
         alerts: AlertService.alerts,
         cpuOptimized: true,
-        serverMode: config.serverMode
+        serverMode: config.serverMode,
+        secondaryDrawerIcon,
+        secondaryDrawerOnClick,
       }
     },
     async created () {
@@ -208,6 +216,9 @@
       Banner,
       LoginModal,
       Maintenance,
+      WebAudioRecorder,
+      MediaAudioRecorder,
+      AssetUploader,
     },
     computed: {
       withinCordova () {
@@ -256,56 +267,25 @@
 </script>
 
 <style lang="sass">
-  // .container
-  //   &.fill-height
-  //     align-items: start
   html, body
     overflow: auto !important
-    // overflow: auto !important
-    /*padding-top: constant(safe-area-inset-top)*/
-    /*padding-top: env(safe-area-inset-top)*/
-  // .route-loading
-  //   position: absolute
-  //   margin: 0
-  //   margin-top: 2px
-  // .navigation-drawer
-  //   z-index: 1600
-  //   padding: 0
-  // .dialog
-  //   z-index: 1600
-  // .overlay
-  //   z-index: 1500
-  // .app-container
-  //   /*margin-top: 50px*/
-  //   /*margin-bottom: 50px*/
-  // .app-container-demo
-  //   padding-top: 56px
-  // .main-menu
-  //   margin-top: 0 !important
-  // .main-menu-demo
-  //   margin-top: 56px !important
-  // .demo-banner
-  //   z-index: 1600
-  //   position: fixed
-  //   width: 100%
-  //   height: 55px
-  //   margin-top: 0
-  //   font-weight: bold
-  //   font-size: 20px
-  // @media only screen and (max-width: 900px)
-  //   .demo-banner
-  //     font-size: 15px
-  // @media only screen and (max-width: 700px)
-  //   .demo-banner
-  //     font-size: 11px
-  // .list--dense
-  //   padding-top: 0
+
+  .route-container > *
+    width: 100%
   .logo
     height: 55%
     img
       max-width: 100%
       max-height: 100%
-  
+
+  #trellis-main
+    margin-top: 64px !important
+    padding: 0 !important
+    height: calc(100% - 64px)
+
+  .v-main__wrap
+    height: 100%
+
   .main-wrapper
     display: flex
     flex-direction: column
@@ -320,9 +300,7 @@
   .scroll-container
     overflow: auto
     flex: 1 1 auto !important
-    // margin-bottom: 64px
-  // .study
-  //   margin-left: 0
+
   .fade-in
     animation: fade-in .3s ease-in-out 0s 1
   @keyframes fade-in
@@ -335,7 +313,6 @@
     *:not(.stepper__wrapper)
       transition-property: none !important
       transition-duration: 0s !important
-      /*transform: none !important*/
       animation: none !important
   .page-footer
     background-color: #808080 !important

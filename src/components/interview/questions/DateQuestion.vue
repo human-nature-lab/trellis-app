@@ -16,7 +16,8 @@
   import AT from '../../../static/action.types'
   import PT from '../../../static/parameter.types'
   import global from '../../../static/singleton'
-  import * as moment from 'moment'
+  import { parseFormats } from '@/classes/parseFormats'
+  import { add, sub } from 'date-fns'
 
   export default {
     name: 'date-question',
@@ -38,20 +39,20 @@
     methods: {
       dateVal (val) {
         const TODAY = 'TODAY'
+        console.log('dateVal', val)
         if (val.substr(0, 5) === TODAY) {
-          const n = moment()
+          let n = new Date()
           if (val.includes('+')) {
             const exp = val.split('+')[1]
-            n.add(JSON.parse(exp))
+            n = add(n, JSON.parse(exp))
           } else if (val.includes('-')) {
             const exp = val.split('-')[1]
-            n.subtract(JSON.parse(exp))
+            n = sub(n, JSON.parse(exp))
           }
-          return n.format('YYYY-MM-DD')
+          return format(n, 'YYYY-MM-DD')
         } else {
-          return moment(val, ['YYYY-MM-DD', 'YYYY-M-D']).format('YYYY-MM-DD')
+          return format(parseFormats(val, ['YYYY-MM-DD', 'YYYY-M-D'], new Date()), 'YYYY-MM-DD')
         }
-        return null
       }
     },
     computed: {

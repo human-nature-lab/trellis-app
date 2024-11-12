@@ -48,4 +48,8 @@ export default class Skip extends SparseTimestampedSoftDelete {
     }
     return this
   }
+
+  print (): string {
+    return `${this.showHide ? 'Show' : 'Hide'} if has ${this.anyAll ? 'all' : 'any'} of: ${this.conditionTags.map(ct => ct.conditionTagName).join(', ')}`
+  }
 }

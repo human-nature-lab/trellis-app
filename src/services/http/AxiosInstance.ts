@@ -9,6 +9,7 @@ import DeviceService from '../device'
 import { makeBasicAuthHeader } from '../util'
 import { requestCredentials } from '../../components/login/LoginModal.vue'
 import { ExpiringValue } from '../../classes/ExpiringValue'
+import { Mutex } from 'async-mutex'
 
 export interface Token {
   hash: string
@@ -37,7 +38,7 @@ export function removeToken () {
 function requestInterceptor (request) {
   const token = storage.get(TOKEN_KEY)
   if (token && token.hash) {
-    request.headers['Authorization'] = `bearer ${token.hash}`
+    request.headers.Authorization = `bearer ${token.hash}`
   }
   return request
 }
@@ -72,7 +73,7 @@ export default function defaultInstance (): AxiosInstance {
       timeout: 120000,
     }
     if (config.xKey) {
-      axConf.headers = {'X-Key': config.xKey}
+      axConf.headers = { 'X-Key': config.xKey }
     }
     defaultInst = axios.create(axConf)
 
@@ -89,25 +90,25 @@ export async function heartbeatInstance (apiRoot: string): Promise<AxiosInstance
     timeout: 0,
   }
   if (config.xKey) {
-    axConf.headers = {'X-Key': config.xKey}
+    axConf.headers = { 'X-Key': config.xKey }
   }
   return axios.create(axConf)
 }
 
 const minuteMs = 60 * 1000
-const syncAuthHeader = new ExpiringValue(30 * minuteMs)
+const syncAuthHeader = new ExpiringValue<string>(30 * minuteMs)
 export async function syncInstance (): Promise<AxiosInstance> {
   if (syncInst === undefined) {
     const apiRoot = await DatabaseService.getServerIPAddress()
     syncInst = axios.create({
       baseURL: apiRoot + '/sync',
-      timeout: 0
+      timeout: 0,
     })
     syncInst.interceptors.request.use(async function (config) {
       config.headers['X-Key'] = await DeviceService.getDeviceKey()
       const authHeader = syncAuthHeader.get()
       if (authHeader) {
-        config.headers['Authorization'] = authHeader
+        config.headers.Authorization = authHeader
       }
       return config
     })
@@ -116,7 +117,7 @@ export async function syncInstance (): Promise<AxiosInstance> {
       if (err.response && err.response.status === 401) {
         const config = err.config as AxiosRequestConfig
         const creds = await requestCredentials()
-        config.headers['Authorization'] = makeBasicAuthHeader(creds.username, creds.password)
+        config.headers.Authorization = makeBasicAuthHeader(creds.username, creds.password)
         setSyncCredentials(creds.username, creds.password)
         return syncInst(config)
       } else {
@@ -131,12 +132,25 @@ export async function setSyncCredentials (username: string, password: string) {
   syncAuthHeader.set(makeBasicAuthHeader(username, password))
 }
 
-export async function resetSyncCredentials () {
+export function resetSyncCredentials () {
   syncAuthHeader.clear()
 }
 
-export async function getSyncAuthentication () {
+export function getSyncAuthentication () {
   return syncAuthHeader.get()
+}
+
+const authMutex = new Mutex()
+export function requestSyncAuthentication () {
+  return authMutex.runExclusive(async () => {
+    let header = syncAuthHeader.get()
+    if (!header) {
+      const creds = await requestCredentials()
+      header = makeBasicAuthHeader(creds.username, creds.password)
+      syncAuthHeader.set(header)
+    }
+    return header
+  })
 }
 
 export const adminInst = axios.create({
@@ -147,7 +161,7 @@ adminInst.interceptors.request.use(requestInterceptor)
 adminInst.interceptors.response.use(responseInterceptor, responseError)
 
 export const builderInst = axios.create({
-  baseURL: config.apiRoot + "/builder",
+  baseURL: config.apiRoot + '/builder',
 })
 builderInst.interceptors.request.use(requestInterceptor)
 builderInst.interceptors.response.use(responseInterceptor, responseError)

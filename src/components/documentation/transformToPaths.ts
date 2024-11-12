@@ -1,4 +1,4 @@
-import { replaceAll } from '../../classes/replaceAll'
+import { replaceAll } from '@/classes/strings'
 type FileStruct = {[key: string]: string|FileStruct}
 
 function join (a: string, b: string) {

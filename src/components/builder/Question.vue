@@ -1,3 +1,80 @@
+<script lang="ts" setup>
+import { computed, ref } from 'vue'
+import Question from '@/entities/trellis/Question'
+import Translation from './Translation.vue'
+import QuestionHeader from './QuestionHeader.vue'
+import QuestionParameters from './QuestionParameters.vue'
+import QuestionChoices from './QuestionChoices.vue'
+import questionTypes, { choiceTypes, builderTypes } from '@/static/question.types'
+import QuestionConditions from './QuestionConditions.vue'
+import builderService from '@/services/builder'
+import ExpandSection from './ExpandSection.vue'
+import DistributionQuestionBuilder from './question-builders/DistributionQuestionBuilder.vue'
+import SocialRingBuilder from './question-builders/SocialRingBuilder.vue'
+import ScaleBuilder from './question-builders/ScaleBuilder.vue'
+import { logError } from '@/helpers/log.helper'
+import { useBuilder, useQuestionErrors } from '@/helpers/builder.helper'
+import QuestionPreview from './QuestionPreview.vue'
+import NumberBuilder from './question-builders/NumberBuilder.vue'
+
+const props = defineProps<{
+  value: Question,
+}>()
+
+const builder = useBuilder()
+const errors = useQuestionErrors(() => props.value.id)
+const working = ref(false)
+const showParameters = ref(props.value && !!props.value.questionParameters.length)
+const showChoices = ref(choiceTypes.includes(props.value.questionTypeId))
+const showConditions = ref(props.value && !!props.value.assignConditionTags.length)
+const isBuilderType = computed(() => builderTypes.includes(props.value.questionTypeId))
+
+const questionBuilderComponent = computed(() => {
+  switch (props.value.questionTypeId) {
+    case questionTypes.distribution:
+      return DistributionQuestionBuilder
+    case questionTypes.social_ring:
+      return SocialRingBuilder
+    case questionTypes.scale:
+      return ScaleBuilder
+    case questionTypes.integer:
+    case questionTypes.decimal:
+      return NumberBuilder
+    default:
+      return null
+  }
+})
+
+const isChoiceType = computed(() => {
+  return props.value.questionTypeId === questionTypes.multiple_choice ||
+  props.value.questionTypeId === questionTypes.multiple_select
+})
+
+async function updateQuestion () {
+  if (working.value) return
+  working.value = true
+  showChoices.value = isChoiceType.value
+  try {
+    await builderService.updateQuestion(props.value)
+  } catch (err) {
+    logError(err)
+  } finally {
+    working.value = false
+  }
+}
+
+const inPreview = ref(false)
+const builderRef = ref()
+
+const hiddenParameters = computed(() => {
+  if (builderRef.value && builderRef.value.hiddenParameters) {
+    return builderRef.value.hiddenParameters
+  }
+  return []
+})
+
+</script>
+
 <template>
   <v-col class="mb-4">
     <QuestionHeader
@@ -9,141 +86,102 @@
       @change="updateQuestion"
       @remove="$emit('remove')"
       @duplicate="$emit('duplicate')"
+      :in-preview="inPreview"
+      @toggle-preview="inPreview = !inPreview"
       :loading="working"
     />
-    <v-col class="question-content">
-      <Translation
-        :locale="builder.locale"
-        :locked="builder.locked"
-        v-model="value.questionTranslation"
-        class="text-body-1"
-        autogrow
-        editable
-        textarea
-      />
-      <ExpandSection
-        v-if="isDistributionType"
-        v-model="isDistributionType"
-        global
-      >
-        <v-col>
-          <DistributionQuestionBuilder
-            :locked="builder.locked"
-            :value="value"
-            @input="$emit('input', $event)"
-          />
+    <v-col
+      v-if="!inPreview"
+      class="ma-0 pa-0"
+      :class="{ builder: isBuilderType }"
+    >
+      <v-col class="question-content">
+        <v-col
+          v-if="errors"
+          class="pa-0"
+        >
+          <v-alert
+            v-for="(e, index) in errors"
+            :key="index"
+            dense
+            outlined
+            type="warning"
+          >
+            {{ e.message }}
+          </v-alert>
         </v-col>
-      </ExpandSection>
-      <v-col>
-        <ExpandSection
-          v-if="isChoiceType"
-          v-model="showChoices"
-          global
-        >
-          <QuestionChoices
-            :question-id="value.id"
-            :disabled="builder.locked"
-            v-model="value.choices"
-            :locale="builder.locale"
-          />
-        </ExpandSection>
-        <ExpandSection
-          v-model="showParameters"
-          global
-        >
-          <QuestionParameters
-            v-if="showParameters"
-            :disabled="builder.locked"
-            v-model="value.questionParameters"
-            :parameters="builder.parameters"
-            :condition-tags="builder.conditionTags"
-            :locale="builder.locale"
-            :geo-types="builder.geoTypes"
-            :question-id="value.id"
-            :choices="value.choices"
-          />
-        </ExpandSection>
-        <ExpandSection
-          v-model="showConditions"
-          global
-        >
-          <QuestionConditions
-            v-if="showConditions"
-            :question-id="value.id"
-            :condition-tags="builder.conditionTags"
-            :disabled="builder.locked"
-            v-model="value.assignConditionTags"
-          />
-        </ExpandSection>
+        <Translation
+          v-if="!isBuilderType"
+          :locale="builder.locale"
+          :locked="builder.locked"
+          v-model="value.questionTranslation"
+          class="text-body-1"
+          autogrow
+          editable
+          textarea
+        />
+        <component
+          v-if="isBuilderType"
+          ref="builderRef"
+          :is="questionBuilderComponent"
+          :locked="builder.locked"
+          :value="value"
+          @input="$emit('input', $event)"
+        />
+        <v-col>
+          <ExpandSection
+            v-if="isChoiceType"
+            v-model="showChoices"
+            global
+          >
+            <QuestionChoices
+              :question-id="value.id"
+              :disabled="builder.locked"
+              v-model="value.choices"
+              :locale="builder.locale"
+            />
+          </ExpandSection>
+          <ExpandSection
+            v-model="showParameters"
+            global
+          >
+            <QuestionParameters
+              v-if="showParameters"
+              :disabled="builder.locked || !value.questionTypeId"
+              v-model="value.questionParameters"
+              :parameters="builder.parameters"
+              :hidden-parameters="hiddenParameters"
+              :condition-tags="builder.conditionTags"
+              :locale="builder.locale"
+              :geo-types="builder.geoTypes"
+              :question-id="value.id"
+              :question-type-id="value.questionTypeId"
+              :choices="value.choices"
+            />
+          </ExpandSection>
+          <ExpandSection
+            v-model="showConditions"
+            global
+          >
+            <QuestionConditions
+              v-if="showConditions"
+              :question-id="value.id"
+              :condition-tags="builder.conditionTags"
+              :disabled="builder.locked"
+              v-model="value.assignConditionTags"
+            />
+          </ExpandSection>
+        </v-col>
       </v-col>
+    </v-col>
+    <v-col v-else>
+      <QuestionPreview
+        :question="value"
+        :form="builder.form"
+      />
     </v-col>
   </v-col>
 </template>
-
-<script lang="ts">
-import Vue, { PropOptions } from 'vue'
-import Question from '../../entities/trellis/Question'
-import FormQuestionsMixin from '../../mixins/FormQuestionsMixin'
-import Translation from './Translation.vue'
-import QuestionHeader from './QuestionHeader.vue'
-import QuestionParameters from './QuestionParameters.vue'
-import { builder } from '../../symbols/builder'
-import QuestionChoices from './QuestionChoices.vue'
-import questionTypes from '../../static/question.types'
-import QuestionConditions from './QuestionConditions.vue'
-import builderService from '../../services/builder'
-import ExpandSection from './ExpandSection.vue'
-import DistributionQuestionBuilder from './question-builders/DistributionQuestionBuilder.vue'
-
-export default Vue.extend({
-  name: 'Question',
-  inject: { builder },
-  mixins: [FormQuestionsMixin],
-  components: {
-    Translation,
-    QuestionHeader,
-    QuestionParameters,
-    QuestionChoices,
-    QuestionConditions,
-    ExpandSection,
-    DistributionQuestionBuilder,
-  },
-  props: {
-    value: Object as PropOptions<Question>,
-  },
-  data () {
-    return {
-      working: false,
-      showParameters: this.value && !!this.value.questionParameters.length,
-      showChoices: this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select,
-      showConditions: this.value && !!this.value.assignConditionTags.length,
-    }
-  },
-  methods: {
-    async updateQuestion () {
-      console.log('Question.vue@updateQuestion')
-      if (this.working) return
-      this.working = true
-      this.showChoices = this.isChoiceType
-      try {
-        await builderService.updateQuestion(this.value)
-      } catch (err) {
-        this.logError(err)
-      } finally {
-        this.working = false
-      }
-    },
-  },
-  computed: {
-    isChoiceType (): boolean {
-      return this.value.questionTypeId === questionTypes.multiple_choice || this.value.questionTypeId === questionTypes.multiple_select
-    },
-    isDistributionType (): boolean {
-      return this.value.questionTypeId === questionTypes.distribution
-    },
-  },
-})
-</script>
 
 <style lang="sass">
 
@@ -154,4 +192,7 @@ export default Vue.extend({
 .theme--dark
   .question-content
     border: 1px solid darken(lightgrey, 50)
+.question-content.builder
+  padding: 0
+  margin: 0
 </style>

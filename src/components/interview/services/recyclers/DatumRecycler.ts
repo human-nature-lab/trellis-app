@@ -7,6 +7,7 @@ import Action from '../../../../entities/trellis/Action'
 export interface DatumPayload {
   name?: string
   val?: string
+  asset_id?: string
   sort_order?: number
   choice_id?: string
   geo_id?: string
@@ -31,6 +32,7 @@ class DatumRecycler extends Recycler<Datum> {
       d.questionDatumId,
       d.surveyId,
       d.choiceId,
+      d.assetId,
       d.edgeId,
       d.geoId,
       d.photoId,
@@ -47,6 +49,7 @@ class DatumRecycler extends Recycler<Datum> {
       questionDatumId: questionDatum.id,
       eventOrder: 0,
       val: payload.val,
+      assetId: payload.asset_id,
       sortOrder: payload.sort_order,
       name: payload.name || '',
       edgeId: payload.edge_id,

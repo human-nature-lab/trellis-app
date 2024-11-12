@@ -48,6 +48,13 @@ export default interface RespondentServiceInterface {
   getRespondentById (respondentId: string): Promise<Respondent>
 
   /**
+   * Get multiple respondents using id
+   * @param {string[]} respondentIds
+   * @returns {Promise<Respondent[]>}
+   */
+  getRespondentsByIds (respondentIds: string[]): Promise<Respondent[]>
+
+  /**
    * Get the results of a search query
    * @param {string} studyId
    * @param {string} query

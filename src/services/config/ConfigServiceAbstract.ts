@@ -1,5 +1,6 @@
-import Config from '../../entities/trellis/Config'
-import config from '../../config'
+import Vue from 'vue'
+import Config from '@/entities/trellis/Config'
+import config from '@/config'
 import { safeParse, setDot } from '../JSONUtil'
 
 export default abstract class ConfigServiceAbstract {
@@ -11,8 +12,13 @@ export default abstract class ConfigServiceAbstract {
     try {
       const pairs: Config[] = await this.getAll()
       for (const pair of pairs) {
-        const val = this.castValue(pair.type, pair.value)
-        setDot(config, pair.key, val)
+        if (pair.key === 'search.visibleConditionTags') {
+          const v = safeParse(pair.value)
+          setDot(config, pair.key, new Set(v || []), Vue.set)
+        } else {
+          const val = this.castValue(pair.type, pair.value)
+          setDot(config, pair.key, val, Vue.set)
+        }
       }
     } catch (err) {
       console.error(err)

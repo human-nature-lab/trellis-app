@@ -27,7 +27,7 @@ export function updateDatum (findFunc: DatumFindFunc, title?: string): ActionHan
         datum[key] = action.payload[key]
       }
     } else {
-      let msg = 'No datum exists that matches this find closure.'
+      let msg = 'Cant update datum. No datum exists that matches this find closure.'
       if (title) msg += `Found in ${title}`
       defaultLoggingService.log({ msg })
     }
@@ -49,7 +49,7 @@ export function removeDatum (findFunc: DatumFindFunc, title?: string): ActionHan
     if (index > -1) {
       return questionDatum.data.splice(index, 1)[0]
     } else {
-      let msg = 'No datum exists that matches this find closure.'
+      let msg = 'Cant remove datum. No datum exists that matches this find closure.'
       if (title) msg += `Found in ${title}`
       defaultLoggingService.log({ msg })
     }

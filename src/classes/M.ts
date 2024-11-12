@@ -1,10 +1,10 @@
 // Math stuff
 
-export function randomInt (min: number = 0, max: number = 100): number {
+export function randomInt (min = 0, max = 100): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export function random (min: number = 0, max: number = 1): number {
+export function random (min = 0, max = 1): number {
   return Math.random() * (max - min) + min
 }
 
@@ -32,12 +32,12 @@ export function randomIntBits (bits: number): number {
  * @param object
  */
 export function roughSizeOf (object: any) {
-  let objectList = []
-  let stack = [object]
+  const objectList = []
+  const stack = [object]
   let bytes = 0
 
   while (stack.length) {
-    let value = stack.pop()
+    const value = stack.pop()
 
     if (typeof value === 'boolean') {
       bytes += 4
@@ -47,10 +47,18 @@ export function roughSizeOf (object: any) {
       bytes += 8
     } else if (typeof value === 'object' && objectList.indexOf(value) === -1) {
       objectList.push(value)
-      for (let i in value) {
+      for (const i in value) {
         stack.push(value[i])
       }
     }
   }
   return bytes
 }
+
+// Returns the number rounded to the specified number of decimal places
+export function roundDecimals (value: number, decimals = 2): number {
+  const d = Math.pow(10, decimals)
+  return Math.round(value * d) / d
+}
+
+window.roundDecimals = roundDecimals

@@ -92,12 +92,12 @@
 
 <script lang="ts">
 import Vue, { PropType } from 'vue'
-import { Hook } from '../../types/Hook'
-import { HookService } from '../../services/hook'
+import { Hook } from '@/types/Hook'
+import { HookService } from '@/services/hook'
 import TrellisModal from '../TrellisModal.vue'
-import { relativeTime } from '../../filters/relativeTime'
-import PermissionMixin from '../../mixins/PermissionMixin'
-import Geo from '../../entities/trellis/Geo'
+import { relativeTime } from '@/filters/date'
+import PermissionMixin from '@/mixins/PermissionMixin'
+import Geo from '@/entities/trellis/Geo'
 
 export default Vue.extend({
   name: 'GeoHooks',

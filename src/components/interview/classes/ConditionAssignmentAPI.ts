@@ -3,6 +3,7 @@ import QT from '../../../static/question.types'
 import { isUndefined } from '../../../services/util'
 import InterviewAlligator from '../services/InterviewAlligator'
 import DataStore from './DataStore'
+import Datum from '@/entities/trellis/Datum'
 
 interface SimpleLocation {
   page: number
@@ -14,6 +15,9 @@ interface SimpleLocation {
 export interface ConditionAssignmentAPI {
   data: {
     get (varName: string, sectionFollowUpRepetition?: number, sectionRepetition?: number): string | string[] | null
+  },
+  rawData: {
+    get (varName: string, sectionFollowUpRepetition?: number, sectionRepetition?: number): Datum[]
   },
   conditionTag: {
     exists (tagName: string): boolean
@@ -58,20 +62,36 @@ export function createConditionAssignmentAPI (data: DataStore, navigator: Interv
         const questionDatum = data.getSingleQuestionDatumByLocation(loc.questionId, loc.sectionRepetition, loc.sectionFollowUpDatumId)
 
         return mapDatumByQuestionType(loc.questionTypeId, questionDatum)
-      }
+      },
+    },
+    rawData: {
+      get (varName: string, sectionFollowUpRepetition?: number, sectionRepetition?: number): Datum[] {
+        if (isUndefined(sectionFollowUpRepetition)) {
+          sectionFollowUpRepetition = navigator.loc.sectionFollowUpRepetition
+        }
+        if (isUndefined(sectionRepetition)) {
+          sectionRepetition = navigator.loc.sectionRepetition
+        }
+        const loc = navigator.getLocByVarName(varName, sectionFollowUpRepetition, sectionRepetition)
+
+        if (isUndefined(loc)) return null
+
+        const questionDatum = data.getSingleQuestionDatumByLocation(loc.questionId, loc.sectionRepetition, loc.sectionFollowUpDatumId)
+        return questionDatum && questionDatum.data ? questionDatum.data : []
+      },
     },
     conditionTag: {
       exists (conditionTagName: string): boolean {
         return data.hasConditionTag(conditionTagName, navigator.loc.sectionRepetition, navigator.loc.sectionFollowUpDatumId)
-      }
+      },
     },
     get state (): SimpleLocation {
       return {
         page: navigator.loc.page,
         section: navigator.loc.section,
         sectionRepetition: navigator.loc.sectionRepetition,
-        sectionFollowUpRepetition: navigator.loc.sectionFollowUpRepetition
+        sectionFollowUpRepetition: navigator.loc.sectionFollowUpRepetition,
       }
-    }
+    },
   }
 }

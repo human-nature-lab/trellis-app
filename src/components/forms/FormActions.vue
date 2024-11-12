@@ -1,7 +1,7 @@
 <template>
   <v-menu offset-y right v-model="isOpen">
     <template #activator="{ on, attrs }">
-      <v-btn icon v-on="on" v-bind="attrs" :disabled="isBusy">
+      <v-btn icon v-on="on" v-bind="attrs" :disabled="isBusy" class="drag-handle">
         <v-progress-circular v-if="isBusy" indeterminate />
         <v-icon v-else>mdi-dots-vertical</v-icon>
       </v-btn>
@@ -15,7 +15,18 @@
           }"
           :disabled="!isTestStudy"
         >
-          <v-list-item-content>Edit</v-list-item-content>
+          <v-list-item-content>{{ $t('edit') }}</v-list-item-content>
+        </v-list-item>
+      </Permission>
+      <Permission :requires="TrellisPermission.EDIT_FORM">
+        <v-list-item 
+          :to="{
+            name: 'FormTranslations',
+            params: { formId: form.id },
+          }"
+          :disabled="!isTestStudy"
+        >
+          <v-list-item-content>{{ $t('edit_translations') }}</v-list-item-content>
         </v-list-item>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
@@ -24,7 +35,7 @@
           :disabled="!isTestStudy"
         >
           <v-list-item-content>
-            {{ $t("edit_skips") }}
+            {{ $t('edit_skips') }}
           </v-list-item-content>
         </v-list-item>
       </Permission>

@@ -11,6 +11,7 @@
     <v-spacer></v-spacer>
     <v-btn
       icon
+      :disabled="disabled"
       class="white--text"
       @click="$emit('close')">
       <v-icon>mdi-close</v-icon>
@@ -24,6 +25,10 @@
     props: {
       title: {
         type: String
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
       },
     },
     name: 'ModalTitle'

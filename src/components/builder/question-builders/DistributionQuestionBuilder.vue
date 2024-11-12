@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
-import Question from '../../../entities/trellis/Question'
-import { jsonQuestionParameter } from '../../../lib/json-question-parameter'
-import { bins } from '../../../lib/distribution/bin'
 import Translation from '../Translation.vue'
-import { numberTransformer } from '../../../lib/number-transformer'
+import Question from '@/entities/trellis/Question'
+import { jsonQuestionParameter } from '@/lib/json-question-parameter'
+import { bins } from '@/lib/distribution/bin'
+import { numberTransformer } from '@/lib/number-transformer'
+import { useBuilder } from '@/helpers/builder.helper'
 
 export type Config = {
   type: 'currency'
@@ -31,7 +31,8 @@ const { config, loading, error } = jsonQuestionParameter<Config>(props.value, {
   bins: ['envelope', 'wallet'],
 })
 
-console.log('config', JSON.stringify(config.value))
+const builder = useBuilder()
+
 const quantity = numberTransformer(config, 'quantity')
 const stepSize = numberTransformer(config, 'stepSize')
 const startingPercentage = numberTransformer(config, 'startingPercentage')
@@ -44,6 +45,18 @@ const startingPercentage = numberTransformer(config, 'startingPercentage')
       v-if="loading"
       indeterminate
     />
+    <Translation
+      :locale="builder.locale"
+      :locked="builder.locked"
+      v-model="props.value.questionTranslation"
+      class="text-body-1"
+      autogrow
+      editable
+      textarea
+    />
+    <v-row class="no-gutters mt-6">
+      <h4>{{ $t('configuration') }}</h4>
+    </v-row>
     <v-row class="no-gutters">
       <v-col
         class="px-1"

@@ -5,26 +5,30 @@ import StudyGuard from './guards/StudyGuard'
 import LocaleGuard from './guards/LocaleGuard'
 import CensusFormGuard from './guards/CensusFormGuard'
 import CompletedSurveyGuard from './guards/CompletedSurveyGuard'
-import Geo from '../components/geo/Geo.vue'
 import SurveyComplete from '../components/interview/SurveyComplete.vue'
 import CensusFormLoaderPage from '../components/CensusFormLoaderPage.vue'
 import WebLogin from '../views/WebLogin.vue'
 import docs from '../components/documentation/docs'
 import LoginGuard from './guards/LoginGuard'
 
-const Interview = () => import(/* webpackChunkName: "interview" */'../components/interview/Interview.vue')
-const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'../views/ServiceTesting.vue')
-const LocationHistory = () => import(/* webpackChunkName: "location-history" */'../views/LocationHistory.vue')
-const TrellisInfo = () => import(/* webpackChunkName: "trellis-info" */'../views/TrellisInfo.vue')
-const GeoSearchWithMap = () => import(/* webpackChunkName: "geo-search" */'../components/geo/GeoSearchWithMap.vue')
-const LocaleSelectorPage = () => import(/* webpackChunkName: "locale-selector" */'../views/LocaleSelectorPage.vue')
-const StudySelectorPage = () => import(/* webpackChunkName: "study-selector" */'../views/StudySelectorPage.vue')
-const RespondentsSearch = () => import(/* webpackChunkName: "respondent-search" */'../components/respondent/RespondentsSearch.vue')
-const RespondentForms = () => import(/* webpackChunkName: "respondent-forms" */'../components/respondent/RespondentForms.vue')
-const RespondentInfo = () => import(/* webpackChunkName: "respondent-info" */'../components/respondent/RespondentInfo.vue')
-const DocsRoute = () => import(/* webpackChunkName: "documentation" */'../components/documentation/DocsRoute.vue')
-const Changelog = () => import(/* webpackChunkName: "changelog" */'../components/changelog/Changelog.vue')
-const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'../components/geo/GeoInfo.vue')
+const Interview = () => import(/* webpackChunkName: "interview" */'@/views/Interview.vue')
+const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'@/views/ServiceTesting.vue')
+const LocationHistory = () => import(/* webpackChunkName: "location-history" */'@/views/info/LocationHistory.vue')
+const TrellisInfo = () => import(/* webpackChunkName: "trellis-info" */'@/views/info/TrellisInfo.vue')
+const GeoSearchWithMap = () => import(/* webpackChunkName: "geo-search" */'@/views/geo/GeoSearchWithMap.vue')
+const LocaleSelectorPage = () => import(/* webpackChunkName: "locale-selector" */'@/views/study/LocaleSelectorPage.vue')
+const StudySelectorPage = () => import(/* webpackChunkName: "study-selector" */'@/views/study/StudySelectorPage.vue')
+const RespondentsSearch = () => import(/* webpackChunkName: "respondent-search" */'@/views/respondent/RespondentsSearch.vue')
+const RespondentForms = () => import(/* webpackChunkName: "respondent-forms" */'@/views/respondent/RespondentForms.vue')
+const RespondentInfo = () => import(/* webpackChunkName: "respondent-info" */'@/views/respondent/RespondentInfo.vue')
+const DocsRoute = () => import(/* webpackChunkName: "documentation" */'@/views/DocsRoute.vue')
+const Changelog = () => import(/* webpackChunkName: "changelog" */'@/views/info/Changelog.vue')
+const GeoInfo = () => import(/* webpackChunkName: "geo-info" */'@/views/geo/GeoInfo.vue')
+const Geo = () => import(/* webpackChunkName: "geo-search" */'@/views/geo/Geo.vue')
+const Theme = () => import(/* webpackChunkName: "theme" */'@/views/Theme.vue')
+const Assets = () => import(/* webpackChunkName: "assets" */'@/views/assets/Assets.vue')
+const Asset = () => import(/* webpackChunkName: "asset" */'@/views/assets/Asset.vue')
+const Test = () => import(/* webpackChunkName: "test" */'@/views/Test.vue')
 
 console.log(docs)
 const docsRoutes = Object.keys(docs.content).map(path => ({
@@ -116,4 +120,23 @@ export default [{
   path: '/changelog',
   name: 'Changelog',
   component: Changelog,
+}, {
+  path: '/theme',
+  name: 'Theme',
+  component: Theme,
+}, {
+  path: '/assets',
+  name: 'Assets',
+  component: Assets,
+  beforeEnter: guardQueue([LoginGuard]),
+}, {
+  path: '/asset/:id',
+  name: 'Asset',
+  component: Asset,
+  beforeEnter: guardQueue([LoginGuard]),
+}, {
+  path: '/test',
+  name: 'Test',
+  component: Test,
+  beforeEnter: guardQueue([LoginGuard]),
 }] as RouteConfig[]
