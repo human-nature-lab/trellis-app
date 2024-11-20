@@ -9,7 +9,7 @@
     :disabled="isQuestionDisabled"
     :append-icon="barcodeIcon"
     @click:append="doScan"
-    />
+  />
 </template>
 
 <script>
