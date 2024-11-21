@@ -1,3 +1,23 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { docsTocOpen, docsSidebarOpen, openSidebarLink } from '@/helpers/docs.helper'
+import Documentation from './Documentation.vue'
+
+const content = ref()
+const fileName = '_Sidebar.md'
+
+function close () {
+  docsTocOpen.value = false
+  docsSidebarOpen.value = true
+}
+
+onMounted(async () => {
+  const d = await import(/* webpackChunkName: "documentation" */'./docs')
+  const docs = d.default
+  content.value = docs.content[fileName]
+})
+</script>
+
 <template>
   <v-flex>
     <v-toolbar flat>
@@ -14,51 +34,11 @@
     </v-toolbar>
     <v-container>
       <v-layout>
-        <div :is="content" />
-        <!-- <Markdown
-            v-if="content"
-            @navigation="$emit('navigation', $event)"
-            :preventLinkPropagation="preventLinkPropagation"
-            :transformLinks="transformLinks"
-            routeName="Documentation"
-            paramName="filePath"
-            fileName="_Sidebar.md"
-            :markdown="content" /> -->
+        <Documentation
+          current-file="_Sidebar.md"
+          @click-link="(to, isExternal) => $emit('click-link', to, isExternal)"
+        />
       </v-layout>
     </v-container>
   </v-flex>
 </template>
-
-<script lang="ts">
-import Vue from 'vue'
-import { DocsEventTypes } from './DocsEventBus'
-export default Vue.extend({
-  async created () {
-    const d = await import(/* webpackChunkName: "documentation" */'./docs')
-    const docs = d.default
-    this.content = docs.content[this.fileName]
-  },
-  data () {
-    return {
-      fileName: '_Sidebar.md',
-      content: null,
-    }
-  },
-  name: 'DocsTOC',
-  props: {
-    transformLinks: {
-      type: Boolean,
-      default: false,
-    },
-    preventLinkPropagation: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  methods: {
-    close () {
-      this.$emit(DocsEventTypes.close)
-    },
-  },
-})
-</script>

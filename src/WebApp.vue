@@ -1,6 +1,5 @@
 <template>
   <div class="main-wrapper">
-    <Banner :serverMode="serverMode" />
     <v-app
       class="web"
       :dark="global.darkTheme"
@@ -11,66 +10,11 @@
       >
         <MainMenu />
       </v-navigation-drawer>
-      <v-app-bar
-        app
-        absolute
-        elevate-on-scroll
-        scroll-target="#trellis-main">
-        <v-app-bar-nav-icon
-          :disabled="maintenanceMode"
-          @click="global.menuDrawer.open = !global.menuDrawer.open" />
-        <v-toolbar-title class="logo">
-          <router-link :to="{name: 'Home'}" class="deep-orange--text">
-            <img src="./assets/trellis-logo.png?url" alt="trellis" />
-          </router-link>
-        </v-toolbar-title>
-        <v-toolbar-title v-if="global.study" class="study">
-          <v-tooltip right>
-            <template #activator="{ on, attrs }">
-              <v-btn 
-                class="subheading"
-                v-on="on"
-                v-bind="attrs"
-                :color="isTestStudy ? 'error' : null"
-                text
-                @click="toStudySelector">
-                {{global.study.name}}
-                <v-icon class="ml-2" v-if="isTestStudy" color="error">
-                  mdi-dev-to
-                </v-icon>
-              </v-btn>
-            </template>
-            <span>{{$t('change_study')}}</span>
-          </v-tooltip>
-        </v-toolbar-title>
-        <v-spacer />
-        <v-tooltip left>
-          <template #activator="{ on, attrs }">
-            <v-btn 
-              class="subheading"
-              icon
-              v-bind="attrs"
-              v-on="on"
-              @click="toLocaleSelector">
-              {{global.locale ? global.locale.languageTag : ''}}
-            </v-btn>
-          </template>
-          <span>{{$t('change_locale')}}</span>
-        </v-tooltip>
-        <v-tooltip
-          v-if="secondaryDrawerIcon"
-          left>
-          <template #activator="{on, attrs}">
-            <v-icon
-              v-on="on"
-              v-bind="attrs"
-              @click.stop="secondaryDrawerOnClick">
-              {{ secondaryDrawerIcon }}
-            </v-icon>
-          </template>
-          <span>{{$t('view_current_documentation')}}</span>
-        </v-tooltip>
-      </v-app-bar>
+      <AppBar
+        :maintenance-mode="maintenanceMode"
+        :server-mode="serverMode"
+        :show-banner="showBanner"
+      />
       <v-dialog
         max-width="300"
         :value="global.loading.fullscreen && global.loading.active"
@@ -86,7 +30,11 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-      <v-main id="trellis-main" class="scroll-container d-flex flex-column">
+      <v-main 
+        id="trellis-main"
+        class="scroll-container d-flex flex-column"
+        :class="{ 'with-banner': showBanner, 'no-banner': !showBanner }"
+      >
         <v-dialog :value="alerts && alerts.length > 0" persistent>
           <v-card>
             <v-card-text>
@@ -144,7 +92,8 @@
   import Maintenance from './components/Maintenance.vue'
   import maintenanceService from './services/maintenance'
   import { secondaryDrawerIcon, secondaryDrawerOnClick } from '@/helpers/drawer.helper'
-import AssetUploader from './components/asset/AssetUploader.vue'
+  import AssetUploader from './components/asset/AssetUploader.vue'
+  import AppBar from './components/AppBar.vue'
 
   export default {
     name: 'WebApp',
@@ -206,6 +155,7 @@ import AssetUploader from './components/asset/AssetUploader.vue'
       }
     },
     components: {
+      AppBar,
       MainMenu,
       TrellisAlert,
       LocationFinder,
@@ -223,15 +173,12 @@ import AssetUploader from './components/asset/AssetUploader.vue'
     computed: {
       withinCordova () {
         return window.cordova && typeof cordova === 'object'
-      }
+      },
+      showBanner () {
+        return this.serverMode.toLowerCase() === 'demo' || this.serverMode.toLowerCase() === 'test'
+      },
     },
     methods: {
-      toStudySelector () {
-        routeQueue.pushAndReturnToCurrent({ name: 'StudySelector' })
-      },
-      toLocaleSelector () {
-        routeQueue.pushAndReturnToCurrent({ name: 'LocaleSelector' })
-      },
       startGPSWatch () {
         if (this.global.watchGPS) {
           GeoLocationService.watchPosition()
@@ -279,9 +226,14 @@ import AssetUploader from './components/asset/AssetUploader.vue'
       max-height: 100%
 
   #trellis-main
-    margin-top: 64px !important
     padding: 0 !important
     height: calc(100% - 64px)
+
+  .with-banner
+    margin-top: 128px !important
+
+  .no-banner
+    margin-top: 64px !important
 
   .v-main__wrap
     height: 100%
@@ -292,8 +244,8 @@ import AssetUploader from './components/asset/AssetUploader.vue'
     height: 100vh
     overflow: hidden
 
-  .banner
-    flex-grow: 0
+  // .banner
+  //   flex-grow: 0
   .v-application
     flex-grow: 1
     height: 100%

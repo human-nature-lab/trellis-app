@@ -22,8 +22,8 @@ entered using the `YYYY-MM-DD` format. Some examples include: `2020-01-31` for *
 for the beginning of Unix time.
 
 Additionally, simple expressions can be used to indicate an offset from the date of the survey. Expressions should be 
-JSON parsable Objects which are passed to moment's [add](https://momentjs.com/docs/#/manipulating/add/) or 
-[subtract](https://momentjs.com/docs/#/manipulating/subtract/) methods. Any of the keys listed are valid candidates 
+JSON parsable strings which are passed to date-fns's [add](https://date-fns.org/docs/add#types/Duration/2523) or 
+[subtract](https://date-fns.org/docs/sub#types/Duration/2523) methods. Any of the keys listed are valid candidates 
 for a date expression.
 
 Examples:

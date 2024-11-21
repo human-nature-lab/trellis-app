@@ -1,4 +1,4 @@
-import * as VueRouter from 'vue-router'
+import VueRouter, { Route } from 'vue-router'
 import { copyWhitelist } from '../services/JSONUtil'
 import StorageService from '../services/StorageService'
 import { routerReady } from './index'
@@ -33,7 +33,7 @@ export class RouteQueue {
     this.defaultRoute = route
   }
 
-  private afterEach = (to: VueRouter.Route, from: VueRouter.Route) => {
+  private afterEach = (to: Route, from: Route) => {
     this.setCurrentRoute(to)
     pushHistory(to)
   }

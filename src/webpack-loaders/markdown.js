@@ -8,6 +8,7 @@ const { merge } = require('lodash')
 const path = require('path')
 const hljs = require('highlight.js')
 const compiler = require('vue-template-compiler')
+const fs = require('fs')
 
 const schema = {
   type: 'object',
@@ -16,6 +17,11 @@ const schema = {
       type: 'object',
     },
   },
+}
+
+function log (...args) {
+  // console.log(...args)
+  fs.appendFileSync('log.txt', `${new Date().toISOString()} ${args.join(' ')}\n`)
 }
 
 let configuredMarked = false
@@ -43,16 +49,20 @@ function configure (opts) {
     link (href, title, text) {
       const isExternal = href.startsWith('http')
       if (!isExternal) {
+        log('currentFile', currentFile, 'href', href)
         const currentDir = path.dirname(currentFile)
+        log('currentDir', currentDir)
         const relDir = path.relative(opts.rootPath, path.resolve(opts.rootPath, currentDir))
+        log('relDir', relDir)
         let nhref = opts.marked.baseUrl + path.join(relDir, href)
         nhref = nhref.replaceAll('\\', '/')
         if (href === 'Home.md') {
           nhref = opts.marked.baseUrl + ''
         }
-        return `<a href="${nhref}" title="${title}">${text}</a>`
+        log('nhref', nhref)
+        return `<a href="${nhref}" title="${title}" @click.prevent="onClickLink('${nhref}', false)">${text}</a>`
       } else {
-        return `<a href="${href}" title="${title}" target="_blank">${text}</a>`
+        return `<a href="${href}" title="${title}" target="_blank" @click.prevent="onClickLink('${href}', true)">${text}</a>`
       }
     },
     table (header, body) {
@@ -93,7 +103,8 @@ async function transform (opts, source) {
   let html = marked.parse(source)
   html = html.replaceAll('`', '\'')
   const imports = Array.from(toImport).map(v => `import '${v}'`).join('\n')
-  const name = path.basename(currentFile).replace('.md', '')
+  let name = path.basename(currentFile).replace('.md', '')
+  name = name.trim('_')
   if (opts.compileVue) {
     const r = compiler.compile('<div v-html="html" />')
     if (r.errors && r.errors.length) {
@@ -106,13 +117,23 @@ async function transform (opts, source) {
           html: ` + '`' + html + '`' + `
         }
       },
+      methods: {
+        onClickLink (href, isExternal) {
+          this.$emit('click-link', href, isExternal)
+        },
+      },
       render: ${r.render},
     }`
   }
   let res = `<template><div>${html}</div></template>\n`
-  if (imports !== '') {
-    res += `<script>\n${imports}\n export default { name : '${name}' }</script>\n`
-  }
+  res += `<script>\n${imports}\n export default { 
+    name : '${name}',
+    methods: {
+      onClickLink (href, isExternal) {
+        this.$emit('click-link', href, isExternal)
+      },
+    },
+  }</script>\n`
   res += '<style></style>'
   return res
 }
@@ -123,7 +144,7 @@ module.exports = function (source) {
   // Apply some transformations to the source...
   transform.call(this, options, source)
     .then(res => {
-      // console.log(res)
+      log(res.toString())
       done(null, res)
     })
     .catch(err => done(err))

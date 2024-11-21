@@ -8,53 +8,66 @@
     </template>
     <v-list>
       <Permission :requires="TrellisPermission.EDIT_FORM">
-        <v-list-item
+        <AlertListItem
+          :alert-msg="$t('switch_to_test_mode')"
           :to="{
             name: 'FormBuilder',
             params: { formId: form.id, mode: 'builder' },
           }"
           :disabled="!isTestStudy"
+          :title="!isTestStudy ? $t('switch_to_test_mode') : ''"
         >
           <v-list-item-content>{{ $t('edit') }}</v-list-item-content>
-        </v-list-item>
+        </AlertListItem>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
-        <v-list-item 
+        <AlertListItem
+          :alert-msg="$t('switch_to_test_mode')"
           :to="{
             name: 'FormTranslations',
             params: { formId: form.id },
           }"
+          @click="$emit('editTranslations', form)"
           :disabled="!isTestStudy"
-        >
+        > 
           <v-list-item-content>{{ $t('edit_translations') }}</v-list-item-content>
-        </v-list-item>
+        </AlertListItem>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
-        <v-list-item
+        <AlertListItem
+          :alert-msg="$t('switch_to_test_mode')"
           @click="$emit('toggleFormSkips', studyForm.form)"
           :disabled="!isTestStudy"
         >
           <v-list-item-content>
             {{ $t('edit_skips') }}
           </v-list-item-content>
-        </v-list-item>
+        </AlertListItem>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
-        <v-list-item @click="$emit('publish', form)" :disabled="!isTestStudy">
+        <AlertListItem
+          :alert-msg="$t('switch_to_test_mode')"
+          @click="$emit('publish', form)"
+          :disabled="!isTestStudy"
+        >
           <v-list-item-content>
             {{ $t("publish_form") }}
           </v-list-item-content>
-        </v-list-item>
+        </AlertListItem>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
-        <v-list-item @click="$emit('update:isPublished', !form.isPublished)" :disabled="isTestStudy">
+        <AlertListItem
+          :alert-msg="$t('switch_to_test_mode')"
+          @click="$emit('update:isPublished', !form.isPublished)"
+          :disabled="isTestStudy"
+        >
           <v-list-item-content v-if="form.isPublished">
             {{ $t('disable_form') }}
           </v-list-item-content>
           <v-list-item-content v-else>
             {{ $t('enable_form') }}
           </v-list-item-content>
-        </v-list-item>
+        </AlertListItem>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
         <v-list-item @click="$emit('revert', form)" :disabled="isTestStudy">
@@ -100,12 +113,14 @@
   import StudyForm from '../../entities/trellis/StudyForm'
   import PermissionMixin from '../../mixins/PermissionMixin'
   import Permission from '../Permission.vue'
+  import AlertListItem from '../util/AlertListItem.vue'
 
   export default Vue.extend({
     name: 'FormActions',
     mixins: [PermissionMixin],
     components: {
       Permission,
+      AlertListItem,
     },
     props: {
       isBusy: {
