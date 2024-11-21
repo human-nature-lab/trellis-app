@@ -104,7 +104,10 @@ async function transform (opts, source) {
   html = html.replaceAll('`', '\'')
   const imports = Array.from(toImport).map(v => `import '${v}'`).join('\n')
   let name = path.basename(currentFile).replace('.md', '')
-  name = name.trim('_')
+  name = name.trim()
+  if (name.startsWith('_')) {
+    name = name.slice(1)
+  }
   if (opts.compileVue) {
     const r = compiler.compile('<div v-html="html" />')
     if (r.errors && r.errors.length) {

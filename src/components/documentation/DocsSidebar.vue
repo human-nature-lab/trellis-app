@@ -59,7 +59,7 @@ function closeTOC () {
           :to="newTabLink"
           target="_blank"
           icon
-          flat
+          text
         >
           <v-icon>mdi-launch</v-icon>
         </v-btn>
