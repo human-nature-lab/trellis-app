@@ -30,13 +30,15 @@ const Assets = () => import(/* webpackChunkName: "assets" */'@/views/assets/Asse
 const Asset = () => import(/* webpackChunkName: "asset" */'@/views/assets/Asset.vue')
 const Test = () => import(/* webpackChunkName: "test" */'@/views/Test.vue')
 
-console.log(docs)
+console.log('docs', docs)
 const docsRoutes = Object.keys(docs.content).map(path => ({
   path: path === 'Home.md' ? '' : encodeURI(path),
   name: path,
   default: path === 'Home.md',
   component: docs.content[path],
 }))
+
+console.log('docs routes', docsRoutes)
 
 export default [{
   path: '/study/:studyId/interview/:interviewId',

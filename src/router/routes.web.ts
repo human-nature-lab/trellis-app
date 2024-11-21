@@ -101,7 +101,7 @@ export default sharedRoutes.concat([{
   path: '/server-config',
   name: 'ServerConfig',
   component: ServerConfig,
-  beforeEnter: guardQueue([LoginGuard]),
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_CONFIG)]),
 }, {
   path: '/demo-signup',
   name: 'DemoSignUp',
@@ -114,5 +114,5 @@ export default sharedRoutes.concat([{
   path: '/permissions',
   name: 'Permissions',
   component: Permissions,
-  beforeEnter: guardQueue([LoginGuard]),
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_PERMISSIONS)]),
 }])
