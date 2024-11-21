@@ -180,7 +180,7 @@ const sections = computed(() => {
       to: { name: 'Users' },
       icon: 'mdi-account-box-multiple',
       title: i18n.t('users'),
-      showIf: userHasPermission(TrellisPermission.VIEW_USERS),
+      showIf: userHasPermission(TrellisPermission.VIEW_USERS).value,
     }, {
       to: { name: 'Forms' },
       icon: 'mdi-form-select',
@@ -189,22 +189,22 @@ const sections = computed(() => {
       to: { name: 'Reports' },
       icon: 'mdi-content-save',
       title: i18n.t('reports'),
-      showIf: userHasPermission(TrellisPermission.VIEW_REPORTS),
+      showIf: userHasPermission(TrellisPermission.VIEW_REPORTS).value,
     }, {
       to: { name: 'DataImport' },
       icon: 'mdi-upload',
       title: i18n.t('data_import'),
-      showIf: userHasPermission(TrellisPermission.IMPORT_RESPONDENTS),
+      showIf: userHasPermission(TrellisPermission.IMPORT_RESPONDENTS).value,
     }, {
       to: { name: 'Devices' },
       icon: 'mdi-cellphone-link',
       title: i18n.t('devices'),
-      showIf: userHasPermission(TrellisPermission.VIEW_DEVICES),
+      showIf: userHasPermission(TrellisPermission.VIEW_DEVICES).value,
     }, {
       to: { name: 'Studies' },
       icon: 'mdi-book-open-blank-variant',
       title: i18n.t('studies'),
-      showIf: userHasPermission(TrellisPermission.VIEW_STUDIES),
+      showIf: userHasPermission(TrellisPermission.VIEW_STUDIES).value,
     }, {
       to: { name: 'GeoTypes' },
       icon: 'mdi-map-plus',
@@ -282,7 +282,7 @@ const sections = computed(() => {
       to: { name: 'ServerConfig' },
       icon: 'mdi-wrench',
       title: i18n.t('server_config'),
-      showIf: isWeb.value && userHasPermission(TrellisPermission.VIEW_CONFIG),
+      showIf: isWeb.value && userHasPermission(TrellisPermission.VIEW_CONFIG).value,
     }, {
       click: logCheckpoint,
       icon: 'mdi-flag',
@@ -291,7 +291,7 @@ const sections = computed(() => {
       to: { name: 'Permissions' },
       icon: 'mdi-lock',
       title: i18n.t('permissions'),
-      showIf: isWeb.value && userHasPermission(TrellisPermission.VIEW_PERMISSIONS),
+      showIf: isWeb.value && userHasPermission(TrellisPermission.VIEW_PERMISSIONS).value,
     }, {
       click: refresh,
       icon: 'mdi-refresh',

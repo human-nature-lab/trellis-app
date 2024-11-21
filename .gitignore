@@ -47,3 +47,4 @@ components.d.ts
 *.crt
 *.key
 logcat.log
+log.txt
