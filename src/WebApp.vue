@@ -175,6 +175,9 @@
         return window.cordova && typeof cordova === 'object'
       },
       showBanner () {
+        if (!this.serverMode) {
+          return false
+        }
         return this.serverMode.toLowerCase() === 'demo' || this.serverMode.toLowerCase() === 'test'
       },
     },
