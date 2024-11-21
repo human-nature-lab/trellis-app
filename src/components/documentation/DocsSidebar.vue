@@ -18,7 +18,11 @@ const newTabLink = computed(() => {
   if (!docsCurrentFile.value) {
     return ''
   }
-  return '/documentation' + docsCurrentFile.value
+  let link = docsCurrentFile.value
+  if (!link.startsWith('/')) {
+    link = '/' + link
+  }
+  return '/documentation' + link
 })
 
 function openTOC () {
