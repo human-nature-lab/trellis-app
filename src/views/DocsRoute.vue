@@ -6,7 +6,6 @@ import { routeQueue } from '@/router'
 
 const isTocOpen = ref(false)
 setSecondaryDrawerIconForView('mdi-table-of-contents', () => {
-  console.log('docs toc open', isTocOpen.value)
   isTocOpen.value = !isTocOpen.value
 })
 
