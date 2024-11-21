@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import global from '../static/singleton'
 import { routeQueue } from '@/router'
-import { secondaryDrawerIcon, secondaryDrawerOnClick } from '@/helpers/drawer.helper'
+import { secondaryDrawerIcon, secondaryDrawerOnClick, secondaryDrawerTooltip } from '@/helpers/drawer.helper'
 import { isTestStudy } from '@/helpers/singleton.helper'
 import Banner from './Banner.vue'
 
-const props = defineProps<{
+defineProps<{
   maintenanceMode: boolean;
   serverMode: string;
   showBanner: boolean;
@@ -88,6 +87,8 @@ function toLocaleSelector () {
     </v-tooltip>
     <v-tooltip
       v-if="secondaryDrawerIcon"
+      :disabled="!secondaryDrawerTooltip"
+      bottom
       left
     >
       <template #activator="{on, attrs}">
@@ -99,7 +100,7 @@ function toLocaleSelector () {
           {{ secondaryDrawerIcon }}
         </v-icon>
       </template>
-      <span>{{ $t('view_current_documentation') }}</span>
+      <span>{{ secondaryDrawerTooltip }}</span>
     </v-tooltip>
 
     <template

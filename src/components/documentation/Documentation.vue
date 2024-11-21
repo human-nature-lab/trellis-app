@@ -1,12 +1,13 @@
 <template>
   <v-flex class="documentation">
-    <v-container>
-      <v-layout v-if="isLoaded">
-        <div :is="markdown" />
-      </v-layout>
-      <v-layout v-else>
-        {{ $t('loading') }}
-      </v-layout>
+    <v-container v-if="isLoaded">
+      <div
+        :is="markdown"
+        v-on="$listeners"
+      />
+    </v-container>
+    <v-container v-else>
+      {{ $t('loading') }}
     </v-container>
   </v-flex>
 </template>
@@ -51,7 +52,10 @@ export default Vue.extend({
       return this.parts.length > 1 ? this.parts[1] : null
     },
     fileKey (): string {
-      const fileName = this.parts[0]
+      let fileName = this.parts[0]
+      if (fileName.startsWith('/')) {
+        fileName = fileName.slice(1)
+      }
       return fileName.slice(-3) === '.md' ? fileName : fileName + '.md'
     },
     markdown (): Component {
