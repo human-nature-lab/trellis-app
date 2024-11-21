@@ -42,7 +42,7 @@ assigned study, contact the study administrator.*
 6. *If you are creating a census form, select the event that will trigger the display of this form in the "Census type" 
    drop-down list.
 7. Open the actions (<i class="icon mdi mdi-dots-vertical"></i>) menu and click the pencil icon to open
-   the form builder. See the [form builder documentation](../form-builder/Introduction.md) for instructions for editing
+   the form builder. See the [form builder documentation](form-builder/Introduction.md) for instructions for editing
    your form.
 8. When you have finished editing the form, return to the forms page and check the "Published" checkbox to activate the 
    form for your study.

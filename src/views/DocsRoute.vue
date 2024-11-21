@@ -1,67 +1,39 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import DocsTOC from '@/components/documentation/DocsTOC.vue'
+import { setSecondaryDrawerIconForView } from '@/helpers/drawer.helper'
+import { routeQueue } from '@/router'
+
+const isTocOpen = ref(false)
+setSecondaryDrawerIconForView('mdi-table-of-contents', () => {
+  console.log('docs toc open', isTocOpen.value)
+  isTocOpen.value = !isTocOpen.value
+})
+
+function updateRoute (href, isExternal) {
+  if (isExternal) {
+    window.open(href, '_blank')
+  } else {
+    href = href.replace('/#/', '/')
+    routeQueue.push(href)
+  }
+}
+</script>
+
 <template>
   <v-flex>
     <v-container>
-      <router-view /> 
+      <router-view @click-link="updateRoute" />
     </v-container>
-    <!-- <Documentation
-      v-if="currentFile"
-      :transform-links="true"
-      :current-file="currentFile"
-    /> -->
     <v-navigation-drawer
       right
       app
-      v-model="isTOCOpen"
+      v-model="isTocOpen"
     >
       <DocsTOC
-        @close="isTOCOpen = false"
-        :transform-links="true"
+        @close="isTocOpen = false"
+        @click-link="updateRoute"
       />
     </v-navigation-drawer>
   </v-flex>
 </template>
-
-<script lang="ts">
-import Vue from 'vue'
-import DocsTOC from '@/components/documentation/DocsTOC.vue'
-import { Route } from 'vue-router'
-import global from '@/static/singleton'
-
-export default Vue.extend({
-  components: { DocsTOC },
-  name: 'DocsRoute',
-  beforeRouteEnter (to: Route, from: Route, next) {
-    global.secondaryDrawer.isEnabled = true
-    global.secondaryDrawer.icon = 'mdi-table-of-contents'
-    next()
-  },
-  beforeRouteUpdate (to: Route, from: Route, next) {
-    if (to.params.filePath && to.params.filePath !== from.params.filePath) {
-      this.currentFile = './' + to.params.filePath
-    }
-    next()
-  },
-  beforeRouteLeave (to: Route, from: Route, next) {
-    global.secondaryDrawer.isEnabled = false
-    next()
-  },
-  async created () {
-    global.secondaryDrawer.onClick = this.toggleTOC
-    const docs = (await import('@/components/documentation/docs')).default
-    this.names = docs.names
-    this.currentFile = this.$route.params.filePath ? './' + this.$route.params.filePath : './Home.md'
-  },
-  data () {
-    return {
-      names: [],
-      currentFile: null,
-      isTOCOpen: false,
-    }
-  },
-  methods: {
-    toggleTOC () {
-      this.isTOCOpen = !this.isTOCOpen
-    },
-  },
-})
-</script>
