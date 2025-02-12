@@ -48,6 +48,10 @@ function configure (opts) {
     },
     link (href, title, text) {
       const isExternal = href.startsWith('http')
+      const attributes = []
+      if (title) {
+        attributes.push(`title="${title}"`)
+      }
       if (!isExternal) {
         log('currentFile', currentFile, 'href', href)
         const currentDir = path.dirname(currentFile)
@@ -60,10 +64,11 @@ function configure (opts) {
           nhref = opts.marked.baseUrl + ''
         }
         log('nhref', nhref)
-        return `<a href="${nhref}" title="${title}" @click.prevent="onClickLink('${nhref}', false)">${text}</a>`
+        attributes.push(`href="${nhref}"`)
       } else {
-        return `<a href="${href}" title="${title}" target="_blank" @click.prevent="onClickLink('${href}', true)">${text}</a>`
+        attributes.push('target="_blank"')
       }
+      return `<a ${attributes.join(' ')} @click.prevent="onClickLink('${href}', ${isExternal})">${text}</a>`
     },
     table (header, body) {
       return `<div class="v-data-table">

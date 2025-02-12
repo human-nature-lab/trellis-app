@@ -9,6 +9,10 @@ export function alert (color: TranslateResult, msg?: TranslateResult, config: Pa
   AddSnack(msg, config)
 }
 
+export function alertSuccess (msg: TranslateResult, config: Partial<SnackConfig> = {}) {
+  alert('success', msg, config)
+}
+
 export function log (log: any): Promise<Log> {
   if (typeof log === 'object' && log && !log.component) {
     const instance = getCurrentInstance()

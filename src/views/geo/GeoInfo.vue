@@ -6,47 +6,87 @@
           <AsyncTranslationText :translation="geo.nameTranslation" />
         </v-toolbar-title>
         <v-spacer />
-        <Permission :requires="TrellisPermission.EDIT_GEO">
-          <v-btn
+        <DotsMenu>
+          <v-list-item @click="viewRespondents">
+            <v-list-item-icon>
+              <v-icon>mdi-account-group</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              {{ $t('respondents') }}
+            </v-list-item-title>
+          </v-list-item>
+          <Permission :requires="TrellisPermission.EDIT_GEO">
+            <v-list-item
+              icon
+              small
+              @click="showEditName = true"
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-pencil</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>
+                {{ $t('edit') }}
+              </v-list-item-title>
+            </v-list-item>
+          </Permission>
+          <v-list-item
+            v-if="geo"
+            :to="geoMapSearchRoute(geo.id)"
             icon
-            small
-            @click="showEditName = true"
           >
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-        </Permission>
-        <v-btn
-          v-if="geo"
-          :to="geoMapSearchRoute(geo.id)"
-          icon
-        >
-          <v-icon>mdi-map</v-icon>
-        </v-btn>
-        <v-btn
-          v-if="geo"
-          :to="geoSearchRoute(geo.id)"
-          icon
-        >
-          <v-icon>mdi-magnify</v-icon>
-        </v-btn>
-        <v-btn @click="viewRespondents">
-          {{ $t('respondents') }}
-        </v-btn>
+            <v-list-item-icon>
+              <v-icon>mdi-map</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              {{ $t('location_search_map') }}
+            </v-list-item-title>
+          </v-list-item>
+          <v-list-item
+            v-if="geo"
+            :to="geoSearchRoute(geo.id)"
+            icon
+          >
+            <v-list-item-icon>
+              <v-icon>mdi-magnify</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              {{ $t('location_search') }}
+            </v-list-item-title>
+          </v-list-item>
+          <Permission
+            v-if="isWeb"
+            :requires="TrellisPermission.ADD_RESPONDENT_CONDITION_TAG"
+          >
+            <v-list-item
+              @click="showConditionTagAssignDialog = true"
+              icon
+            >
+              <v-list-item-icon>
+                <v-icon>mdi-tag</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title>
+                {{ $t('add_condition_tag') }}
+              </v-list-item-title>
+            </v-list-item>
+          </Permission>
+        </DotsMenu>
       </v-toolbar>
       <v-col
         class="mb-4"
       >
-        <v-row no-gutters>
-          <v-flex>
+        <v-row
+          no-gutters
+          class="justify-space-between"
+        >
+          <v-col>
             <span class="subheading button-min-height">
               {{ $t('location') }}: <GeoBreadcrumbs
                 v-if="geo.id"
                 :geo-id="geo.id"
               />
             </span>
-          </v-flex>
-          <v-spacer />
-          <v-flex class="text-xs-right">
+          </v-col>
+          <v-col class="text-right">
             <span class="subheading button-min-height">
               {{ $t('type') }}:
               {{ geo.geoType.name }}
@@ -60,7 +100,7 @@
                 </v-btn>
               </Permission>
             </span>
-          </v-flex>
+          </v-col>
         </v-row>
       </v-col>
       <PhotoAlbum
@@ -113,6 +153,15 @@
         @save="updateTranslation"
       />
     </TrellisModal>
+    <TrellisModal
+      v-model="showConditionTagAssignDialog"
+      :title="$t('assign_condition_tag')"
+    >
+      <AssignGeoToConditionTag
+        :geo-id="geo.id"
+        @done="showConditionTagAssignDialog = false"
+      />
+    </TrellisModal>
   </v-container>
 </template>
 
@@ -140,6 +189,8 @@ import { SearchFilter } from '@/services/respondent/RespondentServiceInterface'
 import DocsFiles from '@/components/documentation/DocsFiles'
 import { computedTitle } from '@/router/history'
 import { geoSearchRoute, geoMapSearchRoute } from '@/router/util'
+import AssignGeoToConditionTag from '@/components/geo/AssignGeoToConditionTag.vue'
+import DotsMenu from '@/components/util/DotsMenu.vue'
 
 export default Vue.extend({
   name: 'GeoInfo',
@@ -158,6 +209,8 @@ export default Vue.extend({
     Permission,
     TranslationTextField,
     TrellisModal,
+    AssignGeoToConditionTag,
+    DotsMenu,
   },
   data () {
     return {
@@ -168,6 +221,7 @@ export default Vue.extend({
       geoPhotosLoading: true,
       showGeoTypeDialog: false,
       showEditName: false,
+      showConditionTagAssignDialog: false,
     }
   },
   created () {

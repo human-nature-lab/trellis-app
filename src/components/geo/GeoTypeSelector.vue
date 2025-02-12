@@ -1,72 +1,71 @@
-<template>
-  <v-container fluid>
-    <v-layout row wrap>
-      <v-flex xs12>
-        <v-select
-          single-line
-          return-object
-          :items="geoTypes"
-          v-model="curGeoType"
-          item-text="name"
-          :label="$t('select_location_type')">
-        </v-select>
-        <v-btn
-          :disabled="curGeoType === null || disableButton"
-          text
-          right
-          @click="selectGeoType">
-          {{ $t('select') }}
-        </v-btn>
-      </v-flex>
-    </v-layout>
-  </v-container>
-</template>
+<script lang="ts" setup>
+import { ref, watch } from 'vue'
+import GeoType from '../../entities/trellis/GeoType'
+import GeoService from '../../services/geo'
+import global from '../../static/singleton'
+import { logError } from '@/helpers/log.helper'
+import { isNotAuthError } from '@/helpers/auth.helper'
 
-<script>
-  import GeoType from '../../entities/trellis/GeoType'
-  import GeoService from '../../services/geo'
-  import global from '../../static/singleton'
+const props = defineProps<{
+  value: GeoType | null
+  disableButton?: boolean
+  showUserAddable?: boolean
+  geoType?: GeoType
+}>()
 
-  export default {
-    name: 'geo-type-selector',
-    async created () {
-      try {
-        this.geoTypes = await GeoService.getGeoTypesByStudy(global.study.id, this.showUserAddable)
-        if (this.geoType) {
-          this.curGeoType = this.geoTypes.find((gt) => gt.id === this.geoType.id)
-        }
-      } catch (err) {
-        if (this.isNotAuthError(err)) {
-          this.logError(err)
-        }
-      }
-    },
-    props: {
-      disableButton: {
-        type: Boolean,
-        required: false,
-        'default': false
-      },
-      showUserAddable: {
-        type: Boolean,
-        required: false,
-        'default': false
-      },
-      geoType: {
-        type: GeoType,
-        required: false
-      }
-    },
-    data: function () {
-      return {
-        geoTypes: [],
-        curGeoType: null
-      }
-    },
-    methods: {
-      selectGeoType: function () {
-        this.$emit('geo-type-selected', this.curGeoType)
-      }
+const emit = defineEmits<{
+  (e: 'input', value: GeoType | null): void
+  (e: 'geo-type-selected', geoType: GeoType): void
+}>()
+
+const geoTypes = ref<GeoType[]>([])
+const curGeoType = ref<GeoType | null>(props.value || null)
+
+function updateGeoType () {
+  emit('input', curGeoType.value)
+  emit('geo-type-selected', curGeoType.value)
+}
+
+const loading = ref(false)
+watch(() => global.study, async s => {
+  try {
+    loading.value = true
+    geoTypes.value = await GeoService.getGeoTypesByStudy(global.study.id, props.showUserAddable)
+    if (props.value) {
+      curGeoType.value = geoTypes.value.find((gt) => gt.id === props.value.id)
+    } else if (props.geoType) {
+      curGeoType.value = geoTypes.value.find((gt) => gt.id === props.geoType.id)
     }
+  } catch (err) {
+    if (isNotAuthError(err)) {
+      logError(err)
+    }
+  } finally {
+    loading.value = false
   }
+}, { immediate: true })
 </script>
+
+<template>
+  <v-row>
+    <v-col>
+      <v-select
+        single-line
+        return-object
+        :loading="loading"
+        :items="geoTypes"
+        v-model="curGeoType"
+        item-text="name"
+        :label="$t('select_location_type')"
+      />
+      <v-btn
+        :disabled="curGeoType === null || disableButton"
+        text
+        right
+        @click="updateGeoType"
+      >
+        {{ $t('select') }}
+      </v-btn>
+    </v-col>
+  </v-row>
+</template>

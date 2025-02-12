@@ -39,6 +39,15 @@ export class ConditionTagService implements ConditionTagInterface {
     return res.data.condition_tags.map(c => new ConditionTag().fromSnakeJSON(c))
   }
 
+  async assignTagViaGeos (conditionTagId: string, includeChildren: boolean, onlyUseCurrentGeo: boolean, geoIds: string[]) {
+    const res = await adminInst.post(`respondent/assign-tag-via-geo/${conditionTagId}`, {
+      includeChildren,
+      onlyUseCurrentGeo,
+      geoIds,
+    })
+    return res.data
+  }
+
   async importRespondentConditionTags (file: File, studyId: string): Promise<void> {
     const formData = new FormData()
     formData.append('file', file)
