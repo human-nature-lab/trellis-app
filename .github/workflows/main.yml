@@ -48,12 +48,19 @@ jobs:
           distribution: zulu
           java-version: '11'
 
-      - name: Setup Android SDK 27, 28, 29 and 30
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
           cmdline-tools-version: 9123335
 
-      - run: sdkmanager "platforms;android-33.0.2"
+      - run: sdkmanager tools "platforms;android-33.0.2"
+
+      - name: Breakpoint if tests failed
+        if: failure()
+        uses: namespacelabs/breakpoint-action@v0
+        with:
+          duration: 30m
+          authorized-users: wyattis
       # - name: Uninstall corrupt sdk build-tools
       #   run: |
       #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
