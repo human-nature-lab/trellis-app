@@ -48,11 +48,10 @@ jobs:
           distribution: zulu
           java-version: '11'
 
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup android tools
+        uses: maxim-lobanov/setup-android-tools@v1
         with:
-          cmdline-tools-version: 9123335
-          accept-android-sdk-licenses: true
+          packages: platforms;android-30
       
       # - name: Uninstall corrupt sdk build-tools
       #   run: |
