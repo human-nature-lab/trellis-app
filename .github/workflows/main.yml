@@ -60,7 +60,7 @@ jobs:
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: wyattis
+          authorized-keys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCb60INRLdeIQeqCWOAnXMiVhF3Z7n9w9+XRJFhDSTbHB3K/Kz+7rWmNtU3PZaGZPreM3Z1lZMNoLWnryQIHRIdYUOxr/y6z/Fsph2oEuEOZkdJ+wmEz+OfLLM/MU9nAxZCEXejiXTeIegARoX1phmRWc9468UgAZ6RvP8NAzlyYboO2PeCE3kJx0FKNZRHt478NIQVcq+BLiGHjD0isChDGOVfQGMRf7o6RB2eAc1JcBAIROs2B6JrjtFTmKrknGd0rr+GZsFrWtg+oNaQ14EMJmBy256umZZp8ZWkBXh7pNqydPzCeZ9crvZy//tjyorJF59PvBn+bwJd+4g2DPaTidRYKTWqXK362YM6IUOL30TcY7h3MJKGke2pmjAEHa5IAQ1eI98dMZu/s85r/x+4cUwLeO8Wds1WCvMfS4aH88soCUSXOZkNV84Fj1nwio6hKh2oOEgg/FkbsrDf4Rd3CXY9qtDLIFPejmm7bJ8rav6gqJuis6Dq4VsZJYevvcc="
       # - name: Uninstall corrupt sdk build-tools
       #   run: |
       #     $ANDROID_SDK_ROOT/tools/bin/sdkmanager --uninstall 'build-tools;31.0.0'
