@@ -1,5 +1,5 @@
 #!/bin/sh -l
-set -e
+set -e # exit on error
 
 echo "pwd: $(pwd)"
 echo "ls -la: $(ls -la)"

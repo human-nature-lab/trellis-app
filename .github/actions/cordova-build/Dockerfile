@@ -4,7 +4,7 @@ FROM node:16-bullseye as build
 
 # Install Java 11 and required tools
 RUN apt-get update && \
-    apt-get install -y openjdk-11-jdk wget unzip git && \
+    apt-get install -y openjdk-11-jdk wget unzip git zip && \
     rm -rf /var/lib/apt/lists/*
 
 # Set JAVA_HOME
@@ -25,6 +25,12 @@ RUN mkdir -p $ANDROID_SDK_ROOT/cmdline-tools && \
 # Accept licenses and install required SDK packages
 RUN yes | sdkmanager --licenses && \
     sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "tools"
+
+RUN wget https://services.gradle.org/distributions/gradle-7.4.2-bin.zip -O /tmp/gradle-7.4.2-bin.zip && \
+    mkdir -p /opt/gradle && \
+    unzip /tmp/gradle-7.4.2-bin.zip -d /opt/gradle && \
+    rm /tmp/gradle-7.4.2-bin.zip && \
+    ln -s /opt/gradle/gradle-7.4.2/bin/gradle /usr/bin/gradle
 
 # Install Cordova CLI
 RUN npm install -g cordova@11
