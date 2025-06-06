@@ -28,6 +28,7 @@ RUN yes | sdkmanager --licenses && \
 
 # Install Cordova CLI
 RUN npm install -g cordova@11
+RUN npm install -g @ionic/cli@6
 
 # Set workdir and copy package files first for caching
 COPY entrypoint.sh /entrypoint.sh
