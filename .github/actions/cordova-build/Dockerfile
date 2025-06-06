@@ -56,3 +56,5 @@ RUN npm install -g cordova@11
 # # Final stage: minimal image with just the APK
 # FROM busybox
 # COPY --from=build /app/platforms/android/app/build/outputs/apk/debug/app-debug.apk /output/app-debug.apk
+
+ENTRYPOINT ["/entrypoint.sh"]
