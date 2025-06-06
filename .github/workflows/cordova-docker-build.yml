@@ -63,7 +63,6 @@ jobs:
           draft: ${{ env.IS_PRERELEASE == 'false' }}
           prerelease: ${{ env.IS_PRERELEASE }}
       
-      
       - name: Upload web bundle
         id: upload-web-bundle
         uses: actions/upload-release-asset@v1
