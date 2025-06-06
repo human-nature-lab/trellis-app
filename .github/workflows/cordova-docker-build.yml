@@ -36,6 +36,15 @@ jobs:
       - name: Build app
         uses: ./.github/actions/cordova-build
         id: build-app
+    
+      - name: Save Gradle Cache
+        if: always()  # This ensures cache save runs even after a failed build
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       - name: Release content
         run: node ./make-release-content.js ${{ github.ref }}
