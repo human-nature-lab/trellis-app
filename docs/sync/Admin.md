@@ -6,19 +6,20 @@ web app to generate snapshots of the current database and process uploaded data.
 The sync process is as follows:
 
 1. Click the **Generate Snapshot** button in the Sync control panel to create a snapshot of the database.
-2. On each device, go to the Sync screen and click the Download button to download the latest snapshot.
+2. On each device, go to the **Sync** screen and click the Download button to download the latest snapshot.
 3. When the download completes the devices are ready for offline data collection.
-4. Go to the Sync screen and click the Upload button to upload any collected data.
-5. Click the **Process Uploads** button to add the uploaded data to the server's database.
-5. After you have processed the uploaded data, generate a new snapshot with the combined data collected by all devices.
+4. Collect your data
+5. On the tablets, go to the **Sync** screen and click the Upload button to upload any collected data.
+6. Click the **Process Uploads** button to add the uploaded data to the server's database.
+7. After you have processed the uploaded data, generate a new snapshot with the combined data collected by all devices.
 
 ### Snapshots
 The **Snapshots** table displays the date and filename of database archives that have been previously generated. 
 
-The **Generate Snapshot** button will create a copy of the server's database that registered devices can download.
+The **Generate Snapshot** button will create a copy of the server's database that registered devices can download. By default, the server checks if any data has changed and skips the snapshot if it hasn't. The **Force snapshot** button will just create the snapshot without checking if any data has changed.
 
 ### Uploads
-The **Uploads** table displays data the data that has been uploaded by devices along with the upload date, file name,
+The **Uploads** table displays the data that has been uploaded by devices along with the upload date, file name,
 device name and ID, and upload status.
 
 The upload status can be one of the following:
