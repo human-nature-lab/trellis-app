@@ -1,0 +1,20 @@
+# aider --model openrouter/deepseek/deepseek-r1-0528:free --yes
+
+# action.yml
+name: 'Trellis Cordova Build'
+description: 'Build the Trellis Cordova app for Android and Web'
+# inputs:
+#   android-sdk-version:  # id of input
+#     description: 'The version of the Android SDK to use'
+#     required: true
+#     default: '34'
+outputs:
+  apk-path: # id of output
+    description: 'The path to the built APK'
+  web-path: # id of output
+    description: 'The path to the built web app'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  # args:
+  #   - ${{ inputs.android-sdk-version }}
