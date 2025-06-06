@@ -22,6 +22,8 @@ RUN mkdir -p $ANDROID_SDK_ROOT/cmdline-tools && \
     rm cmdline-tools.zip && \
     mv cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
 
+ENV ANDROID_SDK_HOME=/opt/android-home
+RUN mkdir -p $ANDROID_SDK_HOME && chmod -R a+w $ANDROID_SDK_HOME
 RUN chmod -R a+w /opt/android-sdk
 
 # Accept licenses and install required SDK packages
