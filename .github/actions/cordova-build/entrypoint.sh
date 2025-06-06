@@ -17,7 +17,7 @@ npm run build:web
 zip -r trellis-web.zip www/
 
 # fix platform permissions before building
-chmod -R 777 platforms/
+mkdir -p platforms && chmod -R 777 platforms/
 npm run setup:cordova
 sh cordova-setup.sh
 
