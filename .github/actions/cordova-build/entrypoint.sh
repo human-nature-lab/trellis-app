@@ -18,10 +18,12 @@ zip -r trellis-web.zip www/
 
 # fix platform permissions before building
 mkdir -p platforms && chmod -R 777 platforms/
+mkdir -p plugins && chmod -R 777 plugins/f
 npm run setup:cordova
 sh cordova-setup.sh
 
 chmod -R 777 platforms/
+chmod -R 777 plugins/
 
 set -o pipefail
 npm run webpack:release:android -- --verbose| tee build.log
