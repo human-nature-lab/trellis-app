@@ -1,0 +1,26 @@
+name: Cordova Docker Build
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build app
+        uses: ./.github/actions/cordova-build.yml
+        id: build-app
+
+      # - name: Upload APK artifact
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: trellis-app-debug-apk
+      #     path: output/app-debug.apk 
