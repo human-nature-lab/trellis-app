@@ -17,5 +17,7 @@ zip -r trellis-web.zip www/
 
 npm run setup:cordova
 sh cordova-setup.sh
+# fix platform permissions before building
+chmod -R 777 platforms/
 npm run webpack:release:android
 mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
