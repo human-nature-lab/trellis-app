@@ -30,6 +30,9 @@ RUN yes | sdkmanager --licenses && \
 RUN npm install -g cordova@11
 
 # Set workdir and copy package files first for caching
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # WORKDIR /app
 # COPY package*.json ./
 # COPY config ./config
