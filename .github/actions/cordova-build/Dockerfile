@@ -26,7 +26,7 @@ RUN chmod -R a+w /opt/android-sdk
 
 # Accept licenses and install required SDK packages
 RUN yes | sdkmanager --licenses && \
-    sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "build-tools;32.0.0" "tools"
+    sdkmanager "platform-tools" "platforms;android-33" "platforms;android-31" "build-tools;33.0.2" "build-tools;32.0.0" "tools"
 
 RUN wget https://services.gradle.org/distributions/gradle-7.4.2-bin.zip -O /tmp/gradle-7.4.2-bin.zip && \
     mkdir -p /opt/gradle && \
