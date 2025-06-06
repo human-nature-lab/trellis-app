@@ -32,6 +32,9 @@ RUN wget https://services.gradle.org/distributions/gradle-7.4.2-bin.zip -O /tmp/
     rm /tmp/gradle-7.4.2-bin.zip && \
     ln -s /opt/gradle/gradle-7.4.2/bin/gradle /usr/bin/gradle
 
+# Set ANDROID_HOME environment variable for legacy tools compatibility
+ENV ANDROID_HOME=$ANDROID_SDK_ROOT
+
 # Install Cordova CLI
 RUN npm install -g cordova@11
 RUN npm install -g @ionic/cli@6
