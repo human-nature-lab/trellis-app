@@ -22,6 +22,8 @@ RUN mkdir -p $ANDROID_SDK_ROOT/cmdline-tools && \
     rm cmdline-tools.zip && \
     mv cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
 
+RUN chmod -R a+w /opt/android-sdk
+
 # Accept licenses and install required SDK packages
 RUN yes | sdkmanager --licenses && \
     sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2" "build-tools;32.0.0" "tools"
@@ -43,31 +45,5 @@ RUN npm install -g @ionic/cli@6
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# WORKDIR /app
-# COPY package*.json ./
-# COPY config ./config
-# COPY src/config.xml.hbs ./src/config.xml.hbs
-# COPY cordova-setup.sh ./cordova-setup.sh
-# COPY hooks ./hooks
-# COPY www/static ./www/static
-
-# # Install dependencies
-# RUN npm ci
-
-# # Copy the rest of the app
-# COPY . .
-
-# # Make hooks executable
-# RUN chmod +x -R hooks/*.sh && chmod +x cordova-setup.sh
-
-# # Cordova setup (platforms/plugins)
-# RUN ./cordova-setup.sh
-
-# # Build APK
-# RUN npm run webpack:release:android
-
-# # Final stage: minimal image with just the APK
-# FROM busybox
-# COPY --from=build /app/platforms/android/app/build/outputs/apk/debug/app-debug.apk /output/app-debug.apk
 
 ENTRYPOINT ["/entrypoint.sh"]
