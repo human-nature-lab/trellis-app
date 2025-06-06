@@ -16,9 +16,12 @@ cp config/config-xml.dev.default.js config/config-xml.dev.js
 npm run build:web
 zip -r trellis-web.zip www/
 
-npm run setup:cordova
-sh cordova-setup.sh
 # fix platform permissions before building
 chmod -R 777 platforms/
-npm run webpack:release:android
+npm run setup:cordova
+sh cordova-setup.sh
+
+set -o pipefail
+npm run webpack:release:android -- --verbose| tee build.log
+echo "Exit code: $?"
 mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk
