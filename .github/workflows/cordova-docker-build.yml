@@ -2,8 +2,6 @@ name: Cordova Docker Build
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
   workflow_dispatch:
@@ -15,36 +13,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Cache npm
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-    
-      - name: Cache Gradle
+      - name: Cache build resources
         uses: actions/cache@v4
         with:
           path: |
+            ~/.npm
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
       - name: Build app
         uses: ./.github/actions/cordova-build
         id: build-app
-    
-      - name: Save Gradle Cache
-        if: always()  # This ensures cache save runs even after a failed build
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       - name: Release content
         run: node ./make-release-content.js ${{ github.ref }}
