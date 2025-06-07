@@ -13,11 +13,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         
-      - name: Cache build resources
+      - name: Cache npm resources
         uses: actions/cache@v4
         with:
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           path: |
             ~/.npm
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+      
+      - name: Cache gradle resources
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle') }}
+          path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
 
