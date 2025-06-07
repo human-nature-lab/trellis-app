@@ -671,6 +671,7 @@ extra_modules,Extra modules,Modulos extra,
 history,History,Historial,
 syncing_with_api,Syncing with {0},Sincronizando con {0},ex: syncing with https://api.trellisprod.net
 force_generate_snapshot,Force snapshot,Forzar captura,
+generate_full_snapshot,Full snapshot,Captura completa,
 dialog,Dialog,Dialogo,
 dictator_async,Dictator pairing,Emparejamiento de dictador,
 start_leader,Start leader,Iniciar Lider,

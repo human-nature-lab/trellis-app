@@ -27,6 +27,9 @@
               <v-list-item @click="generateSnapshot(true)">
                 {{ $t('force_generate_snapshot') }}
               </v-list-item>
+              <v-list-item @click="generateSnapshot(true, true)">
+                {{ $t('generate_full_snapshot') }}
+              </v-list-item>
             </v-list>
           </v-menu>
         </v-card-title>
@@ -97,14 +100,14 @@
             :headers="uploadColumns"
             :items="uploadsFiltered">
             <template v-slot:expanded-item="{ item }">
-              <UploadError 
-                v-if="item.status === 'FAILED' || item.status === 'ERROR'" 
-                :error="item" 
+              <UploadError
+                v-if="item.status === 'FAILED' || item.status === 'ERROR'"
+                :error="item"
                 colspan="8" />
-              <UploadLogs 
+              <UploadLogs
                 v-else-if="item.status === 'SUCCESS'"
-                :upload="item" 
-                :isOpen="true" 
+                :upload="item"
+                :isOpen="true"
                 colspan="8" />
               <td v-else colspan="8">
                 Please process this upload to view more information about it.
@@ -235,10 +238,10 @@
           this.uploadsProcessing = false
         }
       },
-      generateSnapshot: async function (force = false) {
+      generateSnapshot: async function (force = false, complete = false) {
         this.generatingSnapshot = true
         try {
-          const res = await SyncAdminService.generateSnapshot(force)
+          const res = await SyncAdminService.generateSnapshot(force, complete)
           this.alertRes('success', res.data, 'Successfully created snapshot')
           this.getSnapshots()
         } catch (err) {
