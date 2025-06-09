@@ -20,7 +20,7 @@ class SyncAdminService {
   async generateSnapshot (force = false, complete = false) {
     return adminInst.post('generate-snapshot', {
       force,
-      complete: complete,
+      complete,
     }, {
       timeout: 0,
     })
