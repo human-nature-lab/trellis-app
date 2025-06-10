@@ -5,7 +5,7 @@ import Question from '../../src/entities/trellis/Question'
 import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
 import QT from '../../src/static/question.types'
 import PT from '../../src/static/parameter.types'
-import uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 export default function () {
 
   function makeQuestion(questionType: string, questionParameters: [string | number, any][], values: (string | number)[], dkRf: boolean = null, dkRfVal?: string): Question {

@@ -1,5 +1,5 @@
 import DiffService from '@/components/interview/services/DiffService'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import {now} from '@/services/DateService'
 describe('DiffService.spec', () => {
   function copy (arr) {

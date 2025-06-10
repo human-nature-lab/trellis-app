@@ -1,4 +1,4 @@
-import uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 import actionManager from '../services/actions/InterviewActionDefinitions'
 import validateParameters from '../services/ValidatorService'
 import ActionStore from './ActionStore'

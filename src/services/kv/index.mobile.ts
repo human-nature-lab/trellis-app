@@ -1,7 +1,7 @@
 import KV from '@/entities/trellis/KV'
 import DatabaseService from '../database/'
 import { Connection, TreeRepository } from 'typeorm'
-import uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 
 export class KVStore {
   async get (namespace: string, key: string) {

@@ -2,7 +2,7 @@ import DatabaseService from '../database'
 import ConditionTagInterface from './ConditionTagInterface'
 import RespondentConditionTag from '../../entities/trellis/RespondentConditionTag'
 import ConditionTag from '../../entities/trellis/ConditionTag'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { IsNull } from 'typeorm'
 
 export class ConditionTagService implements ConditionTagInterface {

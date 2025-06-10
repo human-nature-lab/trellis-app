@@ -4,7 +4,7 @@ import Vue from 'vue'
 import config from './config'
 import Study from './entities/trellis/Study'
 import DeviceService from './services/device'
-import SentryOfflineTransport from './services/logging/SentryOfflineTransport'
+// import SentryOfflineTransport from './services/logging/SentryOfflineTransport'
 import { BrowserOptions } from '@sentry/browser/esm'
 import { APP_ENV } from './static/constants'
 import SingletonService, { SingletonEvent } from './services/SingletonService'
@@ -39,16 +39,16 @@ if (config.sentry && config.sentry.dsn) {
     integrations: [new Sentry.Integrations.Vue({ Vue }), new Sentry.Integrations.RewriteFrames()],
     debug: config.debug,
   }
-  if (config.sentry.offline) {
-    console.info('SentryOfflineTransport implemented')
-    sentryConfig.transportOptions = {
-      dsn: config.sentry.dsn,
-    }
-    if (config.sentry.onlineIntervalRate) {
-      sentryConfig.transportOptions.onlineIntervalRate = config.sentry.onlineIntervalRate
-    }
-    sentryConfig.transport = SentryOfflineTransport
-  }
+  // if (config.sentry.offline) {
+  //   console.info('SentryOfflineTransport implemented')
+  //   sentryConfig.transportOptions = {
+  //     dsn: config.sentry.dsn,
+  //   }
+  //   if (config.sentry.onlineIntervalRate) {
+  //     sentryConfig.transportOptions.onlineIntervalRate = config.sentry.onlineIntervalRate
+  //   }
+  //   sentryConfig.transport = SentryOfflineTransport
+  // }
   console.info('Using sentry for logging', sentryConfig)
   Sentry.init(sentryConfig)
 

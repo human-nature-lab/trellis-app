@@ -12,7 +12,7 @@ import docs from '../components/documentation/docs'
 import LoginGuard from './guards/LoginGuard'
 
 const Interview = () => import(/* webpackChunkName: "interview" */'@/views/Interview.vue')
-const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'@/views/ServiceTesting.vue')
+// const ServiceTesting = () => import(/* webpackChunkName: "service-testing" */'@/views/ServiceTesting.vue')
 const LocationHistory = () => import(/* webpackChunkName: "location-history" */'@/views/info/LocationHistory.vue')
 const TrellisInfo = () => import(/* webpackChunkName: "trellis-info" */'@/views/info/TrellisInfo.vue')
 const GeoSearchWithMap = () => import(/* webpackChunkName: "geo-search" */'@/views/geo/GeoSearchWithMap.vue')
@@ -95,11 +95,13 @@ export default [{
   name: 'StudySelector',
   component: StudySelectorPage,
   beforeEnter: guardQueue([LoginGuard]),
-}, {
-  path: '/test/services',
-  name: 'ServiceTesting',
-  component: ServiceTesting,
-}, {
+}, 
+// {
+//   path: '/test/services',
+//   name: 'ServiceTesting',
+//   component: ServiceTesting,
+// }, 
+{
   path: '/survey/:surveyId/completed',
   name: 'SurveyComplete',
   component: SurveyComplete,
@@ -136,9 +138,11 @@ export default [{
   name: 'Asset',
   component: Asset,
   beforeEnter: guardQueue([LoginGuard]),
-}, {
-  path: '/test',
-  name: 'Test',
-  component: Test,
-  beforeEnter: guardQueue([LoginGuard]),
-}] as RouteConfig[]
+},
+  // {
+  //   path: '/test',
+  //   name: 'Test',
+  //   component: Test,
+  //   beforeEnter: guardQueue([LoginGuard]),
+  // },
+] as RouteConfig[]

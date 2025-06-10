@@ -1,5 +1,5 @@
 import DiffService from '../../src/services/DiffService'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import {now} from '../../src/services/DateService'
 import {expect} from 'chai'
 import QuestionDatum from "../../src/entities/trellis/QuestionDatum";

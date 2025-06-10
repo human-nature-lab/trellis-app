@@ -11,7 +11,7 @@ import Datum from '../../src/entities/trellis/Datum'
 import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
 import { expect } from 'chai'
 import FormService from '../../src/services/form'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 export default function () {
   describe('Transactions', function (this: any) {

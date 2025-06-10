@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import path from 'path'
 import { file, FSFileEntry } from '@/cordova/file'
 import SyncService from '@/services/SyncService'

@@ -1,7 +1,7 @@
 import FileService from '../file'
 import DatabaseService from '../database'
 import Photo from '../../entities/trellis/Photo'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import PhotoServiceAbstract, { CancelFunction } from './PhotoServiceAbstract'
 import { In, IsNull } from 'typeorm'
 import CancellablePromise from '../../classes/CancellablePromise'

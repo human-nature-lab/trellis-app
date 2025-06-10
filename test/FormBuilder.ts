@@ -1,6 +1,6 @@
 import QuestionType from '../src/entities/trellis/QuestionType'
 import { now } from '../src/services/DateService'
-import uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 import AssignConditionTag from '../src/entities/trellis/AssignConditionTag'
 import Choice from '../src/entities/trellis/Choice'
 import ConditionTag from '../src/entities/trellis/ConditionTag'

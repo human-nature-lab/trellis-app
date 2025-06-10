@@ -1,7 +1,7 @@
 import SurveyServiceInterface from './SurveyServiceInterface'
 import Survey from '../../entities/trellis/Survey'
 import DatabaseService from '../database'
-import uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 import { now } from '../DateService'
 import { IsNull } from 'typeorm'
 

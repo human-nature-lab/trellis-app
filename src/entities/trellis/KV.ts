@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm'
 import TimestampedSoftDelete from '../base/TimestampedSoftDelete'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 
 @Entity()
 export default class KV extends TimestampedSoftDelete {

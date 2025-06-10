@@ -1,4 +1,4 @@
-import Mutex from 'async-mutex/lib/Mutex'
+import { Mutex } from 'async-mutex'
 import RolePermission from '../../entities/trellis/RolePermission'
 import User from '../../entities/trellis/User'
 import {

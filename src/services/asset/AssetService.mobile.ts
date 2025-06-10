@@ -1,5 +1,5 @@
 import { In, IsNull } from 'typeorm'
-import uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 import Asset from '@/entities/trellis/Asset'
 import { AssetServiceInterface, CreateAsset, UpdateAsset } from './AssetServiceInterface'
 import DatabaseService from '../database'

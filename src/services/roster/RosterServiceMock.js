@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import MockService from '../mock/MockService'
 import storage from '@/services/storage/StorageService'
 export default class RosterServiceMock {

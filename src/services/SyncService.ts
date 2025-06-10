@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import { AxiosRequestConfig, CancelTokenSource } from 'axios'
 import { Connection } from 'typeorm'
 import Sync from '../entities/trellis-config/Sync'

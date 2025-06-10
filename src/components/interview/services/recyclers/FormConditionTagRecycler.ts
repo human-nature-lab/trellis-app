@@ -1,5 +1,5 @@
 import Recycler from '../../../../classes/Recycler'
-import uuidv4 from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 import { now } from '../../../../services/DateService'
 import SurveyConditionTag from '../../../../entities/trellis/SurveyConditionTag'
 import InterviewManagerOld from '../../classes/InterviewManager'

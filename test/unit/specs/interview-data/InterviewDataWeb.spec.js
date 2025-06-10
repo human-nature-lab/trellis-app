@@ -1,6 +1,6 @@
 import moxios from 'moxios'
 import http from '@/services/http/AxiosInstance'
-import uuid from 'uuid/v4'
+import { v4 as uuid } from 'uuid'
 import InterviewDataWeb, {copy} from '@/components/interview/services/interview-data/InterviewDataWeb'
 describe('InterviewDataWeb.spec', () => {
   let data
