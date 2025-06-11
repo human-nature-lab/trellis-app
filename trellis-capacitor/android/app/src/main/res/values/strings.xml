@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Trellis</string>
+    <string name="title_activity_main">Trellis</string>
+    <string name="package_name">edu.yale.trellis.surveyview</string>
+    <string name="custom_url_scheme">edu.yale.trellis.surveyview</string>
+</resources>
