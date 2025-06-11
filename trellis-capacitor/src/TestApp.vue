@@ -12,11 +12,11 @@
               @click="takePhoto"
             >
               <v-icon>mdi-camera</v-icon>
-            </v-btn>
-            <v-btn icon>
-              <v-icon>mdi-check</v-icon>
-            </v-btn>
-            <v-btn icon @click="photo = null">
+          </v-btn>
+            <v-btn
+              icon
+              @click="photo = null"
+            >
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-col>
@@ -24,6 +24,7 @@
       </v-container>
       <CheckList />
       <v-img :src="photo" />
+      <DBTest />
     </v-main>
   </v-app>
 </template>
@@ -33,6 +34,7 @@ import { ref, onMounted } from 'vue'
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import { SplashScreen } from '@capacitor/splash-screen'
 import CheckList from './CheckList.vue'
+import DBTest from './components/DBTest.vue'
 
 onMounted(() => {
   console.log('onMounted')
@@ -49,4 +51,5 @@ const takePhoto = async () => {
   })
   photo.value = res.webPath ?? null
 }
+
 </script>
