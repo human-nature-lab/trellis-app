@@ -2,11 +2,17 @@
 include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
 
+include ':capacitor-community-sqlite'
+project(':capacitor-community-sqlite').projectDir = new File('../node_modules/@capacitor-community/sqlite/android')
+
 include ':capacitor-camera'
 project(':capacitor-camera').projectDir = new File('../node_modules/@capacitor/camera/android')
 
+include ':capacitor-file-transfer'
+project(':capacitor-file-transfer').projectDir = new File('../node_modules/@capacitor/file-transfer/android')
+
+include ':capacitor-filesystem'
+project(':capacitor-filesystem').projectDir = new File('../node_modules/@capacitor/filesystem/android')
+
 include ':capacitor-splash-screen'
 project(':capacitor-splash-screen').projectDir = new File('../node_modules/@capacitor/splash-screen/android')
-
-include ':capacitor-community-sqlite'
-project(':capacitor-community-sqlite').projectDir = new File('../node_modules/@capacitor-community/sqlite/android')

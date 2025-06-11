@@ -25,6 +25,7 @@
       <CheckList />
       <v-img :src="photo" />
       <DBTest />
+      <TransferAndZip />
     </v-main>
   </v-app>
 </template>
@@ -35,6 +36,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import { SplashScreen } from '@capacitor/splash-screen'
 import CheckList from './CheckList.vue'
 import DBTest from './components/DBTest.vue'
+import TransferAndZip from './components/TransferAndZip.vue'
 
 onMounted(() => {
   console.log('onMounted')
