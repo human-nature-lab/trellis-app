@@ -34,15 +34,11 @@
         </AlertListItem>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
-        <AlertListItem
-          :alert-msg="$t('switch_to_test_mode')"
-          @click="$emit('toggleFormSkips', studyForm.form)"
-          :disabled="!isTestStudy"
-        >
+        <v-list-item @click="$emit('toggleFormSkips', studyForm.form)">
           <v-list-item-content>
             {{ $t('edit_skips') }}
           </v-list-item-content>
-        </AlertListItem>
+        </v-list-item>
       </Permission>
       <Permission :requires="TrellisPermission.EDIT_FORM">
         <AlertListItem

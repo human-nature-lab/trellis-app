@@ -27,6 +27,8 @@ import { saveAs } from 'file-saver'
 import PrintOptionsForm from '@/components/print/PrintOptionsForm.vue'
 import TransformService from '@/services/transform'
 import TrellisFileUpload from '@/components/import/TrellisFileUpload.vue'
+import DotsMenu from '@/components/util/DotsMenu.vue'
+import AlertListItem from '@/components/util/AlertListItem.vue'
 
 const isLoading = ref(false)
 const studyForms = ref<StudyForm[]>([])
@@ -38,6 +40,7 @@ const isDragging = ref(false)
 const sortBy = ref('sortOrder')
 const selectedForms = ref<StudyForm[]>([])
 const showExport = ref(false)
+const showDisabledForms = ref(isTestStudy.value)
 
 setDocsLink(DocsFiles.getting_started + '#creating-a-form')
 
@@ -59,7 +62,7 @@ async function loadForms () {
 onMounted(loadForms)
 
 const studyFormsByType = computed(() => {
-  return groupBy(studyForms.value, 'formTypeId')
+  return groupBy(studyForms.value.filter(sf => showDisabledForms.value || sf.form.isPublished), 'formTypeId')
 })
 
 const numericFormTypes = computed(() => {
@@ -334,47 +337,34 @@ async function importTranslations (file: File) {
         <v-toolbar flat>
           <v-toolbar-title>{{ formTypeName(formType) }}</v-toolbar-title>
           <v-spacer />
-
-          <v-menu
-            offset-y
-            left
-          >
-            <template #activator="{ on, attrs }">
-              <v-btn
-                v-on="on"
-                v-bind="attrs"
-                icon
-              >
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
-            </template>
+          <DotsMenu>
             <v-list>
-              <Permission
-                v-if="isTestStudy"
+              <AlertListItem
                 :requires="TrellisPermission.ADD_FORM"
+                :alert-msg="$t('switch_to_test_mode')"
+                @click="addForm(formType)"
+                :disabled="!isTestStudy"
               >
-                <v-list-item @click="addForm(formType)">
-                  <v-list-item-action>
-                    <v-icon>mdi-plus</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    {{ $t('add_form') }}
-                  </v-list-item-content>
-                </v-list-item>
-              </Permission>
-              <Permission
-                v-if="isTestStudy"
+                <v-list-item-action>
+                  <v-icon>mdi-plus</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  {{ $t('add_form') }}
+                </v-list-item-content>
+              </AlertListItem>
+              <AlertListItem
+                :alert-msg="$t('switch_to_test_mode')"
+                :disabled="!isTestStudy"
                 :requires="TrellisPermission.ADD_FORM"
+                @click="showImportForm = true; importFormType = Number(formType)"
               >
-                <v-list-item @click="showImportForm = true; importFormType = Number(formType)">
-                  <v-list-item-action>
-                    <v-icon>mdi-swap-vertical</v-icon>
-                  </v-list-item-action>
-                  <v-list-item-content>
-                    {{ $t('import_form') }}
-                  </v-list-item-content>
-                </v-list-item>
-              </Permission>
+                <v-list-item-action>
+                  <v-icon>mdi-swap-vertical</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  {{ $t('import_form') }}
+                </v-list-item-content>
+              </AlertListItem>
               <v-list-item
                 @click="showExport = true"
                 :disabled="!selectedForms.length"
@@ -413,8 +403,16 @@ async function importTranslations (file: File) {
                   </v-list-item-content>
                 </v-list-item>
               </Permission>
+              <v-list-item @click="showDisabledForms = !showDisabledForms">
+                <v-list-item-action>
+                  <v-icon>{{ showDisabledForms ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  {{ showDisabledForms ? $t('hide_disabled_forms') : $t('show_disabled_forms') }}
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
-          </v-menu>
+          </DotsMenu>
         </v-toolbar>
         <v-data-table
           v-model="selectedForms"
