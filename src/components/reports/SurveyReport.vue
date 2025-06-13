@@ -15,7 +15,7 @@ const props = defineProps<{
   survey: Survey
 }>()
 
-const { form, interview, data, loading, error } = useSurveyData(() => props.survey)
+const { form, data, loading, error } = useSurveyData(() => props.survey)
 
 type Row = {
   varName: string
@@ -89,7 +89,7 @@ const hasConditionTags = computed(() => hasSectionConditionTags.value || hasSurv
 </script>
 
 <template>
-  <v-card>
+  <v-card flat>
     <v-card-title>
       {{ title }}
     </v-card-title>
