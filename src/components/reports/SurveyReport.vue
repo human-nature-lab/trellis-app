@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { lookupQuestionType } from '@/static/question.types'
 import ParameterTypes from '@/static/parameter.types'
 import Respondent from '@/entities/trellis/Respondent'
@@ -16,6 +16,9 @@ const props = defineProps<{
 }>()
 
 const { form, interview, data, loading, error } = useSurveyData(() => props.survey)
+watch(data, () => {
+  console.log('data', JSON.stringify(data.value))
+}, { immediate: true })
 
 type Row = {
   varName: string
@@ -86,6 +89,7 @@ const hasSurveyConditionTags = computed(() => data.value && data.value.condition
 const hasRespondentConditionTags = computed(() => data.value && data.value.conditionTags && !!data.value.conditionTags.respondent.length)
 
 const hasConditionTags = computed(() => hasSectionConditionTags.value || hasSurveyConditionTags.value || hasRespondentConditionTags.value)
+const surveyConditionTags = computed(() => data.value && data.value.conditionTags && data.value.conditionTags.survey.filter(ct => ct.conditionTag))
 </script>
 
 <template>
@@ -170,7 +174,7 @@ const hasConditionTags = computed(() => hasSectionConditionTags.value || hasSurv
           <h4>{{ $t('form') }}</h4>
           <v-row no-gutters>
             <v-chip
-              v-for="ct in data.conditionTags.survey"
+              v-for="ct in surveyConditionTags"
               :key="ct.id"
             >
               {{ ct.conditionTag.name }}
