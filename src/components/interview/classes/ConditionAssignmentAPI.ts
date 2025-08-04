@@ -25,15 +25,16 @@ export interface ConditionAssignmentAPI {
   state: SimpleLocation
 }
 
-function mapDatumByQuestionType (questionTypeId: string, questionDatum: QuestionDatum): string | string[] | null {
+function mapDatumByQuestionType (data: DataStore, questionTypeId: string, questionDatum: QuestionDatum): string | string[] | null {
   switch (questionTypeId) {
     case QT.relationship:
-    case QT.roster:
     case QT.multiple_select:
     case QT.geo:
     case QT.respondent_geo:
     case QT.image:
       return questionDatum.data.map(d => d.val)
+    case QT.roster:
+      return questionDatum.data.map(d => data.rosters.get(d.rosterId)?.val)
     default:
       return questionDatum.data && questionDatum.data.length ? questionDatum.data[0].val : null
   }
@@ -61,7 +62,7 @@ export function createConditionAssignmentAPI (data: DataStore, navigator: Interv
 
         const questionDatum = data.getSingleQuestionDatumByLocation(loc.questionId, loc.sectionRepetition, loc.sectionFollowUpDatumId)
 
-        return mapDatumByQuestionType(loc.questionTypeId, questionDatum)
+        return mapDatumByQuestionType(data, loc.questionTypeId, questionDatum)
       },
     },
     rawData: {

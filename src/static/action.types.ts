@@ -10,6 +10,7 @@ const ActionTypes = {
   add_edge: 'add-edge',
   remove_edge: 'remove-edge',
   add_roster_row: 'add-roster-row',
+  edit_roster_row: 'edit-roster-row',
   remove_roster_row: 'remove-roster-row',
   change_sort_order: 'change-sort-order',
   set_val: 'set-val',

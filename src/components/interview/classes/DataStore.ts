@@ -21,7 +21,9 @@ import { cloneDeep } from 'lodash'
 import InterviewService from '../../../services/interview'
 import { Mutex, MutexInterface } from 'async-mutex'
 import EdgeService from '../../../services/edge'
+import RosterService from '../../../services/roster'
 import Edge from '../../../entities/trellis/Edge'
+import Roster from '@/entities/trellis/Roster'
 
 export interface FindFunction<T> {
   (o: T, i?: number, a?: T[]): boolean
@@ -42,6 +44,7 @@ export default class DataStore extends Emitter {
   }
 
   public edges: Map<string, Edge> = EdgeService.cache
+  public rosters: Map<string, Roster> = RosterService.cache
   private extraEdgeIds = []
   private baseRespondentConditionTags = []
   private datumIdMap = new Map<string, Datum>()
@@ -69,6 +72,7 @@ export default class DataStore extends Emitter {
    */
   async initialize () {
     await this.preloadEdges()
+    await this.preloadRosters()
     this.previousState = this.getState()
     this.emit('initialState', this.data)
   }
@@ -85,6 +89,20 @@ export default class DataStore extends Emitter {
     ids.push(...this.extraEdgeIds)
     if (ids.length) {
       return EdgeService.getEdges(ids)
+    }
+  }
+
+  async preloadRosters () {
+    const ids: string[] = []
+    for (const qd of this.data) {
+      for (const d of qd.data) {
+        if (d.rosterId) {
+          ids.push(d.rosterId)
+        }
+      }
+    }
+    if (ids.length) {
+      return RosterService.getRosterRows(ids)
     }
   }
 

@@ -6,6 +6,7 @@ export interface SourceTarget {
 }
 
 export default interface EdgeServiceInterface {
+  cache: Map<string, Edge>
   /**
    * Resolves to an array of edges with both source and target respondents included
    * @param {string[]} edgeIds

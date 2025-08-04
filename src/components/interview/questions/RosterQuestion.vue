@@ -5,10 +5,11 @@
         <v-list-item
           :data-id="row.id"
           v-for="(row, rowIndex) in roster"
-          :key="row.id">
+          :key="row.id"
+        >
           <v-list-item-avatar>
             <v-tooltip top>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn
                   v-on="on"
                   v-bind="attrs"
@@ -35,8 +36,11 @@
               @click:append="scanBarcode"
               @keyup.enter="stopEditingAndSave(row, rowIndex)"
               @keyup.esc.stop="stopEditingAndRevert(row, rowIndex)" />
-            <span class="roster-val"
-              v-if="rowIndex !== editingIndex">{{row.val}}</span>
+            <span 
+              v-if="rowIndex !== editingIndex"
+              class="roster-val">
+              {{row.val}}
+            </span>
           </v-list-item-content>
           <v-list-item-action>
             <v-menu
@@ -44,7 +48,7 @@
               :disabled="editingIndex > 0 || isQuestionDisabled"
               left
               :nudge-left="30">
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn icon v-on="on" v-bind="attrs">
                   <v-icon>mdi-dots-vertical</v-icon>
                 </v-btn>
@@ -52,7 +56,7 @@
               <v-list>
                 <v-list-item>
                   <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ on, attrs }">
                       <v-btn
                         v-on="on"
                         v-bind="attrs"
@@ -68,7 +72,7 @@
                 </v-list-item>
                 <v-list-item>
                   <v-tooltip left>
-                    <template v-slot:activator="{ on, attrs }">
+                    <template #activator="{ on, attrs }">
                       <v-btn
                         v-on="on"
                         v-bind="attrs"
@@ -83,25 +87,27 @@
               </v-list>
             </v-menu>
             <v-tooltip top>
-              <template v-slot:activator="{ on, attrs }">
+              <template #activator="{ on, attrs }">
                 <v-btn
                   v-on="on"
                   v-bind="attrs"
                   v-if="editingIndex === rowIndex"
                   icon
                   :disabled="isQuestionDisabled"
-                  @click.stop="stopEditingAndSave(row, rowIndex)">
-                    <v-icon color="green">mdi-check</v-icon>
+                  @click.stop="stopEditingAndSave(row, rowIndex)"
+                >
+                  <v-icon color="green">mdi-check</v-icon>
                 </v-btn>
               </template>
               <span>
                 {{ $t('save') }}
               </span>
             </v-tooltip>
-                <v-progress-circular
+            <v-progress-circular
               v-if="isSavingEdit || row.isLoading"
               indeterminate
-              color="primary" />
+              color="primary"
+            />
           </v-list-item-action>
         </v-list-item>
         <v-list-item v-if="isAddingNew">
@@ -197,6 +203,11 @@
         row.val = this.newText
         RosterService.editRosterRow(row).then(newRow => {
           this.$set(this.rosterCache, newRow.id, newRow)
+          this.action(AT.edit_roster_row, {
+            roster_id: newRow.id,
+            name: this.question.varName,
+            val: newRow.val,
+          })
         }).catch(err => {
           this.error = err
         }).then(() => {
@@ -225,8 +236,8 @@
             this.rosterCache[row.id] = row
             this.$nextTick(() => this.action(AT.add_roster_row, {
               roster_id: row.id,
-              name: '',
-              val: row.id
+              name: this.question.varName,
+              val: row.id,
             }))
           }
         }).catch(err => {

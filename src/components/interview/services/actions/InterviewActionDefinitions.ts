@@ -105,6 +105,7 @@ actionManager.add(AT.add_photo, addDatum)
 actionManager.add(AT.remove_photo, removeDatum((datum, payload) => datum.photoId === payload.photo_id))
 actionManager.add(AT.add_roster_row, addDatum)
 actionManager.add(AT.remove_roster_row, removeDatum((datum, payload) => datum.rosterId === payload.roster_id))
+actionManager.add(AT.edit_roster_row, updateDatum((datum, payload) => datum.rosterId === payload.roster_id))
 actionManager.add(AT.change_sort_order, function (interview, action: Action, questionDatum: QuestionDatum) {
   // TODO: This is not right. We can't have a datum_id in the payload because the datum_ids can change
   const datum = questionDatum.data.find(datum => datum.id === action.payload.datum_id)

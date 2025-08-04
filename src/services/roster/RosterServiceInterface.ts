@@ -2,6 +2,8 @@ import Roster from '../../entities/trellis/Roster'
 
 export default interface RosterServiceInterface {
 
+  cache: Map<string, Roster>
+
   /**
    * Get multiple rosters by their ids
    * @param {string[]} rosterIds
