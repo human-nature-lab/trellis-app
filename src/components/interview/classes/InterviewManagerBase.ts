@@ -25,10 +25,9 @@ import DataStore from './DataStore'
 import RespondentFillStore from './RespondentFillStore'
 
 export default class InterviewManagerBase extends Emitter {
-
   public navigator: InterviewAlligator
-  protected shouldSaveData: boolean = false
-  protected shouldSaveActions: boolean = false
+  protected shouldSaveData = false
+  protected shouldSaveActions = false
 
   // Indexes and data stores
   protected respondentFills: RespondentFillStore = new RespondentFillStore()
@@ -66,7 +65,7 @@ export default class InterviewManagerBase extends Emitter {
     })
 
     for (let s = 0; s < this.blueprint.sections.length; s++) {
-      let section = this.blueprint.sections[s]
+      const section = this.blueprint.sections[s]
       section.isRepeatable = section.formSections[0].isRepeatable
       section.maxRepetitions = section.formSections[0].maxRepetitions
       section.followUpQuestionId = section.formSections[0].followUpQuestionId
@@ -74,12 +73,12 @@ export default class InterviewManagerBase extends Emitter {
         return pageA.sectionQuestionGroup.questionGroupOrder - pageB.sectionQuestionGroup.questionGroupOrder
       })
       for (let p = 0; p < section.questionGroups.length; p++) {
-        let page = section.questionGroups[p]
+        const page = section.questionGroups[p]
         page.skips.sort((skipA, skipB) => skipA.precedence - skipB.precedence)
         page.questions.sort((questionA, questionB) => {
           return questionA.sortOrder - questionB.sortOrder
         })
-        for (let question of page.questions) {
+        for (const question of page.questions) {
           question.varName = question.varName.trim()
           if (this.varNameIndex.has(question.varName)) {
             throw new Error(`The var_name "${question.varName}" occurs more than once in this form. Make sure all variables are unique.`)
@@ -90,7 +89,7 @@ export default class InterviewManagerBase extends Emitter {
             question.choices.sort((cA, cB) => {
               return cA.sortOrder - cB.sortOrder
             })
-            for (let qc of question.choices) {
+            for (const qc of question.choices) {
               this.choiceIndex.set(qc.choiceId, qc.choice)
             }
           }
@@ -102,7 +101,6 @@ export default class InterviewManagerBase extends Emitter {
       }
     }
   }
-
 
   /**
    * Register all condition assignment functions which will be executed when the respondent navigates between pages
@@ -128,9 +126,9 @@ export default class InterviewManagerBase extends Emitter {
                   component: 'InterviewManagerBase.ts',
                   stack: err.stack.toString(),
                   message: err.message,
-                  name: err.name
+                  name: err.name,
                 },
-                logic: act.logic
+                logic: act.logic,
               })
             }
           })
@@ -165,10 +163,10 @@ export default class InterviewManagerBase extends Emitter {
       section: 0,
       sectionRepetition: 0,
       sectionFollowUpRepetition: 0,
-      sectionFollowUpDatumId: null
+      sectionFollowUpDatumId: null,
     }
     if (location) {
-      for (let key of Object.keys(loc)) {
+      for (const key of Object.keys(loc)) {
         if (location[key] != null) {
           loc[key] = location[key]
         }
@@ -184,17 +182,6 @@ export default class InterviewManagerBase extends Emitter {
    */
   protected findQuestionBlueprint (questionId: string): Question {
     return this.questionIndex.get(questionId)
-  }
-
-  /**
-   * Make a single questionDatum from the provided questionBlueprint
-   * @param {Question} question
-   * @returns {QuestionDatum}
-   */
-  protected makeQuestionDatum (question: Question): QuestionDatum {
-    let questionDatum = QuestionDatumRecycler.getNoKey(this, question) // OPTIMIZATION: This could be optimized by using 'get' instead of getNoKey
-    this.data.add(questionDatum)
-    return questionDatum
   }
 
   /**
@@ -214,19 +201,6 @@ export default class InterviewManagerBase extends Emitter {
    */
   protected getPage (section: number, page: number) {
     return this.getSection(section).pages[page]
-  }
-
-  /**
-   * Make all non-existent question datum for the current page
-   */
-  protected makePageQuestionDatum (section: number, page: number): void {
-    let currentPage = this.getPage(section, page)
-    const location = this.navigator.loc
-    for (let questionBlueprint of currentPage.questions) {
-      if (!this.data.locationHasQuestionDatum(questionBlueprint.id, location.sectionRepetition, location.sectionFollowUpDatumId)) {
-        this.makeQuestionDatum(questionBlueprint)
-      }
-    }
   }
 
   /**
@@ -253,7 +227,7 @@ export default class InterviewManagerBase extends Emitter {
   questionsWithData () {
     const questionDefinitions: Question[] = this.navigator.currentQuestions()
     const location: InterviewLocation = this.navigator.loc
-    let questionData: QuestionDatum[] = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), location.sectionRepetition, location.sectionFollowUpDatumId)
+    const questionData: QuestionDatum[] = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), location.sectionRepetition, location.sectionFollowUpDatumId)
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
       question = question.copy() // Dereference the question
@@ -271,7 +245,7 @@ export default class InterviewManagerBase extends Emitter {
   protected _evaluateConditionAssignment (): void {
     // TODO: This should probably be every question in the survey so far
     const questionsWithData: Question[] = this.questionsWithData()
-    let vars = questionsWithData.reduce((vars, question) => {
+    const vars = questionsWithData.reduce((vars, question) => {
       if (!question.datum || !question.datum.data) {
         throw new Error('question datum and data should already exist!')
       }
@@ -289,8 +263,9 @@ export default class InterviewManagerBase extends Emitter {
           vars[question.varName] = true
           break
         case QT.multiple_choice:
-          vars[question.varName] = !!question.datum.data.length && !!question.datum.data[0].choiceId ?
-            this.choiceIndex.get(question.datum.data[0].choiceId).val : undefined
+          vars[question.varName] = !!question.datum.data.length && !!question.datum.data[0].choiceId
+            ? this.choiceIndex.get(question.datum.data[0].choiceId).val
+            : undefined
           break
         default:
           vars[question.varName] = question.datum.data.length ? question.datum.data[0].val : undefined
@@ -300,8 +275,8 @@ export default class InterviewManagerBase extends Emitter {
 
     const api = createConditionAssignmentAPI(this.data, this.navigator)
 
-    for (let question of questionsWithData) {
-      for (let act of question.assignConditionTags) {
+    for (const question of questionsWithData) {
+      for (const act of question.assignConditionTags) {
         try {
           if (this.conditionAssigner.run(act.id, vars, api)) {
             this.assignConditionTag(act)
@@ -319,14 +294,13 @@ export default class InterviewManagerBase extends Emitter {
               component: 'InterviewManagerBase.ts',
               stack: err.stack.toString(),
               message: err.message,
-              name: err.name
-            }
+              name: err.name,
+            },
           })
         }
       }
     }
   }
-
 
   /**
    * Get all currently assigned condition tags
@@ -352,20 +326,6 @@ export default class InterviewManagerBase extends Emitter {
     return conditionTags.length !== conditionTagSet.size
   }
 
-  getSortedQuestionDatumData (questionDatumId: string, useRandom: boolean = false): Datum[] {
-    let data = this.data.getQuestionDatumById(questionDatumId).data
-    if (useRandom) {
-      data.sort(function (a, b) {
-        return a['randomVal'] - b['randomVal']
-      })
-    } else {
-      data.sort(function (a, b) {
-        return a.sortOrder - b.sortOrder
-      })
-    }
-    return data
-  }
-
   /**
    * Get an array of the questions for the current page. This function handles merging existing datum with
    * the question blueprint and dereferences everything
@@ -377,7 +337,7 @@ export default class InterviewManagerBase extends Emitter {
    */
   public getPageQuestions (section: number, sectionRepetition: number, sectionFollowUpDatumId: string, page?: number): Question[] {
     const questionDefinitions = this.navigator.currentQuestions()
-    let questionData = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), sectionRepetition, sectionFollowUpDatumId)
+    const questionData = this.data.getQuestionDataByIds(questionDefinitions.map(q => q.id), sectionRepetition, sectionFollowUpDatumId)
     // Copy and assign existing datum to each question
     return questionDefinitions.map(question => {
       question = question.copy() // Dereference the question
@@ -394,7 +354,7 @@ export default class InterviewManagerBase extends Emitter {
    * @returns {QuestionDatum}
    */
   private getFollowUpQuestionDatum (sectionFollowUpQuestionId: string): QuestionDatum {
-    let qDatum = this.data.getQuestionDataByQuestionId(sectionFollowUpQuestionId)
+    const qDatum = this.data.getQuestionDataByQuestionId(sectionFollowUpQuestionId)
     if (qDatum && qDatum.length > 1) {
       throw Error('We need to handle follow up questions. Too many question datum for this followUpQuestionId')
     }
@@ -411,14 +371,14 @@ export default class InterviewManagerBase extends Emitter {
    * @returns {T | undefined}
    * @private
    */
-  public getFollowUpQuestionDatumData (sectionFollowUpQuestionId: string, currentRepetition: number = 0, currentFollowUpSection: number = 0): Datum[] {
-    let qDatum = this.getFollowUpQuestionDatum(sectionFollowUpQuestionId)
+  public getFollowUpQuestionDatumData (sectionFollowUpQuestionId: string, currentRepetition = 0, currentFollowUpSection = 0): Datum[] {
+    const qDatum = this.getFollowUpQuestionDatum(sectionFollowUpQuestionId)
     // TODO: This should change if we're using randomization for follow up sections
     if (!qDatum || !qDatum.data) return []
 
     // Guard against repeated sections for now
     if (this.questionIdToSectionIndex.get(sectionFollowUpQuestionId).maxRepetitions || this.questionIdToSectionIndex.get(sectionFollowUpQuestionId).followUpQuestionId) {
-      throw Error(`Can't handle follow up questions from repeated sections currently`)
+      throw Error('Can\'t handle follow up questions from repeated sections currently')
     }
     qDatum.data.sort(function (a, b) {
       return a.sortOrder - b.sortOrder

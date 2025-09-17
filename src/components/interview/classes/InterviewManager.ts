@@ -141,7 +141,7 @@ export default class InterviewManager extends InterviewManagerBase {
   _resetState () {
     this.data.reset()
     const location = this.navigator.loc
-    this.makePageQuestionDatum(location.section, location.page)
+    this.navigator.makePageQuestionDatum(location.section, location.page)
   }
 
   /**
@@ -222,7 +222,7 @@ export default class InterviewManager extends InterviewManagerBase {
    * @private
    */
   private onPageEnter () {
-    this.makePageQuestionDatum(this.navigator.loc.section, this.navigator.loc.page)
+    this.navigator.makePageQuestionDatum(this.navigator.loc.section, this.navigator.loc.page)
   }
 
   private get isAtHighWaterMark (): boolean {

@@ -9,6 +9,8 @@ import Question from '../../../entities/trellis/Question'
 import SkipService from '../../../services/SkipService'
 import Action from '../../../entities/trellis/Action'
 import { locToNumber } from './LocationHelpers'
+import QuestionDatumRecycler from './recyclers/QuestionDatumRecycler'
+import Interview from '../../../entities/trellis/Interview'
 
 export interface InterviewLocation {
   section: number
@@ -45,6 +47,7 @@ export default class InterviewAlligator {
   private pages: InterviewLocation[]
   private form: Form
   private data: DataStore
+  private interview: Interview
   private sectionIndex: Map<string, Section> = new Map()
   private pageIndex: Map<string, QuestionGroup> = new Map()
   private sectionToNumIndex: Map<string, number> = new Map()
@@ -58,6 +61,7 @@ export default class InterviewAlligator {
   constructor (private manager: InterviewManager) {
     this.form = manager.blueprint
     this.data = manager.data
+    this.interview = manager.interview
     this.pages = []
     this.skipped = []
     this.createIndexes()
@@ -203,19 +207,11 @@ export default class InterviewAlligator {
           const datum = data[d]
           const isSameRepetitionAsInitial = isInitialSection && d === initLocation.sectionFollowUpRepetition
           const initPage = isSameRepetitionAsInitial ? initLocation.page : 0
-          for (let p = initPage; p < section.questionGroups.length; p++) {
-            const page = section.questionGroups[p]
-            this.addLocation(page.id, section.id, datum.id, d, 0)
-            actuallyUpdated++
-          }
+          actuallyUpdated += this.addLocationPages(initPage, section, datum.id, d, 0)
         }
       } else {
         const initPage = isInitialSection ? initLocation.page : 0
-        for (let p = initPage; p < section.questionGroups.length; p++) {
-          const page = section.questionGroups[p]
-          this.addLocation(page.id, section.id, null, 0, 0)
-          actuallyUpdated++
-        }
+        actuallyUpdated += this.addLocationPages(initPage, section, null, 0, 0)
       }
     }
 
@@ -226,6 +222,28 @@ export default class InterviewAlligator {
       this.updatePages()
     }
     this.hasDataChanges = false
+  }
+
+  private addLocationPages (initPage: number, section: Section, sectionFollowUpDatumId?: string, sectionFollowUpRepetition?: number, sectionRepetition?: number) {
+    // TODO: This is where we would could handle page randomization within a section.
+    // We can explore needing using question_datum uuids as the sort key
+    const pages = section.questionGroups.slice()
+    let updated = 0
+    if (section.formSections[0].randomizePages) {
+      // TODO: Randomize pages
+      pages.sort((a, b) => {
+        const da = this.data.getSingleQuestionDatumByLocation(a.questions[0].id, sectionRepetition, sectionFollowUpDatumId)
+        const db = this.data.getSingleQuestionDatumByLocation(b.questions[0].id, sectionRepetition, sectionFollowUpDatumId)
+        return da.id.localeCompare(db.id)
+      })
+    } else {
+      for (let p = initPage; p < section.questionGroups.length; p++) {
+        const page = section.questionGroups[p]
+        this.addLocation(page.id, section.id, sectionFollowUpDatumId, sectionFollowUpRepetition, sectionRepetition)
+        updated++
+      }
+    }
+    return updated
   }
 
   private goToFirstValidLocation () {
@@ -264,6 +282,27 @@ export default class InterviewAlligator {
 
   public locationIsAheadOfCurrent (location: InterviewLocation): boolean {
     return locToNumber(location) > locToNumber(this.loc)
+  }
+
+  public makePageQuestionDatum (section: number, page: number): void {
+    const currentPage = this.form.sections[section].questionGroups[page]
+    const location = this.loc
+    for (const questionBlueprint of currentPage.questions) {
+      const hasExistingDatum = this.data.locationHasQuestionDatum(
+        questionBlueprint.id,
+        location.sectionRepetition,
+        location.sectionFollowUpDatumId)
+      if (!hasExistingDatum) {
+        this.makeQuestionDatum(questionBlueprint)
+      }
+    }
+  }
+
+  public makeQuestionDatum (question: Question): QuestionDatum {
+    // PERF: This could be optimized by using 'get' instead of getNoKey
+    const questionDatum = QuestionDatumRecycler.getNoKey(this.interview, this.loc, question)
+    this.data.add(questionDatum)
+    return questionDatum
   }
 
   public getActionQuestionDatum (action: Action): QuestionDatum|null {

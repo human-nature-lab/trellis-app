@@ -1,9 +1,10 @@
-import Recycler, {Recyclable} from '../../../../classes/Recycler'
+import Recycler, { Recyclable } from '../../../../classes/Recycler'
 import uuidv4 from 'uuid/v4'
 import { now } from '../../../../services/DateService'
 import QuestionDatum from '../../../../entities/trellis/QuestionDatum'
 import Question from '../../../../entities/trellis/Question'
-import InterviewManagerOld from '../../classes/InterviewManager'
+import Interview from '../../../../entities/trellis/Interview'
+import { InterviewLocation } from '../InterviewAlligator'
 
 class QuestionDatumRecycler extends Recycler<QuestionDatum> implements Recyclable<QuestionDatum> {
   /**
@@ -15,7 +16,7 @@ class QuestionDatumRecycler extends Recycler<QuestionDatum> implements Recyclabl
       qd.surveyId,
       qd.sectionRepetition,
       qd.followUpDatumId,
-      qd.questionId
+      qd.questionId,
     ]
   }
 
@@ -25,18 +26,19 @@ class QuestionDatumRecycler extends Recycler<QuestionDatum> implements Recyclabl
    * @param {Question} questionBlueprint
    * @returns {QuestionDatum}
    */
-  objectCreator (interview: InterviewManagerOld, questionBlueprint: Question): QuestionDatum {
+  objectCreator (interview: Interview, location: InterviewLocation, questionBlueprint: Question): QuestionDatum {
     return new QuestionDatum().fromRecycler({
       id: uuidv4(),
       questionId: questionBlueprint.id,
-      surveyId: interview.interview.surveyId,
-      followUpDatumId: interview.location.sectionFollowUpDatumId,
-      sectionRepetition: interview.location.sectionRepetition,
+      surveyId: interview.surveyId,
+      followUpDatumId: location.sectionFollowUpDatumId,
+      sectionRepetition: location.sectionRepetition,
       answeredAt: now(),
       skippedAt: null,
-      interviewId: interview.interview.id,
+      interviewId: interview.id,
       dkRf: null,
-      dkRfVal: null
+      dkRfVal: null,
+      noOne: null,
     })
   }
 }

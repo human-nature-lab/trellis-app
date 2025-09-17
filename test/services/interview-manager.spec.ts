@@ -118,7 +118,7 @@ function makeAction (questionId: string, actionType: string, payload: ActionPayl
   action.actionType = actionType
   action.payload = payload
   action.questionId = questionId
-  actions.createdAt = addSeconds(new Date(), n)
+  action.createdAt = addSeconds(new Date(), n)
   n++
   return action
 }

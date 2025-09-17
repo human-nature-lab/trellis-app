@@ -46,7 +46,7 @@
           <v-toolbar-title>Results</v-toolbar-title>
         </v-toolbar>
         <v-card>
-          <v-row class="result" v-for="test in tests" :key="test.title">
+          <v-row class="result " v-for="test in tests" :key="test.title">
             <v-col cols="1" class="px-6 py-8">
               <v-icon v-if="test.state === SUCCESSFUL" color="success">mdi-check-circle</v-icon>
               <v-icon v-else-if="test.state === FAILED" color="error">mdi-alert-circle</v-icon>
