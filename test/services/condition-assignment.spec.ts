@@ -1,15 +1,14 @@
 import './globals'
-import {expect} from 'chai'
+import { expect } from 'chai'
 import Form from '../../src/entities/trellis/Form'
 
 import ConditionAssignmentService from '../../src/services/SaferEvalService'
 import { FormBuilder } from '../FormBuilder'
-import { SectionTemplate } from '../FormBuilderTypes'
 import { InterviewController } from '../InterviewController'
 
 function time (func, n = 5000) {
   let i = n
-  let start = performance.now()
+  const start = performance.now()
   while (i--) {
     func()
   }
@@ -35,7 +34,7 @@ export default function () {
     })
     it('should handle unregistering', () => {
       const cass = new ConditionAssignmentService()
-      cass.register('question1', `'empty inside'`)
+      cass.register('question1', '\'empty inside\'')
       expect(cass.conditionAssignmentMethods.get('question1')).to.not.be.undefined
       cass.unregister('question1')
       expect(cass.conditionAssignmentMethods.get('question1')).to.be.undefined
@@ -47,7 +46,7 @@ export default function () {
     it('should be faster than calling eval inline', function (this: any) {
       this.timeout(20 * 1000)
       const cass = new ConditionAssignmentService()
-      let func = `function (val) { 
+      const func = `function (val) { 
       var a = val + 2;
       function res (v) {
         for (let i = 0; i < v + 1; i++) {
@@ -64,8 +63,8 @@ export default function () {
       function testEval () {
         eval(`(${func})(1000)`)
       }
-      let cassTime = time(testCass)
-      let evalTime = time(testEval)
+      const cassTime = time(testCass)
+      const evalTime = time(testEval)
       // console.log(cassTime, evalTime)
       expect(cassTime).to.be.lessThan(evalTime, 'Wow... This managed to be slower somehow O.o')
     })
@@ -107,5 +106,4 @@ export default function () {
       it('should get data for current section in follow up sections')
     })
   })
-
 }

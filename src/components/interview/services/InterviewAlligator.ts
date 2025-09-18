@@ -11,6 +11,9 @@ import Action from '../../../entities/trellis/Action'
 import { locToNumber } from './LocationHelpers'
 import QuestionDatumRecycler from './recyclers/QuestionDatumRecycler'
 import Interview from '../../../entities/trellis/Interview'
+import { JSF32bSource, Random } from '@/lib/random/random'
+
+const MAX_RECURSION_DEPTH = 100
 
 export interface InterviewLocation {
   section: number
@@ -90,12 +93,20 @@ export default class InterviewAlligator {
   }
 
   private createIndexes (): void {
+    const seed = this.interview.surveyId
+    const rand = new Random(new JSF32bSource(seed))
     for (let s = 0; s < this.form.sections.length; s++) {
       const section = this.form.sections[s]
       this.sectionIndex.set(section.id, section)
       this.sectionToNumIndex.set(section.id, s)
-      for (let p = 0; p < section.questionGroups.length; p++) {
-        const page = section.questionGroups[p]
+      const pages = this.form.sections[s].questionGroups
+      if (section.formSections[0].randomizePages) {
+        rand.shuffle(pages)
+        console.debug('randomizing pages', seed, pages.map(p => p.id))
+        // this.form.sections[s].questionGroups = pages
+      }
+      for (let p = 0; p < pages.length; p++) {
+        const page = pages[p]
         this.skipService.register(page.skips)
         this.pageIndex.set(page.id, page)
         this.pageToNumIndex.set(page.id, p)
@@ -177,7 +188,7 @@ export default class InterviewAlligator {
     return qd.data
   }
 
-  private updatePages () {
+  private updatePages (depth = 0) {
     this.skipCache.clear()
     this.updatePagesCalled++
     const initLocation: InterviewLocation = this.loc
@@ -216,32 +227,23 @@ export default class InterviewAlligator {
     }
 
     // Keep calling updatePages until it reaches a stable state
+    if (depth > MAX_RECURSION_DEPTH) {
+      throw new Error(`updatePages recursion limit reached. not able to stabilize within ${MAX_RECURSION_DEPTH} calls`)
+    }
     const hash = this.getCurrentHash()
     if (hash !== this.lastPageHash) {
       this.lastPageHash = hash
-      this.updatePages()
+      this.updatePages(depth + 1)
     }
     this.hasDataChanges = false
   }
 
   private addLocationPages (initPage: number, section: Section, sectionFollowUpDatumId?: string, sectionFollowUpRepetition?: number, sectionRepetition?: number) {
-    // TODO: This is where we would could handle page randomization within a section.
-    // We can explore needing using question_datum uuids as the sort key
-    const pages = section.questionGroups.slice()
     let updated = 0
-    if (section.formSections[0].randomizePages) {
-      // TODO: Randomize pages
-      pages.sort((a, b) => {
-        const da = this.data.getSingleQuestionDatumByLocation(a.questions[0].id, sectionRepetition, sectionFollowUpDatumId)
-        const db = this.data.getSingleQuestionDatumByLocation(b.questions[0].id, sectionRepetition, sectionFollowUpDatumId)
-        return da.id.localeCompare(db.id)
-      })
-    } else {
-      for (let p = initPage; p < section.questionGroups.length; p++) {
-        const page = section.questionGroups[p]
-        this.addLocation(page.id, section.id, sectionFollowUpDatumId, sectionFollowUpRepetition, sectionRepetition)
-        updated++
-      }
+    for (let p = initPage; p < section.questionGroups.length; p++) {
+      const page = section.questionGroups[p]
+      this.addLocation(page.id, section.id, sectionFollowUpDatumId, sectionFollowUpRepetition, sectionRepetition)
+      updated++
     }
     return updated
   }

@@ -29,13 +29,12 @@ import {
   QuestionTemplate,
   SectionTemplate,
   ShowHide,
-  SkipTemplate
+  SkipTemplate,
 } from './FormBuilderTypes'
 
 const english = new Locale().fromSnakeJSON({ id: '48984fbe-84d4-11e5-ba05-0800279114ca', language_tag: 'en' })
 
 export class FormBuilder {
-
   readonly form: Form
 
   constructor (form?: Form) {
@@ -147,6 +146,7 @@ export class FormBuilder {
       section.questionGroups = []
     }
     const p = new QuestionGroup()
+    p.id = page.id || uuidv4()
     p.skips = []
     p.sectionQuestionGroup = new SectionQuestionGroup()
     p.sectionQuestionGroup.questionGroupOrder = page.sortOrder || section.questionGroups.length
@@ -170,8 +170,8 @@ export class FormBuilder {
       id: uuidv4(),
       translation_text: [{
         translated_text: text,
-        locale_id: localeId
-      }]
+        locale_id: localeId,
+      }],
     })
     this.timestamp(t)
     this.timestamp(t.translationText[0])
@@ -183,6 +183,7 @@ export class FormBuilder {
       this.form.sections = []
     }
     const s = new Section().fromSnakeJSON(section)
+    s.id = section.id || uuidv4()
     s.formSections = []
     this.timestamp(s)
     s.nameTranslation = this.makeTranslation(section.label || '', null)
@@ -191,13 +192,15 @@ export class FormBuilder {
     s.formSections[0].sortOrder = section.sortOrder || this.form.sections.length
     s.formSections[0].randomizeFollowUp = !!section.randomizeFollowUp
     s.formSections[0].followUpQuestionId = section.followUpQuestionId
-    s.formSections[0].isRepeatable = section.isRepeatable
+    s.formSections[0].isRepeatable = !!section.isRepeatable
     s.formSections[0].maxRepetitions = section.maxRepetitions || 0
+    s.formSections[0].randomizePages = !!section.randomizePages
     this.timestamp(s.formSections[0])
     for (const p of section.pages) {
       this.addPage(s, p)
     }
     this.form.sections.push(s)
+    return this
   }
 
   static formToTemplate (form: Form): FormTemplate {
@@ -212,7 +215,7 @@ export class FormBuilder {
         isRepeatable: !!section.formSections[0].isRepeatable,
         maxRepetitions: +section.formSections[0].maxRepetitions,
         followUpQuestionId: section.formSections[0].followUpQuestionId,
-        randomizeFollowUp: !!section.formSections[0].randomizeFollowUp
+        randomizeFollowUp: !!section.formSections[0].randomizeFollowUp,
       }
       if (s.followUpQuestionId) {
         const q = questionIdMap.get(s.followUpQuestionId)
@@ -222,7 +225,7 @@ export class FormBuilder {
         const p = {
           sortOrder: page.sectionQuestionGroup.questionGroupOrder,
           questions: [],
-          skips: []
+          skips: [],
         }
         for (const question of page.questions) {
           const q = {
@@ -232,7 +235,7 @@ export class FormBuilder {
             sortOrder: question.sortOrder,
             choices: [],
             parameters: [],
-            assignConditionTags: []
+            assignConditionTags: [],
           }
           questionIdMap.set(question.id, q)
           p.questions.push(q)
@@ -240,20 +243,20 @@ export class FormBuilder {
             q.choices.push({
               label: TranslationService.getAny(choice.choice.choiceTranslation, english),
               sortOrder: choice.sortOrder,
-              val: choice.choice.val
+              val: choice.choice.val,
             })
           }
           for (const parameter of question.questionParameters) {
             q.parameters.push({
               type: parameter.parameter.name,
-              val: parameter.val
+              val: parameter.val,
             })
           }
           for (const act of question.assignConditionTags) {
             q.assignConditionTags.push({
               conditionTag: act.conditionTag.name,
               scope: act.scope,
-              logic: act.scope
+              logic: act.scope,
             })
           }
           q.choices.sort((a, b) => a.sortOrder - b.sortOrder)
@@ -264,8 +267,8 @@ export class FormBuilder {
             anyAll: skip.anyAll ? AnyAll.ANY : AnyAll.ALL,
             sortOrder: skip.precedence,
             conditions: skip.conditionTags.map(ct => ({
-              conditionTag: ct.conditionTagName
-            }))
+              conditionTag: ct.conditionTagName,
+            })),
           })
         }
         p.questions.sort((a, b) => a.sortOrder - b.sortOrder)
@@ -289,7 +292,7 @@ export class FormBuilder {
         return obj
       }
     } else {
-      let props = Object
+      const props = Object
         .keys(obj)
         .map(key => `${' '.repeat(indents * depth)}${key}: ${FormBuilder.stringify(obj[key], indents, depth + 1)}`)
         .join(',\n')

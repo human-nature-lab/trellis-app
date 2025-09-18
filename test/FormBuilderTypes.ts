@@ -57,17 +57,20 @@ export interface QuestionTemplate extends Sortable {
 }
 
 export interface PageTemplate extends Sortable {
-  questions: QuestionTemplate[],
-  skips: SkipTemplate[]
+  id?: string
+  questions?: QuestionTemplate[],
+  skips?: SkipTemplate[]
 }
 
 export interface SectionTemplate extends Sortable {
+  id?: string
   label?: string
   pages: PageTemplate[]
-  isRepeatable: boolean
+  isRepeatable?: boolean
   maxRepetitions?: number,
   followUpQuestionId?: string,
   randomizeFollowUp?: boolean
+  randomizePages?: boolean
 }
 
 export interface FormTemplate {

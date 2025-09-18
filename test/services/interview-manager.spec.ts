@@ -1,5 +1,7 @@
 import InterviewManager from '../../src/components/interview/classes/InterviewManager'
 import Interview from '../../src/entities/trellis/Interview'
+import { InterviewController } from '../InterviewController'
+import { randomizedPages } from '../test-forms'
 import {
   forms,
   studyId,
@@ -18,8 +20,6 @@ import {
 } from '../testing-ids'
 import SurveyService from '../../src/services/survey/index'
 import InterviewService from '../../src/services/interview'
-import FormService from '../../src/services/form'
-import RespondentService from '../../src/services/respondent'
 import AT from '../../src/static/action.types'
 import QT from '../../src/static/question.types'
 import { createForm, createChoiceQuestion } from './util'
@@ -30,7 +30,6 @@ import { deepCompareEntities, isSorted, j, strip, timestamps } from './helpers'
 import Action from '../../src/entities/trellis/Action'
 import { ActionPayload } from '../../src/components/interview/services/actions/DatumOperations'
 import Question from '../../src/entities/trellis/Question'
-import { InterviewLocation } from '../../src/components/interview/services/InterviewAlligator'
 import QuestionDatum from '../../src/entities/trellis/QuestionDatum'
 import { ConditionTagInterface } from '../../src/services/interview/InterviewDataInterface'
 import { locToNumber } from '../../src/components/interview/services/LocationHelpers'
@@ -40,6 +39,7 @@ import Form from '../../src/entities/trellis/Form'
 import Skip from '../../src/entities/trellis/Skip'
 import Measurement from '../../src/classes/Measurement'
 import EdgeService from '../../src/services/edge'
+import { v4 as uuidv4 } from 'uuid'
 
 interface SimpleLocation {
   section?: number
@@ -376,6 +376,22 @@ export default function () {
         await next(manager, { page: 2, section: 1, sectionFollowUpDatumId })
         sectionFollowUpDatumId = orderedSectionDatumIds.shift()
         await next(manager, { page: 0, section: 1, sectionFollowUpDatumId })
+      })
+
+      it('should handle randomization of pages', async () => {
+        // This is a statistical test to validate that running it 100 times gives us a decent  distribution of the order
+        // of the pages
+        let firstCount = 0
+        const firstPageId = randomizedPages.sections[0].questionGroups[0].id
+        for (let i = 0; i < 100; i++) {
+          const controller = new InterviewController(randomizedPages)
+          controller.interview.surveyId = uuidv4()
+          await controller.load()
+          if (controller.manager.location.pageId === firstPageId) {
+            firstCount++
+          }
+        }
+        expect(firstCount).to.be.greaterThan(30).and.lessThan(70)
       })
 
       it('should not be able to navigate backwards until forward navigation is complete', async () => {
