@@ -174,7 +174,7 @@ import Form from '@/entities/trellis/Form'
 import TranslationService from '@/services/TranslationService'
 import Respondent from '@/entities/trellis/Respondent'
 import { onBeforeUnload } from '@/helpers/window.helper'
-import { provideDataStore, provideManager } from '@/helpers/interview.helper'
+import { v4 as uuidv4 } from 'uuid'
 
 function load (to) {
   return new Promise(async (resolve, reject) => {
@@ -292,6 +292,9 @@ export default {
     async initializeInterview (d) {
       const { actions, form, baseRespondentConditionTags, conditionTags, data, interview, respondentFills, respondent } = d
       clearSharedInterview()
+      if (this.type !== 'interview') {
+        interview.surveyId = interview.surveyId || uuidv4()
+      }
       this.dialog.end = false
       this.dialog.beginning = false
       this.dialog.conditionTag = false

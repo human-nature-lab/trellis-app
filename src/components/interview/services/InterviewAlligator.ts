@@ -100,6 +100,7 @@ export default class InterviewAlligator {
       this.sectionIndex.set(section.id, section)
       this.sectionToNumIndex.set(section.id, s)
       const pages = this.form.sections[s].questionGroups
+      console.log('randomize pages', section.id, section.formSections[0].randomizePages)
       if (section.formSections[0].randomizePages) {
         rand.shuffle(pages)
         console.debug('randomizing pages', seed, pages.map(p => p.id))

@@ -99,19 +99,3 @@ export class Random {
     return subset
   }
 }
-
-if (DEV) {
-  const vals = []
-  let rand = new Random(new JSF32bSource(1))
-  for (let i = 0; i < 10; i++) {
-    vals.push(rand.random())
-  }
-  console.log('random vals', vals)
-  rand = new Random(new JSF32bSource(1))
-  for (let i = 0; i < 10; i++) {
-    if (vals[i] !== rand.random()) {
-      throw new Error('random vals are not the same')
-    }
-  }
-  console.log('random vals are deterministic')
-}

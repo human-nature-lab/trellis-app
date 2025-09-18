@@ -11,6 +11,7 @@
       @remove="$emit('remove', $event)"
       @update:followUp="updateFollowUp"
       @update:randomizeFollowUp="randomizeFollowUp"
+      @update:randomizePages="randomizePages"
     />
     <v-progress-linear
       v-if="working"
@@ -76,6 +77,11 @@ export default Vue.extend({
     randomizeFollowUp (randomize: boolean) {
       const s = this.value.formSections[0]
       s.randomizeFollowUp = randomize
+      this.updateFormSection(s)
+    },
+    randomizePages (randomize: boolean) {
+      const s = this.value.formSections[0]
+      s.randomizePages = randomize
       this.updateFormSection(s)
     },
     async updateFormSection (val: FormSection) {
