@@ -1,5 +1,3 @@
-// Here we'll implement a seedable PRNG
-
 export interface Source {
   next32(): number // returns a 32-bit integer
 }
@@ -12,6 +10,7 @@ function stringTo32BitInteger (str: string): number {
   return hash
 }
 
+// Adapted from an implementation mentioned here: https://github.com/bryc/code/blob/master/jshash/PRNGs.md
 export class JSF32bSource implements Source {
   private a: number
   private b: number
