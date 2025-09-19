@@ -1,5 +1,8 @@
 <template>
-  <v-col class="pa-0 background" :class="{ sticky: visible }">
+  <v-col
+    class="pa-0 background"
+    :class="{ sticky: visible }"
+  >
     <v-row
       no-gutters
       class="align-center"
@@ -30,6 +33,16 @@
       </BuilderChip>
       <BuilderChip :visible="!!section.linkedFormSections.length">
         {{ $tc('linked_to_forms_n', section.linkedFormSections.length) }}
+      </BuilderChip>
+      <BuilderChip
+        :visible="!!section.formSections[0].randomizePages"
+        :locked="builder.locked"
+        @click="$emit('update:randomizePages', !section.formSections[0].randomizePages)"
+      >
+        <v-icon left>
+          mdi-shuffle
+        </v-icon>
+        {{ $t('randomized_order') }}
       </BuilderChip>
       <MenuSelect
         :disabled="builder.locked"
@@ -74,6 +87,15 @@
             <v-icon>mdi-plus</v-icon>
           </v-list-item-icon>
           <v-list-item-content>{{ $t('add_page', builder.locale.languageTag) }}</v-list-item-content>
+        </v-list-item>
+        <v-list-item
+          :disabled="builder.locked"
+          @click="$emit('update:randomizePages', !section.formSections[0].randomizePages)"
+        >
+          <v-list-item-icon>
+            <v-icon>mdi-shuffle</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>{{ $t(section.formSections[0].randomizePages ? 'disable_page_rand' : 'enable_page_rand') }}</v-list-item-content>
         </v-list-item>
       </DotsMenu>
     </v-row>

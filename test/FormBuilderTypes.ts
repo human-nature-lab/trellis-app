@@ -51,23 +51,27 @@ export interface QuestionTemplate extends Sortable {
   label: string
   questionType: string,
   varName: string,
-  choices: (ChoiceTemplate | string)[],
-  parameters: ParameterTemplate[]
-  assignConditionTags: AssignConditionTagTemplate[]
+  choices?: (ChoiceTemplate | string)[],
+  parameters?: ParameterTemplate[]
+  assignConditionTags?: AssignConditionTagTemplate[]
 }
 
 export interface PageTemplate extends Sortable {
-  questions: QuestionTemplate[],
-  skips: SkipTemplate[]
+  id?: string
+  questions?: QuestionTemplate[],
+  skips?: SkipTemplate[]
+  randomizeQuestions?: boolean
 }
 
 export interface SectionTemplate extends Sortable {
+  id?: string
   label?: string
   pages: PageTemplate[]
-  isRepeatable: boolean
+  isRepeatable?: boolean
   maxRepetitions?: number,
   followUpQuestionId?: string,
   randomizeFollowUp?: boolean
+  randomizePages?: boolean
 }
 
 export interface FormTemplate {

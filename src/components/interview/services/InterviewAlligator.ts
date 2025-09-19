@@ -9,6 +9,11 @@ import Question from '../../../entities/trellis/Question'
 import SkipService from '../../../services/SkipService'
 import Action from '../../../entities/trellis/Action'
 import { locToNumber } from './LocationHelpers'
+import QuestionDatumRecycler from './recyclers/QuestionDatumRecycler'
+import Interview from '../../../entities/trellis/Interview'
+import { JSF32bSource, Random } from '@/lib/random/random'
+
+const MAX_RECURSION_DEPTH = 100
 
 export interface InterviewLocation {
   section: number
@@ -45,6 +50,7 @@ export default class InterviewAlligator {
   private pages: InterviewLocation[]
   private form: Form
   private data: DataStore
+  private interview: Interview
   private sectionIndex: Map<string, Section> = new Map()
   private pageIndex: Map<string, QuestionGroup> = new Map()
   private sectionToNumIndex: Map<string, number> = new Map()
@@ -58,6 +64,7 @@ export default class InterviewAlligator {
   constructor (private manager: InterviewManager) {
     this.form = manager.blueprint
     this.data = manager.data
+    this.interview = manager.interview
     this.pages = []
     this.skipped = []
     this.createIndexes()
@@ -86,15 +93,26 @@ export default class InterviewAlligator {
   }
 
   private createIndexes (): void {
+    const seed = this.interview.surveyId
+    const rand = new Random(new JSF32bSource(seed))
     for (let s = 0; s < this.form.sections.length; s++) {
       const section = this.form.sections[s]
       this.sectionIndex.set(section.id, section)
       this.sectionToNumIndex.set(section.id, s)
-      for (let p = 0; p < section.questionGroups.length; p++) {
-        const page = section.questionGroups[p]
+      const pages = section.questionGroups
+      if (section.formSections[0].randomizePages) {
+        rand.shuffle(pages)
+        console.debug('randomized pages', seed, pages.map(p => p.id))
+      }
+      for (let p = 0; p < pages.length; p++) {
+        const page = pages[p]
         this.skipService.register(page.skips)
         this.pageIndex.set(page.id, page)
         this.pageToNumIndex.set(page.id, p)
+        if (page.sectionQuestionGroup.randomizeQuestions) {
+          rand.shuffle(page.questions)
+          console.debug('randomized questions', seed, page.questions.map(q => q.id))
+        }
         for (const question of page.questions) {
           this.varNameToQuestionIndex.set(question.varName, question)
         }
@@ -173,7 +191,7 @@ export default class InterviewAlligator {
     return qd.data
   }
 
-  private updatePages () {
+  private updatePages (depth = 0) {
     this.skipCache.clear()
     this.updatePagesCalled++
     const initLocation: InterviewLocation = this.loc
@@ -203,29 +221,34 @@ export default class InterviewAlligator {
           const datum = data[d]
           const isSameRepetitionAsInitial = isInitialSection && d === initLocation.sectionFollowUpRepetition
           const initPage = isSameRepetitionAsInitial ? initLocation.page : 0
-          for (let p = initPage; p < section.questionGroups.length; p++) {
-            const page = section.questionGroups[p]
-            this.addLocation(page.id, section.id, datum.id, d, 0)
-            actuallyUpdated++
-          }
+          actuallyUpdated += this.addLocationPages(initPage, section, datum.id, d, 0)
         }
       } else {
         const initPage = isInitialSection ? initLocation.page : 0
-        for (let p = initPage; p < section.questionGroups.length; p++) {
-          const page = section.questionGroups[p]
-          this.addLocation(page.id, section.id, null, 0, 0)
-          actuallyUpdated++
-        }
+        actuallyUpdated += this.addLocationPages(initPage, section, null, 0, 0)
       }
     }
 
     // Keep calling updatePages until it reaches a stable state
+    if (depth > MAX_RECURSION_DEPTH) {
+      throw new Error(`updatePages recursion limit reached. not able to stabilize within ${MAX_RECURSION_DEPTH} calls`)
+    }
     const hash = this.getCurrentHash()
     if (hash !== this.lastPageHash) {
       this.lastPageHash = hash
-      this.updatePages()
+      this.updatePages(depth + 1)
     }
     this.hasDataChanges = false
+  }
+
+  private addLocationPages (initPage: number, section: Section, sectionFollowUpDatumId?: string, sectionFollowUpRepetition?: number, sectionRepetition?: number) {
+    let updated = 0
+    for (let p = initPage; p < section.questionGroups.length; p++) {
+      const page = section.questionGroups[p]
+      this.addLocation(page.id, section.id, sectionFollowUpDatumId, sectionFollowUpRepetition, sectionRepetition)
+      updated++
+    }
+    return updated
   }
 
   private goToFirstValidLocation () {
@@ -264,6 +287,27 @@ export default class InterviewAlligator {
 
   public locationIsAheadOfCurrent (location: InterviewLocation): boolean {
     return locToNumber(location) > locToNumber(this.loc)
+  }
+
+  public makePageQuestionDatum (section: number, page: number): void {
+    const currentPage = this.form.sections[section].questionGroups[page]
+    const location = this.loc
+    for (const questionBlueprint of currentPage.questions) {
+      const hasExistingDatum = this.data.locationHasQuestionDatum(
+        questionBlueprint.id,
+        location.sectionRepetition,
+        location.sectionFollowUpDatumId)
+      if (!hasExistingDatum) {
+        this.makeQuestionDatum(questionBlueprint)
+      }
+    }
+  }
+
+  public makeQuestionDatum (question: Question): QuestionDatum {
+    // PERF: This could be optimized by using 'get' instead of getNoKey
+    const questionDatum = QuestionDatumRecycler.getNoKey(this.interview, this.loc, question)
+    this.data.add(questionDatum)
+    return questionDatum
   }
 
   public getActionQuestionDatum (action: Action): QuestionDatum|null {

@@ -32,6 +32,9 @@ export default class FormSection extends SparseTimestampedSoftDelete {
   @Column('boolean') @Serializable
   randomizeFollowUp: boolean
 
+  @Column('boolean') @Serializable
+  randomizePages: boolean
+
   @ManyToOne(type => Section, section => section.formSections)
   section: Section
 

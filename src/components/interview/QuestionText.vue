@@ -166,7 +166,6 @@ export default Vue.extend({
     }
   },
   created () {
-    console.log('QuestionText.created')
     this.convertTemplate()
     this.updateFills()
   },
@@ -222,7 +221,6 @@ export default Vue.extend({
   },
   computed: {
     component (): Component {
-      console.log('QuestionText.component')
       let tmp = this.translated ? this.translated.trim() : 'Loading...'
 
       // Convert old string iterpolation into Vue templates

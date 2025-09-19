@@ -17,6 +17,9 @@ export default class SectionQuestionGroup extends SparseTimestampedSoftDelete {
   @Column({ type: 'integer' }) @Serializable
   questionGroupOrder: number
 
+  @Column('boolean') @Serializable
+  randomizeQuestions: boolean
+
   @OneToOne(type => QuestionGroup, qg => qg.sectionQuestionGroup)
   @JoinColumn()
   questionGroup: QuestionGroup
