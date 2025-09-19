@@ -99,18 +99,20 @@ export default class InterviewAlligator {
       const section = this.form.sections[s]
       this.sectionIndex.set(section.id, section)
       this.sectionToNumIndex.set(section.id, s)
-      const pages = this.form.sections[s].questionGroups
-      console.log('randomize pages', section.id, section.formSections[0].randomizePages)
+      const pages = section.questionGroups
       if (section.formSections[0].randomizePages) {
         rand.shuffle(pages)
-        console.debug('randomizing pages', seed, pages.map(p => p.id))
-        // this.form.sections[s].questionGroups = pages
+        console.debug('randomized pages', seed, pages.map(p => p.id))
       }
       for (let p = 0; p < pages.length; p++) {
         const page = pages[p]
         this.skipService.register(page.skips)
         this.pageIndex.set(page.id, page)
         this.pageToNumIndex.set(page.id, p)
+        if (page.sectionQuestionGroup.randomizeQuestions) {
+          rand.shuffle(page.questions)
+          console.debug('randomized questions', seed, page.questions.map(q => q.id))
+        }
         for (const question of page.questions) {
           this.varNameToQuestionIndex.set(question.varName, question)
         }

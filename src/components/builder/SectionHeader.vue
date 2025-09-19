@@ -36,9 +36,13 @@
       </BuilderChip>
       <BuilderChip
         :visible="!!section.formSections[0].randomizePages"
+        :locked="builder.locked"
         @click="$emit('update:randomizePages', !section.formSections[0].randomizePages)"
       >
-        {{ $t('randomize_pages') }}
+        <v-icon left>
+          mdi-shuffle
+        </v-icon>
+        {{ $t('randomized_order') }}
       </BuilderChip>
       <MenuSelect
         :disabled="builder.locked"
@@ -91,7 +95,7 @@
           <v-list-item-icon>
             <v-icon>mdi-shuffle</v-icon>
           </v-list-item-icon>
-          <v-list-item-content>{{ $t('randomize_pages') }}</v-list-item-content>
+          <v-list-item-content>{{ $t(section.formSections[0].randomizePages ? 'disable_page_rand' : 'enable_page_rand') }}</v-list-item-content>
         </v-list-item>
       </DotsMenu>
     </v-row>

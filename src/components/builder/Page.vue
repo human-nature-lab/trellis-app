@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Question from './Question.vue'
 import QuestionGroup from '@/entities/trellis/QuestionGroup'
 import QuestionModel from '@/entities/trellis/Question'
@@ -12,6 +12,7 @@ import ExpandSection from './ExpandSection.vue'
 import SortableList, { Added, Moved } from '@/components/util/SortableList.vue'
 import { logError } from '@/helpers/log.helper'
 import { useBuilder, useBuilderQuestionList } from '@/helpers/builder.helper'
+import BuilderChip from './BuilderChip.vue'
 
 const props = defineProps<{
   value: QuestionGroup,
@@ -58,6 +59,23 @@ async function addQuestion () {
     working.value = false
   }
 }
+
+async function setRandomizeQuestions (randomize: boolean) {
+  if (working.value) return
+  try {
+    working.value = true
+    const sqg = props.value.sectionQuestionGroup
+    sqg.randomizeQuestions = randomize
+    await builderService.updateSectionQuestionGroup(sqg)
+    emit('input', Object.assign({}, props.value, { sectionQuestionGroup: sqg }))
+  } catch (err) {
+    logError(err)
+  } finally {
+    working.value = false
+  }
+}
+
+const randomizeQuestions = computed(() => props.value.sectionQuestionGroup.randomizeQuestions)
 
 async function removeQuestion (question: QuestionModel) {
   if (working.value) return
@@ -133,6 +151,16 @@ async function questionMoved (e: Added<QuestionModel> | Moved<QuestionModel>) {
         >
           {{ $tc('skip_count', value.skips ? value.skips.length : 0) }}
         </v-chip>
+        <BuilderChip
+          :visible="!!randomizeQuestions"
+          :locked="builder.locked"
+          @click="setRandomizeQuestions(!randomizeQuestions)"
+        >
+          <v-icon left>
+            mdi-shuffle
+          </v-icon>
+          {{ $t('randomized_order') }}
+        </BuilderChip>
         <DotsMenu
           :disabled="builder.locked"
           removable
@@ -152,6 +180,15 @@ async function questionMoved (e: Added<QuestionModel> | Moved<QuestionModel>) {
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
             <v-list-item-content>{{ $t('add_question') }}</v-list-item-content>
+          </v-list-item>
+          <v-list-item
+            :disabled="builder.locked"
+            @click="setRandomizeQuestions(!randomizeQuestions)"
+          >
+            <v-list-item-icon>
+              <v-icon>mdi-shuffle</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>{{ $t(randomizeQuestions ? 'disable_question_rand' : 'enable_question_rand') }}</v-list-item-content>
           </v-list-item>
         </DotsMenu>
       </v-row>

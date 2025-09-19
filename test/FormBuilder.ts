@@ -129,9 +129,7 @@ export class FormBuilder {
         this.timestamp(qp)
         qp.parameter = new Parameter()
         qp.parameter.name = p.type
-        // @ts-ignore
         qp.parameter.id = PT[p.type]
-        // @ts-ignore
         qp.parameterId = PT[p.type]
         qp.val = p.val as string
         return qp
@@ -149,6 +147,7 @@ export class FormBuilder {
     p.id = page.id || uuidv4()
     p.skips = []
     p.sectionQuestionGroup = new SectionQuestionGroup()
+    p.sectionQuestionGroup.randomizeQuestions = !!page.randomizeQuestions
     p.sectionQuestionGroup.questionGroupOrder = page.sortOrder || section.questionGroups.length
     this.timestamp(p.sectionQuestionGroup)
     this.timestamp(p)

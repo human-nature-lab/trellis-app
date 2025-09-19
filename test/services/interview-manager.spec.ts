@@ -1,7 +1,7 @@
 import InterviewManager from '../../src/components/interview/classes/InterviewManager'
 import Interview from '../../src/entities/trellis/Interview'
 import { InterviewController } from '../InterviewController'
-import { randomizedPages } from '../test-forms'
+import { randomizedPages, randomizedQuestions } from '../test-forms'
 import {
   forms,
   studyId,
@@ -387,7 +387,24 @@ export default function () {
           const controller = new InterviewController(randomizedPages)
           controller.interview.surveyId = uuidv4()
           await controller.load()
+          validateLocation(controller.manager, { page: 0 })
           if (controller.manager.location.pageId === firstPageId) {
+            firstCount++
+          }
+        }
+        expect(firstCount).to.be.greaterThan(30).and.lessThan(70)
+      })
+
+      it('should handle randomization of questions', async () => {
+        let firstCount = 0
+        for (let i = 0; i < 100; i++) {
+          const controller = new InterviewController(randomizedQuestions)
+          controller.interview.surveyId = uuidv4()
+          await controller.load()
+          controller.validateLocation({ page: 0 })
+          controller.manager.getCurrentPageQuestions()
+          const firstQuestionId = controller.manager.getCurrentPageQuestions()[0].id
+          if (firstQuestionId === 'first') {
             firstCount++
           }
         }

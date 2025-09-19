@@ -31,3 +31,25 @@ export const randomizedPages = new FormBuilder().addSection({
     },
   ],
 }).form
+
+export const randomizedQuestions = new FormBuilder().addSection({
+  pages: [
+    {
+      randomizeQuestions: true,
+      questions: [
+        {
+          id: 'first',
+          varName: 'q1',
+          label: 'Question 2',
+          questionType: 'text',
+        },
+        {
+          id: 'second',
+          varName: 'q2',
+          label: 'Question 3',
+          questionType: 'text',
+        },
+      ],
+    },
+  ],
+}).form
