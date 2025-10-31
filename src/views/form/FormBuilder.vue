@@ -23,6 +23,7 @@ import ExistingSectionSelector from '@/components/builder/ExistingSectionSelecto
 import { useRoute } from 'vue-router/composables'
 import { logError } from '@/helpers/log.helper'
 import { useBuilderQuestionErrors } from '@/helpers/builder.helper'
+import { useFormValidation } from '@/helpers/form.helper'
 
 const $route = useRoute()
 const isLoading = ref(true)
@@ -131,11 +132,26 @@ function sectionMoved (e: Moved<SectionModel> | Added<SectionModel>) {
 
 watch(() => $route, load, { immediate: true })
 
+const { valid, errors } = useFormValidation(() => builder.form)
+
 </script>
 
 <template>
   <v-col class="bg-grey lighten-3 min-h-screen form-builder">
     <v-col class="w-full w-max-normal mx-auto">
+      <v-alert
+        v-if="!valid"
+        type="error"
+      >
+        <v-list>
+          <v-list-item
+            v-for="(error, index) in errors"
+            :key="index"
+          >
+            {{ error.message }}
+          </v-list-item>
+        </v-list>
+      </v-alert>
       <v-row
         v-if="builder.form"
         no-gutters
