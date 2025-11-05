@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, provide, reactive, ref, watch } from 'vue'
+import { provide, reactive, ref, watch } from 'vue'
 import Form from '@/entities/trellis/Form'
 import SectionModel from '@/entities/trellis/Section'
 import FormService from '@/services/form'
@@ -11,6 +11,7 @@ import QuestionType from '@/entities/trellis/QuestionType'
 import builderService from '@/services/builder'
 import Translation from '@/components/builder/Translation.vue'
 import BuilderMenu from '@/components/builder/BuilderMenu.vue'
+import FormBuilderValidation from '@/components/builder/FormBuilderValidation.vue'
 import { builder as builderSymbol, questionErrors } from '@/symbols/builder'
 import { study } from '@/symbols/main'
 import Parameter from '@/entities/trellis/Parameter'
@@ -40,7 +41,7 @@ const builder = reactive({
 
 provide(builderSymbol, builder)
 provide(study, reactive(singleton.study))
-provide(questionErrors, useBuilderQuestionErrors(() => builder.form))
+provide(questionErrors, useBuilderQuestionErrors(() => builder.form as Form | null))
 
 async function load () {
   isLoading.value = true
@@ -72,7 +73,10 @@ async function addSection () {
   if (isLoading.value) return
   isLoading.value = true
   try {
-    const section = await builderService.createSection($route.params.formId, { sort_order: builder.form.sections.length })
+    const section = await builderService.createSection(
+      $route.params.formId,
+      { sort_order: builder.form.sections.length },
+    )
     builder.form.sections.push(section)
     builder.form.sections = builder.form.sections.slice()
   } catch (err) {
@@ -132,26 +136,18 @@ function sectionMoved (e: Moved<SectionModel> | Added<SectionModel>) {
 
 watch(() => $route, load, { immediate: true })
 
-const { valid, errors } = useFormValidation(() => builder.form)
+const { valid, errors } = useFormValidation(() => builder.form as unknown as Form)
 
 </script>
 
 <template>
   <v-col class="bg-grey lighten-3 min-h-screen form-builder">
     <v-col class="w-full w-max-normal mx-auto">
-      <v-alert
-        v-if="!valid"
-        type="error"
-      >
-        <v-list>
-          <v-list-item
-            v-for="(error, index) in errors"
-            :key="index"
-          >
-            {{ error.message }}
-          </v-list-item>
-        </v-list>
-      </v-alert>
+      <FormBuilderValidation
+        :builder="builder"
+        :valid="valid"
+        :errors="errors"
+      />
       <v-row
         v-if="builder.form"
         no-gutters
