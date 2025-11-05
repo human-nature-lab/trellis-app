@@ -66,6 +66,18 @@ export default class InterviewManager extends InterviewManagerBase {
     this.data.reset()
     this.initializeConditionAssignment()
     this.navigator.initialize()
+    if (this.navigator.isEmpty()) {
+      if (this.blueprint.sections.length > 0) {
+        this.emit('error', {
+          msg: 'No unskipped pages in the form',
+        })
+      } else {
+        this.emit('error', {
+          msg: 'No pages in the form',
+        })
+      }
+      return
+    }
     this.onFirstPage()
     this.playAllActions()
     this.seekToInitialLocation()

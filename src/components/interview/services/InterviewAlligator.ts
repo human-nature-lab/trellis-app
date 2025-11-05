@@ -241,6 +241,10 @@ export default class InterviewAlligator {
     this.hasDataChanges = false
   }
 
+  public isEmpty (): boolean {
+    return this.pages.length === 0
+  }
+
   private addLocationPages (initPage: number, section: Section, sectionFollowUpDatumId?: string, sectionFollowUpRepetition?: number, sectionRepetition?: number) {
     let updated = 0
     for (let p = initPage; p < section.questionGroups.length; p++) {
