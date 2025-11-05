@@ -11,12 +11,15 @@ export type TranslationRow = {
   type: string
   ownerId: string
   varName?: string
+  hasMissing?: boolean
   translation: Translation
 }
 
 const props = defineProps<{
   translations: TranslationRow[]
+  onlyMissing?: boolean
   loading?: boolean
+  showVarName?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -34,7 +37,7 @@ const locales = computed<Locale[]>(() => {
   return res
 })
 
-type LocaleRow = Pick<TranslationRow, 'type' | 'ownerId'> & {
+type LocaleRow = Pick<TranslationRow, 'type' | 'ownerId' | 'hasMissing' | 'varName'> & {
   translationId: string
   translation: Record<string, TranslationText>
 }
@@ -42,9 +45,12 @@ type LocaleRow = Pick<TranslationRow, 'type' | 'ownerId'> & {
 const translationRows = computed(() => {
   const rows: LocaleRow[] = []
   for (const t of props.translations) {
+    if (props.onlyMissing && !t.hasMissing) continue
     const row = {
       type: t.type,
       ownerId: t.ownerId,
+      varName: t.varName,
+      hasMissing: t.hasMissing,
       translationId: t.translation.id,
       translation: {},
     }
@@ -88,6 +94,9 @@ const disabled = computed(() => {
     <thead>
       <tr>
         <th>{{ $t('type') }}</th>
+        <th v-if="showVarName">
+          {{ $t('var_name') }}
+        </th>
         <th
           v-for="l in locales"
           :key="l.id"
@@ -100,6 +109,7 @@ const disabled = computed(() => {
       <tr
         v-for="t in translationRows"
         :key="t.translationId"
+        :class="{'primary': t.hasMissing}"
       >
         <td v-if="workingOn === t.translationId">
           <v-progress-circular
@@ -109,6 +119,9 @@ const disabled = computed(() => {
         </td>
         <td v-else>
           {{ t.type }}
+        </td>
+        <td v-if="showVarName">
+          {{ t.varName }}
         </td>
         <td
           v-for="l in locales"
