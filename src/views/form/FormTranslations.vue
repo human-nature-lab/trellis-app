@@ -18,6 +18,8 @@ const route = useRoute()
 const form = ref<Form>()
 const loading = ref(false)
 const showImport = ref(false)
+const onlyMissing = ref(false)
+const showVarName = ref(false)
 
 async function loadForm (formId: string) {
   try {
@@ -37,6 +39,18 @@ function sortByLocale (a: TranslationText, b: TranslationText) {
   return a.locale.languageTag.localeCompare(b.locale.languageTag)
 }
 
+const expectedLocales = computed(() => new Set(global.study.locales.map(l => l.id)))
+function hasMissingTranslation (translation: Translation) {
+  const expected = new Set(expectedLocales.value.values())
+  for (const tt of translation.translationText) {
+    if (tt.translatedText.trim() === '') {
+      return true
+    }
+    expected.delete(tt.localeId)
+  }
+  return expected.size > 0
+}
+
 const translations = computed(() => {
   const res: TranslationRow[] = []
   if (!form) return res
@@ -46,6 +60,7 @@ const translations = computed(() => {
     type: 'form',
     ownerId: form.value.id,
     translation: f.nameTranslation,
+    hasMissing: hasMissingTranslation(f.nameTranslation),
   })
   for (const section of form.value.sections) {
     section.nameTranslation.translationText.sort(sortByLocale)
@@ -53,6 +68,7 @@ const translations = computed(() => {
       type: 'section',
       ownerId: section.id,
       translation: section.nameTranslation,
+      hasMissing: hasMissingTranslation(section.nameTranslation),
     })
     for (const qg of section.questionGroups) {
       for (const question of qg.questions) {
@@ -62,6 +78,7 @@ const translations = computed(() => {
           ownerId: question.id,
           varName: question.varName,
           translation: question.questionTranslation,
+          hasMissing: hasMissingTranslation(question.questionTranslation),
         })
         for (const choice of question.choices) {
           choice.choice.choiceTranslation.translationText.sort(sortByLocale)
@@ -70,6 +87,7 @@ const translations = computed(() => {
             ownerId: choice.choice.id,
             varName: question.varName,
             translation: choice.choice.choiceTranslation,
+            hasMissing: hasMissingTranslation(choice.choice.choiceTranslation),
           })
         }
       }
@@ -203,6 +221,20 @@ async function importTranslations (file: File) {
     <v-row no-gutters>
       <h3>{{ $t('edit_translations') }}</h3>
       <v-spacer />
+      <v-checkbox
+        v-model="onlyMissing"
+        dense
+        hide-details
+        class="mr-2"
+        :label="$t('show_missing')"
+      />
+      <v-checkbox
+        v-model="showVarName"
+        dense
+        hide-details
+        class="mr-2"
+        :label="$t('show_var_name')"
+      />
       <v-btn
         @click="exportToCSV"
         :disabled="loading"
@@ -229,6 +261,8 @@ async function importTranslations (file: File) {
       <TranslationEditor
         v-if="form"
         :translations="translations"
+        :only-missing="onlyMissing"
+        :show-var-name="showVarName"
         @update="translationTextChange"
         @create="translationTextChange"
       />

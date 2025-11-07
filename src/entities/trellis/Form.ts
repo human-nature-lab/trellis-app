@@ -100,4 +100,14 @@ export default class Form extends TimestampedSoftDelete {
     }
     return m
   }
+
+  eachQuestion (callback: (question: Question) => void) {
+    for (const section of this.sections) {
+      for (const page of section.pages) {
+        for (const question of page.questions) {
+          callback(question)
+        }
+      }
+    }
+  }
 }
