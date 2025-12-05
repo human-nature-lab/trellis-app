@@ -1,9 +1,9 @@
-import { watch, ref, WatchSource } from 'vue'
+import { watch, ref, WatchSource, Ref } from 'vue'
 import type { Table } from '@/components/table/types'
 import { useStudy } from './singleton.helper'
 import { adminInst } from '@/services/http/AxiosInstance'
 
-export function useReport (reportName: WatchSource) {
+export function useReport (reportName: WatchSource<string>) {
   const report = ref<Table<any>>()
   const loading = ref(false)
   const error = ref<Error | null>(null)
@@ -28,7 +28,7 @@ export function useReport (reportName: WatchSource) {
   }
   async function reload () {
     // Unwrap the WatchSource to get the current value (works for both Ref and getter fn)
-    const name = typeof reportName === 'function' ? reportName() : (reportName as any).value
+    const name = typeof reportName === 'function' ? reportName() : (reportName as Ref<string>).value
     return load(name)
   }
   watch(reportName, (name) => {

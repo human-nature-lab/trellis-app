@@ -25,7 +25,7 @@ const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'@/
 const Permissions = () => import(/* webpackChunkName: "permissions" */'@/views/admin/Permissions.vue')
 const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'@/views/study/StudyDashboard.vue')
 const DataImport = () => import(/* webpackChunkName: "data-import" */'@/views/admin/DataImport.vue')
-const Report = () => import(/* webpackChunkName: "report" */'@/views/reports/report.vue')
+const Report = () => import(/* webpackChunkName: "report" */'@/views/reports/Report.vue')
 
 export default sharedRoutes.concat([{
   path: '/',
@@ -108,7 +108,7 @@ export default sharedRoutes.concat([{
   name: 'DemoSignUp',
   component: DemoSignUp,
 }, {
-  path: '/email-confirmation/:key', 
+  path: '/email-confirmation/:key',
   name: 'EmailConfirmation',
   component: EmailConfirmation,
 }, {

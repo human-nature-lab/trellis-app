@@ -24,8 +24,7 @@ const columns = computed(() => {
   })
 })
 
-const selected = ref<typeof props.table.rows[number][]>([])
-const grid = ref<VGrid | null>(null)
+const grid = ref<typeof VGrid | null>(null)
 const gridReady = ref(false)
 
 type RevoGridWebComponent = HTMLElement & {
