@@ -41,6 +41,7 @@ ENV ANDROID_HOME=$ANDROID_SDK_ROOT
 
 # Install Bun
 RUN npm install -g bun
+ENV PATH="/root/.bun/bin:$PATH"
 
 # Install Cordova CLI
 RUN bun install --global cordova@11
