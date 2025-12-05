@@ -25,6 +25,7 @@ const EmailConfirmation = () => import(/* webpackChunkName: "confirmation" */'@/
 const Permissions = () => import(/* webpackChunkName: "permissions" */'@/views/admin/Permissions.vue')
 const StudyDashboard = () => import(/* webpackChunkName: "study-dashboard" */'@/views/study/StudyDashboard.vue')
 const DataImport = () => import(/* webpackChunkName: "data-import" */'@/views/admin/DataImport.vue')
+const Report = () => import(/* webpackChunkName: "report" */'@/views/reports/Report.vue')
 
 export default sharedRoutes.concat([{
   path: '/',
@@ -115,4 +116,9 @@ export default sharedRoutes.concat([{
   name: 'Permissions',
   component: Permissions,
   beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_PERMISSIONS)]),
+}, {
+  path: '/report/:reportName',
+  name: 'Report',
+  component: Report,
+  beforeEnter: guardQueue([LoginGuard, PermissionGuard(TrellisPermission.VIEW_REPORTS), StudyGuard]),
 }])

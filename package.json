@@ -51,6 +51,7 @@
     "@codemirror/view": "^0.19.47",
     "@mdi/font": "^5.9.55",
     "@mdi/js": "^5.9.55",
+    "@revolist/vue-datagrid": "^4.19.3",
     "@sentry/browser": "^4.5.3",
     "@types/webpack-env": "^1.13.6",
     "@zip.js/zip.js": "^2.7.40",

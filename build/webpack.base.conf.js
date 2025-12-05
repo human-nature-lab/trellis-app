@@ -189,6 +189,10 @@ module.exports = {
     alias: {
       vue$: 'vue/dist/vue.esm.js',
       '@': resolve('src'),
+      // Work around packages that expose only `exports` (webpack 4 doesn't read them).
+      '@revolist/vue-datagrid$': path.resolve(__dirname, '../node_modules/@revolist/vue-datagrid/dist/vue-datagrid.js'),
+      '@revolist/revogrid$': path.resolve(__dirname, '../node_modules/@revolist/revogrid/dist/index.js'),
+      '@revolist/revogrid/loader$': path.resolve(__dirname, '../node_modules/@revolist/revogrid/loader/index.js'),
       // Stupid leaflet CSS import workaround. Might be fixed in newer versions of leaflet, but I'm not opening that can of worms.
       './images/layers.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers.png'),
       './images/layers-2x.png$': path.resolve(__dirname, '../node_modules/leaflet/dist/images/layers-2x.png'),
@@ -289,7 +293,15 @@ module.exports = {
         }, {
           loader: 'babel-loader',
         }],
-        exclude: /node_modules/,
+        exclude (modulePath) {
+          if (!modulePath) {
+            return false
+          }
+          if (modulePath.includes('node_modules')) {
+            return !/node_modules[\\/]@revolist[\\/](?:revogrid|vue-datagrid)/.test(modulePath)
+          }
+          return false
+        },
       },
       {
         test: /\.tsx?$/,
