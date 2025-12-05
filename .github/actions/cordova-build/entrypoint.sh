@@ -9,21 +9,21 @@ echo "gradle version: $(gradle --version)"
 
 chmod +x -R hooks/*.sh
 
-npm ci
+bun install
 cp static/config.default.js static/config.js
 cp config/config-xml.dev.default.js config/config-xml.dev.js
 
-npm run build:web
+bun run build:web
 zip -r trellis-web.zip www/
 
 # fix platform permissions before building
 mkdir -p platforms && chmod -R 777 platforms/
 mkdir -p plugins && chmod -R 777 plugins/
-npm run setup:cordova
+bun run setup:cordova
 sh cordova-setup.sh
 
 chmod -R 777 platforms/
 chmod -R 777 plugins/
 
-npm run webpack:release:android
+bun run webpack:release:android
 mv platforms/android/app/build/outputs/apk/debug/app-debug.apk trellis-debug.apk

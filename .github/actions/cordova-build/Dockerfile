@@ -39,9 +39,12 @@ RUN wget https://services.gradle.org/distributions/gradle-7.4.2-bin.zip -O /tmp/
 # Set ANDROID_HOME environment variable for legacy tools compatibility
 ENV ANDROID_HOME=$ANDROID_SDK_ROOT
 
+# Install Bun
+RUN npm install -g bun
+
 # Install Cordova CLI
-RUN npm install -g cordova@11
-RUN npm install -g @ionic/cli@6
+RUN bun install --global cordova@11
+RUN bun install --global @ionic/cli@6
 
 # Set workdir and copy package files first for caching
 COPY entrypoint.sh /entrypoint.sh
