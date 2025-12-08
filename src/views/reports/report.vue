@@ -22,12 +22,7 @@ const { report, loading, ready, error, reload } = useReport(() => route.params.r
     <ReportTable
       v-if="ready"
       :table="report"
+      @reload="reload"
     />
-    <v-btn
-      :disabled="loading"
-      @click="reload"
-    >
-      Reload
-    </v-btn>
   </v-container>
 </template>

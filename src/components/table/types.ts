@@ -13,4 +13,5 @@ export type Table<T extends Record<string, any>> = {
   filters?: string[]
   header: Header[]
   rows: T[]
+  summary?: { label: string; value: any }[]
 }

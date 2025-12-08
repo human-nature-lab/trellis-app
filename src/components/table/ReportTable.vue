@@ -4,9 +4,14 @@ import type { Table } from './types'
 import type { BasePlugin } from '@revolist/revogrid'
 import VGrid from '@revolist/vue-datagrid'
 import { useVuetify } from '@/helpers/vuetify.helper'
+import DotsMenu from '@/components/util/DotsMenu.vue'
 
 const props = defineProps<{
   table: Table<any>
+}>()
+
+const emit = defineEmits<{
+  (e: 'reload'): void
 }>()
 
 const vuetify = useVuetify()
@@ -56,7 +61,7 @@ async function exportData () {
 </script>
 
 <template>
-  <v-col>
+  <v-col class="h-full">
     <v-row
       v-if="table.title || table.filters"
       class="no-gutters"
@@ -65,7 +70,27 @@ async function exportData () {
         {{ table.title }}
       </h3>
       <v-spacer />
-      {{ table.filters }}
+      <!-- {{ table.filters }} -->
+      <DotsMenu>
+        <v-list-item
+          @click="emit('reload')"
+          :disabled="!gridReady"
+        >
+          <v-list-item-icon>
+            <v-icon>mdi-reload</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>{{ $t('refresh') }}</v-list-item-title>
+        </v-list-item>
+        <v-list-item
+          @click="exportData"
+          :disabled="!gridReady"
+        >
+          <v-list-item-icon>
+            <v-icon>mdi-export</v-icon>
+          </v-list-item-icon>
+          <v-list-item-title>{{ $t('export_csv') }}</v-list-item-title>
+        </v-list-item>
+      </DotsMenu>
     </v-row>
     <VGrid
       ref="grid"
@@ -85,14 +110,16 @@ async function exportData () {
       <v-col>
         {{ props.table.rows.length }} rows
       </v-col>
-      <v-col>
-        <v-btn
-          @click="exportData"
-          :disabled="!gridReady"
-        >
-          <v-icon>mdi-export</v-icon>
-          Export
-        </v-btn>
+    </v-row>
+    <v-row
+      v-if="table.summary"
+      class="no-gutters"
+    >
+      <v-col
+        v-for="summary in table.summary"
+        :key="summary.label"
+      >
+        <strong>{{ summary.label }}:</strong> {{ summary.value }}
       </v-col>
     </v-row>
   </v-col>
@@ -100,5 +127,5 @@ async function exportData () {
 
 <style lang="sass" scoped>
 .grid
-  height: calc(100% - 30px)
+  height: calc(100% - 100px)
 </style>
