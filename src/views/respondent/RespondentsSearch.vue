@@ -85,7 +85,7 @@
           />
         </v-row>
         <v-col
-          v-if="!respondentResults.length"
+          v-if="!respondentResults.length && !isLoading"
           ma-4
         >
           <v-container>{{ $t("no_results") }}: {{ query }}</v-container>
@@ -113,6 +113,17 @@
               <span v-if="respondentId">{{ $t("add_other_respondent") }}</span>
               <span v-else>{{ $t("add_respondent") }}</span>
             </v-btn>
+          </v-col>
+        </v-row>
+        <v-row
+          v-if="pagination.total > 0"
+          class="no-gutters justify-space-between px-0 py-4"
+        >
+          <v-col
+            cols="auto"
+            class="px-0"
+          >
+            {{ $t("total_respondents", { n: pagination.total }) }}
           </v-col>
         </v-row>
       </v-container>
@@ -344,6 +355,7 @@ export default {
         const page = await RespondentService.getSearchPage(study.id, this.query, this.filters, this.pagination, this.respondentId)
         this.pagination.seed = page.seed
         this.results = page.data
+        this.pagination.total = page.total
       } catch (err) {
         if (this.isNotAuthError(err)) {
           this.logError(err)

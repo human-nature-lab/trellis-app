@@ -292,6 +292,11 @@ export default class DatabaseServiceCordova {
     }
   }
 
+  async createQueryBuilder<T> (entity: ObjectType<T>, alias: string) {
+    const connection = await this.getDatabase()
+    return connection.createQueryBuilder<T>(entity, alias)
+  }
+
   async getLatestDownload (): Promise<Sync> {
     const connection = await this.getConfigDatabase()
     const repository = await connection.getRepository(Sync)

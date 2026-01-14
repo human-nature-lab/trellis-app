@@ -7,7 +7,7 @@ import RespondentName from '../../entities/trellis/RespondentName'
 import RespondentGeo from '../../entities/trellis/RespondentGeo'
 import StudyRespondent from '../../entities/trellis/StudyRespondent'
 import DatabaseService from '../database'
-import { Connection, EntityManager, In, IsNull } from 'typeorm'
+import { Connection, EntityManager, In, IsNull, Brackets } from 'typeorm'
 import RespondentPhoto from '../../entities/trellis/RespondentPhoto'
 import Photo from '../../entities/trellis/Photo'
 import { removeSoftDeleted } from '../database/SoftDeleteHelper'
@@ -162,21 +162,11 @@ export class RespondentService implements RespondentServiceInterface {
   async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null): Promise<RandomPaginationResult<Respondent>> {
     const repository = await DatabaseService.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
-    let geos
 
-    // Get the relevant geo ids to use later
-    if (Array.isArray(filters.geos) && filters.geos.length > 0) {
-      geos = await this.getGeoIds(filters.geos, filters.includeChildren)
-    }
-
-    const seed = pagination.seed || randomIntBits(24)
-
-    let limitQuery = `select r.id from respondent r
-      where r.deleted_at is null 
-      and r.id in (
-        select respondent_id from study_respondent where study_id = '${studyId}'
-      )`
-    const params = { studyId }
+    const limitQb = repository.createQueryBuilder('r')
+    limitQb.select('r.id')
+    limitQb.andWhere('r.deleted_at is null')
+    limitQb.andWhere('r.id in (select respondent_id from study_respondent where study_id = :studyId)', { studyId })
 
     // Query string broken into words
     if (typeof query === 'string' && query.trim().length > 0) {
@@ -184,74 +174,100 @@ export class RespondentService implements RespondentServiceInterface {
       for (let i = 0; i < searchTerms.length; i++) {
         const searchTerm = '% ' + searchTerms[i].trim() + '%'
         const key = `searchTerm${i}`
-        limitQuery += ` and r.id in (select distinct respondent_id from respondent_name where " " || name like :${key})`
-        params[key] = searchTerm
+        limitQb.andWhere(
+          `r.id in (select respondent_id from respondent_name where " " || name like :${key})`,
+          { [key]: searchTerm },
+        )
       }
     }
 
-    // Condition tag filters
-    if (Array.isArray(filters.conditionTags) && filters.conditionTags.length > 0) {
-      const conditionTagNames = filters.conditionTags
-      if (conditionTagNames.length > 1) {
-        // TODO: Isn't this group by very expensive?
-        // Doesn't it basically require grouping every single respondent_condition_tag regardless of how many responses we actually want?
-        limitQuery += ` and r.id in (
-          select distinct respondent_id from respondent_condition_tag where condition_tag_id in (
-          select id from condition_tag where name in (:...conditionTagNames)) 
-          group by respondent_id having count(distinct condition_tag_id) = :conditionTagsLength)`
-        params.conditionTagNames = conditionTagNames
-        params.conditionTagsLength = conditionTagNames.length
-      } else {
-        limitQuery += ` and r.id in (
-          select distinct respondent_id from respondent_condition_tag where condition_tag_id in (
-            select id from condition_tag where name in (:...conditionTagNames)
+    limitQb.andWhere(new Brackets(qb => {
+      // Condition tag filters
+      if (Array.isArray(filters.conditionTags) && filters.conditionTags.length > 0) {
+        // TODO: Couldn't we just add several where conditions instead of a group by?
+        for (let i = 0; i < filters.conditionTags.length; i++) {
+          const tagName = filters.conditionTags[i]
+          const key = `andConditionTag${i}`
+          qb.andWhere(
+            `r.id in (
+              select respondent_id from respondent_condition_tag where condition_tag_id in (
+                select id from condition_tag where name = :${key}
+              )
+            )`,
+            { [key]: tagName },
           )
-        )`
-        params.conditionTagNames = conditionTagNames
-      }
-    }
-
-    limitQuery += ` and (
-      (r.associated_respondent_id is null`
-
-    // Geo filters
-    if (geos && geos.length > 0) {
-      if (geos.length > 999) {
-        throw new Error('Too many respondent geos')
+        }
       }
 
-      let subselect = 'select distinct respondent_id from respondent_geo where deleted_at is null and geo_id in (:...geoIds)'
-      params.geoIds = geos
+      // Geo filters
+      if (Array.isArray(filters.geos) && filters.geos.length > 0) {
+        const geoLevels = 2
+        // if (geos.length > 999) {
+        //   throw new Error('Too many respondent geos')
+        // }
+        const geoQb = limitQb.subQuery().from(RespondentGeo, 'rg')
+        geoQb.select('rg.respondent_id')
+        geoQb.where('rg.deleted_at is null')
+        // geoQb.andWhere('rg.geo_id in (:...geoIds)', { geoIds: filters.geos })
+        geoQb.andWhere(new Brackets(qb => {
+          qb.orWhere('rg.geo_id in (:...geoIds)', { geoIds: filters.geos })
+          if (filters.includeChildren) {
+            const q = k => `select id from geo where parent_id in (${k})`
+            for (let i = 0; i < geoLevels; i++) {
+              let sql = q(':...geoIds')
+              for (let l = 0; l < i; l++) {
+                sql = q(sql)
+              }
+              qb.orWhere(`rg.geo_id in (${sql})`, { geoIds: filters.geos })
+            }
+          }
+        }))
 
-      if (filters.onlyCurrentGeo) {
-        subselect += ' and is_current = 1'
+        if (filters.onlyCurrentGeo) {
+          geoQb.andWhere('rg.is_current = 1')
+        }
+
+        const geoSql = geoQb.getQuery()
+        const geoParams = geoQb.getParameters()
+        qb.andWhere(`r.id in ${geoSql}`, geoParams)
       }
-      limitQuery += ` and r.id in (${subselect})`
-    }
-    limitQuery += ')'
-    if (respondentId) {
-      limitQuery += ' or r.associated_respondent_id = :respondentId'
-      params.respondentId = respondentId
+
+      // Or Condition tags
+      if (Array.isArray(filters.orConditionTags) && filters.orConditionTags.length > 0) {
+        qb.andWhere(
+          `r.id in (
+            select respondent_id from respondent_condition_tag where deleted_at is null and condition_tag_id in (
+              select id from condition_tag where name in (:...orConditionTags)
+            )
+          )`,
+          { orConditionTags: filters.orConditionTags },
+        )
+      }
+      if (respondentId) {
+        qb.orWhere('respondent.associated_respondent_id = :respondentId', { respondentId })
+      }
+    }))
+
+    let limitSql = limitQb.getQuery()
+    const limitParams = limitQb.getParameters()
+
+    // this version of typeorm is apparently creating invalid sql so we're adding a hack to fix it
+    if (limitSql.endsWith(' AND')) {
+      limitSql = limitSql.slice(0, -4)
     }
 
-    // Or Condition tags
-    if (Array.isArray(filters.orConditionTags) && filters.orConditionTags.length > 0) {
-      const orConditionTagNames = filters.orConditionTags
-      limitQuery += ` or r.id in (
-        select distinct respondent_id from respondent_condition_tag where deleted_at is null and condition_tag_id in (
-          select id from condition_tag where name in (:...orConditionTags)
-      ))`
-      params.orConditionTags = orConditionTagNames
+    const seed = pagination.seed || randomIntBits(24)
+    if (filters.randomize || filters.randomize === null || filters.randomize === undefined) {
+      // Psuedo-random sort order is achieved as described here -> https://stackoverflow.com/a/24511461/5551941
+      limitSql += ` order by substr(r.rowid * ${seed}, length(r.rowid) + 2)`
+    } else {
+      limitSql += ' order by r.id'
     }
-    limitQuery += ')'
-
-    // Psuedo-random sort order is achieved as described here -> https://stackoverflow.com/a/24511461/5551941
+    const total = await limitQb.clone().select('distinct r.id').getCount()
     const offset = pagination.size * pagination.page
-    limitQuery += ` order by substr(r.rowid * ${seed}, length(r.rowid) + 2) limit ${pagination.size} offset ${offset}`
-
-    console.log('limitQuery', limitQuery, params)
-
-    let q = queryBuilder.where(`respondent.id in (${limitQuery})`, params)
+    limitSql += ` limit ${pagination.size} offset ${offset}`
+    console.log('limitQuery', limitSql, limitParams)
+    let q = queryBuilder.where(`respondent.id in (${limitSql})`, limitParams)
     q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
     q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
     q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
@@ -260,11 +276,12 @@ export class RespondentService implements RespondentServiceInterface {
 
     const respondents = await q.getMany()
     removeSoftDeleted(respondents)
+    console.log('respondents', respondents.length)
     return {
       page: pagination.page,
       size: pagination.size,
       seed: seed,
-      total: 0,
+      total: total ?? 0,
       data: respondents,
     }
   }
