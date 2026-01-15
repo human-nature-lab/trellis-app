@@ -9,6 +9,10 @@ const props = defineProps<{
   value: string[];
 }>()
 
+const emit = defineEmits<{
+  (e: 'input', value: string[]): void
+}>()
+
 const isLoading = ref(false)
 const conditionTags = ref<string[]>([])
 const hasLoaded = ref(false)
@@ -47,7 +51,7 @@ watch(() => [props.value, query.value], async () => {
     :hide-no-data="!hasLoaded"
     :search-input.sync="query"
     :loading="isLoading"
-    @input="$emit('input', $event)"
+    @input="emit('input', $event)"
     v-bind="$attrs"
   >
     <template #selection="props">

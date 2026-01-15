@@ -131,7 +131,7 @@ export async function downloadSnapshot (ctrl: StepController, { snapshot }: { sn
   //   ctrl.log.warn('downloading over http in dev mode', url.href)
   // }
   const snapshotFilePath = path.join(directoryEntry.toURL(), fileName)
-  console.log('snapshotFilePath', snapshotFilePath, fileEntry.toURL())
+  console.log('snapshotFilePath', snapshotFilePath, fileEntry.toURL(), DEV)
   const p = filetransfer.download(url.toString(), snapshotFilePath, DEV, {
     headers: {
       'X-Key': deviceKey,

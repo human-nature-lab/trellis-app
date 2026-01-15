@@ -6,8 +6,12 @@
           <v-toolbar-title>Service Testing</v-toolbar-title>
           <v-spacer />
           <v-menu offset-y>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn v-on="on" v-bind="attrs" icon>
+            <template #activator="{ on, attrs }">
+              <v-btn
+                v-on="on"
+                v-bind="attrs"
+                icon
+              >
                 <v-icon>mdi-dots-vertical</v-icon>
               </v-btn>
             </template>
@@ -19,7 +23,9 @@
                     extensions="json"
                     v-model="forms"
                     @input="convertForm"
-                  >Convert form to TypeScript</file-upload>
+                  >
+                    Convert form to TypeScript
+                  </file-upload>
                 </v-list-item-content>
               </v-list-item>
               <v-list-item @click="addAlert">
@@ -37,19 +43,44 @@
             </v-list>
           </v-menu>
         </v-toolbar>
-        <v-list>
-          <v-list-item v-for="name in testModules" :key="name">
-            <v-checkbox v-model="modulesToRun" :value="name" :label="name" />
+        <v-list dense>
+          <v-list-item
+            v-for="name in testModules"
+            :key="name"
+            dense
+          >
+            <v-checkbox
+              v-model="modulesToRun"
+              :value="name"
+              :label="name"
+            />
           </v-list-item>
         </v-list>
         <v-toolbar flat>
           <v-toolbar-title>Results</v-toolbar-title>
         </v-toolbar>
         <v-card>
-          <v-row class="result " v-for="test in tests" :key="test.title">
-            <v-col cols="1" class="px-6 py-8">
-              <v-icon v-if="test.state === SUCCESSFUL" color="success">mdi-check-circle</v-icon>
-              <v-icon v-else-if="test.state === FAILED" color="error">mdi-alert-circle</v-icon>
+          <v-row
+            class="result no-gutters pa-0 ma-0"
+            v-for="test in tests"
+            :key="test.title"
+          >
+            <v-col
+              cols="1"
+              class="px-6 py-8"
+            >
+              <v-icon
+                v-if="test.state === SUCCESSFUL"
+                color="success"
+              >
+                mdi-check-circle
+              </v-icon>
+              <v-icon
+                v-else-if="test.state === FAILED"
+                color="error"
+              >
+                mdi-alert-circle
+              </v-icon>
             </v-col>
             <v-col cols="11">
               <v-col>{{ test.title }} - {{ test.duration }}ms</v-col>
@@ -58,11 +89,17 @@
           </v-row>
         </v-card>
         <v-card-actions>
-          <v-btn :disabled="state !== WAITING" @click="start()">
+          <v-btn
+            :disabled="state !== WAITING"
+            @click="start()"
+          >
             <span v-if="state === WAITING">Start</span>
             <v-progress-circular v-else />
           </v-btn>
-          <v-checkbox label="Debug errors" v-model="debugErrors" />
+          <v-checkbox
+            label="Debug errors"
+            v-model="debugErrors"
+          />
         </v-card-actions>
       </v-card>
     </v-container>
@@ -70,7 +107,7 @@
 </template>
 
 <script>
-/*global mocha*/
+/* global mocha */
 import { LoginServiceCordova } from '../services/login/LoginServiceCordova'
 import { LoginServiceWeb } from '../services/login/LoginServiceWeb'
 import config from '../config'
@@ -84,11 +121,11 @@ import { saveAs } from 'file-saver'
 
 let runner
 export default {
-  name: 'service-testing',
+  name: 'ServiceTesting',
   components: {
-    FileUpload
+    FileUpload,
   },
-  data() {
+  data () {
     const d = {
       testSelectorOpen: [true],
       SUCCESSFUL: 'passed',
@@ -100,27 +137,27 @@ export default {
       modulesToRun: [],
       tests: [],
       debugErrors: false,
-      forms: []
+      forms: [],
     }
     d.state = d.WAITING
     return d
   },
-  beforeDestroy() {
+  beforeDestroy () {
     // if (runner) runner.teardown('bdd')
   },
   methods: {
-    addAlert() {
+    addAlert () {
       const types = ['error', 'info', 'warn', 'primary', 'secondary']
-      if (Math.random() > .5) {
+      if (Math.random() > 0.5) {
         this.alert(randomFrom(types), 'A persistent alert', { timeout: 0 })
       } else {
         this.alert(randomFrom(types), 'A random alert that dismisses itself')
       }
     },
-    throwError() {
+    throwError () {
       throw new Error('Throwing an error from service testing')
     },
-    getNestedTitle(test) {
+    getNestedTitle (test) {
       let title = test.title
       let t = test.parent
       while (t.parent) {
@@ -131,24 +168,24 @@ export default {
       }
       return title
     },
-    testToDisplay(test) {
+    testToDisplay (test) {
       return {
         state: test.state,
         title: this.getNestedTitle(test),
         err: test.err ? test.err.message : null,
-        duration: test.duration
+        duration: test.duration,
       }
     },
-    async validateLoggedIn() {
+    async validateLoggedIn () {
       await (new LoginServiceCordova()).login(config.user?.username, config.user?.password)
       await (new LoginServiceWeb()).login(config.user?.username, config.user?.password)
       return true
     },
-    async validateDataVersion() {
+    async validateDataVersion () {
       // TODO: Check that local database is the same snapshot as the latest on the server
       return true
     },
-    async start() {
+    async start () {
       if (!this.modulesToRun.length) return
       this.tests = []
       this.state = this.WORKING
@@ -182,14 +219,14 @@ export default {
         this.state = this.WAITING
       })
     },
-    convertForm() {
+    convertForm () {
       if (!this.forms.length) return
       const file = this.forms[0].file
       const reader = new FileReader()
       let content
       reader.onload = function (evt) {
         if (evt.target.readyState !== 2) {
-          return
+
         } else if (evt.target.error) {
           throw evt.target.error
         } else {
@@ -202,7 +239,7 @@ export default {
         }
       }
       reader.readAsText(file)
-    }
+    },
   },
 }
 </script>

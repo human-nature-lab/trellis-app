@@ -25,6 +25,7 @@
         <v-container>
           <slot />
         </v-container>
+        <slot name="footer" />
       </v-card>
     </ScrollContainer>
   </v-dialog>
