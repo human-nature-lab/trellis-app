@@ -15,6 +15,8 @@ import Geo from '../../entities/trellis/Geo'
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export class RespondentService implements RespondentServiceInterface {
+  private maxGeoLevel: Record<string, number> = {}
+
   async addPhoto (respondentId: string, photo: Photo): Promise<PhotoWithPivotTable> {
     const repo = await DatabaseService.getRepository(RespondentPhoto)
     const rPhoto = new RespondentPhoto()
@@ -159,6 +161,28 @@ export class RespondentService implements RespondentServiceInterface {
     return geos
   }
 
+  async getMaxGeoLevel (studyId: string): Promise<number> {
+    if (this.maxGeoLevel[studyId]) {
+      return this.maxGeoLevel[studyId]
+    }
+    const sql = `
+      WITH RECURSIVE tree AS (
+        SELECT id, parent_id, 1 AS depth
+        FROM geo_type
+        WHERE parent_id IS NULL and deleted_at is null
+        UNION ALL
+        SELECT c.id, c.parent_id, p.depth + 1
+        FROM geo_type c
+        JOIN tree p ON c.parent_id = p.id and c.deleted_at is null
+      )
+      SELECT MAX(depth) AS max_depth FROM tree;
+    `
+    const db = await DatabaseService.getDatabase()
+    const [row] = await db.query(sql)
+    this.maxGeoLevel[studyId] = +row.max_level || 3
+    return this.maxGeoLevel[studyId]
+  }
+
   async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null): Promise<RandomPaginationResult<Respondent>> {
     const repository = await DatabaseService.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
@@ -173,12 +197,17 @@ export class RespondentService implements RespondentServiceInterface {
       const searchTerms = query.split(' ')
       for (let i = 0; i < searchTerms.length; i++) {
         const searchTerm = '% ' + searchTerms[i].trim() + '%'
-        const key = `searchTerm${i}`
-        limitQb.andWhere(
-          `r.id in (select respondent_id from respondent_name where " " || name like :${key})`,
-          { [key]: searchTerm },
-        )
+        const key = `spaceTerm${i}`
+        const q = filters.looseMatching
+          ? `r.id in (select respondent_id from respondent_name where name like :${key})`
+          : `r.id in (select respondent_id from respondent_name where " " || name like :${key})`
+        limitQb.andWhere(q, { [key]: searchTerm })
       }
+    }
+
+    let geoLevels: number
+    if (filters.includeChildren && Array.isArray(filters.geos) && filters.geos.length > 0) {
+      geoLevels = await this.getMaxGeoLevel(studyId)
     }
 
     limitQb.andWhere(new Brackets(qb => {
@@ -201,10 +230,7 @@ export class RespondentService implements RespondentServiceInterface {
 
       // Geo filters
       if (Array.isArray(filters.geos) && filters.geos.length > 0) {
-        const geoLevels = 2
-        // if (geos.length > 999) {
-        //   throw new Error('Too many respondent geos')
-        // }
+        console.log(`using ${geoLevels} geo levels for study ${studyId}`)
         const geoQb = limitQb.subQuery().from(RespondentGeo, 'rg')
         geoQb.select('rg.respondent_id')
         geoQb.where('rg.deleted_at is null')
@@ -244,7 +270,7 @@ export class RespondentService implements RespondentServiceInterface {
         )
       }
       if (respondentId) {
-        qb.orWhere('respondent.associated_respondent_id = :respondentId', { respondentId })
+        qb.orWhere('r.associated_respondent_id = :respondentId', { respondentId })
       }
     }))
 
@@ -263,7 +289,14 @@ export class RespondentService implements RespondentServiceInterface {
     } else {
       limitSql += ' order by r.id'
     }
-    const total = await limitQb.clone().select('distinct r.id').getCount()
+    let total = 0
+    // I've wrapped this in a try/catch because typeorm generates invalid sql for some variants of this query for some
+    // reason
+    try {
+      total = await limitQb.clone().select('distinct r.id').getCount()
+    } catch (error) {
+      console.error('failed to get total', error)
+    }
     const offset = pagination.size * pagination.page
     limitSql += ` limit ${pagination.size} offset ${offset}`
     console.log('limitQuery', limitSql, limitParams)

@@ -789,4 +789,4 @@ disable_page_rand,Disable page randomization,Deshabilitar la aleatorización de 
 enable_page_rand,Enable page randomization,Habilitar la aleatorizacion de páginas,
 show_missing,Show missing,Mostrar faltante,
 show_var_name,Show variable,Mostrar variable,
-total_respondents,{n} total respondents,,
+total_respondents,{n} total respondents,{n} total encuestados,

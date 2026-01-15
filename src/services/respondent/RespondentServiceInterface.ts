@@ -7,6 +7,7 @@ import { RandomPagination, RandomPaginationResult } from '../../types/Pagination
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export interface SearchFilter {
+  looseMatching?: boolean      // Indicates that search terms will be loosely matched
   conditionTags?: string[],    // Array of condition tag names to filter respondents by, logical AND
   orConditionTags?: string[],  // Array of condition tag names to union respondents by, logical OR
   geos?: string[]              // Array of geo ids
