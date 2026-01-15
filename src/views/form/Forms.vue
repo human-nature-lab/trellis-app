@@ -29,10 +29,12 @@ import TransformService from '@/services/transform'
 import TrellisFileUpload from '@/components/import/TrellisFileUpload.vue'
 import DotsMenu from '@/components/util/DotsMenu.vue'
 import AlertListItem from '@/components/util/AlertListItem.vue'
+import FormSkipTester from '@/components/forms/FormSkipTester.vue'
 
 const isLoading = ref(false)
 const studyForms = ref<StudyForm[]>([])
 const formSkipsForm = ref<StudyForm | null>(null)
+const showFormSkipTester = ref(false)
 const showFormSkips = ref(false)
 const showImportForm = ref(false)
 const importFormType = ref(formTypes.CENSUS)
@@ -411,6 +413,14 @@ async function importTranslations (file: File) {
                   {{ showDisabledForms ? $t('hide_disabled_forms') : $t('show_disabled_forms') }}
                 </v-list-item-content>
               </v-list-item>
+              <v-list-item @click="showFormSkipTester = true">
+                <v-list-item-action>
+                  <v-icon>mdi-test-tube</v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  {{ $t('test_skips') }}
+                </v-list-item-content>
+              </v-list-item>
             </v-list>
           </DotsMenu>
         </v-toolbar>
@@ -454,6 +464,15 @@ async function importTranslations (file: File) {
         </v-data-table>
       </v-card>
     </v-col>
+    <TrellisModal
+      v-if="showFormSkipTester"
+      v-model="showFormSkipTester"
+      :title="$t('test_skips')"
+    >
+      <FormSkipTester
+        :forms="studyForms"
+      />
+    </TrellisModal>
     <FormImport
       v-model="showImportForm"
       :form-type="importFormType"
