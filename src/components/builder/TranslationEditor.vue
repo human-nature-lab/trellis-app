@@ -6,6 +6,7 @@ import TranslationText from '@/entities/trellis/TranslationText'
 import Locale from '@/entities/trellis/Locale'
 import ClickToEdit from '../ClickToEdit.vue'
 import TranslationTextService from '@/services/translation-text'
+import { format } from 'date-fns'
 
 export type TranslationRow = {
   type: string
@@ -103,6 +104,9 @@ const disabled = computed(() => {
         >
           {{ l.languageName }}
         </th>
+        <th>
+          {{  $t('last_updated') }}
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -132,6 +136,9 @@ const disabled = computed(() => {
             :disabled="disabled"
             @save="updateTranslationText(t, l, $event)"
           />
+        </td>
+        <td>
+          {{ t.translation[locales[0].id] ? format(t.translation[locales[0].id].updatedAt, 'MM/dd/yyyy hh:mm a') : '' }}
         </td>
       </tr>
     </tbody>

@@ -1,5 +1,5 @@
 <template>
-  <v-layout row>
+  <v-row class="no-gutters">
     <v-flex class="container">
       <v-progress-linear height="20" color="accent" :value="timer.progress * 100"/>
       <div class="center" :style="{color: timer.elapsed > timer.duration / 2 ? 'white' : 'black'}">{{Math.abs(timer.duration - timer.elapsed) / 1000 | toFixed(0)}}</div>
@@ -18,7 +18,7 @@
       @click="reset">
       <v-icon>mdi-refresh</v-icon>
     </v-btn>
-  </v-layout>
+  </v-row>
 </template>
 
 <script lang="ts">

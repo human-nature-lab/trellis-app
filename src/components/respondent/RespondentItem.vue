@@ -94,6 +94,7 @@ const displayConditionTags = computed(() => {
               sm="auto"
             >
               <v-btn
+                v-if="props.formsButtonVisible"
                 :to="{name: 'RespondentForms', params: {studyId: global.study.id, respondentId: respondent.id}}"
                 icon
               >
