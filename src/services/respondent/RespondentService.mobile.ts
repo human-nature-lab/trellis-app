@@ -179,7 +179,7 @@ export class RespondentService implements RespondentServiceInterface {
     `
     const db = await DatabaseService.getDatabase()
     const [row] = await db.query(sql)
-    this.maxGeoLevel[studyId] = +row.max_level || 3
+    this.maxGeoLevel[studyId] = +row.max_depth || 3
     return this.maxGeoLevel[studyId]
   }
 
