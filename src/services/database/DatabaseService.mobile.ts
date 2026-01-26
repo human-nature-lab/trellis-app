@@ -10,6 +10,8 @@ import { delay } from '../../classes/delay'
 import { Mutex } from 'async-mutex'
 import { trellisConfigEntities, trellisEntities } from './entities'
 
+type Ctrl = { setProgress: (progress: number, total: number) => void }
+
 enum DB {
   CONFIG = 'trellis-config',
   TRELLIS = 'trellis'
@@ -33,7 +35,7 @@ const trellisOptions = {
   namingStrategy: new SnakeCaseNamingStrategy(),
   // logging: ['warning', 'error'] // reduced logging
   // logging: true // verbose logging
-  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['query', 'warning', 'error']
+  logging: (config.database && config.database.logging !== null) ? config.database.logging : ['query', 'warning', 'error'],
 }
 
 console.log('database configs', trellisConfigOptions, trellisOptions)
@@ -125,8 +127,6 @@ export default class DatabaseServiceCordova {
     }
   }
 
- 
-
   async createUpdatedRecordsTable (queryRunner: QueryRunner, status: { message: string }) {
     try {
       const q = `create table if not exists updated_records 
@@ -137,6 +137,81 @@ export default class DatabaseServiceCordova {
       await queryRunner.rollbackTransaction()
       throw err
     }
+  }
+
+  transformTextForSearch (name: string): string {
+    let result = name.toLowerCase() // transform to lowercase
+    result = result.replace(/[^\p{L}\p{N}\s]/gu, ' ') // remove punctuation
+    result = result.replace(/\s+/g, ' ').trim() // collapse multiple spaces
+    // remove diacritics as specified here: https://stackoverflow.com/a/37511463
+    result = result.normalize('NFD').replace(/\p{Diacritic}/u, '')
+    return result
+  }
+  
+  async generateRespondentNameColumns (ctrl: Ctrl) {
+    const db = await this.getDatabase()
+    // Ensure the name_searchable column is created if it doesn't exist
+    const columnExists = await db.query(`
+      select count(*) as c from pragma_table_info('respondent_name') where name = 'name_searchable'
+    `)
+    console.log('columnExists', columnExists)
+    if (+columnExists[0].c === 0) {
+      await db.query(`
+        alter table respondent_name add column name_searchable text
+      `)
+    }
+
+    let insertCount = 0
+    const selectChunkSize = 10000
+    const insertChunkSize = Math.floor(9999 / 7) // 7 columns with a max of 9999 parameters allowed by sqlite
+    const res = await db.query('select count(*) as c from respondent_name where deleted_at is null and name_searchable is null')
+    const total = +res[0].c
+    if (+res[0].c === 0) {
+      return
+    }
+    console.log('total respondent names to generate searchable names for', total)
+    ctrl.setProgress(0, total)
+    while (true) {
+      const rows = await db.query(`
+        select id, name from respondent_name 
+        where deleted_at is null and name_searchable is null 
+        limit ${selectChunkSize}
+      `)
+      if (rows.length === 0) {
+        break
+      }
+      for (let i = 0; i < rows.length; i++) {
+        rows[i].nameSearchable = this.transformTextForSearch(rows[i].name)
+      }
+      for (let i = 0; i < rows.length; i += insertChunkSize) {
+        const chunk = rows.slice(i, i + insertChunkSize)
+        const params: any[] = []
+        const valuesSql = chunk.map(r => {
+          params.push(r.id, 0, '', '', r.nameSearchable, '', '')
+          return '(?, ?, ?, ?, ?, ?, ?)'
+        }).join(', ')
+        await db.query(
+          `INSERT INTO respondent_name 
+          (id, is_display_name, respondent_id, name, name_searchable, created_at, updated_at) 
+          VALUES ${valuesSql}
+          ON CONFLICT(id) DO UPDATE SET name_searchable = excluded.name_searchable`,
+          params,
+        )
+        insertCount += chunk.length
+        console.log(`completed generating ${insertCount} of ${total} searchable names`)
+        ctrl.setProgress(insertCount, total)
+      }
+    }
+    console.log('completed generating all searchable names')
+    ctrl.setProgress(total, total)
+    await db.query(`
+      create index if not exists idx__respondent_name__name_searchable on respondent_name (name_searchable);
+    `)
+    console.log('created index on respondent_name.name_searchable')
+  }
+
+  async addGeneratedColumns (ctrl: Ctrl): Promise<void> {
+    await this.generateRespondentNameColumns(ctrl)
   }
 
   async addTriggers (queryRunner: QueryRunner, status: { message: string }): Promise<void> {
@@ -188,7 +263,7 @@ export default class DatabaseServiceCordova {
     }
   }
 
-  async executeSnapshot (queryRunner: QueryRunner, file: File, trackProgress: SnapshotProgressCallback , isCancelled: () => boolean): Promise<void> {
+  async executeSnapshot (queryRunner: QueryRunner, file: File, trackProgress: SnapshotProgressCallback, isCancelled: () => boolean): Promise<void> {
     return new Promise((resolve, reject) => {
       const decoder = new TextDecoder()
       const fileReader = new FileReader(file)

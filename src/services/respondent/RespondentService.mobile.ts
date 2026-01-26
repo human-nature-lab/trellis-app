@@ -195,14 +195,20 @@ export class RespondentService implements RespondentServiceInterface {
     // Query string broken into words
     if (typeof query === 'string' && query.trim().length > 0) {
       const searchTerms = query.split(' ')
-      for (let i = 0; i < searchTerms.length; i++) {
-        const searchTerm = '% ' + searchTerms[i].trim() + '%'
-        const key = `spaceTerm${i}`
-        const q = filters.looseMatching
-          ? `r.id in (select respondent_id from respondent_name where name like :${key})`
-          : `r.id in (select respondent_id from respondent_name where " " || name like :${key})`
-        limitQb.andWhere(q, { [key]: searchTerm })
-      }
+      limitQb.andWhere(new Brackets(qb => {
+        for (let i = 0; i < searchTerms.length; i++) {
+          const searchTerm = '% ' + searchTerms[i].trim() + '%'
+          const key = `spaceTerm${i}`
+          const q = filters.looseMatching
+            ? `r.id in (select respondent_id from respondent_name where name_searchable like :${key} and deleted_at is null)`
+            : `r.id in (select respondent_id from respondent_name where " " || name_searchable like :${key} and deleted_at is null)`
+          qb.andWhere(q, { [key]: searchTerm })
+        }
+        if (searchTerms.length === 1) {
+          const respIdQuery = '%' + searchTerms[0].trim() + '%'
+          qb.orWhere('r.id like :respIdQuery', { respIdQuery })
+        }
+      }))
     }
 
     let geoLevels: number
@@ -326,6 +332,7 @@ export class RespondentService implements RespondentServiceInterface {
       respondentName = new RespondentName()
       respondentName.isDisplayName = isDisplayName
       respondentName.name = name
+      respondentName.nameSearchable = DatabaseService.transformTextForSearch(name)
       respondentName.respondentId = respondentId
       respondentName.localeId = localeId
       respondentName.previousRespondentNameId = null
@@ -346,6 +353,7 @@ export class RespondentService implements RespondentServiceInterface {
     const editedRespondentName = new RespondentName()
     editedRespondentName.isDisplayName = (isDisplayName === null) ? oldRespondentName.isDisplayName : isDisplayName
     editedRespondentName.name = newName
+    editedRespondentName.nameSearchable = DatabaseService.transformTextForSearch(newName)
     editedRespondentName.respondentId = respondentId
     editedRespondentName.localeId = (localeId === null) ? oldRespondentName.locale : localeId
     editedRespondentName.previousRespondentNameId = oldRespondentName.id
