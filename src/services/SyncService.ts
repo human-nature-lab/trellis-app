@@ -319,6 +319,16 @@ class SyncService {
           updatedPhotos = await this.getUpdatedPhotos(connection, subsetRowIds)
         } else if (table.tableName === 'asset') {
           updatedAssets = chunkRowIds.slice()
+        } else if (table.tableName === 'respondent_name') {
+          // These columns are generated when syncing the database and are just used for sqlite
+          const generatedColumns = ['name_searchable']
+          for (let i = 0; i < updatedRows.length; i++) {
+            const row = updatedRows[i]
+            for (const column of generatedColumns) {
+              delete row[column]
+            }
+            updatedRows[i] = row
+          }
         }
         await fileWriter.writeLines(updatedRows.map(v => JSON.stringify(v)))
         // await this.writeUpdatedRows(fileWriter, updatedRows, isCancelled)

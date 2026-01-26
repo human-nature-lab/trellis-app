@@ -101,13 +101,15 @@ export async function compareUpload (ctrl: StepController, data: { snapshot: Sna
 
 export async function configureDatabase (ctrl: StepController) {
   const status = { message: i18n.t('configuring_db') }
-  ctrl.setProgress(0, 2)
+  ctrl.setProgress(0, 3)
   await DatabaseService.createDatabase()
   const queryRunner = (await DatabaseService.getDatabase()).createQueryRunner()
   await DatabaseService.createUpdatedRecordsTable(queryRunner, status)
-  ctrl.setProgress(1, 2)
+  ctrl.setProgress(1, 3)
+  await DatabaseService.addGeneratedColumns(ctrl)
+  ctrl.setProgress(2, 3)
   await DatabaseService.addTriggers(queryRunner, status)
-  ctrl.setProgress(2, 2)
+  ctrl.setProgress(3, 3)
   return delay(500)
 }
 
@@ -150,6 +152,12 @@ export async function downloadSnapshot (ctrl: StepController, { snapshot }: { sn
     snapshot,
     fileEntry,
   }
+}
+
+export async function buildIndexes (ctrl: StepController) {
+  await DatabaseService.generateRespondentNameColumns(ctrl)
+  // TODO: Generate all SearchableNames for respondents
+  // TODO: Create our index for these searchable columns
 }
 
 export async function emptySnapshotDirectory () {
