@@ -154,12 +154,6 @@ export async function downloadSnapshot (ctrl: StepController, { snapshot }: { sn
   }
 }
 
-export async function buildIndexes (ctrl: StepController) {
-  await DatabaseService.generateRespondentNameColumns(ctrl)
-  // TODO: Generate all SearchableNames for respondents
-  // TODO: Create our index for these searchable columns
-}
-
 export async function emptySnapshotDirectory () {
   const fileSystem = await FileService.requestFileSystem()
   const tempFs = await file.temporary()

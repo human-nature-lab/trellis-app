@@ -164,13 +164,12 @@ export default class DatabaseServiceCordova {
     let insertCount = 0
     const selectChunkSize = 10000
     const insertChunkSize = Math.floor(9999 / 7) // 7 columns with a max of 9999 parameters allowed by sqlite
-    // const insertChunkSize = 1
     const res = await db.query('select count(*) as c from respondent_name where deleted_at is null and name_searchable is null')
     const total = +res[0].c
     if (+res[0].c === 0) {
       return
     }
-    console.log('total', total)
+    console.log('total respondent names to generate searchable names for', total)
     ctrl.setProgress(0, total)
     while (true) {
       const rows = await db.query(`
@@ -191,7 +190,7 @@ export default class DatabaseServiceCordova {
           params.push(r.id, 0, '', '', r.nameSearchable, '', '')
           return '(?, ?, ?, ?, ?, ?, ?)'
         }).join(', ')
-        const res = await db.query(
+        await db.query(
           `INSERT INTO respondent_name 
           (id, is_display_name, respondent_id, name, name_searchable, created_at, updated_at) 
           VALUES ${valuesSql}
@@ -199,13 +198,16 @@ export default class DatabaseServiceCordova {
           params,
         )
         insertCount += chunk.length
-        console.log('filled searchable names', insertCount, res)
+        console.log(`completed generating ${insertCount} of ${total} searchable names`)
         ctrl.setProgress(insertCount, total)
       }
     }
+    console.log('completed generating all searchable names')
+    ctrl.setProgress(total, total)
     await db.query(`
       create index if not exists idx__respondent_name__name_searchable on respondent_name (name_searchable);
     `)
+    console.log('created index on respondent_name.name_searchable')
   }
 
   async addGeneratedColumns (ctrl: Ctrl): Promise<void> {
