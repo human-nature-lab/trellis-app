@@ -217,4 +217,11 @@
         /*overflow: auto*/
         max-width: 95%
         /*height: auto*/
+
+  .decimal-question, .integer-question
+    .v-slider__tick-label
+      max-width: 110px
+      white-space: normal
+      overflow: visible
+  
 </style>
