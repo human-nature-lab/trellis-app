@@ -1,5 +1,6 @@
 import Translation from '../entities/trellis/Translation'
 import Locale from '../entities/trellis/Locale'
+import TranslationTextService from './translation-text/TranslationTextService'
 
 export default class TranslationService {
   /**
@@ -40,5 +41,12 @@ export default class TranslationService {
       }
     }
     return translated || '[No translation text exists for this resource]'
+  }
+
+  static async ensureTranslationText (translation: Translation) {
+    if (!translation.translationText) {
+      translation.translationText = await TranslationTextService.getTranslatedTextByTranslationId(translation.id)
+    }
+    return translation
   }
 }

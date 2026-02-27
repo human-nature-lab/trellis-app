@@ -56,15 +56,17 @@ export default class InterpolationService {
           }))
           break
         case QT.multiple_select:
-        case QT.multiple_choice:
+        case QT.multiple_choice: {
           const qc = question.choices.find(qc => qc.choiceId === datum.choiceId)
           if (qc) {
             const choice = qc.choice
-            promises.push(new Promise(resolve => {
-              resolve(TranslationService.getAny(choice.choiceTranslation, singleton.locale))
-            }))
+            promises.push((async () => {
+              await TranslationService.ensureTranslationText(choice.choiceTranslation)
+              return TranslationService.getAny(choice.choiceTranslation, singleton.locale)
+            })())
           }
           break
+        }
         default:
           promises.push(new Promise(resolve => resolve(datum.val)))
           break
@@ -101,7 +103,7 @@ export default class InterpolationService {
       const vals = await InterpolationService.getInterpolatedData(data, question)
       return vals.join(', ')
     } catch (err) {
-      let fill = interviewManager.getRespondentFillByVarName(varName)
+      const fill = interviewManager.getRespondentFillByVarName(varName)
       if (fill) {
         return fill
       } else {
