@@ -21,6 +21,10 @@ export const isTestStudy = computed(() => {
   return !!global.study && !global.study.testStudyId
 })
 
+export const locale = computed(() => {
+  return global.locale
+})
+
 export function useStudy () {
   return computed(() => {
     return global.study

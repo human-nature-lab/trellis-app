@@ -67,6 +67,10 @@ export class SurveyService implements SurveyServiceInterface {
   }
 
   async uncomplete (): Promise<Survey> {
-    throw new Error('not implemented')
+    throw new Error('not supported on mobile')
+  }
+
+  async transfer (surveyId: string, newRespondentId: string): Promise<{ success: boolean, message: string }> {
+    throw new Error('not supported on mobile')
   }
 }

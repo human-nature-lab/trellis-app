@@ -5,28 +5,57 @@ import TrellisModal from '../TrellisModal.vue'
 import { dirtyRef } from '@/hooks/dirtyRef'
 import Geo from '@/entities/trellis/Geo'
 import GeoBreadcrumbs from '@/components/geo/GeoBreadcrumbs.vue'
+import type { RespondentListDisplay } from './RespondentList.vue'
+import SingleButtonToggle from '../util/SingleButtonToggle.vue'
 
-const props = defineProps<{
+/** Geo entity, id string, or plain `{ id }` from serialized filters. */
+type GeoFilterEntry = Geo | string | { id: string }
+
+const props = withDefaults(defineProps<{
   conditionTags?: string[]
-  geos?: Geo[]
+  geos?: GeoFilterEntry[]
   includeChildren?: boolean
   showGeoFilterOptions?: boolean
   showPastResidents?: boolean
   canRemoveGeos?: boolean
-}>()
+  /** Display mode for `RespondentList`: cards, list, or dense rows. */
+  listDisplay?: RespondentListDisplay
+}>(), {
+  listDisplay: 'list',
+})
 
-const emit = defineEmits<{
-  (event: 'update:conditionTags', value: string[]): void
-  (event: 'update:includeChildren', value: boolean): void
-  (event: 'update:showPastResidents', value: boolean): void
-  (event: 'update:geos', value: Geo[]): void
-}>()
+type FiltersEmit = {
+  (e: 'update:conditionTags', value: string[]): void
+  (e: 'update:includeChildren', value: boolean): void
+  (e: 'update:showPastResidents', value: boolean): void
+  (e: 'update:geos', value: GeoFilterEntry[]): void
+  (e: 'update:listDisplay', value: RespondentListDisplay): void
+}
+const emit: FiltersEmit = defineEmits([
+  'update:conditionTags',
+  'update:includeChildren',
+  'update:showPastResidents',
+  'update:geos',
+  'update:listDisplay',
+])
+
+function onListDisplayChange (v: RespondentListDisplay) {
+  emit('update:listDisplay', v)
+}
+
+function geoEntryId (entry: GeoFilterEntry): string {
+  return typeof entry === 'string' ? entry : entry.id
+}
 
 const isOpen = ref(false)
 const conditionTags = dirtyRef(() => props.conditionTags, [])
 const includeChildren = dirtyRef(() => props.includeChildren, false)
 const showPastResidents = dirtyRef(() => props.showPastResidents, false)
-const geos = dirtyRef(() => props.geos.slice(), [])
+const geos = dirtyRef(() => (props.geos || []).slice(), [])
+
+function onConditionTagsInput (value: string[]) {
+  conditionTags.value = value
+}
 
 function removeGeoFilter (index: number) {
   geos.value.splice(index, 1)
@@ -66,20 +95,33 @@ const hasChanged = computed(() => {
 </script>
 
 <template>
-  <v-btn
-    icon
-    @click="isOpen = true"
-    class="ml-2"
-  >
-    <v-badge
-      :value="!!numAppliedFilters"
-      :content="numAppliedFilters"
-      color="accent"
+  <div class="respondent-search-filters d-flex align-center flex-shrink-0 ml-2">
+    <v-btn
+      icon
+      @click="isOpen = true"
     >
-      <v-icon>
-        mdi-filter-variant
-      </v-icon>
-    </v-badge>
+      <v-badge
+        :value="!!numAppliedFilters"
+        :content="numAppliedFilters"
+        color="accent"
+      >
+        <v-icon>
+          mdi-filter-variant
+        </v-icon>
+      </v-badge>
+    </v-btn>
+
+    <SingleButtonToggle
+      icon
+      class="ml-2"
+      :value="props.listDisplay"
+      @input="onListDisplayChange"
+      :options="[
+        { icon: 'mdi-view-grid', value: 'cards' },
+        { icon: 'mdi-view-list', value: 'list' },
+        { icon: 'mdi-format-list-bulleted', value: 'dense' },
+      ]"
+    />
 
     <TrellisModal
       :value="isOpen"
@@ -91,7 +133,10 @@ const hasChanged = computed(() => {
         v-if="isOpen"
         class="px-0"
       >
-        <ConditionTagAutocomplete v-model="conditionTags" />
+        <ConditionTagAutocomplete
+          :value="conditionTags"
+          @input="onConditionTagsInput"
+        />
       </v-col>
       <v-col
         v-if="geos && geos.length"
@@ -103,7 +148,7 @@ const hasChanged = computed(() => {
         <v-row class="no-gutters">
           <v-chip
             v-for="(geo, index) in geos"
-            :key="geo.id"
+            :key="geoEntryId(geo)"
             color="primary"
             outlined
             @click:close="removeGeoFilter(index)"
@@ -113,7 +158,7 @@ const hasChanged = computed(() => {
               <v-icon>mdi-home</v-icon>
             </v-avatar>
             <GeoBreadcrumbs
-              :geo-id="geo"
+              :geo-id="geoEntryId(geo)"
               :max-depth="2"
             />
           </v-chip>
@@ -154,9 +199,10 @@ const hasChanged = computed(() => {
         </v-btn>
       </v-row>
     </TrellisModal>
-  </v-btn>
+  </div>
 </template>
 
 <style lang="sass">
-
+.respondent-search-filters__layout
+  flex-shrink: 0
 </style>

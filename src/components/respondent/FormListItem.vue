@@ -141,6 +141,21 @@
                       </v-list-item-content>
                     </v-list-item>
                   </Permission>
+                  <Permission
+                    web-only
+                    :allowed-roles="['admin']"
+                  >
+                    <v-list-item
+                      @click="surveyIdToTransfer = survey.id"
+                      :disabled="disabled"
+                    >
+                      <v-list-item-content>
+                        <v-list-item-title>
+                          {{ $t('transfer_survey') }}
+                        </v-list-item-title>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </Permission>
                 </DotsMenu>
               </td>
             </tr>
@@ -148,11 +163,23 @@
         </v-simple-table>
       </v-flex>
     </v-row>
+    <TrellisModal
+      :value="!!surveyIdToTransfer"
+      @close="surveyIdToTransfer = null"
+    >
+      <TransferSurveyForm
+        :survey-id="surveyIdToTransfer"
+        @success="completeSurveyTransfer"
+        @error="alert('error', $t('transfer_survey_failed', [$event]))"
+      />
+    </TrellisModal>
   </v-col>
 </template>
 
 <script lang="ts">
 import AsyncTranslationText from '../AsyncTranslationText.vue'
+import TrellisModal from '../TrellisModal.vue'
+import TransferSurveyForm from './TransferSurveyForm.vue'
 
 import Vue, { PropOptions } from 'vue'
 import global from '../../static/singleton'
@@ -209,6 +236,7 @@ export default Vue.extend({
     return {
       global: global,
       isOpen: false,
+      surveyIdToTransfer: null,
       previousInterviewCoordinatesTolerance: 24 * 60 * 60 * 1000,
     }
   },
@@ -244,6 +272,10 @@ export default Vue.extend({
     },
   },
   methods: {
+    completeSurveyTransfer () {
+      this.surveyIdToTransfer = null
+      this.$emit('reload')
+    },
     getName (user) {
       return user ? user.name : this.$t('unknown_user')
     },
@@ -332,6 +364,8 @@ export default Vue.extend({
     Permission,
     FormattedDate,
     TimeDuration,
+    TrellisModal,
+    TransferSurveyForm,
   },
 })
 </script>

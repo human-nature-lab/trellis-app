@@ -54,6 +54,7 @@
         :loading="loading"
         :disabled="loading"
         @update:forms="rehydrate"
+        @reload="rehydrate"
         :respondent="respondent"
         :show-hidden="showHidden"
         :show-unpublished="showUnpublished"

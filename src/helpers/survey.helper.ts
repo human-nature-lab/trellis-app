@@ -5,6 +5,7 @@ import Form from '@/entities/trellis/Form'
 import Interview from '@/entities/trellis/Interview'
 import Survey from '@/entities/trellis/Survey'
 import InterviewDataInterface from '@/services/interview/InterviewDataInterface'
+import SurveyService from '@/services/survey'
 
 export function useSurveyData (source: WatchSource<Survey>) {
   const form = ref<Form>(null)
@@ -36,4 +37,26 @@ export function useSurveyData (source: WatchSource<Survey>) {
   }, { immediate: true })
 
   return { form, data, interview, loading, error }
+}
+
+export function useSurvey (surveyId: WatchSource<string>) {
+  const survey = ref<Survey>(null)
+  const loading = ref(false)
+  const error = ref(null)
+
+  watch(surveyId, async surveyId => {
+    loading.value = true
+    if (!surveyId) {
+      return
+    }
+    try {
+      survey.value = await SurveyService.getSurveyById(surveyId)
+    } catch (e) {
+      error.value = e
+    } finally {
+      loading.value = false
+    }
+  }, { immediate: true })
+
+  return { survey, loading, error }
 }

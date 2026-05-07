@@ -42,4 +42,9 @@ export default interface SurveyServiceInterface {
   complete (surveyId: string): Promise<Survey>
 
   uncomplete (surveyId: string): Promise<Survey>
+
+  /**
+   * Transfer a survey to a new respondent
+   */
+  transfer (surveyId: string, newRespondentId: string): Promise<{ success: boolean, message: string }>
 }

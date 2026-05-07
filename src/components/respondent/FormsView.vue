@@ -13,6 +13,7 @@
       :allow-multiple-surveys="allowMultipleSurveys"
       :can-create-surveys="canCreateSurveys"
       @survey="survey => updateSurvey(form, survey)"
+      @reload="$emit('reload')"
       @newInterview="$emit('newInterview', $event)"
       @view-report="survey => $emit('view-report', survey)"
     />
