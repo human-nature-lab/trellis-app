@@ -64,7 +64,6 @@ function getPhoto (r: Respondent) {
   return r && r.photos && r.photos.length ? r.photos[0] : null
 }
 
-
 function onSelect (r: Respondent) {
   emit('select', r)
 }
@@ -88,7 +87,6 @@ function onSelect (r: Respondent) {
   <div
     v-else-if="display === 'cards'"
     class="respondent-list respondent-list--cards respondent-list__scroll"
-    :style="scrollStyle"
   >
     <v-row
       no-gutters
@@ -129,6 +127,7 @@ function onSelect (r: Respondent) {
         <Photo
           v-if="getPhoto(r)"
           :photo="getPhoto(r)"
+          is-contained
         />
         <v-icon v-else>
           mdi-account
@@ -199,6 +198,22 @@ function onSelect (r: Respondent) {
 .respondent-list__avatar
   border-radius: 4px
   overflow: hidden
+  flex-shrink: 0
+  align-self: center
+  // Fill Vuetify avatar box; Photo uses v-flex — constrain child so image cannot spill past 64×64.
+  ::v-deep .photo
+    width: 100%
+    height: 100%
+    min-width: 0
+    min-height: 0
+    display: flex
+    align-items: center
+    justify-content: center
+  ::v-deep .photo img
+    object-fit: contain
+    width: 100%
+    height: 100%
+    display: block
 
 .respondent-list-empty
   width: 100%
