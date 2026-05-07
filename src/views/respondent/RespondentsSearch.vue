@@ -1,7 +1,7 @@
 <template>
-  <v-container
+  <div
     fluid
-    class="respondent-search d-flex flex-column fill-height pa-0"
+    class="respondent-search pa-0"
   >
     <div class="respondent-search__header pa-2">
       <v-row class="no-gutters align-center flex-nowrap">
@@ -66,11 +66,9 @@
     </div>
 
     <RespondentList
-      class="flex-grow-1"
       :display="listDisplay"
       :respondents="respondentResults"
       :selected="selected"
-      :height="listHeight"
       :forms-button-visible="formsButtonVisible"
       :info-button-visible="infoButtonVisible"
       :get-labels="getRespondentLabels"
@@ -110,7 +108,7 @@
         :associated-respondent-id="respondentId"
       />
     </TrellisModal>
-  </v-container>
+  </div>
 </template>
 
 <script>

@@ -160,6 +160,18 @@ export function useRespondentSearch (options: UseRespondentSearchOptions) {
   const debounceMs = options.debounceMs == null ? 1000 : options.debounceMs
   const debouncedLoad = debounceMs > 0 ? debounce(load, debounceMs) : load
 
+  // Watch only inputs that should trigger a new fetch. The API syncs `seed` and
+  // `total` onto the same pagination object after each response; a deep watch
+  // would refetch forever.
+  //
+  // Return a primitive from the getter: a fresh array each run compares unequal
+  // by reference and would retrigger every reactive flush (flash loop).
+  function paginationFetchKey (): string {
+    const p = readSource(options.pagination)
+    const maxPages = (p as RandomPagination & { maxPages?: number }).maxPages ?? 0
+    return `${p.page}:${p.size}:${maxPages}`
+  }
+
   const stops = [
     watch(options.query, () => {
       loading.value = true
@@ -167,7 +179,7 @@ export function useRespondentSearch (options: UseRespondentSearchOptions) {
     }),
     watch(options.studyId, load, { immediate: true }),
     watch(options.filters, load, { deep: true }),
-    watch(options.pagination, load, { deep: true }),
+    watch(paginationFetchKey, load),
   ]
   if (options.respondentId) {
     stops.push(watch(options.respondentId, load))

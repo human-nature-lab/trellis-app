@@ -64,15 +64,6 @@ function getPhoto (r: Respondent) {
   return r && r.photos && r.photos.length ? r.photos[0] : null
 }
 
-const scrollStyle = computed(() => {
-  const h = props.height
-  if (h === undefined || h === '') return {}
-  const px = typeof h === 'number' ? `${h}px` : String(h)
-  return {
-    maxHeight: px,
-    overflowY: 'auto' as const,
-  }
-})
 
 function onSelect (r: Respondent) {
   emit('select', r)
@@ -121,7 +112,6 @@ function onSelect (r: Respondent) {
     class="respondent-list respondent-list__scroll pa-0"
     :class="`respondent-list--${display}`"
     :dense="display === 'dense'"
-    :style="scrollStyle"
   >
     <v-list-item
       v-for="r in respondents"
