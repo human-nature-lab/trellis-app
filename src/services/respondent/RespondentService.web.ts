@@ -91,6 +91,11 @@ export class RespondentService implements RespondentServiceInterface {
     }
   }
 
+  // TODO: Needs a dedicated associated-only endpoint on the server before this can be implemented.
+  async getAssociatedSearchPage (studyId: string, respondentId: string, query: string, pagination?: RandomPagination): Promise<RandomPaginationResult<Respondent>> {
+    throw new Error('Not implemented')
+  }
+
   async addName (respondentId, name, isDisplayName = null, localeId = null): Promise<RespondentName> {
     const res = await http().post(uriTemplate('respondent/{}/name', [respondentId]), {
       name: name,

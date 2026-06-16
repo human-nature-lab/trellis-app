@@ -208,6 +208,10 @@ export class RespondentService implements RespondentServiceInterface {
           const respIdQuery = '%' + searchTerms[0].trim() + '%'
           qb.orWhere('r.id like :respIdQuery', { respIdQuery })
         }
+        // Conditionally show associated respondents when searching too
+        if (respondentId) {
+          qb.orWhere('r.associated_respondent_id = :respondentId', { respondentId })
+        }
       }))
     }
 
@@ -320,6 +324,80 @@ export class RespondentService implements RespondentServiceInterface {
       page: pagination.page,
       size: pagination.size,
       seed: seed,
+      total: total ?? 0,
+      data: respondents,
+    }
+  }
+
+  /**
+   * Get a page of respondents associated with respondentId (their associated_respondent_id points
+   * at it). This is the dedicated counterpart to getSearchPage for surfacing "associated"
+   * respondents on their own, without the geo/condition tag filtering getSearchPage applies. An
+   * optional query narrows the list by name (or id for a single term).
+   */
+  async getAssociatedSearchPage (studyId: string, respondentId: string, query: string, pagination?: RandomPagination): Promise<RandomPaginationResult<Respondent>> {
+    const seed = pagination.seed || randomIntBits(24)
+
+    const repository = await DatabaseService.getRepository(Respondent)
+    const queryBuilder = await repository.createQueryBuilder('respondent')
+
+    const limitQb = repository.createQueryBuilder('r')
+    limitQb.select('r.id')
+    limitQb.andWhere('r.deleted_at is null')
+    // Scope to the current study to match getSearchPage. Remove this line if associated
+    // respondents enrolled in other studies should also be returned.
+    limitQb.andWhere('r.id in (select respondent_id from study_respondent where study_id = :studyId)', { studyId })
+    limitQb.andWhere('r.associated_respondent_id = :respondentId', { respondentId })
+
+    // Optional query narrows the associated respondents by name (or id for a single term)
+    if (typeof query === 'string' && query.trim().length > 0) {
+      const searchTerms = query.split(' ')
+      limitQb.andWhere(new Brackets(qb => {
+        for (let i = 0; i < searchTerms.length; i++) {
+          const searchTerm = '% ' + searchTerms[i].trim() + '%'
+          const key = `spaceTerm${i}`
+          qb.andWhere(`r.id in (select respondent_id from respondent_name where name_searchable like :${key} and deleted_at is null)`, { [key]: searchTerm })
+        }
+        if (searchTerms.length === 1) {
+          const respIdQuery = '%' + searchTerms[0].trim() + '%'
+          qb.orWhere('r.id like :respIdQuery', { respIdQuery })
+        }
+      }))
+    }
+
+    let limitSql = limitQb.getQuery()
+    const limitParams = limitQb.getParameters()
+
+    // this version of typeorm is apparently creating invalid sql so we're adding a hack to fix it
+    if (limitSql.endsWith(' AND')) {
+      limitSql = limitSql.slice(0, -4)
+    }
+
+    // Stable ordering so pagination over the associated list is deterministic
+    limitSql += ' order by r.id'
+
+    let total = 0
+    try {
+      total = await limitQb.clone().select('distinct r.id').getCount()
+    } catch (error) {
+      console.error('failed to get associated total', error)
+    }
+    const offset = pagination.size * pagination.page
+    limitSql += ` limit ${pagination.size} offset ${offset}`
+
+    let q = queryBuilder.where(`respondent.id in (${limitSql})`, limitParams)
+    q = q.leftJoinAndSelect('respondent.photos', 'photo', 'respondent_photo.deleted_at is null and respondent_photo.sort_order = 0')
+    q = q.leftJoinAndSelect('respondent.names', 'respondent_name')
+    q = q.leftJoinAndSelect('respondent.geos', 'respondent_geo')
+    q = q.leftJoinAndSelect('respondent.respondentConditionTags', 'respondent_condition_tag')
+    q = q.leftJoinAndSelect('respondent_condition_tag.conditionTag', 'condition_tag')
+
+    const respondents = await q.getMany()
+    removeSoftDeleted(respondents)
+    return {
+      page: pagination.page,
+      size: pagination.size,
+      seed,
       total: total ?? 0,
       data: respondents,
     }

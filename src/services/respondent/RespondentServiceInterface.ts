@@ -7,13 +7,13 @@ import { RandomPagination, RandomPaginationResult } from '../../types/Pagination
 import PhotoWithPivotTable from '../../types/PhotoWithPivotTable'
 
 export interface SearchFilter {
-  looseMatching?: boolean      // Indicates that search terms will be loosely matched
-  conditionTags?: string[],    // Array of condition tag names to filter respondents by, logical AND
-  orConditionTags?: string[],  // Array of condition tag names to union respondents by, logical OR
-  geos?: string[]              // Array of geo ids
-  onlyCurrentGeo?: boolean     // Indicates that only current residents should be included
-  includeChildren?: boolean    // Indicates that nested respondents should be included
-  randomize?: boolean          // Indicates that the respondents results should be randomized TODO: Web
+  looseMatching?: boolean // Indicates that search terms will be loosely matched
+  conditionTags?: string[], // Array of condition tag names to filter respondents by, logical AND
+  orConditionTags?: string[], // Array of condition tag names to union respondents by, logical OR
+  geos?: string[] // Array of geo ids
+  onlyCurrentGeo?: boolean // Indicates that only current residents should be included
+  includeChildren?: boolean // Indicates that nested respondents should be included
+  randomize?: boolean // Indicates that the respondents results should be randomized TODO: Web
 }
 
 export interface EdgeDatum {
@@ -22,7 +22,6 @@ export interface EdgeDatum {
   target_respondent_id: string
   var_name: string
 }
-
 
 export default interface RespondentServiceInterface {
 
@@ -72,6 +71,17 @@ export default interface RespondentServiceInterface {
     pagination?: RandomPagination,
     respondentId?: string
   ): Promise<RandomPaginationResult<Respondent>>
+
+  /**
+   * Get a page of respondents associated with the given respondent (their associated_respondent_id
+   * points at respondentId). Optionally narrowed by a name/id query.
+   * @param {string} studyId
+   * @param {string} respondentId
+   * @param {string} query
+   * @param {RandomPagination} [pagination]
+   * @returns {Promise<RandomPaginationResult<Respondent>>}
+   */
+  getAssociatedSearchPage (studyId: string, respondentId: string, query: string, pagination?: RandomPagination): Promise<RandomPaginationResult<Respondent>>
 
   /**
    * Add a name to the respondent
@@ -193,7 +203,6 @@ export default interface RespondentServiceInterface {
    * @param studyId
    */
   importRespondentGeos (file: File, studyId: string): Promise<any>
-
 
   listEdges (respondentId: string): Promise<EdgeDatum[]>
 }

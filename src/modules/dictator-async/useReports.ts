@@ -20,16 +20,16 @@ export type ReportStatus = {
   savedAt: Date
 }
 
-export function useReports (formId: string, deviceId: string) {
+export function useReports(formId: string, deviceId: string) {
   const kv = new NamespaceStore(store, 'dictator' + formId + deviceId)
   const reports = ref<ReportStatus[]>()
   const loading = ref(false)
   const error = ref()
-  async function load () {
+  async function load() {
     try {
       loading.value = true
       const res = await kv.all()
-      const d = res.map(r => (JSON.parse(r.value) as ReportStatus))
+      const d = res.map((r) => JSON.parse(r.value) as ReportStatus)
       for (const r of d) {
         r.savedAt = new Date(r.savedAt)
       }
@@ -38,6 +38,8 @@ export function useReports (formId: string, deviceId: string) {
       })
       reports.value = d
     } catch (err) {
+      console.error('error loading reports')
+      console.error(err)
       error.value = err
     } finally {
       loading.value = false
@@ -45,7 +47,7 @@ export function useReports (formId: string, deviceId: string) {
   }
   load()
 
-  async function pushReport (report: Report) {
+  async function pushReport(report: Report) {
     try {
       loading.value = true
       const savedAt = new Date()

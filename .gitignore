@@ -48,3 +48,4 @@ components.d.ts
 *.key
 logcat.log
 log.txt
+.zed
