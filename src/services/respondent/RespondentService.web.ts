@@ -91,9 +91,22 @@ export class RespondentService implements RespondentServiceInterface {
     }
   }
 
-  // TODO: Needs a dedicated associated-only endpoint on the server before this can be implemented.
   async getAssociatedSearchPage (studyId: string, respondentId: string, query: string, pagination?: RandomPagination): Promise<RandomPaginationResult<Respondent>> {
-    throw new Error('Not implemented')
+    const params = {
+      q: query,
+      page: pagination.page,
+      size: pagination.size,
+      seed: pagination.seed,
+      associated_respondent_id: respondentId,
+    }
+    const res = await http().get(uriTemplate('study/{studyId}/respondents/associated/search', [studyId]), { params })
+    return {
+      page: res.data.page,
+      size: res.data.size,
+      total: res.data.total,
+      seed: res.data.seed,
+      data: res.data.data.map(r => new Respondent().fromSnakeJSON(r)),
+    }
   }
 
   async addName (respondentId, name, isDisplayName = null, localeId = null): Promise<RespondentName> {

@@ -13,6 +13,9 @@ const props = defineProps<{
   showGeoFilterOptions?: boolean
   showPastResidents?: boolean
   canRemoveGeos?: boolean
+  associatedOnly?: boolean
+  showAssociatedOption?: boolean
+  associatedDisabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -20,6 +23,7 @@ const emit = defineEmits<{
   (event: 'update:includeChildren', value: boolean): void
   (event: 'update:showPastResidents', value: boolean): void
   (event: 'update:geos', value: Geo[]): void
+  (event: 'update:associatedOnly', value: boolean): void
 }>()
 
 const isOpen = ref(false)
@@ -27,6 +31,7 @@ const conditionTags = dirtyRef(() => props.conditionTags, [])
 const includeChildren = dirtyRef(() => props.includeChildren, false)
 const showPastResidents = dirtyRef(() => props.showPastResidents, false)
 const geos = dirtyRef(() => props.geos.slice(), [])
+const associatedOnly = dirtyRef(() => props.associatedOnly, false)
 
 function removeGeoFilter (index: number) {
   geos.value.splice(index, 1)
@@ -45,6 +50,9 @@ function save () {
   if (geos.isDirty) {
     emit('update:geos', geos.value)
   }
+  if (associatedOnly.isDirty) {
+    emit('update:associatedOnly', associatedOnly.value)
+  }
   isOpen.value = false
 }
 
@@ -54,14 +62,19 @@ function cancel () {
   includeChildren.reset()
   showPastResidents.reset()
   geos.reset()
+  associatedOnly.reset()
 }
 
 const numAppliedFilters = computed(() => {
+  // When showing associated only, the geo/tag filters don't apply, so surface it as the one filter
+  if (associatedOnly.value) {
+    return 1
+  }
   return conditionTags.value.length + (geos.value ? geos.value.length : 0)
 })
 
 const hasChanged = computed(() => {
-  return conditionTags.isDirty || includeChildren.isDirty || showPastResidents.isDirty || geos.isDirty
+  return conditionTags.isDirty || includeChildren.isDirty || showPastResidents.isDirty || geos.isDirty || associatedOnly.isDirty
 })
 </script>
 
@@ -87,56 +100,69 @@ const hasChanged = computed(() => {
       max-width="800"
       :title="$t('filter_respondents')"
     >
-      <v-col
-        v-if="isOpen"
-        class="px-0"
-      >
-        <ConditionTagAutocomplete v-model="conditionTags" />
-      </v-col>
-      <v-col
-        v-if="geos && geos.length"
-        class="align-center pa-0 mb-2"
-      >
-        <v-col class="subheading pa-0 mb-2">
-          {{ $t("locations") }}
+      <template v-if="showAssociatedOption">
+        <v-switch
+          v-model="associatedOnly"
+          :label="$t('associated_only')"
+          :disabled="associatedDisabled"
+          :messages="associatedDisabled ? $t('associated_unavailable_web') : ''"
+          hide-details="auto"
+          class="mt-0 mb-2"
+        />
+        <v-divider class="mb-2" />
+      </template>
+      <div :class="{ 'filters-disabled': associatedOnly }">
+        <v-col
+          v-if="isOpen"
+          class="px-0"
+        >
+          <ConditionTagAutocomplete v-model="conditionTags" />
         </v-col>
-        <v-row class="no-gutters">
-          <v-chip
-            v-for="(geo, index) in geos"
-            :key="geo.id"
-            color="primary"
-            outlined
-            @click:close="removeGeoFilter(index)"
-            :close="props.canRemoveGeos"
-          >
-            <v-avatar>
-              <v-icon>mdi-home</v-icon>
-            </v-avatar>
-            <GeoBreadcrumbs
-              :geo-id="geo"
-              :max-depth="2"
+        <v-col
+          v-if="geos && geos.length"
+          class="align-center pa-0 mb-2"
+        >
+          <v-col class="subheading pa-0 mb-2">
+            {{ $t("locations") }}
+          </v-col>
+          <v-row class="no-gutters">
+            <v-chip
+              v-for="(geo, index) in geos"
+              :key="geo.id"
+              color="primary"
+              outlined
+              @click:close="removeGeoFilter(index)"
+              :close="props.canRemoveGeos"
+            >
+              <v-avatar>
+                <v-icon>mdi-home</v-icon>
+              </v-avatar>
+              <GeoBreadcrumbs
+                :geo-id="geo"
+                :max-depth="2"
+              />
+            </v-chip>
+          </v-row>
+        </v-col>
+        <v-divider v-if="showGeoFilterOptions" />
+        <v-row
+          v-if="props.showGeoFilterOptions"
+          class="no-gutters"
+        >
+          <v-col>
+            <v-switch
+              v-model="includeChildren"
+              :label="$t('include_child_locations')"
             />
-          </v-chip>
+          </v-col>
+          <v-col>
+            <v-switch
+              v-model="showPastResidents"
+              :label="$t('show_past_residents')"
+            />
+          </v-col>
         </v-row>
-      </v-col>
-      <v-divider v-if="showGeoFilterOptions" />
-      <v-row
-        v-if="props.showGeoFilterOptions"
-        class="no-gutters"
-      >
-        <v-col>
-          <v-switch
-            v-model="includeChildren"
-            :label="$t('include_child_locations')"
-          />
-        </v-col>
-        <v-col>
-          <v-switch
-            v-model="showPastResidents"
-            :label="$t('show_past_residents')"
-          />
-        </v-col>
-      </v-row>
+      </div>
       <v-row class="no-gutters mt-4">
         <v-spacer />
         <v-btn
@@ -158,5 +184,7 @@ const hasChanged = computed(() => {
 </template>
 
 <style lang="sass">
-
+.filters-disabled
+  opacity: 0.5
+  pointer-events: none
 </style>

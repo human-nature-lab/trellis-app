@@ -356,7 +356,7 @@ export class RespondentService implements RespondentServiceInterface {
         for (let i = 0; i < searchTerms.length; i++) {
           const searchTerm = '% ' + searchTerms[i].trim() + '%'
           const key = `spaceTerm${i}`
-          qb.andWhere(`r.id in (select respondent_id from respondent_name where name_searchable like :${key} and deleted_at is null)`, { [key]: searchTerm })
+          qb.andWhere(`r.id in (select respondent_id from respondent_name where " " || name_searchable like :${key} and deleted_at is null)`, { [key]: searchTerm })
         }
         if (searchTerms.length === 1) {
           const respIdQuery = '%' + searchTerms[0].trim() + '%'

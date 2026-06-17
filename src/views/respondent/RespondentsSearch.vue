@@ -28,6 +28,9 @@
               :geos="filters.geos"
               @update:geos="filters.geos = $event"
               :can-remove-geos="canRemoveGeos"
+              :show-associated-option="showAssociatedOption"
+              :associated-only="mode === 'associated'"
+              @update:associatedOnly="mode = $event ? 'associated' : 'all'"
             />
             <v-btn
               v-if="canSelect"
@@ -277,7 +280,6 @@ export default {
   data () {
     return {
       global: singleton,
-      results: [],
       query: '',
       filters: Object.assign({
         conditionTags: [],
@@ -289,12 +291,10 @@ export default {
       isLoading: false,
       showAssociatedRespondentDialog: false,
       filtersIsOpen: false,
-      pagination: {
-        page: 0,
-        seed: null,
-        size: 20,
-        maxPages: 0,
-        total: 0,
+      mode: 'all',
+      panes: {
+        all: this.newPane(),
+        associated: this.newPane(),
       },
     }
   },
@@ -322,9 +322,26 @@ export default {
       if (this.shouldUpdateRoute) {
         updateRoute(this)
       }
-      this.pagination.page = 0
-      this.pagination.maxPages = 0
+      this.activePane.pagination.page = 0
+      this.activePane.pagination.maxPages = 0
+      // The other tab's cached results are now stale; refresh them next time it's opened
+      this.invalidateOtherPanes()
       return this.getCurrentPage()
+    },
+    invalidateOtherPanes () {
+      for (const key in this.panes) {
+        if (key !== this.mode) {
+          this.panes[key].loaded = false
+        }
+      }
+    },
+    newPane () {
+      return {
+        results: [],
+        loaded: false,
+        lastQuery: null,
+        pagination: { page: 0, seed: null, size: 20, maxPages: 0, total: 0 },
+      }
     },
     toggleAll () {
       let changing = []
@@ -341,21 +358,27 @@ export default {
       }
     },
     async updateCurrentPage (pageVal) {
-      this.pagination.page = pageVal - 1
+      const pane = this.activePane
+      pane.pagination.page = pageVal - 1
       await this.getCurrentPage()
-      if (this.results.length === this.pagination.size && this.pagination.page > this.pagination.maxPages) {
-        this.pagination.maxPages = this.pagination.page
+      if (pane.results.length === pane.pagination.size && pane.pagination.page > pane.pagination.maxPages) {
+        pane.pagination.maxPages = pane.pagination.page
       }
     },
     async getCurrentPage () {
       const study = this.global.study
+      const pane = this.activePane
       this.isLoading = true
       PhotoService.cancelAllOutstanding()
       try {
-        const page = await RespondentService.getSearchPage(study.id, this.query, this.filters, this.pagination, this.respondentId)
-        this.pagination.seed = page.seed
-        this.results = page.data
-        this.pagination.total = page.total
+        const page = this.mode === 'associated'
+          ? await RespondentService.getAssociatedSearchPage(study.id, this.respondentId, this.query, pane.pagination)
+          : await RespondentService.getSearchPage(study.id, this.query, this.filters, pane.pagination, this.respondentId)
+        pane.pagination.seed = page.seed
+        pane.results = page.data
+        pane.pagination.total = page.total
+        pane.loaded = true
+        pane.lastQuery = this.query
       } catch (err) {
         if (this.isNotAuthError(err)) {
           this.logError(err)
@@ -396,8 +419,10 @@ export default {
     addRespondentClose (respondent) {
       // TODO: Maybe add this to cache (if there is one)
       if (!this.query.length) {
-        this.results.push(respondent)
+        this.activePane.results.push(respondent)
       }
+      // A newly added respondent may belong in the other tab too; refresh it on next open
+      this.invalidateOtherPanes()
       this.showAssociatedRespondentDialog = false
     },
     getRespondentName (respondent) {
@@ -432,17 +457,36 @@ export default {
       },
       deep: true,
     },
+    mode () {
+      // Lazy-load the newly active tab the first time it's shown, or when the query changed while
+      // it was inactive. Cached results are reused otherwise, so nothing runs until first switch.
+      const pane = this.activePane
+      if (!pane.loaded || pane.lastQuery !== this.query) {
+        pane.pagination.page = 0
+        pane.pagination.maxPages = 0
+        this.getCurrentPage()
+      }
+    },
   },
   computed: {
     studyId () {
       return this.global.study.id
+    },
+    activePane () {
+      return this.panes[this.mode]
+    },
+    pagination () {
+      return this.activePane.pagination
+    },
+    showAssociatedOption () {
+      return !!this.respondentId
     },
     selected () {
       const selected = this.selectedRespondents.concat(this.added)
       return selected.filter(r => r && this.removed.findIndex((removed) => removed.id === r.id) === -1)
     },
     respondentResults () {
-      return orderBy(this.results, ['score'], ['desc'])
+      return orderBy(this.activePane.results, ['score'], ['desc'])
     },
     showLabels () {
       return this.filters.geos.length > 0
