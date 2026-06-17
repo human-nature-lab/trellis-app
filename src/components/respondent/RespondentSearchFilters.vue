@@ -15,7 +15,6 @@ const props = defineProps<{
   canRemoveGeos?: boolean
   associatedOnly?: boolean
   showAssociatedOption?: boolean
-  associatedDisabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -104,8 +103,6 @@ const hasChanged = computed(() => {
         <v-switch
           v-model="associatedOnly"
           :label="$t('associated_only')"
-          :disabled="associatedDisabled"
-          :messages="associatedDisabled ? $t('associated_unavailable_web') : ''"
           hide-details="auto"
           class="mt-0 mb-2"
         />
