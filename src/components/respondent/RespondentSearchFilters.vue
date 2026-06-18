@@ -13,8 +13,6 @@ const props = defineProps<{
   showGeoFilterOptions?: boolean
   showPastResidents?: boolean
   canRemoveGeos?: boolean
-  associatedOnly?: boolean
-  showAssociatedOption?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -22,7 +20,6 @@ const emit = defineEmits<{
   (event: 'update:includeChildren', value: boolean): void
   (event: 'update:showPastResidents', value: boolean): void
   (event: 'update:geos', value: Geo[]): void
-  (event: 'update:associatedOnly', value: boolean): void
 }>()
 
 const isOpen = ref(false)
@@ -30,7 +27,6 @@ const conditionTags = dirtyRef(() => props.conditionTags, [])
 const includeChildren = dirtyRef(() => props.includeChildren, false)
 const showPastResidents = dirtyRef(() => props.showPastResidents, false)
 const geos = dirtyRef(() => props.geos.slice(), [])
-const associatedOnly = dirtyRef(() => props.associatedOnly, false)
 
 function removeGeoFilter (index: number) {
   geos.value.splice(index, 1)
@@ -49,9 +45,6 @@ function save () {
   if (geos.isDirty) {
     emit('update:geos', geos.value)
   }
-  if (associatedOnly.isDirty) {
-    emit('update:associatedOnly', associatedOnly.value)
-  }
   isOpen.value = false
 }
 
@@ -61,19 +54,14 @@ function cancel () {
   includeChildren.reset()
   showPastResidents.reset()
   geos.reset()
-  associatedOnly.reset()
 }
 
 const numAppliedFilters = computed(() => {
-  // When showing associated only, the geo/tag filters don't apply, so surface it as the one filter
-  if (associatedOnly.value) {
-    return 1
-  }
   return conditionTags.value.length + (geos.value ? geos.value.length : 0)
 })
 
 const hasChanged = computed(() => {
-  return conditionTags.isDirty || includeChildren.isDirty || showPastResidents.isDirty || geos.isDirty || associatedOnly.isDirty
+  return conditionTags.isDirty || includeChildren.isDirty || showPastResidents.isDirty || geos.isDirty
 })
 </script>
 
@@ -99,16 +87,7 @@ const hasChanged = computed(() => {
       max-width="800"
       :title="$t('filter_respondents')"
     >
-      <template v-if="showAssociatedOption">
-        <v-switch
-          v-model="associatedOnly"
-          :label="$t('associated_only')"
-          hide-details="auto"
-          class="mt-0 mb-2"
-        />
-        <v-divider class="mb-2" />
-      </template>
-      <div :class="{ 'filters-disabled': associatedOnly }">
+      <div>
         <v-col
           v-if="isOpen"
           class="px-0"
@@ -179,9 +158,3 @@ const hasChanged = computed(() => {
     </TrellisModal>
   </v-btn>
 </template>
-
-<style lang="sass">
-.filters-disabled
-  opacity: 0.5
-  pointer-events: none
-</style>

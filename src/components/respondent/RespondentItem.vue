@@ -43,6 +43,12 @@ const photo = computed(() => {
   return props.respondent && props.respondent.photos && props.respondent.photos.length ? props.respondent.photos[0] : null
 })
 
+// A respondent linked to the current one (the respondent question type) carries an
+// associatedRespondentId; flag it so the list shows which results are "other" respondents.
+const isAssociated = computed(() => {
+  return !!(props.respondent && props.respondent.associatedRespondentId)
+})
+
 const displayConditionTags = computed(() => {
   if (!props.respondent.respondentConditionTags) {
     return []
@@ -70,11 +76,21 @@ const displayConditionTags = computed(() => {
       tile
       :class="{selected: selected === true, respondent: true, 'ma-1': true}"
     >
-      <Photo
-        class="respondent-photo"
-        @click.capture.stop.prevent="onClick"
-        :photo="photo"
-      />
+      <div class="respondent-photo-wrapper">
+        <Photo
+          class="respondent-photo"
+          @click.capture.stop.prevent="onClick"
+          :photo="photo"
+        />
+        <v-icon
+          v-if="isAssociated"
+          color="primary"
+          class="associated-badge"
+          :title="$t('other_respondent')"
+        >
+          mdi-link-variant
+        </v-icon>
+      </div>
       <v-card-actions class="respondent-name">
         <v-col class="pa-0">
           <v-row
@@ -158,4 +174,13 @@ const displayConditionTags = computed(() => {
         max-width: 100%
         max-height: 100%
         pointer-events: none
+    .respondent-photo-wrapper
+      position: relative
+    .associated-badge
+      position: absolute
+      top: 4px
+      right: 4px
+      background-color: rgba(255, 255, 255, 0.85)
+      border-radius: 50%
+      padding: 2px
 </style>

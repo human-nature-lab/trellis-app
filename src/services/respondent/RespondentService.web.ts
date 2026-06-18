@@ -54,14 +54,13 @@ export class RespondentService implements RespondentServiceInterface {
     return res.data.respondents.map(r => new Respondent().fromSnakeJSON(r))
   }
 
-  async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null): Promise<RandomPaginationResult<Respondent>> {
+  async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination): Promise<RandomPaginationResult<Respondent>> {
     // TODO: Add is_current filter
     const params = {
       q: query,
       page: pagination.page,
       size: pagination.size,
       seed: pagination.seed,
-      associated_respondent_id: respondentId,
     }
     if (filters.conditionTags) {
       params.c = filters.conditionTags.join(',')

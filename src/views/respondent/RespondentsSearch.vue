@@ -28,9 +28,6 @@
               :geos="filters.geos"
               @update:geos="filters.geos = $event"
               :can-remove-geos="canRemoveGeos"
-              :show-associated-option="showAssociatedOption"
-              :associated-only="mode === 'associated'"
-              @update:associatedOnly="mode = $event ? 'associated' : 'all'"
             />
             <v-btn
               v-if="canSelect"
@@ -102,7 +99,7 @@
               :length="pagination.maxPages + 2"
               :value="pagination.page + 1"
               total-visible="7"
-              :disabled="isLoading || (pagination.page === 0 && respondentResults.length !== pagination.size)"
+              :disabled="isLoading || (pagination.page === 0 && normalCount !== pagination.size)"
               @input="updateCurrentPage"
             />
           </v-col>
@@ -291,11 +288,11 @@ export default {
       isLoading: false,
       showAssociatedRespondentDialog: false,
       filtersIsOpen: false,
-      mode: 'all',
-      panes: {
-        all: this.newPane(),
-        associated: this.newPane(),
-      },
+      results: [],
+      // Number of results returned by the normal (top-level) search on the last fetch. Drives
+      // pagination since the appended associated results would otherwise skew the page-full check.
+      normalCount: 0,
+      pagination: { page: 0, seed: null, size: 20, maxPages: 0, total: 0 },
     }
   },
   created () {
@@ -322,26 +319,9 @@ export default {
       if (this.shouldUpdateRoute) {
         updateRoute(this)
       }
-      this.activePane.pagination.page = 0
-      this.activePane.pagination.maxPages = 0
-      // The other tab's cached results are now stale; refresh them next time it's opened
-      this.invalidateOtherPanes()
+      this.pagination.page = 0
+      this.pagination.maxPages = 0
       return this.getCurrentPage()
-    },
-    invalidateOtherPanes () {
-      for (const key in this.panes) {
-        if (key !== this.mode) {
-          this.panes[key].loaded = false
-        }
-      }
-    },
-    newPane () {
-      return {
-        results: [],
-        loaded: false,
-        lastQuery: null,
-        pagination: { page: 0, seed: null, size: 20, maxPages: 0, total: 0 },
-      }
     },
     toggleAll () {
       let changing = []
@@ -358,27 +338,29 @@ export default {
       }
     },
     async updateCurrentPage (pageVal) {
-      const pane = this.activePane
-      pane.pagination.page = pageVal - 1
+      this.pagination.page = pageVal - 1
       await this.getCurrentPage()
-      if (pane.results.length === pane.pagination.size && pane.pagination.page > pane.pagination.maxPages) {
-        pane.pagination.maxPages = pane.pagination.page
+      if (this.normalCount === this.pagination.size && this.pagination.page > this.pagination.maxPages) {
+        this.pagination.maxPages = this.pagination.page
       }
     },
     async getCurrentPage () {
       const study = this.global.study
-      const pane = this.activePane
       this.isLoading = true
       PhotoService.cancelAllOutstanding()
       try {
-        const page = this.mode === 'associated'
-          ? await RespondentService.getAssociatedSearchPage(study.id, this.respondentId, this.query, pane.pagination)
-          : await RespondentService.getSearchPage(study.id, this.query, this.filters, pane.pagination, this.respondentId)
-        pane.pagination.seed = page.seed
-        pane.results = page.data
-        pane.pagination.total = page.total
-        pane.loaded = true
-        pane.lastQuery = this.query
+        // In the respondent question type (respondentId set) the respondent's "other" respondents
+        // are surfaced alongside the normal results. Everywhere else only the normal search runs.
+        const requests = [RespondentService.getSearchPage(study.id, this.query, this.filters, this.pagination)]
+        if (this.respondentId) {
+          requests.push(RespondentService.getAssociatedSearchPage(study.id, this.respondentId, this.query, this.pagination))
+        }
+        const [normal, associated] = await Promise.all(requests)
+        this.normalCount = normal.data.length
+        this.pagination.seed = normal.seed
+        this.pagination.total = normal.total + (associated ? associated.total : 0)
+        // Show the associated ("other") respondents ahead of the normal results so they stay visible
+        this.results = (associated ? associated.data : []).concat(normal.data)
       } catch (err) {
         if (this.isNotAuthError(err)) {
           this.logError(err)
@@ -419,10 +401,8 @@ export default {
     addRespondentClose (respondent) {
       // TODO: Maybe add this to cache (if there is one)
       if (!this.query.length) {
-        this.activePane.results.push(respondent)
+        this.results.push(respondent)
       }
-      // A newly added respondent may belong in the other tab too; refresh it on next open
-      this.invalidateOtherPanes()
       this.showAssociatedRespondentDialog = false
     },
     getRespondentName (respondent) {
@@ -430,17 +410,19 @@ export default {
       return rName ? rName.name : this.respondent.name
     },
     getRespondentLabels (respondent) {
-      if (!this.showLabels) return []
+      // The "other respondent" indicator now lives on the card itself (RespondentItem badge).
       const labels = []
-      // let isPastResident = true
-      // for (let geo of respondent.geos) {
-      //   if (geo.isCurrent && this.filters.geos.indexOf(geo.geoId) > -1) {
-      //     isPastResident = false
-      //     break
+      // if (this.showLabels) {
+      //   let isPastResident = true
+      //   for (let geo of respondent.geos) {
+      //     if (geo.isCurrent && this.filters.geos.indexOf(geo.geoId) > -1) {
+      //       isPastResident = false
+      //       break
+      //     }
       //   }
-      // }
-      // if (isPastResident) {
-      //   labels.push(this.$t('past_resident'))
+      //   if (isPastResident) {
+      //     labels.push(this.$t('past_resident'))
+      //   }
       // }
       return labels
     },
@@ -457,36 +439,17 @@ export default {
       },
       deep: true,
     },
-    mode () {
-      // Lazy-load the newly active tab the first time it's shown, or when the query changed while
-      // it was inactive. Cached results are reused otherwise, so nothing runs until first switch.
-      const pane = this.activePane
-      if (!pane.loaded || pane.lastQuery !== this.query) {
-        pane.pagination.page = 0
-        pane.pagination.maxPages = 0
-        this.getCurrentPage()
-      }
-    },
   },
   computed: {
     studyId () {
       return this.global.study.id
-    },
-    activePane () {
-      return this.panes[this.mode]
-    },
-    pagination () {
-      return this.activePane.pagination
-    },
-    showAssociatedOption () {
-      return !!this.respondentId
     },
     selected () {
       const selected = this.selectedRespondents.concat(this.added)
       return selected.filter(r => r && this.removed.findIndex((removed) => removed.id === r.id) === -1)
     },
     respondentResults () {
-      return orderBy(this.activePane.results, ['score'], ['desc'])
+      return orderBy(this.results, ['score'], ['desc'])
     },
     showLabels () {
       return this.filters.geos.length > 0

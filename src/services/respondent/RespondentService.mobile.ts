@@ -183,7 +183,7 @@ export class RespondentService implements RespondentServiceInterface {
     return this.maxGeoLevel[studyId]
   }
 
-  async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination, respondentId = null): Promise<RandomPaginationResult<Respondent>> {
+  async getSearchPage (studyId: string, query: string, filters: SearchFilter, pagination: RandomPagination): Promise<RandomPaginationResult<Respondent>> {
     const repository = await DatabaseService.getRepository(Respondent)
     const queryBuilder = await repository.createQueryBuilder('respondent')
 
@@ -191,6 +191,8 @@ export class RespondentService implements RespondentServiceInterface {
     limitQb.select('r.id')
     limitQb.andWhere('r.deleted_at is null')
     limitQb.andWhere('r.id in (select respondent_id from study_respondent where study_id = :studyId)', { studyId })
+    // Associated respondents are excluded from the normal flow; they're surfaced via getAssociatedSearchPage
+    limitQb.andWhere('r.associated_respondent_id is null')
 
     // Query string broken into words
     if (typeof query === 'string' && query.trim().length > 0) {
@@ -207,10 +209,6 @@ export class RespondentService implements RespondentServiceInterface {
         if (searchTerms.length === 1) {
           const respIdQuery = '%' + searchTerms[0].trim() + '%'
           qb.orWhere('r.id like :respIdQuery', { respIdQuery })
-        }
-        // Conditionally show associated respondents when searching too
-        if (respondentId) {
-          qb.orWhere('r.associated_respondent_id = :respondentId', { respondentId })
         }
       }))
     }
@@ -278,9 +276,6 @@ export class RespondentService implements RespondentServiceInterface {
           )`,
           { orConditionTags: filters.orConditionTags },
         )
-      }
-      if (respondentId) {
-        qb.orWhere('r.associated_respondent_id = :respondentId', { respondentId })
       }
     }))
 

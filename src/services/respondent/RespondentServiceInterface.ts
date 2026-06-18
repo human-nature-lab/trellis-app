@@ -61,15 +61,13 @@ export default interface RespondentServiceInterface {
    * @param {SearchFilter} filters
    * @param {number} page
    * @param {number} size
-   * @param respondentId
    * @returns {Promise<Respondent[]>}
    */
   getSearchPage (
     studyId: string,
     query: string,
     filters: SearchFilter,
-    pagination?: RandomPagination,
-    respondentId?: string
+    pagination?: RandomPagination
   ): Promise<RandomPaginationResult<Respondent>>
 
   /**
